@@ -1,13 +1,13 @@
 ---
 id: deploy-docs-vercel-en
-title: Deploy docs to Vercel at /docs
+title: Deploy docs to Vercel reliably
 ---
 
-When Next.js and Docusaurus share one Vercel project, `/docs/*` can return 404. Put docs in a separate project. Add rewrites so the app project forwards `/docs/*` to the docs project.
+When Next.js and Docusaurus share one Vercel project, routing conflicts can cause 404s. Put docs in a separate project. Add rewrites only when you need `/docs/*` on the app domain.
 
 ## Goals
 
-- Keep the public URL as `https://<app-domain>/docs/...`.
+- Use `https://<docs-domain>/` as the default, and keep `https://<app-domain>/docs/...` only when needed.
 - The docs project builds and serves the Docusaurus site.
 - Build/CI should fail on 404 or broken links.
 
@@ -17,31 +17,29 @@ When Next.js and Docusaurus share one Vercel project, `/docs/*` can return 404. 
 2. Build Command: `npm run build`; Output Directory: `build`.
 3. Add env vars:
    - `DOCS_SITE_URL=https://<docs-domain>` (e.g., `https://river-reviewer-docs.vercel.app`)
-   - `DOCS_BASE_URL=/docs/`
-   - `DOCS_ROUTE_BASE_PATH=/`
-4. Redirect root to `/docs/` (configured in `vercel.json`):
+   - `DOCS_BASE_URL=/` (optional; default is `/`)
+   - `DOCS_ROUTE_BASE_PATH=/` (optional; default is `/`)
+4. If you want `/docs/` to redirect to root, keep `vercel.json` as below:
 
 ```json
 {
   "trailingSlash": true,
-  "redirects": [
-    { "source": "/", "destination": "/docs/", "permanent": true },
-    { "source": "/docs", "destination": "/docs/", "permanent": true }
-  ]
+  "redirects": [{ "source": "/docs/", "destination": "/", "permanent": true }]
 }
 ```
 
-If you omit `DOCS_BASE_URL`, the build targets GitHub Pages at `/river-reviewer/docs/` as before.
+If you want `/docs/` as the base path, set `DOCS_BASE_URL=/docs/` and update redirects to point `/` -> `/docs/`.
+If you omit `DOCS_BASE_URL`, the build targets GitHub Pages at `/river-reviewer/` as before.
 
 ## App project (e.g., `<app-domain>` / `river-reviewer.vercel.app`)
 
-Add rewrites in the app `vercel.json` to forward `/docs/*` to the docs domain:
+Add rewrites in the app `vercel.json` to forward `/docs/*` to the docs domain (docs served at `/`):
 
 ```json
 {
   "rewrites": [
-    { "source": "/docs", "destination": "https://<docs-domain>/docs/" },
-    { "source": "/docs/:path*", "destination": "https://<docs-domain>/docs/:path*" }
+    { "source": "/docs", "destination": "https://<docs-domain>/" },
+    { "source": "/docs/:path*", "destination": "https://<docs-domain>/:path*" }
   ]
 }
 ```
@@ -49,5 +47,5 @@ Add rewrites in the app `vercel.json` to forward `/docs/*` to the docs domain:
 ## Quality gates
 
 - `onBrokenLinks` and `onBrokenMarkdownLinks` are set to `throw`, so broken internal links fail the build.
-- `npm run build` (optionally with `DOCS_BASE_URL=/docs/ DOCS_ROUTE_BASE_PATH=/`) verifies local `/docs/` output.
+- `npm run build` (optionally with `DOCS_BASE_URL=/docs/ DOCS_ROUTE_BASE_PATH=/`) verifies the chosen output path locally.
 - The link checker workflow blocks PRs when external links break.
