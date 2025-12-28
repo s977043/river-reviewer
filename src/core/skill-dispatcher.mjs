@@ -5,6 +5,20 @@ import { loadSkills } from '../lib/skill-loader.mjs'; // Added
 import { AIClientFactory } from '../ai/factory.mjs';
 import { buildSystemPrompt } from '../prompts/buildSystemPrompt.mjs';
 
+const MODEL_HINT_TO_NAME = {
+  cheap: 'gpt-4o-mini',
+  balanced: 'gpt-4o',
+  'high-accuracy': 'gpt-4o',
+};
+
+function resolveModelName(skill) {
+  if (skill.model) return skill.model;
+  if (skill.modelHint && MODEL_HINT_TO_NAME[skill.modelHint]) {
+    return MODEL_HINT_TO_NAME[skill.modelHint];
+  }
+  return MODEL_HINT_TO_NAME.balanced;
+}
+
 function shouldExclude(filePath, patterns = []) {
   return patterns.some(pattern => minimatch(filePath, pattern, { dot: true }));
 }
@@ -21,6 +35,7 @@ export class SkillDispatcher {
 
     let skills = (config.skills || []).map(skill => ({
       ...skill,
+      phase: skill.phase ?? skill.trigger?.phase,
       files: skill.files ?? skill.applyTo ?? [],
     }));
     if (skills.length === 0) {
@@ -57,18 +72,15 @@ export class SkillDispatcher {
         skill =>
           !skill.phase || skill.phase === phase || (Array.isArray(skill.phase) && skill.phase.includes(phase)),
       );
-      const excluded = phaseMatched.filter(skill =>
-        (skill.exclude ?? []).some(pattern => minimatch(file, pattern, { dot: true })),
-      );
-      const applicableSkills = skills.filter(
-        skill =>
-          (skill.files || []).some(pattern => minimatch(file, pattern, { dot: true })) &&
-          (!skill.phase || skill.phase === phase || (Array.isArray(skill.phase) && skill.phase.includes(phase))) &&
-          !(skill.exclude ?? []).some(pattern => minimatch(file, pattern, { dot: true })),
+      const applicableSkills = phaseMatched.filter(
+        skill => !(skill.exclude ?? []).some(pattern => minimatch(file, pattern, { dot: true })),
       );
 
       if (applicableSkills.length === 0) {
         if (debug) {
+          const excluded = phaseMatched.filter(skill =>
+            (skill.exclude ?? []).some(pattern => minimatch(file, pattern, { dot: true })),
+          );
           console.log(
             `Skipping ${file}: matched files ${fileMatched.length}/${skills.length}, phase ok ${phaseMatched.length}/${fileMatched.length}, excluded ${excluded.length}.`,
           );
@@ -83,13 +95,7 @@ export class SkillDispatcher {
 
       const skillPromises = applicableSkills.map(async (skill) => {
         try {
-          // Determine model: explicit model > modelHint map > default
-          let modelName = skill.model;
-          if (!modelName && skill.modelHint) {
-             modelName = skill.modelHint === 'cheap' ? 'gpt-4o-mini' : 'gpt-4o';
-          }
-          if (!modelName) modelName = 'gpt-4o'; // Default
-
+          const modelName = resolveModelName(skill);
           const systemPrompt = buildSystemPrompt(skill, language);
 
           if (debug) {

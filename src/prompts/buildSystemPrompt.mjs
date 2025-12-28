@@ -8,19 +8,25 @@ export const buildSystemPrompt = (skill, language = 'en') => {
     content = skill.rules
       .map(
         (rule) => `
-### Rule: ${rule.id} (${rule.severity.toUpperCase()})
-- **Description**: ${rule.description}
-- **Context**: ${rule.context}
+### Rule: ${rule.id ?? ''} (${String(rule.severity ?? '').toUpperCase()})
+- **Description**: ${rule.description ?? ''}
+- **Context**: ${rule.context ?? ''}
 - **Patterns**: ${rule.patterns ? rule.patterns.join(', ') : ''}
 - **Anti-Patterns**:
 ${rule.anti_patterns ? rule.anti_patterns.map((p) => `\`\`\`\n${p}\n\`\`\``).join('\n') : ''}
-- **Fix Guidance**: ${rule.fix_guidance}
+- **Fix Guidance**: ${rule.fix_guidance ?? ''}
 `
       )
       .join('\n');
   }
 
-  const name = skill.name || skill.metadata?.name || 'River Reviewer';
+  if (!content || !content.trim()) {
+    content = isJa
+      ? '（このスキルには具体的なルールや本文が定義されていません。一般的なコードレビューのベストプラクティスに基づき、セキュリティ、可読性、保守性、性能の観点から重大な問題に集中してレビューしてください。）'
+      : '(No specific rules or body were defined for this skill. Perform a general, best-practice code review focusing on security, readability, maintainability, and performance, and only report materially important issues.)';
+  }
+
+  const name = skill.name || 'River Reviewer';
 
   if (isJa) {
     return `
