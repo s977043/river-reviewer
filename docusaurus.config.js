@@ -1,29 +1,33 @@
 /** @type {import('@docusaurus/types').Config} */
+const organizationName = 's977043';
+const projectName = 'river-reviewer';
 const isVercel = Boolean(process.env.VERCEL);
 const normalizeSiteUrl = (url) => url.replace(/\/+$/, '');
 const ensureLeadingAndTrailingSlash = (value) => {
   const withLeading = value.startsWith('/') ? value : `/${value}`;
   return withLeading.endsWith('/') ? withLeading : `${withLeading}/`;
 };
+const resolveBaseUrl = () => process.env.DOCS_BASE_URL || (isVercel ? '/' : '/river-reviewer/');
+const resolveSiteUrl = () => {
+  if (process.env.DOCS_SITE_URL) return process.env.DOCS_SITE_URL;
+  if (isVercel) {
+    if (process.env.VERCEL_ENV === 'production') return 'https://river-reviewer.vercel.app';
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+    return 'https://river-reviewer.vercel.app';
+  }
+  return 'https://s977043.github.io';
+};
 
-const siteUrl = normalizeSiteUrl(
-  process.env.DOCS_SITE_URL ||
-    (isVercel && process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'https://s977043.github.io')
-);
-const baseUrl = ensureLeadingAndTrailingSlash(
-  process.env.DOCS_BASE_URL ? process.env.DOCS_BASE_URL : isVercel ? '/docs/' : '/river-reviewer/'
-);
-const docsRouteBasePath =
-  process.env.DOCS_ROUTE_BASE_PATH ?? (baseUrl.endsWith('/docs/') ? '/' : 'docs');
+const siteUrl = normalizeSiteUrl(resolveSiteUrl());
+const baseUrl = ensureLeadingAndTrailingSlash(resolveBaseUrl());
+const docsRouteBasePath = process.env.DOCS_ROUTE_BASE_PATH ?? '/';
 
 module.exports = {
   title: 'River Reviewer',
   url: siteUrl,
   baseUrl: baseUrl,
-  organizationName: 's977043',
-  projectName: 'river-reviewer',
+  organizationName,
+  projectName,
   trailingSlash: true,
   i18n: { defaultLocale: 'ja', locales: ['ja'] },
   themes: ['@docusaurus/theme-mermaid'],
@@ -35,6 +39,7 @@ module.exports = {
           path: 'pages',
           routeBasePath: docsRouteBasePath,
           sidebarPath: require.resolve('./sidebars.js'),
+          editUrl: `https://github.com/${organizationName}/${projectName}/tree/main/`,
         },
         theme: { customCss: require.resolve('./src/css/custom.css') },
         sitemap: { changefreq: 'weekly', priority: 0.5 },
@@ -44,7 +49,7 @@ module.exports = {
   themeConfig: {
     navbar: {
       title: 'River Reviewer',
-      items: [{ type: 'doc', docId: 'index', label: 'Docs', position: 'left' }],
+      items: [],
     },
     footer: {
       style: 'dark',

@@ -1,6 +1,10 @@
+---
+id: continuity
+---
+
 Goal (success criteria included):
 
-- PR #204 の最新内容と行コメントを再確認し、必要な追加対応の有無を判断した上でセルフレビューする。
+- PR #204 のレビュー指摘（baseUrl 設定重複の解消、Diátaxis リマインド対応）を反映し、セルフレビュー後プッシュする。
 
 Constraints / Assumptions:
 
@@ -9,7 +13,7 @@ Constraints / Assumptions:
 
 Key decisions:
 
-- docs ルーティング設定の単一ソース化を継続（config の計算結果を共有して重複を排除）。
+- docs ルーティング設定の単一ソース化を行う（config の計算結果を共有して重複を排除）。
 
 State:
 Done:
@@ -19,10 +23,9 @@ Done:
 - docsRouteBasePath を customFields で公開し、ホームリダイレクトで共有利用するよう重複を解消。
 - PR 本文に Diátaxis (Guide/How-to) を明記し、テスト・lint・build を再実行。
   Now:
-- 最新のリポジトリ状態と行コメント有無を確認し、追加の修正や追試が必要か洗い出す。
-- npm test / npm run lint を最新状態で再実行済み（pass）。
+- コメント返信内容をまとめて報告する。
   Next:
-- 追加のレビューフィードバックがあれば対応する。
+- 追加のレビューフィードバックが来た場合に対応する。
 
 Open questions:
 
@@ -30,4 +33,4 @@ Open questions:
 
 Working set (files / ids / commands):
 
-- CONTINUITY.md; PR #204（Improve docs routing and link quality gates）
+- docs/maintainers/continuity.md; PR #204（Improve docs routing and link quality gates）
