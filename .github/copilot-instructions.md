@@ -14,6 +14,7 @@ Always search `skills/` before starting a task. Use both English and Japanese ke
 - Prompts: `/skill`, `/review` (in `.github/prompts/`)
 - Reviews: Use `coding-review-checklist.md` as baseline rubric
 - Docs: Japanese is source of truth; English translations use `.en.md` suffix
+- Reviews and review comments must be written in Japanese.
 
 ## Quick reference (from AGENTS.md)
 
