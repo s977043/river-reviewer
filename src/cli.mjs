@@ -367,7 +367,13 @@ async function main() {
       };
 
       console.log(`River Reviewer (Skills) - Target: ${targetPath}`);
-      const results = await dispatcher.run(repoDiff.changedFiles, getFileDiff);
+      const results = await dispatcher.run(
+        repoDiff.changedFiles,
+        getFileDiff,
+        parsed.phase,
+        parsed.dryRun,
+        parsed.debug,
+      );
       
       if (parsed.output === 'markdown') {
         console.log(`## Review Results\n`);
