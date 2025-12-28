@@ -325,6 +325,7 @@ River Reviewer は、品質と再現性を保つための標準レビューポ�
 ## ドキュメント設計
 
 River Reviewer の技術ドキュメントは、[Diátaxis ドキュメントフレームワーク](https://diataxis.fr/) に基づいて構成しています。日本語がデフォルト言語で、英語版は `.en.md` 拡張子の別ファイルとして管理します（差分がある場合は日本語版を優先）。
+公開ドキュメントの正（Single Source of Truth）は `pages/` で、`docs/` は内部資料のみに限定します。詳細は `DOCUMENTATION.md` を参照してください。
 
 ドキュメントは次の 4 種類に分類されます。
 
@@ -361,8 +362,8 @@ River Reviewer の技術ドキュメントは、[Diátaxis ドキュメントフ
 
 ガイドラインは `CONTRIBUTING.md` を参照してください。Issue や PR を歓迎します。
 
-- コミット概要（日本語）: `docs/contributing/commit-summary.ja.md`
-- レビューチェックリスト: `docs/contributing/review-checklist.md`
+- コミット概要（日本語）: `pages/contributing/commit-summary.md`
+- レビューチェックリスト: `pages/contributing/review-checklist.md`
 
 ## ライセンス
 
