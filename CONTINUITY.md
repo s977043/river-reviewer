@@ -1,34 +1,33 @@
 Goal (success criteria included):
 
-- Address review feedback on config loader changes by resolving inline comments, keeping config loading robust and documented.
+- PR #204 の最新内容と行コメントを再確認し、必要な追加対応の有無を判断した上でセルフレビューする。
 
 Constraints / Assumptions:
 
-- Follow repository AGENTS.md guidelines (run npm test and npm run lint before commit/PR).
-- Work in Japanese for communication per user request.
-- Maintain ledger updates before/after significant steps.
+- レポジトリの AGENTS.md ルールに従う（npm test / npm run lint 実施）。
+- Ledger を主要イベント前後で更新する。
 
 Key decisions:
 
-- Use existing ConfigLoader/schema structure; adjust behavior per review comments once identified.
+- docs ルーティング設定の単一ソース化を継続（config の計算結果を共有して重複を排除）。
 
 State:
 Done:
 
-- Enforced object-only top-level parsing for config files and improved ConfigLoaderError options handling.
-- Added tests for .yml support and non-object configuration rejection.
-- Updated README to note object-only config requirement.
-- Ran npm test and npm run lint successfully.
+- 直近のドキュメントルーティング改善はコミット済み（PR #204 参照）。
+- PR #204 の CI は全成功。Diátaxis リマインドと Gemini から baseUrl 重複指摘あり。
+- docsRouteBasePath を customFields で公開し、ホームリダイレクトで共有利用するよう重複を解消。
+- PR 本文に Diátaxis (Guide/How-to) を明記し、テスト・lint・build を再実行。
   Now:
-- Prepare commit and PR message summarizing fixes.
+- 最新のリポジトリ状態と行コメント有無を確認し、追加の修正や追試が必要か洗い出す。
+- npm test / npm run lint を最新状態で再実行済み（pass）。
   Next:
-- Commit changes and generate PR message via make_pr.
+- 追加のレビューフィードバックがあれば対応する。
 
 Open questions:
 
-- Specific inline comments are not visible in context; adjustments made to improve robustness and coverage accordingly.
+- アプリ側（Next.js 側）の rewrite 適用状況は別リポジトリ管理のため不明（UNCONFIRMED）。
 
 Working set (files / ids / commands):
 
-- CONTINUITY.md, src/config/loader.mjs, src/config/default.mjs, src/config/schema.mjs, tests/config-loader.test.mjs, README.md, package.json, package-lock.json
-- Commands executed: npm test; npm run lint
+- CONTINUITY.md; PR #204（Improve docs routing and link quality gates）
