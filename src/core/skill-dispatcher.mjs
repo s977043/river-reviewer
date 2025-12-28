@@ -1,5 +1,7 @@
+import path from 'node:path'; // Added for path.join
 import { minimatch } from 'minimatch';
 import { loadConfig } from '../config/loader.mjs';
+import { loadSkills } from '../lib/skill-loader.mjs'; // Added
 import { AIClientFactory } from '../ai/factory.mjs';
 import { buildSystemPrompt } from '../prompts/buildSystemPrompt.mjs';
 
@@ -12,15 +14,29 @@ export class SkillDispatcher {
     this.repoRoot = repoRoot;
   }
 
-  async run(changedFiles, getFileDiff) {
+  async run(changedFiles, getFileDiff, phase = 'midstream', dryRun = false, debug = false) {
     const config = await loadConfig(this.repoRoot);
     const results = [];
+    const language = config.review?.language || 'en';
 
-    const skills = config.skills || [];
-    console.log(`Loaded ${skills.length} skills from config.`);
+    let skills = (config.skills || []).map(skill => ({
+      ...skill,
+      files: skill.files ?? skill.applyTo ?? [],
+    }));
+    if (skills.length === 0) {
+      // Fallback: load skills from local directory if not in config
+      console.log('Loading skills from local directory...');
+      const loaded = await loadSkills({ skillsDir: path.join(this.repoRoot, 'skills') });
+      skills = loaded.map(s => ({
+        ...s.metadata,
+        body: s.body, // Include body for prompt generation
+        files: s.metadata.files || s.metadata.applyTo || [], // Normalize files
+      }));
+    }
+    console.log(`Loaded ${skills.length} skills. Filtering by phase: ${phase}`);
 
     if (skills.length === 0) {
-      console.log('No skills configured. Please add skills to your configuration file (or check if you are using the legacy config format).');
+      console.log('No skills configured or found in skills/ directory.');
       return results;
     }
 
@@ -34,13 +50,31 @@ export class SkillDispatcher {
 
     for (const file of reviewFiles) {
       // 1. Identify applicable skills for this file
+      const fileMatched = skills.filter(skill =>
+        (skill.files || []).some(pattern => minimatch(file, pattern, { dot: true })),
+      );
+      const phaseMatched = fileMatched.filter(
+        skill =>
+          !skill.phase || skill.phase === phase || (Array.isArray(skill.phase) && skill.phase.includes(phase)),
+      );
+      const excluded = phaseMatched.filter(skill =>
+        (skill.exclude ?? []).some(pattern => minimatch(file, pattern, { dot: true })),
+      );
       const applicableSkills = skills.filter(
         skill =>
-          skill.files.some(pattern => minimatch(file, pattern, { dot: true })) &&
+          (skill.files || []).some(pattern => minimatch(file, pattern, { dot: true })) &&
+          (!skill.phase || skill.phase === phase || (Array.isArray(skill.phase) && skill.phase.includes(phase))) &&
           !(skill.exclude ?? []).some(pattern => minimatch(file, pattern, { dot: true })),
       );
 
-      if (applicableSkills.length === 0) continue;
+      if (applicableSkills.length === 0) {
+        if (debug) {
+          console.log(
+            `Skipping ${file}: matched files ${fileMatched.length}/${skills.length}, phase ok ${phaseMatched.length}/${fileMatched.length}, excluded ${excluded.length}.`,
+          );
+        }
+        continue;
+      }
 
       console.log(`Analyzing ${file} with skills: ${applicableSkills.map(s => s.name).join(', ')}`);
 
@@ -49,10 +83,30 @@ export class SkillDispatcher {
 
       const skillPromises = applicableSkills.map(async (skill) => {
         try {
-          const client = AIClientFactory.create({ modelName: skill.model, temperature: skill.temperature });
-          const systemPrompt = buildSystemPrompt(skill);
+          // Determine model: explicit model > modelHint map > default
+          let modelName = skill.model;
+          if (!modelName && skill.modelHint) {
+             modelName = skill.modelHint === 'cheap' ? 'gpt-4o-mini' : 'gpt-4o';
+          }
+          if (!modelName) modelName = 'gpt-4o'; // Default
 
-          console.log(`  -> Invoking ${skill.model} for skill "${skill.name}"...`);
+          const systemPrompt = buildSystemPrompt(skill, language);
+
+          if (debug) {
+            console.log(`\n--- System Prompt Debug (${skill.name}) ---\n${systemPrompt}\n-----------------------------------\n`);
+          }
+
+          if (dryRun) {
+             console.log(`  -> Invoking (dry-run) ${modelName} for skill "${skill.name}"...`);
+             return {
+               file,
+               skill: skill.name,
+               review: `(dry-run) Skipped LLM call for skill: ${skill.name}`,
+             };
+          }
+
+          const client = AIClientFactory.create({ modelName, temperature: skill.temperature ?? 0 });
+          console.log(`  -> Invoking ${modelName} for skill "${skill.name}"...`);
           const review = await client.generateReview(systemPrompt, diff);
 
           return {
@@ -74,7 +128,7 @@ export class SkillDispatcher {
       const fileResults = await Promise.all(skillPromises);
       results.push(...fileResults);
     }
-
     return results;
   }
+
 }
