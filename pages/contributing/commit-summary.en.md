@@ -9,7 +9,7 @@ Summary of the fixes implemented in this PR.
 **Commit**: ac1b26b
 
 - CONTRIBUTING.md: Fixed typos in legacy brand names.
-- docs/contributing/review-checklist.md: Fixed 11 typos.
+- pages/contributing/review-checklist.md: Fixed 11 typos.
   - Corrected terminology for evidence, function limits, guidelines, branching, high-order functions, tracking, mechanisms, validation, and vulnerability.
 
 ### 2. Created Vale Directory and Simplified CODEOWNERS
