@@ -3,7 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { GitError, GitRepoNotFoundError, ensureGitRepo, detectDefaultBranch, findMergeBase } from './lib/git.mjs';
 import { doctorLocalReview, planLocalReview, runLocalReview } from './lib/local-runner.mjs';
-import { SkillLoaderError } from './lib/skill-loader.mjs';
+import { SkillLoaderError } from '../runners/core/skill-loader.mjs';
 import { collectRepoDiff } from './lib/diff.mjs';
 import { renderDiffText } from './lib/diff-optimizer.mjs';
 import CostEstimator from './core/cost-estimator.mjs';

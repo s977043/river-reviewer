@@ -1,8 +1,8 @@
-import { rankByModelHint } from './review-runner.mjs';
+import { rankByModelHint } from '../../runners/core/review-runner.mjs';
 
 /**
  * Summarize a skill's metadata for LLM consumption.
- * @param {import('./review-runner.mjs').SkillDefinition|import('./review-runner.mjs').SkillMetadata} skill
+ * @param {import('../../runners/core/review-runner.mjs').SkillDefinition|import('../../runners/core/review-runner.mjs').SkillMetadata} skill
  */
 export function summarizeSkill(skill) {
   const meta = skill?.metadata ?? skill;

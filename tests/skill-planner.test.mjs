@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { loadSkills } from '../src/lib/skill-loader.mjs';
+import { loadSkills } from '../runners/core/skill-loader.mjs';
 import { planSkills, summarizeSkill } from '../src/lib/skill-planner.mjs';
 
 const mockContext = {

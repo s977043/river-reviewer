@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseUnifiedDiff } from './diff.mjs';
-import { loadSkills } from './skill-loader.mjs';
-import { buildExecutionPlan } from './review-runner.mjs';
+import { loadSkills } from '../../runners/core/skill-loader.mjs';
+import { buildExecutionPlan } from '../../runners/core/review-runner.mjs';
 
 function getMeta(skill) {
   return skill?.metadata ?? skill;
