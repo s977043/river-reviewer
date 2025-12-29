@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0  # Required for git diff
+          fetch-depth: 0 # Required for git diff
 
       - name: Run River Reviewer
         uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
@@ -39,12 +39,12 @@ This runs all `midstream` skills on changed files and posts findings as PR comme
 
 River Reviewer organizes skills by SDLC phase:
 
-| Phase | Focus | When to Run | Example Skills |
-|-------|-------|-------------|----------------|
-| **upstream** | Design & Architecture | On ADR changes, design docs | Architecture patterns, API design |
-| **midstream** | Implementation | On source code changes | Code quality, security, observability |
-| **downstream** | Testing & QA | On test file changes | Coverage gaps, test quality |
-| **all** | Cross-cutting | Always | Documentation, commit message quality |
+| Phase          | Focus                 | When to Run                 | Example Skills                        |
+| -------------- | --------------------- | --------------------------- | ------------------------------------- |
+| **upstream**   | Design & Architecture | On ADR changes, design docs | Architecture patterns, API design     |
+| **midstream**  | Implementation        | On source code changes      | Code quality, security, observability |
+| **downstream** | Testing & QA          | On test file changes        | Coverage gaps, test quality           |
+| **all**        | Cross-cutting         | Always                      | Documentation, commit message quality |
 
 ### Phase-Specific Workflows
 
@@ -129,13 +129,13 @@ jobs:
 
 ## Action Inputs
 
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `phase` | No | `all` | SDLC phase: `upstream`, `midstream`, `downstream`, or `all` |
-| `skills-dir` | No | `skills` | Path to skills directory |
-| `base-ref` | No | Auto-detected | Base branch for diff (usually `main`) |
-| `head-ref` | No | Auto-detected | Head branch for diff (PR branch) |
-| `output-format` | No | `pr-comment` | Output format: `pr-comment`, `json`, `markdown` |
+| Input           | Required | Default       | Description                                                 |
+| --------------- | -------- | ------------- | ----------------------------------------------------------- |
+| `phase`         | No       | `all`         | SDLC phase: `upstream`, `midstream`, `downstream`, or `all` |
+| `skills-dir`    | No       | `skills`      | Path to skills directory                                    |
+| `base-ref`      | No       | Auto-detected | Base branch for diff (usually `main`)                       |
+| `head-ref`      | No       | Auto-detected | Head branch for diff (PR branch)                            |
+| `output-format` | No       | `pr-comment`  | Output format: `pr-comment`, `json`, `markdown`             |
 
 ### Example: Custom Skills Directory
 
@@ -143,7 +143,7 @@ jobs:
 - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
   with:
     phase: midstream
-    skills-dir: custom-skills  # Use custom skill location
+    skills-dir: custom-skills # Use custom skill location
 ```
 
 ### Example: JSON Output
@@ -168,20 +168,23 @@ jobs:
 River Reviewer supports multiple LLM providers. Configure via environment variables:
 
 **OpenAI (Recommended):**
+
 ```yaml
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  OPENAI_MODEL: gpt-4o  # Optional, defaults to gpt-4o
+  OPENAI_MODEL: gpt-4o # Optional, defaults to gpt-4o
 ```
 
 **Anthropic:**
+
 ```yaml
 env:
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-  ANTHROPIC_MODEL: claude-3-5-sonnet-20241022  # Optional
+  ANTHROPIC_MODEL: claude-3-5-sonnet-20241022 # Optional
 ```
 
 **Azure OpenAI:**
+
 ```yaml
 env:
   AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
@@ -270,8 +273,8 @@ jobs:
           phase: midstream
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          MAX_FILES_PER_SKILL: 10  # Limit files processed
-          MAX_SKILLS_PER_RUN: 5    # Limit skills executed
+          MAX_FILES_PER_SKILL: 10 # Limit files processed
+          MAX_SKILLS_PER_RUN: 5 # Limit skills executed
 ```
 
 ### Approval Required Before Running
@@ -343,8 +346,7 @@ Findings posted as review comments on changed lines:
 
 ```markdown
 **Finding:** SQL injection vulnerability
-**Evidence:** Line 15: `db.query(\`SELECT * FROM users WHERE id = ${id}\`)`
-**Fix:** Use parameterized queries: `db.query('SELECT * FROM users WHERE id = ?', [id])`
+**Evidence:** Line 15: `db.query(\`SELECT _ FROM users WHERE id = ${id}\`)`**Fix:** Use parameterized queries:`db.query('SELECT _ FROM users WHERE id = ?', [id])`
 **Severity:** major
 ```
 
@@ -381,6 +383,7 @@ Formatted report for artifacts:
 # Code Review Report
 
 ## Summary
+
 - **Total Findings:** 3
 - **Critical:** 0
 - **Major:** 1
@@ -401,6 +404,7 @@ Line 15: ...
 **Cause:** No skills match the phase or file patterns.
 
 **Solution:**
+
 1. Check `phase` input matches skill metadata
 2. Verify file patterns in skill's `applyTo` field
 3. Ensure changed files match skill patterns
@@ -410,6 +414,7 @@ Line 15: ...
 **Cause:** LLM provider API key not set.
 
 **Solution:**
+
 1. Add API key to repository secrets
 2. Reference in workflow: `${{ secrets.OPENAI_API_KEY }}`
 3. Verify secret name matches environment variable
@@ -419,6 +424,7 @@ Line 15: ...
 **Cause:** Too many API requests.
 
 **Solution:**
+
 1. Use `MAX_FILES_PER_SKILL` to limit processing
 2. Add delays between skill executions
 3. Use `modelHint: cheap` for lightweight skills
@@ -429,10 +435,11 @@ Line 15: ...
 **Cause:** `fetch-depth: 0` not set in checkout.
 
 **Solution:**
+
 ```yaml
 - uses: actions/checkout@v6
   with:
-    fetch-depth: 0  # Required for git diff
+    fetch-depth: 0 # Required for git diff
 ```
 
 ## Best Practices

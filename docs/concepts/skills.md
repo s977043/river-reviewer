@@ -475,7 +475,7 @@ Evaluation answers:
 
 ### Evaluation Strategies
 
-**1. Exact Match (Strict)**
+#### 1. Exact Match (Strict)
 
 ```yaml
 assert:
@@ -485,7 +485,7 @@ assert:
 
 Use for: Specific technical terms, required phrases
 
-**2. Similarity (Flexible)**
+#### 2. Similarity (Flexible)
 
 ```yaml
 assert:
@@ -496,7 +496,7 @@ assert:
 
 Use for: Natural language outputs, variable phrasing
 
-**3. LLM-as-Judge (Rubric)**
+#### 3. LLM-as-Judge (Rubric)
 
 ```yaml
 assert:
