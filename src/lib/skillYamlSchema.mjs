@@ -1,6 +1,6 @@
 /**
  * Skill YAML Schema
- * Based on specs/skill-yaml-spec.md
+ * Based on pages/reference/skill-metadata.md
  */
 
 import { z } from 'zod';
@@ -36,7 +36,10 @@ const DependencyEnum = z.enum([
   'tracing',
 ]);
 
-const DependencySchema = z.union([DependencyEnum, z.string().startsWith('custom:')]);
+const DependencySchema = z.union([
+  DependencyEnum,
+  z.string().regex(/^custom:.+/, 'Custom dependency must be in format "custom:name"'),
+]);
 
 // Prompt reference
 const PromptSchema = z.object({
@@ -72,29 +75,22 @@ export const SkillYamlSchema = z
     applyTo: z.array(z.string().min(1)).optional().describe('File patterns (glob)'),
     trigger: TriggerSchema.optional().describe('Alternative trigger format'),
 
-    // Optional fields
-    tags: z.array(z.string()).default([]).describe('Classification tags'),
-    severity: SeverityEnum.default('minor').describe('Severity level of findings'),
-    inputContext: z
-      .array(InputContextEnum)
-      .default(['diff'])
-      .describe('Input context references'),
+    // Optional fields (per spec: pages/reference/skill-metadata.md)
+    tags: z.array(z.string()).optional().describe('Classification tags'),
+    severity: SeverityEnum.optional().describe('Severity level of findings'),
+    inputContext: z.array(InputContextEnum).optional().describe('Input context references'),
     outputKind: z
       .array(OutputKindEnum)
-      .default(['findings', 'summary'])
+      .default(['findings'])
       .describe('Output types'),
-    modelHint: ModelHintEnum.default('balanced').describe('Recommended model type'),
-    dependencies: z.array(DependencySchema).default([]).describe('Feature dependencies'),
+    modelHint: ModelHintEnum.optional().describe('Recommended model type'),
+    dependencies: z.array(DependencySchema).optional().describe('Feature dependencies'),
 
-    // Implementation references
+    // Implementation references (optional, commonly used but not in spec)
     prompt: PromptSchema.optional().describe('Prompt file references'),
-
-    // Evaluation settings
     eval: EvalSchema.optional().describe('Evaluation configuration'),
-
-    // Test data
-    fixturesDir: z.string().default('fixtures').describe('Fixtures directory path'),
-    goldenDir: z.string().default('golden').describe('Golden directory path'),
+    fixturesDir: z.string().optional().describe('Fixtures directory path'),
+    goldenDir: z.string().optional().describe('Golden directory path'),
   })
   .refine(
     (data) => {

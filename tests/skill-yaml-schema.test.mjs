@@ -14,15 +14,10 @@ test('validates a minimal valid skill.yaml', () => {
 
   const result = SkillYamlSchema.safeParse(validSkill);
   assert.ok(result.success, 'Should validate minimal valid skill');
-  assert.strictEqual(result.data.severity, 'minor', 'Should apply default severity');
-  assert.deepStrictEqual(
-    result.data.inputContext,
-    ['diff'],
-    'Should apply default inputContext'
-  );
+  // Only outputKind has default value per spec
   assert.deepStrictEqual(
     result.data.outputKind,
-    ['findings', 'summary'],
+    ['findings'],
     'Should apply default outputKind'
   );
 });
@@ -195,4 +190,19 @@ test('rejects skill with invalid dependency', () => {
 
   const result = SkillYamlSchema.safeParse(invalidSkill);
   assert.ok(!result.success, 'Should reject skill with invalid dependency');
+});
+
+test('rejects skill with empty custom dependency', () => {
+  const invalidSkill = {
+    id: 'rr-empty-custom-dep-001',
+    version: '0.1.0',
+    name: 'Empty Custom Dependency Skill',
+    description: 'A skill with empty custom dependency',
+    phase: 'midstream',
+    applyTo: ['src/**/*.ts'],
+    dependencies: ['custom:'], // empty custom dependency name
+  };
+
+  const result = SkillYamlSchema.safeParse(invalidSkill);
+  assert.ok(!result.success, 'Should reject skill with empty custom dependency name');
 });
