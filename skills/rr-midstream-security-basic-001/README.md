@@ -1,0 +1,91 @@
+# Baseline Security Checks
+
+セキュリティレビューの基本的なチェックを行うスキルです。
+
+## 概要
+
+このスキルは、コードの差分（diff）を分析し、一般的なセキュリティ脆弱性を検出します：
+
+- **SQLインジェクション**: 文字列連結によるクエリ構築
+- **XSS (Cross-Site Scripting)**: 未サニタイズの HTML 出力
+- **秘密情報の漏洩**: ハードコードされた API キーやパスワード
+- **入力バリデーション**: 外部入力の検証不足
+- **認証・認可**: アクセス制御の欠如
+
+## 使用方法
+
+### 対象ファイル
+
+以下のパターンにマッチするファイルが対象：
+
+```globtext
+**/{api,routes,db,ui,components,auth,security,config}/**/*.{ts,tsx,js,jsx}
+```
+
+### 実行
+
+```bash
+# バリデーション
+npm run validate:skill-yaml
+
+# promptfoo での評価（設定完了後）
+cd skills/rr-midstream-security-basic-001
+npx promptfoo eval
+```
+
+## 出力例
+
+```text
+**Finding:** SQL injection vulnerability in user lookup query
+**Evidence:** Line 42: `db.query(\`SELECT * FROM users WHERE id = ${userId}\`)`
+**Impact:** Attacker could execute arbitrary SQL commands
+**Fix:** Use parameterized queries: `db.query('SELECT * FROM users WHERE id = ?', [userId])`
+**Severity:** major
+**Confidence:** high
+```
+
+## テストケース
+
+### Happy Path (fixtures/01-sql-injection-happy.md)
+
+安全なコード例：
+
+- パラメータ化されたクエリ
+- 適切なサニタイゼーション
+- 環境変数からの秘密情報読み込み
+
+### Edge Case (fixtures/02-false-positive-test.md)
+
+偽陽性を避けるケース：
+
+- テストファイル内のダミー値
+- 環境変数参照
+- 短い文字列定数
+
+## 設計判断
+
+### なぜ midstream?
+
+コード実装時のレビューとして最も効果的。upstream では具体的なコードがなく、downstream では修正コストが高い。
+
+### なぜ major severity?
+
+セキュリティ脆弱性は本番環境での事故に直結するため、高優先度で対応すべき。
+
+### なぜ code_search dependency?
+
+コンテキスト検索により、周辺コードの認証・認可実装を参照し、より正確な判断が可能。
+
+## 改善履歴
+
+- v0.1.0 (2025-12-29): 初版リリース（legacy 形式から移植）
+
+## 関連スキル
+
+- `rr-midstream-typescript-strict-001`: 型安全性によるセキュリティ向上
+- `rr-midstream-logging-observability-001`: セキュリティイベントのロギング
+
+## 参考資料
+
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [CWE - Common Weakness Enumeration](https://cwe.mitre.org/)

@@ -1,0 +1,69 @@
+# promptfoo configuration for Baseline Security Checks skill evaluation
+# See: https://www.promptfoo.dev/docs/configuration/guide
+
+prompts:
+  - file://prompt/system.md
+  - file://prompt/user.md
+
+providers:
+  - id: openai:gpt-4o
+    config:
+      temperature: 0.1
+      max_tokens: 2000
+
+  - id: anthropic:claude-3-5-sonnet-20241022
+    config:
+      temperature: 0.1
+      max_tokens: 2000
+
+tests:
+  - description: SQL Injection Detection (Happy Path)
+    vars:
+      diff: file://fixtures/01-sql-injection-happy.md
+    assert:
+      - type: llm-rubric
+        value: |
+          The output must identify a SQL injection vulnerability.
+          Score 1 if the output mentions SQL injection or query construction risks.
+          Score 0 otherwise.
+
+      - type: contains
+        value: 'SQL injection'
+
+      - type: contains
+        value: 'Severity: major'
+
+      - type: llm-rubric
+        value: |
+          The output must provide a concrete fix suggestion.
+          Score 1 if it suggests parameterized queries or prepared statements.
+          Score 0 otherwise.
+
+      - type: similar
+        value: file://golden/01-sql-injection-happy.md
+        threshold: 0.7
+
+  - description: False Positive Avoidance (Test File)
+    vars:
+      diff: file://fixtures/02-false-positive-test.md
+    assert:
+      - type: llm-rubric
+        value: |
+          The output should NOT flag test file credentials as security issues.
+          Score 1 if it recognizes this is test data and does not raise major security concerns.
+          Score 0 if it incorrectly flags test credentials as vulnerabilities.
+
+      - type: not-contains
+        value: 'Severity: major'
+
+      - type: llm-rubric
+        value: |
+          The output should acknowledge the test context.
+          Score 1 if it mentions tests, test files, or mock data.
+          Score 0 otherwise.
+
+defaultTest:
+  options:
+    provider: openai:gpt-4o
+
+outputPath: eval/results.json
