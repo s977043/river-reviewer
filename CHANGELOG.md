@@ -13,7 +13,7 @@
 - Added JSON Schema 2020-12 output format with `issues` array and `summary` aggregation (breaking for consumers of the old flat schema).
 - Added upstream/midstream/downstream sample skills with YAML frontmatter.
 - Added local CLI (`river run`) with diff optimization, cost estimation, and dry-run fallback behavior.
-- Added composite GitHub Action (`.github/actions/river-reviewer`) and refreshed README/tutorial examples.
+- Added composite GitHub Action (`runners/github-action`) and refreshed README/tutorial examples.
 - Added the Riverbed Memory design draft under `pages/explanation/`.
 - Added additional downstream and midstream skills (coverage gaps, flaky tests, test existence, TypeScript null safety).
 

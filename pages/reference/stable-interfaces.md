@@ -11,7 +11,7 @@ River Reviewer は OSS として成長中であり、内部実装は変更され
 次の要素は「外部に公開されたインターフェース」として扱います。
 
 - スキル定義（`schemas/skill.schema.json`）と、その意味論（severity/confidence など）
-- GitHub Actions（`.github/actions/river-reviewer/action.yml`）の inputs / outputs と動作
+- GitHub Actions（`runners/github-action/action.yml`）のinputs / outputsと動作
 - CLI（`river` / `river-reviewer`）のコマンド/オプションと終了コード
 - PR コメントの idempotent 更新方式（marker）
 
@@ -43,7 +43,7 @@ River Reviewer は OSS として成長中であり、内部実装は変更され
 
 ### inputs（安定）
 
-定義は `.github/actions/river-reviewer/action.yml` を参照してください。
+定義は `runners/github-action/action.yml` を参照してください。
 
 - `phase`: `upstream|midstream|downstream`
 - `planner`: `off|order|prune`

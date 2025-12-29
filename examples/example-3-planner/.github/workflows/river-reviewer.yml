@@ -14,7 +14,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (planner=order)
-        uses: s977043/river-reviewer/.github/actions/river-reviewer@main
+        uses: s977043/river-reviewer/runners/github-action@main
         with:
           phase: midstream
           planner: order # off|order|prune

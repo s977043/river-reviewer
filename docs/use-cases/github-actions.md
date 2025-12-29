@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0 # Required for git diff
 
       - name: Run River Reviewer
-        uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+        uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: midstream
         env:
@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -81,7 +81,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -95,7 +95,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -122,7 +122,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: ${{ matrix.phase }} }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -140,7 +140,7 @@ jobs:
 ### Example: Custom Skills Directory
 
 ```yaml
-- uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+- uses: s977043/river-reviewer/runners/github-action@v0.1.1
   with:
     phase: midstream
     skills-dir: custom-skills # Use custom skill location
@@ -149,7 +149,7 @@ jobs:
 ### Example: JSON Output
 
 ```yaml
-- uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+- uses: s977043/river-reviewer/runners/github-action@v0.1.1
   with:
     phase: midstream
     output-format: json
@@ -224,7 +224,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -249,7 +249,7 @@ jobs:
           repository: your-org/shared-skills
           path: shared-skills
 
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: midstream
           skills-dir: shared-skills
@@ -268,7 +268,7 @@ jobs:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: midstream
         env:
@@ -309,7 +309,7 @@ jobs:
           ref: refs/pull/${{ inputs.pr_number }}/head
           fetch-depth: 0
 
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: ${{ inputs.phase }}
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
@@ -333,7 +333,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -473,7 +473,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -485,7 +485,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -518,7 +518,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: ${{ matrix.phase }} }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -526,7 +526,7 @@ jobs:
 ## Resources
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [River Reviewer Action Source](https://github.com/s977043/river-reviewer/tree/main/.github/actions/river-reviewer)
+- [River Reviewer Action Source](https://github.com/s977043/river-reviewer/tree/main/runners/github-action)
 - [Example Workflows](https://github.com/s977043/river-reviewer/tree/main/.github/workflows)
 - [Skills Concepts](../concepts/skills.md)
 

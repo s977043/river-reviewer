@@ -11,7 +11,7 @@ Breaking changes generally require a **major version bump**.
 The following elements are treated as "public interfaces":
 
 - Skill definitions (`schemas/skill.schema.json`) and their semantics (severity/confidence, etc.)
-- GitHub Actions (`.github/actions/river-reviewer/action.yml`) inputs / outputs and behavior
+- GitHub Actions (`runners/github-action/action.yml`) inputs / outputs and behavior
 - CLI (`river` / `river-reviewer`) commands/options and exit codes
 - Idempotent update method for PR comments (marker)
 
@@ -43,7 +43,7 @@ The following elements are treated as "public interfaces":
 
 ### inputs (Stable)
 
-See `.github/actions/river-reviewer/action.yml` for definition.
+See `runners/github-action/action.yml` for definition.
 
 - `phase`: `upstream|midstream|downstream`
 - `planner`: `off|order|prune`

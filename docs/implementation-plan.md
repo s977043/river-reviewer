@@ -70,7 +70,7 @@
 
 - Labels: `type:task`, `P0`, `m1-public`
 - 受け入れ条件:
-  - 外部リポで `uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.x` が動く
+  - 外部リポで `uses: s977043/river-reviewer/runners/github-action@v0.x` が動く
   - `target` が外部リポ（`github.workspace`）を指すときに差分取得できる
   - 失敗時に「次の行動」がログ/エラーで分かる（例: permissions, fetch-depth, token）
   - `npm test` が落ちない（回帰なし）

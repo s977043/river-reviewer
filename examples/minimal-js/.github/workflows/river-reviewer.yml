@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/.github/actions/river-reviewer@v0
+        uses: s977043/river-reviewer/runners/github-action@v0
         with:
           phase: midstream
         env:
