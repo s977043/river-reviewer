@@ -20,7 +20,7 @@ skills:
   - id: rr-midstream-security-basic-001
     version: '0.1.0'
     name: 'Basic Security Review'
-    path: skills/midstream/rr-midstream-security-basic-001.md
+    path: skills/rr-midstream-security-basic-001/skill.yaml
     phase: midstream
     tags: [security, midstream, basic]
     severity: major

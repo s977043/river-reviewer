@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { loadSkills } from '../src/lib/skill-loader.mjs';
+import { loadSkills } from '../runners/core/skill-loader.mjs';
 
 const OUTPUT_PATHS = [
   path.resolve('docs/skills-catalog.md'),

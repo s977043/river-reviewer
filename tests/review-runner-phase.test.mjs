@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { matchesPhase } from '../src/lib/review-runner.mjs';
+import { matchesPhase } from '../runners/core/review-runner.mjs';
 
 const skillWithPhase = phase => ({
   metadata: { phase },

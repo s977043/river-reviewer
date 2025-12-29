@@ -1,0 +1,21 @@
+{
+  "name": "@river-reviewer/core-runner",
+  "version": "0.1.0",
+  "description": "Core skill execution components for River Reviewer",
+  "type": "module",
+  "exports": {
+    "./skill-loader": "./skill-loader.mjs",
+    "./review-runner": "./review-runner.mjs"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1",
+    "minimatch": "^10.1.1"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}

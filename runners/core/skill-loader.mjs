@@ -76,6 +76,25 @@ export function createSkillValidator(schema) {
 export async function listSkillFiles(dir = defaultSkillsDir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = [];
+
+  // Check if this directory contains a skill.yaml file (new directory structure)
+  const hasSkillYaml = entries.some(
+    entry => !entry.isDirectory() && (entry.name === 'skill.yaml' || entry.name === 'skill.yml')
+  );
+
+  // If skill.yaml exists, only include that file and skip other files and subdirectories in this directory
+  if (hasSkillYaml) {
+    const skillYamlEntry = entries.find(
+      entry => !entry.isDirectory() && (entry.name === 'skill.yaml' || entry.name === 'skill.yml')
+    );
+    if (!skillYamlEntry) {
+      throw new Error(`skill.yaml detected but not found in ${dir}`);
+    }
+    files.push(path.join(dir, skillYamlEntry.name));
+    return files.sort();
+  }
+
+  // Otherwise, process files and subdirectories normally (legacy structure)
   for (const entry of entries) {
     const entryPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {

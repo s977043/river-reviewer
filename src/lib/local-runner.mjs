@@ -8,9 +8,9 @@ import { generateReview } from './review-engine.mjs';
 import { detectDefaultBranch, ensureGitRepo, findMergeBase } from './git.mjs';
 import { createOpenAIPlanner } from './openai-planner.mjs';
 import { normalizePlannerMode } from './planner-utils.mjs';
-import { buildExecutionPlan } from './review-runner.mjs';
+import { buildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { loadProjectRules } from './rules.mjs';
-import { loadSkills } from './skill-loader.mjs';
+import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import { parseList } from './utils.mjs';
 
 function normalizePhase(phase) {

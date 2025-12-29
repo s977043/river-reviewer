@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import test from 'node:test';
-import { createSkillValidator, defaultPaths, loadSchema, loadSkillFile } from '../src/lib/skill-loader.mjs';
+import { createSkillValidator, defaultPaths, loadSchema, loadSkillFile } from '../runners/core/skill-loader.mjs';
 
 async function buildValidator(schemaPath = defaultPaths.schemaPath) {
   const schema = await loadSchema(schemaPath);

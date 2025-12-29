@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { loadSkills } from '../src/lib/skill-loader.mjs';
-import { buildExecutionPlan, rankByModelHint, selectSkills } from '../src/lib/review-runner.mjs';
+import { loadSkills } from '../runners/core/skill-loader.mjs';
+import { buildExecutionPlan, rankByModelHint, selectSkills } from '../runners/core/review-runner.mjs';
 
 test('selects skills by phase and applyTo glob', async () => {
   const skills = await loadSkills();

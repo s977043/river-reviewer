@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildExecutionPlan } from '../src/lib/review-runner.mjs';
+import { buildExecutionPlan } from '../runners/core/review-runner.mjs';
 
 function findSkillInPlan(plan, id) {
   const selected = plan.selected.find(s => s.metadata?.id === id);

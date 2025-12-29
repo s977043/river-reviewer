@@ -8,11 +8,13 @@
 
 ![River Reviewer logo](assets/logo/river-reviewer-logo.svg)
 
-日本語版 README です。[English README is available here.](./README.en.md)
+日本語版READMEです。[English README is available here.](./README.en.md)
 
 Philosophy: [なぜ作ったのか](#philosophy)
 
-流れに寄り添う AI レビューエージェント。River Reviewer はフロー型・メタデータ駆動の AI レビューエージェントで、設計意図・実装判断・テストカバレッジを SDLC 全体でつなぎます。
+**River ReviewerはSkill Registry中心のコードレビューフレームワークです。**
+
+チーム固有のレビュー知識を「スキル」として明示化・バージョン管理し、GitHub Actions/CLI/Node APIなど、あらゆる環境で再利用できます。スキルはテスト可能で、継続的に改善できる資産です。
 
 <a id="philosophy"></a>
 

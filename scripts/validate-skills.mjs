@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import path from 'path';
-import { defaultPaths, createSkillValidator, loadSchema, loadSkillFile, listSkillFiles } from '../src/lib/skill-loader.mjs';
+import { defaultPaths, createSkillValidator, loadSchema, loadSkillFile, listSkillFiles } from '../runners/core/skill-loader.mjs';
 
 function hasSection(text, patterns) {
   return patterns.some(re => re.test(text));
@@ -39,6 +39,14 @@ async function validateSkills() {
   let success = true;
   for (const filePath of files) {
     const relativePath = path.relative(defaultPaths.repoRoot, filePath);
+
+    // Skip Registry format skill.yaml files (validated by validate:skill-yaml)
+    const basename = path.basename(filePath);
+    if (basename === 'skill.yaml' || basename === 'skill.yml') {
+      console.log(`ℹ️  ${relativePath} (skipped - registry format, use npm run validate:skill-yaml)`);
+      continue;
+    }
+
     try {
       const skill = await loadSkillFile(filePath, { validator });
       console.log(`✅ ${relativePath}`);

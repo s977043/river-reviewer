@@ -1,6 +1,6 @@
 import { mergeConfig } from '../config/loader.mjs';
 import { defaultConfig } from '../config/default.mjs';
-import { summarizeSkill } from './review-runner.mjs';
+import { summarizeSkill } from '../../runners/core/review-runner.mjs';
 import { buildHeuristicComments } from './heuristic-review.mjs';
 import { formatFindingMessage, validateFindingMessage } from './finding-format.mjs';
 

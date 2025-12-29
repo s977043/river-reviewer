@@ -175,6 +175,49 @@
       "type": "object",
       "description": "Optional nested metadata container",
       "additionalProperties": true
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version (x.y.z)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "prompt": {
+      "type": "object",
+      "description": "Prompt file references",
+      "additionalProperties": false,
+      "properties": {
+        "system": {
+          "type": "string",
+          "description": "Path to system prompt file",
+          "minLength": 1
+        },
+        "user": {
+          "type": "string",
+          "description": "Path to user prompt file",
+          "minLength": 1
+        }
+      }
+    },
+    "eval": {
+      "type": "object",
+      "description": "Evaluation configuration",
+      "additionalProperties": false,
+      "properties": {
+        "promptfoo": {
+          "type": "string",
+          "description": "Path to promptfoo configuration"
+        }
+      }
+    },
+    "fixturesDir": {
+      "type": "string",
+      "description": "Fixtures directory path",
+      "default": "fixtures"
+    },
+    "goldenDir": {
+      "type": "string",
+      "description": "Golden directory path",
+      "default": "golden"
     }
   }
 }

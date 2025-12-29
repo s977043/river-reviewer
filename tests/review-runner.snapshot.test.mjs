@@ -3,7 +3,7 @@ import test from 'node:test';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildExecutionPlan } from '../src/lib/review-runner.mjs';
+import { buildExecutionPlan } from '../runners/core/review-runner.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const snapshotPath = path.join(repoRoot, 'tests', 'fixtures', 'execution-plan-midstream.json');
