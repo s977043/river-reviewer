@@ -1,0 +1,50 @@
+# Base promptfoo configuration for River Reviewer skills
+# See: https://www.promptfoo.dev/docs/configuration/guide
+
+# Default providers for skill evaluation
+providers:
+  - id: openai:gpt-4o
+    config:
+      temperature: 0.1
+      max_tokens: 2000
+
+  - id: anthropic:claude-3-5-sonnet-20241022
+    config:
+      temperature: 0.1
+      max_tokens: 2000
+
+# Default test configuration
+defaultTest:
+  options:
+    provider: openai:gpt-4o
+  assert:
+    # Basic quality checks
+    - type: llm-rubric
+      value: |
+        The output must be relevant and actionable.
+        Score 1 if the output provides clear, specific feedback.
+        Score 0 if the output is vague or off-topic.
+
+# Shared assertions that can be referenced by individual skills
+sharing:
+  # Common assertion for checking severity levels
+  severityAssertion:
+    - type: javascript
+      value: |
+        const severity = output.match(/Severity:\s*(critical|major|minor|info)/i);
+        return severity ? { pass: true } : { pass: false, reason: 'Missing severity level' };
+
+  # Common assertion for checking evidence
+  evidenceAssertion:
+    - type: javascript
+      value: |
+        const hasEvidence = /Evidence:/i.test(output);
+        return hasEvidence ? { pass: true } : { pass: false, reason: 'Missing evidence' };
+
+# Output configuration
+outputPath: eval-results/combined.json
+
+# Evaluation settings
+evaluateOptions:
+  maxConcurrency: 5
+  showProgressBar: true

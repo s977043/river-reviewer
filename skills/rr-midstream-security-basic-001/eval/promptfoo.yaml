@@ -2,8 +2,8 @@
 # See: https://www.promptfoo.dev/docs/configuration/guide
 
 prompts:
-  - file://prompt/system.md
-  - file://prompt/user.md
+  - file://../prompt/system.md
+  - file://../prompt/user.md
 
 providers:
   - id: openai:gpt-4o
@@ -19,7 +19,7 @@ providers:
 tests:
   - description: SQL Injection Detection (Happy Path)
     vars:
-      diff: file://fixtures/01-sql-injection-happy.md
+      diff: file://../fixtures/01-sql-injection-happy.md
     assert:
       - type: llm-rubric
         value: |
@@ -40,12 +40,12 @@ tests:
           Score 0 otherwise.
 
       - type: similar
-        value: file://golden/01-sql-injection-happy.md
+        value: file://../golden/01-sql-injection-happy.md
         threshold: 0.7
 
   - description: False Positive Avoidance (Test File)
     vars:
-      diff: file://fixtures/02-false-positive-test.md
+      diff: file://../fixtures/02-false-positive-test.md
     assert:
       - type: llm-rubric
         value: |

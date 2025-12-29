@@ -32,6 +32,7 @@
     "skills:validate": "node scripts/validate-skills.mjs",
     "validate:skill-yaml": "node scripts/validate-skill-yaml.mjs",
     "agent-skills:validate": "node scripts/validate-agent-skills.mjs",
+    "eval:skills": "node scripts/run-promptfoo.mjs",
     "skills:catalog": "node scripts/generate-skill-catalog.mjs",
     "create:skill": "node scripts/create-skill.mjs",
     "dashboard:generate": "node scripts/generate-dashboard-data.js",
@@ -75,6 +76,7 @@
     "markdownlint-cli": "^0.47.0",
     "prettier": "^3.7.4",
     "prh": "^5.4.4",
+    "promptfoo": "^0.120.8",
     "textlint": "^15.5.0",
     "textlint-rule-preset-ja-technical-writing": "^12.0.2",
     "textlint-rule-prh": "^6.1.0"

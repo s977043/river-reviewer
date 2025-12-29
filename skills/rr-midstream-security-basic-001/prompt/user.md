@@ -30,7 +30,7 @@ You will receive:
 
 For each security finding, provide:
 
-```texttext
+```text
 **Finding:** [Brief description of the security issue]
 **Evidence:** [Specific code snippet or line reference from diff]
 **Impact:** [What could happen if exploited]
@@ -49,7 +49,7 @@ For each security finding, provide:
 
 ### Example Output
 
-```texttext
+```text
 **Finding:** SQL injection vulnerability in user lookup query
 **Evidence:** Line 42: `db.query(\`SELECT * FROM users WHERE id = ${userId}\`)`
 **Impact:** Attacker could execute arbitrary SQL commands by manipulating userId parameter

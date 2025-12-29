@@ -24,3 +24,5 @@ CLAUDE.local.md
 .gemini/
 .worktrees/
 .vale/Microsoft
+eval-results/
+**/eval/results.json
