@@ -230,6 +230,74 @@ function findMissingTests({ diff }) {
   ];
 }
 
+function looksLikeGitHubWorkflowFile(filePath) {
+  const normalized = String(filePath).replaceAll('\\', '/');
+  return normalized.startsWith('.github/workflows/') && /\.(yml|yaml)$/.test(normalized);
+}
+
+function findGitHubActionsIssues({ diff }) {
+  const MAX_WORKFLOW_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || !looksLikeGitHubWorkflowFile(filePath)) continue;
+
+    for (const { line, text } of iterateAddedLines(file)) {
+      // Check for pull_request_target usage (privilege escalation risk)
+      if (/^\s*-?\s*pull_request_target\s*:?\s*$/.test(text)) {
+        comments.push({
+          file: filePath,
+          line,
+          kind: 'gh-actions-pull-request-target',
+        });
+        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
+        continue;
+      }
+
+      // Check for excessive permissions
+      if (/permissions\s*:\s*(write-all|'write-all'|"write-all")/.test(text)) {
+        comments.push({
+          file: filePath,
+          line,
+          kind: 'gh-actions-excessive-permissions',
+        });
+        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
+        continue;
+      }
+
+      // Check for secrets in run blocks (potential exposure)
+      if (/\$\{\{\s*secrets\.\w+\s*\}\}/.test(text) && /run\s*:/.test(text)) {
+        comments.push({
+          file: filePath,
+          line,
+          kind: 'gh-actions-secret-in-run',
+        });
+        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
+        continue;
+      }
+
+      // Check for unsanitized user input in run blocks (command injection)
+      if (
+        /github\.event\.(issue|pull_request|comment)\.(title|body|name)/.test(text) &&
+        !/\|\s*jq\b/.test(text) &&
+        !/toJSON/.test(text)
+      ) {
+        comments.push({
+          file: filePath,
+          line,
+          kind: 'gh-actions-unsanitized-input',
+        });
+        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
+        continue;
+      }
+    }
+  }
+
+  return comments;
+}
+
 /**
  * Generate deterministic review comments from heuristics.
  * These comments are used as a fallback when LLM is not available.
@@ -240,6 +308,7 @@ export function buildHeuristicComments({ diff, plan }) {
 
   if (hasSkill(plan, 'rr-midstream-security-basic-001')) {
     comments.push(...findHardcodedSecrets({ diff }));
+    comments.push(...findGitHubActionsIssues({ diff }));
   }
 
   if (hasSkill(plan, 'rr-midstream-logging-observability-001')) {

@@ -249,6 +249,58 @@ function normalizeHeuristicComments(rawComments) {
             confidence: 'high',
           }),
         };
+      case 'gh-actions-pull-request-target':
+        return {
+          file: c.file,
+          line: c.line,
+          message: formatFindingMessage({
+            finding: 'pull_request_targetイベントは権限昇格のリスクがある',
+            evidence: 'pull_request_targetトリガーが追加されている',
+            impact: 'フォークからのPRで任意コードが本リポジトリの権限で実行される可能性',
+            fix: 'pull_requestイベントを使用するか、pull_request_targetの場合はチェックアウト前に入力を検証する',
+            severity: 'blocker',
+            confidence: 'high',
+          }),
+        };
+      case 'gh-actions-excessive-permissions':
+        return {
+          file: c.file,
+          line: c.line,
+          message: formatFindingMessage({
+            finding: '過剰な権限設定（write-all）が検出された',
+            evidence: 'permissions: write-all が設定されている',
+            impact: 'ワークフローが侵害された場合の影響範囲が最大化される',
+            fix: '最小権限の原則に従い、必要な権限のみを個別に指定する（例: contents: read, pull-requests: write）',
+            severity: 'warning',
+            confidence: 'high',
+          }),
+        };
+      case 'gh-actions-secret-in-run':
+        return {
+          file: c.file,
+          line: c.line,
+          message: formatFindingMessage({
+            finding: 'runブロック内でsecretsを直接使用している',
+            evidence: 'run: と secrets.* が同一行に存在',
+            impact: 'ログ出力やエラーメッセージでシークレットが漏洩する可能性',
+            fix: 'シークレットを環境変数として設定し、envブロック経由で参照する',
+            severity: 'warning',
+            confidence: 'medium',
+          }),
+        };
+      case 'gh-actions-unsanitized-input':
+        return {
+          file: c.file,
+          line: c.line,
+          message: formatFindingMessage({
+            finding: 'ユーザー入力がサニタイズされずに使用されている',
+            evidence: 'github.event.*.title/body/name がrunブロックで直接使用',
+            impact: 'コマンドインジェクション攻撃のリスクがある',
+            fix: 'jqやtoJSONを使用して入力をサニタイズする、または環境変数経由で渡す',
+            severity: 'blocker',
+            confidence: 'high',
+          }),
+        };
       default:
         return {
           file: c.file,

@@ -209,6 +209,17 @@ exclude:
 6. CLI で直接指定する場合: `--context diff,fullFile` や `--dependency code_search,test_runner` フラグで環境変数を上書きできます（逗号区切り）。
 7. 依存のスタブ有効化: `RIVER_DEPENDENCY_STUBS=1` を指定すると、既知の依存（`code_search`, `test_runner`, `coverage_report`, `adr_lookup`, `repo_metadata`, `tracing`）を「利用可能」とみなしてスキップを防ぎます。実装準備中の環境でプランだけ確認したいときに使用してください。
 
+### CLI Runnerインターフェイス（runners/cli）
+
+新しいCLIインターフェイスにより、コアランナー機能に直接アクセスできます:
+
+- `river review [files...]` - ファイルをレビュー（実行プラン生成とスキル選択）
+- `river eval <skill>` - スキル定義の検証と評価
+- `river eval --all` - すべてのスキルを評価
+- `river create skill` - 新しいスキルをテンプレートから作成
+
+詳細は [runners/cli/README.md](./runners/cli/README.md) を参照してください。
+
 ## Project-specific review rules
 
 - リポジトリルートに `.river/rules.md` を置くと、プロジェクト固有のレビューポリシーが LLM プロンプトへ自動注入されます（`river run .` と GitHub Actions の双方で有効）
