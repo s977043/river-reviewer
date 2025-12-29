@@ -42,15 +42,9 @@ async function prompt(rl, question, defaultValue, validator = null) {
  * Validate skill ID format
  */
 function validateSkillId(id) {
-<<<<<<< Updated upstream
-  if (!id) return 'Skill ID is required';
-  if (!/^[a-z0-9-]+$/.test(id)) {
-    return 'Skill ID must contain only lowercase letters, numbers, and hyphens';
-=======
   if (!id) return 'スキルIDは必須です';
   if (!/^[a-z0-9-]+$/.test(id)) {
     return 'スキルIDは小文字、数字、ハイフンのみ使用できます';
->>>>>>> Stashed changes
   }
   return true;
 }
@@ -59,30 +53,14 @@ function validateSkillId(id) {
  * Validate version format
  */
 function validateVersion(version) {
-<<<<<<< Updated upstream
-  if (!version) return 'Version is required';
-  if (!/^\d+\.\d+\.\d+$/.test(version)) {
-    return 'Version must be in semver format (x.y.z)';
-=======
   if (!version) return 'バージョンは必須です';
   if (!/^\d+\.\d+\.\d+$/.test(version)) {
     return 'バージョンはsemver形式（x.y.z）である必要があります';
->>>>>>> Stashed changes
   }
   return true;
 }
 
 /**
-<<<<<<< Updated upstream
- * Replace placeholders in file content
- */
-function replacePlaceholders(content, replacements) {
-  let result = content;
-  for (const [key, value] of Object.entries(replacements)) {
-    const regex = new RegExp(key, 'g');
-    result = result.replace(regex, value);
-  }
-=======
  * Validate required field
  */
 function validateRequired(fieldName) {
@@ -128,7 +106,6 @@ function replacePlaceholders(content, replacements) {
     result = result.replace(regex, value);
   }
 
->>>>>>> Stashed changes
   return result;
 }
 
@@ -146,9 +123,6 @@ function processTemplateFile(sourcePath, targetPath, replacements) {
  * Main function
  */
 async function main() {
-<<<<<<< Updated upstream
-  console.log('🚀 Create New Skill\n');
-=======
   console.log('🚀 新しいスキルを作成\n');
 
   // Check template directory existence
@@ -156,20 +130,10 @@ async function main() {
     console.error(`❌ テンプレートディレクトリが見つかりません: ${templateDir}`);
     process.exit(1);
   }
->>>>>>> Stashed changes
 
   const rl = readline.createInterface({ input, output });
 
   try {
-<<<<<<< Updated upstream
-    // Collect user input
-    const id = await prompt(rl, 'Skill ID (e.g., rr-midstream-code-quality-001)');
-    const validation = validateSkillId(id);
-    if (validation !== true) {
-      console.error(`❌ ${validation}`);
-      process.exit(1);
-    }
-=======
     // Collect user input with validation and retry
     const id = await prompt(
       rl,
@@ -177,47 +141,10 @@ async function main() {
       null,
       validateSkillId
     );
->>>>>>> Stashed changes
 
     // Check if skill already exists
     const skillPath = join(skillsDir, id);
     if (existsSync(skillPath)) {
-<<<<<<< Updated upstream
-      console.error(`❌ Skill already exists at ${skillPath}`);
-      process.exit(1);
-    }
-
-    const version = await prompt(rl, 'Version', '0.1.0');
-    const versionValidation = validateVersion(version);
-    if (versionValidation !== true) {
-      console.error(`❌ ${versionValidation}`);
-      process.exit(1);
-    }
-
-    const name = await prompt(rl, 'Skill Name (e.g., Code Quality Review)');
-    if (!name) {
-      console.error('❌ Skill name is required');
-      process.exit(1);
-    }
-
-    const description = await prompt(rl, 'Description');
-    if (!description) {
-      console.error('❌ Description is required');
-      process.exit(1);
-    }
-
-    const phase = await prompt(
-      rl,
-      'Phase (upstream/midstream/downstream)',
-      'midstream'
-    );
-    if (!['upstream', 'midstream', 'downstream'].includes(phase)) {
-      console.error('❌ Phase must be upstream, midstream, or downstream');
-      process.exit(1);
-    }
-
-    const applyTo = await prompt(rl, 'File patterns (glob, comma-separated)', 'src/**/*.ts');
-=======
       console.error(`❌ スキルは既に存在します: ${skillPath}`);
       rl.close();
       process.exit(1);
@@ -256,51 +183,17 @@ async function main() {
       'ファイルパターン（glob、カンマ区切り）',
       'src/**/*.ts'
     );
->>>>>>> Stashed changes
     const applyToArray = applyTo
       .split(',')
       .map((p) => p.trim())
       .filter(Boolean);
 
-<<<<<<< Updated upstream
-    const tags = await prompt(rl, 'Tags (comma-separated)', '');
-=======
     const tags = await prompt(rl, 'タグ（カンマ区切り）', '');
->>>>>>> Stashed changes
     const tagsArray = tags
       .split(',')
       .map((t) => t.trim())
       .filter(Boolean);
 
-<<<<<<< Updated upstream
-    const severity = await prompt(rl, 'Severity (info/minor/major/critical)', 'minor');
-    if (!['info', 'minor', 'major', 'critical'].includes(severity)) {
-      console.error('❌ Severity must be info, minor, major, or critical');
-      process.exit(1);
-    }
-
-    rl.close();
-
-    // Prepare replacements
-    const replacements = {
-      '<phase>': phase,
-      '<name>': id,
-      '<number>': '001',
-      '<Skill Name>': name,
-      '<What this skill does>': description,
-      'rr-<phase>-<name>-<number>': id,
-      '"0.1.0"': `"${version}"`,
-      'midstream': phase,
-      "- 'src/\\*\\*/\\*.ts'": applyToArray
-        .map((p) => `  - '${p}'`)
-        .join('\n')
-        .trim(),
-      '- example': tagsArray.map((t) => `  - ${t}`).join('\n') || '  - example',
-      'severity: minor': `severity: ${severity}`,
-    };
-
-    console.log('\n📝 Creating skill files...\n');
-=======
     const severity = await prompt(
       rl,
       '重要度 (info/minor/major/critical)',
@@ -331,7 +224,6 @@ async function main() {
     };
 
     console.log('\n📝 スキルファイルを作成中...\n');
->>>>>>> Stashed changes
 
     // Copy template structure
     cpSync(templateDir, skillPath, { recursive: true });
@@ -353,18 +245,6 @@ async function main() {
       }
     }
 
-<<<<<<< Updated upstream
-    console.log(`\n✅ Created skill at ${skillPath}\n`);
-    console.log('Next steps:');
-    console.log(`  1. cd ${skillPath}`);
-    console.log('  2. Edit prompt/system.md and prompt/user.md');
-    console.log('  3. Add test fixtures in fixtures/');
-    console.log('  4. Add expected outputs in golden/');
-    console.log('  5. Run validation: npm run validate:skill-yaml');
-    console.log('  6. Run tests: npx promptfoo eval (if configured)\n');
-  } catch (error) {
-    console.error('❌ Error:', error.message);
-=======
     console.log(`\n✅ スキルを作成しました: ${skillPath}\n`);
     console.log('次のステップ:');
     console.log(`  1. cd ${skillPath}`);
@@ -376,7 +256,6 @@ async function main() {
   } catch (error) {
     rl.close();
     console.error('❌ エラー:', error.message);
->>>>>>> Stashed changes
     process.exit(1);
   }
 }
