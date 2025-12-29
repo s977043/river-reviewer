@@ -1,0 +1,117 @@
+# ============================================================
+# Skill Definition Template
+# ============================================================
+# This is a template for creating new skills using the Skill Registry format.
+# Replace placeholder values and remove optional fields as needed.
+# See specs/skill-yaml-spec.md for full specification.
+
+# ============================================================
+# Required Fields
+# ============================================================
+
+# Unique identifier for this skill
+# Format: rr-<phase>-<category>-<number>
+# Example: rr-midstream-code-quality-001
+id: 'rr-<phase>-<category>-<number>'
+
+# Semantic version (x.y.z)
+# Start with 0.1.0 for new skills
+version: '0.1.0'
+
+# Human-readable name
+# Keep concise and descriptive (see specs/skill-yaml-spec.md)
+name: '<Skill Name>'
+
+# Purpose and role of this skill
+# Describe what this skill checks/reviews
+description: '<What this skill does>'
+
+# ============================================================
+# Trigger Conditions (Required)
+# ============================================================
+
+# SDLC phase(s) where this skill applies
+# Values: upstream | midstream | downstream
+# Can be a single string or array
+phase: midstream
+# phase: [midstream, downstream]  # Array example
+
+# File patterns (glob) this skill applies to
+# Be as specific as possible to avoid unnecessary invocations
+applyTo:
+  - 'src/**/*.ts'
+  - 'tests/**/*.test.ts'
+
+# ============================================================
+# Optional Fields
+# ============================================================
+
+# Classification tags
+# Use for categorization (security, testing, api, etc.)
+# Add "community" tag if intended for public sharing
+tags:
+  - example
+  - category
+
+# Severity level of findings
+# Values: info | minor | major | critical
+# Default: minor
+severity: minor
+
+# Input context this skill references
+# Values: diff | fullFile | tests | adr | commitMessage | repoConfig
+# Default: [diff]
+inputContext:
+  - diff
+  # - fullFile  # Uncomment if full file context needed
+
+# Output types this skill produces
+# Values: findings | summary | actions | tests | metrics | questions
+# Default: [findings, summary]
+outputKind:
+  - findings
+  - summary
+  # - actions  # Uncomment if action items generated
+
+# Recommended model type
+# Values: cheap | balanced | high-accuracy
+# Default: balanced
+modelHint: balanced
+
+# Feature dependencies
+# Values: code_search | test_runner | adr_lookup | repo_metadata |
+#         coverage_report | tracing | custom:{name}
+# Default: []
+# dependencies:
+#   - adr_lookup
+#   - repo_metadata
+
+# ============================================================
+# Implementation References (Optional)
+# ============================================================
+
+# Prompt file paths (relative to skill directory)
+# If not specified, the skill content is embedded in this file or a .md file
+# prompt:
+#   system: "prompt/system.md"
+#   user: "prompt/user.md"
+
+# ============================================================
+# Evaluation Settings (Optional)
+# ============================================================
+
+# Evaluation configuration
+# eval:
+#   promptfoo: "eval/promptfoo.yaml"
+
+# ============================================================
+# Test Data (Optional)
+# ============================================================
+
+# Fixtures directory (test inputs)
+# Default: fixtures
+# fixturesDir: "fixtures"
+
+# Golden directory (expected outputs)
+# Default: golden
+# goldenDir: "golden"
