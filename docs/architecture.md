@@ -1,64 +1,71 @@
-# River Reviewer アーキテクチャ（Planner 連携版）
+# River Reviewer Architecture
 
-## 目的
+## Overview
 
-- Skill Planner 導入後の全体像（metadata → loader → planner → runner）を共有する。
-- LLM を使った優先度決定と、フォールバック経路を明示する。
-- 今後の最適化タスク（#85 以降）のベースドキュメントとする。
+River Reviewer is a **Skill Registry-based AI code review framework** that transforms implicit team knowledge into reproducible, version-controlled agent skills.
 
-## コンポーネント一覧
+The core philosophy: **"Skills are the main feature."** Everything else—GitHub Actions, CLI, Node API—are just interfaces to execute these skills.
 
-- Skill Metadata: `skills/**/*.md` の frontmatter（`pages/reference/skill-metadata.md` が仕様源）。
-- Skill Loader: frontmatter を schema で検証し、`SkillDefinition` を構築。
-- Skill Planner: LLM または関数でスキル順序を推論（`src/lib/skill-planner.mjs`）。
-- Review Runner: スキル選択と実行のオーケストレーション（`src/lib/review-runner.mjs`）。
+## Architecture Principles
 
-## 処理フロー
+1. **Skills as First-Class Assets**
+   - Each skill is a versioned, testable, documented artifact
+   - Skills live in a registry with metadata, prompts, fixtures, and evaluations
+   - Skills can be shared, improved, and composed
+
+2. **Separation of Concerns**
+   - **Skill Definition** (what to check) is separate from **Execution Environment** (how to run)
+   - Skills are portable across different execution contexts (Actions, CLI, API)
+
+3. **Data-Driven Routing**
+   - Skills declare their requirements (phase, file patterns, input context)
+   - The framework automatically routes files to appropriate skills
+
+4. **Evaluation-Driven Development**
+   - Every skill includes test fixtures and golden outputs
+   - promptfoo integration enables regression testing and quality measurement
+
+## Core Components
 
 ```mermaid
-flowchart LR
-  A[skills/**/*.md\n(frontmatter)] --> B[Skill Loader\nschema validate]
-  B --> C{Filter\nphase/applyTo\ninputContext}
-  C -->|ok| D[候補スキル]
-  C -->|skip理由| S[Skipped list]
-  D -->|plannerあり| P[Skill Planner\nLLM / function]
-  D -->|plannerなし| R[rankByModelHint\n決定論的順位付け]
-  P -->|順序と理由| O[Ordered skills]
-  P -->|例外| R
-  R --> O
-  O --> X[Review Runner\n実行]
+flowchart TB
+    subgraph Registry["Skill Registry (skills/)"]
+        direction TB
+        S1[skill.yaml<br/>Metadata]
+        S2[prompt/<br/>System & User Prompts]
+        S3[fixtures/<br/>Test Inputs]
+        S4[golden/<br/>Expected Outputs]
+        S5[eval/<br/>promptfoo Config]
+    end
+
+    subgraph Loader["Skill Loader"]
+        L1[Schema Validation<br/>Zod]
+        L2[Frontmatter Parser<br/>Legacy Skills]
+        L3[SkillDefinition<br/>Unified Model]
+    end
+
+    subgraph Router["Skill Router"]
+        R1[Phase Filter<br/>upstream/midstream/downstream]
+        R2[File Pattern Match<br/>applyTo globs]
+        R3[Context Filter<br/>diff/fullFile/tests]
+        R4[Ranking<br/>modelHint/priority]
+    end
+
+    subgraph Runner["Review Runner"]
+        RN1[Context Builder<br/>diff/files/PR]
+        RN2[LLM Client<br/>OpenAI/Anthropic]
+        RN3[Formatter<br/>Markdown/JSON]
+    end
+
+    Registry --> Loader
+    Loader --> Router
+    Router --> Runner
+    Runner -->|Results| OUT[Output<br/>PR Comments/JSON]
 ```
 
-## Skill Planner の入出力
+## References
 
-- 入力: `llmPlan({ skills, context })`
-  - `skills`: `summarizeSkill` 済みメタデータ（id/name/description/phase/applyTo/inputContext/outputKind/modelHint/dependencies/tags/severity）
-  - `context`: `phase`, `changedFiles`, `availableContexts`（必要なら diff 要約や PR 情報を拡張可）
-- 出力: `[{ id, reason? }]`（配列順が実行順。`priority` は現状未使用）
-- フォールバック:
-  - planner 未指定 → `rankByModelHint` による決定論的順序
-  - planner 内で例外発生 → 決定論的順序に切り替え、理由を `plannerReasons` に残す
-- サンプルコード: `pages/guides/skill-planner.md` にミニマム実装例あり。
-
-## Review Runner の動作概要
-
-1. Skill Loader から全スキルを取得。
-2. `phase` / `applyTo` / `inputContext` でフィルタし、`selected` と `skipped` を生成。
-3. planner があれば `planSkills` を呼び出し、なければ `rankByModelHint`。
-4. 結果を `selected`（実行順序付き）と `skipped`（理由付き）として返却。
-5. Planner 失敗時は決定論的経路に自動フォールバック。
-
-## 代表スキルとの関係
-
-- 例: `skills/midstream/sample-code-quality.md`
-  - `phase: midstream`
-  - `applyTo: ["src/**/*.ts", "src/**/*.js", "src/**/*.py"]`
-  - `inputContext: ["diff"]`
-  - `modelHint: balanced`
-- Planner は `summarizeSkill` で整形されたメタデータを受け取り、LLM が選択順序や理由を返す。`applyTo`/`inputContext` で事前に絞り込み済みなので、LLM は「どれを優先するか」に集中できる。
-
-## 参考ドキュメント
-
-- `pages/reference/skill-metadata.md`（メタデ仕様の真実の源泉）
-- `pages/guides/skill-planner.md`（LLM 接続例と I/O 契約）
-- `src/lib/skill-loader.mjs` / `src/lib/review-runner.mjs` / `src/lib/skill-planner.mjs`
+- [Skill YAML Specification](../specs/skill-yaml-spec.md)
+- [Skill Registry README](../skills/README.md)
+- [Migration Guide](./migration/skill-migration-guide.md)
+- [promptfoo Documentation](https://www.promptfoo.dev/)
