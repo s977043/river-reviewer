@@ -180,3 +180,127 @@ test('buildHeuristicComments detects missing tests for downstream test skills', 
   assert.equal(comments[0].kind, 'missing-tests');
   assert.ok(Number.isInteger(comments[0].line));
 });
+
+test('buildHeuristicComments detects pull_request_target in GitHub Actions workflows', () => {
+  const diffText = `diff --git a/.github/workflows/test.yml b/.github/workflows/test.yml
+index 1111111..2222222 100644
+--- a/.github/workflows/test.yml
++++ b/.github/workflows/test.yml
+@@ -1,3 +1,5 @@
+ name: Test
+ on:
+-  push:
++  pull_request_target:
++    branches: [main]
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+
+  assert.equal(comments.length, 1);
+  assert.equal(comments[0].file, '.github/workflows/test.yml');
+  assert.equal(comments[0].kind, 'gh-actions-pull-request-target');
+  assert.ok(Number.isInteger(comments[0].line));
+});
+
+test('buildHeuristicComments detects pull_request_target in array syntax', () => {
+  const diffText = `diff --git a/.github/workflows/test.yml b/.github/workflows/test.yml
+index 1111111..2222222 100644
+--- a/.github/workflows/test.yml
++++ b/.github/workflows/test.yml
+@@ -1,2 +1,2 @@
+ name: Test
+-on: [push, pull_request]
++on: [push, pull_request_target]
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+
+  assert.equal(comments.length, 1);
+  assert.equal(comments[0].kind, 'gh-actions-pull-request-target');
+});
+
+test('buildHeuristicComments detects excessive permissions in GitHub Actions workflows', () => {
+  const diffText = `diff --git a/.github/workflows/test.yml b/.github/workflows/test.yml
+index 1111111..2222222 100644
+--- a/.github/workflows/test.yml
++++ b/.github/workflows/test.yml
+@@ -5,3 +5,5 @@ on:
+ jobs:
+   test:
+     runs-on: ubuntu-latest
++    permissions: write-all
+     steps:
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+
+  assert.equal(comments.length, 1);
+  assert.equal(comments[0].file, '.github/workflows/test.yml');
+  assert.equal(comments[0].kind, 'gh-actions-excessive-permissions');
+  assert.ok(Number.isInteger(comments[0].line));
+});
+
+test('buildHeuristicComments detects secrets in run blocks', () => {
+  const diffText = `diff --git a/.github/workflows/deploy.yml b/.github/workflows/deploy.yml
+index 1111111..2222222 100644
+--- a/.github/workflows/deploy.yml
++++ b/.github/workflows/deploy.yml
+@@ -10,3 +10,4 @@ jobs:
+     steps:
+       - uses: actions/checkout@v3
++      - run: echo $\{\{ secrets.API_KEY \}\}
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+
+  assert.equal(comments.length, 1);
+  assert.equal(comments[0].file, '.github/workflows/deploy.yml');
+  assert.equal(comments[0].kind, 'gh-actions-secret-in-run');
+  assert.ok(Number.isInteger(comments[0].line));
+});
+
+test('buildHeuristicComments detects unsanitized user input in run blocks', () => {
+  const diffText = `diff --git a/.github/workflows/comment.yml b/.github/workflows/comment.yml
+index 1111111..2222222 100644
+--- a/.github/workflows/comment.yml
++++ b/.github/workflows/comment.yml
+@@ -10,3 +10,4 @@ jobs:
+     steps:
+       - uses: actions/checkout@v3
++      - run: echo "$\{\{ github.event.issue.title \}\}"
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+
+  assert.equal(comments.length, 1);
+  assert.equal(comments[0].file, '.github/workflows/comment.yml');
+  assert.equal(comments[0].kind, 'gh-actions-unsanitized-input');
+  assert.ok(Number.isInteger(comments[0].line));
+});
+
+test('buildHeuristicComments ignores non-workflow YAML files', () => {
+  const diffText = `diff --git a/config/settings.yml b/config/settings.yml
+index 1111111..2222222 100644
+--- a/config/settings.yml
++++ b/config/settings.yml
+@@ -1,1 +1,2 @@
+ name: test
++permissions: write-all
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+
+  assert.equal(comments.length, 0);
+});
