@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import path from 'path';
-import { defaultPaths, createSkillValidator, loadSchema, loadSkillFile, listSkillFiles } from '../src/lib/skill-loader.mjs';
+import { defaultPaths, createSkillValidator, loadSchema, loadSkillFile, listSkillFiles } from '../runners/core/skill-loader.mjs';
 
 function hasSection(text, patterns) {
   return patterns.some(re => re.test(text));

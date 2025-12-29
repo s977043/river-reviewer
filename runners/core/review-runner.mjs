@@ -1,8 +1,8 @@
 import { minimatch } from 'minimatch';
 import { loadSkills } from './skill-loader.mjs';
-import { planSkills, summarizeSkill } from './skill-planner.mjs';
-import { inferImpactTags } from './impact-scope.mjs';
-import { normalizePlannerMode } from './planner-utils.mjs';
+import { planSkills, summarizeSkill } from '../../src/lib/skill-planner.mjs';
+import { inferImpactTags } from '../../src/lib/impact-scope.mjs';
+import { normalizePlannerMode } from '../../src/lib/planner-utils.mjs';
 
 const MODEL_PRIORITY = {
   cheap: 1,

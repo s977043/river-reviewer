@@ -82,11 +82,14 @@ export async function listSkillFiles(dir = defaultSkillsDir) {
     entry => !entry.isDirectory() && (entry.name === 'skill.yaml' || entry.name === 'skill.yml')
   );
 
-  // If skill.yaml exists, only include that file and skip other files in this directory
+  // If skill.yaml exists, only include that file and skip other files and subdirectories in this directory
   if (hasSkillYaml) {
     const skillYamlEntry = entries.find(
       entry => !entry.isDirectory() && (entry.name === 'skill.yaml' || entry.name === 'skill.yml')
     );
+    if (!skillYamlEntry) {
+      throw new Error(`skill.yaml detected but not found in ${dir}`);
+    }
     files.push(path.join(dir, skillYamlEntry.name));
     return files.sort();
   }
