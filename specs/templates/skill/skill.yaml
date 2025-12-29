@@ -12,14 +12,14 @@
 # Unique identifier for this skill
 # Format: rr-<phase>-<category>-<number>
 # Example: rr-midstream-code-quality-001
-id: 'rr-<phase>-<name>-<number>'
+id: 'rr-<phase>-<category>-<number>'
 
 # Semantic version (x.y.z)
 # Start with 0.1.0 for new skills
 version: '0.1.0'
 
 # Human-readable name
-# Keep concise (50 chars max recommended)
+# Keep concise and descriptive (see specs/skill-yaml-spec.md)
 name: '<Skill Name>'
 
 # Purpose and role of this skill

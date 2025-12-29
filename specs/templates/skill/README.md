@@ -5,7 +5,7 @@ This directory contains the template structure for creating new skills in the Sk
 ## Structure
 
 ```text
-_template/
+<skill-name>/
 ├── skill.yaml              # Skill metadata and configuration
 ├── prompt/                 # Prompt files (optional)
 │   ├── system.md          # System prompt
@@ -14,7 +14,7 @@ _template/
 ├── golden/                # Expected outputs (optional)
 ├── eval/                  # Evaluation configuration (optional)
 │   └── promptfoo.yaml    # promptfoo config
-└── README.md              # This file
+└── README.md              # Usage documentation
 ```
 
 ## Usage
@@ -58,7 +58,7 @@ If you have an existing skill in YAML frontmatter format (`.md` file):
 
 1. Extract the YAML frontmatter to `skill.yaml`
 2. Add `version: "0.1.0"` field
-3. Move the Markdown content to `prompt/system.md`
+3. Move the Markdown content to the `prompt/` directory (e.g., `prompt/system.md`), splitting it if necessary
 4. Update file references in the skill registry
 
 See [specs/skill-yaml-spec.md](../../skill-yaml-spec.md) for the full specification.
@@ -67,4 +67,3 @@ See [specs/skill-yaml-spec.md](../../skill-yaml-spec.md) for the full specificat
 
 - [Skill YAML Specification](../../skill-yaml-spec.md)
 - [promptfoo Documentation](https://www.promptfoo.dev/)
-- [River Reviewer Skills Guide](../../../skills/README.md) (to be created)

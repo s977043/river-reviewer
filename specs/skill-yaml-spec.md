@@ -51,7 +51,7 @@ goldenDir: string # golden ディレクトリ（デフォルト: "golden"）
 - **説明**: スキルの一意識別子
 - **制約**:
   - 1文字以上
-  - 推奨形式: `rr-{phase}-{name}-{version}`（例: `rr-midstream-code-quality-001`）
+  - 推奨形式: `rr-{phase}-{category}-{number}`（例: `rr-midstream-code-quality-001`）
 - **例**: `"design-review"`, `"rr-upstream-adr-quality-001"`
 
 ### version
@@ -111,13 +111,13 @@ goldenDir: string # golden ディレクトリ（デフォルト: "golden"）
 - **説明**: トリガー条件をまとめたオブジェクト
 - **プロパティ**:
   - `phase`: string | string[]
-  - `files`: string[]
+  - `applyTo`: string[]
 - **例**:
 
   ```yaml
   trigger:
     phase: [upstream, midstream]
-    files: ['docs/adr/**/*']
+    applyTo: ['docs/adr/**/*']
   ```
 
 ## オプションフィールド
