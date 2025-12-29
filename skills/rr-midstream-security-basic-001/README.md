@@ -18,7 +18,7 @@
 
 以下のパターンにマッチするファイルが対象：
 
-```globtext
+```text
 **/{api,routes,db,ui,components,auth,security,config}/**/*.{ts,tsx,js,jsx}
 ```
 
