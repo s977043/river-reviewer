@@ -77,7 +77,7 @@ skills:
     recommended: false
     description: 'Triages and prioritizes review comments'
 
-  - id: sample-code-quality
+  - id: rr-midstream-code-quality-sample-001
     version: '0.1.0'
     name: 'Sample Code Quality'
     path: skills/midstream/sample-code-quality.md
@@ -87,7 +87,7 @@ skills:
     recommended: false
     description: 'Sample code quality review skill'
 
-  - id: review-policy-standard
+  - id: rr-midstream-review-policy-standard-001
     version: '0.1.0'
     name: 'Review Policy Standard'
     path: skills/midstream/review-policy-standard.md
@@ -96,60 +96,6 @@ skills:
     severity: info
     recommended: false
     description: 'Enforces standard review policies'
-
-# Phase-based categorization
-categories:
-  upstream:
-    description: 'Design & Architecture phase skills'
-    skills: []
-
-  midstream:
-    description: 'Implementation phase skills'
-    skills:
-      - rr-midstream-hello-skill-001
-      - rr-midstream-security-basic-001
-      - rr-midstream-logging-observability-001
-      - rr-midstream-typescript-strict-001
-      - rr-midstream-typescript-nullcheck-001
-      - rr-midstream-gh-address-comments-001
-      - rr-midstream-review-comment-triage-001
-      - sample-code-quality
-      - review-policy-standard
-
-  downstream:
-    description: 'Testing & Release phase skills'
-    skills: []
-
-# Tag-based categorization
-tags:
-  security:
-    description: 'Security-related skills'
-    skills:
-      - rr-midstream-security-basic-001
-
-  typescript:
-    description: 'TypeScript-specific skills'
-    skills:
-      - rr-midstream-typescript-strict-001
-      - rr-midstream-typescript-nullcheck-001
-
-  observability:
-    description: 'Observability and logging skills'
-    skills:
-      - rr-midstream-logging-observability-001
-
-  review-process:
-    description: 'Review process and workflow skills'
-    skills:
-      - rr-midstream-gh-address-comments-001
-      - rr-midstream-review-comment-triage-001
-      - review-policy-standard
-
-  sample:
-    description: 'Sample and example skills'
-    skills:
-      - rr-midstream-hello-skill-001
-      - sample-code-quality
 
 # Recommended skill sets
 recommendations:
