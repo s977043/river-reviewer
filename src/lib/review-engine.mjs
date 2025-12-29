@@ -367,9 +367,15 @@ export async function generateReview({
       debug.heuristicsUsed = true;
       debug.heuristicsCount = heuristic.length;
     } else {
-      comments = includeFallback ? buildFallbackComments(diff, plan) : [];
-      debug.heuristicsUsed = false;
-      debug.fallbackIncluded = includeFallback;
+      // ヒューリスティックが実行されたが何も検出しなかった場合、
+      // それは正常な状態（問題のないコード）を示す可能性がある。
+      // フォールバックコメントは、本当にレビューできなかった場合のみ生成する。
+      const hasRelevantSkills = plan?.selected?.length > 0;
+      comments = includeFallback && !hasRelevantSkills ? buildFallbackComments(diff, plan) : [];
+      debug.heuristicsUsed = true;
+      debug.heuristicsCount = 0;
+      debug.heuristicsExecuted = true;
+      debug.fallbackIncluded = includeFallback && !hasRelevantSkills;
     }
   }
 

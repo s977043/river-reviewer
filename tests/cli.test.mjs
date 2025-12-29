@@ -43,7 +43,16 @@ async function createRepoWithChange() {
   await runGit(['add', '.'], dir);
   await runGit(['commit', '-m', 'init'], dir);
 
-  writeFileSync(app, 'export const value = 2;\n');
+  // ヒューリスティックが検出するパターンを含める（silent catch）
+  writeFileSync(app, `export const value = 2;
+export function test() {
+  try {
+    run();
+  } catch(e) {
+    return;
+  }
+}
+`);
 
   return { dir, app };
 }
