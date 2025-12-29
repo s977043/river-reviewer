@@ -33,6 +33,7 @@
     "validate:skill-yaml": "node scripts/validate-skill-yaml.mjs",
     "agent-skills:validate": "node scripts/validate-agent-skills.mjs",
     "skills:catalog": "node scripts/generate-skill-catalog.mjs",
+    "create:skill": "node scripts/create-skill.mjs",
     "dashboard:generate": "node scripts/generate-dashboard-data.js",
     "trace:validate": "OTEL_ENABLED=1 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 node scripts/validate-agents.mjs",
     "fix:dashes": "node scripts/fix-dashes.mjs",
