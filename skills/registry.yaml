@@ -1,0 +1,176 @@
+# River Reviewer Skills Registry
+# Version 1.0
+
+version: '1.0'
+description: 'Catalog of all River Reviewer skills organized by phase and tags'
+
+# Skill Catalog
+skills:
+  # Midstream Skills (Implementation Phase)
+  - id: rr-midstream-hello-skill-001
+    version: '0.1.0'
+    name: 'Hello Skill (Always-On Sample)'
+    path: skills/midstream/rr-midstream-hello-skill-001.md
+    phase: midstream
+    tags: [sample, hello, midstream]
+    severity: info
+    recommended: false
+    description: 'Always-on sample skill for testing the skill system'
+
+  - id: rr-midstream-security-basic-001
+    version: '0.1.0'
+    name: 'Basic Security Review'
+    path: skills/midstream/rr-midstream-security-basic-001.md
+    phase: midstream
+    tags: [security, midstream, basic]
+    severity: major
+    recommended: true
+    description: 'Detects common security vulnerabilities'
+
+  - id: rr-midstream-logging-observability-001
+    version: '0.1.0'
+    name: 'Logging & Observability'
+    path: skills/midstream/rr-midstream-logging-observability-001.md
+    phase: midstream
+    tags: [observability, logging, midstream]
+    severity: minor
+    recommended: true
+    description: 'Reviews logging and observability practices'
+
+  - id: rr-midstream-typescript-strict-001
+    version: '0.1.0'
+    name: 'TypeScript Strict Mode'
+    path: skills/midstream/rr-midstream-typescript-strict-001.md
+    phase: midstream
+    tags: [typescript, type-safety, midstream]
+    severity: minor
+    recommended: true
+    description: 'Enforces TypeScript strict mode best practices'
+
+  - id: rr-midstream-typescript-nullcheck-001
+    version: '0.1.0'
+    name: 'TypeScript Null Safety'
+    path: skills/midstream/rr-midstream-typescript-nullcheck-001.md
+    phase: midstream
+    tags: [typescript, null-safety, midstream]
+    severity: minor
+    recommended: true
+    description: 'Checks for null/undefined handling'
+
+  - id: rr-midstream-gh-address-comments-001
+    version: '0.1.0'
+    name: 'GitHub Review Comment Addressing'
+    path: skills/midstream/rr-midstream-gh-address-comments-001.md
+    phase: midstream
+    tags: [github, review-process, midstream]
+    severity: info
+    recommended: false
+    description: 'Checks if review comments have been addressed'
+
+  - id: rr-midstream-review-comment-triage-001
+    version: '0.1.0'
+    name: 'Review Comment Triage'
+    path: skills/midstream/rr-midstream-review-comment-triage-001.md
+    phase: midstream
+    tags: [review-process, triage, midstream]
+    severity: info
+    recommended: false
+    description: 'Triages and prioritizes review comments'
+
+  - id: sample-code-quality
+    version: '0.1.0'
+    name: 'Sample Code Quality'
+    path: skills/midstream/sample-code-quality.md
+    phase: midstream
+    tags: [sample, code-quality, midstream]
+    severity: minor
+    recommended: false
+    description: 'Sample code quality review skill'
+
+  - id: review-policy-standard
+    version: '0.1.0'
+    name: 'Review Policy Standard'
+    path: skills/midstream/review-policy-standard.md
+    phase: midstream
+    tags: [policy, review-process, midstream]
+    severity: info
+    recommended: false
+    description: 'Enforces standard review policies'
+
+# Phase-based categorization
+categories:
+  upstream:
+    description: 'Design & Architecture phase skills'
+    skills: []
+
+  midstream:
+    description: 'Implementation phase skills'
+    skills:
+      - rr-midstream-hello-skill-001
+      - rr-midstream-security-basic-001
+      - rr-midstream-logging-observability-001
+      - rr-midstream-typescript-strict-001
+      - rr-midstream-typescript-nullcheck-001
+      - rr-midstream-gh-address-comments-001
+      - rr-midstream-review-comment-triage-001
+      - sample-code-quality
+      - review-policy-standard
+
+  downstream:
+    description: 'Testing & Release phase skills'
+    skills: []
+
+# Tag-based categorization
+tags:
+  security:
+    description: 'Security-related skills'
+    skills:
+      - rr-midstream-security-basic-001
+
+  typescript:
+    description: 'TypeScript-specific skills'
+    skills:
+      - rr-midstream-typescript-strict-001
+      - rr-midstream-typescript-nullcheck-001
+
+  observability:
+    description: 'Observability and logging skills'
+    skills:
+      - rr-midstream-logging-observability-001
+
+  review-process:
+    description: 'Review process and workflow skills'
+    skills:
+      - rr-midstream-gh-address-comments-001
+      - rr-midstream-review-comment-triage-001
+      - review-policy-standard
+
+  sample:
+    description: 'Sample and example skills'
+    skills:
+      - rr-midstream-hello-skill-001
+      - sample-code-quality
+
+# Recommended skill sets
+recommendations:
+  basic:
+    description: 'Basic skill set for getting started'
+    skills:
+      - rr-midstream-security-basic-001
+      - rr-midstream-logging-observability-001
+
+  typescript:
+    description: 'Recommended skills for TypeScript projects'
+    skills:
+      - rr-midstream-typescript-strict-001
+      - rr-midstream-typescript-nullcheck-001
+      - rr-midstream-security-basic-001
+      - rr-midstream-logging-observability-001
+
+  comprehensive:
+    description: 'Comprehensive review coverage'
+    skills:
+      - rr-midstream-security-basic-001
+      - rr-midstream-logging-observability-001
+      - rr-midstream-typescript-strict-001
+      - rr-midstream-typescript-nullcheck-001
