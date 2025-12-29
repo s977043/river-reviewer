@@ -175,8 +175,5 @@ See [registry.yaml](./registry.yaml) for the complete catalog.
 
 ## References
 
-<!-- - [Skill YAML Specification](../specs/skill-yaml-spec.md) -->
-<!-- - [Skill Template](../specs/templates/skill/) -->
-
 - [promptfoo Documentation](https://www.promptfoo.dev/)
 - [River Reviewer Documentation](../DOCUMENTATION.md)

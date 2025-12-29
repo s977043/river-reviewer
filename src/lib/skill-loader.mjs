@@ -87,8 +87,6 @@ export async function listSkillFiles(dir = defaultSkillsDir) {
     } else if (
       allowedExtensions.has(path.extname(entry.name)) &&
       !['.gitkeep', 'README.md', 'registry.yaml'].includes(entry.name) &&
-
-
       !entry.name.startsWith('_')
     ) {
       files.push(entryPath);
