@@ -50,7 +50,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (upstream)
-        uses: ./.github/actions/river-reviewer
+        uses: ./runners/github-action
         with:
           phase: upstream
           dry_run: true # 秘密情報やモデル設定を確認後に false へ切り替える
