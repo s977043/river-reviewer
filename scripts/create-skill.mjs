@@ -17,15 +17,6 @@ const templateDir = join(repoRoot, 'specs/templates/skill');
 const skillsDir = join(repoRoot, 'skills');
 
 /**
-<<<<<<< Updated upstream
- * Prompt user for input
- */
-async function prompt(rl, question, defaultValue) {
-  const answer = await rl.question(
-    defaultValue ? `${question} (${defaultValue}): ` : `${question}: `
-  );
-  return answer.trim() || defaultValue || '';
-=======
  * Prompt user for input with retry on validation failure
  */
 async function prompt(rl, question, defaultValue, validator = null) {
@@ -45,7 +36,6 @@ async function prompt(rl, question, defaultValue, validator = null) {
 
     return value;
   }
->>>>>>> Stashed changes
 }
 
 /**
