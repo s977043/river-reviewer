@@ -7,7 +7,7 @@ This directory is for internal use only.
 ## 重要な注意事項 / Important Notice
 
 - ❌ **外部リンク禁止** - このディレクトリ配下のファイルへ外部からリンクを張らないでください
-- ❌ **Do NOT link to files in this directory from external sources**
+- ❌ **No External Links** - Do NOT link to files in this directory from external sources
 - 📌 **公開ドキュメントは `pages/` ディレクトリが正 (Single Source of Truth)** です
 - 📌 **Official and public documentation lives under the `pages/` directory** and the published documentation site
 
@@ -29,3 +29,5 @@ This directory is for internal use only.
 ---
 
 📖 公開ドキュメントの構成については [DOCUMENTATION.md](../DOCUMENTATION.md) を参照してください。
+
+📖 For public documentation structure, please refer to [DOCUMENTATION.md](../DOCUMENTATION.md).
