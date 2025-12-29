@@ -8,7 +8,7 @@
 
 import { readFileSync } from 'node:fs';
 import { glob } from 'glob';
-import { parse as parseYaml } from 'yaml';
+import { load as parseYaml } from 'js-yaml';
 import { SkillYamlSchema } from '../src/lib/skillYamlSchema.mjs';
 
 async function validateSkills() {
@@ -42,13 +42,13 @@ async function validateSkills() {
         console.log(`✅ ${file}`);
       } else {
         results.push({ file, valid: false, errors: result.error });
-        console.log(`❌ ${file}`);
-        console.log(`   Errors:`);
+        console.error(`❌ ${file}`);
+        console.error(`   Errors:`);
         result.error.errors.forEach((err) => {
           const path = err.path.join('.');
-          console.log(`   - ${path || '(root)'}: ${err.message}`);
+          console.error(`   - ${path || '(root)'}: ${err.message}`);
         });
-        console.log('');
+        console.error('');
       }
     } catch (error) {
       results.push({
@@ -56,11 +56,11 @@ async function validateSkills() {
         valid: false,
         error,
       });
-      console.log(`❌ ${file}`);
-      console.log(
+      console.error(`❌ ${file}`);
+      console.error(
         `   Parse error: ${error instanceof Error ? error.message : String(error)}`
       );
-      console.log('');
+      console.error('');
     }
   }
 
