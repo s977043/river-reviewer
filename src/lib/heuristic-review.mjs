@@ -230,11 +230,26 @@ function findMissingTests({ diff }) {
   ];
 }
 
+/**
+ * Check if a file path is a GitHub Actions workflow file.
+ * @param {string} filePath - File path to check
+ * @returns {boolean} True if the file is a workflow YAML file in .github/workflows/
+ */
 function looksLikeGitHubWorkflowFile(filePath) {
   const normalized = String(filePath).replaceAll('\\', '/');
   return normalized.startsWith('.github/workflows/') && /\.(yml|yaml)$/.test(normalized);
 }
 
+/**
+ * Detect GitHub Actions security issues in workflow files.
+ * Checks for common security vulnerabilities including:
+ * - pull_request_target privilege escalation risks
+ * - Excessive permissions (write-all)
+ * - Secrets exposed in run blocks
+ * - Unsanitized user input in run blocks (command injection)
+ * @param {{diff: {files?: Array}}} options - Diff object containing file changes
+ * @returns {Array<{file: string, line: number, kind: string}>} Array of detected security issues
+ */
 function findGitHubActionsIssues({ diff }) {
   const MAX_WORKFLOW_COMMENTS = 3;
   const comments = [];
@@ -246,7 +261,10 @@ function findGitHubActionsIssues({ diff }) {
 
     for (const { line, text } of iterateAddedLines(file)) {
       // Check for pull_request_target usage (privilege escalation risk)
-      if (/^\s*-?\s*pull_request_target\s*:?\s*$/.test(text)) {
+      if (
+        /^\s*(-\s+)?pull_request_target\s*:?\s*$/.test(text) ||
+        /\bon\s*:\s*\[[^\]]*\bpull_request_target\b[^\]]*\]/.test(text)
+      ) {
         comments.push({
           file: filePath,
           line,
@@ -280,7 +298,8 @@ function findGitHubActionsIssues({ diff }) {
 
       // Check for unsanitized user input in run blocks (command injection)
       if (
-        /github\.event\.(issue|pull_request|comment)\.(title|body|name)/.test(text) &&
+        /run\s*:/.test(text) &&
+        /\$\{\{\s*github\.event\.(issue|pull_request|comment)\.(title|body)\s*\}\}/.test(text) &&
         !/\|\s*jq\b/.test(text) &&
         !/toJSON/.test(text)
       ) {
