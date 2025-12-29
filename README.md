@@ -78,6 +78,8 @@ jobs:
 
 最新リリース: [v0.1.1](https://github.com/s977043/river-reviewer/releases/tag/v0.1.1)
 
+> **⚠️ v0.2.0へのアップグレード予定のユーザーへ:** v0.2.0では、GitHub Actionのパスが `.github/actions/river-reviewer` から `runners/github-action` に変更されます。詳細は[移行ガイド](docs/migration/runners-migration-guide.md)と[DEPRECATED.md](DEPRECATED.md)をご確認ください。
+
 ### 高度な設定例
 
 - フェーズ別レビューを並列実行（上流・中流・下流を個別ジョブに分割）
