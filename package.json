@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "private": true,
   "description": "River Reviewer docs, schemas, and validation utilities.",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "engines": {
     "node": "20.x"
   },
