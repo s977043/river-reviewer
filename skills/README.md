@@ -70,7 +70,7 @@ rr-midstream-example-001/
     └── promptfoo.yaml     # Evaluation config
 ```
 
-See [\_template.md](./_template.md) and [skill.schema.json](../schemas/skill.schema.json) for the full specification.
+See [specs/skill-yaml-spec.md](../specs/skill-yaml-spec.md) for the full specification.
 
 ## Creating a New Skill
 
@@ -91,7 +91,7 @@ This interactive tool will:
 1. Copy the template:
 
    ```bash
-   cp skills/_template.md skills/<phase>/<skill-id>.md
+   cp -r specs/templates/skill skills/<phase>/<skill-id>
    ```
 
 2. Edit `skill.yaml` with your skill metadata
@@ -175,5 +175,7 @@ See [registry.yaml](./registry.yaml) for the complete catalog.
 
 ## References
 
+- [Skill YAML Specification](../specs/skill-yaml-spec.md)
+- [Skill Template](../specs/templates/skill/)
 - [promptfoo Documentation](https://www.promptfoo.dev/)
 - [River Reviewer Documentation](../DOCUMENTATION.md)
