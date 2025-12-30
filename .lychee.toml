@@ -52,9 +52,6 @@ include_fragments = true
 # Cache results for faster subsequent runs
 cache = true
 
-# Verbose output
-verbose = true
-
 # User agent string
 user_agent = "Mozilla/5.0 (compatible; River-Reviewer-LinkChecker/1.0; +https://github.com/s977043/river-reviewer)"
 
