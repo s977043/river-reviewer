@@ -17,6 +17,16 @@ skills:
     recommended: true
     description: 'Detects missing validation plans (SLO/SLI, load testing, canary, rollback, DR) in design documents'
 
+  - id: rr-upstream-multitenancy-isolation-001
+    version: '0.1.0'
+    name: 'Multitenancy Isolation Guard'
+    path: skills/rr-upstream-multitenancy-isolation-001/skill.yaml
+    phase: upstream
+    tags: [multitenancy, isolation, security, architecture, upstream]
+    severity: major
+    recommended: true
+    description: 'Detects tenant isolation gaps in data, authorization, resources, and failure boundaries'
+
   # Midstream Skills (Implementation Phase)
   - id: rr-midstream-hello-skill-001
     version: '0.1.0'
@@ -127,7 +137,14 @@ recommendations:
   comprehensive:
     description: 'Comprehensive review coverage'
     skills:
+      - rr-upstream-multitenancy-isolation-001
       - rr-midstream-security-basic-001
       - rr-midstream-logging-observability-001
       - rr-midstream-typescript-strict-001
       - rr-midstream-typescript-nullcheck-001
+
+  multitenancy:
+    description: 'Recommended skills for multi-tenant SaaS applications'
+    skills:
+      - rr-upstream-multitenancy-isolation-001
+      - rr-midstream-security-basic-001

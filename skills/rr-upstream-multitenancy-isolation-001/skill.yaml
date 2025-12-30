@@ -1,0 +1,47 @@
+id: rr-upstream-multitenancy-isolation-001
+version: 0.1.0
+name: Multitenancy Isolation Guard
+description: マルチテナント前提の設計差分から、テナント分離（データ/権限/リソース/障害影響）の抜けや越境リスクを検出
+
+phase: upstream
+applyTo:
+  - '**/*.md'
+  - '**/*.yaml'
+  - '**/*.yml'
+  - '**/*.json'
+  - 'docs/**/*'
+  - 'design/**/*'
+  - 'architecture/**/*'
+  - 'specs/**/*'
+
+tags:
+  - multitenancy
+  - isolation
+  - security
+  - architecture
+  - upstream
+
+severity: major
+
+inputContext:
+  - fullFile
+  - adr
+
+outputKind:
+  - findings
+  - actions
+
+modelHint: balanced
+
+dependencies:
+  - code_search
+
+prompt:
+  system: prompt/system.md
+  user: prompt/user.md
+
+eval:
+  promptfoo: eval/promptfoo.yaml
+
+fixturesDir: fixtures
+goldenDir: golden
