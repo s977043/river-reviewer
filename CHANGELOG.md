@@ -31,7 +31,7 @@
 
 ### Breaking Changes
 
-⚠️ **Important:** This release contains breaking changes. See [Migration Guide](docs/migration/runners-migration-guide.md) for upgrade instructions.
+⚠️ **Important:** This release contains breaking changes. See [Migration Guide](docs/migration/runners-architecture-guide.md) for upgrade instructions.
 
 1. **GitHub Action Path Changed:**
    - **Old (v0.1.x):** `s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1`
@@ -46,7 +46,7 @@
 
 ### Migration Resources
 
-- **Full Migration Guide:** [docs/migration/runners-migration-guide.md](docs/migration/runners-migration-guide.md)
+- **Full Migration Guide:** [docs/migration/runners-architecture-guide.md](docs/migration/runners-architecture-guide.md)
 - **Deprecation Notice:** [DEPRECATED.md](DEPRECATED.md)
 - **Architecture Overview:** [docs/architecture.md](docs/architecture.md)
 
