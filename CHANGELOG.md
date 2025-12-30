@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.2.0—TBD
+## v0.2.0—2025-12-29
 
 ### Features
 
