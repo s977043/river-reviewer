@@ -117,13 +117,24 @@ jobs:
             echo "::warning::No API keys configured - running dry-run validation only"
           fi
 
-      - name: Run evaluation (dry-run)
+      - name: Validate config (no API keys)
         if: github.event.inputs.dry_run == 'true' || steps.check-keys.outputs.has_keys != 'true'
         working-directory: skills/${{ matrix.skill }}/eval
         run: |
-          echo "=== Dry-run mode: Validating promptfoo config ==="
-          promptfoo eval --config promptfoo.yaml --dry-run --no-cache
-          echo "=== Config validation successful ==="
+          echo "=== Validating promptfoo config (no API keys available) ==="
+          # Validate YAML syntax
+          npx js-yaml promptfoo.yaml > /dev/null
+          echo "✓ Config file is valid YAML"
+          # Check that referenced files exist
+          for file in $(grep -oP 'file://\K[^"]+' promptfoo.yaml 2>/dev/null || true); do
+            if [ -f "$file" ]; then
+              echo "✓ Referenced file exists: $file"
+            else
+              echo "✗ Missing referenced file: $file"
+              exit 1
+            fi
+          done
+          echo "=== Config validation successful (skipping actual evaluation) ==="
 
       - name: Run evaluation
         if: github.event.inputs.dry_run != 'true' && steps.check-keys.outputs.has_keys == 'true'
