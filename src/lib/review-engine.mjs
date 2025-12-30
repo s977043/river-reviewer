@@ -414,13 +414,13 @@ export async function generateReview({
 
   if (!comments.length) {
     const heuristic = buildHeuristicComments({ diff, plan });
+    debug.heuristicsUsed = true;
     if (heuristic.length) {
       comments = normalizeHeuristicComments(heuristic);
-      debug.heuristicsUsed = true;
       debug.heuristicsCount = heuristic.length;
     } else {
       comments = includeFallback ? buildFallbackComments(diff, plan) : [];
-      debug.heuristicsUsed = false;
+      debug.heuristicsCount = 0;
       debug.fallbackIncluded = includeFallback;
     }
   }
