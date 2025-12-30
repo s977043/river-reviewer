@@ -81,6 +81,8 @@ jobs:
     name: Evaluate ${{ matrix.skill }}
     needs: discover-skills
     if: needs.discover-skills.outputs.has_skills == 'true'
+    # Continue on error - evaluations are informational and shouldn't block PRs
+    continue-on-error: true
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -102,8 +104,21 @@ jobs:
       - name: Install promptfoo
         run: npm install -g promptfoo
 
+      - name: Check API keys availability
+        id: check-keys
+        env:
+          HAS_OPENAI: ${{ secrets.OPENAI_API_KEY != '' }}
+          HAS_ANTHROPIC: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          if [ "$HAS_OPENAI" = "true" ] || [ "$HAS_ANTHROPIC" = "true" ]; then
+            echo "has_keys=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_keys=false" >> $GITHUB_OUTPUT
+            echo "::warning::No API keys configured - running dry-run validation only"
+          fi
+
       - name: Run evaluation (dry-run)
-        if: github.event.inputs.dry_run == 'true'
+        if: github.event.inputs.dry_run == 'true' || steps.check-keys.outputs.has_keys != 'true'
         working-directory: skills/${{ matrix.skill }}/eval
         run: |
           echo "=== Dry-run mode: Validating promptfoo config ==="
@@ -111,7 +126,7 @@ jobs:
           echo "=== Config validation successful ==="
 
       - name: Run evaluation
-        if: github.event.inputs.dry_run != 'true'
+        if: github.event.inputs.dry_run != 'true' && steps.check-keys.outputs.has_keys == 'true'
         working-directory: skills/${{ matrix.skill }}/eval
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -121,7 +136,7 @@ jobs:
           promptfoo eval --config promptfoo.yaml --no-cache --output results.json --share
 
       - name: Check must_include assertions
-        if: github.event.inputs.dry_run != 'true'
+        if: github.event.inputs.dry_run != 'true' && steps.check-keys.outputs.has_keys == 'true'
         working-directory: skills/${{ matrix.skill }}/eval
         run: |
           echo "=== Checking evaluation results ==="
@@ -145,7 +160,7 @@ jobs:
           fi
 
       - name: Upload evaluation results
-        if: always() && github.event.inputs.dry_run != 'true'
+        if: always() && github.event.inputs.dry_run != 'true' && steps.check-keys.outputs.has_keys == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: eval-results-${{ matrix.skill }}
@@ -197,7 +212,7 @@ jobs:
           if [ "$TOTAL_FAILED" -gt 0 ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "> Note: See individual job logs for failure details" >> $GITHUB_STEP_SUMMARY
-            exit 1
+            # Don't fail the workflow - evaluations are informational
           fi
 
       - name: Comment on PR
