@@ -1,11 +1,19 @@
-# Expected Output: Well-Designed Privacy
+# Expected Output: Well-Designed Security/Privacy
+
+## Summary
+
+(summary):1: 顧客データプラットフォーム設計において、セキュリティ・プライバシー要件は十分に記載されています。データ保持ポリシー、削除リクエスト対応、バックアップPII考慮、データレジデンシ、監査ログ設計が網羅されています。
+
+## Findings
 
 NO_ISSUES
 
-The document properly addresses security and privacy design requirements:
+この設計書には以下のセキュリティ・プライバシー要件が適切に含まれています:
 
-- Data retention periods are explicitly defined in a table
-- Backup handling for deletion requests is documented
-- Data residency is clearly specified per region
-- Audit logging is designed with retention periods
-- Reference to Privacy Impact Assessment exists
+- データ保持ポリシー（データ種別ごとの保持期間と削除トリガー、データ分類付き）
+- 削除リクエスト対応フロー（受付、対象範囲、SLA、例外ケース明記）
+- バックアップPII考慮（削除マーカー方式、リストア時の考慮、ローテーション）
+- データレジデンシ（リージョン別保存、越境転送ポリシー、規制対応）
+- 監査ログ設計（対象イベント、保持期間、アクセス制御、改ざん防止）
+- 暗号化要件（保存時、転送時、PIIフィールド別）
+- アクセス制御（認証、認可、APIトークン管理）
