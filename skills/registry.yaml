@@ -7,6 +7,16 @@ description: 'Catalog of all River Reviewer skills organized by phase and tags'
 # Skill Catalog
 skills:
   # Upstream Skills (Design Phase)
+  - id: rr-upstream-architecture-validation-plan-001
+    version: '0.1.0'
+    name: 'Architecture Validation Plan Guard'
+    path: skills/rr-upstream-architecture-validation-plan-001/skill.yaml
+    phase: upstream
+    tags: [architecture, validation, verification, slo, upstream]
+    severity: minor
+    recommended: true
+    description: 'Detects missing validation plans (SLO/SLI, load testing, canary, rollback, DR) in design documents'
+
   - id: rr-upstream-multitenancy-isolation-001
     version: '0.1.0'
     name: 'Multitenancy Isolation Guard'
