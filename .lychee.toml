@@ -21,11 +21,11 @@ exclude = [
   'your-org/',
 
   # Sites that commonly block bots or require authentication
-  'linkedin\.com',
-  'discord\.gg',
-  'discord\.com/invite',
-  't\.co', # Twitter short links
-  'slack\.com',
+  '^https?://([^/]+\.)?linkedin\.com',
+  '^https?://discord\.gg',
+  '^https?://discord\.com/invite',
+  '^https?://t\.co', # Twitter short links
+  '^https?://([^/]+\.)?slack\.com',
 
   # GitHub URLs that may not exist yet (for PRs)
   # Uncomment if needed:
