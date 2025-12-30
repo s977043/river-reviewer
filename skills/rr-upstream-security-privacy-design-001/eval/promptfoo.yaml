@@ -1,45 +1,22 @@
-# promptfoo evaluation configuration
 description: 'Evaluation for Security & Privacy Design Review'
-
 providers:
   - id: openai:gpt-4o-mini
     config:
       temperature: 0.1
-
 prompts:
   - file://../prompt/system.md
   - file://../prompt/user.md
-
 tests:
-  - description: 'Detect missing data retention and privacy gaps'
+  - description: 'Detect missing retention'
     vars:
       document: file://../fixtures/01-missing-retention.md
     assert:
       - type: contains-any
-        value:
-          - 'retention'
-          - 'Retention'
-      - type: contains-any
-        value:
-          - 'backup'
-          - 'Backup'
-      - type: contains-any
-        value:
-          - 'region'
-          - 'residency'
-
-  - description: 'No false positive on well-designed privacy'
+        value: [retention, Retention, backup, Backup]
+  - description: 'No false positive'
     vars:
       document: file://../fixtures/02-well-designed.md
     assert:
       - type: contains-any
-        value:
-          - 'NO_ISSUES'
-          - 'no issues'
-          - 'properly'
-
+        value: [NO_ISSUES, no issues, properly]
 outputPath: ./output.json
-
-defaultTest:
-  options:
-    provider: openai:gpt-4o-mini

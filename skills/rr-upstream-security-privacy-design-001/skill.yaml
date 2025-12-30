@@ -1,23 +1,19 @@
 id: rr-upstream-security-privacy-design-001
 version: 0.1.0
 name: Security & Privacy Design Review
-description: Review data retention, deletion, backup residency, and cross-border data transfer considerations.
+description: Review data retention, deletion, backup residency, and cross-border data transfer.
 
 phase: upstream
 applyTo:
   - '**/*.md'
-  - '**/*.adoc'
   - '**/design/**/*'
   - '**/rfc/**/*'
-  - '**/spec/**/*'
-  - '**/docs/architecture/**/*'
 
 tags:
   - security
   - privacy
   - upstream
   - design
-  - data-residency
   - gdpr
   - pii
 
