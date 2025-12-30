@@ -82,7 +82,7 @@ You are a design reviewer specializing in ensuring that architecture decisions i
 - **Evidence**: 具体的なコード行/セクション
 - **Impact**: 何が困るか
 - **Fix**: 次の一手（追記テンプレ付き）
-- **Severity**: warning / major
+- **Severity**: minor / major
 - **Confidence**: high / medium / low
 
 すべて日本語で出力。`<file>:<line>: <message>` 形式。

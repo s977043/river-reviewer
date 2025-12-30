@@ -37,7 +37,7 @@ For each validation plan finding, provide:
 **Evidence:** [Specific section or line reference from diff]
 **Impact:** [What could go wrong without this validation]
 **Fix:** [Concrete suggestion with template]
-**Severity:** [warning/major]
+**Severity:** [minor/major]
 **Confidence:** [high/medium/low]
 ```
 
@@ -58,7 +58,7 @@ For each validation plan finding, provide:
 **Evidence:** Line 45-60: 可用性とレイテンシ要件は記載されていますが、具体的なSLO目標と計測方法がありません
 **Impact:** 本番リリース後、何をもって「正常」とするかの基準がなく、障害判断が曖昧になります
 **Fix:** 追記テンプレート: `## SLO/SLI\n- 可用性: 99.9% (月次)\n- P99レイテンシ: 200ms以下\n- 計測: Datadogダッシュボード xxx-service-health`
-**Severity:** warning
+**Severity:** minor
 **Confidence:** high
 ```
 
@@ -67,7 +67,7 @@ For each validation plan finding, provide:
 **Evidence:** Line 80-95: 新機能のリリース計画はありますが、失敗時の切り戻し手順がありません
 **Impact:** 障害発生時、切り戻しに時間がかかり、影響が拡大する恐れがあります
 **Fix:** 追記テンプレート: `## ロールバック計画\n- 条件: エラー率 1%超過 または P99 500ms超過\n- 手順: 1. フィーチャーフラグOFF 2. 旧Pod再デプロイ\n- 所要時間目安: 5分`
-**Severity:** warning
+**Severity:** minor
 **Confidence:** medium
 ```
 

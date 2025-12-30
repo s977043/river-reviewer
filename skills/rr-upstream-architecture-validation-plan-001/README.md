@@ -49,7 +49,7 @@ npx promptfoo eval
 **Evidence:** Line 24-27: 可用性とレイテンシ要件は記載されていますが、具体的なSLO目標と計測方法がありません
 **Impact:** 本番リリース後、何をもって「正常」とするかの基準がなく、障害判断が曖昧になります
 **Fix:** 追記テンプレート: `## SLO/SLI\n- 可用性: 99.9% (月次)\n- P99レイテンシ: 200ms以下\n- 計測: Datadogダッシュボード xxx-service-health`
-**Severity:** warning
+**Severity:** minor
 **Confidence:** high
 ```
 
@@ -80,9 +80,9 @@ npx promptfoo eval
 
 設計フェーズで検証計画を検討することで、実装後の「こんなはずじゃなかった」を防ぐ。実装後（midstream）では修正コストが高く、リリース後（downstream）では手遅れになる。
 
-### なぜ warning severity?
+### なぜ minor severity?
 
-検証計画の欠如は直接的な障害を引き起こさないが、障害発生時の検知・対応を困難にするため、設計段階で対処すべき。ただし、小規模な変更では過剰な要求を避けるため warning とする。
+検証計画の欠如は直接的な障害を引き起こさないが、障害発生時の検知・対応を困難にするため、設計段階で対処すべき。ただし、小規模な変更では過剰な要求を避けるため minor とする。
 
 ### なぜ medium confidence?
 
