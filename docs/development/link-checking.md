@@ -309,8 +309,11 @@ brew install lychee  # macOS
 ### キャッシュのクリア
 
 ```bash
-# Lycheeのキャッシュをクリア
-rm -rf ~/.cache/lychee
+# 1. 以下のコマンドでキャッシュディレクトリのパスを確認します
+lychee --cache-path
+
+# 2. 表示されたパスのディレクトリを削除します
+# 例: rm -rf <表示されたパス>
 ```
 
 ### 設定ファイルが読み込まれない

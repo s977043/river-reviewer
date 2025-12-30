@@ -31,6 +31,10 @@ exclude = [
   # Uncomment if needed:
   # 'github\.com/.*/tree/main/.*',
   # 'github\.com/.*/pull/\d+',
+
+  # Docusaurus-style internal links (handled by site routing)
+  '^/$',
+  '^/index-en$',
 ]
 
 # Accept status codes
