@@ -416,6 +416,517 @@ async function customReviewWorkflow() {
 }
 ```
 
+## AI Provider Integration Guide
+
+This guide explains how to integrate AI providers (OpenAI, Anthropic, etc.) with the River Reviewer Node API to execute skills and generate code review findings.
+
+### Execution Model
+
+The River Reviewer Node API provides **execution plans**, not AI execution. This means:
+
+1. **`review()`** - Returns which skills should be executed and against which files
+2. **`buildExecutionPlan()`** - Creates an optimized execution plan with skill prioritization
+3. **`evaluateSkill()`** - Currently a placeholder that requires custom AI integration
+
+To perform actual AI-powered code reviews, you must:
+
+1. Build an execution plan using the Node API
+2. Pass the skill body and code context to your AI provider
+3. Parse the AI response into `Finding` objects
+4. Aggregate findings across all executed skills
+
+### Interface Requirements
+
+Your AI provider integration must handle:
+
+**Input to AI Provider:**
+
+- `skill.body` - The skill instructions (markdown text with review criteria)
+- `diffText` - Git diff of changes (when `inputContext` includes `'diff'`)
+- `fileContents` - Full file contents (when `inputContext` includes `'fullFile'`)
+- `skill.metadata` - Skill metadata for context (severity, tags, etc.)
+
+**Output from AI Provider:**
+
+- Structured findings that can be parsed into the `Finding` interface:
+
+```typescript
+interface Finding {
+  file: string; // File path where finding was detected
+  line?: number; // Line number (optional)
+  column?: number; // Column number (optional)
+  message: string; // Finding description
+  severity: Severity; // 'info' | 'minor' | 'major' | 'critical'
+  skillId: string; // Skill ID that produced this finding
+  suggestion?: string; // Suggested fix (optional)
+}
+```
+
+### Example: OpenAI Integration
+
+```typescript
+import OpenAI from 'openai';
+import { buildExecutionPlan, loadSkills } from '@river-reviewer/node-api';
+import type { SkillDefinition, Finding, Severity } from '@river-reviewer/node-api';
+import { execSync } from 'child_process';
+import * as fs from 'fs';
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// System prompt for structured output
+const SYSTEM_PROMPT = `You are a code reviewer. Analyze the provided code according to the skill instructions.
+
+Return findings as a JSON array with this structure:
+{
+  "findings": [
+    {
+      "file": "path/to/file.ts",
+      "line": 42,
+      "message": "Description of the issue",
+      "severity": "major",
+      "suggestion": "How to fix it"
+    }
+  ]
+}
+
+Severity levels:
+- "critical": Security vulnerabilities, data loss risks
+- "major": Bugs, significant issues that will cause problems
+- "minor": Code quality issues, minor improvements
+- "info": Suggestions, observations, best practices
+
+If no issues are found, return: { "findings": [] }`;
+
+// Execute a single skill with OpenAI
+async function executeSkillWithOpenAI(
+  skill: SkillDefinition,
+  diffText: string,
+  fileContents: Map<string, string>
+): Promise<Finding[]> {
+  // Build the context based on skill's input requirements
+  const inputContexts = skill.metadata.inputContext ?? ['diff'];
+  let codeContext = '';
+
+  if (inputContexts.includes('diff')) {
+    codeContext += `## Git Diff\n\`\`\`diff\n${diffText}\n\`\`\`\n\n`;
+  }
+
+  if (inputContexts.includes('fullFile')) {
+    codeContext += '## Full File Contents\n';
+    for (const [filePath, content] of fileContents) {
+      codeContext += `### ${filePath}\n\`\`\`\n${content}\n\`\`\`\n\n`;
+    }
+  }
+
+  // Build the user prompt
+  const userPrompt = `## Skill Instructions
+${skill.body}
+
+## Code to Review
+${codeContext}
+
+Analyze the code according to the skill instructions and return findings as JSON.`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: skill.metadata.modelHint === 'cheap' ? 'gpt-4o-mini' : 'gpt-4o',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userPrompt },
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.1,
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      return [];
+    }
+
+    // Parse the response
+    const parsed = JSON.parse(content) as { findings: Array<Omit<Finding, 'skillId'>> };
+
+    // Add skillId to each finding and validate severity
+    return parsed.findings.map((f) => ({
+      ...f,
+      skillId: skill.metadata.id,
+      severity: validateSeverity(f.severity, skill.metadata.severity),
+    }));
+  } catch (error) {
+    console.error(`Error executing skill ${skill.metadata.id}:`, error);
+    return [];
+  }
+}
+
+// Validate and normalize severity
+function validateSeverity(severity: string | undefined, defaultSeverity?: Severity): Severity {
+  const validSeverities: Severity[] = ['info', 'minor', 'major', 'critical'];
+  if (severity && validSeverities.includes(severity as Severity)) {
+    return severity as Severity;
+  }
+  return defaultSeverity ?? 'minor';
+}
+
+// Main review workflow with OpenAI
+async function reviewWithOpenAI(changedFiles: string[], baseBranch = 'main') {
+  // Get git diff
+  const diffText = execSync(`git diff ${baseBranch}`, { encoding: 'utf8' });
+
+  // Read file contents
+  const fileContents = new Map<string, string>();
+  for (const file of changedFiles) {
+    if (fs.existsSync(file)) {
+      fileContents.set(file, fs.readFileSync(file, 'utf8'));
+    }
+  }
+
+  // Build execution plan
+  const plan = await buildExecutionPlan({
+    phase: 'midstream',
+    changedFiles,
+    availableContexts: ['diff', 'fullFile'],
+    preferredModelHint: 'balanced',
+    diffText,
+  });
+
+  console.log(`Executing ${plan.selected.length} skills...`);
+
+  // Execute each skill
+  const allFindings: Finding[] = [];
+
+  for (const skill of plan.selected) {
+    console.log(`  Running: ${skill.metadata.id}`);
+    const findings = await executeSkillWithOpenAI(skill, diffText, fileContents);
+    allFindings.push(...findings);
+  }
+
+  // Summarize results
+  const summary = {
+    totalFindings: allFindings.length,
+    bySeverity: {
+      critical: allFindings.filter((f) => f.severity === 'critical').length,
+      major: allFindings.filter((f) => f.severity === 'major').length,
+      minor: allFindings.filter((f) => f.severity === 'minor').length,
+      info: allFindings.filter((f) => f.severity === 'info').length,
+    },
+    filesReviewed: changedFiles.length,
+    skillsExecuted: plan.selected.length,
+  };
+
+  return { findings: allFindings, summary };
+}
+
+// Usage
+const result = await reviewWithOpenAI(['src/app.ts', 'src/utils.ts']);
+console.log(`Found ${result.summary.totalFindings} findings`);
+```
+
+### Example: Anthropic Integration
+
+````typescript
+import Anthropic from '@anthropic-ai/sdk';
+import { buildExecutionPlan } from '@river-reviewer/node-api';
+import type { SkillDefinition, Finding, Severity } from '@river-reviewer/node-api';
+import { execSync } from 'child_process';
+import * as fs from 'fs';
+
+// Initialize Anthropic client
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+// System prompt for structured output
+const SYSTEM_PROMPT = `You are a code reviewer. Analyze the provided code according to the skill instructions.
+
+Return your findings as a JSON object with this structure:
+{
+  "findings": [
+    {
+      "file": "path/to/file.ts",
+      "line": 42,
+      "message": "Description of the issue",
+      "severity": "major",
+      "suggestion": "How to fix it"
+    }
+  ]
+}
+
+Severity levels:
+- "critical": Security vulnerabilities, data loss risks
+- "major": Bugs, significant issues
+- "minor": Code quality issues
+- "info": Suggestions and observations
+
+Return ONLY the JSON object, no additional text.`;
+
+// Select model based on skill's model hint
+function selectAnthropicModel(modelHint?: string): string {
+  switch (modelHint) {
+    case 'cheap':
+      return 'claude-3-5-haiku-20241022';
+    case 'high-accuracy':
+      return 'claude-opus-4-5-20251101';
+    case 'balanced':
+    default:
+      return 'claude-sonnet-4-20250514';
+  }
+}
+
+// Execute a single skill with Anthropic
+async function executeSkillWithAnthropic(
+  skill: SkillDefinition,
+  diffText: string,
+  fileContents: Map<string, string>
+): Promise<Finding[]> {
+  // Build context based on skill requirements
+  const inputContexts = skill.metadata.inputContext ?? ['diff'];
+  let codeContext = '';
+
+  if (inputContexts.includes('diff')) {
+    codeContext += `## Git Diff\n\`\`\`diff\n${diffText}\n\`\`\`\n\n`;
+  }
+
+  if (inputContexts.includes('fullFile')) {
+    codeContext += '## Full File Contents\n';
+    for (const [filePath, content] of fileContents) {
+      codeContext += `### ${filePath}\n\`\`\`\n${content}\n\`\`\`\n\n`;
+    }
+  }
+
+  const userMessage = `## Skill Instructions
+${skill.body}
+
+## Code to Review
+${codeContext}
+
+Analyze the code and return findings as JSON.`;
+
+  try {
+    const response = await anthropic.messages.create({
+      model: selectAnthropicModel(skill.metadata.modelHint),
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userMessage }],
+    });
+
+    // Extract text content
+    const textBlock = response.content.find((block) => block.type === 'text');
+    if (!textBlock || textBlock.type !== 'text') {
+      return [];
+    }
+
+    // Parse JSON from response (handle potential markdown code blocks)
+    let jsonText = textBlock.text.trim();
+    if (jsonText.startsWith('```json')) {
+      jsonText = jsonText.slice(7);
+    }
+    if (jsonText.startsWith('```')) {
+      jsonText = jsonText.slice(3);
+    }
+    if (jsonText.endsWith('```')) {
+      jsonText = jsonText.slice(0, -3);
+    }
+
+    const parsed = JSON.parse(jsonText.trim()) as {
+      findings: Array<Omit<Finding, 'skillId'>>;
+    };
+
+    // Add skillId and validate severity
+    return parsed.findings.map((f) => ({
+      ...f,
+      skillId: skill.metadata.id,
+      severity: validateSeverity(f.severity, skill.metadata.severity),
+    }));
+  } catch (error) {
+    console.error(`Error executing skill ${skill.metadata.id}:`, error);
+    return [];
+  }
+}
+
+// Validate severity helper
+function validateSeverity(severity: string | undefined, defaultSeverity?: Severity): Severity {
+  const validSeverities: Severity[] = ['info', 'minor', 'major', 'critical'];
+  if (severity && validSeverities.includes(severity as Severity)) {
+    return severity as Severity;
+  }
+  return defaultSeverity ?? 'minor';
+}
+
+// Main review workflow with Anthropic
+async function reviewWithAnthropic(changedFiles: string[], baseBranch = 'main') {
+  const diffText = execSync(`git diff ${baseBranch}`, { encoding: 'utf8' });
+
+  const fileContents = new Map<string, string>();
+  for (const file of changedFiles) {
+    if (fs.existsSync(file)) {
+      fileContents.set(file, fs.readFileSync(file, 'utf8'));
+    }
+  }
+
+  const plan = await buildExecutionPlan({
+    phase: 'midstream',
+    changedFiles,
+    availableContexts: ['diff', 'fullFile'],
+    preferredModelHint: 'balanced',
+    diffText,
+  });
+
+  console.log(`Executing ${plan.selected.length} skills with Anthropic...`);
+
+  const allFindings: Finding[] = [];
+
+  for (const skill of plan.selected) {
+    console.log(`  Running: ${skill.metadata.id}`);
+    const findings = await executeSkillWithAnthropic(skill, diffText, fileContents);
+    allFindings.push(...findings);
+  }
+
+  return {
+    findings: allFindings,
+    summary: {
+      totalFindings: allFindings.length,
+      bySeverity: {
+        critical: allFindings.filter((f) => f.severity === 'critical').length,
+        major: allFindings.filter((f) => f.severity === 'major').length,
+        minor: allFindings.filter((f) => f.severity === 'minor').length,
+        info: allFindings.filter((f) => f.severity === 'info').length,
+      },
+      filesReviewed: changedFiles.length,
+      skillsExecuted: plan.selected.length,
+    },
+  };
+}
+
+// Usage
+const result = await reviewWithAnthropic(['src/app.ts']);
+console.log(`Found ${result.summary.totalFindings} findings`);
+````
+
+### Error Handling and Rate Limiting
+
+When integrating with AI providers, implement proper error handling and rate limiting:
+
+```typescript
+import type { SkillDefinition, Finding } from '@river-reviewer/node-api';
+
+// Simple rate limiter
+class RateLimiter {
+  private queue: Array<() => Promise<void>> = [];
+  private running = 0;
+
+  constructor(
+    private maxConcurrent: number,
+    private minDelayMs: number
+  ) {}
+
+  async execute<T>(fn: () => Promise<T>): Promise<T> {
+    while (this.running >= this.maxConcurrent) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    this.running++;
+    try {
+      const result = await fn();
+      await new Promise((resolve) => setTimeout(resolve, this.minDelayMs));
+      return result;
+    } finally {
+      this.running--;
+    }
+  }
+}
+
+// Retry with exponential backoff
+async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, baseDelayMs = 1000): Promise<T> {
+  let lastError: Error | undefined;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Check for rate limit errors
+      if (isRateLimitError(error)) {
+        const delay = baseDelayMs * Math.pow(2, attempt);
+        console.warn(`Rate limited. Retrying in ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      // Don't retry on non-retryable errors
+      if (!isRetryableError(error)) {
+        throw lastError;
+      }
+
+      const delay = baseDelayMs * Math.pow(2, attempt);
+      console.warn(`Attempt ${attempt + 1} failed. Retrying in ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError;
+}
+
+function isRateLimitError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return (
+      error.message.includes('rate limit') ||
+      error.message.includes('429') ||
+      error.message.includes('Too Many Requests')
+    );
+  }
+  return false;
+}
+
+function isRetryableError(error: unknown): boolean {
+  if (error instanceof Error) {
+    // Retry on network errors, timeouts, and 5xx errors
+    return (
+      error.message.includes('ECONNRESET') ||
+      error.message.includes('ETIMEDOUT') ||
+      error.message.includes('500') ||
+      error.message.includes('502') ||
+      error.message.includes('503')
+    );
+  }
+  return false;
+}
+
+// Usage with rate limiting and retry
+const rateLimiter = new RateLimiter(3, 500); // 3 concurrent, 500ms delay
+
+async function executeSkillsWithRateLimiting(
+  skills: SkillDefinition[],
+  executeSkill: (skill: SkillDefinition) => Promise<Finding[]>
+): Promise<Finding[]> {
+  const results = await Promise.all(
+    skills.map((skill) => rateLimiter.execute(() => withRetry(() => executeSkill(skill), 3, 1000)))
+  );
+
+  return results.flat();
+}
+```
+
+### Best Practices
+
+1. **Model Selection**: Use `skill.metadata.modelHint` to select appropriate models:
+   - `'cheap'`: Use faster/cheaper models (gpt-4o-mini, claude-3-5-haiku)
+   - `'balanced'`: Use standard models (gpt-4o, claude-sonnet-4)
+   - `'high-accuracy'`: Use most capable models (gpt-4o, claude-opus-4-5)
+
+2. **Token Management**: Skills can have large bodies. Consider truncating diff/file content if needed.
+
+3. **Caching**: Cache skill execution results for unchanged files to reduce API calls.
+
+4. **Parallel Execution**: Execute independent skills in parallel, respecting rate limits.
+
+5. **Error Isolation**: One skill failure should not prevent other skills from executing.
+
+6. **Response Validation**: Always validate and sanitize AI responses before using them.
+
 ## Development
 
 ### Build
