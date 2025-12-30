@@ -1,0 +1,108 @@
+# promptfoo evaluation configuration
+# See https://www.promptfoo.dev/docs/configuration/guide
+
+description: 'Evaluation for Logging and Observability Guard'
+
+# Model providers to test
+providers:
+  - id: openai:gpt-4o-mini
+    config:
+      temperature: 0.1
+
+# Prompts to evaluate
+prompts:
+  - file://../prompt/system.md
+  - file://../prompt/user.md
+
+# Test cases
+tests:
+  # Test case 1: Silent catch - should detect
+  - description: 'Detect silent exception catch'
+    vars:
+      diff: |
+        diff --git a/src/services/user.ts b/src/services/user.ts
+        index 1111111..2222222 100644
+        --- a/src/services/user.ts
+        +++ b/src/services/user.ts
+        @@ -10,0 +11,8 @@
+        +async function fetchUser(userId: string) {
+        +  try {
+        +    const response = await api.get(`/users/${userId}`);
+        +    return response.data;
+        +  } catch (error) {
+        +    // ignore
+        +  }
+        +}
+    assert:
+      - type: contains
+        value: 'src/services/user.ts'
+      - type: contains-any
+        value:
+          - '握りつぶ'
+          - 'silent'
+          - 'catch'
+          - 'ログ'
+          - 'log'
+
+  # Test case 2: Proper error handling - should NOT flag
+  - description: 'No false positive on proper error handling'
+    vars:
+      diff: |
+        diff --git a/src/services/user.ts b/src/services/user.ts
+        index 1111111..2222222 100644
+        --- a/src/services/user.ts
+        +++ b/src/services/user.ts
+        @@ -10,0 +11,10 @@
+        +async function fetchUser(userId: string) {
+        +  try {
+        +    const response = await api.get(`/users/${userId}`);
+        +    return response.data;
+        +  } catch (error) {
+        +    logger.error('Failed to fetch user', { userId, error });
+        +    throw error;
+        +  }
+        +}
+    assert:
+      - type: contains-any
+        value:
+          - 'NO_ISSUES'
+          - '問題ありません'
+          - '指摘なし'
+          - 'No findings'
+          - '良い'
+
+  # Test case 3: Missing context in log - should detect
+  - description: 'Detect missing context in error log'
+    vars:
+      diff: |
+        diff --git a/src/services/payment.ts b/src/services/payment.ts
+        index 1111111..2222222 100644
+        --- a/src/services/payment.ts
+        +++ b/src/services/payment.ts
+        @@ -20,0 +21,8 @@
+        +async function processPayment(amount: number) {
+        +  try {
+        +    await paymentGateway.charge(amount);
+        +  } catch (error) {
+        +    console.log('Payment failed');
+        +    throw error;
+        +  }
+        +}
+    assert:
+      - type: contains
+        value: 'src/services/payment.ts'
+      - type: contains-any
+        value:
+          - 'context'
+          - '文脈'
+          - 'requestId'
+          - 'amount'
+          - '追跡'
+
+# Output format
+outputPath: ./output.json
+
+# Default test settings
+defaultTest:
+  options:
+    provider: openai:gpt-4o-mini
