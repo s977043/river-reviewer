@@ -26,3 +26,4 @@ CLAUDE.local.md
 .vale/Microsoft
 eval-results/
 **/eval/results.json
+dist/

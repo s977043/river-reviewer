@@ -1,0 +1,69 @@
+# Lychee Link Checker Configuration
+# https://github.com/lycheeverse/lychee
+
+# Maximum number of redirects to follow
+max_redirects = 5
+
+# Maximum number of concurrent network requests
+max_concurrency = 8
+
+# Exclude patterns (regex)
+exclude = [
+  # Email addresses
+  '^mailto:',
+
+  # Localhost and development servers
+  '^https?://localhost',
+  '^https?://127\.0\.0\.1',
+
+  # Common placeholders in documentation
+  'example\.com',
+  'your-org/',
+
+  # Sites that commonly block bots or require authentication
+  '^https?://([^/]+\.)?linkedin\.com',
+  '^https?://discord\.gg',
+  '^https?://discord\.com/invite',
+  '^https?://t\.co', # Twitter short links
+  '^https?://([^/]+\.)?slack\.com',
+
+  # GitHub URLs that may not exist yet (for PRs)
+  # Uncomment if needed:
+  # 'github\.com/.*/tree/main/.*',
+  # 'github\.com/.*/pull/\d+',
+]
+
+# Accept status codes
+# Redirects are handled by max_redirects (not listed here to ensure permanent redirects are visible in logs)
+accept = [
+  # Success codes only
+  200, 201, 202, 203, 204,
+  # Client error codes to accept (use carefully)
+  # 403, # Forbidden - some sites block automated requests
+  # 429, # Too Many Requests
+]
+
+# Exclude all private IPs from checking
+exclude_all_private = true
+
+# Include fragments in link checking (important for internal anchor links in documentation)
+include_fragments = true
+
+# Cache results for faster subsequent runs
+cache = true
+
+# User agent string
+user_agent = "Mozilla/5.0 (compatible; River-Reviewer-LinkChecker/1.0; +https://github.com/s977043/river-reviewer)"
+
+# Timeout per request (in seconds)
+timeout = 30
+
+# Retry failed requests
+max_retries = 3
+
+# Headers to send with requests (helps with some sites that block bots)
+headers = []
+
+# Methods to use for checking (HEAD is faster and sufficient for link validation)
+# Note: Some servers don't support HEAD properly. If issues arise, change back to "get"
+method = "head"
