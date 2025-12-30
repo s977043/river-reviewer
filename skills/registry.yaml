@@ -6,6 +6,17 @@ description: 'Catalog of all River Reviewer skills organized by phase and tags'
 
 # Skill Catalog
 skills:
+  # Upstream Skills (Design Phase)
+  - id: rr-upstream-cache-strategy-consistency-001
+    version: '0.1.0'
+    name: 'Cache Strategy Consistency Guard'
+    path: skills/rr-upstream-cache-strategy-consistency-001/skill.yaml
+    phase: upstream
+    tags: [cache, consistency, architecture, upstream, design-review]
+    severity: minor
+    recommended: true
+    description: 'Detects undefined or inconsistent cache strategies in design documents'
+
   # Midstream Skills (Implementation Phase)
   - id: rr-midstream-hello-skill-001
     version: '0.1.0'
