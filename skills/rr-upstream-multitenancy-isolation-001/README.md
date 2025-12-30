@@ -113,5 +113,5 @@ npx promptfoo eval
 ## 参考資料
 
 - [OWASP Multi-Tenancy Security](https://owasp.org/www-project-web-security-testing-guide/)
-- [Azure Multi-tenant Architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/)
+- [Azure Multi-tenant Architecture](https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/overview)
 - [AWS SaaS Tenant Isolation](https://docs.aws.amazon.com/wellarchitected/latest/saas-lens/tenant-isolation.html)
