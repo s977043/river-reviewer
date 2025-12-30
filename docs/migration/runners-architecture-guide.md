@@ -453,7 +453,7 @@ const plan = await buildExecutionPlan({
   changedFiles: ['src/security.ts'],
   availableContexts: ['diff', 'fullFile'],
   preferredModelHint: 'balanced',
-  diffText: gitDiffOutput,
+  diffText: gitDiffOutput, // string containing the git diff output
 });
 
 // Execute in priority order
@@ -627,7 +627,7 @@ plan.skipped.forEach(({ skill, reasons }) => {
 
 ## Related Documentation
 
-- [Migration Guide](./runners-migration-guide.md) - Step-by-step migration instructions
+- [CHANGELOG](../../CHANGELOG.md) - Version history and breaking changes
 - [Deprecated Paths](../../DEPRECATED.md) - Full deprecation notice
 - [Architecture Overview](../architecture.md) - System architecture
 - [Skills Concepts](../concepts/skills.md) - Understanding skills
