@@ -101,4 +101,4 @@ npx promptfoo eval
 
 - [Caching Strategies and How to Choose the Right One](https://codeahoy.com/2017/08/11/caching-strategies-and-how-to-choose-the-right-one/)
 - [AWS Caching Best Practices](https://aws.amazon.com/caching/best-practices/)
-- [Redis Caching Patterns](https://redis.io/docs/manual/patterns/)
+- [Redis Caching Solutions](https://redis.io/solutions/caching/)
