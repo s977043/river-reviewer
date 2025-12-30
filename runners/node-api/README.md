@@ -12,20 +12,25 @@ The Node API runner provides a TypeScript/JavaScript API for integrating River R
 npm install @river-reviewer/node-api
 ```
 
+## Important Notes
+
+> **⚠️ Current Implementation Status:** The `review()` and `evaluateSkill()` functions currently return execution plans and skill selection results only. They do **not** execute skills with AI providers. Actual AI-powered review execution requires custom AI provider integration. See the [Integration with Custom AI Provider](#integration-with-custom-ai-provider) section for examples.
+
 ## Quick Start
 
 ```typescript
 import { review, loadSkills, buildExecutionPlan } from '@river-reviewer/node-api';
 
-// Review files programmatically
+// Build execution plan (note: does not execute AI review)
 const results = await review({
   phase: 'midstream',
   files: ['src/**/*.ts'],
   availableContexts: ['diff', 'fullFile'],
 });
 
-console.log(`Found ${results.summary.totalFindings} findings`);
-console.log(`Executed ${results.summary.skillsExecuted} skills`);
+// Access the execution plan
+console.log(`Skills selected: ${results.summary.skillsExecuted}`);
+// For actual AI execution, integrate with your AI provider
 ```
 
 ## API Reference
