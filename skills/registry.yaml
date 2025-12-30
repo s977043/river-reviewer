@@ -17,6 +17,16 @@ skills:
     recommended: true
     description: 'Detects missing validation plans (SLO/SLI, load testing, canary, rollback, DR) in design documents'
 
+  - id: rr-upstream-cache-strategy-consistency-001
+    version: '0.1.0'
+    name: 'Cache Strategy Consistency Guard'
+    path: skills/rr-upstream-cache-strategy-consistency-001/skill.yaml
+    phase: upstream
+    tags: [cache, consistency, architecture, upstream, design-review]
+    severity: minor
+    recommended: true
+    description: 'Detects undefined or inconsistent cache strategies in design documents'
+
   - id: rr-upstream-multitenancy-isolation-001
     version: '0.1.0'
     name: 'Multitenancy Isolation Guard'
