@@ -1,5 +1,9 @@
 # Use Riverbed Memory
 
+:::caution[Draft / Planned Feature]
+This guide describes a planned feature. The current version (v0) is stateless, and Riverbed Memory is not yet implemented. The steps below will be available in future versions.
+:::
+
 Riverbed Memory stores past review context so future flows stay consistent.
 
 ## Steps

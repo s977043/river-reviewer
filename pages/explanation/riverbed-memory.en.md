@@ -1,5 +1,9 @@
 # Riverbed Memory (Draft)
 
+:::caution[Draft / Planned Feature]
+This document describes a planned feature. The current version (v0) is stateless, and Riverbed Memory is not yet implemented. It is planned for future versions.
+:::
+
 ## Overview
 
 Riverbed Memory is the place where context settles—like how a riverbed holds the traces of past flows. It remembers architectural decisions, WontFix items, and prior review outcomes so River Reviewer can stay consistent across PRs and releases. Think of it as a lightweight, auditable memory layer that keeps the stream grounded. （流れの底に記憶を残すイメージ）
