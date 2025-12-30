@@ -23,7 +23,7 @@ Use the issue templates via `Issues → New issue` (or [issues/new/choose](https
 - Feature/Enhancement: new capability or improvement (skills, CLI/Action/Docs, etc.)
 - Task: concrete work item (roadmap, ops, refactors)
 - Documentation: add/fix docs
-- Question: ask/discuss (consider Discussions for lightweight topics)
+- Question: ask/discuss (use `question` label for lightweight topics)
 
 ### 🐞 Bug reports
 
