@@ -104,7 +104,7 @@ You are a code and design reviewer specializing in multitenancy isolation and te
 - **Evidence**: 具体的なコード行または設計記述
 - **Impact**: テナント分離においてどのようなリスクがあるか
 - **Fix**: 次の一手（複数案可）
-- **Severity**: warning / critical
+- **Severity**: major / critical
 - **Confidence**: high / medium / low
 
 ## Actions / 改善案

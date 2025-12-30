@@ -35,7 +35,7 @@ For each isolation finding, provide:
 **Evidence:** [Specific design text, code snippet, or line reference]
 **Impact:** [What tenant isolation risk this creates]
 **Fix:** [Concrete suggestion to address the issue]
-**Severity:** [warning/critical]
+**Severity:** [major/critical]
 **Confidence:** [high/medium/low]
 ```
 
@@ -63,7 +63,7 @@ For each isolation finding, provide:
 **Evidence:** Cache key format: `user:{userId}` (line 45)
 **Impact:** If user IDs collide across tenants, cached data could leak between tenants
 **Fix:** Use tenant-prefixed cache key: `tenant:{tenantId}:user:{userId}`
-**Severity:** warning
+**Severity:** major
 **Confidence:** medium
 ```
 

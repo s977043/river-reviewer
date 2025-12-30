@@ -13,5 +13,5 @@
 **Evidence:** Cache key format: `order:{orderId}` does not include tenant identifier
 **Impact:** If order IDs collide or are reused across tenants, cached data could leak between tenants
 **Fix:** Use tenant-prefixed cache key: `tenant:{tenantId}:order:{orderId}`
-**Severity:** warning
+**Severity:** major
 **Confidence:** high
