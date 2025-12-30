@@ -32,16 +32,18 @@ exclude = [
   # 'github\.com/.*/tree/main/.*',
   # 'github\.com/.*/pull/\d+',
 
-  # Docusaurus-style internal links (handled by site routing)
-  '^/$',
-  '^/index-en$',
 ]
+
+# Exclude specific files that contain Docusaurus-internal routing links
+exclude_path = ['pages/index.md', 'pages/index.en.md']
 
 # Accept status codes
 # Redirects are handled by max_redirects (not listed here to ensure permanent redirects are visible in logs)
 accept = [
   # Success codes only
   200, 201, 202, 203, 204,
+  # Server error codes to accept (temporary issues)
+  500, # Internal Server Error - may be temporary
   # Client error codes to accept (use carefully)
   # 403, # Forbidden - some sites block automated requests
   # 429, # Too Many Requests
