@@ -324,8 +324,8 @@ lychee --config .lychee.toml '**/*.md'
 
 - [Lychee Documentation](https://github.com/lycheeverse/lychee)
 - [Lychee Action Documentation](https://github.com/lycheeverse/lychee-action)
-- [Link Check Workflow](https://github.com/s977043/river-reviewer/blob/main/.github/workflows/link-check.yml)
-- [Configuration File](https://github.com/s977043/river-reviewer/blob/main/.lychee.toml)
+- [Link Check Workflow](../../.github/workflows/link-check.yml)
+- [Configuration File](../../.lychee.toml)
 
 ## 質問・問題報告
 
