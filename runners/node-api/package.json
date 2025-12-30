@@ -1,0 +1,40 @@
+{
+  "name": "@river-reviewer/node-api",
+  "version": "0.1.0",
+  "description": "Node.js API interface for programmatic usage of River Reviewer",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "dependencies": {
+    "@river-reviewer/core-runner": "file:../core",
+    "js-yaml": "^4.1.1",
+    "minimatch": "^10.1.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/minimatch": "^5.1.2",
+    "@types/node": "^20.17.9",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "keywords": [
+    "river-reviewer",
+    "code-review",
+    "ai-review",
+    "skill-execution",
+    "api"
+  ]
+}

@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+        uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: midstream # upstream|midstream|downstream
           dry_run: true # Post PR comments without calling external APIs (fallback)

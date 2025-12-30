@@ -1,0 +1,21 @@
+{
+  "name": "@river-reviewer/cli-runner",
+  "version": "0.1.0",
+  "description": "CLI interface for River Reviewer",
+  "type": "module",
+  "main": "./src/index.mjs",
+  "bin": {
+    "river": "./bin/river"
+  },
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "ora": "^9.0.0",
+    "@inquirer/prompts": "^9.0.0"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}

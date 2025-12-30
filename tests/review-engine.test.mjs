@@ -31,11 +31,11 @@ const plan = {
 test('generateReview runs heuristics when LLM is skipped', async () => {
   // スキルが選択されている場合、ヒューリスティックが実行される。
   // ヒューリスティックが何も検出しなかった場合、コメントは0件となる（正常な動作）。
-  const result = await generateReview({ diff, plan, phase: 'midstream', dryRun: true });
+  const result = await generateReview({ diff, plan, phase: 'midstream', dryRun: true, includeFallback: false });
   assert.equal(result.debug.llmUsed, false);
   assert.ok(result.prompt.includes('River Reviewer'));
   // dry-runモードでもヒューリスティックが実行される
-  assert.equal(result.debug.heuristicsExecuted, true);
+  assert.equal(result.debug.heuristicsUsed, true);
   // スキルが選択されているが検出パターンがない場合、コメントは0件
   assert.equal(result.comments.length, 0);
 });

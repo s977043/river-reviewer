@@ -25,7 +25,7 @@ Issue テンプレートは `Issues → New issue` から利用できます（�
 - Feature/Enhancement: 新機能・改善提案（スキル追加、CLI/Action/Docs の改善など）
 - Task: 具体的な作業項目（ロードマップ/運用改善/リファクタ等）
 - Documentation: ドキュメントの追加・誤り修正
-- Question: 相談・質問（必要に応じて Issue、または軽い内容なら Discussions を検討）
+- Question: 相談・質問（軽い内容でも`question`ラベルを使ってIssueに投稿）
 
 ### 🐞 バグの報告
 

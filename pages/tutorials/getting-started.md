@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: {org}/{repo}/.github/actions/river-reviewer@v0.1.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: midstream
           dry_run: true # 外部 API を呼び出す場合は false に設定

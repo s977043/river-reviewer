@@ -59,7 +59,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+        uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
@@ -69,6 +69,8 @@ jobs:
 Pin to a release tag such as `@v0.1.1` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
 
 Latest release: [v0.1.1](https://github.com/s977043/river-reviewer/releases/tag/v0.1.1)
+
+> **⚠️ For users upgrading to v0.2.0:** v0.2.0 changes the GitHub Action path from `.github/actions/river-reviewer` to `runners/github-action`. See [Migration Guide](docs/migration/runners-migration-guide.md) and [DEPRECATED.md](DEPRECATED.md) for details.
 
 ## Quick start (local)
 

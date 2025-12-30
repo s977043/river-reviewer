@@ -294,7 +294,7 @@ function normalizeHeuristicComments(rawComments) {
           line: c.line,
           message: formatFindingMessage({
             finding: 'ユーザー入力がサニタイズされずに使用されている',
-            evidence: 'github.event.*.title/body がrunブロックで直接使用',
+            evidence: 'github.event.*.title/body/name がrunブロックで直接使用',
             impact: 'コマンドインジェクション攻撃のリスクがある',
             fix: 'jqやtoJSONを使用して入力をサニタイズする、または環境変数経由で渡す',
             severity: 'blocker',
@@ -414,20 +414,14 @@ export async function generateReview({
 
   if (!comments.length) {
     const heuristic = buildHeuristicComments({ diff, plan });
+    debug.heuristicsUsed = true;
     if (heuristic.length) {
       comments = normalizeHeuristicComments(heuristic);
-      debug.heuristicsUsed = true;
       debug.heuristicsCount = heuristic.length;
     } else {
-      // ヒューリスティックが実行されたが何も検出しなかった場合、
-      // それは正常な状態（問題のないコード）を示す可能性がある。
-      // フォールバックコメントは、本当にレビューできなかった場合のみ生成する。
-      const hasRelevantSkills = plan?.selected?.length > 0;
-      comments = includeFallback && !hasRelevantSkills ? buildFallbackComments(diff, plan) : [];
-      debug.heuristicsUsed = true;
+      comments = includeFallback ? buildFallbackComments(diff, plan) : [];
       debug.heuristicsCount = 0;
-      debug.heuristicsExecuted = true;
-      debug.fallbackIncluded = includeFallback && !hasRelevantSkills;
+      debug.fallbackIncluded = includeFallback;
     }
   }
 

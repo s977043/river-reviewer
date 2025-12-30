@@ -67,7 +67,7 @@ jobs:
         with:
           fetch-depth: 0 # merge-base を安定取得
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+        uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
@@ -77,6 +77,8 @@ jobs:
 タグは `@v0.1.1` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
 
 最新リリース: [v0.1.1](https://github.com/s977043/river-reviewer/releases/tag/v0.1.1)
+
+> **⚠️ v0.2.0へのアップグレード予定のユーザーへ:** v0.2.0では、GitHub Actionのパスが `.github/actions/river-reviewer` から `runners/github-action` に変更されます。詳細は[移行ガイド](docs/migration/runners-migration-guide.md)と[DEPRECATED.md](DEPRECATED.md)をご確認ください。
 
 ### 高度な設定例
 
@@ -89,7 +91,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -98,7 +100,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -107,7 +109,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -121,7 +123,7 @@ review:
   steps:
     - uses: actions/checkout@v6
       with: { fetch-depth: 0 }
-    - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+    - uses: s977043/river-reviewer/runners/github-action@v0.1.1
       with:
         phase: midstream
         estimate: true # コスト見積もりのみ
@@ -139,7 +141,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: midstream
           dry_run: true            # Draft はドライランでプロンプト確認のみ
@@ -152,7 +154,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
         with:
           phase: midstream
           dry_run: false           # Ready ではフルレビュー
@@ -208,6 +210,17 @@ exclude:
 5. コンテキスト/依存の制御: `RIVER_AVAILABLE_CONTEXTS=diff,tests` や `RIVER_AVAILABLE_DEPENDENCIES=code_search,test_runner` を設定すると、スキル選択時に要求を満たさないものを理由付きでスキップできます（未設定の場合は依存チェックをスキップ）。
 6. CLI で直接指定する場合: `--context diff,fullFile` や `--dependency code_search,test_runner` フラグで環境変数を上書きできます（逗号区切り）。
 7. 依存のスタブ有効化: `RIVER_DEPENDENCY_STUBS=1` を指定すると、既知の依存（`code_search`, `test_runner`, `coverage_report`, `adr_lookup`, `repo_metadata`, `tracing`）を「利用可能」とみなしてスキップを防ぎます。実装準備中の環境でプランだけ確認したいときに使用してください。
+
+### CLI Runnerインターフェイス（runners/cli）
+
+新しいCLIインターフェイスにより、コアランナー機能に直接アクセスできます:
+
+- `river review [files...]` - ファイルをレビュー（実行プラン生成とスキル選択）
+- `river eval <skill>` - スキル定義の検証と評価
+- `river eval --all` - すべてのスキルを評価
+- `river create skill` - 新しいスキルをテンプレートから作成
+
+詳細は [runners/cli/README.md](./runners/cli/README.md) を参照してください。
 
 ## Project-specific review rules
 

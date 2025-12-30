@@ -50,7 +50,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        action_root="$(cd "${GITHUB_ACTION_PATH}/../../.." && pwd)"
+        action_root="$(cd "${GITHUB_ACTION_PATH}/../.." && pwd)"
         echo "Action repo root: ${action_root}"
         cd "${action_root}"
         npm ci
@@ -59,7 +59,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        action_root="$(cd "${GITHUB_ACTION_PATH}/../../.." && pwd)"
+        action_root="$(cd "${GITHUB_ACTION_PATH}/../.." && pwd)"
         repo_path="$(cd "${{ inputs.target }}" && pwd)"
 
         cmd=(node "${action_root}/src/cli.mjs" run "${repo_path}" --phase "${{ inputs.phase }}" --planner "${{ inputs.planner }}" --output markdown)
