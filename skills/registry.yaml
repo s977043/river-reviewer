@@ -7,6 +7,16 @@ description: 'Catalog of all River Reviewer skills organized by phase and tags'
 # Skill Catalog
 skills:
   # Upstream Skills (Design Phase)
+  - id: rr-upstream-architecture-validation-plan-001
+    version: '0.1.0'
+    name: 'Architecture Validation Plan Guard'
+    path: skills/rr-upstream-architecture-validation-plan-001/skill.yaml
+    phase: upstream
+    tags: [architecture, validation, verification, slo, upstream]
+    severity: minor
+    recommended: true
+    description: 'Detects missing validation plans (SLO/SLI, load testing, canary, rollback, DR) in design documents'
+
   - id: rr-upstream-cache-strategy-consistency-001
     version: '0.1.0'
     name: 'Cache Strategy Consistency Guard'
@@ -16,6 +26,16 @@ skills:
     severity: minor
     recommended: true
     description: 'Detects undefined or inconsistent cache strategies in design documents'
+
+  - id: rr-upstream-multitenancy-isolation-001
+    version: '0.1.0'
+    name: 'Multitenancy Isolation Guard'
+    path: skills/rr-upstream-multitenancy-isolation-001/skill.yaml
+    phase: upstream
+    tags: [multitenancy, isolation, security, architecture, upstream]
+    severity: major
+    recommended: true
+    description: 'Detects tenant isolation gaps in data, authorization, resources, and failure boundaries'
 
   # Midstream Skills (Implementation Phase)
   - id: rr-midstream-hello-skill-001
@@ -127,7 +147,14 @@ recommendations:
   comprehensive:
     description: 'Comprehensive review coverage'
     skills:
+      - rr-upstream-multitenancy-isolation-001
       - rr-midstream-security-basic-001
       - rr-midstream-logging-observability-001
       - rr-midstream-typescript-strict-001
       - rr-midstream-typescript-nullcheck-001
+
+  multitenancy:
+    description: 'Recommended skills for multi-tenant SaaS applications'
+    skills:
+      - rr-upstream-multitenancy-isolation-001
+      - rr-midstream-security-basic-001

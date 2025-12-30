@@ -31,9 +31,6 @@ outputKind:
 
 modelHint: balanced
 
-dependencies:
-  - code_search
-
 prompt:
   system: prompt/system.md
   user: prompt/user.md

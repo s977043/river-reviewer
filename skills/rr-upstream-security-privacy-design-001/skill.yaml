@@ -1,0 +1,46 @@
+id: rr-upstream-security-privacy-design-001
+version: 0.1.0
+name: Security & Privacy Design Review
+description: Review data retention, deletion, backup residency, and cross-border data transfer considerations.
+
+phase: upstream
+applyTo:
+  - '**/*.md'
+  - '**/*.adoc'
+  - '**/design/**/*'
+  - '**/rfc/**/*'
+  - '**/spec/**/*'
+  - '**/docs/architecture/**/*'
+
+tags:
+  - security
+  - privacy
+  - upstream
+  - design
+  - data-residency
+  - gdpr
+  - pii
+
+severity: minor
+
+inputContext:
+  - fullFile
+
+outputKind:
+  - findings
+  - actions
+
+modelHint: balanced
+
+dependencies:
+  - code_search
+
+prompt:
+  system: prompt/system.md
+  user: prompt/user.md
+
+eval:
+  promptfoo: eval/promptfoo.yaml
+
+fixturesDir: fixtures
+goldenDir: golden

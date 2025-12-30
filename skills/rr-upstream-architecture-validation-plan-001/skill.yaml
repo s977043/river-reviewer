@@ -1,0 +1,48 @@
+id: rr-upstream-architecture-validation-plan-001
+version: 0.1.0
+name: Architecture Validation Plan Guard
+description: Detect missing validation plans (how to verify the design is correct) in design documents and ADRs.
+
+phase: upstream
+applyTo:
+  - 'docs/**/*design*.md'
+  - 'docs/**/*architecture*.md'
+  - 'docs/adr/**/*'
+  - 'docs/architecture/**/*'
+  - 'pages/**/*design*.md'
+  - 'pages/**/*architecture*.md'
+  - '**/*.adr'
+
+tags:
+  - architecture
+  - validation
+  - verification
+  - slo
+  - upstream
+
+severity: minor
+
+inputContext:
+  - diff
+  - adr
+
+outputKind:
+  - findings
+  - actions
+  - questions
+
+modelHint: balanced
+
+dependencies:
+  - adr_lookup
+  - repo_metadata
+
+prompt:
+  system: prompt/system.md
+  user: prompt/user.md
+
+eval:
+  promptfoo: eval/promptfoo.yaml
+
+fixturesDir: fixtures
+goldenDir: golden
