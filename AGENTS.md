@@ -22,13 +22,17 @@ River Reviewer は「流れに寄り添う」AI レビューエージェント�
 - ドキュメントビルド: `npm run build`
 - テスト（Node.js test runner）: `npm test`
 - Lint 一式（Prettier / markdownlint / textlint など）: `npm run lint`
+- リンクチェック（lychee、別途インストール必要）: `npm run check:links`
+  - クイックチェック: `npm run check:links:quick`
+  - オフライン（内部リンクのみ）: `npm run check:links:local`
+  - **注意:** lycheeは別途インストールが必要です: `brew install lychee` (macOS) または[インストールガイド](https://github.com/lycheeverse/lychee#installation)を参照
 - エージェント定義検証: `npm run agents:validate`
 - スキル定義検証: `npm run skills:validate`
 - Agent Skills 検証: `npm run agent-skills:validate`
 - OpenTelemetry トレース検証（必要時のみ）: `npm run trace:validate`
 - Planner 評価（任意・オフラインベンチ用）: `npm run planner:eval`
 
-PR/CI では少なくとも `npm test` と `npm run lint` を通し、変更内容に応じて `agents:validate` / `skills:validate` を実行してください。
+PR/CI では少なくとも `npm test` と `npm run lint` を通し、変更内容に応じて `agents:validate` / `skills:validate` を実行してください。ドキュメント変更時は `npm run check:links` でリンク切れを確認してください。
 
 ---
 
