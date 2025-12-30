@@ -35,7 +35,7 @@ test('generateReview runs heuristics when LLM is skipped', async () => {
   assert.equal(result.debug.llmUsed, false);
   assert.ok(result.prompt.includes('River Reviewer'));
   // dry-runモードでもヒューリスティックが実行される
-  assert.equal(result.debug.heuristicsExecuted, true);
+  assert.equal(result.debug.heuristicsUsed, true);
   // スキルが選択されているが検出パターンがない場合、コメントは0件
   assert.equal(result.comments.length, 0);
 });
