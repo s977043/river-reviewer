@@ -1,0 +1,290 @@
+name: Skill Evaluation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'skills/*/eval/**'
+      - 'skills/*/prompt/**'
+      - 'skills/*/fixtures/**'
+      - 'skills/*/golden/**'
+      - '.github/workflows/skill-eval.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'skills/*/eval/**'
+      - 'skills/*/prompt/**'
+      - 'skills/*/fixtures/**'
+      - 'skills/*/golden/**'
+      - '.github/workflows/skill-eval.yml'
+  schedule:
+    # Run weekly on Mondays at 9:00 AM JST (00:00 UTC)
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+    inputs:
+      skill_filter:
+        description: 'Skill ID pattern to filter (e.g., rr-midstream-*)'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Run in dry-run mode (no actual API calls)'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: skill-eval-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover-skills:
+    name: Discover skills with eval configs
+    runs-on: ubuntu-latest
+    outputs:
+      skills: ${{ steps.find-skills.outputs.skills }}
+      has_skills: ${{ steps.find-skills.outputs.has_skills }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find skills with promptfoo.yaml
+        id: find-skills
+        run: |
+          # Find all skills with eval/promptfoo.yaml
+          SKILLS_JSON=$(find skills -name "promptfoo.yaml" -path "*/eval/*" | \
+            sed 's|skills/||;s|/eval/promptfoo.yaml||' | \
+            sort | \
+            jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          # Apply filter if provided
+          FILTER="${{ github.event.inputs.skill_filter }}"
+          if [ -n "$FILTER" ]; then
+            SKILLS_JSON=$(echo "$SKILLS_JSON" | jq -c --arg filter "$FILTER" '[.[] | select(test($filter))]')
+          fi
+
+          echo "skills=$SKILLS_JSON" >> $GITHUB_OUTPUT
+
+          # Check if we have any skills
+          SKILL_COUNT=$(echo "$SKILLS_JSON" | jq 'length')
+          if [ "$SKILL_COUNT" -gt 0 ]; then
+            echo "has_skills=true" >> $GITHUB_OUTPUT
+            echo "Found $SKILL_COUNT skill(s) with eval configs:"
+            echo "$SKILLS_JSON" | jq -r '.[]'
+          else
+            echo "has_skills=false" >> $GITHUB_OUTPUT
+            echo "No skills with eval configs found"
+          fi
+
+  evaluate:
+    name: Evaluate ${{ matrix.skill }}
+    needs: discover-skills
+    if: needs.discover-skills.outputs.has_skills == 'true'
+    # Continue on error - evaluations are informational and shouldn't block PRs
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        skill: ${{ fromJson(needs.discover-skills.outputs.skills) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install promptfoo
+        run: npm install -g promptfoo
+
+      - name: Check API keys availability
+        id: check-keys
+        env:
+          HAS_OPENAI: ${{ secrets.OPENAI_API_KEY != '' }}
+          HAS_ANTHROPIC: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          if [ "$HAS_OPENAI" = "true" ] || [ "$HAS_ANTHROPIC" = "true" ]; then
+            echo "has_keys=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_keys=false" >> $GITHUB_OUTPUT
+            echo "::warning::No API keys configured - running dry-run validation only"
+          fi
+
+      - name: Validate config (no API keys)
+        if: github.event.inputs.dry_run == 'true' || steps.check-keys.outputs.has_keys != 'true'
+        working-directory: skills/${{ matrix.skill }}/eval
+        run: |
+          echo "=== Validating promptfoo config (no API keys available) ==="
+          # Validate YAML syntax
+          npx js-yaml promptfoo.yaml > /dev/null
+          echo "✓ Config file is valid YAML"
+          # Check that referenced files exist
+          for file in $(grep -oP 'file://\K[^"]+' promptfoo.yaml 2>/dev/null || true); do
+            if [ -f "$file" ]; then
+              echo "✓ Referenced file exists: $file"
+            else
+              echo "✗ Missing referenced file: $file"
+              exit 1
+            fi
+          done
+          echo "=== Config validation successful (skipping actual evaluation) ==="
+
+      - name: Run evaluation
+        if: github.event.inputs.dry_run != 'true' && steps.check-keys.outputs.has_keys == 'true'
+        working-directory: skills/${{ matrix.skill }}/eval
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "=== Running promptfoo evaluation for ${{ matrix.skill }} ==="
+          promptfoo eval --config promptfoo.yaml --no-cache --output results.json --share
+
+      - name: Check must_include assertions
+        if: github.event.inputs.dry_run != 'true' && steps.check-keys.outputs.has_keys == 'true'
+        working-directory: skills/${{ matrix.skill }}/eval
+        run: |
+          echo "=== Checking evaluation results ==="
+          if [ -f results.json ]; then
+            TOTAL=$(jq '.results.stats.testCases // 0' results.json)
+            PASSED=$(jq '.results.stats.successes // 0' results.json)
+            FAILED=$(jq '.results.stats.failures // 0' results.json)
+            echo "Total tests: $TOTAL"
+            echo "Passed: $PASSED"
+            echo "Failed: $FAILED"
+            if [ "$FAILED" -gt 0 ]; then
+              echo "::error::Evaluation failed: $FAILED test(s) failed"
+              echo "=== Failed Assertions ==="
+              jq -r '.results.results[] | select(.success == false) | "Test: \(.description)\nProvider: \(.provider)\nFailure: \(.gradingResult.reason)\n---"' results.json || true
+              exit 1
+            else
+              echo "::notice::All $PASSED test(s) passed!"
+            fi
+          else
+            echo "::warning::No results.json found"
+          fi
+
+      - name: Upload evaluation results
+        if: always() && github.event.inputs.dry_run != 'true' && steps.check-keys.outputs.has_keys == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-${{ matrix.skill }}
+          path: skills/${{ matrix.skill }}/eval/results.json
+          if-no-files-found: ignore
+
+  summary:
+    name: Evaluation Summary
+    needs: [discover-skills, evaluate]
+    if: always() && needs.discover-skills.outputs.has_skills == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: results
+          pattern: eval-results-*
+
+      - name: Generate summary
+        run: |
+          echo "# Skill Evaluation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Skill | Status | Passed | Failed |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          TOTAL_PASSED=0
+          TOTAL_FAILED=0
+          for dir in results/eval-results-*/; do
+            if [ -d "$dir" ]; then
+              SKILL=$(basename "$dir" | sed 's/eval-results-//')
+              RESULT_FILE="$dir/results.json"
+              if [ -f "$RESULT_FILE" ]; then
+                PASSED=$(jq '.results.stats.successes // 0' "$RESULT_FILE")
+                FAILED=$(jq '.results.stats.failures // 0' "$RESULT_FILE")
+                TOTAL_PASSED=$((TOTAL_PASSED + PASSED))
+                TOTAL_FAILED=$((TOTAL_FAILED + FAILED))
+                if [ "$FAILED" -gt 0 ]; then
+                  STATUS="Failed"
+                else
+                  STATUS="Passed"
+                fi
+                echo "| $SKILL | $STATUS | $PASSED | $FAILED |" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "| $SKILL | No results | - | - |" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total: $TOTAL_PASSED passed, $TOTAL_FAILED failed**" >> $GITHUB_STEP_SUMMARY
+          if [ "$TOTAL_FAILED" -gt 0 ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "> Note: See individual job logs for failure details" >> $GITHUB_STEP_SUMMARY
+            # Don't fail the workflow - evaluations are informational
+          fi
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let summary = "## Skill Evaluation Results\n\n";
+            const resultsDir = 'results';
+            let totalPassed = 0;
+            let totalFailed = 0;
+            const skillResults = [];
+            try {
+              const dirs = fs.readdirSync(resultsDir);
+              for (const dir of dirs) {
+                if (dir.startsWith('eval-results-')) {
+                  const skill = dir.replace('eval-results-', '');
+                  const resultPath = resultsDir + '/' + dir + '/results.json';
+                  if (fs.existsSync(resultPath)) {
+                    const results = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+                    const passed = results.results?.stats?.successes || 0;
+                    const failed = results.results?.stats?.failures || 0;
+                    totalPassed += passed;
+                    totalFailed += failed;
+                    skillResults.push({ skill, passed, failed, status: failed > 0 ? 'Failed' : 'Passed' });
+                  }
+                }
+              }
+            } catch (e) {
+              console.log('No results to process:', e.message);
+            }
+            if (skillResults.length > 0) {
+              summary += "| Skill | Status | Passed | Failed |\n";
+              summary += "|-------|--------|--------|--------|\n";
+              for (const r of skillResults) {
+                const statusIcon = r.status === 'Passed' ? ':white_check_mark:' : ':x:';
+                summary += '| ' + r.skill + ' | ' + statusIcon + ' ' + r.status + ' | ' + r.passed + ' | ' + r.failed + ' |\n';
+              }
+              summary += '\n**Total: ' + totalPassed + ' passed, ' + totalFailed + ' failed**\n';
+            } else {
+              summary += "_No evaluation results available._\n";
+            }
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const botComment = comments.find(c => c.user.type === 'Bot' && c.body.includes('## Skill Evaluation Results'));
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: summary
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: summary
+              });
+            }

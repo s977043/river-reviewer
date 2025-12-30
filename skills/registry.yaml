@@ -30,9 +30,9 @@ skills:
   - id: rr-midstream-logging-observability-001
     version: '0.1.0'
     name: 'Logging & Observability'
-    path: skills/midstream/rr-midstream-logging-observability-001.md
+    path: skills/rr-midstream-logging-observability-001/skill.yaml
     phase: midstream
-    tags: [observability, logging, midstream]
+    tags: [observability, logging, reliability, midstream]
     severity: minor
     recommended: true
     description: 'Reviews logging and observability practices'
