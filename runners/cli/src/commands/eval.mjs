@@ -1,6 +1,5 @@
 import { fileURLToPath } from 'url';
-import { dirname, join, resolve } from 'path';
-import { readdir, stat } from 'fs/promises';
+import { dirname, resolve } from 'path';
 import { loadSkills, loadSkillFile } from '../../../core/skill-loader.mjs';
 import { Logger } from '../utils/logger.mjs';
 

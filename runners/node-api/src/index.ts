@@ -324,7 +324,13 @@ export async function review(options: ReviewOptions): Promise<ReviewResult> {
  * ```
  */
 export async function evaluateSkill(options: EvaluateSkillOptions): Promise<EvaluationResult> {
-  const { skillId, provider, files = [], inputContexts = [], skillsDir } = options;
+  const {
+    skillId,
+    provider: _provider,
+    files: _files = [],
+    inputContexts: _inputContexts = [],
+    skillsDir,
+  } = options;
 
   const startTime = Date.now();
 

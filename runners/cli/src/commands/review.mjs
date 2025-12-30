@@ -1,10 +1,9 @@
 import { fileURLToPath } from 'url';
-import { dirname, join, resolve } from 'path';
-import { minimatch } from 'minimatch';
+import { dirname } from 'path';
 import { buildExecutionPlan } from '../../../core/review-runner.mjs';
 import { loadSkills } from '../../../core/skill-loader.mjs';
 import { Logger } from '../utils/logger.mjs';
-import { formatPlan, formatComments, formatSkillList, formatSkipped } from '../utils/format.mjs';
+import { formatPlan, formatSkillList, formatSkipped } from '../utils/format.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
