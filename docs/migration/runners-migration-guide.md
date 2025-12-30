@@ -325,8 +325,8 @@ Still stuck? Here's how to get help:
    - Template: Bug Report or Question
    - Include: workflow file, error logs, versions
 
-4. **Community Discussion:**
-   - [GitHub Discussions](https://github.com/s977043/river-reviewer/discussions)
-   - Tag: `migration`
+4. **Ask Questions:**
+   - [GitHub Issues](https://github.com/s977043/river-reviewer/issues)
+   - Labels: `question`, `migration`
 
 We're here to help make your migration smooth! 🚀
