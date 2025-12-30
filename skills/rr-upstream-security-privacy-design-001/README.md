@@ -100,5 +100,5 @@ npx promptfoo eval
 
 - [GDPR - Right to erasure ('right to be forgotten')](https://gdpr-info.eu/art-17-gdpr/)
 - [OWASP Security by Design Principles](https://owasp.org/www-project-developer-guide/draft/design/web_app_checklist/security_by_design/)
-- [Privacy by Design - 7 Foundational Principles](https://www.ipc.on.ca/wp-content/uploads/resources/7foundationalprinciples.pdf)
+- [Privacy by Design - 7 Foundational Principles](https://student.cs.uwaterloo.ca/~cs492/papers/7foundationalprinciples_longer.pdf)
 - [AWS Data Residency](https://aws.amazon.com/compliance/data-residency/)
