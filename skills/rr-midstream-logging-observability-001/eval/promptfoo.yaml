@@ -19,20 +19,7 @@ tests:
   # Test case 1: Silent catch - should detect
   - description: 'Detect silent exception catch'
     vars:
-      diff: |
-        diff --git a/src/services/user.ts b/src/services/user.ts
-        index 1111111..2222222 100644
-        --- a/src/services/user.ts
-        +++ b/src/services/user.ts
-        @@ -10,0 +11,8 @@
-        +async function fetchUser(userId: string) {
-        +  try {
-        +    const response = await api.get(`/users/${userId}`);
-        +    return response.data;
-        +  } catch (error) {
-        +    // ignore
-        +  }
-        +}
+      diff: file://../fixtures/01-silent-catch.diff
     assert:
       - type: contains
         value: 'src/services/user.ts'
@@ -47,47 +34,20 @@ tests:
   # Test case 2: Proper error handling - should NOT flag
   - description: 'No false positive on proper error handling'
     vars:
-      diff: |
-        diff --git a/src/services/user.ts b/src/services/user.ts
-        index 1111111..2222222 100644
-        --- a/src/services/user.ts
-        +++ b/src/services/user.ts
-        @@ -10,0 +11,10 @@
-        +async function fetchUser(userId: string) {
-        +  try {
-        +    const response = await api.get(`/users/${userId}`);
-        +    return response.data;
-        +  } catch (error) {
-        +    logger.error('Failed to fetch user', { userId, error });
-        +    throw error;
-        +  }
-        +}
+      diff: file://../fixtures/02-proper-error-handling.diff
     assert:
-      - type: contains-any
+      - type: not-contains-any
         value:
-          - 'NO_ISSUES'
-          - '問題ありません'
-          - '指摘なし'
-          - 'No findings'
-          - '良い'
+          - 'Finding:'
+          - '握りつぶ'
+          - 'silent'
+          - 'swallowed'
+          - '問題'
 
   # Test case 3: Missing context in log - should detect
   - description: 'Detect missing context in error log'
     vars:
-      diff: |
-        diff --git a/src/services/payment.ts b/src/services/payment.ts
-        index 1111111..2222222 100644
-        --- a/src/services/payment.ts
-        +++ b/src/services/payment.ts
-        @@ -20,0 +21,8 @@
-        +async function processPayment(amount: number) {
-        +  try {
-        +    await paymentGateway.charge(amount);
-        +  } catch (error) {
-        +    console.log('Payment failed');
-        +    throw error;
-        +  }
-        +}
+      diff: file://../fixtures/03-missing-context.diff
     assert:
       - type: contains
         value: 'src/services/payment.ts'
