@@ -1,23 +1,17 @@
 # Copilot instructions (river-reviewer)
 
-> **Note**: Read [AGENTS.md](../AGENTS.md) first for core project rules.
-> This file contains GitHub Copilot specific configuration only.
+> **Single source:** 必ずリポジトリルートの [AGENTS.md](../AGENTS.md) を先に読み、そこで定義された手順・完了条件に従ってください。本ファイルは Copilot 向けの最小差分です。
 
-## Golden rule
+## 必須チェック（着手前に確認）
 
-Always search `skills/` before starting a task. Use both English and Japanese keywords.
+- 目的と受入条件を読み、短い計画をコメントで共有してから作業開始。
+- タスク単位でブランチを作成し、PR を用意する。
+- PR 前に `npm test` と `npm run lint` を実行。Gemini / Codex へのレビュー依頼を PR 本文に記載。
+- レビューコメントは日本語で記載する。
 
-## Copilot-specific settings
+## 参照ポイント
 
 - Instruction files: `.github/instructions/*.instructions.md`
 - Custom agent: `@river-reviewer` (in `.github/agents/`)
 - Prompts: `/skill`, `/review` (in `.github/prompts/`)
-- Reviews: Use `coding-review-checklist.md` as baseline rubric
-- Docs: Japanese is source of truth; English translations use `.en.md` suffix
-- Reviews and review comments must be written in Japanese.（レビューとレビューコメントは日本語で記載すること）
-
-## Quick reference (from AGENTS.md)
-
-- Skills: Search `skills/` with both English and Japanese keywords
-- Safety: No secrets access, no destructive commands without confirmation
-- Workflow: Small changes → lint/test → PR
+- Docs: Japanese is source of truth; `.en.md` は翻訳

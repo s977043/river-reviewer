@@ -1,7 +1,6 @@
 # Project Codex Instructions (CODEX_HOME scoped)
 
-> **Note**: Read [AGENTS.md](../AGENTS.md) first for core project rules.
-> This file contains Codex-specific configuration only.
+> **Single source:** 共通ルールは [AGENTS.md](../AGENTS.md)。本ファイルは Codex 向けの最小差分です。
 
 ## Usage
 
@@ -11,13 +10,22 @@ Run Codex with project-local config:
 CODEX_HOME=$(pwd)/.codex codex "your prompt"
 ```
 
+## Kickoff snippet（最初に貼る推奨プロンプト）
+
+```text
+あなたはこのリポジトリの実装エージェントです。着手前に AGENTS.md を読み、完了条件とポリシーを確認して短い計画を示してください。
+- ブランチはタスク単位。PR 前に `npm test` と `npm run lint` を実行し、Gemini/Codex レビュー依頼を本文に記載する。
+- セルフレビューで残タスクがないことを確認する。
+- 秘密情報や `.env*` は扱わない。
+```
+
 ## Codex-specific settings
 
-- Config: See `.codex/config.toml` for approval policy and sandbox mode
-- Environment: Limited env vars forwarded (PATH, HOME, USER, SHELL, LANG, LC_ALL)
+- Config: `.codex/config.toml`（approval policy / sandbox）
+- Environment: forward-limited (PATH, HOME, USER, SHELL, LANG, LC_ALL)
 
-## Quick reference (from AGENTS.md)
+## Quick reference
 
-- Skills: Search `skills/` with both English and Japanese keywords
-- Safety: No secrets access, no destructive commands without confirmation
-- Workflow: Small changes → lint/test → PR
+- Skills: `skills/` を英日両方のキーワードで検索
+- Safety: No secrets; destructive commands must be explicit
+- Workflow: Small changes → `npm test` / `npm run lint` → PR
