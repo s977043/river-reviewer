@@ -1,6 +1,7 @@
 # Baseline Security Checks
 
 セキュリティレビューの基本的なチェックを行うスキルです。
+スキル定義: `skills/midstream/rr-midstream-security-basic-001.md`（YAML frontmatter + Markdown）。
 
 ## 概要
 
@@ -26,7 +27,7 @@
 
 ```bash
 # バリデーション
-npm run validate:skill-yaml
+npm run skills:validate
 
 # promptfoo での評価（設定完了後）
 cd skills/rr-midstream-security-basic-001

@@ -33,6 +33,7 @@ Defining items with manageable granularity for future model selection and input 
 | `outputKind`   | enum string[] | optional (default: `["findings"]`) | Output category produced. Used for UI sorting/aggregation or downstream branching. Multiple allowed.    | `findings`, `summary`, `actions`, `tests`, `metrics`, `questions`                         |
 | `modelHint`    | enum string   | optional                           | Cost/Accuracy guide for model selection. Hint for runner to choose model within token/cost constraints. | `cheap`, `balanced`, `high-accuracy`                                                      |
 | `dependencies` | enum string[] | optional                           | Tools/Resources required by skill. Runner decides skip or degrade if unmet before execution.            | `code_search`, `test_runner`, `adr_lookup`, `repo_metadata`, `coverage_report`, `tracing` |
+| `priority`     | number        | optional                           | Ordering hint (lower runs earlier) used when planner is unavailable or falls back.                      | `0`, `10`                                                                                 |
 
 Values for `outputKind` (Guidelines to prevent interpretation drift):
 

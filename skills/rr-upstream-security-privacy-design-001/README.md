@@ -1,6 +1,7 @@
 # Security & Privacy Design Review
 
 設計ドキュメントのセキュリティ・プライバシー設計をレビューするスキルです。
+スキル定義: `skills/upstream/rr-upstream-security-privacy-design-001.md`（YAML frontmatter + Markdown）。
 
 ## 概要
 
@@ -30,7 +31,7 @@
 
 ```bash
 # バリデーション
-npm run validate:skill-yaml skills/rr-upstream-security-privacy-design-001/skill.yaml
+npm run skills:validate
 
 # promptfoo での評価（設定完了後）
 cd skills/rr-upstream-security-privacy-design-001

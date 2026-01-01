@@ -10,7 +10,7 @@ skills:
   - id: rr-upstream-architecture-validation-plan-001
     version: '0.1.0'
     name: 'Architecture Validation Plan Guard'
-    path: skills/rr-upstream-architecture-validation-plan-001/skill.yaml
+    path: skills/upstream/rr-upstream-architecture-validation-plan-001.md
     phase: upstream
     tags: [architecture, validation, verification, slo, upstream]
     severity: minor
@@ -20,7 +20,7 @@ skills:
   - id: rr-upstream-cache-strategy-consistency-001
     version: '0.1.0'
     name: 'Cache Strategy Consistency Guard'
-    path: skills/rr-upstream-cache-strategy-consistency-001/skill.yaml
+    path: skills/upstream/rr-upstream-cache-strategy-consistency-001.md
     phase: upstream
     tags: [cache, consistency, architecture, upstream, design-review]
     severity: minor
@@ -30,7 +30,7 @@ skills:
   - id: rr-upstream-multitenancy-isolation-001
     version: '0.1.0'
     name: 'Multitenancy Isolation Guard'
-    path: skills/rr-upstream-multitenancy-isolation-001/skill.yaml
+    path: skills/upstream/rr-upstream-multitenancy-isolation-001.md
     phase: upstream
     tags: [multitenancy, isolation, security, architecture, upstream]
     severity: major
@@ -40,14 +40,84 @@ skills:
   - id: rr-upstream-security-privacy-design-001
     version: '0.1.0'
     name: 'Security & Privacy Design Review'
-    path: skills/rr-upstream-security-privacy-design-001/skill.yaml
+    path: skills/upstream/rr-upstream-security-privacy-design-001.md
     phase: upstream
     tags: [security, privacy, upstream, design, gdpr, pii]
     severity: minor
     recommended: true
     description: 'Reviews data retention, deletion, backup residency, and cross-border data transfer'
 
+  - id: agent-architecture-review
+    version: '0.1.0'
+    name: 'Architecture Review'
+    path: skills/agent-architecture-review.md
+    phase: upstream
+    tags: [agent, architecture, design]
+    severity: major
+    recommended: false
+    description: '変更の全体設計、責務分離、境界の破綻を検知するためのレビュー手順。'
+
+  - id: agent-code-documentation
+    version: '0.1.0'
+    name: 'Code Documentation'
+    path: skills/agent-code-documentation.md
+    phase: upstream
+    tags: [agent, documentation]
+    severity: minor
+    recommended: false
+    description: 'コードや API の意図を短時間で共有できるドキュメントの書き方をガイドする。'
+
   # Midstream Skills (Implementation Phase)
+  - id: agent-code-review
+    version: '0.1.0'
+    name: 'Code Review (Multi-perspective)'
+    path: skills/agent-code-review.md
+    phase: midstream
+    tags: [agent, review, security, performance, quality]
+    severity: major
+    recommended: false
+    description: 'PR 向けの自動コードレビュー。セキュリティ・性能・品質・テスト観点で差分を評価する。'
+
+  - id: agent-code-quality
+    version: '0.1.0'
+    name: 'Code Quality'
+    path: skills/agent-code-quality.md
+    phase: midstream
+    tags: [agent, quality, readability]
+    severity: minor
+    recommended: false
+    description: '可読性と保守性を中心に、コード品質の基本的な劣化を検知する。'
+
+  - id: agent-code-refactoring
+    version: '0.1.0'
+    name: 'Code Refactoring'
+    path: skills/agent-code-refactoring.md
+    phase: midstream
+    tags: [agent, refactoring, maintainability]
+    severity: minor
+    recommended: false
+    description: '挙動を変えずに設計を整えるためのリファクタリング手順をガイドする。'
+
+  - id: agent-test-coverage
+    version: '0.1.0'
+    name: 'Test Coverage'
+    path: skills/agent-test-coverage.md
+    phase: midstream
+    tags: [agent, testing, coverage]
+    severity: major
+    recommended: false
+    description: '変更に対するテスト不足を検知し、最低限の補完方針を提示する。'
+
+  - id: agent-agentcheck-code-review
+    version: '0.1.0'
+    name: 'AgentCheck Code Review'
+    path: skills/agent-agentcheck-code-review.md
+    phase: midstream
+    tags: [agent, automation, review]
+    severity: major
+    recommended: false
+    description: 'AgentCheck ベースでローカルリポジトリを走査し、PR 前のコードレビューを実行するスキル。'
+
   - id: rr-midstream-hello-skill-001
     version: '0.1.0'
     name: 'Hello Skill (Always-On Sample)'
@@ -61,7 +131,7 @@ skills:
   - id: rr-midstream-security-basic-001
     version: '0.1.0'
     name: 'Basic Security Review'
-    path: skills/rr-midstream-security-basic-001/skill.yaml
+    path: skills/midstream/rr-midstream-security-basic-001.md
     phase: midstream
     tags: [security, midstream, basic]
     severity: major
@@ -71,7 +141,7 @@ skills:
   - id: rr-midstream-logging-observability-001
     version: '0.1.0'
     name: 'Logging & Observability'
-    path: skills/rr-midstream-logging-observability-001/skill.yaml
+    path: skills/midstream/rr-midstream-logging-observability-001.md
     phase: midstream
     tags: [observability, logging, reliability, midstream]
     severity: minor
@@ -137,6 +207,27 @@ skills:
     severity: info
     recommended: false
     description: 'Enforces standard review policies'
+
+  # Downstream Skills (Testing & Release)
+  - id: agent-qa-regression
+    version: '0.1.0'
+    name: 'QA Regression (Playwright)'
+    path: skills/agent-qa-regression.md
+    phase: downstream
+    tags: [agent, testing, regression, playwright]
+    severity: major
+    recommended: false
+    description: 'Playwright を使った回帰テストの設計と実行をガイドする。'
+
+  - id: agent-webapp-testing
+    version: '0.1.0'
+    name: 'Web App Testing (Playwright)'
+    path: skills/agent-webapp-testing.md
+    phase: downstream
+    tags: [agent, testing, playwright, webapp]
+    severity: major
+    recommended: false
+    description: 'Playwright でローカル/プレビュー環境の Web アプリを操作・検証するための手順をまとめる。'
 
   # Legacy Upstream Skills (Design Phase)
   - id: rr-upstream-review-policy-standard-001

@@ -1,13 +1,22 @@
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import test from 'node:test';
 import { createSkillValidator, defaultPaths, loadSchema, loadSkillFile, loadSkills } from '../runners/core/skill-loader.mjs';
 
 async function buildValidator(schemaPath = defaultPaths.schemaPath) {
   const schema = await loadSchema(schemaPath);
   return createSkillValidator(schema);
+}
+
+async function withTempDir(fn) {
+  const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'skill-loader-'));
+  try {
+    return await fn(tmpDir);
+  } finally {
+    await rm(tmpDir, { recursive: true, force: true });
+  }
 }
 
 test('loads existing sample skill and applies default outputKind', async () => {
@@ -148,6 +157,139 @@ Body
       return true;
     }
   );
+});
+
+test('loadSkills skips files that fail validation and continues', async () => {
+  await withTempDir(async tmpDir => {
+    const validator = await buildValidator();
+    const validPath = path.join(tmpDir, 'valid.md');
+    const invalidPath = path.join(tmpDir, 'invalid.md');
+    await writeFile(
+      validPath,
+      `---
+id: rr-test-valid-001
+name: Valid Skill
+description: Valid metadata
+phase: upstream
+applyTo:
+  - 'src/**/*.ts'
+---
+Valid body
+`
+    );
+    await writeFile(
+      invalidPath,
+      `---
+id: rr-test-invalid-001
+name: Invalid Skill
+description: Missing applyTo
+phase: upstream
+---
+Body
+`
+    );
+
+    const errors = [];
+    const originalError = console.error;
+    console.error = (...args) => errors.push(args.join(' '));
+    try {
+      const loaded = await loadSkills({ skillsDir: tmpDir, validator });
+      assert.equal(loaded.length, 1);
+      assert.equal(loaded[0].metadata.id, 'rr-test-valid-001');
+      assert.ok(errors.some(line => line.includes('Failed to load skill')));
+    } finally {
+      console.error = originalError;
+    }
+  });
+});
+
+test('loadSkills prefers the first file when duplicate ids are found', async () => {
+  await withTempDir(async tmpDir => {
+    const validator = await buildValidator();
+    const firstPath = path.join(tmpDir, 'a-first.md');
+    const secondPath = path.join(tmpDir, 'b-second.md');
+    await writeFile(
+      firstPath,
+      `---
+id: rr-test-dup-001
+name: First copy
+description: First version
+phase: midstream
+applyTo:
+  - 'src/**/*.ts'
+---
+First body
+`
+    );
+    await writeFile(
+      secondPath,
+      `---
+id: rr-test-dup-001
+name: Second copy
+description: Second version
+phase: midstream
+applyTo:
+  - 'src/**/*.ts'
+---
+Second body
+`
+    );
+
+    const warnings = [];
+    const originalWarn = console.warn;
+    console.warn = (...args) => warnings.push(args.join(' '));
+    try {
+      const loaded = await loadSkills({ skillsDir: tmpDir, validator });
+      assert.equal(loaded.length, 1);
+      assert.equal(loaded[0].metadata.name, 'First copy');
+      assert.ok(warnings.some(line => line.includes('Duplicate skill id "rr-test-dup-001"')));
+    } finally {
+      console.warn = originalWarn;
+    }
+  });
+});
+
+test('loadSkills excludes skills with filtered tags by default', async () => {
+  await withTempDir(async tmpDir => {
+    const validator = await buildValidator();
+    const keptPath = path.join(tmpDir, 'kept.md');
+    const agentPath = path.join(tmpDir, 'agent.md');
+    await writeFile(
+      keptPath,
+      `---
+id: rr-test-keep-001
+name: Kept Skill
+description: Visible skill
+phase: midstream
+applyTo:
+  - 'src/**/*.ts'
+---
+Body
+`
+    );
+    await writeFile(
+      agentPath,
+      `---
+id: rr-test-agent-001
+name: Agent Skill
+description: Should be excluded by default
+phase: midstream
+applyTo:
+  - 'src/**/*.ts'
+tags: [agent]
+---
+Agent body
+`
+    );
+
+    const defaultLoaded = await loadSkills({ skillsDir: tmpDir, validator });
+    assert.equal(defaultLoaded.length, 1);
+    assert.equal(defaultLoaded[0].metadata.id, 'rr-test-keep-001');
+
+    const allLoaded = await loadSkills({ skillsDir: tmpDir, validator, excludedTags: [] });
+    const ids = allLoaded.map(s => s.metadata.id);
+    assert.deepEqual(ids.sort(), ['rr-test-agent-001', 'rr-test-keep-001']);
+  });
 });
 
 test('loadSkills loads all skill files under default directory', async () => {

@@ -1,6 +1,7 @@
 # Logging and Observability Guard
 
 観測性（ログ/メトリクス/トレース）のレビューを行うスキルです。
+スキル定義: `skills/midstream/rr-midstream-logging-observability-001.md`（YAML frontmatter + Markdown）。
 
 ## 概要
 
@@ -30,7 +31,7 @@ lib/**/*
 
 ```bash
 # バリデーション
-npm run validate:skill-yaml skills/rr-midstream-logging-observability-001/skill.yaml
+npm run skills:validate
 
 # promptfoo での評価（設定完了後）
 cd skills/rr-midstream-logging-observability-001

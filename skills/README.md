@@ -17,27 +17,25 @@ Each skill is a **first-class asset** with its own version, tests, and documenta
 
 ```text
 skills/
-├── README.md                  # This file
-├── registry.yaml              # Skill catalog
-├── _template.md               # Legacy template (YAML frontmatter format)
-├── upstream/                  # Design & Architecture phase
-│   ├── rr-upstream-adr-*.md   # ADR-related skills
+├── README.md                       # This file
+├── registry.yaml                   # Skill catalog
+├── agent-*.md                      # Agent skill definitions (frontmatter + Markdown)
+├── upstream/                       # Design & Architecture phase
+│   ├── rr-upstream-*.md            # Upstream skill definitions
 │   └── ...
-├── midstream/                 # Implementation phase
-│   ├── rr-midstream-code-*.md # Code quality skills
+├── midstream/                      # Implementation phase
+│   ├── rr-midstream-*.md           # Midstream skill definitions
 │   └── ...
-└── downstream/                # Testing & Release phase
-    ├── rr-downstream-test-*.md # Test-related skills
-    └── ...
+├── downstream/                     # Testing & Release phase
+│   └── rr-downstream-*.md          # Downstream skill definitions
+└── agent-skills/                   # Legacy references/checklists (skill bodies live in agent-*.md)
 ```
 
-## Skill Formats
+Some skills keep fixtures/prompt/eval assets in sibling folders for documentation and evaluation, but the source of truth for each skill is the `.md` file listed above.
 
-River Reviewer supports two skill formats:
+## Skill Format
 
-### 1. YAML Frontmatter Format (Legacy)
-
-Single Markdown file with YAML frontmatter:
+Skills use a single format: YAML frontmatter + Markdown body.
 
 ```markdown
 ---
@@ -45,32 +43,21 @@ id: rr-midstream-example-001
 name: Example Skill
 description: Example skill description
 phase: midstream
-applyTo: ['src/**/*.ts']
+applyTo:
+  - 'src/**/*.ts'
+tags: [sample, midstream]
+severity: minor
+inputContext: [diff]
+outputKind: [findings, actions]
+modelHint: balanced
+priority: 10
 ---
 
-## Review Logic
+## Guidance
 
-[Skill implementation here]
+- Keep review instructions concise (around 10 lines) and actionable.
+- Include Non-goals and False-positive guards to control noise.
 ```
-
-### 2. Skill Registry Format (Recommended)
-
-Structured directory with separate files:
-
-```text
-rr-midstream-example-001/
-├── skill.yaml              # Metadata
-├── README.md               # Documentation
-├── prompt/
-│   ├── system.md          # System prompt
-│   └── user.md            # User prompt
-├── fixtures/              # Test inputs
-├── golden/                # Expected outputs
-└── eval/
-    └── promptfoo.yaml     # Evaluation config
-```
-
-See [specs/skill-yaml-spec.md](../specs/skill-yaml-spec.md) for the full specification.
 
 ## Creating a New Skill
 
@@ -83,31 +70,22 @@ npm run create:skill
 This interactive tool will:
 
 1. Prompt for skill metadata (ID, name, description, etc.)
-2. Generate the skill directory structure
-3. Create template files with placeholders
+2. Generate a Markdown skill file with YAML frontmatter
+3. (Optional) Create fixture/eval folders if needed
 
 ### Manual Creation
 
 1. Copy the template:
 
    ```bash
-   cp -r specs/templates/skill skills/<phase>/<skill-id>
+   cp skills/_template.md skills/<phase>/<skill-id>.md
    ```
 
-2. Edit `skill.yaml` with your skill metadata
-3. Implement the review logic in `prompt/system.md` and `prompt/user.md`
-4. Add test fixtures and expected outputs
-5. Configure evaluation in `eval/promptfoo.yaml`
+2. Fill in the YAML frontmatter (id, name, description, phase/applyTo, inputContext, outputKind, priority, etc.)
+3. Keep the body concise with Guidance / Non-goals / False-positive guards
+4. (Optional) Add fixtures or promptfoo configs under a sibling directory if you need evaluations
 
 ## Validating Skills
-
-### Validate skill.yaml Format
-
-```bash
-npm run validate:skill-yaml
-```
-
-### Validate Legacy Format (YAML Frontmatter)
 
 ```bash
 npm run skills:validate
@@ -175,7 +153,7 @@ See [registry.yaml](./registry.yaml) for the complete catalog.
 
 ## References
 
-- [Skill YAML Specification](../specs/skill-yaml-spec.md)
-- [Skill Template](../specs/templates/skill/)
+- [Skill Metadata](../pages/reference/skill-metadata.md)
+- [Skill Template](./_template.md)
 - [promptfoo Documentation](https://www.promptfoo.dev/)
 - [River Reviewer Documentation](../DOCUMENTATION.md)

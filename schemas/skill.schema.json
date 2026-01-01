@@ -218,6 +218,10 @@
       "type": "string",
       "description": "Golden directory path",
       "default": "golden"
+    },
+    "priority": {
+      "type": "number",
+      "description": "Optional ordering hint (lower runs earlier)"
     }
   }
 }

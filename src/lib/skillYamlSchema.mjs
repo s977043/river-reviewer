@@ -85,6 +85,7 @@ export const SkillYamlSchema = z
       .describe('Output types'),
     modelHint: ModelHintEnum.optional().describe('Recommended model type'),
     dependencies: z.array(DependencySchema).optional().describe('Feature dependencies'),
+    priority: z.number().int().optional().describe('Ordering hint for execution priority'),
 
     // Implementation references (optional, commonly used but not in spec)
     prompt: PromptSchema.optional().describe('Prompt file references'),

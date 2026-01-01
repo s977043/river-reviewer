@@ -2,14 +2,14 @@
 title: Agent Skills Packages
 ---
 
-このディレクトリは、Agent Skills 仕様の「スキル・パッケージ」を置くための領域です。
-River Reviewer の `skills/**/*.md` とは別系統として扱い、`SKILL.md` と `references/` を中心に構成します。
+このディレクトリは、Agent Skills の参考資料・付属ドキュメントを置く領域です。
+スキル定義そのものは `skills/agent-*.md`（YAML frontmatter + Markdown）に平坦化されました。
+ここにはチェックリストなどの `references/` のみを残しています。
 
 ## 構成ルール
 
-- 1 スキル = 1 フォルダ（例: `skills/agent-skills/architecture-review/`）
-- 必須: `SKILL.md`（YAML frontmatter + 本文）
-- 推奨: `references/`（詳細手順や根拠、長文を分離）
+- 1 スキル = 1 フォルダ（例: `skills/agent-skills/architecture-review/`）で references/ を管理
+- スキル定義本体は `skills/agent-*.md` に移動（YAML frontmatter + 本文）
 
 ## 収録スキル
 

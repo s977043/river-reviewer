@@ -33,6 +33,7 @@ River Reviewer のスキルは YAML フロントマターでメタデータを�
 | `outputKind`   | enum string[] | optional (default: `["findings"]`) | スキルが返す主な出力カテゴリ。UI での整列・集約や後段処理の分岐に利用。複数指定で兼用も可能。                  | `findings`, `summary`, `actions`, `tests`, `metrics`, `questions`                         |
 | `modelHint`    | enum string   | optional                           | モデル選択のコスト/精度指針。ランナーが上限トークンやコスト制約に合わせてモデルを選ぶ際のヒントにする。        | `cheap`, `balanced`, `high-accuracy`                                                      |
 | `dependencies` | enum string[] | optional                           | スキルが依存するツール/リソース。実行前に満たせない場合はスキップやデグレードを判断する。                      | `code_search`, `test_runner`, `adr_lookup`, `repo_metadata`, `coverage_report`, `tracing` |
+| `priority`     | number        | optional                           | 実行順序のヒント（数値が小さいほど先に実行）。LLM プランナーが無効なときの並び替えに利用。                     | `0`, `10`                                                                                 |
 
 `outputKind` の各値（解釈の揺れを防ぐための目安）:
 
