@@ -50,10 +50,7 @@ interface SkillFrontmatterBase {
   goldenDir?: string;
 }
 
-export type SkillFrontmatter = SkillFrontmatterBase & {
-  // Preserve forward compatibility for metadata extensions (e.g., author, versionName).
-  [key: string]: unknown;
-};
+export type SkillFrontmatter = SkillFrontmatterBase;
 
 export interface SkillMetadata extends SkillFrontmatter {
   category: StreamCategory;

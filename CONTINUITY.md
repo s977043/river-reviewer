@@ -1,6 +1,6 @@
 Goal（成功条件を含む）:
 
-- Stream Architecture 仕様に従い、skills/ を core/upstream/midstream/downstream に再編し、YAML Frontmatter（category, trigger.path_patterns 等）付きでロードできるようリファクタリングする。
+- PR #275 の最新状況を把握し、CI エラー・レビュー/行コメントへ対応してグリーンに戻す。
 
 Constraints / Assumptions:
 
@@ -15,9 +15,9 @@ Key decisions:
 
 State:
 
-- Done: gray-matter 型スタブを追加し、category/path_patterns を含む型・スキーマ・ローダーへ更新。スキルリポジトリを stream 別ディレクトリに再配置し、registry/README/テンプレート/ガイドを更新。
-- Now: 変更箇所の整合性確認とテスト準備（skills:validate/test/lint）。
-- Next: 検証コマンド実行、差分最終確認、コミット+PR 作成。
+- Done: gray-matter 型スタブを追加し、category/path_patterns を含む型・スキーマ・ローダーへ更新。スキルリポジトリを stream 別ディレクトリに再配置し、registry/README/テンプレート/ガイドを更新。SkillFrontmatter の index signature を削除し、npm test / npm run lint / npm run skills:validate を再実行して成功。
+- Now: PR #275 のレビュー/CIコメントへの返答と PR 本文更新（Diátaxis 種別明記）を準備中。
+- Next: PR ボディ更新とレビューコメント返信、最終報告。
 
 Open questions（必要なら UNCONFIRMED）:
 
