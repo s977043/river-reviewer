@@ -1,4 +1,5 @@
 export type Phase = 'upstream' | 'midstream' | 'downstream';
+export type StreamCategory = 'core' | Phase;
 export type Severity = 'info' | 'minor' | 'major' | 'critical';
 export type InputContext = 'diff' | 'fullFile' | 'tests' | 'adr' | 'commitMessage' | 'repoConfig';
 export type OutputKind = 'findings' | 'summary' | 'actions' | 'tests' | 'metrics' | 'questions';
@@ -16,15 +17,18 @@ export interface SkillTrigger {
   phase?: Phase | Phase[];
   applyTo?: string[];
   files?: string[];
+  path_patterns?: string[];
 }
 
 interface SkillFrontmatterBase {
   id: string;
   name: string;
   description: string;
+  category?: StreamCategory;
   phase?: Phase | Phase[];
   applyTo?: string[];
   files?: string[];
+  path_patterns?: string[];
   trigger?: SkillTrigger;
   tags?: string[];
   severity?: Severity;
@@ -52,6 +56,7 @@ export type SkillFrontmatter = SkillFrontmatterBase & {
 };
 
 export interface SkillMetadata extends SkillFrontmatter {
+  category: StreamCategory;
   phase: Phase | Phase[];
   applyTo: string[];
   outputKind?: OutputKind[];

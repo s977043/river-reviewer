@@ -293,7 +293,7 @@ instruction: |
 `skills/` 配下は自由に構成できますが、以下の構成を推奨します。
 
 - `skills/core/`: 標準搭載スキル
-- `skills/community/`: コミュニティ提供や特定ライブラリ向けスキル
+- `skills/<stream>/community/`: コミュニティ提供や特定ライブラリ向けスキル（例: `skills/midstream/community/`）
 - `skills/private/`: プロジェクト固有の非公開スキル
 
 Agent Skills 仕様のパッケージは `skills/agent-skills/` に配置し、`SKILL.md` + `references/` を基本構成とします（River Reviewer のスキーマ検証対象外）。

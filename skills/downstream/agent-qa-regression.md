@@ -2,6 +2,7 @@
 id: agent-qa-regression
 name: QA Regression (Playwright)
 description: Playwright を使った回帰テストの設計と実行をガイドする。
+category: downstream
 phase: downstream
 applyTo:
   - 'tests/e2e/**/*'

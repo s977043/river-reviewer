@@ -2,6 +2,7 @@
 id: agent-code-refactoring
 name: Code Refactoring
 description: 挙動を変えずに設計を整えるためのリファクタリング手順をガイドする。
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*'

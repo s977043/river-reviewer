@@ -2,6 +2,7 @@
 id: rr-midstream-a11y-accessible-name-001
 name: a11y Accessible Name Basics
 description: 画像・ボタン・フォーム要素に適切なアクセシブルネームがあるか確認する。
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*.{ts,tsx,js,jsx,html}'

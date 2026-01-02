@@ -25,6 +25,7 @@ test('loads existing sample skill and applies default outputKind', async () => {
   const loaded = await loadSkillFile(skillPath, { validator });
 
   assert.equal(loaded.metadata.id, 'rr-upstream-architecture-sample-001');
+  assert.equal(loaded.metadata.category, 'upstream');
   assert.deepEqual(loaded.metadata.outputKind, ['findings', 'summary', 'questions', 'actions']);
   assert.ok(loaded.body.trim().length > 0);
 });
@@ -37,6 +38,7 @@ test('loads skill with extended metadata fields', async () => {
 id: rr-downstream-newmeta-001
 name: 'Extended Metadata Skill'
 description: 'Uses new metadata fields for loader'
+category: downstream
 phase: downstream
 applyTo:
   - 'src/**/*.ts'
@@ -56,6 +58,7 @@ Body content
   await writeFile(skillPath, content, 'utf8');
 
   const loaded = await loadSkillFile(skillPath, { validator });
+  assert.equal(loaded.metadata.category, 'downstream');
   assert.deepEqual(loaded.metadata.inputContext, ['diff', 'commitMessage']);
   assert.deepEqual(loaded.metadata.outputKind, ['summary', 'actions']);
   assert.equal(loaded.metadata.modelHint, 'high-accuracy');
@@ -70,6 +73,7 @@ test('loads skill with trigger container and normalizes phase/applyTo', async ()
 id: rr-midstream-trigger-001
 name: 'Trigger Skill'
 description: 'Uses trigger container for activation'
+category: midstream
 trigger:
   phase: midstream
   files:
@@ -92,6 +96,7 @@ test('trigger does not override top-level phase/applyTo', async () => {
 id: rr-midstream-trigger-002
 name: 'Trigger Precedence Skill'
 description: 'Top-level values win over trigger'
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*.ts'
@@ -108,6 +113,61 @@ Body content
   assert.equal(loaded.metadata.phase, 'midstream');
   assert.deepEqual(loaded.metadata.applyTo, ['src/**/*.ts']);
   assert.strictEqual(loaded.metadata.trigger, undefined);
+});
+
+test('normalizes path_patterns aliases and prefers category for phase resolution', async () => {
+  const validator = await buildValidator();
+  await withTempDir(async tmpDir => {
+    const skillPath = path.join(tmpDir, 'with-path-patterns.md');
+    const content = `---
+id: rr-midstream-path-patterns-001
+name: 'Path Pattern Skill'
+description: 'Uses path_patterns aliases'
+category: midstream
+path_patterns:
+  - 'src/**/*'
+trigger:
+  phase: upstream
+  path_patterns:
+    - 'docs/**/*.md'
+---
+Body content
+`;
+    await writeFile(skillPath, content, 'utf8');
+
+    const loaded = await loadSkillFile(skillPath, { validator });
+    assert.equal(loaded.metadata.category, 'midstream');
+    assert.equal(loaded.metadata.phase, 'midstream');
+    assert.deepEqual(loaded.metadata.applyTo, ['src/**/*']);
+  });
+});
+
+test('derives category from phase and trigger paths when category is missing', async () => {
+  const validator = await buildValidator();
+  await withTempDir(async tmpDir => {
+    const skillPath = path.join(tmpDir, 'derive-category.md');
+    const content = `---
+id: rr-core-derived-001
+name: 'Derived Category Skill'
+description: 'Relies on trigger for applyTo'
+phase:
+  - upstream
+  - midstream
+  - downstream
+trigger:
+  phase: downstream
+  path_patterns:
+    - 'tests/**/*.ts'
+---
+Body content
+`;
+    await writeFile(skillPath, content, 'utf8');
+
+    const loaded = await loadSkillFile(skillPath, { validator });
+    assert.equal(loaded.metadata.category, 'core');
+    assert.deepEqual(loaded.metadata.phase, ['upstream', 'midstream', 'downstream']);
+    assert.deepEqual(loaded.metadata.applyTo, ['tests/**/*.ts']);
+  });
 });
 
 test('fails when dependencies contain unsupported values', async () => {

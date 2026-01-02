@@ -72,7 +72,7 @@ Points:
 ## 2. Recommended Directory Structure
 
 - `skills/core/`: Default loaded skills
-- `skills/community/`: External/Library-specific skills
+- `skills/<stream>/community/`: External/Library-specific skills (e.g., `skills/midstream/community/`)
 - `skills/private/`: Project-specific skills
 - `skills/agent-skills/`: Packages following Agent Skills spec (`SKILL.md` + `references/`, not validated by River Reviewer core)
 - Test fixtures should be separated in `tests/fixtures/skills/` etc.

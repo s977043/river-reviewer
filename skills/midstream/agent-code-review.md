@@ -2,6 +2,7 @@
 id: agent-code-review
 name: Code Review (Multi-perspective)
 description: PR 向けの自動コードレビュー。セキュリティ・性能・品質・テスト観点で差分を評価する。
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*'

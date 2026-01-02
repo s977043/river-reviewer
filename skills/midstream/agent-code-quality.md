@@ -2,6 +2,7 @@
 id: agent-code-quality
 name: Code Quality
 description: 可読性と保守性を中心に、コード品質の基本的な劣化を検知する。
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*'

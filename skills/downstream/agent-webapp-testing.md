@@ -2,6 +2,7 @@
 id: agent-webapp-testing
 name: Web App Testing (Playwright)
 description: Playwright でローカル/プレビュー環境の Web アプリを操作・検証するための手順をまとめる。
+category: downstream
 phase: downstream
 applyTo:
   - 'apps/**/*.{ts,tsx,js,jsx}'

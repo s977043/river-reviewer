@@ -22,7 +22,7 @@ AgentCheck は `devlyai/AgentCheck` のテンプレートをローカルに取�
 
 - midstream/downstream フェーズの前処理として、AgentCheck の JSON 出力を Runner に渡す。
 - 重大度タグを River Reviewer の `severity`（`info`/`minor`/`major`/`critical`）に合わせる。
-- 追加ルールは `skills/community` やリポジトリ固有のチェックリストと整合させる。
+- 追加ルールは `skills/<stream>/community`（例: `skills/midstream/community`）やリポジトリ固有のチェックリストと整合させる。
 
 ## 注意点
 

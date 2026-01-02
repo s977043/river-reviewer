@@ -2,6 +2,7 @@
 id: agent-test-coverage
 name: Test Coverage
 description: 変更に対するテスト不足を検知し、最低限の補完方針を提示する。
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*'

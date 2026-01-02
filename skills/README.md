@@ -1,6 +1,6 @@
 # River Reviewer Skills
 
-This directory contains River Reviewer skills - reusable code review patterns organized by SDLC phase.
+This directory contains River Reviewer skills - reusable code review patterns organized by stream category (core/upstream/midstream/downstream).
 
 ## What are Skills?
 
@@ -19,15 +19,17 @@ Each skill is a **first-class asset** with its own version, tests, and documenta
 skills/
 ├── README.md                       # This file
 ├── registry.yaml                   # Skill catalog
-├── agent-*.md                      # Agent skill definitions (frontmatter + Markdown)
-├── upstream/                       # Design & Architecture phase
-│   ├── rr-upstream-*.md            # Upstream skill definitions
-│   └── ...
-├── midstream/                      # Implementation phase
-│   ├── rr-midstream-*.md           # Midstream skill definitions
-│   └── ...
-├── downstream/                     # Testing & Release phase
-│   └── rr-downstream-*.md          # Downstream skill definitions
+├── _template.md                    # Skill frontmatter template
+├── core/                           # Always-on or cross-stream skills
+├── upstream/                       # Design & Architecture skills
+│   ├── rr-upstream-*.md            # Upstream skill definitions (frontmatter + Markdown)
+│   └── agent-*.md                  # Upstream agent skills
+├── midstream/                      # Implementation skills
+│   ├── rr-midstream-*.md           # Midstream skill definitions (frontmatter + Markdown)
+│   ├── community/                  # Community midstream skills
+│   └── agent-*.md                  # Midstream agent skills
+├── downstream/                     # Testing & Release skills
+│   └── rr-downstream-*.md          # Downstream skill definitions (frontmatter + Markdown)
 └── agent-skills/                   # Legacy references/checklists (skill bodies live in agent-*.md)
 ```
 
@@ -37,14 +39,19 @@ Some skills keep fixtures/prompt/eval assets in sibling folders for documentatio
 
 Skills use a single format: YAML frontmatter + Markdown body.
 
+Set `category` to one of `core`, `upstream`, `midstream`, or `downstream` (use `core` for always-on skills). `phase` remains for compatibility but `category` is the primary routing key.
+
 ```markdown
 ---
 id: rr-midstream-example-001
 name: Example Skill
 description: Example skill description
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*.ts'
+path_patterns: # optional alias for applyTo
+  - 'src/**/*.{ts,tsx}'
 tags: [sample, midstream]
 severity: minor
 inputContext: [diff]
@@ -106,7 +113,15 @@ npx promptfoo eval
 npm run eval:fixtures
 ```
 
-## Skill Phases
+## Stream Categories
+
+### Core
+
+Focus: Always-on checks that apply to every stream (e.g., review policies, global safety rails)
+
+- **Input Context**: Depends on the skill; should avoid heavy or stream-specific assumptions
+- **Output**: Cross-cutting guidance or guardrails
+- **Examples**: Review policy baselines, output shaping rules
 
 ### Upstream (Design & Architecture)
 

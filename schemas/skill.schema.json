@@ -2,11 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "River Reviewer Skill Schema",
   "type": "object",
-  "required": ["id", "name", "description"],
+  "required": ["id", "name", "description", "category"],
   "allOf": [
     {
       "anyOf": [
         { "required": ["phase"] },
+        { "required": ["category"] },
         { "required": ["trigger"], "properties": { "trigger": { "$ref": "#/properties/trigger" } } }
       ]
     },
@@ -14,6 +15,7 @@
       "anyOf": [
         { "required": ["applyTo"] },
         { "required": ["files"] },
+        { "required": ["path_patterns"] },
         {
           "required": ["trigger"],
           "properties": { "trigger": { "$ref": "#/properties/trigger" } }
@@ -26,6 +28,10 @@
     "phase": {
       "type": "string",
       "enum": ["upstream", "midstream", "downstream"]
+    },
+    "streamCategory": {
+      "type": "string",
+      "enum": ["core", "upstream", "midstream", "downstream"]
     },
     "severity": {
       "type": "string",
@@ -79,6 +85,10 @@
       "description": "Brief description of what the skill checks",
       "minLength": 1
     },
+    "category": {
+      "$ref": "#/$defs/streamCategory",
+      "description": "Stream category (core/upstream/midstream/downstream)"
+    },
     "phase": {
       "oneOf": [
         { "$ref": "#/$defs/phase" },
@@ -97,6 +107,12 @@
       "minItems": 1
     },
     "files": {
+      "type": "array",
+      "description": "Alias for applyTo",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "path_patterns": {
       "type": "array",
       "description": "Alias for applyTo",
       "items": { "type": "string" },
@@ -156,6 +172,12 @@
         "applyTo": {
           "type": "array",
           "description": "Glob patterns defining which files to check",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "path_patterns": {
+          "type": "array",
+          "description": "Alias for applyTo",
           "items": { "type": "string" },
           "minItems": 1
         },

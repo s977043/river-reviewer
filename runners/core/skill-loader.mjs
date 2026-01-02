@@ -57,6 +57,8 @@ const ignoredSkillDirNames = new Set([
 ]);
 const ignoredFileNames = new Set(['.gitkeep', 'README.md', 'registry.yaml', 'registry.yml', '_template.md']);
 const legacySkillFiles = new Set(['skill.yaml', 'skill.yml']);
+const streamCategories = new Set(['core', 'upstream', 'midstream', 'downstream']);
+const allPhases = ['upstream', 'midstream', 'downstream'];
 
 export const defaultPaths = {
   repoRoot,
@@ -122,7 +124,69 @@ export async function listSkillFiles(dir = defaultSkillsDir) {
   return files.sort((a, b) => a.localeCompare(b));
 }
 
-function normalizeMetadata(metadata) {
+function normalizeStringArray(value) {
+  if (!value) return undefined;
+  const asArray = Array.isArray(value) ? value : [value];
+  const filtered = asArray
+    .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
+    .filter(Boolean);
+  return filtered.length ? filtered : undefined;
+}
+
+function normalizePhaseValue(value) {
+  if (!value) return undefined;
+  if (Array.isArray(value)) {
+    const phases = value.filter(Boolean);
+    if (phases.length === 1) return phases[0];
+    return phases.length ? phases : undefined;
+  }
+  return value;
+}
+
+function inferCategoryFromPhase(phase) {
+  if (!phase) return undefined;
+  if (Array.isArray(phase)) {
+    const unique = Array.from(new Set(phase));
+    if (unique.length === 1 && streamCategories.has(unique[0])) {
+      return unique[0];
+    }
+    if (unique.length > 1) {
+      return 'core';
+    }
+    return undefined;
+  }
+  return streamCategories.has(phase) ? phase : undefined;
+}
+
+function inferCategoryFromPath(filePath) {
+  if (!filePath) return undefined;
+  const segments = path.normalize(filePath).split(path.sep);
+  const skillsIndex = segments.lastIndexOf('skills');
+  const candidate = skillsIndex >= 0 ? segments[skillsIndex + 1] : undefined;
+  if (candidate && streamCategories.has(candidate)) {
+    return candidate;
+  }
+  return undefined;
+}
+
+function resolveCategory(metaCategory, { phase, filePath } = {}) {
+  if (typeof metaCategory === 'string' && streamCategories.has(metaCategory)) {
+    return metaCategory;
+  }
+  return inferCategoryFromPath(filePath) ?? inferCategoryFromPhase(phase);
+}
+
+function resolvePhase(metaPhase, category) {
+  if (category === 'core') {
+    return [...allPhases];
+  }
+  if (category && streamCategories.has(category)) {
+    return category;
+  }
+  return normalizePhaseValue(metaPhase);
+}
+
+function normalizeMetadata(metadata, { filePath } = {}) {
   const meta = { ...metadata };
 
   if (meta.priority !== undefined) {
@@ -134,16 +198,22 @@ function normalizeMetadata(metadata) {
     }
   }
 
-  // Top-level alias first: applyTo has precedence over files.
-  if (meta.files && !meta.applyTo) {
-    meta.applyTo = meta.files;
+  const topLevelApplyTo =
+    normalizeStringArray(meta.applyTo) ??
+    normalizeStringArray(meta.files) ??
+    normalizeStringArray(meta.path_patterns);
+  if (topLevelApplyTo) {
+    meta.applyTo = topLevelApplyTo;
   }
 
   const trigger =
     meta.trigger && typeof meta.trigger === 'object' && !Array.isArray(meta.trigger)
       ? meta.trigger
       : null;
-  const triggerApplyTo = trigger?.applyTo ?? trigger?.files;
+  const triggerApplyTo =
+    normalizeStringArray(trigger?.applyTo) ??
+    normalizeStringArray(trigger?.files) ??
+    normalizeStringArray(trigger?.path_patterns);
 
   if (!meta.phase && trigger?.phase) {
     meta.phase = trigger.phase;
@@ -152,9 +222,15 @@ function normalizeMetadata(metadata) {
     meta.applyTo = triggerApplyTo;
   }
 
+  meta.category = resolveCategory(meta.category, { phase: meta.phase, filePath });
+  meta.phase = resolvePhase(meta.phase, meta.category);
+
   // Trigger is consumed during normalization; avoid leaking nested state.
   if (trigger) {
     delete meta.trigger;
+  }
+  if ('path_patterns' in meta) {
+    delete meta.path_patterns;
   }
 
   return meta;
@@ -182,7 +258,7 @@ export function parseFrontMatter(content, { filePath } = {}) {
   if (Object.keys(metadata).length === 0) {
     throw new SkillLoaderError('Front matter is empty');
   }
-  const normalized = normalizeMetadata(metadata);
+  const normalized = normalizeMetadata(metadata, { filePath });
   const body = (parsed.content ?? '').trim();
   return { metadata: normalized, body };
 }
@@ -226,7 +302,7 @@ async function parseSkillFile(filePath) {
     delete metadata.instruction;
   }
 
-  metadata = normalizeMetadata(metadata);
+  metadata = normalizeMetadata(metadata, { filePath });
   return { metadata, body };
 }
 
