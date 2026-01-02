@@ -124,11 +124,10 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 
 **標準的な進め方 (Standard Procedure):**
 
-1. **作成:** タスク発生時、メインの作業場所とは別の Worktree を作成する。
+1. **作成:** 新しいタスク用のブランチと Worktree を作成する。
 
    ```bash
-   git worktree add <path> <branch>
-   ```
+   git worktree add -b <new-branch-name> <path> main
 
 2. **作業:** 生成されたディレクトリへ移動し、該当タスクを完遂する。
 3. **検証:** 独立した環境でビルド・テストを行い、他の作業中の変更と干渉しないことを確認する。
