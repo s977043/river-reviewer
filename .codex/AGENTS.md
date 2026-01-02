@@ -27,5 +27,6 @@ CODEX_HOME=$(pwd)/.codex codex "your prompt"
 ## Quick reference
 
 - Skills: `skills/` を英日両方のキーワードで検索
-- Safety: No secrets; destructive commands must be explicit
-- Workflow: Small changes → `npm test` / `npm run lint` → PR
+- Safety: 秘密情報へのアクセスは禁止。破壊的なコマンドは明示的に確認を求める。
+- Workflow: 小さな変更 → `npm test` / `npm run lint` → PR
+
