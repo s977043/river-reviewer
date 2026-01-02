@@ -5,7 +5,7 @@ Goal（成功条件を含む）:
 Constraints / Assumptions:
 
 - リポジトリの AGENTS.md など既存のポリシーを遵守する。
-- コミット前に npm test と npm run lint を実行する。
+- コミット前に `npm test` と `npm run lint` を実行する。
 - PR 作成時は Gemini と Codex レビュー依頼を含める。
 - ネットワークアクセスは利用可能。
 - ユーザーからの追加指示を反映し、各エージェント向けラッパーをより薄くしつつ、AGENTS.md を単一ソースとして強化する。
