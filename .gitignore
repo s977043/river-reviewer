@@ -27,3 +27,4 @@ CLAUDE.local.md
 eval-results/
 **/eval/results.json
 dist/
+run_log.txt
