@@ -1,16 +1,15 @@
 # Claude Code Project Guide
 
-> **Note**: Read [AGENTS.md](./AGENTS.md) first for core project rules.
-> This file contains Claude Code specific configuration only.
+> **Single source:** まず [AGENTS.md](./AGENTS.md) を参照し、共通ルールと完了条件に従ってください。本ファイルは Claude 向けの最小差分です。
 
-## Claude-specific settings
+## 必須チェック
 
-- Permission settings: See `.claude/settings.json`
+- 着手前に受入条件とポリシーを確認し、短い計画を提示してから作業開始。
+- ブランチはタスク単位。PR では `npm test` と `npm run lint` を実行し、Gemini / Codex へのレビュー依頼を明記する。
+- セルフレビューで残タスクがないことを確認してから提出する。
+
+## Claude-specific
+
+- Permission settings: `.claude/settings.json`
 - Custom commands: `/skill`, `/review-local` (in `.claude/commands/`)
 - Sub-agent: `river-reviewer` (in `.claude/agents/`)
-
-## Quick reference (from AGENTS.md)
-
-- Skills: Search `skills/` with both English and Japanese keywords
-- Safety: No secrets access, no destructive commands without confirmation
-- Workflow: Small changes → lint/test → PR

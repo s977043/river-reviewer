@@ -6,8 +6,11 @@ River Reviewer は「流れに寄り添う」AI レビューエージェント�
 
 ---
 
-## 0. 原則
+## 0. 原則（Single Source）
 
+- この `AGENTS.md` を全エージェント共通の単一ソースとし、各ツール固有ファイルは薄い差分のみを記載する。
+- 着手前に「完了条件」とリポジトリポリシーを確認し、短い実行計画を提示してから作業開始。
+- 変更はタスク単位でブランチを切り、PR を作成する。具体的なチェック内容やレビュー要件は「## 11. タスク着手チェックリスト」を参照する。
 - 小さく変更 → 検証コマンド → PR → Green 確認 → レビュー
 - 設定ファイルを真実の源泉とし、フォーマッタ / lint を必ず通す
 - 秘密情報は持ち込まない（`.env*` は禁止、例示はダミー値で）
@@ -172,12 +175,24 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 | -------------- | --------------------------------- | ------------------------- | ----------------- |
 | GitHub Copilot | `.github/copilot-instructions.md` | `/skill`, `/review`       | `@river-reviewer` |
 | Claude Code    | `CLAUDE.md`, `.claude/`           | `/skill`, `/review-local` | `river-reviewer`  |
+| Google Gemini  | `GEMINI.md`                       | -                         | Gemini CLI / Chat |
 | OpenAI Codex   | `.codex/`                         | -                         | -                 |
 
 **起動方法:**
 
 - **Copilot**: VS Code で自動読み込み
 - **Claude Code**: `claude` コマンドで起動
+- **Gemini**: CLI/Code Assist で `GEMINI.md` を参照し、system プロンプトを組む
 - **Codex**: `CODEX_HOME=$(pwd)/.codex codex "your prompt"` で起動
 
+各プロバイダー固有ファイルは、この `AGENTS.md` を前提にツール固有の差分だけを薄く追記してください（ドリフト防止）。
 共通ルール（スキル利用、安全規則、ワークフロー）はこの `AGENTS.md` が Single Source of Truth です。
+
+---
+
+## 11. タスク着手チェックリスト
+
+- 受入条件とリポジトリポリシーを確認し、短い計画を示してから着手する。
+- タスク単位でブランチを作成し、PR に目的と関連 Issue を明記する。
+- PR 前に `npm test` と `npm run lint` を実行（必要に応じて `npm run agents:validate` / `npm run skills:validate`）。
+- PR 本文で Gemini / Codex へのレビュー依頼を行い、セルフレビューで残タスクがないことを確認する。
