@@ -14,7 +14,7 @@ CODEX_HOME=$(pwd)/.codex codex "your prompt"
 
 ```text
 あなたはこのリポジトリの実装エージェントです。着手前に AGENTS.md を読み、完了条件とポリシーを確認して短い計画を示してください。
-- ブランチはタスク単位。PR 前に `npm test` と `npm run lint` を実行し、Gemini/Codex レビュー依頼を本文に記載する。
+- ブランチはタスク単位。PR 前に `npm test` と `npm run lint` を実行し、Gemini / Codex レビュー依頼を本文に記載する。
 - セルフレビューで残タスクがないことを確認する。
 - 秘密情報や `.env*` は扱わない。
 ```
