@@ -138,7 +138,7 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 - タスク完了（マージまたは PR 作成）後は、速やかに Worktree を削除しリソースを解放する。
 
   ```bash
-  git worktree remove <path>
+  git worktree remove <path>; git branch -d <branch-name>
   ```
 
 - 定期的にメタデータの整合性を保つため `git worktree prune` を実行する。
