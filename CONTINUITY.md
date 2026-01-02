@@ -1,3 +1,5 @@
+# Continuity Ledger
+
 Goal（成功条件を含む）:
 
 - GitHub issue #80 「[Epic]AGENTS.md を共通指示の単一ソースにして各エージェントから参照させる」の内容を本リポジトリに合わせて実装し、AGENTS.md を単一ソースとする関連ファイル整備を完了する。
