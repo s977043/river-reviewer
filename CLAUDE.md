@@ -5,7 +5,7 @@
 ## 必須チェック
 
 - 着手前に受入条件とポリシーを確認し、短い計画を提示する。
-- ブランチはタスク単位。PR では `npm test` / `npm run lint` を実行し、Gemini / Codex へのレビュー依頼を明記する。
+- ブランチはタスク単位。PR では `npm test` と `npm run lint` を実行し、Gemini / Codex へのレビュー依頼を明記する。
 - セルフレビューで残タスクがないことを確認してから提出する。
 
 ## Claude-specific
