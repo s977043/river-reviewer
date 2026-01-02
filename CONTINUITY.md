@@ -1,8 +1,10 @@
-Goal（成功条件を含む）:
+# Continuity Ledger
+
+## Goal（成功条件を含む）
 
 - GitHub issue #80 「[Epic]AGENTS.md を共通指示の単一ソースにして各エージェントから参照させる」の内容を本リポジトリに合わせて実装し、AGENTS.md を単一ソースとする関連ファイル整備を完了する。
 
-Constraints / Assumptions:
+## Constraints / Assumptions
 
 - リポジトリの AGENTS.md など既存のポリシーを遵守する。
 - コミット前に `npm test` と `npm run lint` を実行する。
@@ -10,11 +12,11 @@ Constraints / Assumptions:
 - ネットワークアクセスは利用可能。
 - ユーザーからの追加指示を反映し、各エージェント向けラッパーをより薄くしつつ、AGENTS.md を単一ソースとして強化する。
 
-Key decisions:
+## Key decisions
 
 - runners/core と runners/node-api 配下の `node_modules` を削除し、lint 対象から依存ドキュメントを外した。
 
-State:
+## State
 
 - Done:
   - リポジトリルート AGENTS.md の内容と issue #80 の受入条件を確認。
@@ -31,11 +33,11 @@ State:
 - Next:
   - レビューコメントや CI 結果に備え、必要に応じてフォローアップする。
 
-Open questions（必要なら UNCONFIRMED）:
+## Open questions（必要なら UNCONFIRMED）
 
 - 各エージェント向け薄いラッパーファイルの具体的要件（本リポジトリの既存構成への適用方法）は UNCONFIRMED。
 
-Working set（files / ids / commands）:
+## Working set（files / ids / commands）
 
 - Issue: <https://github.com/s977043/digital-omikuji/issues/80>
 - AGENTS.md（リポジトリルート）
