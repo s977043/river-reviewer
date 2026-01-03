@@ -28,6 +28,7 @@ metadata:
   id: rr-test-nested-001
   name: Nested Skill
   description: Testing nested structure
+  category: core
   phase: [midstream, downstream]
   files: ['src/**/*.ts']
 instruction: "Do the thing"
@@ -38,7 +39,8 @@ instruction: "Do the thing"
 
     assert.equal(loaded.metadata.id, 'rr-test-nested-001');
     assert.equal(loaded.metadata.name, 'Nested Skill');
-    assert.deepEqual(loaded.metadata.phase, ['midstream', 'downstream']);
+    assert.deepEqual(loaded.metadata.category, 'core');
+    assert.deepEqual(loaded.metadata.phase, ['upstream', 'midstream', 'downstream']);
     // Normalized to applyTo
     assert.deepEqual(loaded.metadata.applyTo, ['src/**/*.ts']);
     assert.equal(loaded.body, 'Do the thing');
@@ -53,6 +55,7 @@ test('loads YAML skill with flat structure and instruction', async () => {
 id: rr-test-flat-001
 name: Flat Skill
 description: Testing flat structure
+category: upstream
 phase: upstream
 files: ['docs/*.md']
 instruction: "Check docs"
@@ -62,6 +65,7 @@ instruction: "Check docs"
     const loaded = await loadSkillFile(skillPath, { validator });
 
     assert.equal(loaded.metadata.id, 'rr-test-flat-001');
+    assert.equal(loaded.metadata.category, 'upstream');
     assert.equal(loaded.metadata.phase, 'upstream');
     assert.deepEqual(loaded.metadata.applyTo, ['docs/*.md']);
     assert.equal(loaded.body, 'Check docs');
@@ -76,6 +80,7 @@ test('loads YAML skill with trigger container', async () => {
 id: rr-test-trigger-001
 name: Trigger YAML Skill
 description: Trigger container in YAML
+category: downstream
 trigger:
   phase: downstream
   applyTo: ['tests/**/*.js']
@@ -85,6 +90,7 @@ instruction: "Check tests"
 
     const loaded = await loadSkillFile(skillPath, { validator });
 
+    assert.equal(loaded.metadata.category, 'downstream');
     assert.equal(loaded.metadata.phase, 'downstream');
     assert.deepEqual(loaded.metadata.applyTo, ['tests/**/*.js']);
     assert.equal(loaded.body, 'Check tests');
@@ -99,6 +105,7 @@ test('trigger does not override top-level phase/applyTo in YAML', async () => {
 id: rr-test-trigger-002
 name: Trigger Precedence YAML Skill
 description: Precedence favors top-level values
+category: midstream
 phase: midstream
 applyTo: ['docs/*.md']
 trigger:
@@ -110,6 +117,7 @@ instruction: "Do not override top-level"
 
     const loaded = await loadSkillFile(skillPath, { validator });
 
+    assert.equal(loaded.metadata.category, 'midstream');
     assert.equal(loaded.metadata.phase, 'midstream');
     assert.deepEqual(loaded.metadata.applyTo, ['docs/*.md']);
     assert.strictEqual(loaded.metadata.trigger, undefined);
@@ -126,6 +134,7 @@ metadata:
   id: rr-test-nested-002
   name: Nested Instruction Skill
   description: Instruction lives under metadata
+  category: midstream
   phase: midstream
   applyTo: ['src/**/*.js']
   instruction: "Use the nested instruction"

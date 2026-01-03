@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 // Enums
 export const PhaseEnum = z.enum(['upstream', 'midstream', 'downstream']);
+export const StreamCategoryEnum = z.enum(['core', 'upstream', 'midstream', 'downstream']);
 export const SeverityEnum = z.enum(['info', 'minor', 'major', 'critical']);
 export const InputContextEnum = z.enum([
   'diff',
@@ -54,8 +55,10 @@ const EvalSchema = z.object({
 
 // Trigger configuration (alternative format)
 const TriggerSchema = z.object({
-  phase: z.union([PhaseEnum, z.array(PhaseEnum)]).describe('SDLC phase(s)'),
-  files: z.array(z.string().min(1)).describe('File patterns (glob)'),
+  phase: z.union([PhaseEnum, z.array(PhaseEnum)]).optional().describe('SDLC phase(s)'),
+  files: z.array(z.string().min(1)).optional().describe('File patterns (glob)'),
+  path_patterns: z.array(z.string().min(1)).optional().describe('File patterns (alias)'),
+  applyTo: z.array(z.string().min(1)).optional().describe('File patterns (alias)'),
 });
 
 // Main Skill YAML Schema
@@ -69,10 +72,12 @@ export const SkillYamlSchema = z
       .describe('Semantic version'),
     name: z.string().min(1).describe('Human-readable skill name'),
     description: z.string().min(1).describe('Purpose and role of the skill'),
+    category: StreamCategoryEnum.describe('Stream category'),
 
     // Trigger conditions (at top level or in trigger object)
     phase: z.union([PhaseEnum, z.array(PhaseEnum)]).optional().describe('SDLC phase(s)'),
     applyTo: z.array(z.string().min(1)).optional().describe('File patterns (glob)'),
+    path_patterns: z.array(z.string().min(1)).optional().describe('File patterns (alias)'),
     trigger: TriggerSchema.optional().describe('Alternative trigger format'),
 
     // Optional fields (per spec: pages/reference/skill-metadata.md)
@@ -85,6 +90,7 @@ export const SkillYamlSchema = z
       .describe('Output types'),
     modelHint: ModelHintEnum.optional().describe('Recommended model type'),
     dependencies: z.array(DependencySchema).optional().describe('Feature dependencies'),
+    priority: z.number().int().optional().describe('Ordering hint for execution priority'),
 
     // Implementation references (optional, commonly used but not in spec)
     prompt: PromptSchema.optional().describe('Prompt file references'),
@@ -94,13 +100,17 @@ export const SkillYamlSchema = z
   })
   .refine(
     (data) => {
-      // Must have either top-level phase/applyTo or trigger object
-      const hasTopLevel = data.phase !== undefined && data.applyTo !== undefined;
-      const hasTrigger = data.trigger !== undefined;
+      const hasTopLevel =
+        (data.phase !== undefined || data.category !== undefined) &&
+        (data.applyTo !== undefined || data.path_patterns !== undefined);
+      const triggerFiles =
+        data.trigger?.applyTo ?? data.trigger?.files ?? data.trigger?.path_patterns;
+      const triggerPhase = data.trigger?.phase !== undefined;
+      const hasTrigger = data.trigger !== undefined && triggerPhase && triggerFiles !== undefined;
       return hasTopLevel || hasTrigger;
     },
     {
       message:
-        'Must have either (phase + applyTo) at top level or trigger object with phase and files',
+        'Must have either (phase/category + applyTo/path_patterns) at top level or trigger object with phase and files',
     }
   );

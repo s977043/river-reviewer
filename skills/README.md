@@ -1,6 +1,6 @@
 # River Reviewer Skills
 
-This directory contains River Reviewer skills - reusable code review patterns organized by SDLC phase.
+This directory contains River Reviewer skills - reusable code review patterns organized by stream category (core/upstream/midstream/downstream).
 
 ## What are Skills?
 
@@ -17,60 +17,54 @@ Each skill is a **first-class asset** with its own version, tests, and documenta
 
 ```text
 skills/
-├── README.md                  # This file
-├── registry.yaml              # Skill catalog
-├── _template.md               # Legacy template (YAML frontmatter format)
-├── upstream/                  # Design & Architecture phase
-│   ├── rr-upstream-adr-*.md   # ADR-related skills
-│   └── ...
-├── midstream/                 # Implementation phase
-│   ├── rr-midstream-code-*.md # Code quality skills
-│   └── ...
-└── downstream/                # Testing & Release phase
-    ├── rr-downstream-test-*.md # Test-related skills
-    └── ...
+├── README.md                       # This file
+├── registry.yaml                   # Skill catalog
+├── _template.md                    # Skill frontmatter template
+├── core/                           # Always-on or cross-stream skills
+├── upstream/                       # Design & Architecture skills
+│   ├── rr-upstream-*.md            # Upstream skill definitions (frontmatter + Markdown)
+│   └── agent-*.md                  # Upstream agent skills
+├── midstream/                      # Implementation skills
+│   ├── rr-midstream-*.md           # Midstream skill definitions (frontmatter + Markdown)
+│   ├── community/                  # Community midstream skills
+│   └── agent-*.md                  # Midstream agent skills
+├── downstream/                     # Testing & Release skills
+│   └── rr-downstream-*.md          # Downstream skill definitions (frontmatter + Markdown)
+└── agent-skills/                   # Legacy references/checklists (skill bodies live in agent-*.md)
 ```
 
-## Skill Formats
+Some skills keep fixtures/prompt/eval assets in sibling folders for documentation and evaluation, but the source of truth for each skill is the `.md` file listed above.
 
-River Reviewer supports two skill formats:
+## Skill Format
 
-### 1. YAML Frontmatter Format (Legacy)
+Skills use a single format: YAML frontmatter + Markdown body.
 
-Single Markdown file with YAML frontmatter:
+Set `category` to one of `core`, `upstream`, `midstream`, or `downstream` (use `core` for always-on skills). `phase` remains for compatibility but `category` is the primary routing key.
 
 ```markdown
 ---
 id: rr-midstream-example-001
 name: Example Skill
 description: Example skill description
+category: midstream
 phase: midstream
-applyTo: ['src/**/*.ts']
+applyTo:
+  - 'src/**/*.ts'
+path_patterns: # optional alias for applyTo
+  - 'src/**/*.{ts,tsx}'
+tags: [sample, midstream]
+severity: minor
+inputContext: [diff]
+outputKind: [findings, actions]
+modelHint: balanced
+priority: 10
 ---
 
-## Review Logic
+## Guidance
 
-[Skill implementation here]
+- Keep review instructions concise (around 10 lines) and actionable.
+- Include Non-goals and False-positive guards to control noise.
 ```
-
-### 2. Skill Registry Format (Recommended)
-
-Structured directory with separate files:
-
-```text
-rr-midstream-example-001/
-├── skill.yaml              # Metadata
-├── README.md               # Documentation
-├── prompt/
-│   ├── system.md          # System prompt
-│   └── user.md            # User prompt
-├── fixtures/              # Test inputs
-├── golden/                # Expected outputs
-└── eval/
-    └── promptfoo.yaml     # Evaluation config
-```
-
-See [specs/skill-yaml-spec.md](../specs/skill-yaml-spec.md) for the full specification.
 
 ## Creating a New Skill
 
@@ -83,31 +77,22 @@ npm run create:skill
 This interactive tool will:
 
 1. Prompt for skill metadata (ID, name, description, etc.)
-2. Generate the skill directory structure
-3. Create template files with placeholders
+2. Generate a Markdown skill file with YAML frontmatter
+3. (Optional) Create fixture/eval folders if needed
 
 ### Manual Creation
 
 1. Copy the template:
 
    ```bash
-   cp -r specs/templates/skill skills/<phase>/<skill-id>
+   cp skills/_template.md skills/<phase>/<skill-id>.md
    ```
 
-2. Edit `skill.yaml` with your skill metadata
-3. Implement the review logic in `prompt/system.md` and `prompt/user.md`
-4. Add test fixtures and expected outputs
-5. Configure evaluation in `eval/promptfoo.yaml`
+2. Fill in the YAML frontmatter (id, name, description, phase/applyTo, inputContext, outputKind, priority, etc.)
+3. Keep the body concise with Guidance / Non-goals / False-positive guards
+4. (Optional) Add fixtures or promptfoo configs under a sibling directory if you need evaluations
 
 ## Validating Skills
-
-### Validate skill.yaml Format
-
-```bash
-npm run validate:skill-yaml
-```
-
-### Validate Legacy Format (YAML Frontmatter)
 
 ```bash
 npm run skills:validate
@@ -128,7 +113,15 @@ npx promptfoo eval
 npm run eval:fixtures
 ```
 
-## Skill Phases
+## Stream Categories
+
+### Core
+
+Focus: Always-on checks that apply to every stream (e.g., review policies, global safety rails)
+
+- **Input Context**: Depends on the skill; should avoid heavy or stream-specific assumptions
+- **Output**: Cross-cutting guidance or guardrails
+- **Examples**: Review policy baselines, output shaping rules
 
 ### Upstream (Design & Architecture)
 
@@ -175,7 +168,7 @@ See [registry.yaml](./registry.yaml) for the complete catalog.
 
 ## References
 
-- [Skill YAML Specification](../specs/skill-yaml-spec.md)
-- [Skill Template](../specs/templates/skill/)
+- [Skill Metadata](../pages/reference/skill-metadata.md)
+- [Skill Template](./_template.md)
 - [promptfoo Documentation](https://www.promptfoo.dev/)
 - [River Reviewer Documentation](../DOCUMENTATION.md)

@@ -72,7 +72,7 @@ instruction: |
 ## 2. ディレクトリ構成の推奨
 
 - `skills/core/` 既定で読み込むスキル群
-- `skills/community/` 外部/ライブラリ特化のスキル
+- `skills/<stream>/community/` 外部/ライブラリ特化のスキル（例: `skills/midstream/community/`）
 - `skills/private/` プロジェクト固有のスキル
 - `skills/agent-skills/` Agent Skills 仕様のパッケージ群（`SKILL.md` + `references/`、River Reviewer の検証対象外）
 - テスト用フィクスチャは `tests/fixtures/skills/` などに分離して管理

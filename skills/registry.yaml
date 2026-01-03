@@ -2,7 +2,7 @@
 # Version 1.0
 
 version: '1.0'
-description: 'Catalog of all River Reviewer skills organized by phase and tags'
+description: 'Catalog of all River Reviewer skills organized by stream category and tags'
 
 # Skill Catalog
 skills:
@@ -10,7 +10,8 @@ skills:
   - id: rr-upstream-architecture-validation-plan-001
     version: '0.1.0'
     name: 'Architecture Validation Plan Guard'
-    path: skills/rr-upstream-architecture-validation-plan-001/skill.yaml
+    path: skills/upstream/rr-upstream-architecture-validation-plan-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, validation, verification, slo, upstream]
     severity: minor
@@ -20,7 +21,8 @@ skills:
   - id: rr-upstream-cache-strategy-consistency-001
     version: '0.1.0'
     name: 'Cache Strategy Consistency Guard'
-    path: skills/rr-upstream-cache-strategy-consistency-001/skill.yaml
+    path: skills/upstream/rr-upstream-cache-strategy-consistency-001.md
+    category: upstream
     phase: upstream
     tags: [cache, consistency, architecture, upstream, design-review]
     severity: minor
@@ -30,7 +32,8 @@ skills:
   - id: rr-upstream-multitenancy-isolation-001
     version: '0.1.0'
     name: 'Multitenancy Isolation Guard'
-    path: skills/rr-upstream-multitenancy-isolation-001/skill.yaml
+    path: skills/upstream/rr-upstream-multitenancy-isolation-001.md
+    category: upstream
     phase: upstream
     tags: [multitenancy, isolation, security, architecture, upstream]
     severity: major
@@ -40,18 +43,97 @@ skills:
   - id: rr-upstream-security-privacy-design-001
     version: '0.1.0'
     name: 'Security & Privacy Design Review'
-    path: skills/rr-upstream-security-privacy-design-001/skill.yaml
+    path: skills/upstream/rr-upstream-security-privacy-design-001.md
+    category: upstream
     phase: upstream
     tags: [security, privacy, upstream, design, gdpr, pii]
     severity: minor
     recommended: true
     description: 'Reviews data retention, deletion, backup residency, and cross-border data transfer'
 
+  - id: agent-architecture-review
+    version: '0.1.0'
+    name: 'Architecture Review'
+    path: skills/upstream/agent-architecture-review.md
+    category: upstream
+    phase: upstream
+    tags: [agent, architecture, design]
+    severity: major
+    recommended: false
+    description: '変更の全体設計、責務分離、境界の破綻を検知するためのレビュー手順。'
+
+  - id: agent-code-documentation
+    version: '0.1.0'
+    name: 'Code Documentation'
+    path: skills/upstream/agent-code-documentation.md
+    category: upstream
+    phase: upstream
+    tags: [agent, documentation]
+    severity: minor
+    recommended: false
+    description: 'コードや API の意図を短時間で共有できるドキュメントの書き方をガイドする。'
+
   # Midstream Skills (Implementation Phase)
+  - id: agent-code-review
+    version: '0.1.0'
+    name: 'Code Review (Multi-perspective)'
+    path: skills/midstream/agent-code-review.md
+    category: midstream
+    phase: midstream
+    tags: [agent, review, security, performance, quality]
+    severity: major
+    recommended: false
+    description: 'PR 向けの自動コードレビュー。セキュリティ・性能・品質・テスト観点で差分を評価する。'
+
+  - id: agent-code-quality
+    version: '0.1.0'
+    name: 'Code Quality'
+    path: skills/midstream/agent-code-quality.md
+    category: midstream
+    phase: midstream
+    tags: [agent, quality, readability]
+    severity: minor
+    recommended: false
+    description: '可読性と保守性を中心に、コード品質の基本的な劣化を検知する。'
+
+  - id: agent-code-refactoring
+    version: '0.1.0'
+    name: 'Code Refactoring'
+    path: skills/midstream/agent-code-refactoring.md
+    category: midstream
+    phase: midstream
+    tags: [agent, refactoring, maintainability]
+    severity: minor
+    recommended: false
+    description: '挙動を変えずに設計を整えるためのリファクタリング手順をガイドする。'
+
+  - id: agent-test-coverage
+    version: '0.1.0'
+    name: 'Test Coverage'
+    path: skills/midstream/agent-test-coverage.md
+    category: midstream
+    phase: midstream
+    tags: [agent, testing, coverage]
+    severity: major
+    recommended: false
+    description: '変更に対するテスト不足を検知し、最低限の補完方針を提示する。'
+
+  - id: agent-agentcheck-code-review
+    version: '0.1.0'
+    name: 'AgentCheck Code Review'
+    path: skills/midstream/agent-agentcheck-code-review.md
+    category: midstream
+    phase: midstream
+    tags: [agent, automation, review]
+    severity: major
+    recommended: false
+    description: 'AgentCheck ベースでローカルリポジトリを走査し、PR 前のコードレビューを実行するスキル。'
+
   - id: rr-midstream-hello-skill-001
     version: '0.1.0'
     name: 'Hello Skill (Always-On Sample)'
     path: skills/midstream/rr-midstream-hello-skill-001.md
+    category: midstream
     phase: midstream
     tags: [sample, hello, midstream]
     severity: info
@@ -61,7 +143,8 @@ skills:
   - id: rr-midstream-security-basic-001
     version: '0.1.0'
     name: 'Basic Security Review'
-    path: skills/rr-midstream-security-basic-001/skill.yaml
+    path: skills/midstream/rr-midstream-security-basic-001.md
+    category: midstream
     phase: midstream
     tags: [security, midstream, basic]
     severity: major
@@ -71,7 +154,8 @@ skills:
   - id: rr-midstream-logging-observability-001
     version: '0.1.0'
     name: 'Logging & Observability'
-    path: skills/rr-midstream-logging-observability-001/skill.yaml
+    path: skills/midstream/rr-midstream-logging-observability-001.md
+    category: midstream
     phase: midstream
     tags: [observability, logging, reliability, midstream]
     severity: minor
@@ -82,6 +166,7 @@ skills:
     version: '0.1.0'
     name: 'TypeScript Strict Mode'
     path: skills/midstream/rr-midstream-typescript-strict-001.md
+    category: midstream
     phase: midstream
     tags: [typescript, type-safety, midstream]
     severity: minor
@@ -92,6 +177,7 @@ skills:
     version: '0.1.0'
     name: 'TypeScript Null Safety'
     path: skills/midstream/rr-midstream-typescript-nullcheck-001.md
+    category: midstream
     phase: midstream
     tags: [typescript, null-safety, midstream]
     severity: minor
@@ -102,6 +188,7 @@ skills:
     version: '0.1.0'
     name: 'GitHub Review Comment Addressing'
     path: skills/midstream/rr-midstream-gh-address-comments-001.md
+    category: midstream
     phase: midstream
     tags: [github, review-process, midstream]
     severity: info
@@ -112,6 +199,7 @@ skills:
     version: '0.1.0'
     name: 'Review Comment Triage'
     path: skills/midstream/rr-midstream-review-comment-triage-001.md
+    category: midstream
     phase: midstream
     tags: [review-process, triage, midstream]
     severity: info
@@ -122,6 +210,7 @@ skills:
     version: '0.1.0'
     name: 'Sample Code Quality'
     path: skills/midstream/sample-code-quality.md
+    category: midstream
     phase: midstream
     tags: [sample, code-quality, midstream]
     severity: minor
@@ -132,17 +221,42 @@ skills:
     version: '0.1.0'
     name: 'Review Policy Standard'
     path: skills/midstream/review-policy-standard.md
+    category: midstream
     phase: midstream
     tags: [policy, review-process, midstream]
     severity: info
     recommended: false
     description: 'Enforces standard review policies'
 
+  # Downstream Skills (Testing & Release)
+  - id: agent-qa-regression
+    version: '0.1.0'
+    name: 'QA Regression (Playwright)'
+    path: skills/downstream/agent-qa-regression.md
+    category: downstream
+    phase: downstream
+    tags: [agent, testing, regression, playwright]
+    severity: major
+    recommended: false
+    description: 'Playwright を使った回帰テストの設計と実行をガイドする。'
+
+  - id: agent-webapp-testing
+    version: '0.1.0'
+    name: 'Web App Testing (Playwright)'
+    path: skills/downstream/agent-webapp-testing.md
+    category: downstream
+    phase: downstream
+    tags: [agent, testing, playwright, webapp]
+    severity: major
+    recommended: false
+    description: 'Playwright でローカル/プレビュー環境の Web アプリを操作・検証するための手順をまとめる。'
+
   # Legacy Upstream Skills (Design Phase)
   - id: rr-upstream-review-policy-standard-001
     version: '0.1.0'
     name: 'Standard Review Policy for Upstream'
     path: skills/upstream/review-policy-standard.md
+    category: upstream
     phase: upstream
     tags: [policy, upstream, design, architecture]
     severity: info
@@ -153,6 +267,7 @@ skills:
     version: '0.1.0'
     name: 'Component Test Scaffold (Next.js)'
     path: skills/upstream/rr-test-code-nextjs-001.md
+    category: upstream
     phase: upstream
     tags: [unit-test, tdd, nextjs, react, testing-library]
     severity: major
@@ -163,6 +278,7 @@ skills:
     version: '0.1.0'
     name: 'Test Scaffold (Laravel/PHPUnit)'
     path: skills/upstream/rr-test-code-php-laravel-001.md
+    category: upstream
     phase: upstream
     tags: [unit-test, tdd, php, laravel, phpunit]
     severity: major
@@ -173,6 +289,7 @@ skills:
     version: '0.1.0'
     name: 'Component Test Scaffold (React)'
     path: skills/upstream/rr-test-code-react-001.md
+    category: upstream
     phase: upstream
     tags: [unit-test, tdd, react, testing-library, vite]
     severity: major
@@ -183,6 +300,7 @@ skills:
     version: '0.1.0'
     name: 'Route/Function Test Scaffold (Remix)'
     path: skills/upstream/rr-test-code-remix-001.md
+    category: upstream
     phase: upstream
     tags: [unit-test, tdd, remix, react, vitest]
     severity: major
@@ -193,6 +311,7 @@ skills:
     version: '0.1.0'
     name: 'Unit Test Scaffold (Python/pytest)'
     path: skills/upstream/rr-test-code-unit-python-pytest-001.md
+    category: upstream
     phase: upstream
     tags: [unit-test, tdd, python]
     severity: major
@@ -203,6 +322,7 @@ skills:
     version: '0.1.0'
     name: 'Unit Test Scaffold (TypeScript)'
     path: skills/upstream/rr-test-code-unit-ts-jest-001.md
+    category: upstream
     phase: upstream
     tags: [unit-test, tdd, typescript, jest, vitest]
     severity: major
@@ -213,6 +333,7 @@ skills:
     version: '0.1.0'
     name: 'Component Test Scaffold (Vue.js)'
     path: skills/upstream/rr-test-code-vue-001.md
+    category: upstream
     phase: upstream
     tags: [unit-test, tdd, vue, vitest, vue-test-utils]
     severity: major
@@ -223,6 +344,7 @@ skills:
     version: '0.1.0'
     name: 'ADR Decision Quality'
     path: skills/upstream/rr-upstream-adr-decision-quality-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, adr, decision, upstream]
     severity: major
@@ -233,6 +355,7 @@ skills:
     version: '0.1.0'
     name: 'API Design Consistency'
     path: skills/upstream/rr-upstream-api-design-001.md
+    category: upstream
     phase: upstream
     tags: [api, design, upstream]
     severity: major
@@ -243,6 +366,7 @@ skills:
     version: '0.1.0'
     name: 'API Versioning & Backward Compatibility'
     path: skills/upstream/rr-upstream-api-versioning-compat-001.md
+    category: upstream
     phase: upstream
     tags: [api, compatibility, versioning, upstream]
     severity: major
@@ -253,6 +377,7 @@ skills:
     version: '0.1.0'
     name: 'Architecture Boundaries & Dependencies'
     path: skills/upstream/rr-upstream-architecture-boundaries-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, boundaries, dependencies, upstream]
     severity: major
@@ -263,6 +388,7 @@ skills:
     version: '0.1.0'
     name: 'Architecture Diagrams Readiness'
     path: skills/upstream/rr-upstream-architecture-diagrams-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, diagrams, c4, sequence, upstream]
     severity: major
@@ -273,6 +399,7 @@ skills:
     version: '0.1.0'
     name: 'Architecture Risks, Assumptions & Open Questions'
     path: skills/upstream/rr-upstream-architecture-risk-register-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, risk, assumptions, upstream]
     severity: major
@@ -283,6 +410,7 @@ skills:
     version: '0.1.0'
     name: 'Architecture Traceability & Consistency'
     path: skills/upstream/rr-upstream-architecture-traceability-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, adr, traceability, upstream]
     severity: major
@@ -293,6 +421,7 @@ skills:
     version: '0.1.0'
     name: 'Availability & Resilience Architecture'
     path: skills/upstream/rr-upstream-availability-architecture-001.md
+    category: upstream
     phase: upstream
     tags: [availability, resilience, sre, upstream]
     severity: major
@@ -303,6 +432,7 @@ skills:
     version: '0.1.0'
     name: 'Bounded Context & Ubiquitous Language'
     path: skills/upstream/rr-upstream-bounded-context-language-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, domain, boundaries, language, upstream]
     severity: major
@@ -313,6 +443,7 @@ skills:
     version: '0.1.0'
     name: 'Capacity, Performance & Cost Assumptions'
     path: skills/upstream/rr-upstream-capacity-cost-design-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, performance, capacity, cost, upstream]
     severity: major
@@ -323,6 +454,7 @@ skills:
     version: '0.1.0'
     name: 'Architecture Change Communication'
     path: skills/upstream/rr-upstream-change-communication-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, communication, governance, upstream]
     severity: major
@@ -333,6 +465,7 @@ skills:
     version: '0.1.0'
     name: 'Data Flow & State Ownership'
     path: skills/upstream/rr-upstream-data-flow-state-ownership-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, dataflow, state, ownership, upstream]
     severity: major
@@ -343,6 +476,7 @@ skills:
     version: '0.1.0'
     name: 'Data Model & DB Design Review'
     path: skills/upstream/rr-upstream-data-model-db-design-001.md
+    category: upstream
     phase: upstream
     tags: [database, schema, migration, upstream]
     severity: major
@@ -353,6 +487,7 @@ skills:
     version: '0.1.0'
     name: 'Disaster Recovery & Multi-Region Readiness'
     path: skills/upstream/rr-upstream-dr-multiregion-001.md
+    category: upstream
     phase: upstream
     tags: [reliability, dr, resiliency, multiregion, upstream]
     severity: major
@@ -363,6 +498,7 @@ skills:
     version: '0.1.0'
     name: 'Event-Driven Semantics & Delivery Guarantees'
     path: skills/upstream/rr-upstream-event-driven-semantics-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, events, messaging, reliability, upstream]
     severity: major
@@ -373,6 +509,7 @@ skills:
     version: '0.1.0'
     name: 'External Dependencies & Vendor Risks'
     path: skills/upstream/rr-upstream-external-dependencies-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, dependencies, vendor, risk, upstream]
     severity: major
@@ -383,6 +520,7 @@ skills:
     version: '0.1.0'
     name: 'Failure Modes & Observability in Design'
     path: skills/upstream/rr-upstream-failure-modes-observability-001.md
+    category: upstream
     phase: upstream
     tags: [reliability, observability, api, design, upstream]
     severity: major
@@ -393,6 +531,7 @@ skills:
     version: '0.1.0'
     name: 'Service Integration & Contracts'
     path: skills/upstream/rr-upstream-integration-contracts-001.md
+    category: upstream
     phase: upstream
     tags: [integration, contract, api, events, upstream]
     severity: major
@@ -403,6 +542,7 @@ skills:
     version: '0.1.0'
     name: 'Migration, Rollout & Rollback Plan'
     path: skills/upstream/rr-upstream-migration-rollout-rollback-001.md
+    category: upstream
     phase: upstream
     tags: [migration, rollout, rollback, release, upstream]
     severity: major
@@ -413,6 +553,7 @@ skills:
     version: '0.1.0'
     name: 'OpenAPI Contract Completeness'
     path: skills/upstream/rr-upstream-openapi-contract-001.md
+    category: upstream
     phase: upstream
     tags: [api, openapi, contract, upstream]
     severity: major
@@ -423,6 +564,7 @@ skills:
     version: '0.1.0'
     name: 'Operability, SLO & Runbook Readiness'
     path: skills/upstream/rr-upstream-operability-slo-001.md
+    category: upstream
     phase: upstream
     tags: [reliability, sre, operability, upstream]
     severity: major
@@ -433,6 +575,7 @@ skills:
     version: '0.1.0'
     name: 'Requirements Clarity & Acceptance Criteria'
     path: skills/upstream/rr-upstream-requirements-acceptance-001.md
+    category: upstream
     phase: upstream
     tags: [requirements, product, specification, upstream]
     severity: major
@@ -443,6 +586,7 @@ skills:
     version: '0.1.0'
     name: 'Trust Boundaries & Authorization Architecture'
     path: skills/upstream/rr-upstream-trust-boundaries-authz-001.md
+    category: upstream
     phase: upstream
     tags: [architecture, security, authz, trust-boundary, upstream]
     severity: critical
@@ -453,6 +597,7 @@ skills:
     version: '0.1.0'
     name: 'Sample Architecture Consistency Review'
     path: skills/upstream/sample-architecture-review.md
+    category: upstream
     phase: upstream
     tags: [sample, design, architecture, upstream]
     severity: minor
@@ -463,6 +608,7 @@ skills:
     version: '0.1.0'
     name: '計画作成とレビュー'
     path: skills/upstream/rr-upstream-create-plan-001.md
+    category: upstream
     phase: upstream
     tags: [planning, upstream]
     severity: major
@@ -473,6 +619,7 @@ skills:
     version: '0.1.0'
     name: 'PRテンプレート品質チェック'
     path: skills/upstream/rr-upstream-pr-template-qa-001.md
+    category: upstream
     phase: upstream
     tags: [process, documentation, upstream]
     severity: minor

@@ -3,9 +3,12 @@
 id: rr-<phase>-<category>-<number> # 例: rr-midstream-code-quality-001（フェーズ-カテゴリ-連番）
 name: <Human readable title> # 50文字以内で簡潔に
 description: <What this skill checks> # 具体的なチェック目的
+category: midstream # core | upstream | midstream | downstream
 phase: midstream # upstream | midstream | downstream
 applyTo:
   - 'src/**/*.ts' # glob パターンを列挙。できるだけ絞り込む
+# path_patterns: # applyTo のエイリアス。パス指定をここにまとめてもOK
+#   - 'src/**/*.ts'
 tags:
   - example # カテゴリやドメインタグ（security, testing, api 等）。community 共有は community を付与
 severity: minor # info | minor | major | critical

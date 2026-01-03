@@ -12,16 +12,18 @@ River Reviewer のスキルは YAML フロントマターでメタデータを�
 
 現在のスキルで使われているキーと役割は以下のとおり。
 
-| Field         | Type                                              | Required | 役割                                                                                |
-| ------------- | ------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
-| `id`          | string                                            | yes      | スキルの一意な ID（`rr-<phase>-<slug>-###` 推奨）。リネームや移動でも不変。         |
-| `name`        | string                                            | yes      | レビュー出力などに表示する人間向け名称。                                            |
-| `description` | string                                            | yes      | スキルが何をチェックするかの短い説明。                                              |
-| `phase`       | enum (`upstream` \| `midstream` \| `downstream`)  | yes      | SDLC のどの流れで適用するか。ルーティングの主要キー。                               |
-| `applyTo`     | string[]                                          | yes      | チェック対象ファイルの glob。ランナーが対象ファイルを絞り込むために使用。           |
-| `trigger`     | object                                            | optional | `phase`/`applyTo` をまとめるトリガーコンテナ。`trigger.files` は `applyTo` の別名。 |
-| `tags`        | string[]                                          | optional | スキルの分類タグ（例: `security`, `performance`）。                                 |
-| `severity`    | enum (`info` \| `minor` \| `major` \| `critical`) | optional | 重大度。出力の強調や並び替えに利用。                                                |
+| Field           | Type                                                       | Required | 役割                                                                                                 |
+| --------------- | ---------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| `id`            | string                                                     | yes      | スキルの一意な ID（`rr-<phase>-<slug>-###` 推奨）。リネームや移動でも不変。                          |
+| `name`          | string                                                     | yes      | レビュー出力などに表示する人間向け名称。                                                             |
+| `description`   | string                                                     | yes      | スキルが何をチェックするかの短い説明。                                                               |
+| `category`      | enum (`core` \| `upstream` \| `midstream` \| `downstream`) | yes      | Stream Architecture 上の分類。`core` は全ストリーム共通。                                            |
+| `phase`         | enum (`upstream` \| `midstream` \| `downstream`) \| enum[] | optional | 互換性のために保持。`category` があればそちらを優先し、`core` は全フェーズ配列に展開される。         |
+| `applyTo`       | string[]                                                   | yes\*    | チェック対象ファイルの glob。ランナーが対象ファイルを絞り込むために使用。                            |
+| `path_patterns` | string[]                                                   | optional | `applyTo` のエイリアス。`trigger.path_patterns` もサポート。                                         |
+| `trigger`       | object                                                     | optional | `phase`/`applyTo` をまとめるトリガーコンテナ。`trigger.files`/`trigger.path_patterns` はエイリアス。 |
+| `tags`          | string[]                                                   | optional | スキルの分類タグ（例: `security`, `performance`）。                                                  |
+| `severity`      | enum (`info` \| `minor` \| `major` \| `critical`)          | optional | 重大度。出力の強調や並び替えに利用。                                                                 |
 
 ## 3. 拡張項目（今回設計）
 
@@ -33,6 +35,7 @@ River Reviewer のスキルは YAML フロントマターでメタデータを�
 | `outputKind`   | enum string[] | optional (default: `["findings"]`) | スキルが返す主な出力カテゴリ。UI での整列・集約や後段処理の分岐に利用。複数指定で兼用も可能。                  | `findings`, `summary`, `actions`, `tests`, `metrics`, `questions`                         |
 | `modelHint`    | enum string   | optional                           | モデル選択のコスト/精度指針。ランナーが上限トークンやコスト制約に合わせてモデルを選ぶ際のヒントにする。        | `cheap`, `balanced`, `high-accuracy`                                                      |
 | `dependencies` | enum string[] | optional                           | スキルが依存するツール/リソース。実行前に満たせない場合はスキップやデグレードを判断する。                      | `code_search`, `test_runner`, `adr_lookup`, `repo_metadata`, `coverage_report`, `tracing` |
+| `priority`     | number        | optional                           | 実行順序のヒント（数値が小さいほど先に実行）。LLM プランナーが無効なときの並び替えに利用。                     | `0`, `10`                                                                                 |
 
 `outputKind` の各値（解釈の揺れを防ぐための目安）:
 
@@ -54,6 +57,8 @@ River Reviewer のスキルは YAML フロントマターでメタデータを�
 
 ```ts
 type Phase = 'upstream' | 'midstream' | 'downstream';
+type Phase = 'upstream' | 'midstream' | 'downstream';
+type StreamCategory = 'core' | Phase;
 type Severity = 'info' | 'minor' | 'major' | 'critical';
 
 type InputContext = 'diff' | 'fullFile' | 'tests' | 'adr' | 'commitMessage' | 'repoConfig';
@@ -74,8 +79,10 @@ export interface SkillMetadata {
   id: string;
   name: string;
   description: string;
-  phase: Phase;
+  category: StreamCategory;
+  phase: Phase | Phase[]; // Derived from category (core => all phases)
   applyTo: string[];
+  path_patterns?: string[]; // Alias for applyTo (kept for forward compat)
   tags?: string[];
   severity?: Severity;
   inputContext?: InputContext[];
@@ -87,9 +94,11 @@ export interface SkillMetadata {
 
 ## 5. JSON Schema 実装メモ
 
+- `category` は `core/upstream/midstream/downstream` のいずれか必須。`core` は Runner 内で全フェーズに展開される。
 - `phase` と `severity` は既存どおり enum 固定。
 - `inputContext` は `type: array`, `items.enum` を上記リストで固定、`minItems: 1`, `uniqueItems: true` を推奨。
 - `outputKind` も同様に array + enum + `minItems: 1`。フィールド自体を省略した場合のみランナー側で `['findings']` をデフォルトとし、フィールドが存在する場合は空配列を許可しない。
+- `path_patterns` は `applyTo` のエイリアス。`trigger` 内でも同名キーを許可する。
 - `modelHint` は単一 enum。必須にはしない。
 - `dependencies` は array + enum + `uniqueItems: true`。未実装ツールを防ぐため列挙外は許可しない運用を基本とし、例外は `custom:*` を許容する場合のみ `pattern` を追加する。
 - `additionalProperties: false` を維持してスキーマドリフトを防止。
@@ -103,6 +112,7 @@ export interface SkillMetadata {
 id: rr-midstream-code-quality-sample-001
 name: 'Sample Code Quality Pass'
 description: 'Checks common code quality and maintainability risks.'
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*.ts'
@@ -123,6 +133,7 @@ severity: 'minor'
 id: rr-midstream-code-quality-sample-001
 name: 'Sample Code Quality Pass'
 description: 'Checks common code quality and maintainability risks.'
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*.ts'
@@ -152,6 +163,7 @@ dependencies:
 id: rr-midstream-code-quality-sample-001
 name: 'Sample Code Quality Pass'
 description: 'Checks common code quality and maintainability risks.'
+category: midstream
 trigger:
   phase: midstream
   files:

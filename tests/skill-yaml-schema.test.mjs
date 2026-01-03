@@ -8,6 +8,7 @@ test('validates a minimal valid skill.yaml', () => {
     version: '0.1.0',
     name: 'Test Skill',
     description: 'A test skill for validation',
+    category: 'midstream',
     phase: 'midstream',
     applyTo: ['src/**/*.ts'],
   };
@@ -28,6 +29,7 @@ test('validates a full-featured skill.yaml', () => {
     version: '1.2.3',
     name: 'ADR Decision Quality',
     description: 'Ensure ADRs capture context, decision, alternatives, and tradeoffs',
+    category: 'upstream',
     phase: 'upstream',
     applyTo: ['docs/adr/**/*', 'adr/**/*'],
     tags: ['architecture', 'adr', 'decision'],
@@ -57,6 +59,7 @@ test('validates skill with phase array', () => {
     version: '0.1.0',
     name: 'Multi-Phase Skill',
     description: 'A skill that applies to multiple phases',
+    category: 'core',
     phase: ['midstream', 'downstream'],
     applyTo: ['src/**/*.ts'],
   };
@@ -71,6 +74,7 @@ test('validates skill with trigger object', () => {
     version: '0.1.0',
     name: 'Trigger Test Skill',
     description: 'A skill using trigger object',
+    category: 'core',
     trigger: {
       phase: ['upstream', 'midstream'],
       files: ['docs/adr/**/*'],
@@ -87,6 +91,7 @@ test('validates skill with custom dependency', () => {
     version: '0.1.0',
     name: 'Custom Dependency Skill',
     description: 'A skill with custom dependency',
+    category: 'midstream',
     phase: 'midstream',
     applyTo: ['src/**/*.ts'],
     dependencies: ['adr_lookup', 'custom:my_tool'],
@@ -112,6 +117,7 @@ test('rejects skill with invalid version format', () => {
     version: '1.0', // missing patch version
     name: 'Invalid Version Skill',
     description: 'A skill with invalid version',
+    category: 'midstream',
     phase: 'midstream',
     applyTo: ['src/**/*.ts'],
   };
@@ -139,6 +145,7 @@ test('rejects skill with invalid phase value', () => {
     version: '0.1.0',
     name: 'Invalid Phase Skill',
     description: 'A skill with invalid phase',
+    category: 'midstream',
     phase: 'invalid-phase',
     applyTo: ['src/**/*.ts'],
   };
@@ -153,6 +160,7 @@ test('rejects skill with invalid severity value', () => {
     version: '0.1.0',
     name: 'Invalid Severity Skill',
     description: 'A skill with invalid severity',
+    category: 'midstream',
     phase: 'midstream',
     applyTo: ['src/**/*.ts'],
     severity: 'high', // should be info/minor/major/critical
@@ -168,6 +176,7 @@ test('rejects skill with invalid modelHint value', () => {
     version: '0.1.0',
     name: 'Invalid Model Skill',
     description: 'A skill with invalid modelHint',
+    category: 'midstream',
     phase: 'midstream',
     applyTo: ['src/**/*.ts'],
     modelHint: 'fast', // should be cheap/balanced/high-accuracy
@@ -183,6 +192,7 @@ test('rejects skill with invalid dependency', () => {
     version: '0.1.0',
     name: 'Invalid Dependency Skill',
     description: 'A skill with invalid dependency',
+    category: 'midstream',
     phase: 'midstream',
     applyTo: ['src/**/*.ts'],
     dependencies: ['invalid_dep'], // not in allowed list and doesn't start with "custom:"
@@ -198,6 +208,7 @@ test('rejects skill with empty custom dependency', () => {
     version: '0.1.0',
     name: 'Empty Custom Dependency Skill',
     description: 'A skill with empty custom dependency',
+    category: 'midstream',
     phase: 'midstream',
     applyTo: ['src/**/*.ts'],
     dependencies: ['custom:'], // empty custom dependency name

@@ -8,3 +8,4 @@ export type AIModel = z.infer<typeof AIModelSchema>;
 
 // Re-export for compatibility
 export { ConfigSchema, SkillSchema, RuleSchema, AIModelSchema };
+export * from './skill';

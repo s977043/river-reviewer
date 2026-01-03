@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
+import matter from 'gray-matter';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
@@ -29,6 +30,7 @@ import addFormats from 'ajv-formats';
  * @property {ModelHint=} modelHint
  * @property {Dependency[]=} dependencies
  * @property {{phase?: Phase, applyTo?: string[], files?: string[]}=} trigger
+ * @property {number=} priority
  *
  * @typedef {Object} SkillDefinition
  * @property {SkillMetadata} metadata
@@ -41,8 +43,22 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..', '..');
 const defaultSkillsDir = path.join(repoRoot, 'skills');
 const defaultSchemaPath = path.join(repoRoot, 'schemas', 'skill.schema.json');
-const allowedExtensions = new Set(['.md', '.mdx', '.yaml', '.yml']);
-const ignoredSkillDirNames = new Set(['agent-skills']);
+const markdownExtensions = new Set(['.md', '.mdx']);
+const yamlExtensions = new Set(['.yaml', '.yml']);
+const allowedExtensions = new Set([...markdownExtensions, ...yamlExtensions]);
+const ignoredSkillDirNames = new Set([
+  'agent-skills',
+  'references',
+  'fixtures',
+  'golden',
+  'eval',
+  'prompt',
+  'prompts',
+]);
+const ignoredFileNames = new Set(['.gitkeep', 'README.md', 'registry.yaml', 'registry.yml', '_template.md']);
+const legacySkillFiles = new Set(['skill.yaml', 'skill.yml']);
+const streamCategories = new Set(['core', 'upstream', 'midstream', 'downstream']);
+const allPhases = ['upstream', 'midstream', 'downstream'];
 
 export const defaultPaths = {
   repoRoot,
@@ -77,56 +93,127 @@ export async function listSkillFiles(dir = defaultSkillsDir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = [];
 
-  // Check if this directory contains a skill.yaml file (new directory structure)
-  const hasSkillYaml = entries.some(
-    entry => !entry.isDirectory() && (entry.name === 'skill.yaml' || entry.name === 'skill.yml')
-  );
-
-  // If skill.yaml exists, only include that file and skip other files and subdirectories in this directory
-  if (hasSkillYaml) {
-    const skillYamlEntry = entries.find(
-      entry => !entry.isDirectory() && (entry.name === 'skill.yaml' || entry.name === 'skill.yml')
-    );
-    if (!skillYamlEntry) {
+  const hasLegacySkillFile = entries.some(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+  if (hasLegacySkillFile) {
+    const legacyEntry = entries.find(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+    if (!legacyEntry) {
       throw new Error(`skill.yaml detected but not found in ${dir}`);
     }
-    files.push(path.join(dir, skillYamlEntry.name));
-    return files.sort();
+    files.push(path.join(dir, legacyEntry.name));
+    return files.sort((a, b) => a.localeCompare(b));
   }
 
-  // Otherwise, process files and subdirectories normally (legacy structure)
   for (const entry of entries) {
     const entryPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (ignoredSkillDirNames.has(entry.name)) {
+      if (ignoredSkillDirNames.has(entry.name) || entry.name.startsWith('.')) {
         continue;
       }
       const nested = await listSkillFiles(entryPath);
       files.push(...nested);
-    } else if (
-      allowedExtensions.has(path.extname(entry.name)) &&
-      !['.gitkeep', 'README.md', 'registry.yaml'].includes(entry.name) &&
-      !entry.name.startsWith('_')
-    ) {
-      files.push(entryPath);
+      continue;
     }
+
+    const ext = path.extname(entry.name).toLowerCase();
+    if (!allowedExtensions.has(ext)) continue;
+    if (ignoredFileNames.has(entry.name)) continue;
+    if (entry.name.startsWith('_')) continue;
+    files.push(entryPath);
   }
-  return files.sort();
+
+  return files.sort((a, b) => a.localeCompare(b));
 }
 
-function normalizeMetadata(metadata) {
+function normalizeStringArray(value) {
+  if (!value) return undefined;
+  const asArray = Array.isArray(value) ? value : [value];
+  const filtered = asArray
+    .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
+    .filter(Boolean);
+  return filtered.length ? filtered : undefined;
+}
+
+function normalizePhaseValue(value) {
+  if (!value) return undefined;
+  if (Array.isArray(value)) {
+    const phases = value.filter(Boolean);
+    if (phases.length === 1) return phases[0];
+    return phases.length ? phases : undefined;
+  }
+  return value;
+}
+
+function inferCategoryFromPhase(phase) {
+  if (!phase) return undefined;
+  if (Array.isArray(phase)) {
+    const unique = Array.from(new Set(phase));
+    if (unique.length === 1 && streamCategories.has(unique[0])) {
+      return unique[0];
+    }
+    if (unique.length > 1) {
+      return 'core';
+    }
+    return undefined;
+  }
+  return streamCategories.has(phase) ? phase : undefined;
+}
+
+function inferCategoryFromPath(filePath) {
+  if (!filePath) return undefined;
+  const segments = path.normalize(filePath).split(path.sep);
+  const skillsIndex = segments.lastIndexOf('skills');
+  const candidate = skillsIndex >= 0 ? segments[skillsIndex + 1] : undefined;
+  if (candidate && streamCategories.has(candidate)) {
+    return candidate;
+  }
+  return undefined;
+}
+
+function resolveCategory(metaCategory, { phase, filePath } = {}) {
+  if (typeof metaCategory === 'string' && streamCategories.has(metaCategory)) {
+    return metaCategory;
+  }
+  return inferCategoryFromPath(filePath) ?? inferCategoryFromPhase(phase);
+}
+
+function resolvePhase(metaPhase, category) {
+  if (category === 'core') {
+    return [...allPhases];
+  }
+  if (category && streamCategories.has(category)) {
+    return category;
+  }
+  return normalizePhaseValue(metaPhase);
+}
+
+function normalizeMetadata(metadata, { filePath } = {}) {
   const meta = { ...metadata };
 
-  // Top-level alias first: applyTo has precedence over files.
-  if (meta.files && !meta.applyTo) {
-    meta.applyTo = meta.files;
+  if (meta.priority !== undefined) {
+    const parsedPriority = typeof meta.priority === 'string' ? Number(meta.priority) : meta.priority;
+    if (Number.isFinite(parsedPriority)) {
+      meta.priority = parsedPriority;
+    } else {
+      delete meta.priority;
+    }
+  }
+
+  const topLevelApplyTo =
+    normalizeStringArray(meta.applyTo) ??
+    normalizeStringArray(meta.files) ??
+    normalizeStringArray(meta.path_patterns);
+  if (topLevelApplyTo) {
+    meta.applyTo = topLevelApplyTo;
   }
 
   const trigger =
     meta.trigger && typeof meta.trigger === 'object' && !Array.isArray(meta.trigger)
       ? meta.trigger
       : null;
-  const triggerApplyTo = trigger?.applyTo ?? trigger?.files;
+  const triggerApplyTo =
+    normalizeStringArray(trigger?.applyTo) ??
+    normalizeStringArray(trigger?.files) ??
+    normalizeStringArray(trigger?.path_patterns);
 
   if (!meta.phase && trigger?.phase) {
     meta.phase = trigger.phase;
@@ -135,38 +222,45 @@ function normalizeMetadata(metadata) {
     meta.applyTo = triggerApplyTo;
   }
 
+  meta.category = resolveCategory(meta.category, { phase: meta.phase, filePath });
+  meta.phase = resolvePhase(meta.phase, meta.category);
+
   // Trigger is consumed during normalization; avoid leaking nested state.
   if (trigger) {
     delete meta.trigger;
+  }
+  if ('path_patterns' in meta) {
+    delete meta.path_patterns;
   }
 
   return meta;
 }
 
-export function parseFrontMatter(content) {
-  if (!content.startsWith('---')) {
+export function parseFrontMatter(content, { filePath } = {}) {
+  const trimmed = content.trimStart();
+  if (!trimmed.startsWith('---')) {
     throw new SkillLoaderError('Missing front matter block (---)');
   }
-  const end = content.indexOf('\n---', 3);
-  if (end === -1) {
-    throw new SkillLoaderError('Unterminated front matter block');
-  }
-  const yamlBlock = content.slice(3, end).trim();
-  if (!yamlBlock) {
-    throw new SkillLoaderError('Front matter is empty');
-  }
-  let metadata = {};
+
+  let parsed;
   try {
-    metadata = yaml.load(yamlBlock) ?? {};
+    parsed = matter(trimmed);
   } catch (err) {
-    throw new SkillLoaderError(`Front matter YAML parse error: ${err.message}`);
+    throw new SkillLoaderError(
+      `Front matter parse error${filePath ? ` (${filePath})` : ''}: ${err.message}`
+    );
   }
+
+  const metadata = parsed.data ?? {};
   if (typeof metadata !== 'object' || Array.isArray(metadata)) {
     throw new SkillLoaderError('Front matter must be a mapping');
   }
-  metadata = normalizeMetadata(metadata);
-  const body = content.slice(end + 4);
-  return { metadata, body };
+  if (Object.keys(metadata).length === 0) {
+    throw new SkillLoaderError('Front matter is empty');
+  }
+  const normalized = normalizeMetadata(metadata, { filePath });
+  const body = (parsed.content ?? '').trim();
+  return { metadata: normalized, body };
 }
 
 async function parseSkillFile(filePath) {
@@ -175,10 +269,10 @@ async function parseSkillFile(filePath) {
     throw new SkillLoaderError(`Unsupported skill file extension: ${ext}`);
   }
   const raw = await fs.readFile(filePath, 'utf8');
-  if (ext === '.md' || ext === '.mdx') {
-    return parseFrontMatter(raw);
+  if (markdownExtensions.has(ext)) {
+    return parseFrontMatter(raw, { filePath });
   }
-  
+
   // YAML handling
   let loaded = {};
   try {
@@ -208,7 +302,7 @@ async function parseSkillFile(filePath) {
     delete metadata.instruction;
   }
 
-  metadata = normalizeMetadata(metadata);
+  metadata = normalizeMetadata(metadata, { filePath });
   return { metadata, body };
 }
 
@@ -220,6 +314,34 @@ function validateMetadata(metadata, validate) {
     throw new SkillLoaderError(`Validation failed: ${details}`, validate.errors);
   }
   return metaCopy;
+}
+
+function relativeToRepo(filePath) {
+  return filePath.startsWith(repoRoot) ? path.relative(repoRoot, filePath) : filePath;
+}
+
+function logSkillLoadError(filePath, err) {
+  const location = relativeToRepo(filePath);
+  const reason = err instanceof Error ? err.message : String(err);
+  console.error(`⚠️  Failed to load skill ${location}: ${reason}`);
+  if (err?.details && Array.isArray(err.details)) {
+    for (const detail of err.details) {
+      const instance = detail.instancePath || '/';
+      console.error(`   - ${instance}: ${detail.message}`);
+    }
+  }
+}
+
+function logDuplicateSkill(id, filePath, originalPath) {
+  const location = relativeToRepo(filePath);
+  const first = relativeToRepo(originalPath);
+  console.warn(`⚠️  Duplicate skill id "${id}" in ${location}; already loaded from ${first}. Skipping.`);
+}
+
+function hasExcludedTag(metadata, excludedTags) {
+  if (!excludedTags?.length) return false;
+  const tags = metadata?.tags ?? [];
+  return tags.some(tag => excludedTags.includes(tag));
 }
 
 export async function loadSkillFile(filePath, options = {}) {
@@ -239,9 +361,33 @@ export async function loadSkills(options = {}) {
     skillsDir = defaultSkillsDir,
     schemaPath = defaultSchemaPath,
     validator: providedValidator,
+    excludedTags = ['agent'],
   } = options;
   const schema = providedValidator ? null : await loadSchema(schemaPath);
   const validator = providedValidator ?? createSkillValidator(schema);
   const files = await listSkillFiles(skillsDir);
-  return Promise.all(files.map(filePath => loadSkillFile(filePath, { validator })));
+  const skillsById = new Map();
+
+  for (const filePath of files) {
+    try {
+      const skill = await loadSkillFile(filePath, { validator });
+      const id = skill?.metadata?.id;
+      if (!id) {
+        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
+        continue;
+      }
+      if (hasExcludedTag(skill.metadata, excludedTags)) {
+        continue;
+      }
+      if (skillsById.has(id)) {
+        logDuplicateSkill(id, filePath, skillsById.get(id).path);
+        continue;
+      }
+      skillsById.set(id, skill);
+    } catch (err) {
+      logSkillLoadError(filePath, err);
+    }
+  }
+
+  return Array.from(skillsById.values());
 }

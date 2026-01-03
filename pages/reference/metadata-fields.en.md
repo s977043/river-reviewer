@@ -15,5 +15,6 @@ Use these fields to keep skill metadata consistent and easy to route.
 | `outputKind`   | Output categories produced (for example `findings`, `summary`, `actions`, `tests`, `metrics`, `questions`). Defaults to `findings` if omitted.   |
 | `modelHint`    | Model selection hint: `cheap` / `balanced` / `high-accuracy`.                                                                                    |
 | `dependencies` | Required tools/resources (for example `code_search`, `test_runner`, `adr_lookup`, `repo_metadata`, `coverage_report`, `tracing`, or `custom:*`). |
+| `priority`     | Optional ordering hint (lower runs earlier) for deterministic execution when no planner is used.                                                 |
 
 Keep metadata in front matter so it can be parsed before the instructions run. All required fields must pass checks using `/schemas/skill.schema.json`.
