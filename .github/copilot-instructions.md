@@ -11,7 +11,7 @@
 
 ## 参照ポイント
 
-- Instruction files: `.github/instructions/*.instructions.md`
-- Custom agent: `@river-reviewer` (in `.github/agents/`)
-- Prompts: `/skill`, `/review` (in `.github/prompts/`)
-- Docs: Japanese is source of truth; `.en.md` は翻訳
+- 指示ファイル: `.github/instructions/*.instructions.md`
+- カスタムエージェント: `@river-reviewer` (`.github/agents/` 内)
+- プロンプト: `/skill`, `/review` (`.github/prompts/` 内)
+- Docs: 日本語を正とし、`.en.md` は翻訳版とします。

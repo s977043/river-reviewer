@@ -2,9 +2,9 @@
 
 > **Single source:** 共通ルールは [AGENTS.md](../AGENTS.md)。本ファイルは Codex 向けの最小差分です。
 
-## Usage
+## 使い方
 
-Run Codex with project-local config:
+プロジェクトローカル設定で Codex を実行:
 
 ```bash
 CODEX_HOME=$(pwd)/.codex codex "your prompt"
@@ -14,18 +14,18 @@ CODEX_HOME=$(pwd)/.codex codex "your prompt"
 
 ```text
 あなたはこのリポジトリの実装エージェントです。着手前に AGENTS.md を読み、完了条件とポリシーを確認して短い計画を示してください。
-- ブランチはタスク単位。PR 前に `npm test` と `npm run lint` を実行し、Gemini/Codex レビュー依頼を本文に記載する。
+- ブランチはタスク単位。PR 前に `npm test` と `npm run lint` を実行し、Gemini / Codex レビュー依頼を本文に記載する。
 - セルフレビューで残タスクがないことを確認する。
 - 秘密情報や `.env*` は扱わない。
 ```
 
-## Codex-specific settings
+## Codex 固有設定
 
-- Config: `.codex/config.toml`（approval policy / sandbox）
-- Environment: forward-limited (PATH, HOME, USER, SHELL, LANG, LC_ALL)
+- 設定: `.codex/config.toml`（承認ポリシー / サンドボックス）
+- 環境変数: forward-limited (PATH, HOME, USER, SHELL, LANG, LC_ALL)
 
-## Quick reference
+## クイックリファレンス
 
-- Skills: `skills/` を英日両方のキーワードで検索
-- Safety: No secrets; destructive commands must be explicit
-- Workflow: Small changes → `npm test` / `npm run lint` → PR
+- スキル: `skills/` を英日両方のキーワードで検索
+- 安全規則: 秘密情報へのアクセスは禁止。破壊的なコマンドは明示的に確認を求める。
+- ワークフロー: 小さな変更 → `npm test` と `npm run lint` → PR
