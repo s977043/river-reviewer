@@ -1,5 +1,5 @@
 ---
-description: "Draft a PR description using our template"
+description: 'Draft a PR description using our template'
 ---
 
 この差分を、以下のテンプレートで PR 本文にして：
