@@ -5,30 +5,70 @@
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git fetch:*)",
       "Bash(rg:*)",
       "Bash(fd:*)",
       "Bash(ls:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run format:*)",
+      "Bash(npm test:*)"
     ],
     "ask": [
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git add:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ci:*)",
       "Bash(npm:*)",
       "Bash(pnpm:*)",
       "Bash(yarn:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [
       "Bash(curl:*)",
       "Bash(wget:*)",
-      "Bash(rm:*)",
+      "Bash(rm -rf:*)",
       "Bash(sudo:*)",
+      "Bash(pkill:*)",
+      "Bash(kill:*)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./secrets/**)",
       "Read(./**/*credential*)",
-      "Read(./**/*secret*)"
+      "Read(./**/*secret*)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)",
+      "Read(./config/master.key)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/format.sh"
+          }
+        ]
+      }
     ]
   }
 }
