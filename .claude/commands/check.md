@@ -1,5 +1,5 @@
 ---
-description: "Run lint/typecheck/tests and summarize failures"
+description: 'Run lint/typecheck/tests and summarize failures'
 ---
 
 次をこの順で実行して、失敗したら原因と修正案を出して：
