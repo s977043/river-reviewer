@@ -48,6 +48,7 @@
       "Bash(sudo:*)",
       "Bash(pkill:*)",
       "Bash(kill:*)",
+      "Bash(rm:*)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./secrets/**)",
