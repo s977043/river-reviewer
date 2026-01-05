@@ -634,7 +634,7 @@ npx promptfoo eval
 
 - **[Architecture](./river-architecture.en.md)** - How skills fit into the framework
 - **[Skill Schema Reference](../reference/skill-schema.en.md)** - Complete schema reference
-- **[Skill Template](/skills/_template.md)** - Starting point for new skills
+- **[Skill Template](../reference/skill-template.en.md)** - Starting point for new skills
 - **[promptfoo Docs](https://www.promptfoo.dev/)** - Evaluation framework
 - **[Skills Catalog](../reference/skills-catalog.md)** - Registry overview
 
