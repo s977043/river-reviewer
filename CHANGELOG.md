@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.7.0](https://github.com/s977043/river-reviewer/compare/v0.6.1...v0.7.0) (2026-01-05)
+
+
+### Features
+
+* add config file review skill and improve fallback messages ([102dab0](https://github.com/s977043/river-reviewer/commit/102dab03da191b8157d37a8323ea9b953f44f031))
+
+
+### Bug Fixes
+
+* format CHANGELOG.md to pass prettier checks ([889123d](https://github.com/s977043/river-reviewer/commit/889123d04211ab0c2e299abfb01bcaeb693bb29b))
+* improve markdown output format for review findings ([78f0847](https://github.com/s977043/river-reviewer/commit/78f08471d8d536f378e04cb6cebc7e1fd9894f57))
+* remove trim() to preserve leading newline in markdown output ([b1b0abe](https://github.com/s977043/river-reviewer/commit/b1b0abeb0e066fadc332484587aeaa0f3af7e01c))
+* update broken links and navigation title in skills.en.md ([af209bb](https://github.com/s977043/river-reviewer/commit/af209bbbbc3f65cf0a1a7989947557ad077d1ed3))
+* update broken links to moved skills.md ([2cadbc1](https://github.com/s977043/river-reviewer/commit/2cadbc1024c52121ca1878f34ed77e926d39b154))
+* update skill template link to pages/reference path ([5080e95](https://github.com/s977043/river-reviewer/commit/5080e9542260ac5bbc6b0bc3d92b5e568f31a7cf))
+
 ## [0.6.1](https://github.com/s977043/river-reviewer/compare/v0.6.0...v0.6.1) (2026-01-05)
 
 ### Bug Fixes
