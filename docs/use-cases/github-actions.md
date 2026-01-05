@@ -528,7 +528,7 @@ jobs:
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [River Reviewer Action Source](https://github.com/s977043/river-reviewer/tree/main/runners/github-action)
 - [Example Workflows](https://github.com/s977043/river-reviewer/tree/main/.github/workflows)
-- [Skills Concepts](../concepts/skills.md)
+- [Skills Concepts](../../pages/explanation/skills.en.md)
 
 ## Next Steps
 
