@@ -220,7 +220,7 @@ function formatMessageForMarkdown(message) {
   for (const label of labels) {
     result = result.replace(new RegExp(`\\s*${label}:`, 'g'), `\n  - **${label}:**`);
   }
-  return result.trim();
+  return result;
 }
 
 function formatCommentsMarkdown(comments) {
