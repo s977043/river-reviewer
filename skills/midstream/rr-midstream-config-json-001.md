@@ -46,6 +46,13 @@ modelHint: cheap
 - テストディレクトリ内のファイルは緩和する
 - 明示的にコメントで意図が説明されている場合は抑制する
 
+## Rule / ルール
+
+- 機密情報（APIキー、パスワード、トークン）の直書きは blocker として報告する
+- JSON/YAML の構文エラーや不正なスキーマは major として報告する
+- 非推奨オプションや廃止された設定項目は minor として報告する
+- 環境固有の設定（localhost、開発用URL等）の混入は warning として報告する
+
 ## Output
 
 標準フォーマット: `<file>:<line>: Finding: ... Evidence: ... Impact: ... Fix: ... Severity: ... Confidence: ...`
