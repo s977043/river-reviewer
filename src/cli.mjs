@@ -214,9 +214,18 @@ function printComments(comments) {
   });
 }
 
+function formatMessageForMarkdown(message) {
+  const labels = ['Finding', 'Evidence', 'Impact', 'Fix', 'Severity', 'Confidence'];
+  let result = message;
+  for (const label of labels) {
+    result = result.replace(new RegExp(`\\s*${label}:`, 'g'), `\n  - **${label}:**`);
+  }
+  return result.trim();
+}
+
 function formatCommentsMarkdown(comments) {
   if (!comments?.length) return '_No findings._';
-  return comments.map(c => `- \`${c.file}:${c.line}\` ${c.message}`).join('\n');
+  return comments.map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`).join('\n');
 }
 
 function formatPlanMarkdown(plan) {
