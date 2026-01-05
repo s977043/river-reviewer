@@ -162,11 +162,9 @@ async function callOpenAI({ prompt, apiKey, model, endpoint, temperature, maxTok
   return json.choices?.[0]?.message?.content?.trim() ?? '';
 }
 
-function buildFallbackComments(diff, plan) {
+function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
   const skillNames = (plan?.selected ?? []).map(skill => skill.metadata?.name ?? skill.metadata?.id ?? skill.id);
-  const skillText = skillNames.length
-    ? `Matched skills: ${skillNames.join(', ')}`
-    : 'No matching skills; manual review recommended.';
+  const skillCount = skillNames.length;
 
   const firstFile = diff.files?.find(f => f?.path && f.path !== '/dev/null') ?? null;
   if (!firstFile) {
@@ -190,16 +188,33 @@ function buildFallbackComments(diff, plan) {
     firstFile.addedLines?.[0] ||
     firstFile.hunks?.[0]?.newStart ||
     1; /* default to first added line or hunk start to keep pointers stable */
-  const hunkText = firstFile.hunks?.length ? `Changed around line ${firstFile.hunks[0].newStart}` : 'File changed';
+
+  // Build specific reason message
+  const reasons = [];
+  if (llmSkipReason) {
+    reasons.push(`LLM: ${llmSkipReason}`);
+  }
+  reasons.push('ヒューリスティック検出パターンに該当なし');
+
+  const finding = skillCount > 0
+    ? `${skillCount}件のスキルがマッチしたが自動指摘を生成できなかった`
+    : 'マッチするスキルがなく自動指摘を生成できなかった';
+
+  const evidence = reasons.join('; ');
+
+  const fix = skillCount > 0
+    ? `手動レビューを実施する（選択スキル: ${skillNames.slice(0, 3).join(', ')}${skillCount > 3 ? ` 他${skillCount - 3}件` : ''}）`
+    : 'このファイル種別に対応するスキルを追加するか、手動レビューを実施する';
+
   return [
     {
       file: firstFile.path,
       line,
       message: formatFindingMessage({
-        finding: '自動レビューの指摘を生成できなかった',
-        evidence: hunkText,
+        finding,
+        evidence,
         impact: '重要なリスクを見落とす可能性がある',
-        fix: `手動レビューを行い、必要なら applyTo を調整する（${skillText}）`,
+        fix,
         severity: 'warning',
         confidence: 'low',
       }),
@@ -419,7 +434,8 @@ export async function generateReview({
       comments = normalizeHeuristicComments(heuristic);
       debug.heuristicsCount = heuristic.length;
     } else {
-      comments = includeFallback ? buildFallbackComments(diff, plan) : [];
+      const llmSkipReason = debug.llmSkipped || debug.llmError || null;
+      comments = includeFallback ? buildFallbackComments(diff, plan, { llmSkipReason }) : [];
       debug.heuristicsCount = 0;
       debug.fallbackIncluded = includeFallback;
     }
