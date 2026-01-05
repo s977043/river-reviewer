@@ -1,3 +1,7 @@
+---
+id: skills
+---
+
 # Skills: The Heart of River Reviewer
 
 ## What is a Skill?
