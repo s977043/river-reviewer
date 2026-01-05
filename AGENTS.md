@@ -66,7 +66,7 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 - **Runtime**: Node.js 20+
 - **Package Manager**: npm (lockfile: `package-lock.json`)
 - **Test Runner**: `node --test` (built-in)
-- **Documentation**: Docusaurus 3 (in `pages/`) - *SSOT is Japanese*
+- **Documentation**: Docusaurus 3 (in `pages/`) - _SSOT is Japanese_
 - **Linting & Formatting**:
   - Code: `prettier`, `eslint` (config: `.eslintrc.js`)
   - Markdown: `markdownlint` (config: `.markdownlint.json`), `textlint` (Japanese grammar)

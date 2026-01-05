@@ -29,4 +29,3 @@ CODEX_HOME=$(pwd)/.codex codex "your prompt"
 - 共通ルール: `AGENTS.md` (SSOT)
 - スキル検索: `skills/` (英日両対応)
 - 安全規則: 秘密情報禁止、破壊的コマンド確認
-
