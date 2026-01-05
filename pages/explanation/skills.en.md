@@ -1,3 +1,7 @@
+---
+id: skills
+---
+
 # Skills: The Heart of River Reviewer
 
 ## What is a Skill?
@@ -626,15 +630,13 @@ npx promptfoo eval
 # (Keep it until new skill is validated)
 ```
 
-See [Migration Guide](../migration/skill-migration-guide.md) for details.
-
 ## Resources
 
-- **[Architecture](../architecture.md)** - How skills fit into the framework
-- **[Skill YAML Spec](../../specs/skill-yaml-spec.md)** - Complete schema reference
-- **[Skill Template](../../specs/templates/skill/)** - Starting point for new skills
+- **[Architecture](./river-architecture.en.md)** - How skills fit into the framework
+- **[Skill Schema Reference](../reference/skill-schema.en.md)** - Complete schema reference
+- **[Skill Template](../reference/skill-template.en.md)** - Starting point for new skills
 - **[promptfoo Docs](https://www.promptfoo.dev/)** - Evaluation framework
-- **[Skills README](../../skills/README.md)** - Registry overview
+- **[Skills Catalog](../reference/skills-catalog.md)** - Registry overview
 
 ## Next Steps
 

@@ -630,7 +630,7 @@ plan.skipped.forEach(({ skill, reasons }) => {
 - [CHANGELOG](../../CHANGELOG.md) - Version history and breaking changes
 - [Deprecated Paths](../../DEPRECATED.md) - Full deprecation notice
 - [Architecture Overview](../architecture.md) - System architecture
-- [Skills Concepts](../concepts/skills.md) - Understanding skills
+- [Skills Concepts](../../pages/explanation/skills.en.md) - Understanding skills
 - [Core Runner README](../../runners/core/README.md) - Core module details
 - [CLI Runner README](../../runners/cli/README.md) - CLI documentation
 - [GitHub Action README](../../runners/github-action/README.md) - Action documentation
