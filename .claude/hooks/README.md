@@ -18,7 +18,7 @@ chmod +x .claude/hooks/format.sh
 ### How it works
 
 1. Detects changed files via `git diff`
-2. Filters for supported extensions (js, ts, json, md, yml)
+2. Filters for supported extensions (js, jsx, ts, tsx, json, md, yml, yaml, mjs)
 3. Runs `prettier --write` on those files
 
 ### Customization
