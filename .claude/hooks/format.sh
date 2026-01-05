@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Post-edit hook: format changed files
-# Runs after Claude writes/edits files
-
 if ! command -v npm >/dev/null 2>&1; then
   echo "[format] npm not found, skipping"
+  exit 0
+fi
+
+if [ ! -d .git ]; then
+  echo "[format] Not a git repository, skipping"
   exit 0
 fi
 

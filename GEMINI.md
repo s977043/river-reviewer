@@ -4,20 +4,16 @@
 
 ## 必須チェック
 
-- 着手前に受入条件とポリシーを確認し、短い計画を提示してから作業開始。
-- ブランチはタスク単位。PR 前に `npm test` と `npm run lint` を実行し、Gemini / Codex へのレビュー依頼を PR に明記。
-- 出力・レビューコメントは日本語が基準（別言語指定がある場合のみ例外）。
+- 着手前に「完了条件」とリポジトリポリシー (`AGENTS.md`) を確認し、計画を提示してから作業開始。
+- ブランチはタスク単位。PR 前に `npm test` と `npm run lint` を実行し、レビュー依頼を明記。
+- 出力は日本語が基準。
 
-## Quick reference
+## Gemini-specific Tips
 
-- Docs: `pages/` が編集対象。日本語がソース・オブ・トゥルース。
-- Commands: `npm test`, `npm run lint`（必要に応じて `npm run agents:validate` / `npm run skills:validate`）。
-- Safety: 秘密情報や `.env*` は持ち込まない。破壊的操作は明示。
+### Prompt assembly
 
-## Prompt assembly tips
+- 最初のコンテキストに `AGENTS.md` の全文（または要約）を含める。
+- 本ファイル (`GEMINI.md`) は、Gemini 固有の振る舞い調整が必要な場合のみ参照する。
+- タスク概要、受入条件、編集対象ファイルを明確にする。
 
-- 最初の system/context に AGENTS.md と本ファイルの要点を含める。
-- タスク概要と受入条件、編集予定ファイルと目的を短く列挙する。
-- 追加の Gemini 固有調整があれば後段で指定する（重複は避ける）。
-
-> ルール変更や追加の運用メモは `AGENTS.md` に反映し、このファイルは薄いラッパーとして保守してください。
+> ルール変更や運用メモは `AGENTS.md` に集約し、このファイルは最小限に保ってください。
