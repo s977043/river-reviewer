@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "defaultMode": "ask",
+    "defaultMode": "default",
     "allow": [
       "Bash(git status:*)",
       "Bash(git diff:*)",
@@ -21,7 +21,15 @@
       "Bash(gh pr diff:*)",
       "Bash(npm run lint:*)",
       "Bash(npm run format:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh auth status:*)",
+      "Bash(gh api:*)"
     ],
     "ask": [
       "Bash(git commit:*)",
@@ -31,8 +39,6 @@
       "Bash(git add:*)",
       "Bash(gh pr create:*)",
       "Bash(gh pr merge:*)",
-      "Bash(npm install:*)",
-      "Bash(npm ci:*)",
       "Bash(npm:*)",
       "Bash(pnpm:*)",
       "Bash(yarn:*)",
