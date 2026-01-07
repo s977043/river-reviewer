@@ -78,8 +78,7 @@ npm run lint
 
 ### 📎 関連ドキュメント
 
-- コミット概要（日本語）: `docs/contributing/commit-summary.ja.md`
-- レビューチェックリスト: `docs/contributing/review-checklist.md`
+- レビューチェックリスト: `pages/contributing/review-checklist.md`
 
 ## 🏷️ リリース（タグ発行）運用
 

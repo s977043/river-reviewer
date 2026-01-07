@@ -156,8 +156,7 @@ This will auto-assign the corresponding milestone (`.github/workflows/auto-miles
 
 See `CONTRIBUTING.md` for guidance. Issues and PRs are welcome as we expand River Reviewer.
 
-- Commit summary (JA): `docs/contributing/commit-summary.ja.md`
-- Review checklist: `docs/contributing/review-checklist.md`
+- Review checklist: `pages/contributing/review-checklist.md`
 
 ## License
 
