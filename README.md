@@ -377,7 +377,6 @@ River Reviewer の技術ドキュメントは、[Diátaxis ドキュメントフ
 
 ガイドラインは `CONTRIBUTING.md` を参照してください。Issue や PR を歓迎します。
 
-- コミット概要（日本語）: `pages/contributing/commit-summary.md`
 - レビューチェックリスト: `pages/contributing/review-checklist.md`
 
 ## ライセンス

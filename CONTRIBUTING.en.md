@@ -67,8 +67,7 @@ Depending on what you change:
 
 ### 📎 Related docs
 
-- Commit summary (JA): `docs/contributing/commit-summary.ja.md`
-- Review checklist: `docs/contributing/review-checklist.md`
+- Review checklist: `pages/contributing/review-checklist.md`
 
 ### 🧭 Coding/ops conventions (summary)
 

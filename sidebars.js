@@ -42,12 +42,7 @@ module.exports = {
     {
       type: 'category',
       label: 'コントリビューション',
-      items: ['contributing/commit-summary', 'contributing/review-checklist'],
-    },
-    {
-      type: 'category',
-      label: 'メンテナ用',
-      items: ['maintainers/continuity'],
+      items: ['contributing/review-checklist'],
     },
     {
       type: 'category',
