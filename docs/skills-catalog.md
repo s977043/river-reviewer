@@ -1,1 +1,0 @@
-../pages/reference/skills-catalog.md
