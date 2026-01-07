@@ -3,6 +3,13 @@ name: Build Docusaurus Site
 on:
   pull_request:
     branches: ['main']
+    paths:
+      - 'pages/**'
+      - 'docs/**'
+      - 'docusaurus.config.js'
+      - 'sidebars.js'
+      - 'package.json'
+      - 'package-lock.json'
 
 jobs:
   build:
