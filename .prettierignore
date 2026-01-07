@@ -16,3 +16,4 @@ dist/
 # Config files that should not be formatted
 .vale/
 .lychee.toml
+CHANGELOG.md

@@ -1,6 +1,10 @@
 name: Link Check
 on:
   pull_request:
+    paths:
+      - '**/*.md'
+      - '.lychee.toml'
+      - '.lycheeignore'
   schedule:
     - cron: '0 2 * * 1'
   workflow_dispatch: # Allow manual trigger for maintainers
