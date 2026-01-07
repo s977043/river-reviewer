@@ -8,7 +8,7 @@ agent: 'river-reviewer'
 
 参照（必要に応じて開く）:
 
-- [docs/contributing/review-checklist.md](../../docs/contributing/review-checklist.md)
+- [pages/contributing/review-checklist.md](../../pages/contributing/review-checklist.md)
 - [skills/](../../skills/)
 
 観点:
