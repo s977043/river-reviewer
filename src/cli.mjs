@@ -223,9 +223,38 @@ function formatMessageForMarkdown(message) {
   return result;
 }
 
+function groupCommentsBySkill(comments) {
+  const groups = {};
+  for (const c of comments) {
+    const key = c.skillId || '';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(c);
+  }
+  return groups;
+}
+
 function formatCommentsMarkdown(comments) {
   if (!comments?.length) return '_No findings._';
-  return comments.map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`).join('\n');
+
+  // スキル単位でグループ化
+  const bySkill = groupCommentsBySkill(comments);
+  const entries = Object.entries(bySkill);
+
+  // スキルIDがないグループのみの場合は従来形式
+  if (entries.length === 1 && entries[0][0] === '') {
+    return comments.map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`).join('\n');
+  }
+
+  // スキル単位でセクション化
+  return entries
+    .map(([skillId, items]) => {
+      const header = skillId ? `#### 🔍 ${skillId}` : '#### その他';
+      const body = items
+        .map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`)
+        .join('\n');
+      return `${header}\n${body}`;
+    })
+    .join('\n\n');
 }
 
 function formatPlanMarkdown(plan) {

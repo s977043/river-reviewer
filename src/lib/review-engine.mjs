@@ -163,8 +163,7 @@ async function callOpenAI({ prompt, apiKey, model, endpoint, temperature, maxTok
 }
 
 function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
-  const skillNames = (plan?.selected ?? []).map(skill => skill.metadata?.name ?? skill.metadata?.id ?? skill.id);
-  const skillCount = skillNames.length;
+  const skills = plan?.selected ?? [];
 
   const firstFile = diff.files?.find(f => f?.path && f.path !== '/dev/null') ?? null;
   if (!firstFile) {
@@ -190,36 +189,44 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
     1; /* default to first added line or hunk start to keep pointers stable */
 
   // Build specific reason message
-  const reasons = [];
-  if (llmSkipReason) {
-    reasons.push(`LLM: ${llmSkipReason}`);
+  const evidenceBase = llmSkipReason ? `LLM: ${llmSkipReason}` : 'ヒューリスティック検出パターンに該当なし';
+
+  // スキルがない場合は1件のコメントを生成
+  if (skills.length === 0) {
+    return [
+      {
+        file: firstFile.path,
+        line,
+        message: formatFindingMessage({
+          finding: 'マッチするスキルがなく自動指摘を生成できなかった',
+          evidence: evidenceBase,
+          impact: '重要なリスクを見落とす可能性がある',
+          fix: 'このファイル種別に対応するスキルを追加するか、手動レビューを実施する',
+          severity: 'warning',
+          confidence: 'low',
+        }),
+      },
+    ];
   }
-  reasons.push('ヒューリスティック検出パターンに該当なし');
 
-  const finding = skillCount > 0
-    ? `${skillCount}件のスキルがマッチしたが自動指摘を生成できなかった`
-    : 'マッチするスキルがなく自動指摘を生成できなかった';
-
-  const evidence = reasons.join('; ');
-
-  const fix = skillCount > 0
-    ? `手動レビューを実施する（選択スキル: ${skillNames.slice(0, 3).join(', ')}${skillCount > 3 ? ` 他${skillCount - 3}件` : ''}）`
-    : 'このファイル種別に対応するスキルを追加するか、手動レビューを実施する';
-
-  return [
-    {
+  // スキル単位でコメントを生成
+  return skills.map(skill => {
+    const skillId = skill.metadata?.id ?? skill.id;
+    const skillName = skill.metadata?.name ?? skillId;
+    return {
       file: firstFile.path,
       line,
+      skillId,
       message: formatFindingMessage({
-        finding,
-        evidence,
-        impact: '重要なリスクを見落とす可能性がある',
-        fix,
+        finding: `スキル「${skillName}」の観点で自動指摘を生成できなかった`,
+        evidence: evidenceBase,
+        impact: 'このスキルが検出する問題を見落とす可能性がある',
+        fix: `「${skillName}」の観点で手動レビューを実施する`,
         severity: 'warning',
         confidence: 'low',
       }),
-    },
-  ];
+    };
+  });
 }
 
 function normalizeHeuristicComments(rawComments) {
