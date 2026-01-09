@@ -1,3 +1,19 @@
+/**
+ * スキルIDとヒューリスティック関数のマッピング
+ * dry-run 時はこのマッピングに含まれるスキルのみ実行される
+ */
+export const SKILL_HEURISTIC_MAP = {
+  'rr-midstream-security-basic-001': ['findHardcodedSecrets', 'findGitHubActionsIssues'],
+  'rr-midstream-logging-observability-001': ['findSilentCatch'],
+  'rr-downstream-test-existence-001': ['findMissingTests'],
+  'rr-downstream-coverage-gap-001': ['findMissingTests'],
+};
+
+/**
+ * ヒューリスティック対応スキルIDの一覧（dry-run 時のフィルタリング用）
+ */
+export const HEURISTIC_SKILL_IDS = Object.keys(SKILL_HEURISTIC_MAP);
+
 function ensureArray(value) {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
@@ -9,7 +25,7 @@ function getSkillId(skill) {
 
 function hasSkill(plan, skillId) {
   const selected = ensureArray(plan?.selected);
-  return selected.some(skill => getSkillId(skill) === skillId);
+  return selected.some((skill) => getSkillId(skill) === skillId);
 }
 
 function* iterateAddedLines(file) {
@@ -70,12 +86,12 @@ function matchesHardcodedSecretLine(code) {
     /\bsk-(?:live|test)?_[A-Za-z0-9]{16,}\b/, // Stripe-like
     /\bsk-[A-Za-z0-9]{16,}\b/, // OpenAI-like (generic)
   ];
-  if (explicitPatterns.some(re => re.test(code))) return true;
+  if (explicitPatterns.some((re) => re.test(code))) return true;
 
   // Heuristic: suspicious identifier name + long-ish string literal
   const assignMatch =
     /\b(?:export\s+)?(?:const|let|var)\s+(?<name>[A-Za-z0-9_]+)\s*=\s*(?<quote>['"`])(?<value>[^'"`]+)\k<quote>/.exec(
-      code,
+      code
     ) ||
     /['"](?<name>[A-Za-z0-9_]+)['"]\s*:\s*(?<quote>['"`])(?<value>[^'"`]+)\k<quote>/.exec(code) ||
     /\b(?<name>[A-Za-z0-9_]+)\s*:\s*(?<quote>['"`])(?<value>[^'"`]+)\k<quote>/.exec(code);
@@ -163,8 +179,16 @@ function findSilentCatch({ diff }) {
           if (looksLikeLogging(text) || /\bthrow\b/.test(text)) {
             sawLogOrThrow = true;
           }
-          if (!sawLogOrThrow && (/\breturn\s*;\s*(?:\/\/.*)?$/.test(text) || /\breturn\s+(null|undefined)\s*;/.test(text))) {
-            comments.push({ file: filePath, line: catchAnchor ?? entry.line ?? 1, kind: 'silent-catch' });
+          if (
+            !sawLogOrThrow &&
+            (/\breturn\s*;\s*(?:\/\/.*)?$/.test(text) ||
+              /\breturn\s+(null|undefined)\s*;/.test(text))
+          ) {
+            comments.push({
+              file: filePath,
+              line: catchAnchor ?? entry.line ?? 1,
+              kind: 'silent-catch',
+            });
             if (comments.length >= 3) return comments;
             catchAnchor = null;
             window = 0;
@@ -182,7 +206,11 @@ function findSilentCatch({ diff }) {
 
 function looksLikeTestFile(filePath) {
   const normalized = String(filePath).replaceAll('\\', '/');
-  return normalized.includes('/tests/') || normalized.includes('/__tests__/') || /\.(test|spec)\./.test(normalized);
+  return (
+    normalized.includes('/tests/') ||
+    normalized.includes('/__tests__/') ||
+    /\.(test|spec)\./.test(normalized)
+  );
 }
 
 function looksLikeProductCodeFile(filePath) {
@@ -201,7 +229,8 @@ function hasBehaviorChangeSignal({ diff }) {
   const files = ensureArray(diff?.files);
   for (const file of files) {
     for (const { text } of iterateAddedLines(file)) {
-      if (/\bif\s*\(/.test(text) || /\bswitch\s*\(/.test(text) || /\bthrow\s+new\b/.test(text)) return true;
+      if (/\bif\s*\(/.test(text) || /\bswitch\s*\(/.test(text) || /\bthrow\s+new\b/.test(text))
+        return true;
     }
   }
   return false;
@@ -210,15 +239,15 @@ function hasBehaviorChangeSignal({ diff }) {
 function findMissingTests({ diff }) {
   const files = ensureArray(diff?.files);
   const changedPaths = files
-    .map(f => f?.path)
+    .map((f) => f?.path)
     .filter(Boolean)
-    .filter(p => p !== '/dev/null');
+    .filter((p) => p !== '/dev/null');
   const touchesTests = changedPaths.some(looksLikeTestFile);
   const touchesCode = changedPaths.some(looksLikeProductCodeFile);
   if (!touchesCode || touchesTests) return [];
   if (!hasBehaviorChangeSignal({ diff })) return [];
 
-  const firstCodeFile = files.find(f => looksLikeProductCodeFile(f?.path));
+  const firstCodeFile = files.find((f) => looksLikeProductCodeFile(f?.path));
   const filePath = firstCodeFile?.path;
   const line = firstCodeFile?.addedLines?.[0] || firstCodeFile?.hunks?.[0]?.newStart || 1;
   return [
@@ -325,17 +354,36 @@ function findGitHubActionsIssues({ diff }) {
 export function buildHeuristicComments({ diff, plan }) {
   const comments = [];
 
+  // セキュリティ基本チェック
   if (hasSkill(plan, 'rr-midstream-security-basic-001')) {
-    comments.push(...findHardcodedSecrets({ diff }));
-    comments.push(...findGitHubActionsIssues({ diff }));
+    const skillId = 'rr-midstream-security-basic-001';
+    for (const c of findHardcodedSecrets({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findGitHubActionsIssues({ diff })) {
+      comments.push({ ...c, skillId });
+    }
   }
 
+  // ロギング・可観測性チェック
   if (hasSkill(plan, 'rr-midstream-logging-observability-001')) {
-    comments.push(...findSilentCatch({ diff }));
+    const skillId = 'rr-midstream-logging-observability-001';
+    for (const c of findSilentCatch({ diff })) {
+      comments.push({ ...c, skillId });
+    }
   }
 
-  if (hasSkill(plan, 'rr-downstream-test-existence-001') || hasSkill(plan, 'rr-downstream-coverage-gap-001')) {
-    comments.push(...findMissingTests({ diff }));
+  // テスト存在チェック
+  if (hasSkill(plan, 'rr-downstream-test-existence-001')) {
+    const skillId = 'rr-downstream-test-existence-001';
+    for (const c of findMissingTests({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+  } else if (hasSkill(plan, 'rr-downstream-coverage-gap-001')) {
+    const skillId = 'rr-downstream-coverage-gap-001';
+    for (const c of findMissingTests({ diff })) {
+      comments.push({ ...c, skillId });
+    }
   }
 
   return comments.slice(0, 8);

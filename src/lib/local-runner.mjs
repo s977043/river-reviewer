@@ -230,6 +230,7 @@ export async function planLocalReview({
     preferredModelHint,
     planner: planner ?? undefined,
     plannerMode: requestedPlannerMode,
+    dryRun,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;

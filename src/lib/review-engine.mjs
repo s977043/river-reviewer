@@ -1,7 +1,7 @@
 import { mergeConfig } from '../config/loader.mjs';
 import { defaultConfig } from '../config/default.mjs';
 import { summarizeSkill } from '../../runners/core/review-runner.mjs';
-import { buildHeuristicComments } from './heuristic-review.mjs';
+import { buildHeuristicComments, HEURISTIC_SKILL_IDS } from './heuristic-review.mjs';
 import { formatFindingMessage, validateFindingMessage } from './finding-format.mjs';
 
 const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
@@ -9,6 +9,14 @@ const MAX_PROMPT_CHARS = 12000;
 const MAX_PROMPT_PREVIEW_CHARS = 2000;
 const NO_ISSUES_REGEX = /^NO_ISSUES/i;
 const LINE_COMMENT_REGEX = /^(.+?):(\d+):\s*(.+)$/;
+
+/**
+ * スキル名のサニタイズ: Markdown インジェクション対策
+ */
+function sanitizeSkillName(name) {
+  if (!name) return '';
+  return String(name).replace(/[\[\]`*_{}()#+\-.!|<>\n]/g, '');
+}
 
 function buildSystemMessage(language) {
   return language === 'en'
@@ -163,8 +171,12 @@ async function callOpenAI({ prompt, apiKey, model, endpoint, temperature, maxTok
 }
 
 function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
-  const skillNames = (plan?.selected ?? []).map(skill => skill.metadata?.name ?? skill.metadata?.id ?? skill.id);
-  const skillCount = skillNames.length;
+  const allSkills = plan?.selected ?? [];
+  // ヒューリスティック対応スキルは除外（ヒューリスティックで処理済み）
+  const skills = allSkills.filter(skill => {
+    const skillId = skill.metadata?.id ?? skill.id;
+    return !HEURISTIC_SKILL_IDS.includes(skillId);
+  });
 
   const firstFile = diff.files?.find(f => f?.path && f.path !== '/dev/null') ?? null;
   if (!firstFile) {
@@ -190,36 +202,45 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
     1; /* default to first added line or hunk start to keep pointers stable */
 
   // Build specific reason message
-  const reasons = [];
-  if (llmSkipReason) {
-    reasons.push(`LLM: ${llmSkipReason}`);
+  const evidenceBase = llmSkipReason ? `LLM: ${llmSkipReason}` : 'ヒューリスティック検出パターンに該当なし';
+
+  // スキルがない場合は1件のコメントを生成
+  if (skills.length === 0) {
+    return [
+      {
+        file: firstFile.path,
+        line,
+        message: formatFindingMessage({
+          finding: 'マッチするスキルがなく自動指摘を生成できなかった',
+          evidence: evidenceBase,
+          impact: '重要なリスクを見落とす可能性がある',
+          fix: 'このファイル種別に対応するスキルを追加するか、手動レビューを実施する',
+          severity: 'warning',
+          confidence: 'low',
+        }),
+      },
+    ];
   }
-  reasons.push('ヒューリスティック検出パターンに該当なし');
 
-  const finding = skillCount > 0
-    ? `${skillCount}件のスキルがマッチしたが自動指摘を生成できなかった`
-    : 'マッチするスキルがなく自動指摘を生成できなかった';
-
-  const evidence = reasons.join('; ');
-
-  const fix = skillCount > 0
-    ? `手動レビューを実施する（選択スキル: ${skillNames.slice(0, 3).join(', ')}${skillCount > 3 ? ` 他${skillCount - 3}件` : ''}）`
-    : 'このファイル種別に対応するスキルを追加するか、手動レビューを実施する';
-
-  return [
-    {
+  // スキル単位でコメントを生成
+  return skills.map(skill => {
+    const skillId = skill.metadata?.id ?? skill.id;
+    const rawSkillName = skill.metadata?.name ?? skillId;
+    const skillName = sanitizeSkillName(rawSkillName);
+    return {
       file: firstFile.path,
       line,
+      skillId,
       message: formatFindingMessage({
-        finding,
-        evidence,
-        impact: '重要なリスクを見落とす可能性がある',
-        fix,
+        finding: `スキル「${skillName}」の観点で自動指摘を生成できなかった`,
+        evidence: evidenceBase,
+        impact: 'このスキルが検出する問題を見落とす可能性がある',
+        fix: `「${skillName}」の観点で手動レビューを実施する`,
         severity: 'warning',
         confidence: 'low',
       }),
-    },
-  ];
+    };
+  });
 }
 
 function normalizeHeuristicComments(rawComments) {
