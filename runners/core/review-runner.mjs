@@ -3,6 +3,7 @@ import { loadSkills } from './skill-loader.mjs';
 import { planSkills, summarizeSkill } from '../../src/lib/skill-planner.mjs';
 import { inferImpactTags } from '../../src/lib/impact-scope.mjs';
 import { normalizePlannerMode } from '../../src/lib/planner-utils.mjs';
+import { HEURISTIC_SKILL_IDS } from '../../src/lib/heuristic-review.mjs';
 
 const MODEL_PRIORITY = {
   cheap: 1,
@@ -77,11 +78,21 @@ export function selectSkills(skills, options) {
   const changedFiles = ensureArray(options.changedFiles);
   const availableContexts = ensureArray(options.availableContexts);
   const availableDependencies = options.availableDependencies ?? null;
+  const dryRun = options.dryRun ?? false;
   const selected = [];
   const skipped = [];
 
   for (const skill of skills) {
-    const result = evaluateSkill(skill.metadata ?? skill, {
+    const meta = skill.metadata ?? skill;
+    const skillId = meta.id;
+
+    // dry-run 時はヒューリスティック対応スキルのみ選択
+    if (dryRun && !HEURISTIC_SKILL_IDS.includes(skillId)) {
+      skipped.push({ skill, reasons: ['dry-run: LLM必須スキル（ヒューリスティック未対応）'] });
+      continue;
+    }
+
+    const result = evaluateSkill(meta, {
       phase: options.phase,
       changedFiles,
       availableContexts,
@@ -159,6 +170,7 @@ export async function buildExecutionPlan(options) {
     planner,
     plannerMode,
     diffText,
+    dryRun = false,
   } = options;
 
   const skills = providedSkills ?? (await loadSkills());
@@ -167,6 +179,7 @@ export async function buildExecutionPlan(options) {
     changedFiles,
     availableContexts,
     availableDependencies,
+    dryRun,
   });
   if (selection.selected.length === 0) {
     return { selected: [], skipped: selection.skipped };

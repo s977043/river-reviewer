@@ -1,7 +1,7 @@
 import { mergeConfig } from '../config/loader.mjs';
 import { defaultConfig } from '../config/default.mjs';
 import { summarizeSkill } from '../../runners/core/review-runner.mjs';
-import { buildHeuristicComments } from './heuristic-review.mjs';
+import { buildHeuristicComments, HEURISTIC_SKILL_IDS } from './heuristic-review.mjs';
 import { formatFindingMessage, validateFindingMessage } from './finding-format.mjs';
 
 const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
@@ -163,7 +163,12 @@ async function callOpenAI({ prompt, apiKey, model, endpoint, temperature, maxTok
 }
 
 function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
-  const skills = plan?.selected ?? [];
+  const allSkills = plan?.selected ?? [];
+  // ヒューリスティック対応スキルは除外（ヒューリスティックで処理済み）
+  const skills = allSkills.filter(skill => {
+    const skillId = skill.metadata?.id ?? skill.id;
+    return !HEURISTIC_SKILL_IDS.includes(skillId);
+  });
 
   const firstFile = diff.files?.find(f => f?.path && f.path !== '/dev/null') ?? null;
   if (!firstFile) {
