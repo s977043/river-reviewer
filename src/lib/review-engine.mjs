@@ -250,6 +250,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: 'catch で例外が握りつぶされる可能性がある',
             evidence: 'catch 内で return（ログ/再throwなし）',
@@ -263,6 +264,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: '挙動変更に対するテスト差分が見当たらない',
             evidence: 'コード差分あり・テスト差分なし',
@@ -276,6 +278,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: '秘密情報（トークン/キー）の直書きの可能性がある',
             evidence: 'トークン/キーらしい文字列が追加されている',
@@ -289,6 +292,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: 'pull_request_targetイベントは権限昇格のリスクがある',
             evidence: 'pull_request_targetトリガーが追加されている',
@@ -302,6 +306,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: '過剰な権限設定（write-all）が検出された',
             evidence: 'permissions: write-all が設定されている',
@@ -315,6 +320,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: 'runブロック内でsecretsを直接使用している',
             evidence: 'run: と secrets.* が同一行に存在',
@@ -328,6 +334,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: 'ユーザー入力がサニタイズされずに使用されている',
             evidence: 'github.event.*.title/body/name がrunブロックで直接使用',
