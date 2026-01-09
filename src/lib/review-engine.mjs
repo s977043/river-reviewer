@@ -10,6 +10,14 @@ const MAX_PROMPT_PREVIEW_CHARS = 2000;
 const NO_ISSUES_REGEX = /^NO_ISSUES/i;
 const LINE_COMMENT_REGEX = /^(.+?):(\d+):\s*(.+)$/;
 
+/**
+ * スキル名のサニタイズ: Markdown インジェクション対策
+ */
+function sanitizeSkillName(name) {
+  if (!name) return '';
+  return String(name).replace(/[\[\]`*_{}()#+\-.!|<>\n]/g, '');
+}
+
 function buildSystemMessage(language) {
   return language === 'en'
     ? 'You are River Reviewer, an expert code review assistant. Respond in English. You excel at spotting risky changes and explaining them briefly.'
@@ -217,7 +225,8 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
   // スキル単位でコメントを生成
   return skills.map(skill => {
     const skillId = skill.metadata?.id ?? skill.id;
-    const skillName = skill.metadata?.name ?? skillId;
+    const rawSkillName = skill.metadata?.name ?? skillId;
+    const skillName = sanitizeSkillName(rawSkillName);
     return {
       file: firstFile.path,
       line,

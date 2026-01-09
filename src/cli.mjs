@@ -233,6 +233,16 @@ function groupCommentsBySkill(comments) {
   return groups;
 }
 
+/**
+ * Markdown インジェクション対策: 特殊文字をエスケープ
+ */
+function sanitizeForMarkdown(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/[\\`*_{}[\]()#+\-.!|<>]/g, '\\$&')
+    .replace(/\n/g, ' ');
+}
+
 function formatCommentsMarkdown(comments) {
   if (!comments?.length) return '_No findings._';
 
@@ -245,10 +255,15 @@ function formatCommentsMarkdown(comments) {
     return comments.map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`).join('\n');
   }
 
+  // skillId でソートして出力順序を安定化
+  entries.sort((a, b) => a[0].localeCompare(b[0]));
+
   // スキル単位でセクション化
   return entries
     .map(([skillId, items]) => {
-      const header = skillId ? `#### 🔍 ${skillId}` : '#### その他';
+      // skillId をサニタイズして Markdown インジェクションを防止
+      const safeSkillId = sanitizeForMarkdown(skillId);
+      const header = skillId ? `#### 🔍 ${safeSkillId}` : '#### その他';
       const body = items
         .map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`)
         .join('\n');
