@@ -224,13 +224,11 @@ function formatMessageForMarkdown(message) {
 }
 
 function groupCommentsBySkill(comments) {
-  const groups = {};
-  for (const c of comments) {
-    const key = c.skillId || '';
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(c);
-  }
-  return groups;
+  return (comments ?? []).reduce((groups, comment) => {
+    const key = comment.skillId || '';
+    (groups[key] = groups[key] || []).push(comment);
+    return groups;
+  }, {});
 }
 
 /**
