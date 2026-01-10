@@ -40,10 +40,16 @@ async function validateSkills() {
   for (const filePath of files) {
     const relativePath = path.relative(defaultPaths.repoRoot, filePath);
 
-    // Skip Registry format skill.yaml files (validated by validate:skill-yaml)
+    // Skip Registry format skill.yaml files
     const basename = path.basename(filePath);
     if (basename === 'skill.yaml' || basename === 'skill.yml') {
       console.log(`ℹ️  ${relativePath} (skipped - registry format, use npm run validate:skill-yaml)`);
+      continue;
+    }
+
+    // Skip new Agent Skills format (validated by npm run agent-skills:validate)
+    if (relativePath.includes('agent-skills')) {
+      console.log(`ℹ️  ${relativePath} (skipped - agent skill)`);
       continue;
     }
 
