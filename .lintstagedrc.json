@@ -2,5 +2,6 @@
   "**/*.{js,ts,jsx,tsx}": ["prettier --write"],
   "**/*.{md,markdown}": ["npm run check:dashes", "prettier --write", "markdownlint --fix"],
   "**/*.{json,yml,yaml}": ["prettier --write"],
-  "skills/**/*.md": ["npm run skills:validate"]
+  "skills/**/*.md": ["npm run skills:validate"],
+  "skills/agent-skills/**/*.md": ["npm run agent-skills:validate"]
 }
