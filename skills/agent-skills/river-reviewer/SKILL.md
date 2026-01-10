@@ -22,7 +22,7 @@ River Reviewer は「流れに寄り添う」AI レビューエージェント�
 
 | キーワード             | 専門スキル                  | 説明                         |
 | ---------------------- | --------------------------- | ---------------------------- |
-| 設計, アーキ, ADR      | river-reviewer-architecture | 設計・アーキテクチャレビュー |
+| 設計, アーキテクチャ, ADR | river-reviewer-architecture | 設計・アーキテクチャレビュー |
 | セキュリティ, 脆弱性   | river-reviewer-security     | セキュリティ観点レビュー     |
 | パフォーマンス, 最適化 | river-reviewer-performance  | パフォーマンス観点レビュー   |
 | テスト, カバレッジ     | river-reviewer-testing      | テスト観点レビュー           |
