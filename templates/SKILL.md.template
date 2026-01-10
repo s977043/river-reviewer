@@ -7,13 +7,14 @@ description: |
   キーワード: <関連する用語をカンマ区切りで列挙>
 # Optional: ライセンス情報
 # license: MIT
-# Optional: 互換性情報
+# Optional: 互換性情報（プロジェクトに応じて適宜設定）
 # compatibility:
-#   runtime: ">=1.0.0"
-#   agents: ["copilot", "claude", "codex"]
+#   runtime: ">=1.0.0"  # スキルが動作する最小バージョン
+#   agents: ["copilot", "claude", "codex"]  # 対応エージェント（例）
 # Optional: メタデータ（カスタムフィールド）
+# ※ phase は River Reviewer 固有の分類です。他プロジェクトでは適宜変更してください。
 # metadata:
-#   phase: upstream | midstream | downstream
+#   phase: upstream | midstream | downstream  # River Reviewer 固有
 #   severity: info | minor | major | critical
 ---
 
