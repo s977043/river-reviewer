@@ -36,7 +36,7 @@ index 0000000..e69de29
 @@ -0,0 +1,5 @@
 +import { db } from './db';
 +
-+export function login(username, password) {
++export function login(username: string, password: string) {
 +  // query without placeholders
 +  return db.query(`SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`);
 +}
