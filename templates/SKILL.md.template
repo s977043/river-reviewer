@@ -45,13 +45,15 @@ description: |
 
 ## Output Format / 出力形式
 
-```
+```text
 <file>:<line>: <message>
 ```
 
 - **Finding**: 何が問題か（1文）
 - **Impact**: 何が困るか（短く）
 - **Fix**: 次の一手（最小の修正案）
+
+例: `src/foo.ts:42: 例外が握りつぶされる可能性。障害調査が困難。Fix: catch でログ+再throw`
 
 ## False-positive Guards / 誤検知を防ぐ
 
