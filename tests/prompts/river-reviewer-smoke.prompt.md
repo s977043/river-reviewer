@@ -15,7 +15,7 @@ index e69de29..d95f3ad 100644
 --- a/src/utils.ts
 +++ b/src/utils.ts
 @@ -1,3 +1,3 @@
- export function add(a, b) {
+ export function add(a: number, b: number) {
 -  return a + b;
 +  return a + b; // TODO: handling large numbers
  }
