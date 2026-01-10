@@ -73,6 +73,7 @@ npm run lint
 変更内容に応じて、以下も実行してください:
 
 - スキル（`skills/`）を変更した: `npm run skills:validate`
+- Agent Skills（`skills/agent-skills/`）を変更した: `npm run agent-skills:validate`
 - エージェント定義を変更した: `npm run agents:validate`
 - トレース関連の機能を変更した: `npm run trace:validate`（OpenTelemetry 検証が必要な場合）
 
