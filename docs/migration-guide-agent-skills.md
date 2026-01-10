@@ -1,6 +1,6 @@
 # Agent Skills 対応 移行ガイド (v0.8.0)
 
-River Reviewer v0.8.0 では、標準化されたレビュー体験を提供するため、[Agent Skills](https://github.com/github/agent-skills/tree/main) 公式仕様への完全準拠を行いました。
+River Reviewer v0.8.0 では、標準化されたレビュー体験を提供するため、Agent Skills 公式仕様への完全準拠を行いました。
 
 ## 主な変更点
 
