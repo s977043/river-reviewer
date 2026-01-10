@@ -64,7 +64,9 @@ description: River Reviewer のメインエントリポイント。レビュー�
 | セキュリティ、脆弱性   | `river-review-security`     |
 | パフォーマンス、最適化 | `river-review-performance`  |
 | テスト、カバレッジ     | `river-review-testing`      |
-| 一般コードレビュー     | `river-review-code`         |
+| （上記以外）           | `river-review-code`         |
+
+> **デフォルト動作**: キーワードがどれにも当てはまらない場合は `river-review-code`（一般コードレビュー）にフォールバックする。これにより、すべてのレビュー依頼が適切に処理される。
 
 ---
 
@@ -114,6 +116,13 @@ river-review-<domain>
 2. **Phase 2**: 高優先度の専門スキルを作成（security, architecture, code）
 3. **Phase 3**: 従来スキルの内容を専門スキルへ統合
 4. **Phase 4**: 従来スキルを deprecated 化
+
+### Phase 4: Deprecated 化の具体的手順
+
+1. `registry.yaml` で従来スキルに `deprecated: true` フラグを設定
+2. 各スキルファイルの冒頭に deprecation 警告を追記
+3. ドキュメント（README, CONTRIBUTING）に移行先を明記
+4. 3ヶ月の猶予期間後、次のメジャーバージョンで従来スキルを削除
 
 ---
 
