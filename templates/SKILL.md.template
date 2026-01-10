@@ -1,6 +1,6 @@
 ---
 # Required: ディレクトリ名と一致させる（kebab-case）
-name: river-review-<domain>
+name: river-reviewer-<domain>
 # Required: 何をする/いつ使う + キーワード（検索用）
 description: |
   <このスキルが対象とするレビュー観点を1-2文で説明>
