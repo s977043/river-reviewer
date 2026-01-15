@@ -19,7 +19,8 @@ export class GitRepoNotFoundError extends GitError {
 
 async function runGit(args, { cwd }) {
   try {
-    const { stdout } = await exec('git', args, { cwd });
+    // Use a large maxBuffer (50MB) to handle large diffs (e.g., pnpm-lock.yaml changes)
+    const { stdout } = await exec('git', args, { cwd, maxBuffer: 50 * 1024 * 1024 });
     return stdout.trim();
   } catch (error) {
     const detail = error.stderr?.toString().trim() || error.message;
