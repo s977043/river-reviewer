@@ -211,10 +211,12 @@ export async function planLocalReview({
 
   let planner = null;
   let plannerSkipped = null;
+  const llmEnabled = !!(process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY);
+
   if (plannerRequested) {
     if (dryRun) {
       plannerSkipped = 'dry-run enabled';
-    } else if (!process.env.RIVER_OPENAI_API_KEY && !process.env.OPENAI_API_KEY) {
+    } else if (!llmEnabled) {
       plannerSkipped = 'OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set';
     } else {
       planner = createOpenAIPlanner();
@@ -231,6 +233,7 @@ export async function planLocalReview({
     planner: planner ?? undefined,
     plannerMode: requestedPlannerMode,
     dryRun,
+    llmEnabled,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -372,6 +375,8 @@ export async function doctorLocalReview({
   const { repoRoot, projectRules, defaultBranch, mergeBase, diff, reviewFiles, availableContexts: contexts, availableDependencies: dependencies } =
     base;
 
+  const llmEnabled = !!(process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY);
+
   const plan = reviewFiles.length
     ? await buildExecutionPlan({
         phase: normalizePhase(phase),
@@ -381,6 +386,7 @@ export async function doctorLocalReview({
         availableDependencies: dependencies,
         preferredModelHint,
         skills,
+        llmEnabled,
       })
     : null;
 

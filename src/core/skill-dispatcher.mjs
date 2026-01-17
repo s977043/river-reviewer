@@ -111,6 +111,16 @@ export class SkillDispatcher {
              };
           }
 
+          const llmEnabled = !!(process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY);
+          if (!llmEnabled) {
+             console.log(`  -> Skipped (no API key) skill "${skill.name}"...`);
+             return {
+               file,
+               skill: skill.name,
+               review: `(skipped) LLM API key not set for skill: ${skill.name}`,
+             };
+          }
+
           const client = AIClientFactory.create({ modelName, temperature: skill.temperature ?? 0 });
           console.log(`  -> Invoking ${modelName} for skill "${skill.name}"...`);
           const review = await client.generateReview(systemPrompt, diff);
