@@ -11,7 +11,7 @@ import { normalizePlannerMode } from './planner-utils.mjs';
 import { buildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { loadProjectRules } from './rules.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
-import { parseList } from './utils.mjs';
+import { isLlmEnabled, parseList } from './utils.mjs';
 
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
@@ -211,7 +211,7 @@ export async function planLocalReview({
 
   let planner = null;
   let plannerSkipped = null;
-  const llmEnabled = !!(process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY);
+  const llmEnabled = isLlmEnabled();
 
   if (plannerRequested) {
     if (dryRun) {
@@ -375,7 +375,7 @@ export async function doctorLocalReview({
   const { repoRoot, projectRules, defaultBranch, mergeBase, diff, reviewFiles, availableContexts: contexts, availableDependencies: dependencies } =
     base;
 
-  const llmEnabled = !!(process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY);
+  const llmEnabled = isLlmEnabled();
 
   const plan = reviewFiles.length
     ? await buildExecutionPlan({

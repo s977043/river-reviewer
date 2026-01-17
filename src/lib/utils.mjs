@@ -9,3 +9,11 @@ export function parseList(value) {
     .map(item => item.trim())
     .filter(Boolean);
 }
+
+/**
+ * Check if an LLM (OpenAI) API key is configured in the environment.
+ * @returns {boolean}
+ */
+export function isLlmEnabled() {
+  return !!(process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY);
+}
