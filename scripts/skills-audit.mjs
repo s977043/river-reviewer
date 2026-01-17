@@ -7,7 +7,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { parseFrontMatter } from '../runners/core/skill-loader.mjs';
+import { parseSkillFile } from '../runners/core/skill-loader.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,13 +72,18 @@ async function collectSkillFiles(dir, files = []) {
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      // テスト用ディレクトリは除外
+      // テスト用ディレクトリなどは除外
       const excludeDirs = ['fixtures', 'golden', 'prompt', 'references', 'scripts', 'assets'];
       if (!excludeDirs.includes(entry.name)) {
         await collectSkillFiles(fullPath, files);
       }
-    } else if (entry.name.endsWith('.md') && !entry.name.startsWith('_') && entry.name !== 'README.md') {
-      files.push(fullPath);
+    } else {
+      const isMarkdown = entry.name.endsWith('.md') || entry.name.endsWith('.mdx');
+      const isIgnored = entry.name.startsWith('_') || entry.name === 'README.md';
+
+      if (isMarkdown && !isIgnored) {
+        files.push(fullPath);
+      }
     }
   }
   return files;
@@ -101,10 +106,11 @@ async function validateSkill(filePath) {
     const content = await fs.readFile(filePath, 'utf8');
     result.lineCount = await countLines(content);
 
-    // frontmatter パース
-    const parsed = parseFrontMatter(content);
+    // parseSkillFile を使用 (自動補完ロジックを含む)
+    const parsed = await parseSkillFile(filePath);
+    
     if (!parsed.metadata || Object.keys(parsed.metadata).length === 0) {
-      result.issues.push('frontmatter がパースできないまたは空');
+      result.issues.push('メタデータが取得できないまたは空');
       result.priority = 'Blocker';
       return result;
     }
@@ -134,19 +140,19 @@ async function validateSkill(filePath) {
       result.issues.push(`行数が推奨上限超過 (${result.lineCount}行 > 500行)`);
     }
 
-    // 必須フィールドチェック
+    // 必須フィールドチェック (補完後)
     const requiredFields = ['id', 'name', 'description', 'phase', 'severity'];
     for (const field of requiredFields) {
-      if (!parsed.metadata[field]) {
-        result.issues.push(`必須フィールド ${field} が未定義`);
+      if (!result.metadata[field]) {
+        result.issues.push(`必須フィールド ${field} が未定義 (補完後)`);
       }
     }
 
     // 推奨フィールドチェック
-    const recommendedFields = ['applyTo', 'tags', 'inputContext', 'outputKind'];
+    const recommendedFields = ['applyTo', 'tags'];
     for (const field of recommendedFields) {
-      if (!parsed.metadata[field]) {
-        result.issues.push(`推奨フィールド ${field} が未定義`);
+      if (!result.metadata[field]) {
+        result.issues.push(`推奨フィールド ${field} が未定義 (補完後)`);
       }
     }
 
@@ -242,7 +248,7 @@ async function main() {
   console.log('🔍 Skills Audit 開始...\n');
 
   // skills ディレクトリ配下を走査
-  const phases = ['upstream', 'midstream', 'downstream'];
+  const phases = ['upstream', 'midstream', 'downstream', 'agent-skills'];
   const allFiles = [];
 
   for (const phase of phases) {

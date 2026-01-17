@@ -47,7 +47,6 @@ const markdownExtensions = new Set(['.md', '.mdx']);
 const yamlExtensions = new Set(['.yaml', '.yml']);
 const allowedExtensions = new Set([...markdownExtensions, ...yamlExtensions]);
 const ignoredSkillDirNames = new Set([
-  'agent-skills',
   'references',
   'fixtures',
   'golden',
@@ -263,7 +262,7 @@ export function parseFrontMatter(content, { filePath } = {}) {
   return { metadata: normalized, body };
 }
 
-async function parseSkillFile(filePath) {
+export async function parseSkillFile(filePath) {
   const ext = path.extname(filePath).toLowerCase();
   if (!allowedExtensions.has(ext)) {
     throw new SkillLoaderError(`Unsupported skill file extension: ${ext}`);

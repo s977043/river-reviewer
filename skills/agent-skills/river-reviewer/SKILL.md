@@ -1,9 +1,13 @@
 ---
+id: river-reviewer
 name: river-reviewer
 description: |
   River Reviewer のメインエントリポイント。
   レビュー依頼を適切な専門スキルへルーティングする。
-  キーワード: レビュー, コードレビュー, PR, プルリクエスト, review, code review
+phase: [upstream, midstream, downstream]
+severity: normal
+applyTo: ['**/*']
+tags: [entry, routing]
 ---
 
 # River Reviewer

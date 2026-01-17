@@ -25,7 +25,9 @@ function buildSystemMessage(language) {
 }
 
 function buildLanguageInstruction(language) {
-  return language === 'en' ? '- Write the <message> in English.' : '- <message>は日本語で記述すること。';
+  return language === 'en'
+    ? '- Write the <message> in English.'
+    : '- <message>は日本語で記述すること。';
 }
 
 function buildSeverityInstruction(severity, language) {
@@ -47,7 +49,7 @@ function buildSeverityInstruction(severity, language) {
 function buildAdditionalSection(instructions, language) {
   if (!instructions?.length) return '';
   const header = language === 'en' ? 'Additional instructions:' : '追加指示:';
-  const body = instructions.map(item => `- ${item}`).join('\n');
+  const body = instructions.map((item) => `- ${item}`).join('\n');
   return `\n${header}\n${body}\n`;
 }
 
@@ -58,7 +60,10 @@ function resolveOpenAIConfig(options = {}, config = defaultConfig) {
     provider,
     apiKey: options.apiKey || process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
     model: modelName,
-    endpoint: options.endpoint || process.env.RIVER_OPENAI_BASE_URL || 'https://api.openai.com/v1/chat/completions',
+    endpoint:
+      options.endpoint ||
+      process.env.RIVER_OPENAI_BASE_URL ||
+      'https://api.openai.com/v1/chat/completions',
     temperature: config.model?.temperature ?? 0,
     maxTokens: config.model?.maxTokens ?? 600,
   };
@@ -66,21 +71,22 @@ function resolveOpenAIConfig(options = {}, config = defaultConfig) {
 
 function buildSkillSummary(plan) {
   if (!plan?.selected?.length) return 'No skills selected; provide general review notes.';
-  const summaries = plan.selected.map(skill => summarizeSkill(skill));
+  const summaries = plan.selected.map((skill) => summarizeSkill(skill));
   const top = summaries.slice(0, 6);
   const body = top
     .map(
-      s =>
-        `- ${s.id}: ${s.name} [phase=${s.phase}, severity=${s.severity ?? 'unknown'}, modelHint=${s.modelHint}]`,
+      (s) =>
+        `- ${s.id}: ${s.name} [phase=${s.phase}, severity=${s.severity ?? 'unknown'}, modelHint=${s.modelHint}]`
     )
     .join('\n');
-  const truncated = summaries.length > top.length ? `\n...and ${summaries.length - top.length} more skills.` : '';
+  const truncated =
+    summaries.length > top.length ? `\n...and ${summaries.length - top.length} more skills.` : '';
   return `${body}${truncated}`;
 }
 
 function buildFileSummary(files = []) {
   if (!files.length) return 'No files changed';
-  return files.map(file => `- ${file.path} (hunks: ${file.hunks.length || 1})`).join('\n');
+  return files.map((file) => `- ${file.path} (hunks: ${file.hunks.length || 1})`).join('\n');
 }
 
 function buildProjectRulesSection(rulesText) {
@@ -88,7 +94,15 @@ function buildProjectRulesSection(rulesText) {
   return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
 }
 
-export function buildPrompt({ diffText, diffFiles, plan, phase, projectRules, maxChars = MAX_PROMPT_CHARS, config = defaultConfig }) {
+export function buildPrompt({
+  diffText,
+  diffFiles,
+  plan,
+  phase,
+  projectRules,
+  maxChars = MAX_PROMPT_CHARS,
+  config = defaultConfig,
+}) {
   const effectiveConfig = mergeConfig(defaultConfig, config ?? {});
   const reviewConfig = effectiveConfig.review ?? defaultConfig.review;
   const language = reviewConfig.language ?? defaultConfig.review.language;
@@ -139,7 +153,15 @@ export function parseLineComments(outputText) {
   return comments.length ? comments : null;
 }
 
-async function callOpenAI({ prompt, apiKey, model, endpoint, temperature, maxTokens, systemMessage }) {
+async function callOpenAI({
+  prompt,
+  apiKey,
+  model,
+  endpoint,
+  temperature,
+  maxTokens,
+  systemMessage,
+}) {
   const controller = AbortSignal.timeout(15000);
   const res = await fetch(endpoint, {
     method: 'POST',
@@ -173,12 +195,12 @@ async function callOpenAI({ prompt, apiKey, model, endpoint, temperature, maxTok
 function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
   const allSkills = plan?.selected ?? [];
   // ヒューリスティック対応スキルは除外（ヒューリスティックで処理済み）
-  const skills = allSkills.filter(skill => {
+  const skills = allSkills.filter((skill) => {
     const skillId = skill.metadata?.id ?? skill.id;
     return !HEURISTIC_SKILL_IDS.includes(skillId);
   });
 
-  const firstFile = diff.files?.find(f => f?.path && f.path !== '/dev/null') ?? null;
+  const firstFile = diff.files?.find((f) => f?.path && f.path !== '/dev/null') ?? null;
   if (!firstFile) {
     return [
       {
@@ -202,7 +224,9 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
     1; /* default to first added line or hunk start to keep pointers stable */
 
   // Build specific reason message
-  const evidenceBase = llmSkipReason ? `LLM: ${llmSkipReason}` : 'ヒューリスティック検出パターンに該当なし';
+  const evidenceBase = llmSkipReason
+    ? `LLM: ${llmSkipReason}`
+    : 'ヒューリスティック検出パターンに該当なし';
 
   // スキルがない場合は1件のコメントを生成
   if (skills.length === 0) {
@@ -223,7 +247,7 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
   }
 
   // スキル単位でコメントを生成
-  return skills.map(skill => {
+  return skills.map((skill) => {
     const skillId = skill.metadata?.id ?? skill.id;
     const rawSkillName = skill.metadata?.name ?? skillId;
     const skillName = sanitizeSkillName(rawSkillName);
@@ -244,7 +268,7 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
 }
 
 function normalizeHeuristicComments(rawComments) {
-  return rawComments.map(c => {
+  return rawComments.map((c) => {
     switch (c.kind) {
       case 'silent-catch':
         return {
@@ -432,9 +456,9 @@ export async function generateReview({
       debug.rawLlmOutput = output;
       const parsed = parseLineComments(output);
       if (parsed !== null) {
-        const redacted = parsed.map(c => ({ ...c, message: redactSecrets(c.message) }));
-        const checks = redacted.map(c => validateFindingMessage(c.message));
-        const invalidCount = checks.filter(c => !c.ok).length;
+        const redacted = parsed.map((c) => ({ ...c, message: redactSecrets(c.message) }));
+        const checks = redacted.map((c) => validateFindingMessage(c.message));
+        const invalidCount = checks.filter((c) => !c.ok).length;
         if (invalidCount === 0) {
           comments = redacted;
           debug.llmUsed = true;
@@ -463,20 +487,27 @@ export async function generateReview({
       debug.heuristicsCount = heuristic.length;
     } else {
       const llmSkipReason = debug.llmSkipped || debug.llmError || null;
-      comments = includeFallback ? buildFallbackComments(diff, plan, { llmSkipReason }) : [];
+      // If skipped due to missing API key, do not generate fallback warnings (user request)
+      const isMissingKey = llmSkipReason && llmSkipReason.includes('not set');
+
+      if (isMissingKey) {
+        comments = [];
+      } else {
+        comments = includeFallback ? buildFallbackComments(diff, plan, { llmSkipReason }) : [];
+      }
       debug.heuristicsCount = 0;
       debug.fallbackIncluded = includeFallback;
     }
   }
 
-  const formatChecks = comments.map(c => ({
+  const formatChecks = comments.map((c) => ({
     file: c.file,
     line: c.line,
     ...validateFindingMessage(c.message),
   }));
-  const invalidCount = formatChecks.filter(c => !c.ok).length;
+  const invalidCount = formatChecks.filter((c) => !c.ok).length;
   debug.findingFormat = invalidCount
-    ? { ok: false, invalidCount, samples: formatChecks.filter(c => !c.ok).slice(0, 3) }
+    ? { ok: false, invalidCount, samples: formatChecks.filter((c) => !c.ok).slice(0, 3) }
     : { ok: true };
 
   return {
