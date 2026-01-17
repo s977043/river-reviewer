@@ -15,5 +15,9 @@ export function parseList(value) {
  * @returns {boolean}
  */
 export function isLlmEnabled() {
-  return !!(process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY);
+  return !!(
+    process.env.RIVER_OPENAI_API_KEY ||
+    process.env.OPENAI_API_KEY ||
+    process.env.GOOGLE_API_KEY
+  );
 }
