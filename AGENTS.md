@@ -10,7 +10,7 @@ River Reviewer は「流れに寄り添う」AI レビューエージェント�
 
 - この `AGENTS.md` を全エージェント共通の単一ソースとし、各ツール固有ファイルは薄い差分のみを記載する。
 - 着手前に「完了条件」とリポジトリポリシーを確認し、短い実行計画を提示してから作業開始。
-- 変更はタスク単位でブランチを切り、PR を作成する。具体的なチェック内容やレビュー要件は「## 11. タスク着手チェックリスト」を参照する。
+- **直接コミットの禁止**: `main` ブランチへの直接コミットは、ドキュメント修正であっても例外なく禁止する。必ずタスク単位でブランチを切り、PR を作成する。具体的なチェック内容やレビュー要件は「## 11. タスク着手チェックリスト」を参照する。
 - 小さく変更 → 検証コマンド → PR → Green 確認 → レビュー
 - 設定ファイルを真実の源泉とし、フォーマッタ / lint を必ず通す
 - 秘密情報は持ち込まない（`.env*` は禁止、例示はダミー値で）
@@ -111,6 +111,18 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 
 - コミット前に: `npm test`, `npm run lint`, 変更に応じて `agents:validate` / `skills:validate`
 - PR本文に: 目的 / 変更内容 / 影響範囲 / 実行コマンドと結果を記載
+- **PR 作成の手順**:
+  ```bash
+  # 1. ブランチ作成
+  git checkout -b <type>/<description>
+  # 2. 変更・コミット
+  git add .
+  git commit -m "<type>: <description>"
+  # 3. リモートへプッシュ
+  git push origin <branch-name>
+  # 4. PR作成 (GitHub CLI推奨)
+  gh pr create --title "<type>: <description>" --body "Pull request body content"
+  ```
 
 ---
 
@@ -212,6 +224,8 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 - PR 前に `npm test` と `npm run lint` を実行（必要に応じて `npm run agents:validate` / `npm run skills:validate`）。
 - PR 本文で Gemini / Codex へのレビュー依頼を行い、セルフレビューで残タスクがないことを確認する。
 
+- PR 本文で Gemini / Codex へのレビュー依頼を行い、セルフレビューで残タスクがないことを確認する。
+
 ---
 
 ## 13. プラットフォーム固有の注意事項
@@ -219,6 +233,6 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 ### Windows (WSL) での開発
 
 - **UNC パスの制約**: ファイルを `\\wsl.localhost\Ubuntu\...` のような UNC パス経由で参照している場合、`husky` (pre-commit hook) や `prettier` などの一部のツールが CMD.EXE で実行される際にエラー（UNC パス非対応）になることがある。
-- 推奨:
+- 推奨: 
   - Git 操作や npm スクリプトは WSL ターミナル内（`/home/<user>/...`）で実行する。
   - 制約のある環境でやむをえずコミットする場合は `git commit --no-verify` を使用し、CI での検証に委ねる。
