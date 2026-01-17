@@ -79,6 +79,7 @@ export function selectSkills(skills, options) {
   const availableContexts = ensureArray(options.availableContexts);
   const availableDependencies = options.availableDependencies ?? null;
   const dryRun = options.dryRun ?? false;
+  const llmEnabled = options.llmEnabled ?? true;
   const selected = [];
   const skipped = [];
 
@@ -86,9 +87,13 @@ export function selectSkills(skills, options) {
     const meta = skill.metadata ?? skill;
     const skillId = meta.id;
 
-    // dry-run 時はヒューリスティック対応スキルのみ選択
-    if (dryRun && !HEURISTIC_SKILL_IDS.includes(skillId)) {
-      skipped.push({ skill, reasons: ['dry-run: LLM必須スキル（ヒューリスティック未対応）'] });
+    // dry-run または LLM 無効時はヒューリスティック対応スキルのみ選択
+    const isLlmRestricted = dryRun || !llmEnabled;
+    if (isLlmRestricted && !HEURISTIC_SKILL_IDS.includes(skillId)) {
+      const reason = dryRun
+        ? 'dry-run: LLM必須スキル（ヒューリスティック未対応）'
+        : 'LLM disabled: LLM必須スキル（APIキー未設定）';
+      skipped.push({ skill, reasons: [reason] });
       continue;
     }
 
@@ -171,6 +176,7 @@ export async function buildExecutionPlan(options) {
     plannerMode,
     diffText,
     dryRun = false,
+    llmEnabled = true,
   } = options;
 
   const skills = providedSkills ?? (await loadSkills());
@@ -180,6 +186,7 @@ export async function buildExecutionPlan(options) {
     availableContexts,
     availableDependencies,
     dryRun,
+    llmEnabled,
   });
   if (selection.selected.length === 0) {
     return { selected: [], skipped: selection.skipped };
