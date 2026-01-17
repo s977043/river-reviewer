@@ -30,6 +30,33 @@ Riverbed Memory は過去のレビューコンテキストを保存し、将来�
 3. コンテキストの再利用: 新しいスキルを作成する際、重複した警告や矛盾したガイダンスを避けるために、以前の決定を参照する。
 4. 古いメモリの期限切れ: 定期的なリズム（例: 毎月）を設定して、古い決定を整理し、前提条件を更新する。
 
+## 運用例（Shared Memory の配置）
+
+AI レビュー運用の Shared Memory を `.river/` 配下に整理する例です。
+
+- Static（変えにくいルール）: `.river/ai-review/static/`
+- Dynamic（学習ログ）: `.river/ai-review/dynamic/`
+
+例:
+
+```text
+.river/ai-review/
+  static/
+    overview.md
+    bot-commands.md
+    config-guide.md
+    integration.md
+    security.md
+    plans-and-costs.md
+  dynamic/
+    changelog-template.md
+    tuning-log.md
+```
+
+## 関連
+
+- Riverbed Memory の背景とスコープ: `pages/explanation/riverbed-memory.md`
+
 ## グッドプラクティス
 
 - メモリエントリは小さく、アクション指向（何が変わったか、なぜか、そしてフェーズ）に保つ。

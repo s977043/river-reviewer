@@ -1,6 +1,6 @@
 # Skills Audit Report
 
-Generated: 2026-01-10T01:39:25.357Z
+Generated: 2026-01-17T00:06:22.272Z
 
 ## Summary
 
@@ -8,8 +8,8 @@ Generated: 2026-01-10T01:39:25.357Z
 | ---------- | ------ |
 | ❌ Blocker | 0      |
 | ⚠️ Warning | 0      |
-| ✅ OK      | 66     |
-| **Total**  | **66** |
+| ✅ OK      | 67     |
+| **Total**  | **67** |
 
 ---
 
@@ -23,7 +23,7 @@ Generated: 2026-01-10T01:39:25.357Z
 
 ---
 
-## OK (66)
+## OK (67)
 
 | ファイル                                                                  | 行数 | id                                             |
 | ------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
@@ -93,3 +93,4 @@ Generated: 2026-01-10T01:39:25.357Z
 | skills/downstream/rr-downstream-test-naming-001.md                        | 60   | `rr-downstream-test-naming-001`                |
 | skills/downstream/rr-downstream-test-plan-review-001.md                   | 73   | `rr-downstream-test-plan-review-001`           |
 | skills/downstream/sample-test-review.md                                   | 62   | `rr-downstream-test-review-sample-001`         |
+| skills/agent-skills/river-reviewer/SKILL.md                               | 52   | `river-reviewer`                               |
