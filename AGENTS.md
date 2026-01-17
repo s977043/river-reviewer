@@ -233,6 +233,6 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 ### Windows (WSL) での開発
 
 - **UNC パスの制約**: ファイルを `\\wsl.localhost\Ubuntu\...` のような UNC パス経由で参照している場合、`husky` (pre-commit hook) や `prettier` などの一部のツールが CMD.EXE で実行される際にエラー（UNC パス非対応）になることがある。
-- 推奨: 
+- 推奨:
   - Git 操作や npm スクリプトは WSL ターミナル内（`/home/<user>/...`）で実行する。
   - 制約のある環境でやむをえずコミットする場合は `git commit --no-verify` を使用し、CI での検証に委ねる。
