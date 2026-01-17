@@ -178,6 +178,7 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 - このリポは「AI レビューエージェント」そのものの定義・スキルを含む。仕様変更前に `schemas/*.json` と既存 `skills/` の整合を確認。
 - 大きな変更は小さく刻み、必ずテストと検証スクリプトで裏を取ってから PR。
 - 不明な場合は README と `docs/architecture.md`（Planner/Runner 概要）、`docs/skill-planner.md` を参照。
+- **LLM 有効判定の共通化**: LLM 機能（スキル選択、プランナーなど）を実装・変更する際は、`src/lib/utils.mjs` の `isLlmEnabled()` を使用すること。これは OpenAI (`OPENAI_API_KEY`, `RIVER_OPENAI_API_KEY`) および Google Gemini (`GOOGLE_API_KEY`) の両方のキーを適切にチェックする。
 
 ---
 
@@ -210,3 +211,14 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 - タスク単位でブランチを作成し、PR に目的と関連 Issue を明記する。
 - PR 前に `npm test` と `npm run lint` を実行（必要に応じて `npm run agents:validate` / `npm run skills:validate`）。
 - PR 本文で Gemini / Codex へのレビュー依頼を行い、セルフレビューで残タスクがないことを確認する。
+
+---
+
+## 13. プラットフォーム固有の注意事項
+
+### Windows (WSL) での開発
+
+- **UNC パスの制約**: ファイルを `\\wsl.localhost\Ubuntu\...` のような UNC パス経由で参照している場合、`husky` (pre-commit hook) や `prettier` などの一部のツールが CMD.EXE で実行される際にエラー（UNC パス非対応）になることがある。
+- 推奨:
+  - Git 操作や npm スクリプトは WSL ターミナル内（`/home/<user>/...`）で実行する。
+  - 制約のある環境でやむをえずコミットする場合は `git commit --no-verify` を使用し、CI での検証に委ねる。
