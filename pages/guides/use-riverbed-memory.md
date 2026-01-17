@@ -39,7 +39,7 @@ AI レビュー運用の Shared Memory を `.river/` 配下に整理する例で
 
 例:
 
-```
+```text
 .river/ai-review/
   static/
     overview.md

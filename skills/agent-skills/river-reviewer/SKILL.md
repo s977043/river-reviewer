@@ -6,7 +6,7 @@ description: |
   レビュー依頼を適切な専門スキルへルーティングする。
 phase: [upstream, midstream, downstream]
 severity: normal
-applyTo: ["**/*"]
+applyTo: ['**/*']
 tags: [entry, routing]
 ---
 
