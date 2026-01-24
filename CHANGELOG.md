@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.9.0](https://github.com/s977043/river-reviewer/compare/v0.8.0...v0.9.0) (2026-01-24)
+
+
+### Features
+
+* **runner:** enable runtime loading of agent-skills and update audit script ([01fc8a2](https://github.com/s977043/river-reviewer/commit/01fc8a20f9f7decf83fe3cff951ec22189f4e3b5))
+* **skills:** add entry skill river-reviewer ([ece1790](https://github.com/s977043/river-reviewer/commit/ece1790371a44ba1b6d6245e1d80475ab8fe2b72)), closes [#313](https://github.com/s977043/river-reviewer/issues/313)
+
+
+### Bug Fixes
+
+* address additional review comments ([22800e1](https://github.com/s977043/river-reviewer/commit/22800e192b94673ab0435aebcba3cbd6c219be68))
+* address review comments on templates ([1e3159e](https://github.com/s977043/river-reviewer/commit/1e3159e12f169c15158c54f59e7c78063bbde337))
+* Git diffのmaxBufferを拡大 ([f36af63](https://github.com/s977043/river-reviewer/commit/f36af63c6580eb0a376842c0825f3d14f66c1010))
+* increase maxBuffer for large diffs ([db81630](https://github.com/s977043/river-reviewer/commit/db81630bd19b830e49a8fe152de562b51872959a))
+* **scripts:** skip agent-skills in legacy validator ([18cac4f](https://github.com/s977043/river-reviewer/commit/18cac4fd82ee5db59ad9c11292e8a02f587df4c6))
+* skip LLM-only skills when LLM is disabled ([1329dc9](https://github.com/s977043/river-reviewer/commit/1329dc9ae2d0b4752b1f47bb9c17a28ba4f496a5))
+* support GOOGLE_API_KEY in LLM check and add integration test ([9ac9d8e](https://github.com/s977043/river-reviewer/commit/9ac9d8e4d472fda178e35e1786f92c5d67fd39ff))
+
 ## [0.8.0](https://github.com/s977043/river-reviewer/compare/v0.7.1...v0.8.0) (2026-01-10)
 
 
