@@ -116,7 +116,7 @@ export function createOpenAIPlanner(options = {}) {
     endpoint: config.endpoint,
     plan: async ({ skills, context }) => {
       if (!config.apiKey) {
-        throw new Error('OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set');
+        throw new Error('AI API key (OPENAI_API_KEY or GOOGLE_API_KEY) not set');
       }
       const prompt = buildPlannerPrompt({ skills, context });
       const output = await callOpenAI({

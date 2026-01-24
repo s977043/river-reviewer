@@ -171,3 +171,60 @@ test('buildExecutionPlan falls back when planner output is invalid in prune mode
   assert.deepEqual(ids, ['a', 'b']);
   assert.equal(plan.plannerFallback, true);
 });
+
+test('selectSkills skips LLM-only skills when llmEnabled is false', () => {
+  const skills = [
+    {
+      metadata: {
+        id: 'rr-midstream-security-basic-001', // Known heuristic skill
+        phase: 'midstream',
+        applyTo: ['src/**'],
+      },
+    },
+    {
+      metadata: {
+        id: 'llm-only-skill',
+        phase: 'midstream',
+        applyTo: ['src/**'],
+      },
+    },
+  ];
+
+  const { selected, skipped } = selectSkills(skills, {
+    phase: 'midstream',
+    changedFiles: ['src/app.ts'],
+    availableContexts: ['diff'],
+    llmEnabled: false,
+  });
+
+  const ids = selected.map(s => s.metadata.id);
+  assert.equal(ids.length, 1);
+  assert.ok(ids.includes('rr-midstream-security-basic-001'), 'heuristic skill should be selected');
+  assert.ok(!ids.includes('llm-only-skill'), 'LLM skill should be skipped');
+
+  const llmSkip = skipped.find(s => s.skill.metadata.id === 'llm-only-skill');
+  assert.ok(llmSkip, 'LLM skill should be in skipped list');
+  assert.ok(llmSkip.reasons[0].includes('LLM disabled'), 'Reason should be LLM disabled');
+});
+
+test('buildExecutionPlan propagates llmEnabled: false to selectSkills', async () => {
+  const skills = [
+    { metadata: { id: 'rr-midstream-security-basic-001', phase: 'midstream', applyTo: ['src/**'] } },
+    { metadata: { id: 'llm-only-skill', phase: 'midstream', applyTo: ['src/**'] } },
+  ];
+
+  const plan = await buildExecutionPlan({
+    phase: 'midstream',
+    changedFiles: ['src/app.ts'],
+    availableContexts: ['diff'],
+    skills,
+    llmEnabled: false,
+  });
+
+  const selectedIds = plan.selected.map(s => s.metadata.id);
+  assert.ok(selectedIds.includes('rr-midstream-security-basic-001'));
+  assert.ok(!selectedIds.includes('llm-only-skill'));
+
+  const skippedIds = plan.skipped.map(s => s.skill.metadata.id);
+  assert.ok(skippedIds.includes('llm-only-skill'));
+});

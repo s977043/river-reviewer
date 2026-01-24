@@ -214,9 +214,60 @@ function printComments(comments) {
   });
 }
 
+function formatMessageForMarkdown(message) {
+  const labels = ['Finding', 'Evidence', 'Impact', 'Fix', 'Severity', 'Confidence'];
+  let result = message;
+  for (const label of labels) {
+    result = result.replace(new RegExp(`\\s*${label}:`, 'g'), `\n  - **${label}:**`);
+  }
+  return result;
+}
+
+function groupCommentsBySkill(comments) {
+  return (comments ?? []).reduce((groups, comment) => {
+    const key = comment.skillId || '';
+    (groups[key] = groups[key] || []).push(comment);
+    return groups;
+  }, {});
+}
+
+/**
+ * Markdown インジェクション対策: 特殊文字をエスケープ
+ */
+function sanitizeForMarkdown(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/[\\`*_{}[\]()#+\-.!|<>]/g, '\\$&')
+    .replace(/\n/g, ' ');
+}
+
 function formatCommentsMarkdown(comments) {
   if (!comments?.length) return '_No findings._';
-  return comments.map(c => `- \`${c.file}:${c.line}\` ${c.message}`).join('\n');
+
+  // スキル単位でグループ化
+  const bySkill = groupCommentsBySkill(comments);
+  const entries = Object.entries(bySkill);
+
+  // スキルIDがないグループのみの場合は従来形式
+  if (entries.length === 1 && entries[0][0] === '') {
+    return comments.map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`).join('\n');
+  }
+
+  // skillId でソートして出力順序を安定化
+  entries.sort((a, b) => a[0].localeCompare(b[0]));
+
+  // スキル単位でセクション化
+  return entries
+    .map(([skillId, items]) => {
+      // skillId をサニタイズして Markdown インジェクションを防止
+      const safeSkillId = sanitizeForMarkdown(skillId);
+      const header = skillId ? `#### 🔍 ${safeSkillId}` : '#### その他';
+      const body = items
+        .map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`)
+        .join('\n');
+      return `${header}\n${body}`;
+    })
+    .join('\n\n');
 }
 
 function formatPlanMarkdown(plan) {

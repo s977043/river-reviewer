@@ -11,7 +11,7 @@ import { normalizePlannerMode } from './planner-utils.mjs';
 import { buildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { loadProjectRules } from './rules.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
-import { parseList } from './utils.mjs';
+import { isLlmEnabled, parseList } from './utils.mjs';
 
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
@@ -211,11 +211,13 @@ export async function planLocalReview({
 
   let planner = null;
   let plannerSkipped = null;
+  const llmEnabled = isLlmEnabled();
+
   if (plannerRequested) {
     if (dryRun) {
       plannerSkipped = 'dry-run enabled';
-    } else if (!process.env.RIVER_OPENAI_API_KEY && !process.env.OPENAI_API_KEY) {
-      plannerSkipped = 'OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set';
+    } else if (!llmEnabled) {
+      plannerSkipped = 'AI API key (OPENAI_API_KEY or GOOGLE_API_KEY) not set';
     } else {
       planner = createOpenAIPlanner();
     }
@@ -230,6 +232,8 @@ export async function planLocalReview({
     preferredModelHint,
     planner: planner ?? undefined,
     plannerMode: requestedPlannerMode,
+    dryRun,
+    llmEnabled,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -371,6 +375,8 @@ export async function doctorLocalReview({
   const { repoRoot, projectRules, defaultBranch, mergeBase, diff, reviewFiles, availableContexts: contexts, availableDependencies: dependencies } =
     base;
 
+  const llmEnabled = isLlmEnabled();
+
   const plan = reviewFiles.length
     ? await buildExecutionPlan({
         phase: normalizePhase(phase),
@@ -380,6 +386,7 @@ export async function doctorLocalReview({
         availableDependencies: dependencies,
         preferredModelHint,
         skills,
+        llmEnabled,
       })
     : null;
 

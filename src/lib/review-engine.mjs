@@ -1,7 +1,7 @@
 import { mergeConfig } from '../config/loader.mjs';
 import { defaultConfig } from '../config/default.mjs';
 import { summarizeSkill } from '../../runners/core/review-runner.mjs';
-import { buildHeuristicComments } from './heuristic-review.mjs';
+import { buildHeuristicComments, HEURISTIC_SKILL_IDS } from './heuristic-review.mjs';
 import { formatFindingMessage, validateFindingMessage } from './finding-format.mjs';
 
 const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
@@ -10,6 +10,14 @@ const MAX_PROMPT_PREVIEW_CHARS = 2000;
 const NO_ISSUES_REGEX = /^NO_ISSUES/i;
 const LINE_COMMENT_REGEX = /^(.+?):(\d+):\s*(.+)$/;
 
+/**
+ * スキル名のサニタイズ: Markdown インジェクション対策
+ */
+function sanitizeSkillName(name) {
+  if (!name) return '';
+  return String(name).replace(/[\[\]`*_{}()#+\-.!|<>\n]/g, '');
+}
+
 function buildSystemMessage(language) {
   return language === 'en'
     ? 'You are River Reviewer, an expert code review assistant. Respond in English. You excel at spotting risky changes and explaining them briefly.'
@@ -17,7 +25,9 @@ function buildSystemMessage(language) {
 }
 
 function buildLanguageInstruction(language) {
-  return language === 'en' ? '- Write the <message> in English.' : '- <message>は日本語で記述すること。';
+  return language === 'en'
+    ? '- Write the <message> in English.'
+    : '- <message>は日本語で記述すること。';
 }
 
 function buildSeverityInstruction(severity, language) {
@@ -39,7 +49,7 @@ function buildSeverityInstruction(severity, language) {
 function buildAdditionalSection(instructions, language) {
   if (!instructions?.length) return '';
   const header = language === 'en' ? 'Additional instructions:' : '追加指示:';
-  const body = instructions.map(item => `- ${item}`).join('\n');
+  const body = instructions.map((item) => `- ${item}`).join('\n');
   return `\n${header}\n${body}\n`;
 }
 
@@ -50,7 +60,10 @@ function resolveOpenAIConfig(options = {}, config = defaultConfig) {
     provider,
     apiKey: options.apiKey || process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
     model: modelName,
-    endpoint: options.endpoint || process.env.RIVER_OPENAI_BASE_URL || 'https://api.openai.com/v1/chat/completions',
+    endpoint:
+      options.endpoint ||
+      process.env.RIVER_OPENAI_BASE_URL ||
+      'https://api.openai.com/v1/chat/completions',
     temperature: config.model?.temperature ?? 0,
     maxTokens: config.model?.maxTokens ?? 600,
   };
@@ -58,21 +71,22 @@ function resolveOpenAIConfig(options = {}, config = defaultConfig) {
 
 function buildSkillSummary(plan) {
   if (!plan?.selected?.length) return 'No skills selected; provide general review notes.';
-  const summaries = plan.selected.map(skill => summarizeSkill(skill));
+  const summaries = plan.selected.map((skill) => summarizeSkill(skill));
   const top = summaries.slice(0, 6);
   const body = top
     .map(
-      s =>
-        `- ${s.id}: ${s.name} [phase=${s.phase}, severity=${s.severity ?? 'unknown'}, modelHint=${s.modelHint}]`,
+      (s) =>
+        `- ${s.id}: ${s.name} [phase=${s.phase}, severity=${s.severity ?? 'unknown'}, modelHint=${s.modelHint}]`
     )
     .join('\n');
-  const truncated = summaries.length > top.length ? `\n...and ${summaries.length - top.length} more skills.` : '';
+  const truncated =
+    summaries.length > top.length ? `\n...and ${summaries.length - top.length} more skills.` : '';
   return `${body}${truncated}`;
 }
 
 function buildFileSummary(files = []) {
   if (!files.length) return 'No files changed';
-  return files.map(file => `- ${file.path} (hunks: ${file.hunks.length || 1})`).join('\n');
+  return files.map((file) => `- ${file.path} (hunks: ${file.hunks.length || 1})`).join('\n');
 }
 
 function buildProjectRulesSection(rulesText) {
@@ -80,7 +94,15 @@ function buildProjectRulesSection(rulesText) {
   return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
 }
 
-export function buildPrompt({ diffText, diffFiles, plan, phase, projectRules, maxChars = MAX_PROMPT_CHARS, config = defaultConfig }) {
+export function buildPrompt({
+  diffText,
+  diffFiles,
+  plan,
+  phase,
+  projectRules,
+  maxChars = MAX_PROMPT_CHARS,
+  config = defaultConfig,
+}) {
   const effectiveConfig = mergeConfig(defaultConfig, config ?? {});
   const reviewConfig = effectiveConfig.review ?? defaultConfig.review;
   const language = reviewConfig.language ?? defaultConfig.review.language;
@@ -131,7 +153,15 @@ export function parseLineComments(outputText) {
   return comments.length ? comments : null;
 }
 
-async function callOpenAI({ prompt, apiKey, model, endpoint, temperature, maxTokens, systemMessage }) {
+async function callOpenAI({
+  prompt,
+  apiKey,
+  model,
+  endpoint,
+  temperature,
+  maxTokens,
+  systemMessage,
+}) {
   const controller = AbortSignal.timeout(15000);
   const res = await fetch(endpoint, {
     method: 'POST',
@@ -162,13 +192,15 @@ async function callOpenAI({ prompt, apiKey, model, endpoint, temperature, maxTok
   return json.choices?.[0]?.message?.content?.trim() ?? '';
 }
 
-function buildFallbackComments(diff, plan) {
-  const skillNames = (plan?.selected ?? []).map(skill => skill.metadata?.name ?? skill.metadata?.id ?? skill.id);
-  const skillText = skillNames.length
-    ? `Matched skills: ${skillNames.join(', ')}`
-    : 'No matching skills; manual review recommended.';
+function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
+  const allSkills = plan?.selected ?? [];
+  // ヒューリスティック対応スキルは除外（ヒューリスティックで処理済み）
+  const skills = allSkills.filter((skill) => {
+    const skillId = skill.metadata?.id ?? skill.id;
+    return !HEURISTIC_SKILL_IDS.includes(skillId);
+  });
 
-  const firstFile = diff.files?.find(f => f?.path && f.path !== '/dev/null') ?? null;
+  const firstFile = diff.files?.find((f) => f?.path && f.path !== '/dev/null') ?? null;
   if (!firstFile) {
     return [
       {
@@ -190,30 +222,59 @@ function buildFallbackComments(diff, plan) {
     firstFile.addedLines?.[0] ||
     firstFile.hunks?.[0]?.newStart ||
     1; /* default to first added line or hunk start to keep pointers stable */
-  const hunkText = firstFile.hunks?.length ? `Changed around line ${firstFile.hunks[0].newStart}` : 'File changed';
-  return [
-    {
+
+  // Build specific reason message
+  const evidenceBase = llmSkipReason
+    ? `LLM: ${llmSkipReason}`
+    : 'ヒューリスティック検出パターンに該当なし';
+
+  // スキルがない場合は1件のコメントを生成
+  if (skills.length === 0) {
+    return [
+      {
+        file: firstFile.path,
+        line,
+        message: formatFindingMessage({
+          finding: 'マッチするスキルがなく自動指摘を生成できなかった',
+          evidence: evidenceBase,
+          impact: '重要なリスクを見落とす可能性がある',
+          fix: 'このファイル種別に対応するスキルを追加するか、手動レビューを実施する',
+          severity: 'warning',
+          confidence: 'low',
+        }),
+      },
+    ];
+  }
+
+  // スキル単位でコメントを生成
+  return skills.map((skill) => {
+    const skillId = skill.metadata?.id ?? skill.id;
+    const rawSkillName = skill.metadata?.name ?? skillId;
+    const skillName = sanitizeSkillName(rawSkillName);
+    return {
       file: firstFile.path,
       line,
+      skillId,
       message: formatFindingMessage({
-        finding: '自動レビューの指摘を生成できなかった',
-        evidence: hunkText,
-        impact: '重要なリスクを見落とす可能性がある',
-        fix: `手動レビューを行い、必要なら applyTo を調整する（${skillText}）`,
+        finding: `スキル「${skillName}」の観点で自動指摘を生成できなかった`,
+        evidence: evidenceBase,
+        impact: 'このスキルが検出する問題を見落とす可能性がある',
+        fix: `「${skillName}」の観点で手動レビューを実施する`,
         severity: 'warning',
         confidence: 'low',
       }),
-    },
-  ];
+    };
+  });
 }
 
 function normalizeHeuristicComments(rawComments) {
-  return rawComments.map(c => {
+  return rawComments.map((c) => {
     switch (c.kind) {
       case 'silent-catch':
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: 'catch で例外が握りつぶされる可能性がある',
             evidence: 'catch 内で return（ログ/再throwなし）',
@@ -227,6 +288,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: '挙動変更に対するテスト差分が見当たらない',
             evidence: 'コード差分あり・テスト差分なし',
@@ -240,6 +302,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: '秘密情報（トークン/キー）の直書きの可能性がある',
             evidence: 'トークン/キーらしい文字列が追加されている',
@@ -253,6 +316,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: 'pull_request_targetイベントは権限昇格のリスクがある',
             evidence: 'pull_request_targetトリガーが追加されている',
@@ -266,6 +330,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: '過剰な権限設定（write-all）が検出された',
             evidence: 'permissions: write-all が設定されている',
@@ -279,6 +344,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: 'runブロック内でsecretsを直接使用している',
             evidence: 'run: と secrets.* が同一行に存在',
@@ -292,6 +358,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
+          skillId: c.skillId,
           message: formatFindingMessage({
             finding: 'ユーザー入力がサニタイズされずに使用されている',
             evidence: 'github.event.*.title/body/name がrunブロックで直接使用',
@@ -389,9 +456,9 @@ export async function generateReview({
       debug.rawLlmOutput = output;
       const parsed = parseLineComments(output);
       if (parsed !== null) {
-        const redacted = parsed.map(c => ({ ...c, message: redactSecrets(c.message) }));
-        const checks = redacted.map(c => validateFindingMessage(c.message));
-        const invalidCount = checks.filter(c => !c.ok).length;
+        const redacted = parsed.map((c) => ({ ...c, message: redactSecrets(c.message) }));
+        const checks = redacted.map((c) => validateFindingMessage(c.message));
+        const invalidCount = checks.filter((c) => !c.ok).length;
         if (invalidCount === 0) {
           comments = redacted;
           debug.llmUsed = true;
@@ -419,20 +486,28 @@ export async function generateReview({
       comments = normalizeHeuristicComments(heuristic);
       debug.heuristicsCount = heuristic.length;
     } else {
-      comments = includeFallback ? buildFallbackComments(diff, plan) : [];
+      const llmSkipReason = debug.llmSkipped || debug.llmError || null;
+      // If skipped due to missing API key, do not generate fallback warnings (user request)
+      const isMissingKey = llmSkipReason && llmSkipReason.includes('not set');
+
+      if (isMissingKey) {
+        comments = [];
+      } else {
+        comments = includeFallback ? buildFallbackComments(diff, plan, { llmSkipReason }) : [];
+      }
       debug.heuristicsCount = 0;
       debug.fallbackIncluded = includeFallback;
     }
   }
 
-  const formatChecks = comments.map(c => ({
+  const formatChecks = comments.map((c) => ({
     file: c.file,
     line: c.line,
     ...validateFindingMessage(c.message),
   }));
-  const invalidCount = formatChecks.filter(c => !c.ok).length;
+  const invalidCount = formatChecks.filter((c) => !c.ok).length;
   debug.findingFormat = invalidCount
-    ? { ok: false, invalidCount, samples: formatChecks.filter(c => !c.ok).slice(0, 3) }
+    ? { ok: false, invalidCount, samples: formatChecks.filter((c) => !c.ok).slice(0, 3) }
     : { ok: true };
 
   return {

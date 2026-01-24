@@ -3,6 +3,7 @@ import { loadSkills } from './skill-loader.mjs';
 import { planSkills, summarizeSkill } from '../../src/lib/skill-planner.mjs';
 import { inferImpactTags } from '../../src/lib/impact-scope.mjs';
 import { normalizePlannerMode } from '../../src/lib/planner-utils.mjs';
+import { HEURISTIC_SKILL_IDS } from '../../src/lib/heuristic-review.mjs';
 
 const MODEL_PRIORITY = {
   cheap: 1,
@@ -77,11 +78,26 @@ export function selectSkills(skills, options) {
   const changedFiles = ensureArray(options.changedFiles);
   const availableContexts = ensureArray(options.availableContexts);
   const availableDependencies = options.availableDependencies ?? null;
+  const dryRun = options.dryRun ?? false;
+  const llmEnabled = options.llmEnabled ?? true;
   const selected = [];
   const skipped = [];
 
   for (const skill of skills) {
-    const result = evaluateSkill(skill.metadata ?? skill, {
+    const meta = skill.metadata ?? skill;
+    const skillId = meta.id;
+
+    // dry-run または LLM 無効時はヒューリスティック対応スキルのみ選択
+    const isLlmRestricted = dryRun || !llmEnabled;
+    if (isLlmRestricted && !HEURISTIC_SKILL_IDS.includes(skillId)) {
+      const reason = dryRun
+        ? 'dry-run: LLM必須スキル（ヒューリスティック未対応）'
+        : 'LLM disabled: LLM必須スキル（APIキー未設定）';
+      skipped.push({ skill, reasons: [reason] });
+      continue;
+    }
+
+    const result = evaluateSkill(meta, {
       phase: options.phase,
       changedFiles,
       availableContexts,
@@ -159,6 +175,8 @@ export async function buildExecutionPlan(options) {
     planner,
     plannerMode,
     diffText,
+    dryRun = false,
+    llmEnabled = true,
   } = options;
 
   const skills = providedSkills ?? (await loadSkills());
@@ -167,6 +185,8 @@ export async function buildExecutionPlan(options) {
     changedFiles,
     availableContexts,
     availableDependencies,
+    dryRun,
+    llmEnabled,
   });
   if (selection.selected.length === 0) {
     return { selected: [], skipped: selection.skipped };

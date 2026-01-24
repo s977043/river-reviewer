@@ -81,6 +81,8 @@ test('river run supports markdown output for PR comments', async () => {
     assert.match(result.stdout, /^<!-- river-reviewer -->/);
     assert.match(result.stdout, /## River Reviewer/);
     assert.match(result.stdout, /### 指摘/);
+    // Verify skill grouping header is present (skillId is sanitized, so hyphens are escaped)
+    assert.match(result.stdout, /#### 🔍 rr\\-midstream\\-logging\\-observability\\-001/);
     assert.doesNotMatch(result.stdout, /--- diff preview ---/);
     assert.match(result.stderr, /River Reviewer \(local\)/);
   } finally {

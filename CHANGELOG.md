@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.8.0](https://github.com/s977043/river-reviewer/compare/v0.7.1...v0.8.0) (2026-01-10)
+
+
+### Features
+
+* **dry-run:** ヒューリスティック対応スキルのみ dry-run で実行 ([3f23b9b](https://github.com/s977043/river-reviewer/commit/3f23b9b9fc191dce312e83adf977055366c3943d))
+* **output:** スキル単位で指摘をグループ化 ([560493c](https://github.com/s977043/river-reviewer/commit/560493c22eec689deb2b37117d711c3ac5868b7e))
+* **skills:** add skills audit script and report ([7ac29b4](https://github.com/s977043/river-reviewer/commit/7ac29b4975059ab63c1e323e8bd21bd955eab3db)), closes [#309](https://github.com/s977043/river-reviewer/issues/309)
+
+
+### Bug Fixes
+
+* **lint:** add language to fenced code blocks ([3bcaa21](https://github.com/s977043/river-reviewer/commit/3bcaa212b137416b728b3ab685d1fc3ece6ddcbb))
+* Markdown インジェクション対策と出力順序の安定化 ([39d0fff](https://github.com/s977043/river-reviewer/commit/39d0fff91d5cadb8f2d49f54ed09e17ce919cecf))
+
+## [0.7.1](https://github.com/s977043/river-reviewer/compare/v0.7.0...v0.7.1) (2026-01-07)
+
+
+### Bug Fixes
+
+* **ci:** ignore CHANGELOG.md in lint ([697417b](https://github.com/s977043/river-reviewer/commit/697417bc66a8d4c2fefda90bf235bf31316b2b19))
+
+
+### Performance Improvements
+
+* **ci:** optimize workflow execution ([10c2bad](https://github.com/s977043/river-reviewer/commit/10c2bad04fdad12957c462a1e54d4f9e887ca300))
+
+## [0.7.0](https://github.com/s977043/river-reviewer/compare/v0.6.1...v0.7.0) (2026-01-05)
+
+
+### Features
+
+* add config file review skill and improve fallback messages ([102dab0](https://github.com/s977043/river-reviewer/commit/102dab03da191b8157d37a8323ea9b953f44f031))
+
+
+### Bug Fixes
+
+* format CHANGELOG.md to pass prettier checks ([889123d](https://github.com/s977043/river-reviewer/commit/889123d04211ab0c2e299abfb01bcaeb693bb29b))
+* improve markdown output format for review findings ([78f0847](https://github.com/s977043/river-reviewer/commit/78f08471d8d536f378e04cb6cebc7e1fd9894f57))
+* remove trim() to preserve leading newline in markdown output ([b1b0abe](https://github.com/s977043/river-reviewer/commit/b1b0abeb0e066fadc332484587aeaa0f3af7e01c))
+* update broken links and navigation title in skills.en.md ([af209bb](https://github.com/s977043/river-reviewer/commit/af209bbbbc3f65cf0a1a7989947557ad077d1ed3))
+* update broken links to moved skills.md ([2cadbc1](https://github.com/s977043/river-reviewer/commit/2cadbc1024c52121ca1878f34ed77e926d39b154))
+* update skill template link to pages/reference path ([5080e95](https://github.com/s977043/river-reviewer/commit/5080e9542260ac5bbc6b0bc3d92b5e568f31a7cf))
+
 ## [0.6.1](https://github.com/s977043/river-reviewer/compare/v0.6.0...v0.6.1) (2026-01-05)
 
 ### Bug Fixes

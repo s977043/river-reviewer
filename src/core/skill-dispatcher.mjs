@@ -4,6 +4,7 @@ import { loadConfig } from '../config/loader.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs'; // Added
 import { AIClientFactory } from '../ai/factory.mjs';
 import { buildSystemPrompt } from '../prompts/buildSystemPrompt.mjs';
+import { isLlmEnabled } from '../lib/utils.mjs';
 
 const MODEL_HINT_TO_NAME = {
   cheap: 'gpt-4o-mini',
@@ -32,6 +33,7 @@ export class SkillDispatcher {
     const config = await loadConfig(this.repoRoot);
     const results = [];
     const language = config.review?.language || 'en';
+    const llmEnabled = isLlmEnabled();
 
     let skills = (config.skills || []).map(skill => ({
       ...skill,
@@ -108,6 +110,15 @@ export class SkillDispatcher {
                file,
                skill: skill.name,
                review: `(dry-run) Skipped LLM call for skill: ${skill.name}`,
+             };
+          }
+
+          if (!llmEnabled) {
+             console.log(`  -> Skipped (no API key) skill "${skill.name}"...`);
+             return {
+               file,
+               skill: skill.name,
+               review: `(skipped) LLM API key not set for skill: ${skill.name}`,
              };
           }
 

@@ -1,0 +1,79 @@
+---
+# Required: ディレクトリ名と一致させる（kebab-case）
+name: river-reviewer-<domain>
+# Required: 何をする/いつ使う + キーワード（検索用）
+description: |
+  <このスキルが対象とするレビュー観点を1-2文で説明>
+  キーワード: <関連する用語をカンマ区切りで列挙>
+# Optional: ライセンス情報
+# license: MIT
+# Optional: 互換性情報（プロジェクトに応じて適宜設定）
+# compatibility:
+#   runtime: ">=1.0.0"  # スキルが動作する最小バージョン
+#   agents: ["copilot", "claude", "codex"]  # 対応エージェント（例）
+# Optional: メタデータ（カスタムフィールド）
+# ※ phase は River Reviewer 固有の分類です。他プロジェクトでは適宜変更してください。
+# metadata:
+#   phase: upstream | midstream | downstream  # River Reviewer 固有
+#   severity: info | minor | major | critical
+---
+
+# <スキル名>
+
+## Goal / 目的
+
+- このスキルで "何を減らす/防ぐ/促す" のかを 1〜2 行で書く
+- 1スキル=1テーマに絞り、目的が混ざらないようにする
+
+## When to Use / いつ使うか
+
+- このスキルが選択されるべき条件を明確に記述
+- 例: 「セキュリティ関連のコード変更を含む PR」
+
+## Non-goals / 扱わないこと
+
+- このスキルが扱わない領域を明記
+- 他の専門スキルへの導線を示す
+
+## Core Rules / 基本ルール
+
+1. **ルール1の見出し**: 具体的な指示（短く）
+2. **ルール2の見出し**: 具体的な指示（短く）
+3. **ルール3の見出し**: 具体的な指示（短く）
+
+> [!TIP]
+> 詳細なチェックリストは `references/CHECKLIST.md` を参照
+
+## Output Format / 出力形式
+
+```text
+<file>:<line>: <message>
+```
+
+- **Finding**: 何が問題か（1文）
+- **Impact**: 何が困るか（短く）
+- **Fix**: 次の一手（最小の修正案）
+
+例: `src/foo.ts:42: <問題の説明>。<影響の説明>。Fix: <修正案>`
+
+## False-positive Guards / 誤検知を防ぐ
+
+- こういうケースでは指摘しない、という条件を列挙
+- テストコード、生成コード、サンプルコードなどの除外条件
+
+## Human Handoff / 人間に返す条件
+
+- 仕様や意図が不明確で解釈が分かれる場合
+- 影響範囲が広い設計判断やトレードオフ
+
+---
+
+## References
+
+- [CHECKLIST.md](./references/CHECKLIST.md): 詳細チェックリスト
+- [EXAMPLES.md](./references/EXAMPLES.md): Good/Bad 例
+
+<!-- 
+行数目安: このファイルは 100行以下を目標に。
+詳細は references/ に分離する。
+-->
