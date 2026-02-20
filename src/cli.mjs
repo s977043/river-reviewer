@@ -27,10 +27,22 @@ function printHelp() {
   console.log(`Usage: river <command> <path> [options]
 
 Commands:
-  run <path>     Run River Reviewer locally against the git repo at <path>
-  skills <path>  Run the new Skill-based Reviewer architecture
-  doctor <path>  Check setup and print hints for common issues
-  eval           Run review fixtures evaluation (must_include checks)
+  run <path>            Run River Reviewer locally against the git repo at <path>
+  skills <path>         Run the new Skill-based Reviewer architecture
+  skills import         Import Agent Skills (SKILL.md) into River Reviewer
+  skills export         Export River Reviewer skills to Agent Skills format
+  skills list           List all skills (RR and Agent Skills)
+  doctor <path>         Check setup and print hints for common issues
+  eval                  Run review fixtures evaluation (must_include checks)
+
+Skills Subcommand Options:
+  --from <path>         (import) Source directory to scan for SKILL.md files
+  --to <path>           (import/export) Destination directory
+  --strict              (import) Require full RR schema compliance (default)
+  --loose               (import) Accept minimal name/description, auto-fill missing fields
+  --source <type>       (list) Filter: rr|agent|all (default: all)
+  --include-assets      (export) Copy references/ scripts/ prompt/ alongside SKILL.md
+  --dry-run             (import) Validate without writing files
 
 Options:
   --phase <phase>   Review phase (upstream|midstream|downstream). Default: env RIVER_PHASE or midstream
@@ -50,6 +62,7 @@ Options:
 
 function parseArgs(argv) {
   const args = [...argv];
+  const SKILLS_SUBCOMMANDS = new Set(['import', 'export', 'list']);
   const parsed = {
     command: null,
     target: '.',
@@ -64,13 +77,23 @@ function parseArgs(argv) {
     output: 'text',
     availableContexts: null,
     availableDependencies: null,
+    // skills subcommand fields
+    skillsSubcommand: null,
+    fromPath: null,
+    toPath: null,
+    validationMode: 'strict',
+    listSource: 'all',
+    includeAssets: false,
   };
 
   while (args.length) {
     const arg = args.shift();
     if (!parsed.command && (arg === 'run' || arg === 'doctor' || arg === 'skills')) {
       parsed.command = arg;
-      if (args[0] && !args[0].startsWith('-')) {
+      // Check for skills subcommands (import/export/list)
+      if (arg === 'skills' && args[0] && SKILLS_SUBCOMMANDS.has(args[0])) {
+        parsed.skillsSubcommand = args.shift();
+      } else if (args[0] && !args[0].startsWith('-')) {
         parsed.target = args.shift();
       }
       continue;
@@ -156,6 +179,37 @@ function parseArgs(argv) {
     }
     if (arg === '--dependency') {
       parsed.availableDependencies = parseList(args.shift());
+      continue;
+    }
+    // Skills subcommand options
+    if (arg === '--from') {
+      parsed.fromPath = args.shift() ?? null;
+      continue;
+    }
+    if (arg === '--to') {
+      parsed.toPath = args.shift() ?? null;
+      continue;
+    }
+    if (arg === '--strict') {
+      parsed.validationMode = 'strict';
+      continue;
+    }
+    if (arg === '--loose') {
+      parsed.validationMode = 'loose';
+      continue;
+    }
+    if (arg === '--source') {
+      const value = args.shift();
+      if (!value || !['rr', 'agent', 'all'].includes(value)) {
+        console.error(`Error: --source must be one of: rr, agent, all (got "${value}").`);
+        parsed.command = 'help';
+        break;
+      }
+      parsed.listSource = value;
+      continue;
+    }
+    if (arg === '--include-assets') {
+      parsed.includeAssets = true;
       continue;
     }
     if (arg === '-h' || arg === '--help') {
@@ -403,6 +457,12 @@ async function main() {
   const targetPath = path.resolve(parsed.target);
 
   try {
+    // Skills subcommands (import/export/list) – no git repo required
+    if (parsed.command === 'skills' && parsed.skillsSubcommand) {
+      const { runSkillsSubcommand } = await import('./lib/agent-skill-bridge.mjs');
+      return runSkillsSubcommand(parsed);
+    }
+
     if (parsed.command === 'skills') {
       const repoRoot = await ensureGitRepo(targetPath);
       const defaultBranch = await detectDefaultBranch(repoRoot);
