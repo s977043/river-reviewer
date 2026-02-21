@@ -67,16 +67,19 @@ export class AgentSkillBridgeError extends Error {
 // Discovery
 // ---------------------------------------------------------------------------
 
-async function dirExists(dirPath) {
+async function dirExists(dirPath, { followSymlinks = true } = {}) {
   try {
-    const stat = await fs.stat(dirPath);
+    const stat = followSymlinks ? await fs.stat(dirPath) : await fs.lstat(dirPath);
     return stat.isDirectory();
   } catch {
     return false;
   }
 }
 
-async function listSkillPackages(dirPath) {
+const MAX_SCAN_DEPTH = 10;
+
+async function listSkillPackages(dirPath, depth = 0) {
+  if (depth > MAX_SCAN_DEPTH) return [];
   let entries;
   try {
     entries = await fs.readdir(dirPath, { withFileTypes: true });
@@ -94,7 +97,7 @@ async function listSkillPackages(dirPath) {
       } catch {
         /* not a skill package – check nested */
       }
-      return listSkillPackages(entryPath);
+      return listSkillPackages(entryPath, depth + 1);
     }),
   );
   return groups.flat().sort();
@@ -421,9 +424,9 @@ export async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
     const sourceDir = path.dirname(skill.path);
     for (const assetDir of ASSET_DIRS) {
       const src = path.join(sourceDir, assetDir);
-      if (await dirExists(src)) {
+      if (await dirExists(src, { followSymlinks: false })) {
         const dest = assertSafePath(skillDir, assetDir, 'Asset directory');
-        await fs.cp(src, dest, { recursive: true });
+        await fs.cp(src, dest, { recursive: true, dereference: false });
       }
     }
   }
