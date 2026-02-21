@@ -326,7 +326,7 @@ function assertSafePath(base, child, label) {
 }
 
 async function writeImportedSkill(skill, destDir) {
-  const dirName = skill.metadata.id;
+  const dirName = sanitizeSkillId(skill.metadata.id);
   const skillDir = assertSafePath(destDir, dirName, 'Skill id');
   await fs.mkdir(skillDir, { recursive: true });
 
@@ -452,10 +452,12 @@ export async function exportAllSkills(projectRoot, options = {}) {
 export async function listAllSkills(projectRoot, options = {}) {
   const { source = 'all' } = options;
   const skills = [];
+  const seenIds = new Set();
 
   if (source === 'rr' || source === 'all') {
     const rrSkills = await loadSkills({ skillsDir: path.join(projectRoot, 'skills'), excludedTags: [] });
     for (const s of rrSkills) {
+      seenIds.add(s.metadata.id);
       skills.push({
         id: s.metadata.id,
         name: s.metadata.name,
@@ -471,8 +473,12 @@ export async function listAllSkills(projectRoot, options = {}) {
       try {
         const parsed = await parseAgentSkill(skillPath);
         const dirName = path.basename(path.dirname(skillPath));
+        const id = sanitizeSkillId(parsed.metadata.id || `as-${dirName}`);
+        // Skip duplicates already loaded as RR skills (imported skills)
+        if (seenIds.has(id)) continue;
+        seenIds.add(id);
         skills.push({
-          id: parsed.metadata.id || `as-${dirName}`,
+          id,
           name: parsed.metadata.name || dirName,
           source: 'agent',
           path: path.relative(projectRoot, skillPath),

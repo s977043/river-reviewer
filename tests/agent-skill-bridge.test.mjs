@@ -381,6 +381,62 @@ Body
   });
 });
 
+// ---------------------------------------------------------------------------
+// importAgentSkills – error handling
+// ---------------------------------------------------------------------------
+
+test('importAgentSkills records malformed SKILL.md in errors and continues', async () => {
+  await withTempDir(async (tmpDir) => {
+    // One valid skill
+    const goodDir = path.join(tmpDir, '.agents', 'skills', 'good-skill');
+    await mkdir(goodDir, { recursive: true });
+    await writeFile(
+      path.join(goodDir, 'SKILL.md'),
+      '---\nname: good-skill\ndescription: A valid skill\n---\nBody\n',
+    );
+    // One malformed skill (no frontmatter)
+    const badDir = path.join(tmpDir, '.agents', 'skills', 'bad-skill');
+    await mkdir(badDir, { recursive: true });
+    await writeFile(path.join(badDir, 'SKILL.md'), 'No frontmatter at all');
+
+    const result = await importAgentSkills(tmpDir, {
+      strict: false,
+      outputDir: path.join(tmpDir, 'out'),
+    });
+    assert.equal(result.errors.length, 1, `Expected 1 error, got: ${JSON.stringify(result.errors)}`);
+    assert.equal(result.imported.length, 1, `Expected 1 imported, got: ${result.imported.length}`);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listAllSkills – deduplication
+// ---------------------------------------------------------------------------
+
+test('listAllSkills --source all deduplicates imported agent skills', async () => {
+  await withTempDir(async (tmpDir) => {
+    // Create a skill in both agent-skills discovery path AND rr skills dir
+    const agentDir = path.join(tmpDir, '.agents', 'skills', 'dup-skill');
+    await mkdir(agentDir, { recursive: true });
+    await writeFile(
+      path.join(agentDir, 'SKILL.md'),
+      '---\nname: dup-skill\ndescription: Duplicate skill\nid: as-dup-skill\n---\nBody\n',
+    );
+
+    // Also import it into skills/ (simulating an already-imported state)
+    const rrDir = path.join(tmpDir, 'skills', 'agent-skills', 'as-dup-skill');
+    await mkdir(rrDir, { recursive: true });
+    await writeFile(
+      path.join(rrDir, 'SKILL.md'),
+      '---\nid: as-dup-skill\nname: dup-skill\ndescription: Duplicate skill\ncategory: core\nphase:\n  - upstream\n  - midstream\n  - downstream\napplyTo:\n  - "**/*"\nmetadata:\n  source: agent\n---\nBody\n',
+    );
+
+    const result = await listAllSkills(tmpDir, { source: 'all' });
+    const dupEntries = result.skills.filter((s) => s.id === 'as-dup-skill');
+    assert.equal(dupEntries.length, 1, `Expected 1 entry for as-dup-skill, got ${dupEntries.length}`);
+    assert.equal(dupEntries[0].source, 'rr', 'RR source should take precedence');
+  });
+});
+
 test('exportSkillToAgentFormat sanitizes directory name', async () => {
   await withTempDir(async (tmpDir) => {
     const skill = {
