@@ -117,7 +117,7 @@ description: Has its own id
 id: my-custom-id
 ---
 Body content
-`,
+`
     );
     const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
     const converted = convertAgentSkillToRR(parsed);
@@ -140,7 +140,7 @@ name: test-skill
 description: Test skill
 ---
 Body
-`,
+`
     );
 
     const paths = await discoverAgentSkillPaths(tmpDir);
@@ -370,7 +370,7 @@ description: Skill with malicious id
 id: "../../../etc/passwd"
 ---
 Body
-`,
+`
     );
     const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
     const converted = convertAgentSkillToRR(parsed);
@@ -400,5 +400,34 @@ test('exportSkillToAgentFormat sanitizes directory name', async () => {
     // Directory should not contain shell metacharacters
     assert.ok(!result.path.includes('$('));
     assert.ok(result.path.includes('safewhoami'));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Explicit ID collision deduplication
+// ---------------------------------------------------------------------------
+
+test('convertAgentSkillToRR deduplicates colliding explicit ids', async () => {
+  await withTempDir(async (tmpDir) => {
+    // Create two skills with the same explicit id
+    for (const name of ['skill-a', 'skill-b']) {
+      const dir = path.join(tmpDir, name);
+      await mkdir(dir, { recursive: true });
+      await writeFile(
+        path.join(dir, 'SKILL.md'),
+        `---\nname: ${name}\ndescription: Duplicate id test\nid: shared-id\n---\nBody of ${name}\n`
+      );
+    }
+
+    const existingIds = new Set();
+    const parsedA = await parseAgentSkill(path.join(tmpDir, 'skill-a', 'SKILL.md'));
+    const convertedA = convertAgentSkillToRR(parsedA, existingIds);
+    existingIds.add(convertedA.metadata.id);
+
+    const parsedB = await parseAgentSkill(path.join(tmpDir, 'skill-b', 'SKILL.md'));
+    const convertedB = convertAgentSkillToRR(parsedB, existingIds);
+
+    assert.equal(convertedA.metadata.id, 'shared-id');
+    assert.equal(convertedB.metadata.id, 'shared-id-2');
   });
 });

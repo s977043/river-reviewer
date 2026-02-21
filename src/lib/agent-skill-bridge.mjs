@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
-import matter from 'gray-matter';
+
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import {
@@ -95,14 +95,14 @@ async function listSkillPackages(dirPath) {
         /* not a skill package – check nested */
       }
       return listSkillPackages(entryPath);
-    }),
+    })
   );
   return groups.flat().sort();
 }
 
 export async function discoverAgentSkillPaths(projectRoot, fromPath) {
   if (fromPath) {
-    const resolved = path.resolve(fromPath);
+    const resolved = path.resolve(projectRoot, fromPath);
     if (!(await dirExists(resolved))) return [];
     // fromPath might itself contain SKILL.md packages
     return listSkillPackages(resolved);
@@ -166,11 +166,18 @@ export function convertAgentSkillToRR(parsed, existingIds = new Set()) {
 
   const meta = { ...rawMeta };
 
-  // ID generation / sanitization
+  // ID generation / sanitization / collision handling
   if (!meta.id) {
     meta.id = generateAgentSkillId(dirName, existingIds);
   } else {
     meta.id = sanitizeSkillId(meta.id);
+    // Deduplicate explicit IDs that collide with already-seen IDs
+    if (existingIds.has(meta.id)) {
+      const base = meta.id;
+      let n = 2;
+      while (existingIds.has(`${base}-${n}`)) n++;
+      meta.id = `${base}-${n}`;
+    }
   }
 
   // Category default
@@ -234,7 +241,9 @@ function validateMeta(metadata, validate) {
   const copy = JSON.parse(JSON.stringify(metadata));
   const ok = validate(copy);
   if (!ok) {
-    const details = (validate.errors ?? []).map((e) => `${e.instancePath || '/'} ${e.message}`).join('; ');
+    const details = (validate.errors ?? [])
+      .map((e) => `${e.instancePath || '/'} ${e.message}`)
+      .join('; ');
     return { ok: false, error: details, ajvErrors: validate.errors };
   }
   return { ok: true };
@@ -296,7 +305,9 @@ export async function importAgentSkills(projectRoot, options = {}) {
           autoFilled.push('applyTo');
         }
         if (autoFilled.length) {
-          warnings.push(`${path.relative(projectRoot, skillPath)}: auto-filled [${autoFilled.join(', ')}]`);
+          warnings.push(
+            `${path.relative(projectRoot, skillPath)}: auto-filled [${autoFilled.join(', ')}]`
+          );
         }
       }
 
@@ -425,7 +436,10 @@ export async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
 export async function exportAllSkills(projectRoot, options = {}) {
   const { outputDir, includeAssets = false } = options;
   const dest = outputDir ?? path.join(projectRoot, '.agents', 'skills');
-  const skills = await loadSkills({ skillsDir: path.join(projectRoot, 'skills'), excludedTags: [] });
+  const skills = await loadSkills({
+    skillsDir: path.join(projectRoot, 'skills'),
+    excludedTags: [],
+  });
 
   const exported = [];
   const errors = [];
@@ -454,7 +468,10 @@ export async function listAllSkills(projectRoot, options = {}) {
   const skills = [];
 
   if (source === 'rr' || source === 'all') {
-    const rrSkills = await loadSkills({ skillsDir: path.join(projectRoot, 'skills'), excludedTags: [] });
+    const rrSkills = await loadSkills({
+      skillsDir: path.join(projectRoot, 'skills'),
+      excludedTags: [],
+    });
     for (const s of rrSkills) {
       skills.push({
         id: s.metadata.id,
@@ -509,7 +526,7 @@ export async function runSkillsSubcommand(parsed) {
       for (const e of result.errors) console.error(`❌ ${e.path}: ${e.message}`);
     }
     console.log(
-      `Import complete: ${result.imported.length} imported, ${result.errors.length} failed, ${result.warnings.length} warnings.`,
+      `Import complete: ${result.imported.length} imported, ${result.errors.length} failed, ${result.warnings.length} warnings.`
     );
     return result.errors.length ? 1 : 0;
   }
@@ -523,7 +540,9 @@ export async function runSkillsSubcommand(parsed) {
     if (result.errors.length) {
       for (const e of result.errors) console.error(`❌ ${e.id}: ${e.message}`);
     }
-    console.log(`Export complete: ${result.exported.length} exported, ${result.errors.length} failed.`);
+    console.log(
+      `Export complete: ${result.exported.length} exported, ${result.errors.length} failed.`
+    );
     return result.errors.length ? 1 : 0;
   }
 
@@ -543,7 +562,9 @@ export async function runSkillsSubcommand(parsed) {
     console.log(`${'ID'.padEnd(idW)}  ${'NAME'.padEnd(nameW)}  ${'SOURCE'.padEnd(srcW)}  PATH`);
     console.log(`${'-'.repeat(idW)}  ${'-'.repeat(nameW)}  ${'-'.repeat(srcW)}  ----`);
     for (const s of result.skills) {
-      console.log(`${s.id.padEnd(idW)}  ${s.name.padEnd(nameW)}  ${s.source.padEnd(srcW)}  ${s.path}`);
+      console.log(
+        `${s.id.padEnd(idW)}  ${s.name.padEnd(nameW)}  ${s.source.padEnd(srcW)}  ${s.path}`
+      );
     }
     console.log(`\nTotal: ${result.skills.length} skills`);
     return 0;
