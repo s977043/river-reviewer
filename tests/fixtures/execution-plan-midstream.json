@@ -22,6 +22,13 @@
       "dependencies": ["tracing", "code_search"]
     },
     {
+      "id": "rr-midstream-review-automation-boundary-001",
+      "phase": "midstream",
+      "modelHint": "balanced",
+      "outputKind": ["findings", "actions", "metrics"],
+      "dependencies": []
+    },
+    {
       "id": "rr-midstream-gh-address-comments-001",
       "phase": "midstream",
       "modelHint": "high-accuracy",
