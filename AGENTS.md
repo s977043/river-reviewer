@@ -112,6 +112,7 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 - コミット前に: `npm test`, `npm run lint`, 変更に応じて `agents:validate` / `skills:validate`
 - PR本文に: 目的 / 変更内容 / 影響範囲 / 実行コマンドと結果を記載
 - **PR 作成の手順**:
+
   ```bash
   # 1. ブランチ作成
   git checkout -b <type>/<description>
@@ -119,7 +120,7 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
   git add .
   git commit -m "<type>: <description>"
   # 3. リモートへプッシュ
-  git push origin <branch-name>
+  git push -u origin <type>/<description>
   # 4. PR作成 (GitHub CLI推奨)
   gh pr create --title "<type>: <description>" --body "Pull request body content"
   ```
@@ -222,8 +223,6 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 - 受入条件とリポジトリポリシーを確認し、短い計画を示してから着手する。
 - タスク単位でブランチを作成し、PR に目的と関連 Issue を明記する。
 - PR 前に `npm test` と `npm run lint` を実行（必要に応じて `npm run agents:validate` / `npm run skills:validate`）。
-- PR 本文で Gemini / Codex へのレビュー依頼を行い、セルフレビューで残タスクがないことを確認する。
-
 - PR 本文で Gemini / Codex へのレビュー依頼を行い、セルフレビューで残タスクがないことを確認する。
 
 ---
