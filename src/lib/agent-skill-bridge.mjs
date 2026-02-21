@@ -58,7 +58,7 @@ export class AgentSkillBridgeError extends Error {
 // Description quality validation
 // ---------------------------------------------------------------------------
 
-const VAGUE_PATTERNS = [/^.{0,15}$/, /^(this skill |a skill |skill that )/i];
+const VAGUE_PATTERNS = [/^(this skill |a skill |skill that )/i];
 const GENERIC_PHRASES = [
   'support the project',
   'help with development',
@@ -67,7 +67,7 @@ const GENERIC_PHRASES = [
   'general purpose',
   'various tasks',
 ];
-const TRIGGER_KEYWORDS = /\b(when|if|during|after|before|on |for |upon)\b/i;
+const TRIGGER_KEYWORDS = /\b(when|if|during|after|before|on|for|upon)\b/i;
 
 export function validateDescriptionQuality(description) {
   const issues = [];
@@ -489,6 +489,11 @@ export async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
   }
   // Critical rule: folder names must be kebab-case
   const dirName = toKebabCase(rawName);
+  if (!dirName) {
+    throw new AgentSkillBridgeError(
+      `Skill id or name "${rawName}" is not valid for directory creation after kebab-case normalization`
+    );
+  }
   const skillDir = assertSafePath(outputDir, dirName, 'Skill id');
   await fs.mkdir(skillDir, { recursive: true });
 
@@ -660,8 +665,9 @@ export async function runSkillsSubcommand(parsed) {
       const quality = validateDescriptionQuality(desc);
       const flag = quality.ok ? '' : ' (!)';
       if (!quality.ok) descWarnings++;
+      const maxTextLen = descW - flag.length;
       const descDisplay =
-        (desc.length > descW - 4 ? desc.slice(0, descW - 4) + '...' : desc) + flag;
+        (desc.length > maxTextLen ? desc.slice(0, maxTextLen - 3) + '...' : desc) + flag;
       console.log(
         `${s.id.padEnd(idW)}  ${s.name.padEnd(nameW)}  ${s.source.padEnd(srcW)}  ${descDisplay.padEnd(descW)}  ${s.path}`
       );

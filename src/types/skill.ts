@@ -100,6 +100,3 @@ export interface DescriptionQualityResult {
   ok: boolean;
   issues: Array<{ type: DescriptionIssue; message: string }>;
 }
-
-// Import conflict resolution strategy
-export type ConflictResolution = 'last-wins' | 'first-wins' | 'error';

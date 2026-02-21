@@ -406,6 +406,26 @@ test('export converts camelCase id to kebab-case directory', async () => {
   });
 });
 
+test('export throws when kebab-case produces empty directory name', async () => {
+  await withTempDir(async (tmpDir) => {
+    const skill = {
+      metadata: {
+        id: '!!!',
+        name: '---',
+        description: 'Invalid chars only',
+        category: 'midstream',
+        phase: 'midstream',
+        applyTo: ['**/*.js'],
+      },
+      body: '# Test',
+      path: '/tmp/fake.md',
+    };
+    await assert.rejects(() => exportSkillToAgentFormat(skill, tmpDir), {
+      name: 'AgentSkillBridgeError',
+    });
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Import includes description quality warnings
 // ---------------------------------------------------------------------------
