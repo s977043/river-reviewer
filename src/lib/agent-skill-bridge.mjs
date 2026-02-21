@@ -160,7 +160,7 @@ function extractExtraMetadata(metadata) {
   return Object.keys(extra).length ? extra : undefined;
 }
 
-export function convertAgentSkillToRR(parsed, existingIds = new Set()) {
+export function convertAgentSkillToRR(parsed, existingIds = new Set(), projectRoot) {
   const { metadata: rawMeta, body, dirPath } = parsed;
   const dirName = path.basename(dirPath);
 
@@ -198,7 +198,7 @@ export function convertAgentSkillToRR(parsed, existingIds = new Set()) {
     ...(meta.metadata ?? {}),
     ...(extra ?? {}),
     source: 'agent',
-    originPath: dirPath,
+    originPath: projectRoot ? path.relative(projectRoot, dirPath) : dirPath,
   };
 
   // Remove extra fields from top level (they're now in metadata)
@@ -276,7 +276,16 @@ export async function importAgentSkills(projectRoot, options = {}) {
         continue;
       }
 
-      const converted = convertAgentSkillToRR(parsed, existingIds);
+      const converted = convertAgentSkillToRR(parsed, existingIds, projectRoot);
+
+      // Detect duplicate explicit ids within the same import batch
+      if (existingIds.has(converted.metadata.id)) {
+        errors.push({
+          path: skillPath,
+          message: `Duplicate skill id "${converted.metadata.id}" – already imported in this batch`,
+        });
+        continue;
+      }
       existingIds.add(converted.metadata.id);
 
       if (strict) {
@@ -413,7 +422,7 @@ export async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
     for (const assetDir of ASSET_DIRS) {
       const src = path.join(sourceDir, assetDir);
       if (await dirExists(src)) {
-        const dest = path.join(skillDir, assetDir);
+        const dest = assertSafePath(skillDir, assetDir, 'Asset directory');
         await fs.cp(src, dest, { recursive: true });
       }
     }
@@ -483,8 +492,10 @@ export async function listAllSkills(projectRoot, options = {}) {
           source: 'agent',
           path: path.relative(projectRoot, skillPath),
         });
-      } catch {
-        // Skip unparseable agent skills in listing
+      } catch (err) {
+        process.stderr.write(
+          `⚠️  Skipping unparseable agent skill: ${path.relative(projectRoot, skillPath)}: ${err.message ?? err}\n`,
+        );
       }
     }
   }
