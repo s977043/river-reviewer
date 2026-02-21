@@ -6,12 +6,14 @@ import test from 'node:test';
 import {
   discoverAgentSkillPaths,
   parseAgentSkill,
+  parseAgentSkillMeta,
   generateAgentSkillId,
   convertAgentSkillToRR,
   importAgentSkills,
   serializeToSkillMd,
   exportSkillToAgentFormat,
   listAllSkills,
+  validateDescriptionQuality,
   sanitizeSkillId,
 } from '../src/lib/agent-skill-bridge.mjs';
 import { parseFrontMatter, defaultPaths } from '../runners/core/skill-loader.mjs';
@@ -294,12 +296,12 @@ test('round-trip: export then re-import preserves name, description, body', asyn
       path: '/tmp/roundtrip.md',
     };
 
-    // Export
+    // Export (dirName is kebab-cased from id)
     const exportDir = path.join(tmpDir, 'exported');
-    await exportSkillToAgentFormat(original, exportDir);
+    const result = await exportSkillToAgentFormat(original, exportDir);
 
-    // Re-import
-    const reimported = await parseAgentSkill(path.join(exportDir, 'rr-roundtrip-001', 'SKILL.md'));
+    // Re-import using the actual dirName returned
+    const reimported = await parseAgentSkill(result.path);
 
     assert.equal(reimported.metadata.name, original.metadata.name);
     assert.equal(reimported.metadata.description, original.metadata.description);
@@ -317,6 +319,145 @@ test('listAllSkills returns RR skills with source=rr', async () => {
   for (const s of result.skills) {
     assert.equal(s.source, 'rr');
   }
+});
+
+// ---------------------------------------------------------------------------
+// validateDescriptionQuality
+// ---------------------------------------------------------------------------
+
+test('good description passes quality check', () => {
+  const result = validateDescriptionQuality(
+    'Review TypeScript files for unused imports when PR contains .ts changes'
+  );
+  assert.equal(result.ok, true);
+  assert.equal(result.issues.length, 0);
+});
+
+test('too-short description is flagged', () => {
+  const result = validateDescriptionQuality('short');
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((i) => i.type === 'too_short'));
+});
+
+test('generic description is flagged', () => {
+  const result = validateDescriptionQuality(
+    'This tool helps with development and assist with tasks'
+  );
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((i) => i.type === 'too_generic'));
+});
+
+test('missing trigger context is flagged', () => {
+  const result = validateDescriptionQuality(
+    'Checks code quality and naming conventions in the project'
+  );
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((i) => i.type === 'no_trigger_context'));
+});
+
+test('null/undefined description returns too_short', () => {
+  assert.equal(validateDescriptionQuality(null).ok, false);
+  assert.equal(validateDescriptionQuality(undefined).ok, false);
+});
+
+// ---------------------------------------------------------------------------
+// parseAgentSkillMeta (progressive disclosure)
+// ---------------------------------------------------------------------------
+
+test('parseAgentSkillMeta returns summary without body', async () => {
+  const skillPath = path.join(fixturesDir, 'rich-skill', 'SKILL.md');
+  const summary = await parseAgentSkillMeta(skillPath);
+
+  assert.equal(summary.name, 'rich-skill');
+  assert.equal(summary.description, 'A rich agent skill with extra metadata');
+  assert.equal(summary.source, 'agent');
+  assert.ok(summary.originPath.endsWith('rich-skill'));
+  // Should not have body or assets properties
+  assert.equal(summary.body, undefined);
+  assert.equal(summary.assets, undefined);
+});
+
+test('parseAgentSkillMeta generates id from dir name', async () => {
+  const skillPath = path.join(fixturesDir, 'minimal-skill', 'SKILL.md');
+  const summary = await parseAgentSkillMeta(skillPath);
+  assert.equal(summary.id, 'as-minimal-skill');
+});
+
+// ---------------------------------------------------------------------------
+// Export kebab-case enforcement
+// ---------------------------------------------------------------------------
+
+test('export converts camelCase id to kebab-case directory', async () => {
+  await withTempDir(async (tmpDir) => {
+    const skill = {
+      metadata: {
+        id: 'rrMidstreamExample001',
+        name: 'CamelCase Test',
+        description: 'Tests kebab-case for export dirs',
+        category: 'midstream',
+        phase: 'midstream',
+        applyTo: ['**/*.js'],
+      },
+      body: '# Test',
+      path: '/tmp/fake.md',
+    };
+    const result = await exportSkillToAgentFormat(skill, tmpDir);
+    assert.equal(result.dirName, 'rr-midstream-example001');
+    assert.ok(result.path.includes('rr-midstream-example001'));
+  });
+});
+
+test('export falls back to unnamed-skill when id has only special chars', async () => {
+  await withTempDir(async (tmpDir) => {
+    const skill = {
+      metadata: {
+        id: '!!!',
+        name: '---',
+        description: 'Invalid chars only',
+        category: 'midstream',
+        phase: 'midstream',
+        applyTo: ['**/*.js'],
+      },
+      body: '# Test',
+      path: '/tmp/fake.md',
+    };
+    // sanitizeSkillId falls back to 'unnamed-skill' before toKebabCase
+    const result = await exportSkillToAgentFormat(skill, tmpDir);
+    assert.equal(result.dirName, 'unnamed-skill');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Import includes description quality warnings
+// ---------------------------------------------------------------------------
+
+test('import emits description quality warnings', async () => {
+  await withTempDir(async (tmpDir) => {
+    // Create a skill with a vague description
+    const skillDir = path.join(tmpDir, 'src', 'vague-skill');
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(
+      path.join(skillDir, 'SKILL.md'),
+      `---
+name: vague-skill
+description: Helps code
+---
+# Vague
+Body text.
+`
+    );
+
+    const result = await importAgentSkills(tmpDir, {
+      fromPath: path.join(tmpDir, 'src'),
+      strict: false,
+      outputDir: path.join(tmpDir, 'output'),
+    });
+
+    assert.ok(
+      result.warnings.some((w) => w.includes('description quality')),
+      `Expected description quality warning, got: ${JSON.stringify(result.warnings)}`
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------
