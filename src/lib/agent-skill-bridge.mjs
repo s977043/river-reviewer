@@ -46,6 +46,15 @@ const KNOWN_RR_FIELDS = new Set([
   'metadata',
 ]);
 
+const SAFE_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
+
+export function sanitizeSkillId(id) {
+  if (typeof id !== 'string' || !id) return 'unnamed-skill';
+  if (SAFE_ID_RE.test(id)) return id;
+  const cleaned = id.replace(/[^a-zA-Z0-9._-]/g, '').replace(/^[._-]+/, '');
+  return cleaned || 'unnamed-skill';
+}
+
 export class AgentSkillBridgeError extends Error {
   constructor(message, details = undefined) {
     super(message);
@@ -134,7 +143,7 @@ export async function parseAgentSkill(skillMdPath) {
 }
 
 export function generateAgentSkillId(dirName, existingIds) {
-  const base = `as-${dirName}`;
+  const base = `as-${sanitizeSkillId(dirName)}`;
   if (!existingIds.has(base)) return base;
   let n = 2;
   while (existingIds.has(`${base}-${n}`)) n++;
@@ -157,9 +166,11 @@ export function convertAgentSkillToRR(parsed, existingIds = new Set()) {
 
   const meta = { ...rawMeta };
 
-  // ID generation
+  // ID generation / sanitization
   if (!meta.id) {
     meta.id = generateAgentSkillId(dirName, existingIds);
+  } else {
+    meta.id = sanitizeSkillId(meta.id);
   }
 
   // Category default
@@ -385,10 +396,11 @@ export function serializeToSkillMd(skill) {
 
 export async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
   const { includeAssets = false } = options;
-  const dirName = skill.metadata.id || skill.metadata.name;
-  if (!dirName) {
+  const rawDirName = skill.metadata.id || skill.metadata.name;
+  if (!rawDirName) {
     throw new AgentSkillBridgeError('Skill has no id or name for directory creation');
   }
+  const dirName = sanitizeSkillId(rawDirName);
   const skillDir = assertSafePath(outputDir, dirName, 'Skill id');
   await fs.mkdir(skillDir, { recursive: true });
 
