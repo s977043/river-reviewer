@@ -55,6 +55,83 @@ export class AgentSkillBridgeError extends Error {
 }
 
 // ---------------------------------------------------------------------------
+// Description quality validation
+// ---------------------------------------------------------------------------
+
+const VAGUE_PATTERNS = [/^.{0,15}$/, /^(this skill |a skill |skill that )/i];
+const GENERIC_PHRASES = [
+  'support the project',
+  'help with development',
+  'assist with tasks',
+  'improve code quality',
+  'general purpose',
+  'various tasks',
+];
+const TRIGGER_KEYWORDS = /\b(when|if|during|after|before|on |for |upon)\b/i;
+
+export function validateDescriptionQuality(description) {
+  const issues = [];
+  if (!description || typeof description !== 'string') {
+    return {
+      ok: false,
+      issues: [{ type: 'too_short', message: 'description is missing or empty' }],
+    };
+  }
+  const trimmed = description.trim();
+  if (trimmed.length < 16) {
+    issues.push({
+      type: 'too_short',
+      message: `description is only ${trimmed.length} chars (min recommended: 16)`,
+    });
+  }
+  for (const p of VAGUE_PATTERNS) {
+    if (p.test(trimmed)) {
+      issues.push({ type: 'too_vague', message: `description matches vague pattern: ${p}` });
+      break;
+    }
+  }
+  const lower = trimmed.toLowerCase();
+  for (const phrase of GENERIC_PHRASES) {
+    if (lower.includes(phrase)) {
+      issues.push({
+        type: 'too_generic',
+        message: `description contains generic phrase: "${phrase}"`,
+      });
+      break;
+    }
+  }
+  if (!TRIGGER_KEYWORDS.test(trimmed)) {
+    issues.push({
+      type: 'no_trigger_context',
+      message: 'description lacks trigger context (when/if/during/for)',
+    });
+  }
+  return { ok: issues.length === 0, issues };
+}
+
+// ---------------------------------------------------------------------------
+// Progressive disclosure – meta-only parse (no body / assets)
+// ---------------------------------------------------------------------------
+
+export async function parseAgentSkillMeta(skillMdPath) {
+  const raw = await fs.readFile(skillMdPath, 'utf8');
+  const fmEnd = raw.indexOf('---', raw.indexOf('---') + 3);
+  const fmBlock = fmEnd > 0 ? raw.slice(0, fmEnd + 3) + '\n' : raw;
+  const { metadata } = parseFrontMatter(fmBlock, { filePath: skillMdPath });
+  const dirName = path.basename(path.dirname(skillMdPath));
+  return {
+    id: metadata.id || `as-${dirName}`,
+    name: metadata.name || dirName,
+    description: metadata.description || '',
+    source: 'agent',
+    originPath: path.dirname(skillMdPath),
+    category: metadata.category,
+    tags: metadata.tags,
+    version: metadata.version,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Discovery
 // ---------------------------------------------------------------------------
 
@@ -86,7 +163,7 @@ async function listSkillPackages(dirPath) {
         /* not a skill package – check nested */
       }
       return listSkillPackages(entryPath);
-    }),
+    })
   );
   return groups.flat().sort();
 }
@@ -223,7 +300,9 @@ function validateMeta(metadata, validate) {
   const copy = JSON.parse(JSON.stringify(metadata));
   const ok = validate(copy);
   if (!ok) {
-    const details = (validate.errors ?? []).map((e) => `${e.instancePath || '/'} ${e.message}`).join('; ');
+    const details = (validate.errors ?? [])
+      .map((e) => `${e.instancePath || '/'} ${e.message}`)
+      .join('; ');
     return { ok: false, error: details, ajvErrors: validate.errors };
   }
   return { ok: true };
@@ -265,6 +344,13 @@ export async function importAgentSkills(projectRoot, options = {}) {
         continue;
       }
 
+      // Description quality gate
+      const descQuality = validateDescriptionQuality(parsed.metadata.description);
+      if (!descQuality.ok) {
+        const msgs = descQuality.issues.map((i) => i.message).join('; ');
+        warnings.push(`${path.relative(projectRoot, skillPath)}: description quality: ${msgs}`);
+      }
+
       const converted = convertAgentSkillToRR(parsed, existingIds);
       existingIds.add(converted.metadata.id);
 
@@ -285,7 +371,9 @@ export async function importAgentSkills(projectRoot, options = {}) {
           autoFilled.push('applyTo');
         }
         if (autoFilled.length) {
-          warnings.push(`${path.relative(projectRoot, skillPath)}: auto-filled [${autoFilled.join(', ')}]`);
+          warnings.push(
+            `${path.relative(projectRoot, skillPath)}: auto-filled [${autoFilled.join(', ')}]`
+          );
         }
       }
 
@@ -383,16 +471,29 @@ export function serializeToSkillMd(skill) {
   return `---\n${yamlStr}\n---\n\n${body}\n`;
 }
 
+function toKebabCase(str) {
+  return str
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/[_\s]+/g, '-')
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 export async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
   const { includeAssets = false } = options;
-  const dirName = skill.metadata.id || skill.metadata.name;
-  if (!dirName) {
+  const rawName = skill.metadata.id || skill.metadata.name;
+  if (!rawName) {
     throw new AgentSkillBridgeError('Skill has no id or name for directory creation');
   }
+  // Critical rule: folder names must be kebab-case
+  const dirName = toKebabCase(rawName);
   const skillDir = assertSafePath(outputDir, dirName, 'Skill id');
   await fs.mkdir(skillDir, { recursive: true });
 
   const content = serializeToSkillMd(skill);
+  // Critical rule: file must be exactly SKILL.md
   const skillMdPath = path.join(skillDir, AGENT_SKILL_FILENAME);
   await fs.writeFile(skillMdPath, content, 'utf8');
 
@@ -407,13 +508,24 @@ export async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
     }
   }
 
-  return { path: skillMdPath };
+  // Critical rule: no README.md inside skill folder
+  const readmePath = path.join(skillDir, 'README.md');
+  try {
+    await fs.unlink(readmePath);
+  } catch {
+    // No README to remove – expected
+  }
+
+  return { path: skillMdPath, dirName };
 }
 
 export async function exportAllSkills(projectRoot, options = {}) {
   const { outputDir, includeAssets = false } = options;
   const dest = outputDir ?? path.join(projectRoot, '.agents', 'skills');
-  const skills = await loadSkills({ skillsDir: path.join(projectRoot, 'skills'), excludedTags: [] });
+  const skills = await loadSkills({
+    skillsDir: path.join(projectRoot, 'skills'),
+    excludedTags: [],
+  });
 
   const exported = [];
   const errors = [];
@@ -442,11 +554,15 @@ export async function listAllSkills(projectRoot, options = {}) {
   const skills = [];
 
   if (source === 'rr' || source === 'all') {
-    const rrSkills = await loadSkills({ skillsDir: path.join(projectRoot, 'skills'), excludedTags: [] });
+    const rrSkills = await loadSkills({
+      skillsDir: path.join(projectRoot, 'skills'),
+      excludedTags: [],
+    });
     for (const s of rrSkills) {
       skills.push({
         id: s.metadata.id,
         name: s.metadata.name,
+        description: s.metadata.description || '',
         source: 'rr',
         path: path.relative(projectRoot, s.path),
       });
@@ -457,11 +573,12 @@ export async function listAllSkills(projectRoot, options = {}) {
     const agentPaths = await discoverAgentSkillPaths(projectRoot);
     for (const skillPath of agentPaths) {
       try {
-        const parsed = await parseAgentSkill(skillPath);
-        const dirName = path.basename(path.dirname(skillPath));
+        // Progressive disclosure: meta-only parse for listing
+        const summary = await parseAgentSkillMeta(skillPath);
         skills.push({
-          id: parsed.metadata.id || `as-${dirName}`,
-          name: parsed.metadata.name || dirName,
+          id: summary.id,
+          name: summary.name,
+          description: summary.description,
           source: 'agent',
           path: path.relative(projectRoot, skillPath),
         });
@@ -497,7 +614,7 @@ export async function runSkillsSubcommand(parsed) {
       for (const e of result.errors) console.error(`❌ ${e.path}: ${e.message}`);
     }
     console.log(
-      `Import complete: ${result.imported.length} imported, ${result.errors.length} failed, ${result.warnings.length} warnings.`,
+      `Import complete: ${result.imported.length} imported, ${result.errors.length} failed, ${result.warnings.length} warnings.`
     );
     return result.errors.length ? 1 : 0;
   }
@@ -511,7 +628,9 @@ export async function runSkillsSubcommand(parsed) {
     if (result.errors.length) {
       for (const e of result.errors) console.error(`❌ ${e.id}: ${e.message}`);
     }
-    console.log(`Export complete: ${result.exported.length} exported, ${result.errors.length} failed.`);
+    console.log(
+      `Export complete: ${result.exported.length} exported, ${result.errors.length} failed.`
+    );
     return result.errors.length ? 1 : 0;
   }
 
@@ -523,17 +642,34 @@ export async function runSkillsSubcommand(parsed) {
       return 0;
     }
 
-    // Table header
+    // Table header with description quality indicator
     const idW = Math.max(4, ...result.skills.map((s) => s.id.length));
     const nameW = Math.max(4, ...result.skills.map((s) => s.name.length));
     const srcW = 6;
+    const descW = 40;
 
-    console.log(`${'ID'.padEnd(idW)}  ${'NAME'.padEnd(nameW)}  ${'SOURCE'.padEnd(srcW)}  PATH`);
-    console.log(`${'-'.repeat(idW)}  ${'-'.repeat(nameW)}  ${'-'.repeat(srcW)}  ----`);
+    console.log(
+      `${'ID'.padEnd(idW)}  ${'NAME'.padEnd(nameW)}  ${'SOURCE'.padEnd(srcW)}  ${'DESCRIPTION'.padEnd(descW)}  PATH`
+    );
+    console.log(
+      `${'-'.repeat(idW)}  ${'-'.repeat(nameW)}  ${'-'.repeat(srcW)}  ${'-'.repeat(descW)}  ----`
+    );
+    let descWarnings = 0;
     for (const s of result.skills) {
-      console.log(`${s.id.padEnd(idW)}  ${s.name.padEnd(nameW)}  ${s.source.padEnd(srcW)}  ${s.path}`);
+      const desc = s.description || '';
+      const quality = validateDescriptionQuality(desc);
+      const flag = quality.ok ? '' : ' (!)';
+      if (!quality.ok) descWarnings++;
+      const descDisplay =
+        (desc.length > descW - 4 ? desc.slice(0, descW - 4) + '...' : desc) + flag;
+      console.log(
+        `${s.id.padEnd(idW)}  ${s.name.padEnd(nameW)}  ${s.source.padEnd(srcW)}  ${descDisplay.padEnd(descW)}  ${s.path}`
+      );
     }
     console.log(`\nTotal: ${result.skills.length} skills`);
+    if (descWarnings > 0) {
+      console.log(`Description quality warnings: ${descWarnings} skill(s) marked with (!)`);
+    }
     return 0;
   }
 

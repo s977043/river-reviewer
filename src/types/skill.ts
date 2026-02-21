@@ -80,3 +80,26 @@ export interface AgentSkillParsed {
   dirPath: string;
   assets: Record<string, string>;
 }
+
+// Lazy-loaded skill summary (frontmatter only, no body)
+export interface SkillSummary {
+  id: string;
+  name: string;
+  description: string;
+  source: SkillSource;
+  originPath: string;
+  category?: StreamCategory;
+  tags?: string[];
+  version?: string;
+}
+
+// Description quality validation
+export type DescriptionIssue = 'too_short' | 'too_vague' | 'no_trigger_context' | 'too_generic';
+
+export interface DescriptionQualityResult {
+  ok: boolean;
+  issues: Array<{ type: DescriptionIssue; message: string }>;
+}
+
+// Import conflict resolution strategy
+export type ConflictResolution = 'last-wins' | 'first-wins' | 'error';
