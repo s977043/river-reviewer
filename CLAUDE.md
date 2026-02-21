@@ -6,6 +6,7 @@
 
 - **Security**: Do not access secrets (`.env`, `secrets/`).
 - **Workflow**: `npm run lint` & `npm test` must pass before PR.
+- **Branch Policy**: Never push to `main` or to already-merged PR branches. Always create a new branch + new PR for any changes.
 - **SSOT**: See `AGENTS.md` for tech stack, style guides, and definitions.
 
 ## Claude-specific

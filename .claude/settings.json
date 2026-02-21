@@ -62,7 +62,9 @@
       "Read(./**/*secret*)",
       "Read(./**/*.pem)",
       "Read(./**/*.key)",
-      "Read(./config/master.key)"
+      "Read(./config/master.key)",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin main)"
     ]
   },
   "hooks": {
