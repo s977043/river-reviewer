@@ -6,7 +6,11 @@
     "availableContexts": ["diff", "fullFile"],
     "availableDependencies": ["code_search"],
     "expectedAny": ["rr-midstream-typescript-nullcheck-001", "rr-midstream-typescript-strict-001"],
-    "expectedTop1": ["rr-midstream-typescript-nullcheck-001", "rr-midstream-typescript-strict-001"]
+    "expectedTop1": [
+      "rr-midstream-typescript-nullcheck-001",
+      "rr-midstream-typescript-strict-001",
+      "rr-midstream-type-driven-design-001"
+    ]
   },
   {
     "name": "midstream: security risky patterns (XSS/SQLi)",
@@ -116,7 +120,11 @@
     "availableContexts": ["diff", "fullFile"],
     "availableDependencies": ["code_search"],
     "expectedAny": ["rr-midstream-typescript-strict-001"],
-    "expectedTop1": ["rr-midstream-typescript-strict-001", "rr-midstream-typescript-nullcheck-001"]
+    "expectedTop1": [
+      "rr-midstream-typescript-strict-001",
+      "rr-midstream-typescript-nullcheck-001",
+      "rr-midstream-type-driven-design-001"
+    ]
   },
   {
     "name": "midstream: silent failure (return null)",
