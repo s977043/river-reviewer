@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import process from 'node:process';
-import { GitError, GitRepoNotFoundError, ensureGitRepo, detectDefaultBranch, findMergeBase } from './lib/git.mjs';
+import {
+  GitError,
+  GitRepoNotFoundError,
+  ensureGitRepo,
+  detectDefaultBranch,
+  findMergeBase,
+} from './lib/git.mjs';
 import { doctorLocalReview, planLocalReview, runLocalReview } from './lib/local-runner.mjs';
 import { SkillLoaderError } from '../runners/core/skill-loader.mjs';
 import { collectRepoDiff } from './lib/diff.mjs';
@@ -20,17 +26,29 @@ function printHintLines(lines = []) {
   const hints = lines.filter(Boolean);
   if (!hints.length) return;
   console.error('\nHints:');
-  hints.forEach(line => console.error(`- ${line}`));
+  hints.forEach((line) => console.error(`- ${line}`));
 }
 
 function printHelp() {
   console.log(`Usage: river <command> <path> [options]
 
 Commands:
-  run <path>     Run River Reviewer locally against the git repo at <path>
-  skills <path>  Run the new Skill-based Reviewer architecture
-  doctor <path>  Check setup and print hints for common issues
-  eval           Run review fixtures evaluation (must_include checks)
+  run <path>            Run River Reviewer locally against the git repo at <path>
+  skills <path>         Run the new Skill-based Reviewer architecture
+  skills import         Import Agent Skills (SKILL.md) into River Reviewer
+  skills export         Export River Reviewer skills to Agent Skills format
+  skills list           List all skills (RR and Agent Skills)
+  doctor <path>         Check setup and print hints for common issues
+  eval                  Run review fixtures evaluation (must_include checks)
+
+Skills Subcommand Options:
+  --from <path>         (import) Source directory to scan for SKILL.md files
+  --to <path>           (import) Output dir for converted skills / (export) Output dir for SKILL.md
+  --strict              (import) Require full RR schema compliance (default)
+  --loose               (import) Accept minimal name/description, auto-fill missing fields
+  --source <type>       (list) Filter: rr|agent|all (default: all)
+  --include-assets      (export) Copy references/ scripts/ prompt/ alongside SKILL.md
+  --dry-run             (import) Validate without writing files
 
 Options:
   --phase <phase>   Review phase (upstream|midstream|downstream). Default: env RIVER_PHASE or midstream
@@ -50,6 +68,7 @@ Options:
 
 function parseArgs(argv) {
   const args = [...argv];
+  const SKILLS_SUBCOMMANDS = new Set(['import', 'export', 'list']);
   const parsed = {
     command: null,
     target: '.',
@@ -64,13 +83,23 @@ function parseArgs(argv) {
     output: 'text',
     availableContexts: null,
     availableDependencies: null,
+    // skills subcommand fields
+    skillsSubcommand: null,
+    fromPath: null,
+    toPath: null,
+    validationMode: 'strict',
+    listSource: 'all',
+    includeAssets: false,
   };
 
   while (args.length) {
     const arg = args.shift();
     if (!parsed.command && (arg === 'run' || arg === 'doctor' || arg === 'skills')) {
       parsed.command = arg;
-      if (args[0] && !args[0].startsWith('-')) {
+      // Check for skills subcommands (import/export/list)
+      if (arg === 'skills' && args[0] && SKILLS_SUBCOMMANDS.has(args[0])) {
+        parsed.skillsSubcommand = args.shift();
+      } else if (args[0] && !args[0].startsWith('-')) {
         parsed.target = args.shift();
       }
       continue;
@@ -105,7 +134,9 @@ function parseArgs(argv) {
       }
       const mode = value.toLowerCase();
       if (!PLANNER_MODES.includes(mode)) {
-        console.error(`Error: --planner must be one of: ${PLANNER_MODES.join(', ')} (got "${value}").`);
+        console.error(
+          `Error: --planner must be one of: ${PLANNER_MODES.join(', ')} (got "${value}").`
+        );
         parsed.command = 'help';
         break;
       }
@@ -158,6 +189,37 @@ function parseArgs(argv) {
       parsed.availableDependencies = parseList(args.shift());
       continue;
     }
+    // Skills subcommand options
+    if (arg === '--from') {
+      parsed.fromPath = args.shift() ?? null;
+      continue;
+    }
+    if (arg === '--to') {
+      parsed.toPath = args.shift() ?? null;
+      continue;
+    }
+    if (arg === '--strict') {
+      parsed.validationMode = 'strict';
+      continue;
+    }
+    if (arg === '--loose') {
+      parsed.validationMode = 'loose';
+      continue;
+    }
+    if (arg === '--source') {
+      const value = args.shift();
+      if (!value || !['rr', 'agent', 'all'].includes(value)) {
+        console.error(`Error: --source must be one of: rr, agent, all (got "${value}").`);
+        parsed.command = 'help';
+        break;
+      }
+      parsed.listSource = value;
+      continue;
+    }
+    if (arg === '--include-assets') {
+      parsed.includeAssets = true;
+      continue;
+    }
     if (arg === '-h' || arg === '--help') {
       parsed.command = 'help';
       break;
@@ -168,13 +230,13 @@ function parseArgs(argv) {
 }
 
 function formatPlan(plan) {
-  const selected = plan.selected.map(skill => skill.metadata?.id ?? skill.id);
-  const skipped = plan.skipped.map(item => ({
+  const selected = plan.selected.map((skill) => skill.metadata?.id ?? skill.id);
+  const skipped = plan.skipped.map((item) => ({
     id: item.skill.metadata?.id ?? item.skill.id,
     reasons: item.reasons,
   }));
   const reasonCounts = skipped.reduce((acc, item) => {
-    (item.reasons || []).forEach(reason => {
+    (item.reasons || []).forEach((reason) => {
       acc.set(reason, (acc.get(reason) ?? 0) + 1);
     });
     return acc;
@@ -191,7 +253,7 @@ function printPlan(plan) {
   }
   if (summary.skipped.length) {
     console.log('Skipped skills:');
-    summary.skipped.forEach(item => {
+    summary.skipped.forEach((item) => {
       console.log(`- ${item.id}: ${item.reasons.join('; ')}`);
     });
     if (summary.reasonCounts.size) {
@@ -209,7 +271,7 @@ function printComments(comments) {
     return;
   }
   console.log('Review comments:');
-  comments.forEach(comment => {
+  comments.forEach((comment) => {
     console.log(`- ${comment.file}:${comment.line}: ${comment.message}`);
   });
 }
@@ -250,7 +312,9 @@ function formatCommentsMarkdown(comments) {
 
   // スキルIDがないグループのみの場合は従来形式
   if (entries.length === 1 && entries[0][0] === '') {
-    return comments.map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`).join('\n');
+    return comments
+      .map((c) => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`)
+      .join('\n');
   }
 
   // skillId でソートして出力順序を安定化
@@ -263,7 +327,7 @@ function formatCommentsMarkdown(comments) {
       const safeSkillId = sanitizeForMarkdown(skillId);
       const header = skillId ? `#### 🔍 ${safeSkillId}` : '#### その他';
       const body = items
-        .map(c => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`)
+        .map((c) => `- \`${c.file}:${c.line}\`${formatMessageForMarkdown(c.message)}`)
         .join('\n');
       return `${header}\n${body}`;
     })
@@ -272,13 +336,17 @@ function formatCommentsMarkdown(comments) {
 
 function formatPlanMarkdown(plan) {
   const summary = formatPlan(plan);
-  const selected = summary.selected.length ? summary.selected.map(id => `- \`${id}\``).join('\n') : '- _none_';
+  const selected = summary.selected.length
+    ? summary.selected.map((id) => `- \`${id}\``).join('\n')
+    : '- _none_';
 
   if (!summary.skipped.length) {
     return `### 選択されたスキル (${summary.selected.length})\n${selected}\n`;
   }
 
-  const skippedLines = summary.skipped.map(item => `- \`${item.id}\`: ${item.reasons.join('; ')}`).join('\n');
+  const skippedLines = summary.skipped
+    .map((item) => `- \`${item.id}\`: ${item.reasons.join('; ')}`)
+    .join('\n');
   return `### 選択されたスキル (${summary.selected.length})\n${selected}\n\n<details>\n<summary>スキップされたスキル (${summary.skipped.length})</summary>\n\n${skippedLines}\n\n</details>\n`;
 }
 
@@ -293,7 +361,7 @@ function formatDebugSummaryMarkdown(result) {
   const plan = result.plan ?? {};
   const plannerStatus = formatPlannerStatus(plan, { markdown: true });
   const impactTags = Array.isArray(plan?.impactTags) ? plan.impactTags : [];
-  const impactSummary = impactTags.length ? impactTags.map(t => `\`${t}\``).join(', ') : '`none`';
+  const impactSummary = impactTags.length ? impactTags.map((t) => `\`${t}\``).join(', ') : '`none`';
 
   return [
     `- LLM: ${llmStatus}`,
@@ -305,7 +373,7 @@ function formatDebugSummaryMarkdown(result) {
 }
 
 function formatPlannerStatus(plan, { markdown = false } = {}) {
-  const wrap = value => (markdown ? `\`${value}\`` : value);
+  const wrap = (value) => (markdown ? `\`${value}\`` : value);
   const requested = Boolean(plan?.plannerRequested);
   const mode = plan?.plannerMode || 'off';
   if (!requested || mode === 'off') return wrap('off');
@@ -353,7 +421,9 @@ function printDebugInfo(result, { log = console.log } = {}) {
 - Project rules: ${result.projectRules ? 'present' : 'none'}
 - Available contexts: ${(result.availableContexts || []).join(', ') || 'none'}
 - Available dependencies: ${
-    result.availableDependencies ? result.availableDependencies.join(', ') : 'not specified (skip disabled)'
+    result.availableDependencies
+      ? result.availableDependencies.join(', ')
+      : 'not specified (skip disabled)'
   }
 `);
   if (debug.llmError) {
@@ -365,11 +435,11 @@ function printDebugInfo(result, { log = console.log } = {}) {
     result.projectRules,
     MAX_PROMPT_PREVIEW_LENGTH,
     log,
-    { leadingNewline: true },
+    { leadingNewline: true }
   );
   if (result.plan?.skipped?.length) {
     log('\nSkipped skills detail:');
-    result.plan.skipped.forEach(item => {
+    result.plan.skipped.forEach((item) => {
       const id = item.skill?.metadata?.id ?? item.skill?.id ?? '(unknown)';
       log(`- ${id}: ${item.reasons.join('; ')}`);
     });
@@ -382,7 +452,7 @@ function countChangedLines(files) {
   let lines = 0;
   for (const file of files ?? []) {
     for (const hunk of file.hunks ?? []) {
-      lines += (hunk.lines ?? []).filter(l => l.startsWith('+') || l.startsWith('-')).length;
+      lines += (hunk.lines ?? []).filter((l) => l.startsWith('+') || l.startsWith('-')).length;
     }
   }
   return lines;
@@ -403,16 +473,22 @@ async function main() {
   const targetPath = path.resolve(parsed.target);
 
   try {
+    // Skills subcommands (import/export/list) – no git repo required
+    if (parsed.command === 'skills' && parsed.skillsSubcommand) {
+      const { runSkillsSubcommand } = await import('./lib/agent-skill-bridge.mjs');
+      return runSkillsSubcommand(parsed);
+    }
+
     if (parsed.command === 'skills') {
       const repoRoot = await ensureGitRepo(targetPath);
       const defaultBranch = await detectDefaultBranch(repoRoot);
       const mergeBase = await findMergeBase(repoRoot, defaultBranch);
       const repoDiff = await collectRepoDiff(repoRoot, mergeBase);
-      
+
       const dispatcher = new SkillDispatcher(repoRoot);
-      
+
       const getFileDiff = async (targetFile) => {
-        const fileData = repoDiff.files.find(f => f.path === targetFile);
+        const fileData = repoDiff.files.find((f) => f.path === targetFile);
         if (!fileData) return '';
         return renderDiffText([fileData]);
       };
@@ -423,9 +499,9 @@ async function main() {
         getFileDiff,
         parsed.phase,
         parsed.dryRun,
-        parsed.debug,
+        parsed.debug
       );
-      
+
       if (parsed.output === 'markdown') {
         console.log(`## Review Results\n`);
         for (const res of results) {
@@ -468,11 +544,16 @@ OpenAI (review): ${apiKey ? 'configured' : 'not set'}
 OpenAI (planner): ${apiKey ? 'configured' : 'not set'}
 Contexts: ${(result.availableContexts || []).join(', ') || 'none'}
 Dependencies: ${
-        result.availableDependencies ? result.availableDependencies.join(', ') : 'not specified (skip disabled)'
+        result.availableDependencies
+          ? result.availableDependencies.join(', ')
+          : 'not specified (skip disabled)'
       }`);
 
       if (!apiKey) {
-        printHintLines(['Set `OPENAI_API_KEY` (or `RIVER_OPENAI_API_KEY`) to enable LLM reviews.', 'You can still run with `--dry-run` for local validation.']);
+        printHintLines([
+          'Set `OPENAI_API_KEY` (or `RIVER_OPENAI_API_KEY`) to enable LLM reviews.',
+          'You can still run with `--dry-run` for local validation.',
+        ]);
       }
 
       if (!result.changedFiles.length) {
@@ -485,7 +566,9 @@ Dependencies: ${
       }
       if (parsed.debug) {
         const impactTags = Array.isArray(result.plan?.impactTags) ? result.plan.impactTags : [];
-        console.log(`\nDebug info:\n- Impact tags: ${impactTags.join(', ') || 'none'}\n- Token estimate: ${result.diff.tokenEstimate}\n`);
+        console.log(
+          `\nDebug info:\n- Impact tags: ${impactTags.join(', ') || 'none'}\n- Token estimate: ${result.diff.tokenEstimate}\n`
+        );
         console.log('--- diff preview ---');
         console.log(result.diff.diffText.split('\n').slice(0, MAX_DIFF_PREVIEW_LINES).join('\n'));
       }
@@ -502,9 +585,13 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
     });
 
-    const estimator = new CostEstimator(process.env.OPENAI_MODEL || process.env.RIVER_OPENAI_MODEL || undefined);
+    const estimator = new CostEstimator(
+      process.env.OPENAI_MODEL || process.env.RIVER_OPENAI_MODEL || undefined
+    );
     const estimatedCost =
-      context.status === 'ok' ? estimator.estimateFromDiff(context.diff, context.plan?.selected ?? []) : null;
+      context.status === 'ok'
+        ? estimator.estimateFromDiff(context.diff, context.plan?.selected ?? [])
+        : null;
 
     const logRunHeader = parsed.output === 'markdown' ? console.error : console.log;
     logRunHeader(`River Reviewer (local)
@@ -516,12 +603,16 @@ Dry run: ${parsed.dryRun ? 'yes' : 'no'}
 Debug: ${parsed.debug ? 'yes' : 'no'}
 Planner: ${formatPlannerStatus(context.plan ?? {})}
 Contexts: ${(context.availableContexts || []).join(', ') || 'none'}
-Dependencies: ${ 
-      context.availableDependencies ? context.availableDependencies.join(', ') : 'not specified (skip disabled)'
+Dependencies: ${
+      context.availableDependencies
+        ? context.availableDependencies.join(', ')
+        : 'not specified (skip disabled)'
     }`);
 
     if (context.status === 'skipped-by-label') {
-      const labels = context.matchedLabels?.length ? context.matchedLabels.join(', ') : '(not specified)';
+      const labels = context.matchedLabels?.length
+        ? context.matchedLabels.join(', ')
+        : '(not specified)';
       console.log(`Review skipped: PR labels matched exclude patterns (${labels}).`);
       return 0;
     }
@@ -533,7 +624,9 @@ Dependencies: ${
 
     if (estimatedCost && parsed.maxCost !== null && estimatedCost.usd > parsed.maxCost) {
       console.log(estimator.formatCost(estimatedCost));
-      console.error(`Estimated cost $${estimatedCost.usd.toFixed(4)} exceeds max-cost ${parsed.maxCost}. Aborting.`);
+      console.error(
+        `Estimated cost $${estimatedCost.usd.toFixed(4)} exceeds max-cost ${parsed.maxCost}. Aborting.`
+      );
       return 1;
     }
 
@@ -545,7 +638,9 @@ Dependencies: ${
       console.log('Cost Estimate:');
       console.log(estimator.formatCost(estimatedCost));
       console.log(`Files to review: ${context.changedFiles.length}`);
-      console.log(`Lines changed (approx): ${countChangedLines(context.diff.filesForReview ?? context.diff.files)}`);
+      console.log(
+        `Lines changed (approx): ${countChangedLines(context.diff.filesForReview ?? context.diff.files)}`
+      );
       return 0;
     }
 
@@ -586,7 +681,10 @@ Dependencies: ${
       ]);
     } else if (error instanceof SkillLoaderError) {
       console.error(`Skill configuration error: ${error.message}`);
-      printHintLines(['Run `npm run skills:validate` to see full validation errors.', 'Docs: pages/guides/validate-skill-schema.md']);
+      printHintLines([
+        'Run `npm run skills:validate` to see full validation errors.',
+        'Docs: pages/guides/validate-skill-schema.md',
+      ]);
     } else if (error instanceof ProjectRulesError) {
       console.error(error.message);
       printHintLines([
@@ -595,7 +693,10 @@ Dependencies: ${
       ]);
     } else if (error instanceof GitError) {
       console.error(`Git command failed: ${error.message}`);
-      printHintLines(['Ensure `git` is available and the repository has a default branch.', 'Try `river run . --debug` for more context.']);
+      printHintLines([
+        'Ensure `git` is available and the repository has a default branch.',
+        'Try `river run . --debug` for more context.',
+      ]);
     } else {
       console.error(`CLI error: ${error.message}`);
       printHintLines(['Try `river run . --debug` for more context.']);
@@ -604,7 +705,7 @@ Dependencies: ${
   }
 }
 
-main().then(code => {
+main().then((code) => {
   if (typeof code === 'number' && code !== 0) {
     process.exitCode = code;
   }

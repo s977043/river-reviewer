@@ -64,3 +64,19 @@ export interface SkillDefinition {
   body: string;
   path: string;
 }
+
+// Agent Skills bridge types
+export type SkillSource = 'agent' | 'rr';
+
+export interface AgentSkillMeta {
+  source: SkillSource;
+  originPath: string;
+  [key: string]: unknown;
+}
+
+export interface AgentSkillParsed {
+  metadata: Record<string, unknown>;
+  body: string;
+  dirPath: string;
+  assets: Record<string, string>;
+}
