@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
-import matter from 'gray-matter';
+
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import {
@@ -45,6 +45,15 @@ const KNOWN_RR_FIELDS = new Set([
   'instruction',
   'metadata',
 ]);
+
+const SAFE_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
+
+export function sanitizeSkillId(id) {
+  if (typeof id !== 'string' || !id) return 'unnamed-skill';
+  if (SAFE_ID_RE.test(id)) return id;
+  const cleaned = id.replace(/[^a-zA-Z0-9._-]/g, '').replace(/^[._-]+/, '');
+  return cleaned || 'unnamed-skill';
+}
 
 export class AgentSkillBridgeError extends Error {
   constructor(message, details = undefined) {
@@ -170,7 +179,7 @@ async function listSkillPackages(dirPath) {
 
 export async function discoverAgentSkillPaths(projectRoot, fromPath) {
   if (fromPath) {
-    const resolved = path.resolve(fromPath);
+    const resolved = path.resolve(projectRoot, fromPath);
     if (!(await dirExists(resolved))) return [];
     // fromPath might itself contain SKILL.md packages
     return listSkillPackages(resolved);
@@ -211,7 +220,7 @@ export async function parseAgentSkill(skillMdPath) {
 }
 
 export function generateAgentSkillId(dirName, existingIds) {
-  const base = `as-${dirName}`;
+  const base = `as-${sanitizeSkillId(dirName)}`;
   if (!existingIds.has(base)) return base;
   let n = 2;
   while (existingIds.has(`${base}-${n}`)) n++;
@@ -234,9 +243,18 @@ export function convertAgentSkillToRR(parsed, existingIds = new Set()) {
 
   const meta = { ...rawMeta };
 
-  // ID generation
+  // ID generation / sanitization / collision handling
   if (!meta.id) {
     meta.id = generateAgentSkillId(dirName, existingIds);
+  } else {
+    meta.id = sanitizeSkillId(meta.id);
+    // Deduplicate explicit IDs that collide with already-seen IDs
+    if (existingIds.has(meta.id)) {
+      const base = meta.id;
+      let n = 2;
+      while (existingIds.has(`${base}-${n}`)) n++;
+      meta.id = `${base}-${n}`;
+    }
   }
 
   // Category default
@@ -487,8 +505,8 @@ export async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
   if (!rawName) {
     throw new AgentSkillBridgeError('Skill has no id or name for directory creation');
   }
-  // Critical rule: folder names must be kebab-case
-  const dirName = toKebabCase(rawName);
+  // Critical rule: folder names must be kebab-case and sanitized
+  const dirName = toKebabCase(sanitizeSkillId(rawName));
   if (!dirName) {
     throw new AgentSkillBridgeError(
       `Skill id or name "${rawName}" is not valid for directory creation after kebab-case normalization`

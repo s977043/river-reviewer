@@ -14,6 +14,7 @@ import {
   exportSkillToAgentFormat,
   listAllSkills,
   validateDescriptionQuality,
+  sanitizeSkillId,
 } from '../src/lib/agent-skill-bridge.mjs';
 import { parseFrontMatter, defaultPaths } from '../runners/core/skill-loader.mjs';
 
@@ -406,7 +407,7 @@ test('export converts camelCase id to kebab-case directory', async () => {
   });
 });
 
-test('export throws when kebab-case produces empty directory name', async () => {
+test('export falls back to unnamed-skill when id has only special chars', async () => {
   await withTempDir(async (tmpDir) => {
     const skill = {
       metadata: {
@@ -420,9 +421,9 @@ test('export throws when kebab-case produces empty directory name', async () => 
       body: '# Test',
       path: '/tmp/fake.md',
     };
-    await assert.rejects(() => exportSkillToAgentFormat(skill, tmpDir), {
-      name: 'AgentSkillBridgeError',
-    });
+    // sanitizeSkillId falls back to 'unnamed-skill' before toKebabCase
+    const result = await exportSkillToAgentFormat(skill, tmpDir);
+    assert.equal(result.dirName, 'unnamed-skill');
   });
 });
 
@@ -456,5 +457,118 @@ Body text.
       result.warnings.some((w) => w.includes('description quality')),
       `Expected description quality warning, got: ${JSON.stringify(result.warnings)}`
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// sanitizeSkillId
+// ---------------------------------------------------------------------------
+
+test('sanitizeSkillId passes through valid ids unchanged', () => {
+  assert.equal(sanitizeSkillId('my-skill'), 'my-skill');
+  assert.equal(sanitizeSkillId('as-test.v2'), 'as-test.v2');
+  assert.equal(sanitizeSkillId('Skill_001'), 'Skill_001');
+});
+
+test('sanitizeSkillId strips shell expansion characters', () => {
+  assert.equal(sanitizeSkillId('skill$(whoami)'), 'skillwhoami');
+  assert.equal(sanitizeSkillId('skill`id`'), 'skillid');
+  assert.equal(sanitizeSkillId('skill;rm -rf /'), 'skillrm-rf');
+});
+
+test('sanitizeSkillId strips path separators', () => {
+  assert.equal(sanitizeSkillId('skill/name'), 'skillname');
+  assert.equal(sanitizeSkillId('skill\\name'), 'skillname');
+});
+
+test('sanitizeSkillId strips NUL and control characters', () => {
+  assert.equal(sanitizeSkillId('skill\x00name'), 'skillname');
+  assert.equal(sanitizeSkillId('skill\x01\x02'), 'skill');
+});
+
+test('sanitizeSkillId returns unnamed-skill for empty/invalid input', () => {
+  assert.equal(sanitizeSkillId(''), 'unnamed-skill');
+  assert.equal(sanitizeSkillId(null), 'unnamed-skill');
+  assert.equal(sanitizeSkillId(undefined), 'unnamed-skill');
+  assert.equal(sanitizeSkillId('$()'), 'unnamed-skill');
+});
+
+test('sanitizeSkillId strips leading dots/dashes', () => {
+  assert.equal(sanitizeSkillId('..hidden'), 'hidden');
+  assert.equal(sanitizeSkillId('---dashed'), 'dashed');
+  assert.equal(sanitizeSkillId('..-mixed'), 'mixed');
+});
+
+test('convertAgentSkillToRR sanitizes malicious id from frontmatter', async () => {
+  await withTempDir(async (tmpDir) => {
+    const skillDir = path.join(tmpDir, 'evil-skill');
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(
+      path.join(skillDir, 'SKILL.md'),
+      `---
+name: evil-skill
+description: Skill with malicious id
+id: "../../../etc/passwd"
+---
+Body
+`
+    );
+    const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
+    const converted = convertAgentSkillToRR(parsed);
+    // Path separators and dots at start are stripped
+    assert.ok(!converted.metadata.id.includes('/'));
+    assert.ok(!converted.metadata.id.includes('..'));
+    assert.match(converted.metadata.id, /^[a-zA-Z0-9]/);
+  });
+});
+
+test('exportSkillToAgentFormat sanitizes directory name', async () => {
+  await withTempDir(async (tmpDir) => {
+    const skill = {
+      metadata: {
+        id: 'safe$(whoami)',
+        name: 'Evil Export',
+        description: 'Test shell injection in export dir name',
+        category: 'core',
+        phase: 'midstream',
+        applyTo: ['**/*'],
+      },
+      body: '# Evil Export',
+      path: '/tmp/fake.md',
+    };
+
+    const result = await exportSkillToAgentFormat(skill, tmpDir);
+    // Directory should not contain shell metacharacters
+    assert.ok(!result.path.includes('$('));
+    assert.ok(result.path.includes('safewhoami'));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Explicit ID collision deduplication
+// ---------------------------------------------------------------------------
+
+test('convertAgentSkillToRR deduplicates colliding explicit ids', async () => {
+  await withTempDir(async (tmpDir) => {
+    // Create two skills with the same explicit id
+    for (const name of ['skill-a', 'skill-b']) {
+      const dir = path.join(tmpDir, name);
+      await mkdir(dir, { recursive: true });
+      await writeFile(
+        path.join(dir, 'SKILL.md'),
+        `---\nname: ${name}\ndescription: Duplicate id test\nid: shared-id\n---\nBody of ${name}\n`
+      );
+    }
+
+    const existingIds = new Set();
+    const parsedA = await parseAgentSkill(path.join(tmpDir, 'skill-a', 'SKILL.md'));
+    const convertedA = convertAgentSkillToRR(parsedA, existingIds);
+    existingIds.add(convertedA.metadata.id);
+
+    const parsedB = await parseAgentSkill(path.join(tmpDir, 'skill-b', 'SKILL.md'));
+    const convertedB = convertAgentSkillToRR(parsedB, existingIds);
+
+    assert.equal(convertedA.metadata.id, 'shared-id');
+    assert.equal(convertedB.metadata.id, 'shared-id-2');
   });
 });
