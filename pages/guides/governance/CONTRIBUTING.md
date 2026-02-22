@@ -1,6 +1,9 @@
 # コントリビューションガイド
 
-River Reviewer への参加ありがとうございます。このプロジェクトでは以下の方針に沿ってプルリクエストやIssueを受け付けています。
+> **正式な貢献ガイドはリポジトリルートの [`CONTRIBUTING.md`](https://github.com/s977043/river-reviewer/blob/main/CONTRIBUTING.md) を参照してください。**
+> このページはドキュメントサイト向けの要約版です。
+
+River Reviewerへの参加ありがとうございます。このプロジェクトでは以下の方針に沿ってプルリクエストやIssueを受け付けています。
 
 ## PRの基本方針
 
