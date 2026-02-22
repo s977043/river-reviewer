@@ -70,7 +70,7 @@ Pin to a release tag such as `@v0.5.0` for stability. Optionally, you can mainta
 
 Latest release: [v0.5.0](https://github.com/s977043/river-reviewer/releases/tag/v0.5.0)
 
-> **ℹ️ Upgrading from v0.1.x:** v0.2.0 and later use the new GitHub Action path `runners/github-action` instead of `.github/actions/river-reviewer`. See [Migration Guide](docs/migration/runners-architecture-guide.md) and [DEPRECATED.md](DEPRECATED.md) for details.
+> **ℹ️ Upgrading from v0.1.x:** v0.2.0 and later use the new GitHub Action path `runners/github-action` instead of `.github/actions/river-reviewer`. See [Migration Guide](docs/migration/runners-architecture-guide.md) and [DEPRECATED.md](docs/deprecated.md) for details.
 
 ## Quick start (local)
 
