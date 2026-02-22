@@ -25,6 +25,7 @@ CLAUDE.local.md
 .worktrees/
 .vale/Microsoft
 eval-results/
+reports/
 **/eval/results.json
 dist/
 run_log.txt

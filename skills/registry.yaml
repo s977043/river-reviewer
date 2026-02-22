@@ -228,6 +228,28 @@ skills:
     recommended: false
     description: 'Enforces standard review policies'
 
+  - id: rr-midstream-type-driven-design-001
+    version: '0.1.0'
+    name: 'Type-Driven Design Guard'
+    path: skills/midstream/rr-midstream-type-driven-design-001.md
+    category: midstream
+    phase: midstream
+    tags: [typescript, type-driven-design, domain-modeling, midstream]
+    severity: major
+    recommended: true
+    description: 'Detects primitive obsession and missing domain/brand types; checks that state is modeled via discriminated unions'
+
+  - id: rr-midstream-review-automation-boundary-001
+    version: '0.1.0'
+    name: 'Review Automation Boundary Guard'
+    path: skills/midstream/rr-midstream-review-automation-boundary-001.md
+    category: midstream
+    phase: midstream
+    tags: [review-process, automation, ci, meta-review, midstream]
+    severity: minor
+    recommended: true
+    description: 'Meta-review skill: detects review findings that belong in CI/lint/formatter rather than human review'
+
   # Downstream Skills (Testing & Release)
   - id: agent-qa-regression
     version: '0.1.0'
@@ -639,6 +661,7 @@ recommendations:
     skills:
       - rr-midstream-typescript-strict-001
       - rr-midstream-typescript-nullcheck-001
+      - rr-midstream-type-driven-design-001
       - rr-midstream-security-basic-001
       - rr-midstream-logging-observability-001
 
@@ -650,6 +673,15 @@ recommendations:
       - rr-midstream-logging-observability-001
       - rr-midstream-typescript-strict-001
       - rr-midstream-typescript-nullcheck-001
+      - rr-midstream-type-driven-design-001
+      - rr-midstream-review-automation-boundary-001
+
+  review-quality:
+    description: 'Skills that maximize human review value by pushing automatable concerns to CI'
+    skills:
+      - rr-midstream-review-automation-boundary-001
+      - rr-midstream-review-comment-triage-001
+      - rr-midstream-review-policy-standard-001
 
   multitenancy:
     description: 'Recommended skills for multi-tenant SaaS applications'
