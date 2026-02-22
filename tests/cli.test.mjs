@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { execFile } from 'node:child_process';
 import { mkdtempSync, writeFileSync } from 'node:fs';
-import { mkdir, rm } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { promisify } from 'node:util';
@@ -260,4 +260,37 @@ test('river doctor fails gracefully outside git repos', async t => {
 
   assert.notStrictEqual(result.code, 0);
   assert.match(result.stderr, /Not a git repository/);
+});
+
+// ---------------------------------------------------------------------------
+// skills subcommands
+// ---------------------------------------------------------------------------
+
+test('river skills import --loose --dry-run exits 0 with summary', async t => {
+  const fixturesDir = resolve('tests', 'fixtures', 'agent-skills');
+  const result = await runCli(
+    ['skills', 'import', '--from', fixturesDir, '--loose', '--dry-run'],
+    process.cwd(),
+  );
+  assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
+  assert.match(result.stdout, /Import complete/);
+});
+
+test('river skills list --source rr exits 0 and shows table', async t => {
+  const result = await runCli(['skills', 'list', '--source', 'rr'], process.cwd());
+  assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
+  assert.match(result.stdout, /ID/);
+  assert.match(result.stdout, /Total:/);
+});
+
+test('river skills import with empty dir emits warning and exits 0', async t => {
+  const emptyDir = mkdtempSync(join(tmpdir(), 'river-cli-empty-skills-'));
+  t.after(async () => rm(emptyDir, { recursive: true, force: true }));
+
+  const result = await runCli(
+    ['skills', 'import', '--from', emptyDir, '--dry-run'],
+    process.cwd(),
+  );
+  assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
+  assert.match(result.stdout + result.stderr, /No Agent Skills/);
 });

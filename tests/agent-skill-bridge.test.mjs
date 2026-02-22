@@ -105,6 +105,31 @@ test('converts rich agent skill – preserves extra metadata', async () => {
   assert.deepEqual(converted.metadata.tags, ['security', 'review']);
 });
 
+test('preserves explicitly provided category, phase, and applyTo', async () => {
+  await withTempDir(async (tmpDir) => {
+    const skillDir = path.join(tmpDir, 'explicit-fields');
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(
+      path.join(skillDir, 'SKILL.md'),
+      `---
+name: explicit-fields
+description: Skill with explicit fields
+category: downstream
+phase: downstream
+applyTo:
+  - 'src/**/*.ts'
+---
+Body
+`,
+    );
+    const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
+    const converted = convertAgentSkillToRR(parsed);
+    assert.equal(converted.metadata.category, 'downstream');
+    assert.equal(converted.metadata.phase, 'downstream');
+    assert.deepEqual(converted.metadata.applyTo, ['src/**/*.ts']);
+  });
+});
+
 test('uses existing id from frontmatter when present', async () => {
   await withTempDir(async (tmpDir) => {
     const skillDir = path.join(tmpDir, 'custom-id');
@@ -117,7 +142,7 @@ description: Has its own id
 id: my-custom-id
 ---
 Body content
-`
+`,
     );
     const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
     const converted = convertAgentSkillToRR(parsed);
@@ -140,7 +165,7 @@ name: test-skill
 description: Test skill
 ---
 Body
-`
+`,
     );
 
     const paths = await discoverAgentSkillPaths(tmpDir);
@@ -370,7 +395,7 @@ description: Skill with malicious id
 id: "../../../etc/passwd"
 ---
 Body
-`
+`,
     );
     const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
     const converted = convertAgentSkillToRR(parsed);
@@ -378,84 +403,6 @@ Body
     assert.ok(!converted.metadata.id.includes('/'));
     assert.ok(!converted.metadata.id.includes('..'));
     assert.match(converted.metadata.id, /^[a-zA-Z0-9]/);
-  });
-});
-
-test('exportSkillToAgentFormat sanitizes directory name', async () => {
-  await withTempDir(async (tmpDir) => {
-    const skill = {
-      metadata: {
-        id: 'safe$(whoami)',
-        name: 'Evil Export',
-        description: 'Test shell injection in export dir name',
-        category: 'core',
-        phase: 'midstream',
-        applyTo: ['**/*'],
-      },
-      body: '# Evil Export',
-      path: '/tmp/fake.md',
-    };
-
-    const result = await exportSkillToAgentFormat(skill, tmpDir);
-    // Directory should not contain shell metacharacters
-    assert.ok(!result.path.includes('$('));
-    assert.ok(result.path.includes('safewhoami'));
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Preserve explicit fields
-// ---------------------------------------------------------------------------
-
-test('preserves explicitly provided category, phase, and applyTo', async () => {
-  await withTempDir(async (tmpDir) => {
-    const skillDir = path.join(tmpDir, 'explicit-fields');
-    await mkdir(skillDir, { recursive: true });
-    await writeFile(
-      path.join(skillDir, 'SKILL.md'),
-      `---
-name: explicit-fields
-description: Skill with explicit fields
-category: downstream
-phase: downstream
-applyTo:
-  - 'src/**/*.ts'
----
-Body
-`,
-    );
-    const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
-    const converted = convertAgentSkillToRR(parsed);
-    assert.equal(converted.metadata.category, 'downstream');
-    assert.equal(converted.metadata.phase, 'downstream');
-    assert.deepEqual(converted.metadata.applyTo, ['src/**/*.ts']);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// importAgentSkills – duplicate detection
-// ---------------------------------------------------------------------------
-
-test('importAgentSkills detects duplicate explicit ids in the same batch', async () => {
-  await withTempDir(async (tmpDir) => {
-    const skillsDir = path.join(tmpDir, '.agents', 'skills');
-    // Two skills with the same explicit id
-    for (const name of ['skill-a', 'skill-b']) {
-      const dir = path.join(skillsDir, name);
-      await mkdir(dir, { recursive: true });
-      await writeFile(
-        path.join(dir, 'SKILL.md'),
-        `---\nname: ${name}\ndescription: Skill ${name}\nid: same-id\n---\nBody\n`,
-      );
-    }
-
-    const result = await importAgentSkills(tmpDir, {
-      strict: false,
-      outputDir: path.join(tmpDir, 'out'),
-    });
-    assert.equal(result.imported.length, 1, 'Only first skill should be imported');
-    assert.equal(result.errors.length, 1, 'Second skill should be a duplicate error');
-    assert.ok(result.errors[0].message.includes('Duplicate skill id'), result.errors[0].message);
   });
 });
 
@@ -512,5 +459,50 @@ test('listAllSkills --source all deduplicates imported agent skills', async () =
     const dupEntries = result.skills.filter((s) => s.id === 'as-dup-skill');
     assert.equal(dupEntries.length, 1, `Expected 1 entry for as-dup-skill, got ${dupEntries.length}`);
     assert.equal(dupEntries[0].source, 'rr', 'RR source should take precedence');
+  });
+});
+
+test('importAgentSkills detects duplicate explicit ids in the same batch', async () => {
+  await withTempDir(async (tmpDir) => {
+    const skillsDir = path.join(tmpDir, '.agents', 'skills');
+    // Two skills with the same explicit id
+    for (const name of ['skill-a', 'skill-b']) {
+      const dir = path.join(skillsDir, name);
+      await mkdir(dir, { recursive: true });
+      await writeFile(
+        path.join(dir, 'SKILL.md'),
+        `---\nname: ${name}\ndescription: Skill ${name}\nid: same-id\n---\nBody\n`,
+      );
+    }
+
+    const result = await importAgentSkills(tmpDir, {
+      strict: false,
+      outputDir: path.join(tmpDir, 'out'),
+    });
+    assert.equal(result.imported.length, 1, 'Only first skill should be imported');
+    assert.equal(result.errors.length, 1, 'Second skill should be a duplicate error');
+    assert.ok(result.errors[0].message.includes('Duplicate skill id'), result.errors[0].message);
+  });
+});
+
+test('exportSkillToAgentFormat sanitizes directory name', async () => {
+  await withTempDir(async (tmpDir) => {
+    const skill = {
+      metadata: {
+        id: 'safe$(whoami)',
+        name: 'Evil Export',
+        description: 'Test shell injection in export dir name',
+        category: 'core',
+        phase: 'midstream',
+        applyTo: ['**/*'],
+      },
+      body: '# Evil Export',
+      path: '/tmp/fake.md',
+    };
+
+    const result = await exportSkillToAgentFormat(skill, tmpDir);
+    // Directory should not contain shell metacharacters
+    assert.ok(!result.path.includes('$('));
+    assert.ok(result.path.includes('safewhoami'));
   });
 });
