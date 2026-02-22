@@ -3,5 +3,6 @@
   "**/*.{md,markdown}": ["npm run check:dashes", "prettier --write", "markdownlint --fix"],
   "**/*.{json,yml,yaml}": ["prettier --write"],
   "skills/**/*.md": ["npm run skills:validate"],
-  "skills/agent-skills/**/*.md": ["npm run agent-skills:validate"]
+  "skills/agent-skills/**/*.md": ["npm run agent-skills:validate"],
+  "pages/**/*.md": ["npm run check:bilingual"]
 }

@@ -1,0 +1,153 @@
+name: Doc Quality
+
+on:
+  pull_request:
+    paths:
+      - 'pages/**/*.md'
+      - 'docs/**/*.md'
+      - '*.md'
+      - 'scripts/check-bilingual-pairs.mjs'
+      - 'scripts/check-doc-placement.mjs'
+      - '.github/workflows/doc-quality.yml'
+  schedule:
+    - cron: '30 2 * * 1'
+  workflow_dispatch:
+
+jobs:
+  doc-quality:
+    name: Document quality checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check bilingual pairs
+        id: bilingual
+        run: |
+          set -o pipefail
+          npm run check:bilingual | tee bilingual.log
+        continue-on-error: true
+
+      - name: Check document placement
+        id: placement
+        run: |
+          set -o pipefail
+          npm run check:doc-placement | tee placement.log
+        continue-on-error: true
+
+      - name: Upload log files
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: doc-quality-logs
+          path: '*.log'
+
+      - name: Create GitHub issue on failure (schedule only)
+        if: |
+          github.event_name == 'schedule' && (
+            steps.bilingual.outcome == 'failure' ||
+            steps.placement.outcome == 'failure'
+          )
+        uses: actions/github-script@v8
+        env:
+          OUTCOME_BILINGUAL: ${{ steps.bilingual.outcome }}
+          OUTCOME_PLACEMENT: ${{ steps.placement.outcome }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const checks = [
+              {
+                key: 'check:bilingual',
+                title: '定期チェック: npm run check:bilingual が失敗しました',
+                outcome: process.env.OUTCOME_BILINGUAL,
+                logPath: 'bilingual.log',
+              },
+              {
+                key: 'check:doc-placement',
+                title: '定期チェック: npm run check:doc-placement が失敗しました',
+                outcome: process.env.OUTCOME_PLACEMENT,
+                logPath: 'placement.log',
+              },
+            ];
+
+            const labelName = 'scheduled-check';
+
+            const openIssuesData = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner,
+                repo,
+                state: 'open',
+                labels: labelName,
+                per_page: 100,
+              },
+            );
+
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+
+            let useLabelForIssues = true;
+            try {
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: labelName,
+                color: 'f29513',
+                description: '定期実行の自動検証で見つかった問題',
+              });
+            } catch (err) {
+              if (err.status !== 422) {
+                console.warn(`ラベル作成に失敗しましたが、処理を継続します: ${err.message}`);
+                useLabelForIssues = false;
+              }
+            }
+
+            for (const check of checks) {
+              if (check.outcome !== 'failure') continue;
+              if (openIssuesData.some(issue => issue.title === check.title)) {
+                console.log(`既存の Issue があるため新規作成をスキップします: ${check.key}`);
+                continue;
+              }
+              const log = fs.existsSync(check.logPath) ? fs.readFileSync(check.logPath, 'utf8') : '';
+              const lines = log.trimEnd().split('\n');
+              const isTruncated = lines.length > 120;
+              const snippet = (isTruncated ? lines.slice(-120) : lines).join('\n');
+              const note = isTruncated
+                ? '\n\n_ログは末尾から 120 行のみを表示しています。_'
+                : '';
+              const body = `定期実行で \`${check.key}\` が失敗しています。\n\n- 実行: ${runUrl}\n- ログ:\n\`\`\`\n${snippet}\n\`\`\`\n${note}\n`;
+
+              try {
+                await github.rest.issues.create({
+                  owner,
+                  repo,
+                  title: check.title,
+                  body,
+                  labels: useLabelForIssues ? [labelName] : [],
+                });
+                console.log(`Issue を作成しました: ${check.title}`);
+              } catch (err) {
+                console.error(`Issue 作成に失敗しました (${check.key}): ${err.message}`);
+              }
+            }
+
+      - name: Fail if placement check failed
+        if: steps.placement.outcome == 'failure'
+        run: |
+          echo "Document placement policy violation detected. See logs for details."
+          exit 1
