@@ -68,9 +68,9 @@ import { buildExecutionPlan } from '../runners/core/review-runner.mjs';
 
 ## Migration Resources
 
-- **Migration Guide:** [docs/migration/runners-migration-guide.md](docs/migration/runners-migration-guide.md)
-- **Architecture Documentation:** [docs/architecture.md](docs/architecture.md)
-- **Changelog:** [CHANGELOG.md](CHANGELOG.md)
+- **Migration Guide:** [docs/migration/runners-migration-guide.md](migration/runners-migration-guide.md)
+- **Architecture Documentation:** [docs/architecture.md](architecture.md)
+- **Changelog:** [CHANGELOG.md](../CHANGELOG.md)
 
 ## Version Compatibility
 
@@ -89,6 +89,6 @@ import { buildExecutionPlan } from '../runners/core/review-runner.mjs';
 
 If you have questions about migration, please:
 
-1. Check the [Migration Guide](docs/migration/runners-migration-guide.md)
+1. Check the [Migration Guide](migration/runners-migration-guide.md)
 2. Review [Epic #242](https://github.com/s977043/river-reviewer/issues/242)
 3. Open an issue with the `migration-help` label

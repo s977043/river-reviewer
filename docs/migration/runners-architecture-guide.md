@@ -628,7 +628,7 @@ plan.skipped.forEach(({ skill, reasons }) => {
 ## Related Documentation
 
 - [CHANGELOG](../../CHANGELOG.md) - Version history and breaking changes
-- [Deprecated Paths](../../DEPRECATED.md) - Full deprecation notice
+- [Deprecated Paths](../deprecated.md) - Full deprecation notice
 - [Architecture Overview](../architecture.md) - System architecture
 - [Skills Concepts](../../pages/explanation/skills.en.md) - Understanding skills
 - [Core Runner README](../../runners/core/README.md) - Core module details
