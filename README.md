@@ -78,7 +78,7 @@ jobs:
 
 最新リリース: [v0.5.0](https://github.com/s977043/river-reviewer/releases/tag/v0.5.0)
 
-> **ℹ️ v0.1.x からのアップグレード:** v0.2.0以降では、GitHub Actionのパスが `.github/actions/river-reviewer` から `runners/github-action` に変更されています。詳細は[移行ガイド](docs/migration/runners-architecture-guide.md)と[DEPRECATED.md](DEPRECATED.md)をご確認ください。
+> **ℹ️ v0.1.x からのアップグレード:** v0.2.0以降では、GitHub Actionのパスが `.github/actions/river-reviewer` から `runners/github-action` に変更されています。詳細は[移行ガイド](docs/migration/runners-architecture-guide.md)と[DEPRECATED.md](docs/deprecated.md)をご確認ください。
 
 ### 高度な設定例
 

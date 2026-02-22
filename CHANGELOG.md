@@ -103,7 +103,7 @@
 ### Migration Resources
 
 - **Full Migration Guide:** [docs/migration/runners-migration-guide.md](docs/migration/runners-migration-guide.md)
-- **Deprecation Notice:** [DEPRECATED.md](DEPRECATED.md)
+- **Deprecation Notice:** [DEPRECATED.md](docs/deprecated.md)
 - **Architecture Overview:** [docs/architecture.md](docs/architecture.md)
 
 ### Documentation
