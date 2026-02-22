@@ -1,5 +1,7 @@
 # スキル構造設計書
 
+> **内部資料:** Issue #310の設計メモです。スキル仕様の公開リファレンスは [`pages/reference/skill-schema-reference.md`](../pages/reference/skill-schema-reference.md) を参照してください。
+
 Issue #310: 目標ディレクトリ構造・粒度の決定（入口 + 専門）
 
 ---

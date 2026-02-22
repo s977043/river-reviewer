@@ -304,7 +304,7 @@ v0.1.x will receive critical security fixes only. All feature development happen
 
 ## Additional Resources
 
-- **DEPRECATED.md:** [Full deprecation notice](../../DEPRECATED.md)
+- **DEPRECATED.md:** [Full deprecation notice](../deprecated.md)
 - **Epic #242:** [Architecture Refactoring Details](https://github.com/s977043/river-reviewer/issues/242)
 - **Architecture Docs:** [docs/architecture.md](../architecture.md)
 - **Skills Concepts:** [Skills](../../pages/explanation/skills.en.md)
