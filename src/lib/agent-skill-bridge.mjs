@@ -67,16 +67,19 @@ export class AgentSkillBridgeError extends Error {
 // Discovery
 // ---------------------------------------------------------------------------
 
-async function dirExists(dirPath) {
+async function dirExists(dirPath, { followSymlinks = true } = {}) {
   try {
-    const stat = await fs.stat(dirPath);
+    const stat = followSymlinks ? await fs.stat(dirPath) : await fs.lstat(dirPath);
     return stat.isDirectory();
   } catch {
     return false;
   }
 }
 
-async function listSkillPackages(dirPath) {
+const MAX_SCAN_DEPTH = 10;
+
+async function listSkillPackages(dirPath, depth = 0) {
+  if (depth > MAX_SCAN_DEPTH) return [];
   let entries;
   try {
     entries = await fs.readdir(dirPath, { withFileTypes: true });
@@ -94,7 +97,7 @@ async function listSkillPackages(dirPath) {
       } catch {
         /* not a skill package – check nested */
       }
-      return listSkillPackages(entryPath);
+      return listSkillPackages(entryPath, depth + 1);
     })
   );
   return groups.flat().sort();
@@ -160,24 +163,17 @@ function extractExtraMetadata(metadata) {
   return Object.keys(extra).length ? extra : undefined;
 }
 
-export function convertAgentSkillToRR(parsed, existingIds = new Set()) {
+export function convertAgentSkillToRR(parsed, existingIds = new Set(), projectRoot) {
   const { metadata: rawMeta, body, dirPath } = parsed;
   const dirName = path.basename(dirPath);
 
   const meta = { ...rawMeta };
 
-  // ID generation / sanitization / collision handling
+  // ID generation / sanitization
   if (!meta.id) {
     meta.id = generateAgentSkillId(dirName, existingIds);
   } else {
     meta.id = sanitizeSkillId(meta.id);
-    // Deduplicate explicit IDs that collide with already-seen IDs
-    if (existingIds.has(meta.id)) {
-      const base = meta.id;
-      let n = 2;
-      while (existingIds.has(`${base}-${n}`)) n++;
-      meta.id = `${base}-${n}`;
-    }
   }
 
   // Category default
@@ -205,7 +201,7 @@ export function convertAgentSkillToRR(parsed, existingIds = new Set()) {
     ...(meta.metadata ?? {}),
     ...(extra ?? {}),
     source: 'agent',
-    originPath: dirPath,
+    originPath: projectRoot ? path.relative(projectRoot, dirPath) : dirPath,
   };
 
   // Remove extra fields from top level (they're now in metadata)
@@ -285,7 +281,16 @@ export async function importAgentSkills(projectRoot, options = {}) {
         continue;
       }
 
-      const converted = convertAgentSkillToRR(parsed, existingIds);
+      const converted = convertAgentSkillToRR(parsed, existingIds, projectRoot);
+
+      // Detect duplicate explicit ids within the same import batch
+      if (existingIds.has(converted.metadata.id)) {
+        errors.push({
+          path: skillPath,
+          message: `Duplicate skill id "${converted.metadata.id}" – already imported in this batch`,
+        });
+        continue;
+      }
       existingIds.add(converted.metadata.id);
 
       if (strict) {
@@ -337,7 +342,7 @@ function assertSafePath(base, child, label) {
 }
 
 async function writeImportedSkill(skill, destDir) {
-  const dirName = skill.metadata.id;
+  const dirName = sanitizeSkillId(skill.metadata.id);
   const skillDir = assertSafePath(destDir, dirName, 'Skill id');
   await fs.mkdir(skillDir, { recursive: true });
 
@@ -423,9 +428,9 @@ export async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
     const sourceDir = path.dirname(skill.path);
     for (const assetDir of ASSET_DIRS) {
       const src = path.join(sourceDir, assetDir);
-      if (await dirExists(src)) {
-        const dest = path.join(skillDir, assetDir);
-        await fs.cp(src, dest, { recursive: true });
+      if (await dirExists(src, { followSymlinks: false })) {
+        const dest = assertSafePath(skillDir, assetDir, 'Asset directory');
+        await fs.cp(src, dest, { recursive: true, dereference: false });
       }
     }
   }
@@ -466,6 +471,7 @@ export async function exportAllSkills(projectRoot, options = {}) {
 export async function listAllSkills(projectRoot, options = {}) {
   const { source = 'all' } = options;
   const skills = [];
+  const seenIds = new Set();
 
   if (source === 'rr' || source === 'all') {
     const rrSkills = await loadSkills({
@@ -473,6 +479,7 @@ export async function listAllSkills(projectRoot, options = {}) {
       excludedTags: [],
     });
     for (const s of rrSkills) {
+      seenIds.add(s.metadata.id);
       skills.push({
         id: s.metadata.id,
         name: s.metadata.name,
@@ -488,14 +495,20 @@ export async function listAllSkills(projectRoot, options = {}) {
       try {
         const parsed = await parseAgentSkill(skillPath);
         const dirName = path.basename(path.dirname(skillPath));
+        const id = sanitizeSkillId(parsed.metadata.id || `as-${dirName}`);
+        // Skip duplicates already loaded as RR skills (imported skills)
+        if (seenIds.has(id)) continue;
+        seenIds.add(id);
         skills.push({
-          id: parsed.metadata.id || `as-${dirName}`,
+          id,
           name: parsed.metadata.name || dirName,
           source: 'agent',
           path: path.relative(projectRoot, skillPath),
         });
-      } catch {
-        // Skip unparseable agent skills in listing
+      } catch (err) {
+        process.stderr.write(
+          `⚠️  Skipping unparseable agent skill: ${path.relative(projectRoot, skillPath)}: ${err.message ?? err}\n`,
+        );
       }
     }
   }
