@@ -52,7 +52,7 @@ PR/CI では少なくとも `npm test` と `npm run lint` を通し、変更内�
 
 慎重に扱う/原則手動編集しない:
 
-- `docs/`: 公開用生成物を想定。編集は通常 `pages/` 側で行う
+- `docs/`: 内部向け資料（設計メモ・ADR等）。公開コンテンツは `pages/` で管理する
 - `assets/`: 各種アセット
 - `LICENSE*`, `CITATION.cff`: ライセンス/引用情報
 - `package-lock.json`: `npm ci` で再生成。手作業で書き換えない
@@ -194,7 +194,7 @@ AI エージェントは「主に編集対象」を優先し、それ以外は�
 
 - このリポは「AI レビューエージェント」そのものの定義・スキルを含む。仕様変更前に `schemas/*.json` と既存 `skills/` の整合を確認。
 - 大きな変更は小さく刻み、必ずテストと検証スクリプトで裏を取ってから PR。
-- 不明な場合は README と `docs/architecture.md`（Planner/Runner 概要）、`docs/skill-planner.md` を参照。
+- 不明な場合は README と `docs/architecture.md`（Planner/Runner 概要）、`pages/guides/skill-planner.md` を参照。
 - **LLM 有効判定の共通化**: LLM 機能（スキル選択、プランナーなど）を実装・変更する際は、`src/lib/utils.mjs` の `isLlmEnabled()` を使用すること。これは OpenAI (`OPENAI_API_KEY`, `RIVER_OPENAI_API_KEY`) および Google Gemini (`GOOGLE_API_KEY`) の両方のキーを適切にチェックする。
 
 ---
