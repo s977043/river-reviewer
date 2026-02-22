@@ -49,10 +49,6 @@ async function validateSkill(skillPath) {
   const dirName = path.basename(path.dirname(skillPath));
   const errors = [];
 
-  if (!isKebabCaseName(dirName)) {
-    errors.push('dir name must be lowercase kebab-case');
-  }
-
   let metadata;
   try {
     const content = await fs.readFile(skillPath, 'utf8');
@@ -62,9 +58,18 @@ async function validateSkill(skillPath) {
     errors.push(`frontmatter parse failed: ${err.message}`);
   }
 
+  // Imported agent skills have metadata.source === 'agent' and may use a
+  // generated id (e.g. as-<name>) as directory name while preserving the
+  // original name field. Skip kebab-case and name-match checks for those.
+  const isImported = metadata?.metadata?.source === 'agent';
+
+  if (!isImported && !isKebabCaseName(dirName)) {
+    errors.push('dir name must be lowercase kebab-case');
+  }
+
   if (!metadata?.name || typeof metadata.name !== 'string') {
     errors.push('missing metadata.name');
-  } else if (metadata.name !== dirName) {
+  } else if (!isImported && metadata.name !== dirName) {
     errors.push(`metadata.name must match directory name (${dirName})`);
   }
 
