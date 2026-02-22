@@ -1,5 +1,8 @@
 # Contribution Guide
 
+> **For the full contribution guide, see [`CONTRIBUTING.md`](../../../CONTRIBUTING.md) in the repository root.**
+> This page is a summary for the documentation site.
+
 Thank you for your interest in River Reviewer. We accept Pull Requests and Issues according to the following policies.
 
 ## PR Basic Policy
