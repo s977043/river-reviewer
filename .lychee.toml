@@ -35,18 +35,18 @@ exclude = [
 ]
 
 # Exclude specific files that contain Docusaurus-internal routing links
-exclude_path = ['pages/index.md', 'pages/index.en.md']
+exclude_path = ["pages/index\\.md$", "pages/index\\.en\\.md$"]
 
 # Accept status codes
 # Redirects are handled by max_redirects (not listed here to ensure permanent redirects are visible in logs)
 accept = [
   # Success codes only
-  200, 201, 202, 203, 204,
+  "200", "201", "202", "203", "204",
   # Server error codes to accept (temporary issues)
-  500, # Internal Server Error - may be temporary
+  "500", # Internal Server Error - may be temporary
   # Client error codes to accept (use carefully)
-  # 403, # Forbidden - some sites block automated requests
-  # 429, # Too Many Requests
+  # "403", # Forbidden - some sites block automated requests
+  # "429", # Too Many Requests
 ]
 
 # Exclude all private IPs from checking
@@ -68,7 +68,7 @@ timeout = 30
 max_retries = 3
 
 # Headers to send with requests (helps with some sites that block bots)
-headers = []
+# header = { "accept" = "text/html" }
 
 # Methods to use for checking (HEAD is faster and sufficient for link validation)
 # Note: Some servers don't support HEAD properly. If issues arise, change back to "get"
