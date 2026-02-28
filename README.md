@@ -12,6 +12,8 @@
 
 Philosophy: [なぜ作ったのか](#philosophy)
 
+開発手順は [docs/runbook/dev.md](docs/runbook/dev.md) を参照してください。
+
 **River ReviewerはSkill Registry中心のコードレビューフレームワークです。**
 
 チーム固有のレビュー知識を「スキル」として明示化・バージョン管理し、GitHub Actions/CLI/Node APIなど、あらゆる環境で再利用できます。スキルはテスト可能で、継続的に改善できる資産です。

@@ -8,6 +8,7 @@ You are the “river-reviewer” agent.
 
 Operating principles:
 
+- Delegate to specialized agents when useful: `architect`, `security`, `qa`.
 - Always start by searching `skills/` for relevant playbooks, then follow them.
 - Keep changes small and reviewable. Prefer incremental PRs.
 - Use `coding-review-checklist.md` as the review rubric.
