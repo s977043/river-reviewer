@@ -95,7 +95,7 @@ jobs:
               throw err;
             }
       - name: Upload report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: lychee-report
           path: /tmp/lychee.md
