@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.9.0](https://github.com/s977043/river-reviewer/compare/v0.8.0...v0.9.0) (2026-02-28)
+
+
+### Features
+
+* **runner:** enable runtime loading of agent-skills and update audit script ([01fc8a2](https://github.com/s977043/river-reviewer/commit/01fc8a20f9f7decf83fe3cff951ec22189f4e3b5))
+* **skills:** add Agent Skills (SKILL.md) import/export bridge ([#349](https://github.com/s977043/river-reviewer/issues/349)) ([305f14c](https://github.com/s977043/river-reviewer/commit/305f14c4b610b90e8ff45afd88fdb1d516c7584a))
+* **skills:** add entry skill river-reviewer ([ece1790](https://github.com/s977043/river-reviewer/commit/ece1790371a44ba1b6d6245e1d80475ab8fe2b72)), closes [#313](https://github.com/s977043/river-reviewer/issues/313)
+* **skills:** Agent Skills (SKILL.md) bridge with review enhancements ([#350](https://github.com/s977043/river-reviewer/issues/350)) ([93c4ba5](https://github.com/s977043/river-reviewer/commit/93c4ba58ec46869ce342e0659afed178a9c5a3c1))
+* 型駆動設計ガードとレビュー自動化境界ガードを追加 ([#352](https://github.com/s977043/river-reviewer/issues/352)) ([3616261](https://github.com/s977043/river-reviewer/commit/3616261bf59d47bb048851b7856fb4c5ae3e145a))
+
+
+### Bug Fixes
+
+* address additional review comments ([22800e1](https://github.com/s977043/river-reviewer/commit/22800e192b94673ab0435aebcba3cbd6c219be68))
+* address review comments on AGENTS.md ([f21474c](https://github.com/s977043/river-reviewer/commit/f21474cc0a9f33b93b5088fb9c25fb1f855bde7b))
+* address review comments on templates ([1e3159e](https://github.com/s977043/river-reviewer/commit/1e3159e12f169c15158c54f59e7c78063bbde337))
+* agents.md dead link and root allowlist cleanup ([#360](https://github.com/s977043/river-reviewer/issues/360)) ([47df063](https://github.com/s977043/river-reviewer/commit/47df063a9ccbf93a65b055016aa6b745aefed5c7))
+* **ci:** update .lychee.toml for latest lychee parser compatibility ([#368](https://github.com/s977043/river-reviewer/issues/368)) ([2d3da5a](https://github.com/s977043/river-reviewer/commit/2d3da5a400fb268e6e0492f1a6c16424a3cb7484))
+* enforce branch policy in agent configuration ([#353](https://github.com/s977043/river-reviewer/issues/353)) ([f54bb6f](https://github.com/s977043/river-reviewer/commit/f54bb6fd1a168c297c08f0f727c6dbfbcf4a5498))
+* Git diffのmaxBufferを拡大 ([f36af63](https://github.com/s977043/river-reviewer/commit/f36af63c6580eb0a376842c0825f3d14f66c1010))
+* increase maxBuffer for large diffs ([db81630](https://github.com/s977043/river-reviewer/commit/db81630bd19b830e49a8fe152de562b51872959a))
+* **scripts:** skip agent-skills in legacy validator ([18cac4f](https://github.com/s977043/river-reviewer/commit/18cac4fd82ee5db59ad9c11292e8a02f587df4c6))
+* **security:** address PR [#350](https://github.com/s977043/river-reviewer/issues/350) review findings for agent skill bridge ([#361](https://github.com/s977043/river-reviewer/issues/361)) ([eb4e7a4](https://github.com/s977043/river-reviewer/commit/eb4e7a4fd3dd4d12e430d97a15eb745152d2cca1))
+* skip LLM-only skills when LLM is disabled ([1329dc9](https://github.com/s977043/river-reviewer/commit/1329dc9ae2d0b4752b1f47bb9c17a28ba4f496a5))
+* support GOOGLE_API_KEY in LLM check and add integration test ([9ac9d8e](https://github.com/s977043/river-reviewer/commit/9ac9d8e4d472fda178e35e1786f92c5d67fd39ff))
+
 ## [0.8.0](https://github.com/s977043/river-reviewer/compare/v0.7.1...v0.8.0) (2026-01-10)
 
 
