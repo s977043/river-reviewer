@@ -23,11 +23,16 @@ fi
 FILES_TO_FORMAT=$(echo "$CHANGED_FILES" | grep -E '\.(js|jsx|ts|tsx|json|md|yml|yaml|mjs)$' || true)
 
 if [ -n "$FILES_TO_FORMAT" ]; then
-  echo "$FILES_TO_FORMAT" | while read -r file; do
+  files_to_format_array=()
+  while IFS= read -r file; do
     if [ -f "$file" ]; then
-      npx prettier --write "$file" || true
+      files_to_format_array+=("$file")
     fi
-  done
+  done <<< "$FILES_TO_FORMAT"
+
+  if [ ${#files_to_format_array[@]} -gt 0 ]; then
+    npx --no-install prettier --write "${files_to_format_array[@]}" || true
+  fi
 fi
 
 echo "[format] Done"
