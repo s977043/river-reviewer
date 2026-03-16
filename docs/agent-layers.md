@@ -95,9 +95,9 @@ graph TB
 | エージェント   | Claude Code       | Copilot           | 役割                       |
 | -------------- | ----------------- | ----------------- | -------------------------- |
 | river-reviewer | `.claude/agents/` | `.github/agents/` | コードレビュー・リファクタ |
-| architect      |—                | `.github/agents/` | アーキテクチャ設計         |
-| security       |—                | `.github/agents/` | セキュリティレビュー       |
-| qa             |—                | `.github/agents/` | QA・テスト                 |
+| architect      | -                 | `.github/agents/` | アーキテクチャ設計         |
+| security       | -                 | `.github/agents/` | セキュリティレビュー       |
+| qa             | -                 | `.github/agents/` | QA・テスト                 |
 
 **設計原則:** 各ツールの frontmatter 形式が異なるため、エージェント定義はツール別に維持する。共通の役割・ワークフローはこの文書でマッピングし、ドリフトを防止する。
 
@@ -116,8 +116,8 @@ graph TB
 
 ## 関連ドキュメント
 
-- [AGENTS.md](../AGENTS.md)—全エージェント共通ルール（SSoT）
-- [docs/architecture.md](./architecture.md)—Skill Registry の技術アーキテクチャ
-- [skills/README.md](../skills/README.md)—スキル定義の仕様
-- [.claude/hooks/README.md](../.claude/hooks/README.md)—Claude Code hooks の説明
-- [hooks/README.md](../hooks/README.md)—共通 hook スクリプトの説明
+- [AGENTS.md](../AGENTS.md) - 全エージェント共通ルール（SSoT）
+- [docs/architecture.md](./architecture.md) - Skill Registryの技術アーキテクチャ
+- [skills/README.md](../skills/README.md) - スキル定義の仕様
+- [.claude/hooks/README.md](../.claude/hooks/README.md) - Claude Code hooksの説明
+- [hooks/README.md](../hooks/README.md) - 共通hookスクリプトの説明
