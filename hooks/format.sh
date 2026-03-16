@@ -31,7 +31,7 @@ if [ -n "$FILES_TO_FORMAT" ]; then
   done <<< "$FILES_TO_FORMAT"
 
   if [ ${#files_to_format_array[@]} -gt 0 ]; then
-    npx prettier --write "${files_to_format_array[@]}" || true
+    npx --no-install prettier --write "${files_to_format_array[@]}" || true
   fi
 fi
 

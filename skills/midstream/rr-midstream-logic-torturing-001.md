@@ -13,7 +13,7 @@ applyTo:
 tags: [adversarial, logic-torturing, decision-quality, critical-thinking, midstream, cognitive-bias]
 severity: major
 inputContext: [diff, fullFile, commitMessage, adr]
-outputKind: [findings, questions]
+outputKind: [summary, findings, questions]
 modelHint: high-accuracy
 dependencies: [code_search, repo_metadata]
 ---
@@ -75,7 +75,7 @@ dependencies: [code_search, repo_metadata]
 すべて日本語。
 
 ```text
-(logic-torturing):1: [要約] この変更で最も検証が必要な判断は〈1文〉
+(summary):1: [要約] この変更で最も検証が必要な判断は〈1文〉
 
 <file>:<line>: [論理検証1] <判断の要約>
   問い: <この判断の論理的な穴を突く質問>

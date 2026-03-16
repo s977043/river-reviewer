@@ -12,7 +12,7 @@ applyTo:
 tags: [adversarial, war-game, security, attack-simulation, midstream, cognitive-bias]
 severity: major
 inputContext: [diff, fullFile]
-outputKind: [findings, actions]
+outputKind: [summary, findings, actions]
 modelHint: high-accuracy
 dependencies: [code_search]
 ---
@@ -69,7 +69,7 @@ dependencies: [code_search]
 すべて日本語。
 
 ```text
-(war-game):1: [要約] 攻撃者視点で最も危険な露出は〈1文〉
+(summary):1: [要約] 攻撃者視点で最も危険な露出は〈1文〉
 
 <file>:<line>: [攻撃シナリオ1] <タイトル>
   ペルソナ: <外部攻撃者|認証済み悪意ユーザー|内部脅威者|自動化ボット>
