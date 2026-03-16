@@ -3,7 +3,7 @@ id: rr-midstream-logic-torturing-001
 name: 'Logic Torturing 論理検証'
 description: '変更に含まれる設計判断・実装選択の論理的整合性を徹底的に検証し、確証バイアスを排除して判断精度を高める'
 category: midstream
-phase: midstream
+phase: [upstream, midstream]
 applyTo:
   - 'src/**/*.{ts,tsx,js,jsx,mjs}'
   - 'docs/**/*design*.md'
