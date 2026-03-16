@@ -4,11 +4,12 @@ description: 'coding-review-checklist + skills でレビューする'
 agent: 'river-reviewer'
 ---
 
-この変更をレビューしてください。レビューは日本語で、指摘は「重要度(High/Med/Low)」付きで書いてください。
+この変更をレビューしてください。レビューは日本語で、指摘は「重要度（Critical/Major/Minor/Info）」付きで書いてください。
 
 参照（必要に応じて開く）:
 
 - [pages/contributing/review-checklist.md](../../pages/contributing/review-checklist.md)
+- [docs/review/output-format.md](../../docs/review/output-format.md)
 - [skills/](../../skills/)
 
 観点:
