@@ -185,4 +185,4 @@ gh pr create --title "<type>: <description>" --body "..."
 | Google Gemini  | `GEMINI.md`                       | -                         | Gemini CLI/Chat   |
 | OpenAI Codex   | `.codex/`                         | -                         | -                 |
 
-各プロバイダー固有ファイルはこの`AGENTS.md`を前提にツール固有の差分だけを薄く記載する（ドリフト防止）。
+各プロバイダー固有ファイルはこの`AGENTS.md`を前提にツール固有の差分だけを薄く記載する（ドリフト防止）。`AGENTS.md`内のセクションを参照する場合は、セクション番号ではなく見出しアンカー（例: `#10-aiプロバイダー別設定`）でリンクすること。
