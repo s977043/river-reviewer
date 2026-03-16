@@ -7,7 +7,7 @@
 - **Security**: Do not access secrets (`.env`, `secrets/`).
 - **Workflow**: `npm run lint` & `npm test` must pass before PR.
 - **Branch Policy**: Never push to `main`. Never push to already-merged PR branches. If fixes are needed after merge, create a new branch + new PR.
-- **Edit scope**: Only edit `pages/`, `skills/`, `schemas/`, `scripts/`, `tests/`, `.github/`. Other paths require user confirmation.
+- **Edit scope**: Only edit `pages/`, `skills/`, `schemas/`, `scripts/`, `tests/`, `.github/`. Never edit `package-lock.json` or `LICENSE*`. Other paths require user confirmation.
 - **SSOT**: See `AGENTS.md` for tech stack, style guides, and definitions.
 
 ## Claude-specific

@@ -22,13 +22,13 @@
 
 ## 1. 自律判断の基準
 
-| 条件                                                | 行動                               |
-| --------------------------------------------------- | ---------------------------------- |
-| 変更ファイル3個以下、§3「編集対象」のみ             | そのまま実行してよい               |
-| 変更ファイル4個以上、または複数セクションにまたがる | 実行計画を提示してから着手する     |
-| §3「要確認」パスを含む（`src/`、`docs/`等）         | ユーザーに許可を求めてから編集する |
-| §3「編集禁止」パスを含む                            | 編集しない                         |
-| 判断に迷う場合                                      | ユーザーに確認する。推測で進めない |
+| 条件                                                    | 行動                               |
+| ------------------------------------------------------- | ---------------------------------- |
+| 変更ファイルが3個以下の見込み、§3「編集対象」のみ       | そのまま実行してよい               |
+| 変更ファイルが4個以上の見込み、または複数領域にまたがる | 実行計画を提示してから着手する     |
+| §3「要確認」パスを含む（`src/`、`docs/`等）             | ユーザーに許可を求めてから編集する |
+| §3「編集禁止」パスを含む                                | 編集しない                         |
+| 判断に迷う場合                                          | ユーザーに確認する。推測で進めない |
 
 ---
 
@@ -109,7 +109,7 @@ npm test         # Node.js test runner
 
 - **Runtime**: Node.js 20+、npm（lockfile: `package-lock.json`）
 - **Test Runner**: `node --test`（built-in）
-- **Documentation**: Docusaurus 3（`pages/`配下、日本語がSSoT）
+- **Documentation**: Docusaurus 3（`pages/`配下）
 - **Linting**: `prettier`、`eslint`（`.eslintrc.js`）、`markdownlint`（`.markdownlint.json`）、`textlint`（日本語文法）、`vale`（英語prose）
 - **フォーマット**: Prettier（`**/*.{js,json,md,yml,yaml}`、設定は`.prettierrc.json`）
 - **JavaScript/Node**: ESM
@@ -169,7 +169,7 @@ gh pr create --title "<type>: <description>" --body "..."
 
 ## 9. AI実装メモ
 
-- このリポジトリはAIレビューエージェントそのものの定義・スキルを含む。仕様変更前に`schemas/*.json`と既存`skills/`の整合を確認する
+- このリポジトリはAIレビューエージェントそのものの定義・スキルを含む。`src/`を変更する場合は§3「要確認」に従う
 - **LLM有効判定の共通化**: LLM機能を実装・変更する際は`src/lib/utils.mjs`の`isLlmEnabled()`を使用する。OpenAI（`OPENAI_API_KEY`、`RIVER_OPENAI_API_KEY`）およびGoogle Gemini（`GOOGLE_API_KEY`）の両方のキーをチェックする
 - 不明な場合はREADMEと`docs/architecture.md`を参照する
 - 並行タスクにはGit Worktreeを使用する。手順は`docs/runbook/dev.md`を参照する
