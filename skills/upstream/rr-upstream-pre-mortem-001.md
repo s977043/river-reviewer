@@ -13,7 +13,7 @@ applyTo:
 tags: [adversarial, pre-mortem, risk, design, upstream, cognitive-bias]
 severity: major
 inputContext: [diff, fullFile, adr, commitMessage]
-outputKind: [summary, findings, questions, actions]
+outputKind: [findings, questions, actions]
 modelHint: high-accuracy
 dependencies: [repo_metadata, code_search]
 ---
@@ -69,7 +69,7 @@ dependencies: [repo_metadata, code_search]
 すべて日本語。
 
 ```text
-(summary):1: [要約] この変更の最大リスクは〈1文〉
+(pre-mortem):1: [要約] この変更の最大リスクは〈1文〉
 
 <file>:<line>: [失敗シナリオ1] <タイトル>
   崩れる前提: <この変更が暗黙に依存していること>

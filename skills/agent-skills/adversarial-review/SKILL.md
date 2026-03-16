@@ -6,7 +6,7 @@ description: |
   Pre-mortem（失敗シナリオ分析）、War Game（攻撃者シミュレーション）、
   Logic Torturing（論理検証）を組み合わせ、通常のレビューでは見えない
   設計の盲点・防御の穴・論理の弱点を可視化する。
-category: upstream
+category: midstream
 phase: [upstream, midstream]
 severity: major
 applyTo:
