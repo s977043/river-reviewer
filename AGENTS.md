@@ -56,6 +56,7 @@
 - `scripts/`: 検証・ユーティリティスクリプト
 - `tests/`: テストファイル
 - `.github/`: GitHub Actions、エージェント定義
+- `.claude/`: Claude Code設定（agents、commands、hooks）
 
 ### 編集禁止（自動生成・管理外）
 
