@@ -13,5 +13,12 @@
 
 - 指示ファイル: `.github/instructions/*.instructions.md`
 - カスタムエージェント: `@river-reviewer` (`.github/agents/` 内)
-- プロンプト: `/skill`, `/review` (`.github/prompts/` 内)
+- プロンプト: `/skill`, `/review`, `/pr` (`.github/prompts/` 内)
 - Docs: 日本語を正とし、`.en.md` は翻訳版とします。
+
+## 責務分離ルール（肥大化防止）
+
+- `copilot-instructions.md`: 全体で不変に近いルールのみを記載。
+- `.github/instructions/*.instructions.md`: パス/言語ごとの実装規約を記載。
+- `.github/prompts/*.prompt.md`: 手動実行する定型タスクを記載。
+- 変更頻度が高い手順は `docs/runbook/` に集約し、ここへ長文で書かない。

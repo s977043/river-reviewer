@@ -1,0 +1,41 @@
+- Last updated（ISO日付）:
+  - 2026-02-28T00:55:00Z
+- Goal（成功条件を含む）:
+  - `.github/` 知識ベース整備を対象に、セルフレビュー→改善を3回実施してコミット/PR作成する。
+  - 成功条件: 変更適用・`npm test`/`npm run lint`実行・PR本文にレビュー依頼を記載。
+- Spec（SDD：受け入れ条件 / 例 / 境界。未確定は UNCONFIRMED）:
+  - 受け入れ条件: (1) フロー3回の証跡を台帳に記録 (2) 最後に初期条件確認 (3) エージェントレビュー依頼文をPRへ記載。
+  - 範囲: `.github/` と必要最小限のドキュメント。既存機能コードの変更はしない。
+  - 例: `/pr` prompt追加、instructions責務分離追記、runbook追加。
+  - 境界: UI変更なし、スクリーンショット不要。
+- Test strategy（TDD：対象・レベル・コマンド・期待する証拠）:
+  - Red/Green: `npm run lint` と `npm test` で回帰なしを確認。
+  - 変更依存: `.github`変更に対して `npm run agents:validate` を追加実行。
+- Constraints / Assumptions:
+  - AGENTS.mdをSSOTとして遵守。
+  - `CONTINUITY.md` 初期不在だったため新規作成。
+- Key decisions（理由は1行）:
+  - 変更は最小導入キットに限定し、レビュー可能性を優先。
+  - セルフレビュー3回は「差分確認→改善」を1セットとして記録。
+- State:
+  - Done:
+    - `.github/prompts/pr.prompt.md` を追加。
+    - `.github/agents/{architect,security,qa}.agent.md` を追加。
+    - `river-reviewer` と `copilot-instructions` を責務分離方針で更新。
+    - `docs/runbook/dev.md` 追加、`README.md` へ導線追加。
+    - Self-review loop1: `/pr` を copilot instructions の参照一覧へ追記（再確認時の欠落を修正済み）。
+    - Self-review loop2: `docs.instructions` に runbook 配置方針を追記。
+    - Self-review loop3: `/pr` にレビュー依頼文の例を追記。
+    - `npm run lint` 成功。
+    - `npm test` 成功（既知の警告ログあり・失敗なし）。
+    - `npm run agents:validate` 成功。
+    - `npm run lint` 再実行成功（/pr参照追記後）。
+  - Now:
+    - 追加修正（`copilot-instructions.md`）をコミットして反映する。
+  - Next:
+    - 最初の条件適合可否を最終確認し、PR可否を回答する。
+- Open questions（必要なら UNCONFIRMED）:
+  - UNCONFIRMED: 「最初の条件」はユーザーが提示した `.github` 知識ベース導入案を指す。
+- Working set（files / ids / commands / refs）:
+  - files: `CONTINUITY.md`, `.github/*`, `docs/runbook/dev.md`, `README.md`
+  - commands: `npm run lint`, `npm test`, `npm run agents:validate`, `git diff`

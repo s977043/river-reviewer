@@ -11,3 +11,4 @@ applyTo: '**/*.md'
   - add links from the appropriate index/README if one exists
   - keep multilingual pairing consistent with the repo’s convention (e.g., `.en.md` when used)
 - Don’t let docs drift: update them in the same PR as behavior changes.
+- Procedural content (setup/release/ops) should live under `docs/runbook/` to keep responsibilities clear.
