@@ -1,255 +1,189 @@
-# AGENTS.md—River Reviewer agent guide
+# AGENTS.md—River Reviewer
 
-River Reviewer は「流れに寄り添う」AI レビューエージェントです。
-このリポジトリには、River Reviewer のドキュメント、スキーマ、検証ユーティリティがまとまっています。
-人間と AI コーディングエージェントが、安全かつ一貫した変更を行うためのルールをまとめています。
+この`AGENTS.md`は全AIコーディングエージェント共通のルールである。各ツール固有ファイル（`CLAUDE.md`等）は薄い差分のみを記載する。
 
----
-
-## 0. 原則（Single Source）
-
-- この `AGENTS.md` を全エージェント共通の単一ソースとし、各ツール固有ファイルは薄い差分のみを記載する。
-- 着手前に「完了条件」とリポジトリポリシーを確認し、短い実行計画を提示してから作業開始。
-- **直接コミットの禁止**: `main` ブランチへの直接コミットは、ドキュメント修正であっても例外なく禁止する。必ずタスク単位でブランチを切り、PR を作成する。具体的なチェック内容やレビュー要件は「## 11. タスク着手チェックリスト」を参照する。
-- 小さく変更 → 検証コマンド → PR → Green 確認 → レビュー
-- 設定ファイルを真実の源泉とし、フォーマッタ / lint を必ず通す
-- 秘密情報は持ち込まない（`.env*` は禁止、例示はダミー値で）
+**このリポジトリの概要:** Skill Registry駆動のAIコードレビューフレームワーク。`skills/`配下のレビュースキル定義がプロダクトの中核であり、`src/`のランタイム、GitHub Actions、CLIはそのスキルを実行するインターフェイスである。アーキテクチャ詳細は`docs/architecture.md`を参照する。
 
 ---
 
-## 1. セットアップと共通コマンド（npm 前提）
+## 0. 禁止事項
 
-- 依存導入（CI/再現性重視）: `npm ci`
-- ローカル開発インストール: `npm install`
-- ドキュメント開発サーバ（Docusaurus）: `npm run dev`
-- ドキュメントビルド: `npm run build`
-- テスト（Node.js test runner）: `npm test`
-- Lint 一式（Prettier / markdownlint / textlint など）: `npm run lint`
-- リンクチェック（lychee、別途インストール必要）: `npm run check:links`
-  - クイックチェック: `npm run check:links:quick`
-  - オフライン（内部リンクのみ）: `npm run check:links:local`
-  - **注意:** lycheeは別途インストールが必要です: `brew install lychee` (macOS) または[インストールガイド](https://github.com/lycheeverse/lychee#installation)を参照
-- エージェント定義検証: `npm run agents:validate`
-- スキル定義検証: `npm run skills:validate`
-- Agent Skills 検証: `npm run agent-skills:validate`
-- OpenTelemetry トレース検証（必要時のみ）: `npm run trace:validate`
-- Planner 評価（任意・オフラインベンチ用）: `npm run planner:eval`
+以下は例外なく禁止する。
 
-PR/CI では少なくとも `npm test` と `npm run lint` を通し、変更内容に応じて `agents:validate` / `skills:validate` を実行してください。ドキュメント変更時は `npm run check:links` でリンク切れを確認してください。
+- `main`ブランチへの直接push（`git push origin main`を実行しない）
+- マージ済みPRブランチへの追加push（修正が必要な場合は新しいブランチと新しいPRを作成する）
+- `.env*`、`secrets/`、`*.pem`、`*.key`の読み取り・コミット（例示にはダミー値を使う）
+- `package-lock.json`の手動編集
+- 外部ネットワークへのアクセス（`curl`、`wget`等）
+- 破壊的コマンド（`rm -rf`、`sudo`等）
+- 外部APIを呼ぶコードでタイムアウト・例外処理を省略すること
 
 ---
 
-## 2. ディレクトリ構成と編集範囲
+## 1. 自律判断の基準
 
-主に編集対象:
+| 条件                                                    | 行動                               |
+| ------------------------------------------------------- | ---------------------------------- |
+| 変更ファイルが3個以下の見込み、§3「編集対象」のみ       | そのまま実行してよい               |
+| 変更ファイルが4個以上の見込み、または複数領域にまたがる | 実行計画を提示してから着手する     |
+| §3「要確認」パスを含む（`src/`、`docs/`等）             | ユーザーに許可を求めてから編集する |
+| §3「編集禁止」パスを含む                                | 編集しない                         |
+| 判断に迷う場合                                          | ユーザーに確認する。推測で進めない |
 
-- `pages/`: Docusaurus 用ソースドキュメント（Diátaxis: tutorials/guides/reference/explanation）
-- `skills/`: YAML フロントマター付き Markdown のレビュー「スキル」定義
-- `schemas/`: `skill.schema.json`, `output.schema.json` などの JSON Schema
-- `scripts/`: `validate-*.mjs`, `fix-dashes.mjs` などユーティリティ
-- `tests/`: Node.js test runner 用のテスト
-- `.github/`: GitHub Actions 等の CI 設定
+---
 
-慎重に扱う/原則手動編集しない:
+## 2. 着手フロー
 
-- `docs/`: 内部向け資料（設計メモ・ADR等）。公開コンテンツは `pages/` で管理する
+タスクを受けたら以下の順で進める。
+
+1. 完了条件を確認する。§1の基準で計画提示が必要なら先に提示する
+2. タスク単位でブランチを作成する（`git checkout -b <type>/<description>`）
+3. 編集範囲を§3で確認する
+4. 変更を小さく刻む（1 PRは論理的に1つの目的）
+5. 新規ファイルを作成する場合、同種の既存ファイルのパターンに合わせる
+6. §4の検証コマンドを実行し、全パスを確認する
+7. PRを作成する（§7の手順に従う）
+
+---
+
+## 3. 編集範囲
+
+### 編集対象
+
+- `pages/`: Docusaurusドキュメント（日本語がSSoT）
+- `skills/`: レビュースキル定義（YAMLフロントマター付きMarkdown）
+- `schemas/`: JSON Schema（`skill.schema.json`等）
+- `scripts/`: 検証・ユーティリティスクリプト
+- `tests/`: テストファイル
+- `.github/`: GitHub Actions、エージェント定義
+- `.claude/`: Claude Code設定（agents、commands、hooks）
+
+### 編集禁止（自動生成・管理外）
+
+- `package-lock.json`: `npm ci`で再生成する
+- `LICENSE*`、`CITATION.cff`: ライセンス・引用情報
+
+### 要確認（ユーザーの許可を得てから編集）
+
+- `docs/`: 内部資料。公開コンテンツは`pages/`で管理する
 - `assets/`: 各種アセット
-- `LICENSE*`, `CITATION.cff`: ライセンス/引用情報
-- `package-lock.json`: `npm ci` で再生成。手作業で書き換えない
-
-AI エージェントは「主に編集対象」を優先し、それ以外は必要最小限にとどめてください。
+- `src/`: ランタイムソースコード。仕様変更前に`schemas/*.json`と既存`skills/`の整合を確認する
 
 ---
 
-## 3. 技術スタック
+## 4. 検証コマンド
 
-- **Runtime**: Node.js 20+
-- **Package Manager**: npm (lockfile: `package-lock.json`)
-- **Test Runner**: `node --test` (built-in)
-- **Documentation**: Docusaurus 3 (in `pages/`) - _SSOT is Japanese_
-- **Linting & Formatting**:
-  - Code: `prettier`, `eslint` (config: `.eslintrc.js`)
-  - Markdown: `markdownlint` (config: `.markdownlint.json`), `textlint` (Japanese grammar)
-  - English: `vale` (prose style)
+### 全PR共通（必須）
+
+```bash
+npm run lint     # Prettier + markdownlint + textlint
+npm test         # Node.js test runner
+```
+
+### 変更内容に応じた追加（該当時は必須）
+
+| 変更対象                             | コマンド                        |
+| ------------------------------------ | ------------------------------- |
+| `skills/**/*.md`                     | `npm run skills:validate`       |
+| `skills/agent-skills/**/*.md`        | `npm run agent-skills:validate` |
+| `.github/agents/`、`.claude/agents/` | `npm run agents:validate`       |
+| `pages/**/*.md`                      | `npm run check:links:local`     |
+
+### 任意
+
+| コマンド                 | 用途                           |
+| ------------------------ | ------------------------------ |
+| `npm run check:links`    | 全リンク検証（外部含む、低速） |
+| `npm run trace:validate` | OpenTelemetryトレース検証      |
+| `npm run planner:eval`   | Planner品質ベンチマーク        |
+
+### セットアップ
+
+- 依存導入: `npm ci`（CI/再現性重視）または`npm install`（ローカル開発）
+- ドキュメント開発サーバー: `npm run dev`（Docusaurus）
+- ドキュメントビルド: `npm run build`
+- リンクチェックには別途lycheeが必要: `brew install lychee`（macOS）
 
 ---
 
-## 4. コーディング / ドキュメントスタイル
+## 5. 技術スタックとスタイル
 
-- フォーマット: Prettier (`**/*.{js,json,md,yml,yaml}` 対象). 設定は `.prettierrc.json`
-
-- JavaScript/Node: ESM, `node --test` を使用
-- Markdown: `markdownlint` ルールは `.markdownlint*.json[c]`; 日本語は `textlint` + `prh` に従う
-- ドキュメント言語ポリシー: 日本語がソース・オブ・トゥルース。英語版は `*.en.md` がありうるが差分がある場合は日本語優先
-- 必ず `npm run lint` を通してから PR
+- **Runtime**: Node.js 20+、npm（lockfile: `package-lock.json`）
+- **Test Runner**: `node --test`（built-in）
+- **Documentation**: Docusaurus 3（`pages/`配下）
+- **Linting**: `prettier`、`eslint`（`.eslintrc.js`）、`markdownlint`（`.markdownlint.json`）、`textlint`（日本語文法）、`vale`（英語prose）
+- **フォーマット**: Prettier（`**/*.{js,json,md,yml,yaml}`、設定は`.prettierrc.json`）
+- **JavaScript/Node**: ESM
+- **ドキュメント言語**: 日本語（`*.md`）がSSoT。英語版は`*.en.md`。差分がある場合は日本語を優先する
 
 ---
 
-## 5. スキルとエージェント定義に関するルール
+## 6. スキルとエージェント定義
 
 ### スキル定義（`skills/`）
 
-- 形式: YAML フロントマター付き Markdown
-- 主なフィールド: `id`, `name`, `description`, `phase`, `applyTo`, `inputContext`, `outputKind`, `modelHint`, `dependencies`, `tags`, `severity` など（詳細は `docs/skill-metadata.md`）
-- 変更後に実行: `npm run skills:validate` および `npm test`（該当があれば）
+- 形式: YAMLフロントマター付きMarkdown
+- 主なフィールド: `id`、`name`、`description`、`category`（`core`/`upstream`/`midstream`/`downstream`）、`applyTo`、`inputContext`、`outputKind`、`modelHint`、`severity`、`tags`
+- 新規作成時は`skills/_template.md`と同カテゴリーの既存スキルを参照する
+- 検証: §4の表を参照
 
-### Agent Skills パッケージ（`skills/agent-skills/`）
+### Agent Skillsパッケージ（`skills/agent-skills/`）
 
-- 形式: `SKILL.md` + `references/` を基本とするフォルダ単位
-- 変更後に実行: `npm run agent-skills:validate`（必要に応じて `npm test`）
+- 形式: `SKILL.md` + `references/`を基本とするフォルダー単位
 
-### エージェント/トレース
+### エージェント定義
 
-- エージェント設定やトレース関連を触ったら `npm run agents:validate`
-- 必要に応じて `npm run trace:validate` で OpenTelemetry 経由の挙動確認
-
----
-
-## 6. コミット / PR ルール（簡易まとめ）
-
-詳細は `CONTRIBUTING.md` を参照。最低限:
-
-- コミット前に: `npm test`, `npm run lint`, 変更に応じて `agents:validate` / `skills:validate`
-- PR本文に: 目的 / 変更内容 / 影響範囲 / 実行コマンドと結果を記載
-- **ブランチポリシー（厳守）**:
-  - `main`ブランチへの直接pushは禁止（`git push origin main`は実行しない）
-  - マージ済みPRブランチへの追加pushは禁止（修正が必要な場合は新しいブランチ・新しいPRを作成する）
-  - レビュー指摘への対応も、PRがマージ済みの場合は新規PRで対応する
-- **PR 作成の手順**:
-
-  ```bash
-  # 1. ブランチ作成
-  git checkout -b <type>/<description>
-  # 2. 変更・コミット
-  git add .
-  git commit -m "<type>: <description>"
-  # 3. リモートへプッシュ
-  git push -u origin <type>/<description>
-  # 4. PR作成 (GitHub CLI推奨)
-  gh pr create --title "<type>: <description>" --body "Pull request body content"
-  ```
+- `.claude/agents/`（Claude Code用）、`.github/agents/`（Copilot用）
+- 検証: §4の表を参照
 
 ---
 
-## 7. セキュリティ
+## 7. コミット/PRルール
 
-- `.env*` はコミットしない（例示はダミー値で）
-- 外部 API を呼ぶ場合はタイムアウトと例外処理を必須にする
+詳細は`CONTRIBUTING.md`を参照する。
 
----
+- コミット前に§4の必須検証を実行する
+- PR本文に目的・変更内容・影響範囲・実行コマンドと結果を記載する
+- コミットメッセージはConventional Commits（`feat:`、`fix:`等）に従う
+- PR作成手順:
 
-## 8. 並行タスクは Git Worktree で分離する
-
-**目的と基本方針:**
-
-- **目的:** 開発プロセスにおける並行タスクの管理を改善し、ブランチ切り替えによるコンテキストスイッチのコストや未コミット変更の混入リスクを排除する。
-- **基本方針:** 異なるコンテキスト（機能実装、緊急修正、PR レビューなど）を持つタスクは、必ず物理的に分離された Worktree で実行する。
-
-**並行実行の判断基準:**
-
-- 現在の作業ディレクトリの状態（中断できないプロセスや未コミットの変更）を維持したまま、別のブランチを参照・修正する必要がある場合。
-- 複数の独立したタスクを短期間にスイッチしながら進める場合。
-
-**運用規約:**
-
-- **ディレクトリ構成:** 原則としてプロジェクトルートの親階層、または `.git` 除外設定済みの `.worktrees/` ディレクトリを使用する。
-  - 推奨パス: `../<project-name>-worktrees/<feature-name>`
-- **ブランチ命名:** 既存のプロジェクト規則（`feature/`, `fix/` など）を遵守する。
-
-**標準的な進め方 (Standard Procedure):**
-
-1. **作成:** 新しいタスク用のブランチと Worktree を作成する。
-
-   ```bash
-   git worktree add -b <new-branch-name> <path> main
-   ```
-
-2. **作業:** 生成されたディレクトリへ移動し、該当タスクを完遂する。
-3. **検証:** 独立した環境でビルド・テストを行い、他の作業中の変更と干渉しないことを確認する。
-
-**クリーンアップ手順:**
-
-- タスク完了（マージまたは PR 作成）後は、速やかに Worktree を削除しリソースを解放する。
-
-  ```bash
-  git worktree remove <path> && git branch -d <branch-name>
-  ```
-
-- 定期的にメタデータの整合性を保つため `git worktree prune` を実行する。
+```bash
+git checkout -b <type>/<description>
+git add <files>
+git commit -m "<type>: <description>"
+git push -u origin <type>/<description>
+gh pr create --title "<type>: <description>" --body "..."
+```
 
 ---
 
-## 9. スキル検索戦略
+## 8. スキル検索
 
-スキルは日本語で記述されていますが、英語プロンプトでも活用できるよう以下のルールに従ってください:
+スキルは日本語で記述されているが、英語プロンプトでも活用できる。
 
-- 英語と日本語の両方のキーワードで `skills/` を検索する
+- 英語と日本語の両方のキーワードで`skills/`を検索する
 - 英語検索で見つからない場合、主要な用語を日本語に翻訳して再検索する
-- ファイル名や `id` フィールドには英語ヒントを含むことが多い
-- 検索コマンド例: `rg -i "keyword" skills/` または `fd skill.md skills/`
+- ファイル名や`id`フィールドには英語ヒントを含むことが多い
+- 検索コマンド例: `rg -i "keyword" skills/`または`fd skill.md skills/`
 
 ---
 
-## 10. AI コーディングエージェント向けメモ
+## 9. AI実装メモ
 
-- このリポは「AI レビューエージェント」そのものの定義・スキルを含む。仕様変更前に `schemas/*.json` と既存 `skills/` の整合を確認。
-- 大きな変更は小さく刻み、必ずテストと検証スクリプトで裏を取ってから PR。
-- 不明な場合は README と `docs/architecture.md`（Planner/Runner 概要）、`pages/guides/skill-planner.md` を参照。
-- **LLM 有効判定の共通化**: LLM 機能（スキル選択、プランナーなど）を実装・変更する際は、`src/lib/utils.mjs` の `isLlmEnabled()` を使用すること。これは OpenAI (`OPENAI_API_KEY`, `RIVER_OPENAI_API_KEY`) および Google Gemini (`GOOGLE_API_KEY`) の両方のキーを適切にチェックする。
-
----
-
-## 11. エージェント運用の4層
-
-本リポジトリは AI エージェントの動作を4つの層で制御する。
-詳細は [docs/agent-layers.md](./docs/agent-layers.md) を参照。
-
-| 層     | 役割         | 実体                             |
-| ------ | ------------ | -------------------------------- |
-| 記憶   | 常設ルール   | AGENTS.md + ツール固有ファイル   |
-| 再利用 | 知識パック   | skills/                          |
-| 強制   | ガードレール | npm scripts, CI, hooks           |
-| 分業   | 専門委譲     | .claude/agents/, .github/agents/ |
+- このリポジトリはAIレビューエージェントそのものの定義・スキルを含む。`src/`を変更する場合は§3「要確認」に従う
+- **LLM有効判定の共通化**: LLM機能を実装・変更する際は`src/lib/utils.mjs`の`isLlmEnabled()`を使用する。OpenAI（`OPENAI_API_KEY`、`RIVER_OPENAI_API_KEY`）およびGoogle Gemini（`GOOGLE_API_KEY`）の両方のキーをチェックする
+- 不明な場合はREADMEと`docs/architecture.md`を参照する
+- 並行タスクにはGit Worktreeを使用する。手順は`docs/runbook/dev.md`を参照する
 
 ---
 
-## 12. AI プロバイダー別設定
-
-本リポジトリは複数の AI コーディングアシスタントに対応しています。
+## 10. AIプロバイダー別設定
 
 | プロバイダー   | 設定ファイル                      | カスタムコマンド          | エージェント      |
 | -------------- | --------------------------------- | ------------------------- | ----------------- |
-| GitHub Copilot | `.github/copilot-instructions.md` | `/skill`, `/review`       | `@river-reviewer` |
-| Claude Code    | `CLAUDE.md`, `.claude/`           | `/skill`, `/review-local` | `river-reviewer`  |
-| Google Gemini  | `GEMINI.md`                       | -                         | Gemini CLI / Chat |
+| GitHub Copilot | `.github/copilot-instructions.md` | `/skill`、`/review`       | `@river-reviewer` |
+| Claude Code    | `CLAUDE.md`、`.claude/`           | `/skill`、`/review-local` | `river-reviewer`  |
+| Google Gemini  | `GEMINI.md`                       | -                         | Gemini CLI/Chat   |
 | OpenAI Codex   | `.codex/`                         | -                         | -                 |
 
-**起動方法:**
-
-- **Copilot**: VS Code で自動読み込み
-- **Claude Code**: `claude` コマンドで起動
-- **Gemini**: CLI/Code Assist で `GEMINI.md` を参照し、system プロンプトを組む
-- **Codex**: `CODEX_HOME=$(pwd)/.codex codex "your prompt"` で起動
-
-各プロバイダー固有ファイルは、この `AGENTS.md` を前提にツール固有の差分だけを薄く追記してください（ドリフト防止）。
-共通ルール（スキル利用、安全規則、ワークフロー）はこの `AGENTS.md` が Single Source of Truth です。
-
----
-
-## 13. タスク着手チェックリスト
-
-- 受入条件とリポジトリポリシーを確認し、短い計画を示してから着手する。
-- タスク単位でブランチを作成し、PR に目的と関連 Issue を明記する。
-- PR 前に `npm test` と `npm run lint` を実行（必要に応じて `npm run agents:validate` / `npm run skills:validate`）。
-- PR 本文で Gemini / Codex へのレビュー依頼を行い、セルフレビューで残タスクがないことを確認する。
-
----
-
-## 14. プラットフォーム固有の注意事項
-
-### Windows (WSL) での開発
-
-- **UNC パスの制約**: ファイルを `\\wsl.localhost\Ubuntu\...` のような UNC パス経由で参照している場合、`husky` (pre-commit hook) や `prettier` などの一部のツールが CMD.EXE で実行される際にエラー（UNC パス非対応）になることがある。
-- 推奨:
-  - Git 操作や npm スクリプトは WSL ターミナル内（`/home/<user>/...`）で実行する。
-  - 制約のある環境でやむをえずコミットする場合は `git commit --no-verify` を使用し、CI での検証に委ねる。
+各プロバイダー固有ファイルはこの`AGENTS.md`を前提にツール固有の差分だけを薄く記載する（ドリフト防止）。`AGENTS.md`内のセクションを参照する場合は、セクション番号ではなく見出しアンカー（例: `#10-aiプロバイダー別設定`）でリンクすること。

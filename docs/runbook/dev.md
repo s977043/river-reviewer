@@ -29,6 +29,28 @@ npm run agent-skills:validate
 - Lint エラーが日本語文書で出る場合:
   - `npm run lint:text` の出力に従って文言を修正。
 
+## 並行タスク（Git Worktree）
+
+異なるコンテキストのタスクは物理的に分離して実行する。
+
+```bash
+# 作成
+git worktree add -b <new-branch-name> ../<project>-worktrees/<feature-name> main
+cd ../<project>-worktrees/<feature-name>
+npm ci
+
+# 作業・検証後にクリーンアップ（PRマージ確認後）
+git worktree remove ../<project>-worktrees/<feature-name>
+git branch -d <branch-name>
+git worktree prune
+```
+
+## Windows（WSL）での注意事項
+
+- `\\wsl.localhost\Ubuntu\...`のようなUNCパス経由では`husky`や`prettier`がCMD.EXEで実行されエラーになることがある
+- Git操作やnpmスクリプトはWSLターミナル内（`/home/<user>/...`）で実行する
+- やむをえない場合は`git commit --no-verify`を使用し、CIでの検証に委ねる
+
 ## PR 前チェック
 
 ```bash
