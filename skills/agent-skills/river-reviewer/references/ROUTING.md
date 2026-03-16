@@ -26,6 +26,11 @@ River Reviewer のルーティングロジックの詳細です。
 - 日本語: テスト, カバレッジ, 単体テスト, 結合テスト
 - 英語: test, coverage, unit test, integration test
 
+### 敵対的レビュー (adversarial-review)
+
+- 日本語: 敵対的, 壁打ち, プレモーテム, 失敗分析, 攻撃, ウォーゲーム, 論理検証, バイアス
+- 英語: adversarial, challenge, pre-mortem, war-game, logic, bias, devil's advocate
+
 ### 一般コード (river-reviewer-code) - デフォルト
 
 上記のいずれにも該当しない場合、一般コードレビューを実行します。

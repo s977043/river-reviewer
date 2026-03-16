@@ -22,3 +22,11 @@
 - `.github/instructions/*.instructions.md`: パス/言語ごとの実装規約を記載。
 - `.github/prompts/*.prompt.md`: 手動実行する定型タスクを記載。
 - 変更頻度が高い手順は `docs/runbook/` に集約し、ここへ長文で書かない。
+
+### レイヤー別の使い分け
+
+| Layer                       | 用途                                       | 例                                       |
+| --------------------------- | ------------------------------------------ | ---------------------------------------- |
+| prompt (`.github/prompts/`) | 手動実行の単機能タスク                     | `/select_review`, `/pr`                  |
+| agent (`.github/agents/`)   | 役割ベースの委譲、ツール制限付き           | `river-reviewer`, `security`             |
+| skill (`skills/`)           | 再利用可能なレビューロジック、フェーズ対応 | `upstream/`, `midstream/`, `downstream/` |
