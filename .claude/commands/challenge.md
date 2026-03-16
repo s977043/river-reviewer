@@ -61,7 +61,7 @@ allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Read, Grep
 
 ## Rules
 
-- 各手法で最大3件（合計最大9件）に絞る。
+- 各手法で最大3件（合計最大9件）に絞る（SKILL.md フル実行時は最大5件）。
 - すべての指摘は差分の具体的な行に紐づける。
 - 推測は推測として明示する。
 - 指摘には必ず次のアクション（Fix）を添える。
