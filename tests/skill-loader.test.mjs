@@ -3,7 +3,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import test from 'node:test';
-import { createSkillValidator, defaultPaths, loadSchema, loadSkillFile, loadSkills } from '../runners/core/skill-loader.mjs';
+import {
+  createSkillValidator,
+  defaultPaths,
+  loadSchema,
+  loadSkillFile,
+  loadSkills,
+} from '../runners/core/skill-loader.mjs';
 
 async function buildValidator(schemaPath = defaultPaths.schemaPath) {
   const schema = await loadSchema(schemaPath);
@@ -21,7 +27,10 @@ async function withTempDir(fn) {
 
 test('loads existing sample skill and applies default outputKind', async () => {
   const validator = await buildValidator();
-  const skillPath = path.join(defaultPaths.skillsDir, 'upstream/sample-architecture-review.md');
+  const skillPath = path.join(
+    defaultPaths.skillsDir,
+    'upstream/sample-architecture-review/SKILL.md'
+  );
   const loaded = await loadSkillFile(skillPath, { validator });
 
   assert.equal(loaded.metadata.id, 'rr-upstream-architecture-sample-001');
@@ -117,7 +126,7 @@ Body content
 
 test('normalizes path_patterns aliases and prefers category for phase resolution', async () => {
   const validator = await buildValidator();
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const skillPath = path.join(tmpDir, 'with-path-patterns.md');
     const content = `---
 id: rr-midstream-path-patterns-001
@@ -144,7 +153,7 @@ Body content
 
 test('derives category from phase and trigger paths when category is missing', async () => {
   const validator = await buildValidator();
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const skillPath = path.join(tmpDir, 'derive-category.md');
     const content = `---
 id: rr-core-derived-001
@@ -187,13 +196,10 @@ dependencies:
 `;
   await writeFile(skillPath, content, 'utf8');
 
-  await assert.rejects(
-    loadSkillFile(skillPath, { validator }),
-    err => {
-      assert.match(err.message, /validation failed/i);
-      return true;
-    }
-  );
+  await assert.rejects(loadSkillFile(skillPath, { validator }), (err) => {
+    assert.match(err.message, /validation failed/i);
+    return true;
+  });
 });
 
 test('fails validation when required fields are missing', async () => {
@@ -210,17 +216,14 @@ Body
 `;
   await writeFile(skillPath, content, 'utf8');
 
-  await assert.rejects(
-    loadSkillFile(skillPath, { validator }),
-    err => {
-      assert.match(err.message, /applyTo/i);
-      return true;
-    }
-  );
+  await assert.rejects(loadSkillFile(skillPath, { validator }), (err) => {
+    assert.match(err.message, /applyTo/i);
+    return true;
+  });
 });
 
 test('loadSkills skips files that fail validation and continues', async () => {
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const validator = await buildValidator();
     const validPath = path.join(tmpDir, 'valid.md');
     const invalidPath = path.join(tmpDir, 'invalid.md');
@@ -256,7 +259,7 @@ Body
       const loaded = await loadSkills({ skillsDir: tmpDir, validator });
       assert.equal(loaded.length, 1);
       assert.equal(loaded[0].metadata.id, 'rr-test-valid-001');
-      assert.ok(errors.some(line => line.includes('Failed to load skill')));
+      assert.ok(errors.some((line) => line.includes('Failed to load skill')));
     } finally {
       console.error = originalError;
     }
@@ -264,7 +267,7 @@ Body
 });
 
 test('loadSkills prefers the first file when duplicate ids are found', async () => {
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const validator = await buildValidator();
     const firstPath = path.join(tmpDir, 'a-first.md');
     const secondPath = path.join(tmpDir, 'b-second.md');
@@ -302,7 +305,7 @@ Second body
       const loaded = await loadSkills({ skillsDir: tmpDir, validator });
       assert.equal(loaded.length, 1);
       assert.equal(loaded[0].metadata.name, 'First copy');
-      assert.ok(warnings.some(line => line.includes('Duplicate skill id "rr-test-dup-001"')));
+      assert.ok(warnings.some((line) => line.includes('Duplicate skill id "rr-test-dup-001"')));
     } finally {
       console.warn = originalWarn;
     }
@@ -310,7 +313,7 @@ Second body
 });
 
 test('loadSkills excludes skills with filtered tags by default', async () => {
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const validator = await buildValidator();
     const keptPath = path.join(tmpDir, 'kept.md');
     const agentPath = path.join(tmpDir, 'agent.md');
@@ -347,7 +350,7 @@ Agent body
     assert.equal(defaultLoaded[0].metadata.id, 'rr-test-keep-001');
 
     const allLoaded = await loadSkills({ skillsDir: tmpDir, validator, excludedTags: [] });
-    const ids = allLoaded.map(s => s.metadata.id);
+    const ids = allLoaded.map((s) => s.metadata.id);
     assert.deepEqual(ids.sort(), ['rr-test-agent-001', 'rr-test-keep-001']);
   });
 });
