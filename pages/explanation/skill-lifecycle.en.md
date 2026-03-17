@@ -1,5 +1,5 @@
 ---
-id: skill-lifecycle
+id: skill-lifecycle-en
 ---
 
 # Skill Lifecycle

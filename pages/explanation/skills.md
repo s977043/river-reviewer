@@ -53,7 +53,7 @@ version: 0.1.0
 
 ## スキルの構造
 
-すべてのスキルは5つのコアコンポーネントで構成されます。
+スキルは主に以下の5つのコンポーネントで構成されます。最小構成ではスキル定義の`.md`ファイルのみで動作し、評価用アセットは必要に応じて同梱できます。
 
 ### 1. メタデータ（skill.yaml）
 
@@ -279,13 +279,12 @@ For each issue, provide:
 
 **4. フィクスチャーを追加:**
 
-```markdown
+```diff
 # fixtures/01-unsafe-property-access.md
 
 +function getName(user) {
-
-- return user.profile.name;
-  +}
++  return user.profile.name;
++}
 ```
 
 **5. ゴールデン出力を追加:**
@@ -562,7 +561,7 @@ npm run eval:skills
 ### セキュリティスキル
 
 ```yaml
-# skills/rr-midstream-security-basic-001/skill.yaml
+# skills/midstream/rr-midstream-security-basic-001.md（frontmatter）
 id: rr-midstream-security-basic-001
 name: Baseline Security Checks
 phase: midstream
