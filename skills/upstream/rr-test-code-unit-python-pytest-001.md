@@ -2,6 +2,8 @@
 id: rr-upstream-test-code-unit-python-pytest-001
 name: Unit Test Scaffold (Python/pytest)
 description: Generate Python/pytest unit test skeletons from specifications.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*.md'

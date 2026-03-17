@@ -2,6 +2,8 @@
 id: rr-upstream-requirements-acceptance-001
 name: Requirements Clarity & Acceptance Criteria
 description: Ensure requirement docs define scope, terminology, acceptance criteria, edge cases, and non-functional requirements.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*'

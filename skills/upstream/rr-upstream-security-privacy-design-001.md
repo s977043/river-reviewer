@@ -3,6 +3,7 @@ id: rr-upstream-security-privacy-design-001
 name: Security & Privacy Design Review
 description: Review data retention, deletion, backup residency, and cross-border data transfer.
 version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - '**/*.md'

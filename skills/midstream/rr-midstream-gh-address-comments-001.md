@@ -2,6 +2,8 @@
 id: rr-midstream-gh-address-comments-001
 name: GitHubレビューコメント対応（修正案つき）
 description: PRレビューコメントを重要度ごとに整理し、対応方針・修正案・質問をまとめて返信案を作る
+version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*'

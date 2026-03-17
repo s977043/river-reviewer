@@ -2,6 +2,8 @@
 id: rr-downstream-test-plan-review-001
 name: テスト観点レビュー（差分ドリブン）
 description: 変更差分から重要なテスト観点と欠落を洗い出し、優先度付きでテストケース案を提示する
+version: 0.1.0
+category: downstream
 phase: downstream
 applyTo:
   - 'src/**/*'

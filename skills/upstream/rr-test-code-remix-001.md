@@ -2,6 +2,8 @@
 id: rr-upstream-test-code-remix-001
 name: Route/Function Test Scaffold (Remix)
 description: Generate Remix loader/action and route component test skeletons.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*.md'

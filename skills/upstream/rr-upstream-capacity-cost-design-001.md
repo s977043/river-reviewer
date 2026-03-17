@@ -2,6 +2,8 @@
 id: rr-upstream-capacity-cost-design-001
 name: 'Capacity, Performance & Cost Assumptions'
 description: 'Ensure architecture/design docs state traffic assumptions, performance budgets, resource limits, and cost risks for critical paths.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*performance*.md'

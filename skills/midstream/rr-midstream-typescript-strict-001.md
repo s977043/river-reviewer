@@ -2,6 +2,8 @@
 id: rr-midstream-typescript-strict-001
 name: TypeScript Strictness Guard
 description: Enforce TypeScript strictness by reducing any/unsafe assertions and ensuring null handling.
+version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - '**/*.ts'

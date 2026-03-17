@@ -3,6 +3,7 @@ id: rr-upstream-multitenancy-isolation-001
 name: Multitenancy Isolation Guard
 description: マルチテナント前提の設計差分から、テナント分離（データ/権限/リソース/障害影響）の抜けや越境リスクを検出
 version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - '**/*.md'

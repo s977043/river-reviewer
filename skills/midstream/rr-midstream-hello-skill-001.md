@@ -2,6 +2,8 @@
 id: rr-midstream-hello-skill-001
 name: Hello Skill (Always-On Sample)
 description: Minimal always-on sample skill to guarantee an end-to-end review experience.
+version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - '**/*'

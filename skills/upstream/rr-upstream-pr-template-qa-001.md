@@ -2,6 +2,8 @@
 id: rr-upstream-pr-template-qa-001
 name: PRテンプレート品質チェック
 description: PRテンプレートの必須項目（日本語記載、Diátaxis、検証コマンド、チェックリスト）が明確かを確認し、抜けや誤解を生む文言を指摘する
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - '.github/pull_request_template.md'

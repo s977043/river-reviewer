@@ -2,6 +2,8 @@
 id: rr-midstream-typescript-nullcheck-001
 name: TypeScript Null Safety Guardrails
 description: Enforce null/undefined safety for changed TypeScript code and suggest safer patterns.
+version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - '**/*.ts'

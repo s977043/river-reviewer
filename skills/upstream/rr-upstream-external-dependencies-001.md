@@ -2,6 +2,8 @@
 id: rr-upstream-external-dependencies-001
 name: 'External Dependencies & Vendor Risks'
 description: 'Ensure designs document third-party dependencies, SLAs, quotas, failure modes, and vendor lock-in mitigation.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*design*.md'

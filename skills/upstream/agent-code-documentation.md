@@ -2,6 +2,7 @@
 id: agent-code-documentation
 name: Code Documentation
 description: コードや API の意図を短時間で共有できるドキュメントの書き方をガイドする。
+version: 0.1.0
 category: upstream
 phase: upstream
 applyTo:

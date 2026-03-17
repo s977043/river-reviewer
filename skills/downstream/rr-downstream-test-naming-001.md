@@ -2,6 +2,8 @@
 id: rr-downstream-test-naming-001
 name: Test Naming and Structure
 description: Ensure tests use clear naming and cover edge cases with proper describe/it structure.
+version: 0.1.0
+category: downstream
 phase: downstream
 applyTo:
   - '**/*.test.ts'

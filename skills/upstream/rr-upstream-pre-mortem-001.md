@@ -2,6 +2,7 @@
 id: rr-upstream-pre-mortem-001
 name: 'Pre-mortem 失敗シナリオ分析'
 description: '変更が将来インシデントや技術的負債を引き起こすと仮定し、その原因と経路を逆算して設計の盲点を可視化する'
+version: 0.1.0
 category: upstream
 phase: upstream
 applyTo:

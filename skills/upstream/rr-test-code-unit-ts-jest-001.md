@@ -2,6 +2,8 @@
 id: rr-upstream-test-code-unit-ts-jest-001
 name: Unit Test Scaffold (TypeScript)
 description: Generate TypeScript unit test skeletons (Jest/Vitest) from specifications.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*.md'

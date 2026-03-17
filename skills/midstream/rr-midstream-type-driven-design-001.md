@@ -2,6 +2,7 @@
 id: rr-midstream-type-driven-design-001
 name: Type-Driven Design Guard
 description: Detect primitive obsession and missing domain/brand types; check that state is modeled via discriminated unions.
+version: 0.1.0
 category: midstream
 phase: midstream
 applyTo:

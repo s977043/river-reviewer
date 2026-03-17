@@ -2,6 +2,8 @@
 id: rr-upstream-bounded-context-language-001
 name: 'Bounded Context & Ubiquitous Language'
 description: 'Ensure architecture docs define bounded contexts, ownership, and a consistent ubiquitous language to prevent domain drift and coupling.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*design*.md'

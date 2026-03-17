@@ -2,6 +2,8 @@
 id: rr-upstream-change-communication-001
 name: 'Architecture Change Communication'
 description: 'Ensure architecture updates document affected stakeholders, notification plan, and deprecation/retirement signals to keep knowledge aligned.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/architecture/**/*'

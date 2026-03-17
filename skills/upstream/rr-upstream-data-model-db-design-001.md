@@ -2,6 +2,8 @@
 id: rr-upstream-data-model-db-design-001
 name: 'Data Model & DB Design Review'
 description: 'Ensure data model/DB designs cover constraints, integrity, indexes, migrations, rollback, and operational impacts.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - '**/*schema*.{sql,prisma}'

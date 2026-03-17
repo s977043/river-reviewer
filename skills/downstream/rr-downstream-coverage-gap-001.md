@@ -2,6 +2,8 @@
 id: rr-downstream-coverage-gap-001
 name: Coverage and Failure Path Gaps
 description: Find missing tests for critical paths, edge cases, and failure handling in changed code.
+version: 0.1.0
+category: downstream
 phase: downstream
 applyTo:
   - 'src/**/*'

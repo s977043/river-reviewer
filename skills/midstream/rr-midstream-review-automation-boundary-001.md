@@ -2,6 +2,7 @@
 id: rr-midstream-review-automation-boundary-001
 name: Review Automation Boundary Guard
 description: Detect review findings that belong in CI/lint/formatter rather than human review.
+version: 0.1.0
 category: midstream
 phase: midstream
 applyTo:

@@ -2,6 +2,8 @@
 id: rr-downstream-test-review-sample-001
 name: 'Sample Test Coverage Review'
 description: 'Evaluates downstream tests for coverage and edge cases.'
+version: 0.1.0
+category: downstream
 phase: downstream
 applyTo:
   - 'tests/**/*.ts'

@@ -2,6 +2,8 @@
 id: rr-upstream-availability-architecture-001
 name: 'Availability & Resilience Architecture'
 description: 'Ensure architecture docs capture availability targets, failover strategy, capacity headroom, and resilience trade-offs for critical services.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/architecture/**/*'

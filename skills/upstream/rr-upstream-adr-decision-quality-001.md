@@ -2,6 +2,8 @@
 id: rr-upstream-adr-decision-quality-001
 name: ADR Decision Quality
 description: Ensure ADRs capture context, decision, alternatives, tradeoffs, and follow-ups in a way that prevents future drift.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/adr/**/*'

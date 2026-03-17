@@ -2,6 +2,8 @@
 id: rr-downstream-flaky-test-001
 name: Flaky Test Risk Check
 description: Detects patterns that make tests flaky and proposes stabilization steps.
+version: 0.1.0
+category: downstream
 phase: downstream
 applyTo:
   - '**/*.test.ts'

@@ -2,6 +2,8 @@
 id: rr-upstream-data-flow-state-ownership-001
 name: 'Data Flow & State Ownership'
 description: 'Ensure designs define data flow, state ownership, consistency boundaries, and cross-boundary writes to prevent drift and incidents.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*flow*.md'

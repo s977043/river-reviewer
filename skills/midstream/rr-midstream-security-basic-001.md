@@ -3,6 +3,7 @@ id: rr-midstream-security-basic-001
 name: Baseline Security Checks
 description: Check common security risks in application code (SQLi, XSS, secrets).
 version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - '**/{api,routes,db,ui,components,auth,security,config}/**/*.{ts,tsx,js,jsx}'
