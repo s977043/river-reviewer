@@ -2,6 +2,8 @@
 id: rr-upstream-dr-multiregion-001
 name: 'Disaster Recovery & Multi-Region Readiness'
 description: 'Ensure architecture docs define RPO/RTO, failover paths, data consistency, and DR drillability.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*dr*.md'

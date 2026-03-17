@@ -2,6 +2,8 @@
 id: rr-upstream-api-design-001
 name: API Design Consistency
 description: Ensure API design follows RESTful naming and consistent conventions.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - '**/api/**'

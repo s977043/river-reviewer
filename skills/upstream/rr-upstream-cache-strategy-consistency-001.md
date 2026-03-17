@@ -3,6 +3,7 @@ id: rr-upstream-cache-strategy-consistency-001
 name: Cache Strategy Consistency Guard
 description: Detect undefined or inconsistent cache strategies (layers, consistency, invalidation, TTL, failure handling) in design documents.
 version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*.md'

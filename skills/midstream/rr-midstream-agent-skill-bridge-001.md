@@ -3,6 +3,7 @@ id: rr-midstream-agent-skill-bridge-001
 name: Agent Skill Bridge Review
 description: Review changes to the Agent Skills import/export bridge for path safety, round-trip fidelity, and validation correctness.
 version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - 'src/lib/agent-skill-bridge.mjs'

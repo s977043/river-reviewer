@@ -2,6 +2,8 @@
 id: rr-upstream-test-code-nextjs-001
 name: Component Test Scaffold (Next.js)
 description: Generate React/Next.js component test skeletons (RTL) from specifications.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*.md'

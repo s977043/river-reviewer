@@ -2,6 +2,8 @@
 id: rr-downstream-review-policy-standard-001
 name: 'Standard Review Policy for Downstream'
 description: 'Applies standard AI review policy guidelines for downstream (test/QA) phase reviews.'
+version: 0.1.0
+category: downstream
 phase: downstream
 applyTo:
   - 'test/**/*'

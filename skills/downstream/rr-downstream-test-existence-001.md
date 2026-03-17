@@ -2,6 +2,8 @@
 id: rr-downstream-test-existence-001
 name: Test Presence for Changed Code
 description: Check whether changed code paths have corresponding tests and suggest minimal coverage.
+version: 0.1.0
+category: downstream
 phase: downstream
 applyTo:
   - 'src/**/*'

@@ -2,6 +2,7 @@
 id: agent-architecture-review
 name: Architecture Review
 description: 変更の全体設計、責務分離、境界の破綻を検知するためのレビュー手順。
+version: 0.1.0
 category: upstream
 phase: upstream
 applyTo:

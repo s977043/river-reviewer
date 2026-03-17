@@ -2,6 +2,8 @@
 id: rr-upstream-architecture-boundaries-001
 name: 'Architecture Boundaries & Dependencies'
 description: 'Ensure architecture/design docs define clear boundaries, ownership, dependency direction, and change impact to avoid tight coupling.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/architecture/**/*'

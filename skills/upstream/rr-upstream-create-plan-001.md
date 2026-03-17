@@ -2,6 +2,8 @@
 id: rr-upstream-create-plan-001
 name: 計画作成とレビュー
 description: 課題のゴールと制約を整理し、仮説・リスク付きの実行計画を段階的に提示して人間レビューにかける
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*'

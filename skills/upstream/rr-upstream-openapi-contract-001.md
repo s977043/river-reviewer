@@ -2,6 +2,8 @@
 id: rr-upstream-openapi-contract-001
 name: 'OpenAPI Contract Completeness'
 description: 'Ensure OpenAPI specs define consistent request/response schemas, error model, auth, pagination, and backward compatibility.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - '**/openapi/**/*.{yml,yaml,json}'

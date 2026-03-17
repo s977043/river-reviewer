@@ -2,6 +2,8 @@
 id: rr-upstream-operability-slo-001
 name: 'Operability, SLO & Runbook Readiness'
 description: 'Ensure designs define operability basics: SLO/SLI, monitoring, alerting, on-call actions, and incident handling expectations.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*'

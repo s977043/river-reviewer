@@ -2,6 +2,8 @@
 id: rr-upstream-api-versioning-compat-001
 name: 'API Versioning & Backward Compatibility'
 description: 'Ensure API/contract changes specify versioning strategy, backward compatibility, deprecation plan, and migration guidance.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*api*.md'

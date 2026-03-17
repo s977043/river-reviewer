@@ -2,6 +2,7 @@
 id: rr-midstream-nextjs-app-router-boundary-001
 name: Next.js App Router Client/Server Boundary
 description: App Router の Server Component でクライアント専用APIを使っていないか確認する。
+version: 0.1.0
 category: midstream
 phase: midstream
 applyTo:

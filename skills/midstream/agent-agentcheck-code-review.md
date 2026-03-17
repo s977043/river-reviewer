@@ -2,6 +2,7 @@
 id: agent-agentcheck-code-review
 name: AgentCheck Code Review
 description: AgentCheck ベースでローカルリポジトリを走査し、PR 前のコードレビューを実行するスキル。
+version: 0.1.0
 category: midstream
 phase: midstream
 applyTo:

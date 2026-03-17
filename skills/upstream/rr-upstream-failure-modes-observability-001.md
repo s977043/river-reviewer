@@ -2,6 +2,8 @@
 id: rr-upstream-failure-modes-observability-001
 name: Failure Modes & Observability in Design
 description: Ensure designs specify failure modes, timeouts, error contracts, and observability for critical flows.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - '**/api/**'

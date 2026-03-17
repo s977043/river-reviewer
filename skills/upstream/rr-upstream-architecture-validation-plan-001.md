@@ -3,6 +3,7 @@ id: rr-upstream-architecture-validation-plan-001
 name: Architecture Validation Plan Guard
 description: Detect missing validation plans (how to verify the design is correct) in design documents and ADRs.
 version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*design*.md'

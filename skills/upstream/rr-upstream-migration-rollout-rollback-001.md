@@ -2,6 +2,8 @@
 id: rr-upstream-migration-rollout-rollback-001
 name: Migration, Rollout & Rollback Plan
 description: Ensure design/ADR changes include a concrete migration plan, rollout strategy, rollback conditions, and compatibility considerations.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*'

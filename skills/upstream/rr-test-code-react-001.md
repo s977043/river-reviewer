@@ -2,6 +2,8 @@
 id: rr-upstream-test-code-react-001
 name: Component Test Scaffold (React)
 description: Generate generic React component test skeletons (RTL) from specifications.
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*.md'

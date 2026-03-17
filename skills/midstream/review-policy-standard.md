@@ -2,6 +2,8 @@
 id: rr-midstream-review-policy-standard-001
 name: 'Standard Review Policy for Midstream'
 description: 'Applies standard AI review policy guidelines for midstream (implementation) phase reviews.'
+version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*.ts'

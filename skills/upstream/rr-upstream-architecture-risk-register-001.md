@@ -2,6 +2,8 @@
 id: rr-upstream-architecture-risk-register-001
 name: 'Architecture Risks, Assumptions & Open Questions'
 description: 'Ensure design docs explicitly capture risks, assumptions, and open questions with owners, deadlines, and mitigation plans.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*design*.md'

@@ -2,6 +2,7 @@
 id: rr-midstream-war-game-001
 name: 'War Game 敵対的シミュレーション'
 description: '攻撃者・競合・悪意あるユーザーの視点で変更を分析し、防御の盲点と悪用シナリオを可視化する'
+version: 0.1.0
 category: midstream
 phase: midstream
 applyTo:

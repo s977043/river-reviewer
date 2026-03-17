@@ -2,6 +2,8 @@
 id: rr-midstream-review-comment-triage-001
 name: 'Review Comment Triage (No-Code-Fix Mode)'
 description: 'レビューコメントの重要度ラベリングと対応方針・返信案を整理する。AI はコード修正やパッチ提案を行わない。'
+version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - '**/*'

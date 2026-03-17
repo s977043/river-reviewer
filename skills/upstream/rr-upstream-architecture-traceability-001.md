@@ -2,6 +2,8 @@
 id: rr-upstream-architecture-traceability-001
 name: 'Architecture Traceability & Consistency'
 description: 'Ensure design changes stay consistent across ADRs, diagrams, and specs; decisions are traceable; and drift is explicitly managed.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/architecture/**/*'

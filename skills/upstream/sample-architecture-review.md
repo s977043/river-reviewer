@@ -2,6 +2,7 @@
 id: rr-upstream-architecture-sample-001
 name: 'Sample Architecture Consistency Review'
 description: 'Checks design/ADR docs for consistency and missing decisions.'
+version: 0.1.0
 category: upstream
 phase: upstream
 applyTo:

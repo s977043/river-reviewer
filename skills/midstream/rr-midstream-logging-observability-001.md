@@ -3,6 +3,7 @@ id: rr-midstream-logging-observability-001
 name: Logging and Observability Guard
 description: Ensure code changes keep logs/metrics/traces useful for debugging failures and regressions.
 version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*'

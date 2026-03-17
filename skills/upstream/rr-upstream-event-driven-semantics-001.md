@@ -2,6 +2,8 @@
 id: rr-upstream-event-driven-semantics-001
 name: 'Event-Driven Semantics & Delivery Guarantees'
 description: 'Ensure event-driven designs specify delivery guarantees, ordering, idempotency, schema evolution, and replay/backfill strategy.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*event*.md'

@@ -2,6 +2,8 @@
 id: rr-upstream-review-policy-standard-001
 name: 'Standard Review Policy for Upstream'
 description: 'Applies standard AI review policy guidelines for upstream (design) phase reviews.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - '**/*.md'

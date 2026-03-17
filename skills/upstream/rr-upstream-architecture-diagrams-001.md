@@ -2,6 +2,8 @@
 id: rr-upstream-architecture-diagrams-001
 name: 'Architecture Diagrams Readiness'
 description: 'Ensure architecture diagrams are readable, consistent with text, and clear on scope, boundaries, and data flow.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/architecture/**/*'

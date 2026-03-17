@@ -2,6 +2,8 @@
 id: rr-upstream-trust-boundaries-authz-001
 name: 'Trust Boundaries & Authorization Architecture'
 description: 'Ensure designs define trust boundaries, authn/authz responsibilities, and propagation of identity/claims across services.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*security*.md'

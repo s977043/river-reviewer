@@ -2,6 +2,8 @@
 id: rr-upstream-integration-contracts-001
 name: 'Service Integration & Contracts'
 description: 'Ensure cross-service integration defines contracts, ownership, failure handling, versioning, and rollout/rollback expectations.'
+version: 0.1.0
+category: upstream
 phase: upstream
 applyTo:
   - 'docs/**/*integration*.md'

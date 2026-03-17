@@ -2,6 +2,8 @@
 id: rr-midstream-code-quality-sample-001
 name: 'Sample Code Quality Pass'
 description: 'Checks common code quality and maintainability risks.'
+version: 0.1.0
+category: midstream
 phase: midstream
 applyTo:
   - 'src/**/*.ts'
