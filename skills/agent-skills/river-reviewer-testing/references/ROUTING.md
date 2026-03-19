@@ -37,7 +37,7 @@
 1. テストファイルのみ変更 → `rr-downstream-test-naming-001` + `rr-downstream-flaky-test-001`
 2. ソースファイルのみ変更 → `rr-downstream-test-existence-001` + `rr-downstream-coverage-gap-001`
 3. テスト + ソース両方 → 全スキル実行
-4. 10ファイル以上の変更 → `test-plan-review-001` を追加
+4. 10ファイル以上の変更 → `rr-downstream-test-plan-review-001` を追加
 
 ## フォールバックルール
 
