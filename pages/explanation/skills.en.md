@@ -1,5 +1,5 @@
 ---
-id: skills
+id: skills-en
 ---
 
 # Skills: The Heart of River Reviewer
