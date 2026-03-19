@@ -52,10 +52,10 @@
 
 ## 自動判定ルール
 
-1. `.ts`/`.tsx` ファイル → `typescript-strict-001` + `typescript-nullcheck-001`
-2. React コンポーネント → `a11y-accessible-name-001` を追加
-3. `app/` ディレクトリ（Next.js）→ `nextjs-app-router-boundary-001` を追加
-4. 設定・型定義ファイル → `type-driven-design-001`
+1. `.ts`/`.tsx` ファイル → `rr-midstream-typescript-strict-001` + `rr-midstream-typescript-nullcheck-001`
+2. React コンポーネント → `rr-midstream-a11y-accessible-name-001` を追加
+3. `app/` ディレクトリ（Next.js）→ `rr-midstream-nextjs-app-router-boundary-001` を追加
+4. 設定・型定義ファイル → `rr-midstream-type-driven-design-001`
 
 ## フォールバックルール
 
