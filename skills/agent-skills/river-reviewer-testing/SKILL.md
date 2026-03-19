@@ -6,7 +6,7 @@ description: |
   テスト網羅性、命名規則、フレーキーテスト、カバレッジギャップの個別スキルへルーティングする。
 category: downstream
 phase: [downstream]
-severity: normal
+severity: minor
 applyTo:
   - '**/*.test.{ts,tsx,js,jsx}'
   - '**/*.spec.{ts,tsx,js,jsx}'

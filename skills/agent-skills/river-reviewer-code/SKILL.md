@@ -6,7 +6,7 @@ description: |
   可読性、保守性、型安全性、ロギング等の個別スキルへルーティングする。
 category: midstream
 phase: [midstream]
-severity: normal
+severity: minor
 applyTo:
   - 'src/**/*.{ts,tsx,js,jsx,mjs}'
   - '**/*.{ts,tsx,js,jsx,mjs}'
