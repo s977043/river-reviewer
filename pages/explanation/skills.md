@@ -530,7 +530,7 @@ assert:
 
 ```bash
 # コミット前
-npm run eval:skills
+npm run eval:fixtures
 
 # CIで（オプション—APIキーが必要）
 # .github/workflows/skills-and-tests.ymlを参照
