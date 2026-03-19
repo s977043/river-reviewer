@@ -93,7 +93,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -102,7 +102,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -111,7 +111,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -125,7 +125,7 @@ review:
   steps:
     - uses: actions/checkout@v6
       with: { fetch-depth: 0 }
-    - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+    - uses: s977043/river-reviewer/runners/github-action@v0.5.0
       with:
         phase: midstream
         estimate: true # コスト見積もりのみ
@@ -143,7 +143,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
         with:
           phase: midstream
           dry_run: true            # Draft はドライランでプロンプト確認のみ
@@ -156,7 +156,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
         with:
           phase: midstream
           dry_run: false           # Ready ではフルレビュー
