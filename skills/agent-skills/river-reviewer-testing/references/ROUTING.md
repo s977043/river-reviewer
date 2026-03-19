@@ -34,13 +34,13 @@
 
 ## 自動判定ルール
 
-1. テストファイルのみ変更 → `test-naming-001` + `flaky-test-001`
-2. ソースファイルのみ変更 → `test-existence-001` + `coverage-gap-001`
+1. テストファイルのみ変更 → `rr-downstream-test-naming-001` + `rr-downstream-flaky-test-001`
+2. ソースファイルのみ変更 → `rr-downstream-test-existence-001` + `rr-downstream-coverage-gap-001`
 3. テスト + ソース両方 → 全スキル実行
-4. 10ファイル以上の変更 → `test-plan-review-001` を追加
+4. 10ファイル以上の変更 → `rr-downstream-test-plan-review-001` を追加
 
 ## フォールバックルール
 
 1. キーワード指定なし → 変更ファイルの種類で自動判定
 2. 複数該当 → 全スキル実行
-3. テスト関連ファイルなし → `test-existence-001` のみ実行
+3. テスト関連ファイルなし → `rr-downstream-test-existence-001` のみ実行

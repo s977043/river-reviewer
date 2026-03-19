@@ -5,7 +5,7 @@ description: |
   セキュリティ観点のレビューエージェント。
   基本的なセキュリティチェック、認証・認可設計、プライバシー設計の個別スキルへルーティングする。
 category: midstream
-phase: [upstream, midstream]
+phase: [midstream]
 severity: critical
 applyTo:
   - 'src/**/*.{ts,tsx,js,jsx,mjs}'

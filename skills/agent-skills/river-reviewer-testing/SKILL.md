@@ -41,8 +41,8 @@ version: 0.1.0
 
 ### デフォルト動作
 
-- テストファイルの変更 → `test-naming-001` + `flaky-test-001`
-- ソースコードの変更 → `test-existence-001` + `coverage-gap-001`
+- テストファイルの変更 → `rr-downstream-test-naming-001` + `rr-downstream-flaky-test-001`
+- ソースコードの変更 → `rr-downstream-test-existence-001` + `rr-downstream-coverage-gap-001`
 - 大規模変更 → 全スキル実行
 
 ## Execution Flow / 実行フロー
