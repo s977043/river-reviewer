@@ -150,12 +150,7 @@ async function main() {
       process.exit(1);
     }
 
-    const version = await prompt(
-      rl,
-      'バージョン',
-      '0.1.0',
-      validateVersion
-    );
+    const version = await prompt(rl, 'バージョン', '0.1.0', validateVersion);
 
     const name = await prompt(
       rl,
@@ -178,11 +173,7 @@ async function main() {
       validatePhase
     );
 
-    const applyTo = await prompt(
-      rl,
-      'ファイルパターン（glob、カンマ区切り）',
-      'src/**/*.ts'
-    );
+    const applyTo = await prompt(rl, 'ファイルパターン（glob、カンマ区切り）', 'src/**/*.ts');
     const applyToArray = applyTo
       .split(',')
       .map((p) => p.trim())
@@ -209,16 +200,16 @@ async function main() {
       'rr-<phase>-<category>-<number>': id,
       '<Skill Name>': name,
       '<What this skill does>': description,
-      '"0.1.0"': `"${version}"`,
+      "'0.1.0'": `'${version}'`,
       // Multi-line patterns
       "  - 'src/**/*.ts'\n  - 'tests/**/*.test.ts'": applyToArray
         .map((p) => `  - '${p}'`)
         .join('\n'),
       // Tag patterns
-      '  - example\n  - category': tagsArray.length > 0
-        ? tagsArray.map((t) => `  - ${t}`).join('\n')
-        : '  - example',
+      '  - example\n  - category':
+        tagsArray.length > 0 ? tagsArray.map((t) => `  - ${t}`).join('\n') : '  - example',
       // YAML value patterns (more specific)
+      'category: midstream': `category: ${phase}`,
       'phase: midstream': `phase: ${phase}`,
       'severity: minor': `severity: ${severity}`,
     };
@@ -230,7 +221,7 @@ async function main() {
 
     // Process template files
     const filesToProcess = [
-      'skill.yaml',
+      'SKILL.md',
       'README.md',
       'prompt/system.md',
       'prompt/user.md',
