@@ -92,3 +92,7 @@ version: 0.1.0
 | `river-reviewer-architecture` | 補完 | code は「ミクロ品質」、architecture は「マクロ設計」        |
 | `river-reviewer-testing`      | 補完 | code は「プロダクションコード」、testing は「テストコード」 |
 | `river-reviewer-performance`  | 補完 | code は「可読性」、performance は「実行効率」               |
+
+## References
+
+- [ROUTING.md](./references/ROUTING.md): 詳細なルーティングルール

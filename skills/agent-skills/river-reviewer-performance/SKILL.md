@@ -87,3 +87,7 @@ version: 0.1.0
 | ----------------------------- | ---- | ----------------------------------------------------------------------- |
 | `river-reviewer-architecture` | 補完 | performance は「実行時効率」、architecture は「構造的スケーラビリティ」 |
 | `river-reviewer-code`         | 補完 | performance は「速度・効率」、code は「可読性・保守性」                 |
+
+## References
+
+- [ROUTING.md](./references/ROUTING.md): 詳細なルーティングルール

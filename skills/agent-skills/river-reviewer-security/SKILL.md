@@ -75,3 +75,7 @@ version: 0.1.0
 | ------------------------------- | ---- | ---------------------------------------------------------- |
 | `adversarial-review` (War Game) | 補完 | security は既知パターン検出、War Game は未知の攻撃経路発見 |
 | `river-reviewer-architecture`   | 補完 | security は「脆弱性」、architecture は「構造的安全性」     |
+
+## References
+
+- [ROUTING.md](./references/ROUTING.md): 詳細なルーティングルール

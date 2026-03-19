@@ -79,3 +79,7 @@ version: 0.1.0
 | ------------------------- | ---- | ----------------------------------------------------------------- |
 | `river-reviewer-code`     | 補完 | testing は「テストの品質」、code は「プロダクションコードの品質」 |
 | `river-reviewer-security` | 補完 | testing は「テスト網羅性」、security は「セキュリティ脆弱性」     |
+
+## References
+
+- [ROUTING.md](./references/ROUTING.md): 詳細なルーティングルール
