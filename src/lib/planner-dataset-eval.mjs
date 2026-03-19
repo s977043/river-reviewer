@@ -11,7 +11,7 @@ function getMeta(skill) {
 function hasExcludedTag(skill, excludedTags) {
   if (!excludedTags?.length) return false;
   const tags = getMeta(skill)?.tags ?? [];
-  return tags.some(tag => excludedTags.includes(tag));
+  return tags.some((tag) => excludedTags.includes(tag));
 }
 
 function ensureArray(value) {
@@ -21,21 +21,21 @@ function ensureArray(value) {
 
 function deriveChangedFiles(diffText) {
   const parsed = parseUnifiedDiff(diffText);
-  const files = parsed.files?.map(f => f.path).filter(Boolean) ?? [];
-  return files.filter(p => p !== '/dev/null');
+  const files = parsed.files?.map((f) => f.path).filter(Boolean) ?? [];
+  return files.filter((p) => p !== '/dev/null');
 }
 
 export async function evaluatePlannerDataset({
   datasetDir,
   cases,
-  excludedTags = ['sample', 'hello', 'policy', 'process'],
+  excludedTags = ['sample', 'hello', 'policy', 'process', 'routing'],
   preferredModelHint = 'balanced',
 } = {}) {
   const loadedCases = cases ?? (await readCases({ datasetDir }));
-  const skills = (await loadSkills()).filter(skill => !hasExcludedTag(skill, excludedTags));
+  const skills = (await loadSkills()).filter((skill) => !hasExcludedTag(skill, excludedTags));
 
   const results = await Promise.all(
-    loadedCases.map(async c => {
+    loadedCases.map(async (c) => {
       const diffText = await readDiff({ datasetDir, diffFile: c.diffFile });
       const changedFiles = deriveChangedFiles(diffText);
       const availableContexts = ensureArray(c.availableContexts ?? ['diff']);
@@ -53,12 +53,12 @@ export async function evaluatePlannerDataset({
         skills,
       });
 
-      const selectedIds = plan.selected.map(s => getMeta(s).id);
+      const selectedIds = plan.selected.map((s) => getMeta(s).id);
       const top1 = selectedIds[0] ?? null;
-      const hitCount = expectedAny.filter(id => selectedIds.includes(id)).length;
+      const hitCount = expectedAny.filter((id) => selectedIds.includes(id)).length;
       const coverage = expectedAny.length ? hitCount / expectedAny.length : 1;
       const top1Match = expectedTop1.length ? (expectedTop1.includes(top1) ? 1 : 0) : null;
-      const missingExpected = expectedAny.filter(id => !selectedIds.includes(id));
+      const missingExpected = expectedAny.filter((id) => !selectedIds.includes(id));
 
       return {
         name: c.name,
@@ -74,7 +74,7 @@ export async function evaluatePlannerDataset({
         coverage,
         top1Match,
         missingExpected,
-        skipped: plan.skipped.map(s => ({
+        skipped: plan.skipped.map((s) => ({
           id: getMeta(s.skill).id,
           reasons: s.reasons,
         })),
@@ -82,11 +82,11 @@ export async function evaluatePlannerDataset({
     })
   );
 
-  const definedTop1 = results.map(r => r.top1Match).filter(v => v != null);
+  const definedTop1 = results.map((r) => r.top1Match).filter((v) => v != null);
   return {
     summary: {
       cases: results.length,
-      coverage: average(results.map(r => r.coverage)),
+      coverage: average(results.map((r) => r.coverage)),
       top1Match: definedTop1.length ? average(definedTop1) : 0,
       top1MatchCases: definedTop1.length,
     },
