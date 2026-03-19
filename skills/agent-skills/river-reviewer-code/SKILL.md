@@ -9,7 +9,6 @@ phase: [midstream]
 severity: minor
 applyTo:
   - 'src/**/*.{ts,tsx,js,jsx,mjs}'
-  - '**/*.{ts,tsx,js,jsx,mjs}'
 inputContext: [diff, fullFile]
 outputKind: [findings, actions]
 tags: [code-quality, default, entry, routing]
