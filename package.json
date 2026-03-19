@@ -58,7 +58,7 @@
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.68.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.211.0",
-    "@opentelemetry/resources": "^2.4.0",
+    "@opentelemetry/resources": "^2.5.1",
     "@opentelemetry/sdk-node": "^0.212.0",
     "@opentelemetry/semantic-conventions": "^1.39.0",
     "commander": "^14.0.2",
@@ -67,14 +67,14 @@
     "js-yaml": "^4.1.1",
     "minimatch": "^10.1.1",
     "openai": "^6.22.0",
-    "ora": "^9.1.0",
+    "ora": "^9.3.0",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3",
+    "react-dom": "^19.2.4",
     "recharts": "^3.6.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.3.1",
+    "@commitlint/cli": "^20.4.2",
     "@commitlint/config-conventional": "^20.3.1",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
@@ -84,7 +84,7 @@
     "markdownlint-cli": "^0.47.0",
     "prettier": "^3.8.1",
     "prh": "^5.4.4",
-    "textlint": "^15.5.0",
+    "textlint": "^15.5.2",
     "textlint-rule-preset-ja-technical-writing": "^12.0.2",
     "textlint-rule-prh": "^6.1.0"
   }
