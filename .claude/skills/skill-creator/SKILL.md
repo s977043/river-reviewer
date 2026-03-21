@@ -119,13 +119,14 @@ For every chosen field, state why it is needed.
 
 Draft the skill with this order:
 
-1. purpose
-2. gate
-3. workflow phases
-4. output contract
-5. review step
-6. failure handling
-7. additional resources
+1. pattern declaration
+2. purpose
+3. gate
+4. workflow phases
+5. output contract
+6. review step
+7. failure handling
+8. additional resources
 
 Keep the main file compact.
 Move heavy references, examples, and templates into separate files.

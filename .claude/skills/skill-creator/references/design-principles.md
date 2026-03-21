@@ -36,8 +36,8 @@ Before creating or optimizing any skill:
 
 Available patterns:
 
-- Tool Wrapper: domain knowledge injection on demand
-- Generator: repeatable structured output from templates
-- Reviewer: evaluation against a rubric or checklist
-- Inversion: gather missing information before acting
-- Pipeline: enforce strict multi-step workflow with checkpoints
+- Tool Wrapper — domain knowledge injection on demand
+- Generator — repeatable structured output from templates
+- Reviewer — evaluation against a rubric or checklist
+- Inversion — gather missing information before acting
+- Pipeline — enforce strict multi-step workflow with checkpoints

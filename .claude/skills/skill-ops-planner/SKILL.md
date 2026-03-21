@@ -79,6 +79,7 @@ For each stage, define:
 - review requirement
 - allowed blast radius
 - logging requirement
+- retirement signals (when to deprecate or retire)
 
 ## Phase 3: Metrics and governance
 
@@ -154,6 +155,8 @@ Return exactly these sections:
 ### Governance rules
 
 ### Metrics dashboard definition
+
+### Pattern portfolio
 
 ### 30-day roadmap
 
