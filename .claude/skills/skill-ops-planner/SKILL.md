@@ -5,6 +5,12 @@ disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
+## Pattern declaration
+
+Primary pattern: Pipeline
+Secondary patterns: Reviewer
+Why: portfolio planning requires strict phase order (inventory → classify → policy → metrics → roadmap) with review checkpoints at each stage.
+
 ## Purpose
 
 Plan how a team should operate a set of skills over time.
@@ -36,23 +42,24 @@ If the current inventory is missing:
 - create an inventory-first plan
 - do not pretend portfolio governance already exists
 
-## Phase 1: Inventory and segmentation
+## Phase 1: Inventory and pattern segmentation
 
-Group skills by type:
-
-- knowledge
-- workflow automation
-- investigation / read-only
-- review / verification
-- side-effecting operational tasks
-
-For each group, define:
+For each skill, record:
 
 - owner
-- auto vs manual invocation policy
-- tool restriction level
-- validation requirement
-- retirement signals
+- purpose
+- invocation policy (auto vs manual)
+- risk level
+- primary pattern (Tool Wrapper / Generator / Reviewer / Inversion / Pipeline)
+- secondary patterns
+- current eval maturity
+- review requirement
+
+Group the portfolio by:
+
+- responsibility type (knowledge / workflow / investigation / review / operational)
+- risk type
+- design pattern
 
 ## Phase 2: Lifecycle policy
 
@@ -72,6 +79,7 @@ For each stage, define:
 - review requirement
 - allowed blast radius
 - logging requirement
+- retirement signals (when to deprecate or retire)
 
 ## Phase 3: Metrics and governance
 
@@ -84,6 +92,15 @@ Define portfolio metrics:
 - mean tool count
 - failure recurrence
 - stale skill count
+
+Pattern portfolio metrics:
+
+- count by primary pattern
+- percentage of Inversion usage where ambiguity is common
+- percentage of Generator skills with template coverage
+- percentage of Reviewer skills with explicit rubric coverage
+- percentage of Pipeline skills with checkpoint validation
+- percentage of Tool Wrapper skills with maintained references
 
 Also define:
 
@@ -138,6 +155,8 @@ Return exactly these sections:
 ### Governance rules
 
 ### Metrics dashboard definition
+
+### Pattern portfolio
 
 ### 30-day roadmap
 
