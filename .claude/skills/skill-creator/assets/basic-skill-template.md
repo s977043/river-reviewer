@@ -8,18 +8,9 @@ description: Explain what this skill does and when to use it. Include likely tri
 
 ## Pattern declaration
 
-Primary pattern:
-
-- [Tool Wrapper | Generator | Reviewer | Inversion | Pipeline]
-
-Secondary patterns:
-
-- [optional]
-
-Pattern intent:
-
-- explain why this skill uses this pattern
-- explain why the other patterns are not primary
+Primary pattern: [Tool Wrapper | Generator | Reviewer | Inversion | Pipeline]
+Secondary patterns: [optional]
+Why: [Explain why this skill uses this pattern and why other patterns are not primary]
 
 ## Purpose
 
