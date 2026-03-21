@@ -91,7 +91,7 @@ Classify failures into:
 
 ## Phase 2.5: Pattern mismatch diagnosis
 
-Before proposing wording or structure fixes, check whether the failure is caused by the wrong pattern or a missing secondary pattern.
+Before proposing wording or structure fixes, you must check whether the failure is caused by the wrong pattern or a missing secondary pattern. Do not skip this phase.
 
 Check:
 
@@ -105,6 +105,8 @@ If pattern mismatch exists:
 
 - recommend the smallest structural correction first
 - do not jump to wording tweaks before resolving the pattern issue
+
+Do not proceed to Phase 3 until pattern mismatch has been evaluated and documented.
 
 ## Phase 3: Optimization proposal
 

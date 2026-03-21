@@ -8,8 +8,8 @@ allowed-tools: Read, Grep, Glob, Bash
 ## Pattern declaration
 
 Primary pattern: Pipeline
-Secondary patterns: Reviewer
-Why: portfolio planning requires strict phase order (inventory → classify → policy → metrics → roadmap) with review checkpoints at each stage.
+Secondary patterns: Reviewer, Inversion
+Why: portfolio planning requires strict phase order (inventory → classify → policy → metrics → roadmap) with review checkpoints at each stage. Inversion is needed at Phase 0 to block progress when inventory data is insufficient.
 
 ## Purpose
 
@@ -37,10 +37,11 @@ Before planning, identify:
 - current storage layout
 - current evaluation maturity
 
-If the current inventory is missing:
+If any of the above cannot be determined:
 
-- create an inventory-first plan
-- do not pretend portfolio governance already exists
+- stop and ask the user for the missing information
+- do not proceed to Phase 1 until at least active skills and current storage layout are confirmed
+- if no inventory exists at all, output an inventory-first plan and stop
 
 ## Phase 1: Inventory and pattern segmentation
 
@@ -55,7 +56,21 @@ For each skill, record:
 - current eval maturity
 - review requirement
 
-Group the portfolio by:
+Output each skill as a structured record:
+
+```text
+skill: <name>
+owner: <person or team>
+purpose: <one line>
+invocation: auto | manual
+risk: low | medium | high
+primary_pattern: <pattern>
+secondary_patterns: <patterns or none>
+eval_maturity: none | basic | comprehensive
+review: <cadence>
+```
+
+Then group the portfolio by:
 
 - responsibility type (knowledge / workflow / investigation / review / operational)
 - risk type
