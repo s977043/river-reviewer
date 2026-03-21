@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.10.0](https://github.com/s977043/river-reviewer/compare/v0.9.0...v0.10.0) (2026-03-19)
+
+
+### Features
+
+* **agent-skills:** add 5 routing agent skills for river-reviewer ([da7e7fe](https://github.com/s977043/river-reviewer/commit/da7e7feac42e0779fdf31b49b2eb11ee4f7876fd))
+* **skills:** add adversarial review skills (Pre-mortem, War Game, Logic Torturing) ([#372](https://github.com/s977043/river-reviewer/issues/372)) ([baa3bc6](https://github.com/s977043/river-reviewer/commit/baa3bc6127f272302b7d24d924a45b5d70ea00dc))
+* レビュー基盤改善と敵対的レビュースキルの追加 ([#371](https://github.com/s977043/river-reviewer/issues/371)) ([a4595b2](https://github.com/s977043/river-reviewer/commit/a4595b2e2267cc27c700da365daa863e5bb4efbb))
+
+
+### Bug Fixes
+
+* **agent-skills:** add missing References section to 4 routing agent skills ([c3f5a51](https://github.com/s977043/river-reviewer/commit/c3f5a51dec1b1cdb0efd751c9ba5f1b480f0c2de))
+* **agent-skills:** address PR review comments on routing skills ([2d2c1ff](https://github.com/s977043/river-reviewer/commit/2d2c1ffb480107b3f292eab88f05ba9a13543508))
+* **agent-skills:** fix remaining short-form skill ID in testing ROUTING.md ([d2be57d](https://github.com/s977043/river-reviewer/commit/d2be57d259b7af9269a544923f1061dbec1907d1))
+* **agent-skills:** fix severity validation and exclude routing skills from planner ([bc2a55c](https://github.com/s977043/river-reviewer/commit/bc2a55cc52b3d346c7d95ed1afce80fe2d2178d2))
+* **docs:** correct npm script name eval:skills → eval:fixtures ([4e29419](https://github.com/s977043/river-reviewer/commit/4e29419480312c5c8b039c045c58355bb252ed77))
+* resolve Docusaurus duplicate ID error and address review feedback ([c2087ef](https://github.com/s977043/river-reviewer/commit/c2087ef2e609a5ba650c91c8e8e9f45518f4489a))
+* **skills:** add explicit category and version to all skill frontmatter ([1fc61c4](https://github.com/s977043/river-reviewer/commit/1fc61c4c9cc110b682be5e0213f2895279cfb99f))
+
 ## [0.9.0](https://github.com/s977043/river-reviewer/compare/v0.8.0...v0.9.0) (2026-02-28)
 
 

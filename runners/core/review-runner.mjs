@@ -32,14 +32,16 @@ function matchesApplyTo(skill, changedFiles) {
   const meta = getMeta(skill);
   const globs = ensureArray(meta.applyTo);
   if (!globs.length) return false;
-  return changedFiles.some(file => globs.some(pattern => minimatch(file, pattern, { dot: true })));
+  return changedFiles.some((file) =>
+    globs.some((pattern) => minimatch(file, pattern, { dot: true }))
+  );
 }
 
 function missingInputContexts(skill, availableContexts) {
   const meta = getMeta(skill);
   if (!meta.inputContext || meta.inputContext.length === 0) return [];
   const available = new Set(availableContexts);
-  return meta.inputContext.filter(ctx => !available.has(ctx));
+  return meta.inputContext.filter((ctx) => !available.has(ctx));
 }
 
 function missingDependencies(skill, availableDependencies) {
@@ -48,7 +50,7 @@ function missingDependencies(skill, availableDependencies) {
   if (!deps.length) return [];
   if (availableDependencies == null) return [];
   const available = new Set(ensureArray(availableDependencies));
-  return deps.filter(dep => !available.has(dep));
+  return deps.filter((dep) => !available.has(dep));
 }
 
 function evaluateSkill(skill, options) {
@@ -87,6 +89,13 @@ export function selectSkills(skills, options) {
     const meta = skill.metadata ?? skill;
     const skillId = meta.id;
 
+    // ルーティングスキル（エントリポイント）は実行対象外
+    const tags = ensureArray(meta.tags);
+    if (tags.includes('routing')) {
+      skipped.push({ skill, reasons: ['routing skill: not an executable review skill'] });
+      continue;
+    }
+
     // dry-run または LLM 無効時はヒューリスティック対応スキルのみ選択
     const isLlmRestricted = dryRun || !llmEnabled;
     if (isLlmRestricted && !HEURISTIC_SKILL_IDS.includes(skillId)) {
@@ -114,7 +123,7 @@ export function selectSkills(skills, options) {
 
 export function rankByModelHint(skills, preferredModelHint = 'balanced') {
   const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
-  const weight = hint => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
+  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
   return [...skills].sort((a, b) => {
     const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
     const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
@@ -134,14 +143,14 @@ function computeTagScore(skill, impactTags) {
 }
 
 function rankByImpactTags(skills, impactTags, preferredModelHint = 'balanced') {
-  const scores = new Map(skills.map(s => [getMeta(s).id, computeTagScore(s, impactTags)]));
-  const anyMatched = Array.from(scores.values()).some(v => v > 0);
+  const scores = new Map(skills.map((s) => [getMeta(s).id, computeTagScore(s, impactTags)]));
+  const anyMatched = Array.from(scores.values()).some((v) => v > 0);
   if (!anyMatched) {
     return rankByModelHint(skills, preferredModelHint);
   }
 
   const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
-  const weight = hint => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
+  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
 
   return [...skills].sort((a, b) => {
     const idA = getMeta(a).id;
@@ -195,7 +204,9 @@ export async function buildExecutionPlan(options) {
   const impactTags = inferImpactTags(changedFiles, { diffText });
 
   // If planner is provided, try LLM-based planning, fallback to deterministic rank
-  const effectivePlannerMode = planner ? normalizePlannerMode(plannerMode, { defaultMode: 'order' }) : 'off';
+  const effectivePlannerMode = planner
+    ? normalizePlannerMode(plannerMode, { defaultMode: 'order' })
+    : 'off';
   if (planner && effectivePlannerMode !== 'off') {
     const context = {
       phase,
@@ -209,7 +220,9 @@ export async function buildExecutionPlan(options) {
       llmPlan: planner.plan ?? planner,
       appendRemaining: effectivePlannerMode !== 'prune',
     });
-    const ranked = fallback ? rankByImpactTags(selection.selected, impactTags, preferredModelHint) : planned;
+    const ranked = fallback
+      ? rankByImpactTags(selection.selected, impactTags, preferredModelHint)
+      : planned;
     return {
       selected: ranked,
       skipped: selection.skipped,
