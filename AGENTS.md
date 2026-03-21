@@ -56,7 +56,7 @@
 - `scripts/`: 検証・ユーティリティスクリプト
 - `tests/`: テストファイル
 - `.github/`: GitHub Actions、エージェント定義
-- `.claude/`: Claude Code設定（agents、commands、hooks）
+- `.claude/`: Claude Code設定（agents、commands、hooks、skills）
 
 ### 編集禁止（自動生成・管理外）
 
@@ -130,6 +130,13 @@ npm test         # Node.js test runner
 ### Agent Skillsパッケージ（`skills/agent-skills/`）
 
 - 形式: `SKILL.md` + `references/`を基本とするフォルダー単位
+
+### Claude Codeスキル（`.claude/skills/`）
+
+- 形式: Claude Code Agent Skills仕様に準拠（`SKILL.md` + `references/` + `assets/`）
+- 主なフィールド: `name`、`description`、`allowed-tools`、`disable-model-invocation`
+- 用途: 開発支援ワークフロー（スキル作成・改善・運用計画等）。`skills/`のレビュースキルとは別体系
+- 検証: `npm run lint`（Prettier + markdownlint）
 
 ### エージェント定義
 

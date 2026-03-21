@@ -1,0 +1,178 @@
+---
+name: skill-creator
+description: Design a new Claude Code skill from a concrete use case and produce a repo-ready skill package. Use when the user asks to create a new skill, define a skill's responsibility, draft SKILL.md, choose frontmatter, design supporting files, or prepare eval criteria for a new skill. Also trigger on "スキルを作りたい", "スキルを作って", "スキルを追加して", "新しいスキル", "SKILL.md生成".
+allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+---
+
+## Purpose
+
+Create a new skill only after the use case is concrete enough.
+
+Your job is to:
+
+1. identify the smallest useful responsibility
+2. define when the skill should trigger
+3. choose safe frontmatter defaults
+4. draft a minimal but strong `SKILL.md`
+5. propose supporting files only when they add clear value
+6. define an initial eval set
+
+## Safety constraints
+
+Write output files only to `.claude/skills/` unless the user explicitly specifies a different path.
+Do not modify existing skills without user confirmation.
+
+Note: this skill does not set `disable-model-invocation: true` because file creation is its primary purpose, not an incidental side effect. The settings.json deny list and user confirmation prompts provide sufficient guardrails.
+
+## Core rule
+
+Do not create a broad or fuzzy skill.
+
+Prefer:
+
+- one responsibility
+- one primary workflow
+- one clear success condition
+
+If the requested scope is too broad, split it into multiple skills.
+
+## Phase 0: Gate
+
+Before drafting, confirm:
+
+- target outcome
+- primary user intent
+- trigger phrases
+- audience
+- allowed tools needed
+- whether the skill should be auto-invoked or manual-only
+- source material available
+- definition of done
+
+If any item is unclear:
+
+- ask the minimum focused questions, or
+- inspect available files first if the answer can be found without asking
+
+Do not draft the full skill until the gate passes.
+
+## Phase 1: Skill boundary design
+
+Produce a short working summary with:
+
+- skill name candidate
+- single responsibility
+- in-scope tasks
+- out-of-scope tasks
+- likely trigger language
+- risk level
+
+Reject designs that combine unrelated workflows.
+
+## Phase 2: Frontmatter design
+
+Choose frontmatter intentionally.
+
+Defaults:
+
+- include `name`
+- include `description`
+- omit extra fields unless clearly needed
+
+Use:
+
+- `disable-model-invocation: true` for side-effecting, sensitive, or timing-dependent workflows
+- `allowed-tools` only when safe pre-approval is clearly useful
+- `model` only when there is a concrete reason to override the default
+
+For every chosen field, state why it is needed.
+
+## Phase 3: Structure design
+
+Draft the skill with this order:
+
+1. purpose
+2. gate
+3. workflow phases
+4. output contract
+5. review step
+6. failure handling
+7. additional resources
+
+Keep the main file compact.
+Move heavy references, examples, and templates into separate files.
+
+Use `${CLAUDE_SKILL_ROOT}/assets/basic-skill-template.md` as the starting skeleton.
+
+## Phase 4: Eval design
+
+Create an initial eval plan with:
+
+- 10 to 20 realistic test prompts
+- 3 to 6 pass/fail criteria
+- likely failure modes
+- what should be checked by code vs by reviewer
+
+Include at least:
+
+- one trigger test
+- one under-specified request
+- one boundary case
+- one anti-pattern case
+
+Use `${CLAUDE_SKILL_ROOT}/assets/eval-rubric-template.md` as the rubric structure.
+
+## Phase 5: Review
+
+Check the draft against:
+
+- `${CLAUDE_SKILL_ROOT}/references/review-default.md`
+- `${CLAUDE_SKILL_ROOT}/references/design-principles.md`
+
+Fix any issue before finalizing.
+
+## Phase 6: Registration
+
+After the skill files are written:
+
+1. verify the directory name matches the `name` field in frontmatter
+2. verify `description` is under 1024 characters and includes trigger keywords
+3. verify SKILL.md is under 500 lines
+4. verify all `${CLAUDE_SKILL_ROOT}/` references point to existing files
+5. check the repository CLAUDE.md or AGENTS.md for additional registration steps
+6. if the repository uses a skills index or registry, update it
+
+## Output format
+
+Return exactly these sections:
+
+### Skill summary
+
+### Recommended directory structure
+
+### SKILL.md draft
+
+### Supporting files to add
+
+### Eval plan
+
+### Known risks
+
+## Anti-patterns
+
+Do not:
+
+- create a "do everything" skill
+- invent company-specific rules
+- write a vague description
+- skip the gate
+- omit eval planning
+- hide trade-offs
+
+## Failure handling
+
+If the request is too broad:
+
+- propose 2 to 4 smaller skills
+- explain the split by responsibility
+- recommend which one to build first
