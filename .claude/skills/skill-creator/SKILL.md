@@ -4,6 +4,12 @@ description: Design a new Claude Code skill from a concrete use case and produce
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 ---
 
+## Pattern declaration
+
+Primary pattern: Pipeline
+Secondary patterns: Inversion
+Why: skill creation requires strict phase order (requirements → pattern selection → structure → review) with an upfront question-gathering gate.
+
 ## Purpose
 
 Create a new skill only after the use case is concrete enough.
@@ -11,11 +17,12 @@ Create a new skill only after the use case is concrete enough.
 Your job is to:
 
 1. identify the smallest useful responsibility
-2. define when the skill should trigger
-3. choose safe frontmatter defaults
-4. draft a minimal but strong `SKILL.md`
-5. propose supporting files only when they add clear value
-6. define an initial eval set
+2. select the right design pattern
+3. define when the skill should trigger
+4. choose safe frontmatter defaults
+5. draft a minimal but strong `SKILL.md`
+6. propose supporting files only when they add clear value
+7. define an initial eval set
 
 ## Safety constraints
 
@@ -55,6 +62,27 @@ If any item is unclear:
 - inspect available files first if the answer can be found without asking
 
 Do not draft the full skill until the gate passes.
+
+## Phase 0.5: Pattern selection
+
+Choose the primary design pattern before drafting the skill.
+
+Available patterns:
+
+- Tool Wrapper — the skill mainly injects domain, library, or framework knowledge on demand
+- Generator — the skill mainly produces structured output from a reusable template
+- Reviewer — the skill mainly evaluates output against a checklist or rubric
+- Inversion — the skill must gather missing information before acting
+- Pipeline — the skill must enforce a strict multi-step workflow with checkpoints
+
+Selection rules:
+
+1. identify the primary value source or failure mode the skill addresses
+2. map it to one primary pattern
+3. add secondary patterns only when one pattern is insufficient
+4. each secondary pattern must appear in a named phase with a measurable role
+
+Do not continue until the pattern choice is explicit.
 
 ## Phase 1: Skill boundary design
 
@@ -148,6 +176,8 @@ Return exactly these sections:
 
 ### Skill summary
 
+### Pattern selection
+
 ### Recommended directory structure
 
 ### SKILL.md draft
@@ -166,8 +196,10 @@ Do not:
 - invent company-specific rules
 - write a vague description
 - skip the gate
+- skip pattern selection
 - omit eval planning
 - hide trade-offs
+- stack multiple patterns without justifying each one
 
 ## Failure handling
 

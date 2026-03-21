@@ -24,3 +24,20 @@ Avoid:
 - organization-specific facts without source material
 - long examples in the main file
 - side effects in auto-invoked skills
+
+## Pattern selection rule
+
+Before creating or optimizing any skill:
+
+1. identify the primary failure or value source
+2. map it to one primary pattern
+3. add secondary patterns only when one pattern is insufficient
+4. avoid pattern stacking unless each added pattern has a named phase and a measurable role
+
+Available patterns:
+
+- Tool Wrapper: domain knowledge injection on demand
+- Generator: repeatable structured output from templates
+- Reviewer: evaluation against a rubric or checklist
+- Inversion: gather missing information before acting
+- Pipeline: enforce strict multi-step workflow with checkpoints

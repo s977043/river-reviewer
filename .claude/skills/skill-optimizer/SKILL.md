@@ -5,6 +5,12 @@ disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Pipeline
+Why: optimization starts with diagnosis against criteria, then applies small changes in a controlled sequence with eval checkpoints.
+
 ## Purpose
 
 Improve an existing skill without breaking what already works.
@@ -83,6 +89,23 @@ Classify failures into:
 - unnecessary tool use
 - high token or step cost
 
+## Phase 2.5: Pattern mismatch diagnosis
+
+Before proposing wording or structure fixes, check whether the failure is caused by the wrong pattern or a missing secondary pattern.
+
+Check:
+
+- acts too early on ambiguous input → missing Inversion
+- output structure is inconsistent across runs → missing Generator
+- returns unvalidated or unchecked output → missing Reviewer
+- skips required steps or loses sequence control → missing Pipeline
+- lacks domain-specific accuracy → missing Tool Wrapper
+
+If pattern mismatch exists:
+
+- recommend the smallest structural correction first
+- do not jump to wording tweaks before resolving the pattern issue
+
 ## Phase 3: Optimization proposal
 
 For each proposed change, output:
@@ -141,6 +164,8 @@ Return exactly these sections:
 ### Success criteria
 
 ### Failure modes
+
+### Pattern mismatch diagnosis
 
 ### Recommended next change
 
