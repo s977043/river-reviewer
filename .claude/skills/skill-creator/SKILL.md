@@ -133,6 +133,8 @@ Move heavy references, examples, and templates into separate files.
 
 Use `${CLAUDE_SKILL_ROOT}/assets/basic-skill-template.md` as the starting skeleton.
 
+The generated SKILL.md must include a Pattern declaration section at the top with primary pattern, secondary patterns, and Why fields matching the choice from Phase 0.5.
+
 ## Phase 4: Eval design
 
 Create an initial eval plan with:
