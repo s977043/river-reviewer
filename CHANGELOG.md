@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.11.0](https://github.com/s977043/river-reviewer/compare/v0.10.0...v0.11.0) (2026-03-21)
+
+
+### Features
+
+* **skills:** add Claude Code skill management skills ([#380](https://github.com/s977043/river-reviewer/issues/380)) ([8fae238](https://github.com/s977043/river-reviewer/commit/8fae238e8bc3f9b626361ca3ee11366619bffac8))
+* **skills:** スキル管理スキルに5パターン設計システムを導入 ([#382](https://github.com/s977043/river-reviewer/issues/382)) ([9fa274a](https://github.com/s977043/river-reviewer/commit/9fa274a2efbe724380c3f6c5279292576d4bfe4d))
+
+
+### Bug Fixes
+
+* **skills:** 5パターン診断に基づくスキル改善（統合） ([#385](https://github.com/s977043/river-reviewer/issues/385)) ([857d5ca](https://github.com/s977043/river-reviewer/commit/857d5ca1d05324c8b398d273b371160e3b1a648b))
+
 ## [0.10.0](https://github.com/s977043/river-reviewer/compare/v0.9.0...v0.10.0) (2026-03-19)
 
 
