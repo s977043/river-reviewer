@@ -23,6 +23,12 @@ modelHint: balanced
 dependencies: [adr_lookup, repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: ADR・図・仕様間の食い違いを検出し、設計ドリフトの早期発見とトレーサビリティ確保を行う。
+
 ## Goal / 目的
 
 - 設計変更の差分から、ADR・図・仕様の “食い違い” を早期に発見し、設計ドリフトを抑える。
@@ -32,9 +38,18 @@ dependencies: [adr_lookup, repo_metadata]
 - 設計の正解を断定しない（整合性とトレーサビリティの不足を指摘する）。
 - 実装の詳細レビュー（コード品質やテスト実装の指摘）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にアーキテクチャ/設計関連ファイル（`docs/architecture/`, `docs/adr/`, `*design*.md`, `*architecture*.md`, `*.adr`, `*c4*`, `*diagram*`）が含まれている
+- [ ] 差分に意思決定・構成要素・契約に関する記述の追加・変更が含まれている
+- [ ] inputContextに`diff`が含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-architecture-traceability-001 — 設計トレーサビリティに関連するドキュメントの変更なし`
+
 ## False-positive guards / 抑制条件
 
-- 誤字修正やリンク修正のみで、意思決定やアーキが変わらない場合は指摘しない（`NO_ISSUES`）。
 - 明確に “既存 ADR への参照追加のみ” で、整合性が保たれている場合は重複指摘しない。
 
 ## Rule / ルール

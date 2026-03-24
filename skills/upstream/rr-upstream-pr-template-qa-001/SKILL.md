@@ -21,6 +21,12 @@ outputKind:
 modelHint: balanced
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: PRテンプレートの差分から必須項目・検証コマンド・チェックリストの抜けをレビューし、レビューフロー破綻シナリオを逆照射する。
+
 ## Goal / 目的
 
 - PR テンプレートが日本語記載・必須項目・検証コマンドを明確に示し、レビューフローでブレないようにする。
@@ -30,9 +36,17 @@ modelHint: balanced
 - リポジトリ全体の運用ポリシーを決め直すこと。
 - テンプレート外のドキュメント構成やCI設計を断定しない。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にPRテンプレートファイル（`.github/pull_request_template.md` または `.github/PULL_REQUEST_TEMPLATE.md`）が含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-pr-template-qa-001 — PRテンプレートファイルの差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 表記ゆれや軽微な言い回しだけの場合は指摘しない（`NO_ISSUES`）。
 - 英語版テンプレートが意図的に存在する場合は「日本語前提」への置換を強制しない（方針が明示されていれば黙る）。
 
 ## Rule / ルール

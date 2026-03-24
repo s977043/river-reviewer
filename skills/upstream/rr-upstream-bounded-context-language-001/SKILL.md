@@ -21,6 +21,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 境界と用語の一貫性をチェックリスト型で評価し、ドメインドリフトや責務混線を事前に検出する
+
 ## Goal / 目的
 
 - 設計ドキュメントの差分から、境界（Bounded Context）や用語（Ubiquitous Language）の揺れを抑え、責務の混線とドメインドリフトを減らす。
@@ -30,9 +36,18 @@ dependencies: [repo_metadata]
 - 用語の好みや命名規則の押し付け（差分に紐づく “混乱コスト” の指摘に限定）。
 - 実装レベルの名前付け（変数名/関数名）レビュー。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計ドキュメント（アーキテクチャ/ADR/設計書）の変更がある
+- [ ] 差分に境界定義・責務分担・ドメイン用語に関わる記述の追加または変更がある
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-bounded-context-language-001 — 境界・用語に関わる変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 変更が誤字修正や表記ゆれ修正のみの場合は指摘しない（`NO_ISSUES`）。
 - ドメイン用語集が別途あり、差分が参照更新のみの場合は重複指摘しない。
 
 ## Rule / ルール

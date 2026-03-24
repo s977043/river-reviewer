@@ -21,6 +21,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 設計変更の影響範囲・通知計画・非推奨措置をチェックリスト型で評価し、コミュニケーション漏れを防ぐ
+
 ## Goal / 目的
 
 - 設計変更の差分から、影響範囲・通知経路・非推奨措置を共有するコミュニケーション計画が抜け落ちていないかをチェックする。
@@ -30,9 +36,18 @@ dependencies: [repo_metadata]
 - 内部通知ツール（Slack/Teams）のテンプレ作成や運用作業そのもの。
 - 個別チームの予定調整（ただし通知対象に入るべきステークホルダーは指摘する）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計ドキュメント（アーキテクチャ/ADR/設計書）の変更がある
+- [ ] 差分にアーキテクチャ変更・API変更・非推奨化など影響範囲を伴う記述の追加または変更がある
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-change-communication-001 — コミュニケーション計画が必要な設計変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 変更が名称変更や誤字修正のみで、実質的な影響範囲が動いていない場合は指摘しない（`NO_ISSUES`）。
 - すでに別 ADR/通知チャネルで整備されており、差分がその参照のみであれば重複指摘を避ける。
 
 ## Rule / ルール

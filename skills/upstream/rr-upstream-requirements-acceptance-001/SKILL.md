@@ -20,6 +20,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 要件/仕様ドキュメントの差分から曖昧さ・受け入れ条件の抜けをレビューし、実装ブレや炎上シナリオを逆照射する。
+
 ## Goal / 目的
 
 - 要件/仕様ドキュメントの差分から、実装ブレや炎上の原因になりやすい「曖昧さ・抜け」を早期に潰す。
@@ -29,9 +35,17 @@ dependencies: [repo_metadata]
 - UI/実装の最適解を断定しない（要件としての決定事項・受け入れ条件に絞る）。
 - 仕様が未確定な点を欠陥と断定しない（未決なら “未決の明示” を促す）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に要件定義・仕様書・PRD・ユーザーストーリーに関するドキュメントが含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-requirements-acceptance-001 — 要件/仕様ドキュメントの差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 変更が表記ゆれ/誤字/段落整理のみの場合は指摘しない（`NO_ISSUES`）。
 - 差分外の既存仕様まで掘り返して問題視しない（今回の変更と直結する範囲に限定）。
 
 ## Rule / ルール

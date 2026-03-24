@@ -15,6 +15,12 @@ outputKind: [tests]
 modelHint: high-accuracy
 ---
 
+## Pattern declaration
+
+Primary pattern: Generator
+Secondary patterns: Inversion
+Why: 仕様書からpytestユニットテストの足場を生成するジェネレーターであり、仕様の抜けをテスト観点から逆照射する。
+
 ## Role
 
 あなたは熟練したPython開発者です。
@@ -24,6 +30,16 @@ modelHint: high-accuracy
 
 - 実装ロジックの具体的な書き方や最適化は示さない。
 - E2E/統合テストの網羅は対象外で、pytest によるユニットテストの足場に限定する。
+
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に仕様書（`docs/**/*.md` または `specs/**/*.md`）が含まれている
+- [ ] 仕様書にPythonアプリケーションに関する記述がある
+- [ ] inputContextにfullFileが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-test-code-unit-python-pytest-001 — 対象となるPython仕様が差分に含まれていない`
 
 ## False-positive guards / 抑制条件
 

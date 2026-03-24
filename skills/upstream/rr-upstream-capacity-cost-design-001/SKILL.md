@@ -23,6 +23,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 性能・容量・コストの前提漏れをチェックリスト型で評価し、本番ではじめて発覚するリスクを低減する
+
 ## Goal / 目的
 
 - 設計の差分から、性能/容量/コストの前提不足により “本番で初めて詰む” リスクを減らす。
@@ -32,9 +38,18 @@ dependencies: [repo_metadata]
 - 具体的なインフラ構成やクラウドサービスの最適解を断定しない。
 - 実装レベルのチューニング（クエリ改善やキャッシュ実装など）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計ドキュメント（設計書/ADR/容量計画書）の変更がある
+- [ ] 差分に性能・容量・コストの前提や目標に関わる記述の追加または変更がある
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-capacity-cost-design-001 — 性能・容量・コスト設計に関わる変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 変更が誤字/文言整理のみで、前提や要件が変わらない場合は指摘しない（`NO_ISSUES`）。
 - PoC/運用対象外と明記されている場合は、必須要件としては扱わず “確認” に留める。
 
 ## Rule / ルール

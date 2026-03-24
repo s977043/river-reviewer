@@ -15,6 +15,12 @@ outputKind: [findings, actions]
 dependencies: [code_search]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: TypeScriptコードの差分からany/型アサーションの乱用をレビューし、型安全性の低下シナリオを逆照射する。
+
 ## Rule / ルール
 
 - `any` の使用や無制限の型アサーションを最小化する
@@ -46,11 +52,19 @@ dependencies: [code_search]
 - 既存ライブラリの型定義の不備を修正する。
 - 型以外のスタイル/命名のレビュー。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にTypeScriptファイル（`*.ts` または `*.tsx`）が含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-typescript-strict-001 — TypeScriptファイルの差分がない`
+
 ## False-positive guards / 抑制条件
 
 - `any` が一時的な実験コードで、明示的なコメントがある。
 - 型定義が別ファイルにあり、変更範囲では判定できない。
-- 変更が import 順やフォーマットのみで、型の安全性に影響しない。
 
 ## 評価指標（Evaluation）
 

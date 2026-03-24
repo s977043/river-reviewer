@@ -28,6 +28,12 @@ outputKind:
 modelHint: balanced
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: キャッシュ戦略の整合性・無効化・障害対策をチェックリスト型で評価し、設計段階での不整合を防ぐ
+
 ## Guidance
 
 - Confirm cache layers (CDN/app/DB) and cache keys are specified with owners.
@@ -39,6 +45,16 @@ modelHint: balanced
 
 - キャッシュ実装の好み（ライブラリ選定など）を推測で押し付けない。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計ドキュメント（設計書/spec/RFC）の変更がある
+- [ ] 差分にキャッシュ戦略・キャッシュレイヤー・TTL・無効化に関わる記述の追加または変更がある
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-cache-strategy-consistency-001 — キャッシュ戦略に関わる変更が検出されない`
+
 ## False-positive guards
 
-- 既に整合性・無効化・TTL が別ドキュメントで明示されている場合や差分が非キャッシュ領域のみなら指摘しない。
+- 既に整合性・無効化・TTL が別ドキュメントで明示されている場合は重複指摘しない。

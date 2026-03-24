@@ -18,6 +18,12 @@ modelHint: balanced
 dependencies: [test_runner, coverage_report]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: カバレッジギャップ検出はチェックリスト型評価が主だが、テスト対象コードが差分に含まれない場合は実行を止める必要がある。
+
 ## Rule / ルール
 
 - 主要フローと失敗フローの両方にテストがあることを確認する。
@@ -51,9 +57,18 @@ dependencies: [test_runner, coverage_report]
 - 実行環境や外部サービスの障害注入（カオス試験）の設計。
 - プロダクション監視の網羅性評価。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にソースコード（`src/**/*`, `lib/**/*`）またはテストファイル（`*.test.*`, `*.spec.*`）の変更が含まれている
+- [ ] 実行パスへ影響する変更が差分に含まれている（コメントやドキュメントのみの変更ではない）
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-downstream-coverage-gap-001 — カバレッジギャップ検出の対象となるコード変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 変更がコメントやドキュメントのみで、実行経路に影響しない。
 - 既存テストが同等の失敗経路を十分にカバーしている。
 - テスト対象が外部 API の仕様変更のみで、社内コードに実行分岐が増えていない。
 

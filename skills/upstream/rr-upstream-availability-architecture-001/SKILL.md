@@ -21,6 +21,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 可用性・復旧設計の抜け漏れをチェックリスト型で評価し、運用リスクを事前に可視化する
+
 ## Goal / 目的
 
 - 変更対象の設計ドキュメントから可用性目標・冗長性・復旧手順・容量バッファが漏れていないかをチェックし、運用で詰まらない状態にする。
@@ -30,10 +36,19 @@ dependencies: [repo_metadata]
 - 個別インフラ製品（クラウドプロバイダ等）の設定レビュー。
 - 実装コードやライブラリのパフォーマンス最適化。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計ドキュメント（アーキテクチャ/ADR/設計書）の変更がある
+- [ ] 差分に可用性・冗長性・復旧・容量に関わる記述の追加または変更がある
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-availability-architecture-001 — 可用性設計に関わる変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
 - ドキュメントが PoC/実験系で、本番可用性を担保する責務が無いと明記されている場合は強度を下げる。
-- 変更が誤字修正や構成整理のみで、可用性前提が変わっていない場合は指摘しない。
 
 ## Rule / ルール
 

@@ -18,6 +18,12 @@ modelHint: balanced
 dependencies: [test_runner, coverage_report]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: テスト存在チェックはチェックリスト型評価が主だが、実行パスへ影響するコード変更が差分にない場合は実行を止める必要がある。
+
 ## Goal / 目的
 
 - 差分で挙動が増えたのにテストが追従していないケースを拾い、最小のテスト観点を提案する。
@@ -28,10 +34,19 @@ dependencies: [test_runner, coverage_report]
 - 網羅的なテストケース列挙（提案は最大3点までに絞る）。
 - テスト差分がすでにある場合の追加要求（原則として黙る）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にソースコード（`src/**/*`, `lib/**/*`）またはテストファイル（`*.test.*`, `*.spec.*`）の変更が含まれている
+- [ ] 実行パスへ影響する変更が差分に含まれている（挙動変更のシグナルが存在する）
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-downstream-test-existence-001 — テスト存在チェックの対象となるコード変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
 - 差分にテストファイル（`*.test.*` / `*.spec.*`）が含まれている場合。
-- 挙動変更のシグナル（新しい分岐、例外、バリデーション）が差分から読み取れない場合。
 
 ## Rule / ルール
 

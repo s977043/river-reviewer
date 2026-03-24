@@ -18,6 +18,12 @@ modelHint: balanced
 dependencies: [adr_lookup, repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: ADRの記録品質を多面的チェックリストで検証し、不足を指摘して将来の設計ドリフトを防ぐ。
+
 ## Goal / 目的
 
 - ADR（設計意思決定記録）の差分から、将来の設計ドリフト/再議論/運用事故につながる “記録不足” を減らす。
@@ -27,9 +33,18 @@ dependencies: [adr_lookup, repo_metadata]
 - 技術選定の正解を断定しない（代替案とトレードオフの “記録の質” を見て指摘する）。
 - ADR の書式統一や文章校正を主目的にしない（重要論点の不足を優先）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にADR関連ファイル（`docs/adr/`, `adr/`, `*.adr`, `*adr*.md`）が含まれている
+- [ ] 差分がADRの意思決定内容（Context / Decision / Alternatives / Follow-ups）に実質的な変更を含んでいる
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-adr-decision-quality-001 — ADR関連ファイルの実質的変更なし`
+
 ## False-positive guards / 抑制条件
 
-- 既存 ADR の参照リンク更新や誤字修正のみで、意思決定内容が変わらない場合は指摘しない（`NO_ISSUES`）。
 - 既に別 ADR で合意済みの内容を単に参照しているだけなら、重複指摘しない（参照先が明確な場合）。
 
 ## Rule / ルール

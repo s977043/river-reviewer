@@ -25,6 +25,12 @@ dependencies:
   - code_search
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: プリミティブ型の濫用やドメイン型の欠如をチェックリスト型で評価するが、TypeScript以外の変更では実行不要
+
 ## Goal / 目的
 
 - 型を「仕様書」として扱い、ドメイン概念をプリミティブ型のまま放置しないようにする。
@@ -38,9 +44,18 @@ dependencies:
 - `tsconfig.json` の設定変更。
 - スタイル/命名規則のレビュー（nit は出さない）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にTypeScriptファイル（`.ts`, `.tsx`）の変更が含まれている
+- [ ] 差分がテストファイル（`*.spec.ts`, `*.test.ts`, `__tests__/**`）のみではない
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-type-driven-design-001 — Type-Driven Design評価の対象となるTypeScriptコード変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 差分がテストファイル (`*.spec.ts`, `*.test.ts`, `__tests__/**`) のみで、ブランド型の不在がテストの意図的な緩和である場合。
 - ブランド型がリポジトリに既に存在し、差分コードがそれを正しく使用している場合（`code_search` で確認）。
 - `string` の引数が 1 つしかなく、他のプリミティブとの混入可能性がない場合。
 - 外部 API レスポンスやライブラリ型を直接扱う境界コードで、ブランド型の適用範囲が明確でない場合（注記として返す）。

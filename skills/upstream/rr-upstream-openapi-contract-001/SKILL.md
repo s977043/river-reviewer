@@ -19,6 +19,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: OpenAPI仕様の差分から契約不備・互換性事故・型の曖昧さをレビューし、クライアント側の破綻シナリオを逆照射する。
+
 ## Goal / 目的
 
 - OpenAPI（または同等の API 仕様）の差分から、契約不備による実装ブレ/互換性事故/運用不全を減らす。
@@ -28,9 +34,17 @@ dependencies: [repo_metadata]
 - API の “正解設計” を断定しない（契約の一貫性・明確さ・互換性・運用可能性に限定）。
 - 実装コードの最適化やライブラリ選定。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にOpenAPI/Swagger仕様ファイルまたはAPI設計ドキュメントが含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-openapi-contract-001 — OpenAPI/API仕様に関する差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 自動生成ファイルのみの差分で、契約の実質が変わらない場合は指摘しない（`NO_ISSUES`）。
 - 仕様の不足が差分外で既に合意済み（別ドキュメント参照）で、参照が明確な場合は重複指摘しない。
 
 ## Rule / ルール

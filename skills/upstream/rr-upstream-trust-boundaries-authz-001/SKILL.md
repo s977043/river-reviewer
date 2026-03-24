@@ -23,6 +23,12 @@ modelHint: high-accuracy
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 信頼境界・認可設計はチェックリスト型評価が主だが、セキュリティ設計無関係の差分では実行を止めるゲートが必要
+
 ## Goal / 目的
 
 - 設計差分から、信頼境界（trust boundary）と認証/認可（authn/authz）の責務が曖昧なまま実装に入るリスクを減らす。
@@ -32,10 +38,19 @@ dependencies: [repo_metadata]
 - 具体プロダクトやクラウドの “正解構成” の押し付け。
 - 実装コードの脆弱性レビュー（設計上の責務/契約のレビューに限定）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にセキュリティ設計・認証/認可・信頼境界に関連するドキュメント変更が含まれている
+- [ ] 誤字・リンク更新のみの変更ではない
+- [ ] inputContextにdiffまたはadrが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-trust-boundaries-authz-001 — 信頼境界・認可設計に関連する変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 誤字やリンク更新のみで、権限境界や信頼境界が変わらない場合は指摘しない（`NO_ISSUES`）。
-- 参照先（セキュリティ設計書/権限仕様）で既に明確で、差分が参照更新のみの場合は重複指摘しない。
+- 参照先（セキュリティ設計書/権限仕様）ですでに明確で、差分が参照更新のみの場合は重複指摘しない。
 
 ## Rule / ルール
 

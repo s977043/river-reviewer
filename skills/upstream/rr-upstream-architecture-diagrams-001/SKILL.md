@@ -28,6 +28,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: アーキテクチャ図の差分から読み手の誤解を招く要因（スコープ不明・矛盾・ラベル不足）を検出する。
+
 ## Goal / 目的
 
 - 図（C4/シーケンス/データフロー等）の差分から、読み手が迷う要因（スコープ不明、境界不明、矛盾、ラベル不足）を減らし、実装・運用に落ちる状態にする。
@@ -37,9 +43,18 @@ dependencies: [repo_metadata]
 - 図の美的センスやツール選定の議論。
 - 実装詳細（クラス設計、コード構造）のレビュー。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に図関連ファイル（`*diagram*`, `*c4*`, `*sequence*`, `*flow*`, `*.png`, `*.svg`）またはアーキテクチャドキュメントが含まれている
+- [ ] 差分に図の構成要素（コンポーネント・矢印・境界・ラベル・フロー）の追加・変更が含まれている
+- [ ] inputContextに`diff`が含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-architecture-diagrams-001 — 図関連ファイルの変更なし`
+
 ## False-positive guards / 抑制条件
 
-- 変更がレイアウト調整のみで、意味（境界/依存/流れ）が変わらない場合は指摘しない（`NO_ISSUES`）。
 - 図が “参考図” と明記され、本文が契約の真実の源泉になっている場合は、図への要求強度を下げる。
 
 ## Rule / ルール

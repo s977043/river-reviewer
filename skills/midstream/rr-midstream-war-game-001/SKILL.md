@@ -18,6 +18,12 @@ modelHint: high-accuracy
 dependencies: [code_search]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 攻撃シナリオ分析はチェックリスト型評価が主だが、攻撃面のない変更では実行を止めるゲートが必要
+
 ## Goal / 目的
 
 - 攻撃者の視点に立ち、変更がどのように悪用されうるかを具体的なシナリオとして描写することで、機能比較表やチェックリストでは見えない防御の盲点を発見する。
@@ -29,11 +35,19 @@ dependencies: [code_search]
 - ペネトレーションテストの代替（実際の攻撃コードは生成しない）。
 - ビジネスロジックの正当性判断。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にセキュリティ関連コード（api/, routes/, auth/, config/, middleware/等）の変更が含まれている
+- [ ] テストコード・フィクスチャ・ドキュメントのみの変更ではない
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-war-game-001 — 攻撃面を持つ変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- テストコード・フィクスチャのみの変更には適用しない。
-- ドキュメント/コメントのみの変更には適用しない。
-- 既にセキュリティレビュー済みの箇所で、緩和策が差分内に確認できる場合は抑制。
+- すでにセキュリティレビュー済みの箇所で、緩和策が差分内に確認できる場合は抑制。
 
 ## Rule / ルール
 

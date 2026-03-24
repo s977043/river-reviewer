@@ -21,6 +21,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: データモデル・DB設計の制約・移行・運用リスクをチェックリスト型で評価し、整合性崩れや移行事故を防ぐ
+
 ## Goal / 目的
 
 - データモデル/DB 設計の差分から、整合性崩れ・移行事故・性能劣化・運用不能につながる抜けを早期に潰す。
@@ -30,9 +36,18 @@ dependencies: [repo_metadata]
 - DB 製品や ORM の選定そのもの（ただし前提が必要なら追記を促す）。
 - 実装クエリの最適化（設計の制約/インデックス方針の確認に限定）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にデータモデル/DB設計に関わるファイル（スキーマ定義/マイグレーション/ERD/設計書）の変更がある
+- [ ] 差分にテーブル定義・制約・インデックス・マイグレーション手順に関わる記述の追加または変更がある
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-data-model-db-design-001 — データモデル・DB設計に関わる変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 変更がコメント/フォーマットのみで、スキーマや制約の実質が変わらない場合は指摘しない（`NO_ISSUES`）。
 - 既に別 ADR/設計で合意済みの制約を参照しているだけなら、重複指摘しない（参照先が明確な場合）。
 
 ## Rule / ルール

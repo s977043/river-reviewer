@@ -25,6 +25,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: イベント駆動設計の差分から配信保証・冪等性・スキーマ進化の抜けをレビューし、障害シナリオを逆照射して設計の堅牢性を検証する。
+
 ## Goal / 目的
 
 - イベント駆動設計の差分から、配信保証・順序・冪等性・再処理/リプレイの未定義による事故を減らす。
@@ -34,9 +40,17 @@ dependencies: [repo_metadata]
 - メッセージ基盤の選定（Kafka/SQS 等）の是非の断定。
 - 実装レベルの consumer コードやライブラリ選定。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にイベント駆動・メッセージング・キュー・ストリーム関連のドキュメントまたはスキーマが含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-event-driven-semantics-001 — イベント駆動設計関連の差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 変更が誤字/リンク/整形のみで、イベント契約の実質が変わらない場合は指摘しない（`NO_ISSUES`）。
 - 契約が別ドキュメントで管理され、参照が明確な場合は重複指摘しない。
 
 ## Rule / ルール

@@ -23,6 +23,12 @@ outputKind:
 modelHint: balanced
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: ブリッジモジュールのパス安全性・往復忠実性・バリデーション正当性をチェックリスト型で評価するが、対象ファイル外の変更では実行不要
+
 ## Guidance
 
 - **Path traversal**: `assertSafePath` must reject ids containing `..`, `/`, or NUL bytes. Any new file-write path must route through this function or `sanitizeSkillId`.
@@ -36,7 +42,16 @@ modelHint: balanced
 - Do not critique the RR skill schema itself; focus on bridge logic only.
 - Do not flag auto-fill behaviour as missing validation when the converted metadata passes the strict RR schema.
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にAgent Skillブリッジ関連ファイル（`agent-skill-bridge.mjs`, `validate-agent-skills.mjs`, `agent-skill-loose.schema.json`等）の変更が含まれている
+- [ ] 差分がコメント・JSDoc・空白のみの変更ではない
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-agent-skill-bridge-001 — Agent Skillブリッジ関連の実質的なコード変更が検出されない`
+
 ## False-positive guards
 
-- If the diff only touches comments, JSDoc, or whitespace in bridge files, skip review.
 - If test fixtures are added without corresponding logic changes, that is expected (test-only commits).

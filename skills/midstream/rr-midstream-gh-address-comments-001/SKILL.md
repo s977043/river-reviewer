@@ -30,6 +30,12 @@ dependencies:
   - custom:github
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: レビューコメントの整理・対応方針作成がチェックリスト型の主タスクだが、レビューコメントが存在しない場合は実行不要
+
 ## Goal / 目的
 
 - レビューコメントを must/want/nit に整理し、未対応を解消するための最小の修正方針と返信案を用意する。
@@ -40,6 +46,15 @@ dependencies:
 - 要求の背景が不明なまま大規模リファクタを提案しない。
 - 既に解決済み・outdated なコメントに対する重複指摘を避ける。
 - プロダクト要求の意思決定を独断で覆さない。根拠がない反論はしない。
+
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] PRにレビューコメント（未対応または要確認）が存在する
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-gh-address-comments-001 — 対応すべきレビューコメントが検出されない`
 
 ## False-positive guards / 抑制条件
 

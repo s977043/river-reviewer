@@ -20,6 +20,12 @@ modelHint: balanced
 dependencies: [test_runner]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: Flakyテストリスク検出はチェックリスト型評価が主だが、テストファイルが差分に含まれない場合は実行を止める必要がある。
+
 ## Rule / ルール
 
 - テストを決定的にし、実行順や環境依存を避ける。
@@ -54,10 +60,19 @@ dependencies: [test_runner]
 - テストフレームワークの全面移行。
 - 監視/アラートの設計。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にテストファイル（`*.test.*`, `*.spec.*`, `tests/**/*`）の変更が含まれている
+- [ ] 差分にテストの実行内容に影響する変更がある（コメントや説明文のみの変更ではない）
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-downstream-flaky-test-001 — Flakyテストリスク検出の対象となるテスト変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- テスト対象が純粋関数で、時間・乱数・外部 I/O を一切使っていない。
-- 変更がテストのコメントや説明文のみで、実行内容に影響しない。
+- テスト対象が純粋関数で、時間・乱数・外部I/Oを一切使っていない。
 - すでにフェイクタイマー/固定シードが導入済みで、差分で逸脱がない。
 
 ## 評価指標（Evaluation）

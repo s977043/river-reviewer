@@ -16,6 +16,12 @@ modelHint: balanced
 dependencies: [code_search]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: TypeScriptコードの差分からnull/undefinedの安全性をレビューし、実行時エラーシナリオを逆照射する。
+
 ## Rule / ルール
 
 - 非同期・外部入力・オプショナル値には null/undefined ガードを設ける。
@@ -47,10 +53,18 @@ dependencies: [code_search]
 - `strict` モードの導入可否判断。
 - ライブラリ側の型定義バグの修正。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にTypeScriptファイル（`*.ts` または `*.tsx`）が含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-typescript-nullcheck-001 — TypeScriptファイルの差分がない`
+
 ## False-positive guards / 抑制条件
 
 - null/undefined が型で排除され、追加ガードが不要な箇所。
-- 変更が型注釈やコメントのみで、実行パスに影響しない。
 - `asserts`/バリデータで入力が保証されていると明示されている。
 
 ## 評価指標（Evaluation）

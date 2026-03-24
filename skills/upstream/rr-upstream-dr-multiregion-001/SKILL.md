@@ -25,6 +25,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: DR/マルチリージョン設計の差分からRPO/RTO・フェイルオーバー・データ整合性の抜けをレビューし、逆の障害シナリオから設計を検証する。
+
 ## Goal / 目的
 
 - アーキ/ADR の差分から、RPO/RTO、フェイルオーバー経路、データ整合性、DR 演習計画の抜けを早期に潰す。
@@ -34,9 +40,17 @@ dependencies: [repo_metadata]
 - 具体的なインフラ構築手順や IaC コードレビュー。
 - アプリ/DB 製品の選定やベンチマーク比較の議論。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にDR・災害復旧・事業継続・マルチリージョン・レジリエンスに関するドキュメントが含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-dr-multiregion-001 — DR/マルチリージョン関連のドキュメント差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 文言修正やリンク更新のみで DR 方針が変わらない場合は指摘しない（`NO_ISSUES`）。
 - PoC/単一リージョン前提と明記されている場合は、過剰な DR 目標を要求しない。
 
 ## Rule / ルール

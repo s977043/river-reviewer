@@ -74,6 +74,29 @@ version: 0.1.0
 - エラーメッセージが十分な情報を含むか
 - リカバリー可能なエラーと不可能なエラーの区別
 
+## Execution Flow / 実行フロー
+
+```text
+1. ファイル種別の判定
+   ├─ .ts/.tsxファイル → TypeScript strict + nullチェックを選択
+   ├─ コンポーネントファイル → a11yチェックを追加
+   ├─ 設定ファイル → 型駆動設計チェックを選択
+   └─ キーワード指定あり → 該当スキルを直接選択
+
+2. スキルの実行
+   ├─ typescript-strict: strictモード準拠
+   ├─ typescript-nullcheck: null安全性
+   ├─ type-driven-design: 型駆動設計
+   ├─ logging-observability: ロギング・可観測性
+   ├─ review-automation-boundary: レビュー自動化の境界
+   ├─ a11y-accessible-name: アクセシビリティ
+   └─ nextjs-app-router-boundary: Next.js境界
+
+3. 統合
+   ├─ 重複する指摘の除去
+   └─ Checklistに基づく一般品質チェックの補完
+```
+
 ## Output Format / 出力形式
 
 ```text
