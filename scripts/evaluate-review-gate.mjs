@@ -124,8 +124,11 @@ Options:
     const configRaw = await fs.readFile(configPath, 'utf8');
     const config = JSON.parse(configRaw);
     configGate = config.gate ?? {};
-  } catch {
-    // Config file not found or invalid -- use defaults
+  } catch (err) {
+    // File not found is expected; warn on other errors (e.g. malformed JSON)
+    if (err.code !== 'ENOENT') {
+      console.error(`Warning: failed to load .river-reviewer.json gate config: ${err.message}`);
+    }
   }
 
   const failOnCritical = parsed.failOnCriticalSet
