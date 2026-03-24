@@ -7,7 +7,9 @@ function parseArgs(argv) {
   const parsed = {
     input: null,
     failOnCritical: 1,
+    failOnCriticalSet: false,
     failOnMajor: null,
+    failOnMajorSet: false,
     help: false,
   };
 
@@ -25,6 +27,7 @@ function parseArgs(argv) {
         break;
       }
       parsed.failOnCritical = val;
+      parsed.failOnCriticalSet = true;
       continue;
     }
     if (arg === '--fail-on-major') {
@@ -35,6 +38,7 @@ function parseArgs(argv) {
         break;
       }
       parsed.failOnMajor = val;
+      parsed.failOnMajorSet = true;
       continue;
     }
     if (arg === '-h' || arg === '--help') {
@@ -62,8 +66,10 @@ export async function evaluateGate({ input, failOnCritical = 1, failOnMajor = nu
   }
 
   const counts = data.summary.issueCountBySeverity;
-  if (typeof counts.critical !== 'number' || typeof counts.major !== 'number') {
-    throw new Error('Invalid input: issueCountBySeverity must contain numeric critical and major fields');
+  for (const field of ['critical', 'major', 'minor', 'info']) {
+    if (typeof counts[field] !== 'number') {
+      throw new Error(`Invalid input: issueCountBySeverity.${field} must be a number`);
+    }
   }
   const failures = [];
 
@@ -122,10 +128,10 @@ Options:
     // Config file not found or invalid -- use defaults
   }
 
-  const failOnCritical =
-    parsed.failOnCritical !== 1 ? parsed.failOnCritical : (configGate.failOnCritical ?? 1);
-  const failOnMajor =
-    parsed.failOnMajor !== null ? parsed.failOnMajor : (configGate.failOnMajor ?? null);
+  const failOnCritical = parsed.failOnCriticalSet
+    ? parsed.failOnCritical
+    : (configGate.failOnCritical ?? 1);
+  const failOnMajor = parsed.failOnMajorSet ? parsed.failOnMajor : (configGate.failOnMajor ?? null);
 
   const inputPath = path.resolve(parsed.input);
   const result = await evaluateGate({
