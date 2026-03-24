@@ -33,6 +33,12 @@ dependencies:
   - repo_metadata
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 設計ドキュメントに検証計画（SLO/テスト/ロールバック/可観測性）が欠けていないかを検出する。
+
 ## Guidance
 
 - Ensure design docs include how success is proven: SLO/SLI targets and validation/test plans.
@@ -44,6 +50,16 @@ dependencies:
 
 - ツール選定や好みのアプローチを推測で断定しない。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計/アーキテクチャドキュメント（`docs/*design*.md`, `docs/*architecture*.md`, `docs/adr/`, `*.adr`）が含まれている
+- [ ] 差分に設計上の意思決定・新規コンポーネント・依存関係の追加など検証計画が必要な変更が含まれている
+- [ ] inputContextに`diff`が含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-architecture-validation-plan-001 — 検証計画が必要な設計ドキュメントの変更なし`
+
 ## False-positive guards
 
-- 小さなリファクタや差分外で検証計画が明示されている場合は指摘しない。
+- 差分外で検証計画が明示されている場合は指摘しない。

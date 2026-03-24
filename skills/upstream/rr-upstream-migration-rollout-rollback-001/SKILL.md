@@ -21,6 +21,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 設計変更の差分から移行計画・段階リリース・ロールバックの曖昧さをレビューし、ロールバック不能シナリオを逆照射する。
+
 ## Goal / 目的
 
 - 仕様/設計変更の差分から、移行計画・段階リリース・ロールバックが曖昧なまま実装に入るリスクを減らす。
@@ -30,9 +36,17 @@ dependencies: [repo_metadata]
 - CI/CD や運用基盤の詳細設計そのもの（ただし “必要な前提” が抜けていれば指摘する）。
 - 実装レベルの最適化や手順の細部（設計として必要な骨子に絞る）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計ドキュメント・移行計画・ロールアウト/ロールバック・リリース・デプロイに関するファイルが含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-migration-rollout-rollback-001 — 移行/ロールアウト/ロールバックに関する差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 既存の移行手順への参照更新のみで、計画内容の変更がない場合は指摘しない（参照先が明確な場合）。
 - 影響範囲が明確に “実験/検証のみ・本番影響なし” と書かれている場合は、過度に厳しくしない。
 
 ## Rule / ルール

@@ -21,6 +21,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 設計ドキュメントの暗黙の前提・未決事項・リスクの放置を検出し、明示的な管理を促す。
+
 ## Goal / 目的
 
 - 設計ドキュメントの差分から、暗黙の前提・未決事項・リスクが “放置される” 状態を減らし、意思決定と実装を前に進める。
@@ -30,9 +36,18 @@ dependencies: [repo_metadata]
 - すべての不確実性を欠陥扱いしない（未決なら “未決として管理する” を促す）。
 - プロジェクト管理の一般論（タスク管理ツール運用など）に踏み込まない。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計/アーキテクチャドキュメント（`docs/*design*.md`, `docs/*architecture*.md`, `docs/adr/`, `*.adr`）が含まれている
+- [ ] 差分に前提・リスク・未決事項・意思決定に関する記述の追加・変更が含まれている
+- [ ] inputContextに`diff`が含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-architecture-risk-register-001 — 前提/リスク/未決に関する設計ドキュメントの変更なし`
+
 ## False-positive guards / 抑制条件
 
-- 変更が誤字/リンク/整形のみで、前提や意思決定が増減していない場合は指摘しない（`NO_ISSUES`）。
 - 既にリスク/前提/未決が別ドキュメントで管理され、参照が明確な場合は重複指摘しない。
 
 ## Rule / ルール

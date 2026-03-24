@@ -25,6 +25,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: データフローと状態所有の曖昧さをチェックリスト型で評価し、整合性崩れや二重書き込みを事前に検出する
+
 ## Goal / 目的
 
 - 設計の差分から、データフロー/状態所有の曖昧さによる整合性崩れ・二重書き込み・障害時の復旧困難を減らす。
@@ -34,9 +40,18 @@ dependencies: [repo_metadata]
 - 分散システムの一般論を長々と語らない（差分に紐づく具体的な曖昧さに限定）。
 - 実装レベルの最適化（キュー設定や DB チューニングなど）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計ドキュメント（フロー図/シーケンス図/データフロー設計書）の変更がある
+- [ ] 差分にデータフロー・状態所有・境界横断の書き込みに関わる記述の追加または変更がある
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-data-flow-state-ownership-001 — データフロー・状態所有に関わる変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 変更が誤字/図のレイアウト調整のみで、データの流れや所有の意味が変わらない場合は指摘しない（`NO_ISSUES`）。
 - PoC/運用対象外と明記されている場合は、強度を落として “確認事項” に倒す。
 
 ## Rule / ルール

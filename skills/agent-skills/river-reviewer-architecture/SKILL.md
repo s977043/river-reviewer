@@ -65,6 +65,28 @@ version: 0.1.0
 - キーワード指定なし → 変更内容から自動判定
 - 複数カテゴリに該当 → もっとも関連性の高いスキルを優先
 
+## Execution Flow / 実行フロー
+
+```text
+1. 変更種別の判定
+   ├─ ADR/設計ドキュメント → adr-decision-quality を優先
+   ├─ API定義/エンドポイント → api-design, api-versioning-compat を優先
+   ├─ モジュール構成変更 → architecture-boundaries を優先
+   ├─ データモデル変更 → data-model-db-design を優先
+   └─ キーワード指定あり → 該当スキルを直接選択
+
+2. スキルの実行（該当する専門スキルを並列実行可能）
+   ├─ 設計品質系: adr-decision-quality, architecture-diagrams, architecture-traceability
+   ├─ 構造系: architecture-boundaries, bounded-context-language, data-flow-state-ownership
+   ├─ API系: api-design, api-versioning-compat, openapi-contract, integration-contracts
+   ├─ 運用系: availability-architecture, capacity-cost-design, dr-multiregion, operability-slo
+   └─ リスク系: architecture-risk-register, failure-modes-observability, external-dependencies
+
+3. 統合
+   ├─ 重複する指摘の除去
+   └─ 複数カテゴリ該当時は関連性の高いスキルを優先
+```
+
 ## Output Format / 出力形式
 
 ```text

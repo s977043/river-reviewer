@@ -22,6 +22,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 設計/要件の差分から運用性・SLO・監視・障害対応手順の抜けをレビューし、障害時の対応不能シナリオを逆照射する。
+
 ## Goal / 目的
 
 - 設計/要件の差分から、運用不能・障害対応不能になりやすい “観測/手順の抜け” を早期に潰す。
@@ -31,9 +37,17 @@ dependencies: [repo_metadata]
 - 監視基盤やツールの選定そのもの（ただし前提が必要なら追記を促す）。
 - 全アラート設計の作り込み（設計として必要な最小セットに絞る）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計ドキュメント・SLO/SLI定義・Runbook・運用/監視/アラート関連のファイルが含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-operability-slo-001 — 運用性/SLO関連の差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 変更がドキュメントの誤字修正のみで、運用対象の仕様が変わらない場合は指摘しない（`NO_ISSUES`）。
 - 運用対象外（PoC/ローカルのみ）と明記されている場合は、SLO などの要求を過剰に強制しない。
 
 ## Rule / ルール

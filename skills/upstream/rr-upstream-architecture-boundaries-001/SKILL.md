@@ -22,6 +22,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 設計ドキュメントの責務境界・依存方向・変更影響の記載品質を検証し、密結合を防ぐ。
+
 ## Goal / 目的
 
 - 設計/アーキドキュメントの差分から、責務境界の曖昧さ・依存方向の崩れ・変更影響の見落としを減らす。
@@ -31,9 +37,18 @@ dependencies: [repo_metadata]
 - アーキの正解を断定しない（境界/責務/依存関係の “記述の質” に限定）。
 - 実装レベルの設計（クラス設計や関数分割）への立ち入り。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にアーキテクチャ/設計ドキュメント（`docs/architecture/`, `docs/adr/`, `*architecture*.md`, `*design*.md`, `*.adr`, `*c4*`, `*diagram*`）が含まれている
+- [ ] 差分にコンポーネントの境界・責務・依存関係に関する記述の追加・変更が含まれている
+- [ ] inputContextに`diff`が含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-architecture-boundaries-001 — 境界/依存に関する設計ドキュメントの変更なし`
+
 ## False-positive guards / 抑制条件
 
-- 誤字修正や段落整理のみで、境界/依存/責務の意味が変わらない場合は指摘しない（`NO_ISSUES`）。
 - 既に参照先（ADR/図/既存ルール）で明確な場合は、重複指摘しない。
 
 ## Rule / ルール

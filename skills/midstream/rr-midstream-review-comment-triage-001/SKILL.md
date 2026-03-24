@@ -21,7 +21,22 @@ tags:
 severity: 'minor'
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: レビューコメントの重要度分類と対応方針整理がチェックリスト型の主タスクだが、レビューコメントが存在しない場合は実行不要
+
 # Review Comment Triage (No-Code-Fix Mode)
+
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] PRにレビューコメント（issueコメントまたは行コメント）が存在する
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-review-comment-triage-001 — トリアージ対象のレビューコメントが検出されない`
 
 AI はコード修正や具体的なパッチ提案をしてはいけない。コメント整理・重要度付け・対応方針（自然言語）・返信案だけを出力すること。
 すべての出力と返信文案は日本語で行うこと。PR 本文（説明）と PR コメントの文案も日本語で書く。レビューコメントが英語でも、日本語で整理・回答する。

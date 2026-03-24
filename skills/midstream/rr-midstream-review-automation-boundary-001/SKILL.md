@@ -23,6 +23,12 @@ outputKind:
 modelHint: balanced
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 自動化可能なレビュー指摘を検出しCI/lint委譲を提案するが、コード変更を含まない差分では実行不要
+
 ## Goal / 目的
 
 - レビュー指摘の中から「自動化できるはずの指摘」を検出し、CI/lint/フォーマッタに委ねることで人間レビューの密度を高める。
@@ -35,12 +41,20 @@ modelHint: balanced
 - プロジェクトのスタイルガイドや規約そのものの是非を評価すること。
 - 既に CI に設定が存在するルールへの重複指摘。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にソースコード（テスト/フィクスチャのみでない）の変更が含まれている
+- [ ] 差分がツール設定ファイル（`.eslintrc`, `.prettierrc`, `tsconfig.json`等）のみの変更ではない
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-review-automation-boundary-001 — 自動化境界レビューの対象となるソースコード変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 差分が`.eslintrc`, `.prettierrc`, `tsconfig.json`等のツール設定ファイル自体であれば、設定追加の提案は不要（すでに対応中の可能性が高い）。
 - 差分内に該当ツールの設定ファイル変更が含まれている場合、そのルールは追加中と判断し指摘しない。差分外のリポジトリ設定は確認できないため、断定ではなく「設定がなければ」という条件付きで提案する。
 - マイグレーションや一時的な移行期であることが PR 説明から明確な場合は抑制する。
-- 差分がテスト/フィクスチャのみで、意図的にスタイルを崩している場合は指摘しない。
 
 ## Rule / ルール
 

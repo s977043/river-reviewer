@@ -24,6 +24,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: サービス間連携の差分から契約不備・責任境界・障害時の未定義をレビューし、連携の破綻シナリオを逆照射する。
+
 ## Goal / 目的
 
 - サービス間連携（API/イベント/メッセージング）の差分から、契約不備・責任境界の曖昧さ・障害時の未定義を早期に潰す。
@@ -33,9 +39,17 @@ dependencies: [repo_metadata]
 - 連携方式の正解を断定しない（契約/運用/互換性の明確化に限定）。
 - 実装レベルの細部（SDK、リトライ実装、キュー設定の調整など）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にサービス間連携・契約・インターフェイス・イベント定義に関するドキュメントまたはスキーマが含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-integration-contracts-001 — サービス間連携/契約に関する差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 自動生成ファイルのみで、契約の実質が変わらない場合は指摘しない（`NO_ISSUES`）。
 - 参照先の契約ドキュメントが明確で、差分が参照更新のみの場合は重複指摘しない。
 
 ## Rule / ルール

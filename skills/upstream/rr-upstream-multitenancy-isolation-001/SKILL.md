@@ -32,6 +32,12 @@ dependencies:
   - code_search
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: マルチテナント設計の差分からテナント分離（データ/権限/リソース/障害影響）の抜けをレビューし、テナント越境シナリオを逆照射する。
+
 ## Guidance
 
 - Confirm tenant scoping for data paths (queries, cache keys, queues, storage).
@@ -42,6 +48,16 @@ dependencies:
 ## Non-goals
 
 - テナント以外の一般的な設計批評は避ける。
+
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 対象ファイルにマルチテナントに関する設計・アーキテクチャドキュメントが含まれている
+- [ ] 対象ファイルにテナント分離（データアクセス・権限・リソース分離）に関する記述がある
+- [ ] inputContextにfullFileが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-multitenancy-isolation-001 — マルチテナント設計に関する差分がない`
 
 ## False-positive guards
 

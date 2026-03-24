@@ -22,6 +22,12 @@ outputKind:
 modelHint: cheap
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 設定ファイルの構文・セキュリティ・妥当性をチェックリスト型で評価するが、JSON/YAML以外の変更では実行不要
+
 ## Goal
 
 設定ファイル（JSON/YAML）の変更をレビューし、一般的な問題やベストプラクティス違反を検出する。
@@ -39,6 +45,16 @@ modelHint: cheap
 - `package-lock.json` や自動生成ファイルはレビュー対象外（ノイズ削減のため）
 - `node_modules/` 内のファイルは対象外
 - テスト用フィクスチャファイルの内容は厳密にチェックしない
+
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にJSON/YAMLファイル（`.json`, `.yml`, `.yaml`）の変更が含まれている
+- [ ] 対象ファイルが`package-lock.json`や自動生成ファイルではない
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-config-json-001 — レビュー対象の設定ファイル変更が検出されない`
 
 ## False-positive guards
 

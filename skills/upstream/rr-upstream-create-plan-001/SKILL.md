@@ -24,6 +24,12 @@ outputKind:
 modelHint: balanced
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 計画の網羅性・仮説分離・リスク可視化をチェックリスト型で評価し、曖昧なまま実行に進むリスクを防ぐ
+
 ## Goal / 目的
 
 - 課題のゴールと制約を整理し、実行手順・検証ポイント・リスクを可視化した計画を作る。
@@ -35,9 +41,18 @@ modelHint: balanced
 - 要件が曖昧なままの推測で進めない。情報不足は質問として返す。
 - 大規模な設計判断（アーキ変更/技術選定）を独断で決めない。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計ドキュメント・計画書・ADRの変更がある
+- [ ] 差分に新規機能・設計変更・移行計画など計画策定が必要な内容が含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-create-plan-001 — 計画策定が必要な変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 差分がドキュメント修正のみ、または極小変更で計画が不要な場合は `NO_ISSUES`。
 - 既に明示的な計画や承認済みの実行手順が差分内にある場合は重複提案を避ける。
 
 ## Rule / ルール

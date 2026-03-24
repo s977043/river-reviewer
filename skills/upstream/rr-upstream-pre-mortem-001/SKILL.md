@@ -19,6 +19,12 @@ modelHint: high-accuracy
 dependencies: [repo_metadata, code_search]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 失敗シナリオ分析はチェックリスト型評価が主だが、設計判断を含まない変更では実行を止めるゲートが必要
+
 ## Goal / 目的
 
 - 変更が「6ヶ月後にインシデントを引き起こした」と仮定し、その根本原因を逆算することで、生存バイアスや楽観バイアスを排除し、設計の致命的欠陥を事前に発見する。
@@ -30,11 +36,20 @@ dependencies: [repo_metadata, code_search]
 - 実装の細部（コードスタイル、命名規則など）への言及。
 - すべての変更に対する網羅的なリスク列挙（重大な失敗シナリオに集中する）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計判断を含む変更がある（ADR、設計ドキュメント、アーキテクチャ変更）
+- [ ] 変更が機械的なもの（誤字修正、フォーマット、コメントのみ）ではない
+- [ ] テストコードやフィクスチャのみの変更ではない
+- [ ] inputContextにdiffまたはfullFileが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-pre-mortem-001 — 設計判断を含む変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 変更が誤字修正・フォーマット・コメントのみの場合は `NO_ISSUES` を返す。
-- テストコードやフィクスチャのみの変更には適用しない。
-- 既にADRやデザインドキュメントでリスクと緩和策が明記されている項目は重複指摘しない。
+- すでにADRやデザインドキュメントでリスクと緩和策が明記されている項目は重複指摘しない。
 
 ## Rule / ルール
 

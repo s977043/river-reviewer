@@ -19,6 +19,12 @@ modelHint: high-accuracy
 dependencies: [code_search, repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 論理検証はチェックリスト型評価が主だが、判断を含まない変更では実行を止めるゲートが必要
+
 ## Goal / 目的
 
 - 変更に含まれる設計判断・技術選択・実装方針の論理的な穴を徹底的に突き、確証バイアスを排除する。
@@ -30,10 +36,19 @@ dependencies: [code_search, repo_metadata]
 - 既知のバグパターンの検出（それは他のスキルの役割）。
 - 著者の判断を否定すること自体が目的ではない（より強固な判断にすることが目的）。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計判断・技術選択・実装方針の判断を含む変更がある
+- [ ] 変更が機械的なもの（リネーム、フォーマット、依存更新のみ）ではない
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-midstream-logic-torturing-001 — 論理検証の対象となる判断が検出されない`
+
 ## False-positive guards / 抑制条件
 
-- 明確な判断が含まれない機械的変更（リネーム、フォーマット、依存更新）には適用しない。
-- ADRや設計ドキュメントで既に代替案とトレードオフが十分に記述されている場合は重複指摘しない。
+- ADRや設計ドキュメントですでに代替案とトレードオフが十分に記述されている場合は重複指摘しない。
 - 些末な判断（変数名の選択、import順序など）には適用しない。
 
 ## Rule / ルール

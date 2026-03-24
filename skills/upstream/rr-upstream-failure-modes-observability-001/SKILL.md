@@ -18,6 +18,12 @@ modelHint: balanced
 dependencies: [repo_metadata, tracing]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 設計の差分から失敗モード・エラー契約・観測性の抜けをレビューし、障害シナリオを逆照射してクリティカルフローの堅牢性を検証する。
+
 ## Rule / ルール
 
 - クリティカルフロー（認証、課金、データ保存など）の**失敗モード**（タイムアウト、リトライ、フォールバック、外部障害、権限不備）を明示する。
@@ -49,9 +55,17 @@ dependencies: [repo_metadata, tracing]
 - 既存プロダクション障害の原因究明。
 - 実装詳細（ログライブラリ選定など）の決定。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にAPI定義・ルート定義・設計ドキュメントのいずれかが含まれている
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-failure-modes-observability-001 — 失敗モード/観測性に関連する設計差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 変更がドキュメントの誤字修正のみで、設計内容に影響しない。
 - 失敗モード/観測性が別 ADR で既に合意され、差分が参照更新のみ。
 - 影響範囲がローカルな試験コードで、運用対象外と明記されている。
 

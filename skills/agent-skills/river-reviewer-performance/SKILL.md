@@ -43,6 +43,26 @@ version: 0.1.0
   - 大量データ処理 → メモリ効率チェック
   - 外部API呼び出し → タイムアウト・リトライ検証
 
+## Execution Flow / 実行フロー
+
+```text
+1. 変更内容の分析
+   ├─ ループ内I/O → N+1クエリ検出を優先
+   ├─ 大量データ処理 → メモリ効率チェックを優先
+   ├─ 外部API呼び出し → タイムアウト・リトライ検証を優先
+   └─ キーワード指定あり → 該当スキルを直接選択
+
+2. スキルの実行
+   ├─ cache-strategy-consistency: キャッシュ戦略の一貫性
+   ├─ failure-modes-observability: 障害モードと可観測性
+   ├─ logging-observability: ロギング・可観測性
+   └─ operability-slo: 運用性・SLO
+
+3. 統合
+   ├─ 重複する指摘の除去
+   └─ Checklistに基づくパフォーマンスチェックの補完
+```
+
 ## Checklist / チェックリスト
 
 パフォーマンスレビューでは以下を確認する:

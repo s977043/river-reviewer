@@ -15,6 +15,12 @@ outputKind: [findings, summary, actions]
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: APIエンドポイントの命名・エラー応答・認可の一貫性をRESTful基準で検証する。
+
 ## Rule / ルール
 
 - エンドポイントはリソース指向の RESTful 命名に従う（動詞を避ける）
@@ -45,9 +51,18 @@ dependencies: [repo_metadata]
 - 既存クライアントの破壊的変更に関する移行計画。
 - 実装レベルのパフォーマンス最適化。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にAPI定義またはルーティング関連ファイル（`**/api/**`, `**/routes/**`）が含まれている
+- [ ] 差分にエンドポイントの追加・変更・削除が含まれている
+- [ ] inputContextに`diff`が含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-api-design-001 — API定義/ルーティングの変更なし`
+
 ## False-positive guards / 抑制条件
 
-- ルーティングの追加がなく、コメントやドキュメントのみの変更。
 - 既存の API ガイドラインに完全準拠している差分。
 - 自動生成された API 定義の更新のみで、設計意図に変化がない。
 

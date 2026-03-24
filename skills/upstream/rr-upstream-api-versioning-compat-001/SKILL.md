@@ -25,6 +25,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: API/契約変更のバージョニング・後方互換性・移行計画の記載漏れを検出し、破壊的変更の混乱を防ぐ。
+
 ## Goal / 目的
 
 - API/インターフェースの変更から、後方互換やバージョニング、非推奨/移行計画の抜けを早期に潰す。
@@ -33,6 +39,16 @@ dependencies: [repo_metadata]
 
 - API の正解設計を断定しない（互換性と移行方針の明確化に限定）。
 - 実装コードの最適化やライブラリ選定の議論。
+
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にAPI定義・OpenAPI仕様・契約/インターフェース関連ファイルが含まれている
+- [ ] 差分にAPIのフィールド・型・エンドポイント・バージョンの追加・変更・削除が含まれている
+- [ ] inputContextに`diff`が含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-api-versioning-compat-001 — API/契約の変更なし`
 
 ## False-positive guards / 抑制条件
 

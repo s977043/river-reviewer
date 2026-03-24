@@ -14,6 +14,12 @@ inputContext: [tests, diff]
 outputKind: [tests, findings, summary]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: テスト命名・構造チェックはチェックリスト型評価が主だが、テストファイルが差分に含まれない場合は実行を止める必要がある。
+
 ## Rule / ルール
 
 - describe/it/test の命名を一貫させ、期待される振る舞いを明示する
@@ -44,10 +50,19 @@ outputKind: [tests, findings, summary]
 - テストケース自体の追加・削除の大規模再設計。
 - 実装コードの命名改善。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分にテストファイル（`*.test.*`, `*.spec.*`）の変更が含まれている
+- [ ] 差分にテストの命名・構造に影響する変更がある（コメントやフォーマットのみの変更ではない）
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-downstream-test-naming-001 — テスト命名・構造チェックの対象となるテスト変更が検出されない`
+
 ## False-positive guards / 抑制条件
 
 - 既存の命名規約に沿った変更であり、差分で逸脱がない。
-- 変更がテストのコメントやフォーマットのみ。
 - テストが自動生成され、命名規約が別途管理されている。
 
 ## 評価指標（Evaluation）

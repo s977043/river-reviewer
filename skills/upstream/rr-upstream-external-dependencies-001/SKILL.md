@@ -20,6 +20,12 @@ modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
+## Pattern declaration
+
+Primary pattern: Reviewer
+Secondary patterns: Inversion
+Why: 外部依存の設計差分からSLA・クォータ・障害時の扱い・ロックイン対策の抜けをレビューし、障害シナリオを逆照射する。
+
 ## Goal / 目的
 
 - 外部依存（SaaS/API/決済/認証/地図など）の差分から、SLA/クォータ/障害時の扱い/ロックイン対策の抜けを潰す。
@@ -29,9 +35,18 @@ dependencies: [repo_metadata]
 - ベンダー選定の是非の断定（要求と前提の明確化に限定）。
 - 監視基盤や運用ツールの細部設計。
 
+## Pre-execution Gate / 実行前ゲート
+
+このスキルは以下の条件がすべて満たされない限り`NO_REVIEW`を返す。
+
+- [ ] 差分に設計・アーキテクチャ・依存関係・インテグレーションに関するドキュメントが含まれている
+- [ ] 差分に外部サービス・SaaS・API・ベンダーに関する記述がある
+- [ ] inputContextにdiffが含まれている
+
+ゲート不成立時の出力: `NO_REVIEW: rr-upstream-external-dependencies-001 — 外部依存に関する設計ドキュメントの差分がない`
+
 ## False-positive guards / 抑制条件
 
-- 変更が誤字修正やリンク更新のみで、外部依存の実質が変わらない場合は指摘しない（`NO_ISSUES`）。
 - 外部依存の仕様が別ドキュメントで管理され、参照が明確な場合は重複指摘しない。
 
 ## Rule / ルール
