@@ -42,8 +42,13 @@ export async function validateMeta() {
   const pkg = await readJson('package.json');
   const expectedVersion = pkg.version; // e.g. "0.10.0"
 
-  // Check README files
-  for (const readmePath of ['README.md', 'README.en.md']) {
+  // Check README and docs files that reference action tags
+  const checkFiles = [
+    'README.md',
+    'README.en.md',
+    'docs/use-cases/github-actions.md',
+  ];
+  for (const readmePath of checkFiles) {
     const text = await readText(readmePath);
 
     // Check action tags
@@ -97,5 +102,9 @@ if (isDirectRun) {
     })
     .then((code) => {
       if (code !== 0) process.exitCode = code;
+    })
+    .catch((err) => {
+      console.error(`Meta consistency check failed: ${err.message}`);
+      process.exitCode = 1;
     });
 }
