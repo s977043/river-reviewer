@@ -13,11 +13,11 @@ English edition. The primary Japanese README lives in `README.md`.
 
 ## License Overview
 
-| Scope                                          | License    | Details                              |
-| ---------------------------------------------- | ---------- | ------------------------------------ |
-| Source code (`src/`, `scripts/`, `tests/`)     | MIT        | [LICENSE-CODE](./LICENSE-CODE)       |
-| Documentation (`pages/`, `skills/`, `assets/`) | CC BY 4.0  | [LICENSE-CONTENT](./LICENSE-CONTENT) |
-| Configuration (`.github/`, `*.config.*`)       | Apache-2.0 | [LICENSE](./LICENSE)                 |
+| Scope                                          | License   | Details                              |
+| ---------------------------------------------- | --------- | ------------------------------------ |
+| Source code (`src/`, `scripts/`, `tests/`)     | MIT       | [LICENSE-CODE](./LICENSE-CODE)       |
+| Documentation (`pages/`, `skills/`, `assets/`) | CC BY 4.0 | [LICENSE-CONTENT](./LICENSE-CONTENT) |
+| Configuration (`.github/`, `*.config.*`)       | MIT       | [LICENSE](./LICENSE)                 |
 
 ## Getting Started
 

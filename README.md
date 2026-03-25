@@ -16,7 +16,7 @@
 | --------------------------------------------- | ---------- | ------------------------------------ |
 | ソースコード (`src/`, `scripts/`, `tests/`)   | MIT        | [LICENSE-CODE](./LICENSE-CODE)       |
 | ドキュメント (`pages/`, `skills/`, `assets/`) | CC BY 4.0  | [LICENSE-CONTENT](./LICENSE-CONTENT) |
-| 設定ファイル (`.github/`, `*.config.*`)       | Apache-2.0 | [LICENSE](./LICENSE)                 |
+| 設定ファイル (`.github/`, `*.config.*`)       | MIT        | [LICENSE](./LICENSE)                 |
 
 ## はじめに
 
