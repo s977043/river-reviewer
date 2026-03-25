@@ -11,6 +11,23 @@
 English edition. The primary Japanese README lives in `README.md`.
 [日本語の README はここ](./README.md)—the Japanese copy is the source of truth; English may lag.
 
+## License Overview
+
+| Scope                                          | License    | Details                              |
+| ---------------------------------------------- | ---------- | ------------------------------------ |
+| Source code (`src/`, `scripts/`, `tests/`)     | MIT        | [LICENSE-CODE](./LICENSE-CODE)       |
+| Documentation (`pages/`, `skills/`, `assets/`) | CC BY 4.0  | [LICENSE-CONTENT](./LICENSE-CONTENT) |
+| Configuration (`.github/`, `*.config.*`)       | Apache-2.0 | [LICENSE](./LICENSE)                 |
+
+## Getting Started
+
+| Goal                    | Destination                                                                              |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| Try it in 5 minutes     | [Quick start (GitHub Actions)](#quick-start-github-actions)                              |
+| Add to an existing repo | [Setup guide](https://river-reviewer.vercel.app/guides/github-actions/)                  |
+| Create your first skill | [Skill tutorial](https://river-reviewer.vercel.app/tutorials/creating-your-first-skill/) |
+| Understand the design   | [Architecture docs](https://river-reviewer.vercel.app/explanation/river-architecture/)   |
+
 Philosophy: [Why we built it](#philosophy)
 
 Review that Flows With You. 流れに寄り添う AI レビューエージェント。

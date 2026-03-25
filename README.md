@@ -10,6 +10,23 @@
 
 日本語版READMEです。[English README is available here.](./README.en.md)
 
+## ライセンス概要
+
+| 対象                                          | ライセンス | 詳細                                 |
+| --------------------------------------------- | ---------- | ------------------------------------ |
+| ソースコード (`src/`, `scripts/`, `tests/`)   | MIT        | [LICENSE-CODE](./LICENSE-CODE)       |
+| ドキュメント (`pages/`, `skills/`, `assets/`) | CC BY 4.0  | [LICENSE-CONTENT](./LICENSE-CONTENT) |
+| 設定ファイル (`.github/`, `*.config.*`)       | Apache-2.0 | [LICENSE](./LICENSE)                 |
+
+## はじめに
+
+| やりたいこと             | 行き先                                                                                             |
+| ------------------------ | -------------------------------------------------------------------------------------------------- |
+| 5分で試す                | [クイックスタート（GitHub Actions）](#クイックスタートgithub-actions)                              |
+| 既存リポジトリに導入する | [セットアップガイド](https://river-reviewer.vercel.app/guides/github-actions/)                     |
+| スキルを1個作る          | [スキル作成チュートリアル](https://river-reviewer.vercel.app/tutorials/creating-your-first-skill/) |
+| 設計思想を理解する       | [アーキテクチャ解説](https://river-reviewer.vercel.app/explanation/river-architecture/)            |
+
 Philosophy: [なぜ作ったのか](#philosophy)
 
 開発手順は [docs/runbook/dev.md](docs/runbook/dev.md) を参照してください。
