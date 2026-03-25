@@ -15,6 +15,25 @@ The following elements are treated as "public interfaces":
 - CLI (`river` / `river-reviewer`) commands/options and exit codes
 - Idempotent update method for PR comments (marker)
 
+## Component Stability Labels
+
+Current stability level for each surface.
+
+| Label            | Definition                                                                |
+| ---------------- | ------------------------------------------------------------------------- |
+| **Stable**       | Breaking changes require a major version bump. Recommended for production |
+| **Beta**         | API may change in minor versions. Deprecation notice given before removal |
+| **Experimental** | May change or be removed without notice. Use for evaluation only          |
+
+| Surface                                    | Label        | Notes                                      |
+| ------------------------------------------ | ------------ | ------------------------------------------ |
+| GitHub Action                              | Beta         | v0.x, breaking changes possible            |
+| CLI (`river` command)                      | Beta         | Stable interfaces below are maintained     |
+| Skill Schema (`schemas/skill.schema.json`) | Beta         | CI-validated, field extensions possible    |
+| Node API (`runners/node-api/`)             | Experimental | `private: true`, not published to npm      |
+| Agent Skills bridge                        | Experimental | Added in v0.9.0, still maturing            |
+| Riverbed Memory                            | Experimental | Design phase, stabilization planned for v1 |
+
 ## CLI (`river`) Reference (Minimal)
 
 ### Commands
