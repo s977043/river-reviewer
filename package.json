@@ -15,7 +15,7 @@
     "river": "./src/cli.mjs",
     "river-reviewer": "./src/cli.mjs"
   },
-  "homepage": "https://s977043.github.io/river-reviewer/",
+  "homepage": "https://river-reviewer.vercel.app/",
   "bugs": "https://github.com/s977043/river-reviewer/issues",
   "scripts": {
     "dev": "docusaurus start",
