@@ -57,7 +57,7 @@ Options:
   --debug           Print debug information (merge base, files, token estimate)
   --estimate        Print cost estimate only (no review)
   --max-cost <usd>  Abort if estimated cost exceeds this USD amount
-  --output <mode>   Output format: text|markdown. Default: text
+  --output <mode>   Output format: text|markdown|json. Default: text
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
@@ -173,8 +173,8 @@ function parseArgs(argv) {
         break;
       }
       const mode = value.toLowerCase();
-      if (!['text', 'markdown'].includes(mode)) {
-        console.error(`Error: --output must be one of: text, markdown (got "${value}").`);
+      if (!['text', 'markdown', 'json'].includes(mode)) {
+        console.error(`Error: --output must be one of: text, markdown, json (got "${value}").`);
         parsed.command = 'help';
         break;
       }
@@ -448,6 +448,69 @@ function printDebugInfo(result, { log = console.log } = {}) {
   log(result.diffText.split('\n').slice(0, MAX_DIFF_PREVIEW_LINES).join('\n'));
 }
 
+/**
+ * Map finding severity to output schema severity.
+ * Accepts both internal vocabulary (blocker/warning/nit) and schema vocabulary (critical/major/minor/info).
+ * Unknown values default to 'major' (fail-safe).
+ */
+function mapSeverity(internalSeverity) {
+  const normalized = (internalSeverity ?? '').toLowerCase().trim();
+  switch (normalized) {
+    case 'blocker':
+    case 'critical':
+      return 'critical';
+    case 'warning':
+    case 'major':
+      return 'major';
+    case 'nit':
+    case 'minor':
+      return 'minor';
+    case 'info':
+      return 'info';
+    default:
+      return 'major';
+  }
+}
+
+/**
+ * Extract labeled field value from a finding message string.
+ */
+function extractField(message, label) {
+  const regex = new RegExp(
+    `${label}:\\s*([^]*?)(?=\\s+(?:Finding|Evidence|Impact|Fix|Severity|Confidence):)|${label}:\\s*(.+)$`,
+  );
+  const match = (message ?? '').match(regex);
+  return (match?.[1] ?? match?.[2] ?? '').trim();
+}
+
+/**
+ * Format review result as JSON conforming to schemas/output.schema.json.
+ */
+function formatJsonOutput(result, phase) {
+  const comments = result.comments ?? [];
+  const issueCountBySeverity = { info: 0, minor: 0, major: 0, critical: 0 };
+  const issueCountByPhase = { upstream: 0, midstream: 0, downstream: 0 };
+
+  const issues = comments.map((c, i) => {
+    const severity = mapSeverity(extractField(c.message, 'Severity'));
+    issueCountBySeverity[severity]++;
+    issueCountByPhase[phase] = (issueCountByPhase[phase] ?? 0) + 1;
+    const finding = extractField(c.message, 'Finding');
+    return {
+      id: `rr-${i + 1}`,
+      ruleId: c.skillId || 'unknown',
+      title: finding || c.message.slice(0, 80),
+      message: c.message,
+      severity,
+      phase,
+      file: c.file,
+      ...(c.line ? { line: c.line } : {}),
+    };
+  });
+
+  return { issues, summary: { issueCountBySeverity, issueCountByPhase } };
+}
+
 function countChangedLines(files) {
   let lines = 0;
   for (const file of files ?? []) {
@@ -593,7 +656,7 @@ Dependencies: ${
         ? estimator.estimateFromDiff(context.diff, context.plan?.selected ?? [])
         : null;
 
-    const logRunHeader = parsed.output === 'markdown' ? console.error : console.log;
+    const logRunHeader = parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
     logRunHeader(`River Reviewer (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}
@@ -655,7 +718,9 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
     });
 
-    if (parsed.output === 'markdown') {
+    if (parsed.output === 'json') {
+      console.log(JSON.stringify(formatJsonOutput(result, parsed.phase), null, 2));
+    } else if (parsed.output === 'markdown') {
       printMarkdownReport(result, parsed.phase);
     } else {
       printPlan(result.plan);
@@ -663,8 +728,8 @@ Dependencies: ${
     }
 
     if (parsed.debug) {
-      if (parsed.output === 'markdown') {
-        console.error('\nDebug info (not included in markdown output):');
+      if (parsed.output === 'markdown' || parsed.output === 'json') {
+        console.error('\nDebug info (not included in output):');
         printDebugInfo(result, { log: console.error });
       } else {
         printDebugInfo(result);
