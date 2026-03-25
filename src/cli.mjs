@@ -656,7 +656,7 @@ Dependencies: ${
         ? estimator.estimateFromDiff(context.diff, context.plan?.selected ?? [])
         : null;
 
-    const logRunHeader = parsed.output === 'markdown' ? console.error : console.log;
+    const logRunHeader = parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
     logRunHeader(`River Reviewer (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}
