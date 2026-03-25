@@ -39,7 +39,7 @@ READMEのProjectsリンクを修正しました（`https://github.com/users/s977
 - `src/lib/review-fixtures-eval.mjs`
 - `package.json` の `eval:fixtures` スクリプト
 
-使用方法とオプション詳細は [Evaluation Fixture Format](https://s977043.github.io/river-reviewer/reference/evaluation-fixture-format) に記載済みです。
+使用方法とオプション詳細は [Evaluation Fixture Format](https://river-reviewer.vercel.app/reference/evaluation-fixture-format) に記載済みです。
 
 クローズします。
 ```
@@ -91,7 +91,7 @@ npm run eval:fixtures
 追加ドキュメント:
 
 - `pages/reference/evaluation-fixture-format.md`
-- 公開URL: https://s977043.github.io/river-reviewer/reference/evaluation-fixture-format
+- 公開URL: https://river-reviewer.vercel.app/reference/evaluation-fixture-format
 
 ドキュメントには以下を含みます。
 

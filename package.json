@@ -15,7 +15,7 @@
     "river": "./src/cli.mjs",
     "river-reviewer": "./src/cli.mjs"
   },
-  "homepage": "https://s977043.github.io/river-reviewer/",
+  "homepage": "https://river-reviewer.vercel.app/",
   "bugs": "https://github.com/s977043/river-reviewer/issues",
   "scripts": {
     "dev": "docusaurus start",
@@ -43,6 +43,7 @@
     "planner:eval": "node scripts/evaluate-planner.mjs",
     "planner:eval:dataset": "node scripts/evaluate-planner-dataset.mjs",
     "eval:fixtures": "node scripts/evaluate-review-fixtures.mjs",
+    "meta:validate": "node scripts/validate-meta-consistency.mjs",
     "check:bilingual": "node scripts/check-bilingual-pairs.mjs",
     "check:doc-placement": "node scripts/check-doc-placement.mjs",
     "check:docs": "npm run check:bilingual && npm run check:doc-placement",

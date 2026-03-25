@@ -10,6 +10,23 @@
 
 日本語版READMEです。[English README is available here.](./README.en.md)
 
+## ライセンス概要
+
+| 対象                                          | ライセンス | 詳細                                 |
+| --------------------------------------------- | ---------- | ------------------------------------ |
+| ソースコード (`src/`, `scripts/`, `tests/`)   | MIT        | [LICENSE-CODE](./LICENSE-CODE)       |
+| ドキュメント (`pages/`, `skills/`, `assets/`) | CC BY 4.0  | [LICENSE-CONTENT](./LICENSE-CONTENT) |
+| 設定ファイル (`.github/`, `*.config.*`)       | MIT        | [LICENSE](./LICENSE)                 |
+
+## はじめに
+
+| やりたいこと             | 行き先                                                                                             |
+| ------------------------ | -------------------------------------------------------------------------------------------------- |
+| 5分で試す                | [クイックスタート（GitHub Actions）](#クイックスタートgithub-actions)                              |
+| 既存リポジトリに導入する | [セットアップガイド](https://river-reviewer.vercel.app/guides/github-actions/)                     |
+| スキルを1個作る          | [スキル作成チュートリアル](https://river-reviewer.vercel.app/tutorials/creating-your-first-skill/) |
+| 設計思想を理解する       | [アーキテクチャ解説](https://river-reviewer.vercel.app/explanation/river-architecture/)            |
+
 Philosophy: [なぜ作ったのか](#philosophy)
 
 開発手順は [docs/runbook/dev.md](docs/runbook/dev.md) を参照してください。
@@ -69,16 +86,16 @@ jobs:
         with:
           fetch-depth: 0 # merge-base を安定取得
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.5.0
+        uses: s977043/river-reviewer/runners/github-action@v0.10.0
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-タグは `@v0.5.0` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
+タグは `@v0.10.0` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
 
-最新リリース: [v0.5.0](https://github.com/s977043/river-reviewer/releases/tag/v0.5.0)
+最新リリース: [v0.10.0](https://github.com/s977043/river-reviewer/releases/tag/v0.10.0)
 
 > **ℹ️ v0.1.x からのアップグレード:** v0.2.0以降では、GitHub Actionのパスが `.github/actions/river-reviewer` から `runners/github-action` に変更されています。詳細は[移行ガイド](docs/migration/runners-architecture-guide.md)と[DEPRECATED.md](docs/deprecated.md)をご確認ください。
 
@@ -93,7 +110,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -102,7 +119,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -111,7 +128,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -125,7 +142,7 @@ review:
   steps:
     - uses: actions/checkout@v6
       with: { fetch-depth: 0 }
-    - uses: s977043/river-reviewer/runners/github-action@v0.5.0
+    - uses: s977043/river-reviewer/runners/github-action@v0.10.0
       with:
         phase: midstream
         estimate: true # コスト見積もりのみ
@@ -143,7 +160,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
         with:
           phase: midstream
           dry_run: true            # Draft はドライランでプロンプト確認のみ
@@ -156,7 +173,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.5.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
         with:
           phase: midstream
           dry_run: false           # Ready ではフルレビュー

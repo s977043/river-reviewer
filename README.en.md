@@ -11,6 +11,23 @@
 English edition. The primary Japanese README lives in `README.md`.
 [日本語の README はここ](./README.md)—the Japanese copy is the source of truth; English may lag.
 
+## License Overview
+
+| Scope                                          | License   | Details                              |
+| ---------------------------------------------- | --------- | ------------------------------------ |
+| Source code (`src/`, `scripts/`, `tests/`)     | MIT       | [LICENSE-CODE](./LICENSE-CODE)       |
+| Documentation (`pages/`, `skills/`, `assets/`) | CC BY 4.0 | [LICENSE-CONTENT](./LICENSE-CONTENT) |
+| Configuration (`.github/`, `*.config.*`)       | MIT       | [LICENSE](./LICENSE)                 |
+
+## Getting Started
+
+| Goal                    | Destination                                                                              |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| Try it in 5 minutes     | [Quick start (GitHub Actions)](#quick-start-github-actions)                              |
+| Add to an existing repo | [Setup guide](https://river-reviewer.vercel.app/guides/github-actions/)                  |
+| Create your first skill | [Skill tutorial](https://river-reviewer.vercel.app/tutorials/creating-your-first-skill/) |
+| Understand the design   | [Architecture docs](https://river-reviewer.vercel.app/explanation/river-architecture/)   |
+
 Philosophy: [Why we built it](#philosophy)
 
 Review that Flows With You. 流れに寄り添う AI レビューエージェント。
@@ -59,16 +76,16 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.5.0
+        uses: s977043/river-reviewer/runners/github-action@v0.10.0
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-Pin to a release tag such as `@v0.5.0` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
+Pin to a release tag such as `@v0.10.0` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
 
-Latest release: [v0.5.0](https://github.com/s977043/river-reviewer/releases/tag/v0.5.0)
+Latest release: [v0.10.0](https://github.com/s977043/river-reviewer/releases/tag/v0.10.0)
 
 > **ℹ️ Upgrading from v0.1.x:** v0.2.0 and later use the new GitHub Action path `runners/github-action` instead of `.github/actions/river-reviewer`. See [Migration Guide](docs/migration/runners-architecture-guide.md) and [DEPRECATED.md](docs/deprecated.md) for details.
 
