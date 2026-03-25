@@ -40,7 +40,9 @@ import addFormats from 'ajv-formats';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const repoRoot = path.resolve(__dirname, '..', '..');
+const repoRoot = process.env.RIVER_REPO_ROOT
+  ? path.resolve(process.env.RIVER_REPO_ROOT)
+  : path.resolve(__dirname, '..', '..');
 const defaultSkillsDir = path.join(repoRoot, 'skills');
 const defaultSchemaPath = path.join(repoRoot, 'schemas', 'skill.schema.json');
 const markdownExtensions = new Set(['.md', '.mdx']);

@@ -46,6 +46,7 @@
     "check:bilingual": "node scripts/check-bilingual-pairs.mjs",
     "check:doc-placement": "node scripts/check-doc-placement.mjs",
     "check:docs": "npm run check:bilingual && npm run check:doc-placement",
+    "build:action": "ncc build runners/github-action/src/index.mjs -o runners/github-action/dist --source-map --license licenses.txt",
     "river": "node ./src/cli.mjs",
     "prepare": "husky install"
   },
@@ -76,6 +77,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.4.2",
     "@commitlint/config-conventional": "^20.3.1",
+    "@vercel/ncc": "^0.38.4",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "glob": "^13.0.0",

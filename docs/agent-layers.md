@@ -95,9 +95,9 @@ graph TB
 | エージェント   | Claude Code       | Copilot           | 役割                       |
 | -------------- | ----------------- | ----------------- | -------------------------- |
 | river-reviewer | `.claude/agents/` | `.github/agents/` | コードレビュー・リファクタ |
-| architect      | —                 | `.github/agents/` | アーキテクチャ設計         |
-| security       | —                 | `.github/agents/` | セキュリティレビュー       |
-| qa             | —                 | `.github/agents/` | QA・テスト                 |
+| architect      |—                | `.github/agents/` | アーキテクチャ設計         |
+| security       |—                | `.github/agents/` | セキュリティレビュー       |
+| qa             |—                | `.github/agents/` | QA・テスト                 |
 
 **設計原則:** 各ツールの frontmatter 形式が異なるため、エージェント定義はツール別に維持する。共通の役割・ワークフローはこの文書でマッピングし、ドリフトを防止する。
 
