@@ -203,6 +203,27 @@ exclude:
 7. Review fixtures 評価（任意）: `npm run eval:fixtures`（must_include 方式）
 8. ドキュメント開発（任意）: `npm run dev`（Docusaurus）
 
+### Codex を project-local config で使う
+
+Codex 用の project-local config は [`.codex/config.toml`](./.codex/config.toml) にあり、**opt-in** です。通常の Codex 利用には影響しません。このリポジトリ設定を使うときだけ、以下のいずれかで起動します。
+
+```bash
+CODEX_HOME=$(pwd)/.codex codex -C .
+npm run codex:local -- "AGENTS.md を読んで、このブランチの作業計画を出して"
+```
+
+非対話で実行したい場合:
+
+```bash
+npm run codex:exec -- "review this branch"
+```
+
+運用上の前提:
+
+- project-local config は安全寄りの既定値だけを持ち、モデル選択や web search は CLI 引数で都度上書きします。
+- レビューや PR 準備の前には、少なくとも `npm run lint` と `npm test` を実行してください。
+- `src/` と `docs/` は要確認パスです。変更が必要な場合は、先に明示的な許可を取ってください。
+
 ### ローカルレビュー実行（river run .）
 
 1. インストール後に `npx river run . --dry-run`（または `npm run river -- --dry-run`）で現在の差分を対象にローカルレビューを実行（GitHub への投稿なし）

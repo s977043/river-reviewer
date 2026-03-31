@@ -1,11 +1,19 @@
-# Project-local Codex config
-# Load this by running: CODEX_HOME=$(pwd)/.codex codex ...
-
-# Safer defaults
+# Project-local Codex defaults for river-reviewer
+# Opt in explicitly:
+#   CODEX_HOME=$(pwd)/.codex codex -C .
+#
+# Keep repository defaults conservative.
+# Choose model, profile, web search, or extra writable dirs at runtime:
+#   --model <MODEL>
+#   --profile <NAME>
+#   --search
+#   --add-dir <DIR>
+#
+# Do not set web search or sandbox-bypass flags here by default.
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 
-# Optional tuning (uncomment if needed)
+# Optional tuning (uncomment only after team agreement)
 # model_reasoning_effort = "high"
 
 [shell_environment_policy]

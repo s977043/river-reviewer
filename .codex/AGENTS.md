@@ -2,30 +2,55 @@
 
 > **Single source:** 共通ルールは [AGENTS.md](../AGENTS.md)。本ファイルは Codex 向けの最小差分です。
 
-## 使い方
+## 起動
 
-プロジェクトローカル設定で Codex を実行:
+project-local config は opt-in です。Codex をこのリポジトリ設定で起動する場合のみ `CODEX_HOME` を指定します。
 
 ```bash
-CODEX_HOME=$(pwd)/.codex codex "your prompt"
+CODEX_HOME=$(pwd)/.codex codex -C .
 ```
 
-## Kickoff snippet（最初に貼る推奨プロンプト）
+`package.json` のショートカットを使う場合:
+
+```bash
+npm run codex:local -- "your prompt"
+npm run codex:exec -- "review this branch"
+```
+
+## Kickoff Snippet
 
 ```text
-あなたはこのリポジトリの実装エージェントです。着手前に AGENTS.md を読み、完了条件とポリシーを確認して短い計画を示してください。
-- ブランチはタスク単位。PR 前に `npm test` と `npm run lint` を実行し、Gemini / Codex レビュー依頼を本文に記載する。
-- セルフレビューで残タスクがないことを確認する。
-- 秘密情報や `.env*` は扱わない。
+あなたは river-reviewer の実装エージェントです。着手前に AGENTS.md を読み、完了条件と制約を確認して短い計画を示してください。
+- 変更はタスク単位のブランチで行い、`main` へ直接 push しない。
+- `src/` と `docs/` は要確認パスなので、必要なら編集前に明示許可を取る。
+- PR 前に `npm run lint` と `npm test` を実行し、追加で必要な検証があれば実行する。
+- `.env*`、`secrets/`、鍵ファイルなどの秘密情報は扱わない。
 ```
 
-## Codex 固有設定
+## Review Snippet
+
+```text
+このブランチをセルフレビューしてください。AGENTS.md と .codex/AGENTS.md に従い、重大な見落とし・未検証・SSOT不整合を優先して指摘してください。
+- まず変更ファイルごとのリスクを整理する。
+- `main` 直 push 禁止、要確認パス、秘密情報禁止に反していないか確認する。
+- 必須検証コマンドの不足があれば明記する。
+```
+
+## Codex-Specific Notes
 
 - 設定: `.codex/config.toml`（承認ポリシー / サンドボックス）
-- 環境変数: forward-limited (PATH, HOME, USER, SHELL, LANG, LC_ALL)
+- 環境変数は最小限のみ forward する（PATH, HOME, USER, SHELL, LANG, LC_ALL）
+- 既定値は保守的に維持し、`--model`、`--profile`、`--search`、`--add-dir` は実行時に上書きする
+- web search や sandbox bypass は repo 既定値にしない
 
-## クイックリファレンス
+## Quick Reference
 
 - 共通ルール: `AGENTS.md` (SSOT)
 - スキル検索: `skills/` (英日両対応)
-- 安全規則: 秘密情報禁止、破壊的コマンド確認
+- 必須検証: `npm run lint`、`npm test`
+- 追加検証:
+  - `skills/**/*.md`: `npm run skills:validate`
+  - `skills/agent-skills/**/*.md`: `npm run agent-skills:validate`
+  - `.github/agents/` or `.claude/agents/`: `npm run agents:validate`
+  - `pages/**/*.md`: `npm run check:links:local`
+- 安全規則: `main` 直 push 禁止、秘密情報禁止、破壊的コマンド禁止

@@ -46,6 +46,8 @@
     "check:bilingual": "node scripts/check-bilingual-pairs.mjs",
     "check:doc-placement": "node scripts/check-doc-placement.mjs",
     "check:docs": "npm run check:bilingual && npm run check:doc-placement",
+    "codex:local": "CODEX_HOME=$(pwd)/.codex codex -C .",
+    "codex:exec": "CODEX_HOME=$(pwd)/.codex codex exec -C .",
     "river": "node ./src/cli.mjs",
     "prepare": "husky install"
   },
