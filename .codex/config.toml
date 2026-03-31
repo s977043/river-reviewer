@@ -1,6 +1,7 @@
 # Project-local Codex defaults for river-reviewer
 # Opt in explicitly:
-#   CODEX_HOME=$(pwd)/.codex codex -C .
+#   REPO_ROOT=$(git rev-parse --show-toplevel)
+#   CODEX_HOME="$REPO_ROOT/.codex" codex -C "$REPO_ROOT"
 #
 # Keep repository defaults conservative.
 # Choose model, profile, web search, or extra writable dirs at runtime:

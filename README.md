@@ -208,7 +208,8 @@ exclude:
 Codex 用の project-local config は [`.codex/config.toml`](./.codex/config.toml) にあり、**opt-in** です。通常の Codex 利用には影響しません。このリポジトリ設定を使うときだけ、以下のいずれかで起動します。
 
 ```bash
-CODEX_HOME=$(pwd)/.codex codex -C .
+REPO_ROOT=$(git rev-parse --show-toplevel)
+CODEX_HOME="$REPO_ROOT/.codex" codex -C "$REPO_ROOT"
 npm run codex:local -- "AGENTS.md を読んで、このブランチの作業計画を出して"
 ```
 

@@ -7,7 +7,8 @@
 project-local config は opt-in です。Codex をこのリポジトリ設定で起動する場合のみ `CODEX_HOME` を指定します。
 
 ```bash
-CODEX_HOME=$(pwd)/.codex codex -C .
+REPO_ROOT=$(git rev-parse --show-toplevel)
+CODEX_HOME="$REPO_ROOT/.codex" codex -C "$REPO_ROOT"
 ```
 
 `package.json` のショートカットを使う場合:
