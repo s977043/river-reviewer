@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.11.0](https://github.com/s977043/river-reviewer/compare/v0.10.0...v0.11.0) (2026-04-01)
+
+
+### Features
+
+* **ci:** add meta-consistency validation script and CI job ([#398](https://github.com/s977043/river-reviewer/issues/398)) ([a89b905](https://github.com/s977043/river-reviewer/commit/a89b905e094a726855af8b46a4cd5858f2350eac))
+* **scripts:** add review severity gate evaluator ([#401](https://github.com/s977043/river-reviewer/issues/401)) ([667094a](https://github.com/s977043/river-reviewer/commit/667094a42c761b4dd955f08ad3fca2d01882962f))
+* **skills:** add Claude Code skill management skills ([#380](https://github.com/s977043/river-reviewer/issues/380)) ([8fae238](https://github.com/s977043/river-reviewer/commit/8fae238e8bc3f9b626361ca3ee11366619bffac8))
+* **skills:** add Inversion+Pipeline pattern to all skills ([#399](https://github.com/s977043/river-reviewer/issues/399)) ([e0ec61b](https://github.com/s977043/river-reviewer/commit/e0ec61b463f90f07ad0f2a5b7752200ad16fca82))
+* **skills:** スキル管理スキルに5パターン設計システムを導入 ([#382](https://github.com/s977043/river-reviewer/issues/382)) ([9fa274a](https://github.com/s977043/river-reviewer/commit/9fa274a2efbe724380c3f6c5279292576d4bfe4d))
+
+
+### Bug Fixes
+
+* **codex:** address PR review feedback ([b31d901](https://github.com/s977043/river-reviewer/commit/b31d901872ed86b211281d67173e25bdc713cbb5))
+* **meta:** update version refs to v0.10.0 and unify canonical URL ([#391](https://github.com/s977043/river-reviewer/issues/391), [#392](https://github.com/s977043/river-reviewer/issues/392)) ([8bc2a5d](https://github.com/s977043/river-reviewer/commit/8bc2a5dfa17dc22f01bc69b0b7c0bba2c7e67e4d))
+* **readme:** correct license table to match actual LICENSE file (MIT) ([5a06394](https://github.com/s977043/river-reviewer/commit/5a06394d1bfe4e2e442f6b8d6dda55496af33a63))
+* **scripts:** add .catch() handler and expand check scope in meta-consistency ([54823f3](https://github.com/s977043/river-reviewer/commit/54823f37a8bc62c52680c747e5ecdd74fb173d1f))
+* **skills:** 5パターン診断に基づくスキル改善（統合） ([#385](https://github.com/s977043/river-reviewer/issues/385)) ([857d5ca](https://github.com/s977043/river-reviewer/commit/857d5ca1d05324c8b398d273b371160e3b1a648b))
+
 ## [0.10.0](https://github.com/s977043/river-reviewer/compare/v0.9.0...v0.10.0) (2026-03-19)
 
 
