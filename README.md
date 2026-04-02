@@ -220,6 +220,12 @@ exclude:
 7. Review fixtures 評価（任意）: `npm run eval:fixtures`（must_include 方式）
 8. ドキュメント開発（任意）: `npm run dev`（Docusaurus）
 
+## AI エージェント運用
+
+- ルートの `AGENTS.md` が AI コーディングエージェント向けの SSOT です。
+- `AGENT_LEARNINGS.md` には、再利用できる確定済みの学びだけを追加します。
+- 秘密情報、個人情報、一時的なメモはどちらにも書きません。
+
 ### Codex を project-local config で使う
 
 Codex 用の project-local config は [`.codex/config.toml`](./.codex/config.toml) にあり、**opt-in** です。通常の Codex 利用には影響しません。このリポジトリ設定を使うときだけ、以下のいずれかで起動します。
