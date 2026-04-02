@@ -13,6 +13,7 @@
 - `tests/`: Node.js test suites.
 - `pages/`: public docs; Japanese content is the source of truth.
 - `docs/`: internal notes and runbooks; ask before editing.
+- `runners/github-action/`: GitHub Action runner implementation.
 - `runners/node-api/`: separate TypeScript package built with `tsc`.
 
 ## Package Manager
@@ -41,8 +42,8 @@ Use **npm**.
 
 ## Edit Scope
 
-- Editable: `pages/`, `skills/`, `schemas/`, `scripts/`, `tests/`, `.github/`, `.claude/`
-- Ask before editing: `docs/`, `assets/`, `src/`
+- Editable: `pages/`, `skills/`, `schemas/`, `scripts/`, `tests/`, `.github/`, `.claude/`, `AGENT_LEARNINGS.md`
+- Ask before editing: `docs/`, `assets/`, `src/`, `runners/`, `README.md`, `README.en.md`, `AGENTS.md`
 - Never edit: `package-lock.json`, `LICENSE*`, `CITATION.cff`
 
 ## Workflow
