@@ -37,32 +37,39 @@ inputs:
     description: 'Node.js version to use.'
     required: false
     default: '20'
+  output_format:
+    description: 'Output format (text|markdown|json).'
+    required: false
+    default: 'markdown'
+outputs:
+  json_path:
+    description: 'Path to the JSON output file (only when output_format=json).'
+    value: ${{ steps.river.outputs.json_path }}
 runs:
   using: 'composite'
   steps:
     - uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
-        # NOTE: caching is intentionally disabled here.
-        # - `cache-dependency-path` disallows '.'/'..' path segments on setup-node
-        # - using `github.workspace` would key off the target repo lockfile (often absent)
-    - name: Install dependencies
-      shell: bash
-      run: |
-        set -euo pipefail
-        action_root="$(cd "${GITHUB_ACTION_PATH}/../.." && pwd)"
-        echo "Action repo root: ${action_root}"
-        cd "${action_root}"
-        npm ci
     - name: Run River Reviewer
       id: river
       shell: bash
+      env:
+        RIVER_REPO_ROOT: ${{ github.action_path }}/../..
+        RIVER_OUTPUT_FORMAT: ${{ inputs.output_format }}
       run: |
         set -euo pipefail
-        action_root="$(cd "${GITHUB_ACTION_PATH}/../.." && pwd)"
+        export RIVER_REPO_ROOT="$(cd "${RIVER_REPO_ROOT}" && pwd)"
         repo_path="$(cd "${{ inputs.target }}" && pwd)"
 
-        cmd=(node "${action_root}/src/cli.mjs" run "${repo_path}" --phase "${{ inputs.phase }}" --planner "${{ inputs.planner }}" --output markdown)
+        # Validate output format
+        output_fmt="${RIVER_OUTPUT_FORMAT}"
+        if [[ ! "${output_fmt}" =~ ^(text|markdown|json)$ ]]; then
+          echo "::error::Invalid output_format: ${output_fmt}"
+          exit 1
+        fi
+
+        cmd=(node "${GITHUB_ACTION_PATH}/dist/index.mjs" run "${repo_path}" --phase "${{ inputs.phase }}" --planner "${{ inputs.planner }}" --output "${output_fmt}")
         if [ "${{ inputs.dry_run }}" = "true" ]; then
           cmd+=("--dry-run")
         fi
@@ -76,12 +83,20 @@ runs:
           cmd+=("--max-cost" "${{ inputs.max_cost }}")
         fi
         echo "Running: ${cmd[*]}"
-        out="${RUNNER_TEMP}/river-reviewer-comment.md"
-        "${cmd[@]}" | tee "${out}"
-        echo "comment_path=${out}" >> "${GITHUB_OUTPUT}"
+
+        if [ "${output_fmt}" = "json" ]; then
+          json_out="${RUNNER_TEMP}/river-reviewer-output.json"
+          "${cmd[@]}" > "${json_out}"
+          echo "json_path=${json_out}" >> "${GITHUB_OUTPUT}"
+          cat "${json_out}"
+        else
+          out="${RUNNER_TEMP}/river-reviewer-comment.md"
+          "${cmd[@]}" | tee "${out}"
+          echo "comment_path=${out}" >> "${GITHUB_OUTPUT}"
+        fi
 
     - name: Post PR comment
-      if: ${{ github.event_name == 'pull_request' && inputs.comment == 'true' && inputs.estimate != 'true' }}
+      if: ${{ github.event_name == 'pull_request' && inputs.comment == 'true' && inputs.estimate != 'true' && inputs.output_format != 'json' }}
       uses: actions/github-script@v8
       env:
         RIVER_REVIEWER_COMMENT_PATH: ${{ steps.river.outputs.comment_path }}
