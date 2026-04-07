@@ -27,4 +27,4 @@
   - `Evidence`: `src/lib/utils.mjs`, `src/lib/local-runner.mjs`, `src/core/skill-dispatcher.mjs`.
 - `2026-04-03`: Use Git Worktrees for parallel agent tasks. Setup and teardown steps are documented in `docs/runbook/dev.md` § 並行タスク。
   - `Applies to`: concurrent branch work and multi-agent workflows.
-  - `Evidence`: `docs/runbook/dev.md` lines 32-45.
+  - `Evidence`: `docs/runbook/dev.md`「並行タスク（Git Worktree）」セクション。
