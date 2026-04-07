@@ -2,6 +2,7 @@ import { minimatch } from 'minimatch';
 import { loadSkills } from './skill-loader.mjs';
 import { planSkills, summarizeSkill } from '../../src/lib/skill-planner.mjs';
 import { inferImpactTags } from '../../src/lib/impact-scope.mjs';
+import { classifyChangedFiles } from '../../src/lib/file-classifier.mjs';
 import { normalizePlannerMode } from '../../src/lib/planner-utils.mjs';
 import { HEURISTIC_SKILL_IDS } from '../../src/lib/heuristic-review.mjs';
 
@@ -202,6 +203,7 @@ export async function buildExecutionPlan(options) {
   }
 
   const impactTags = inferImpactTags(changedFiles, { diffText });
+  const fileTypes = classifyChangedFiles(changedFiles);
 
   // If planner is provided, try LLM-based planning, fallback to deterministic rank
   const effectivePlannerMode = planner
@@ -213,6 +215,7 @@ export async function buildExecutionPlan(options) {
       changedFiles,
       availableContexts,
       impactTags,
+      fileTypes,
     };
     const { planned, reasons, fallback } = await planSkills({
       skills: selection.selected,
@@ -231,6 +234,7 @@ export async function buildExecutionPlan(options) {
       plannerFallback: fallback,
       ...(fallback ? { plannerError: reasons?.[0]?.reason ?? 'planner fallback' } : {}),
       impactTags,
+      fileTypes,
     };
   }
 
@@ -241,6 +245,7 @@ export async function buildExecutionPlan(options) {
     selected: ordered,
     skipped: selection.skipped,
     impactTags,
+    fileTypes,
   };
 }
 
