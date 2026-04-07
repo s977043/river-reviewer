@@ -15,6 +15,7 @@
  *   --description <text>   Optional description for ledger entry
  *   --json                 Print result as JSON instead of human-readable
  *   --skip <name>          Skip a sub-eval (planner|fixtures|gate|meta). Repeatable
+ *   --persist-memory       Write eval result as Riverbed Memory entry
  *   -h, --help             Show help
  */
 
@@ -51,6 +52,7 @@ function parseArgs(argv) {
     description: '',
     json: false,
     skip: new Set(),
+    persistMemory: false,
     help: false,
   };
 
@@ -67,6 +69,8 @@ function parseArgs(argv) {
     } else if (arg === '--skip') {
       const name = args.shift();
       if (name) parsed.skip.add(name);
+    } else if (arg === '--persist-memory') {
+      parsed.persistMemory = true;
     } else if (arg === '-h' || arg === '--help') {
       parsed.help = true;
     }
@@ -211,6 +215,7 @@ Options:
   --description <text>   Optional description for ledger entry
   --json                 Print result as JSON
   --skip <name>          Skip a sub-eval (planner|fixtures|gate|meta). Repeatable
+  --persist-memory       Write eval result as Riverbed Memory entry
   -h, --help             Show help
 `);
     return 0;
@@ -315,6 +320,34 @@ Options:
     appendLedger(envelope);
     if (!parsed.json) {
       console.log(`Ledger entry appended to artifacts/evals/results.jsonl`);
+    }
+  }
+
+  if (parsed.persistMemory) {
+    try {
+      const { appendEntry } = await import('../src/lib/riverbed-memory.mjs');
+      const memoryPath = path.join(ROOT, '.river', 'memory', 'index.json');
+      const entryId = `eval-${envelope.commit}-${Date.now()}`;
+      appendEntry(memoryPath, {
+        id: entryId,
+        type: 'eval_result',
+        title: `Eval run ${envelope.commit}`,
+        content: JSON.stringify(envelope),
+        metadata: {
+          createdAt: envelope.timestamp,
+          author: 'evaluate-all',
+          tags: ['eval', envelope.status],
+          summary: `${envelope.status}: ${Object.keys(envelope.scores).length} metrics`,
+        },
+      });
+      if (!parsed.json) {
+        console.log(`Memory entry ${entryId} persisted to .river/memory/index.json`);
+      }
+    } catch (err) {
+      // Memory persistence is optional; don't fail the eval
+      if (!parsed.json) {
+        console.log(`Warning: failed to persist memory entry: ${err.message}`);
+      }
     }
   }
 
