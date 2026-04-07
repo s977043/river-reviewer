@@ -4,8 +4,11 @@ node_modules
 build/
 .docusaurus/
 
-# Runner outputs
-artifacts/
+# Runner outputs (track evals directory for ledger)
+artifacts/*
+!artifacts/evals/
+artifacts/evals/*
+!artifacts/evals/.gitkeep
 
 # Generated schema/examples backups
 *.schema_*.json
