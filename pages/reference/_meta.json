@@ -11,5 +11,6 @@
   "stable-interfaces": "安定インターフェース（CLI / GitHub Actions）",
   "runner-cli-reference": "Runner CLI リファレンス",
   "evaluation-fixture-format": "評価フィクスチャ形式",
-  "glossary": "用語集"
+  "glossary": "用語集",
+  "eval-keep-discard-policy": "評価ベースの採否基準"
 }
