@@ -3,15 +3,15 @@
 #   REPO_ROOT=$(git rev-parse --show-toplevel)
 #   CODEX_HOME="$REPO_ROOT/.codex" codex -C "$REPO_ROOT"
 #
-# Keep repository defaults conservative.
 # Choose model, profile, web search, or extra writable dirs at runtime:
 #   --model <MODEL>
 #   --profile <NAME>
 #   --search
 #   --add-dir <DIR>
 #
-# Do not set web search or sandbox-bypass flags here by default.
-approval_policy = "on-request"
+# Do not set web search or sandbox-bypass flags here.
+# approval_policy is full-auto; safety relies on sandbox_mode and shell_environment_policy.
+approval_policy = "full-auto"
 sandbox_mode = "workspace-write"
 
 # Optional tuning (uncomment only after team agreement)
