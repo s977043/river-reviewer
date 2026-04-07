@@ -9,7 +9,8 @@
 #   --search
 #   --add-dir <DIR>
 #
-# Do not set web search or sandbox-bypass flags here by default.
+# Do not set web search or sandbox-bypass flags here.
+# approval_policy is full-auto; safety relies on sandbox_mode and shell_environment_policy.
 approval_policy = "full-auto"
 sandbox_mode = "workspace-write"
 
