@@ -10,7 +10,7 @@
  * Internal vocabulary is mapped to output schema equivalents.
  * @see .claude/rules/review-core.md for the canonical mapping
  */
-// Pre-compiled patterns for finding message parsing
+// Module-scope regexes to avoid re-creation per call
 const RE_EVIDENCE = /Evidence:\s*(\S.{4,})/;
 const RE_SEVERITY = /Severity:\s*(\w+)/;
 const RE_ACTIONABLE = /(?:Fix|Suggestion):\s*(.{10,})/;
