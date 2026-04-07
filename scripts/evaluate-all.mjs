@@ -31,7 +31,15 @@ const ROOT = path.join(__dirname, '..');
 const PLANNER_COVERAGE_THRESHOLD = 0.5;
 
 /** Metric keys that represent 0-1 ratios (displayed as percentages). */
-const RATIO_METRICS = new Set(['exactMatch', 'top1Match', 'coverage', 'mrr']);
+const RATIO_METRICS = new Set([
+  'exactMatch',
+  'top1Match',
+  'coverage',
+  'mrr',
+  'passRate',
+  'falsePositiveRate',
+  'evidenceRate',
+]);
 
 // --- arg parsing -----------------------------------------------------------
 
@@ -129,14 +137,18 @@ async function runFixturesEval() {
   const { evaluateReviewFixtures } = await import('../src/lib/review-fixtures-eval.mjs');
   const casesPath = path.join(ROOT, 'tests', 'fixtures', 'review-eval', 'cases.json');
 
-  const exitCode = await evaluateReviewFixtures({ casesPath, verbose: false });
+  const result = await evaluateReviewFixtures({ casesPath, verbose: false });
 
   return {
     name: 'fixtures',
-    pass: exitCode === 0,
+    pass: result.exitCode === 0,
     skipped: false,
-    metrics: { exitCode },
-    errors: exitCode === 0 ? [] : ['One or more fixture checks failed'],
+    metrics: {
+      passRate: result.summary.passRate,
+      falsePositiveRate: result.summary.falsePositiveRate,
+      evidenceRate: result.summary.evidenceRate,
+    },
+    errors: result.exitCode === 0 ? [] : ['One or more fixture checks failed'],
   };
 }
 
