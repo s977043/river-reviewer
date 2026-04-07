@@ -1,4 +1,4 @@
-# AGENTS.md — River Reviewer
+# AGENTS.md—River Reviewer
 
 ## Scope
 
@@ -19,6 +19,7 @@ If a rule applies to all tools, it belongs in this file.
 | `runners/github-action/` | GitHub Action runner implementation                  |
 | `runners/node-api/`      | Separate TypeScript package (built with `tsc`)       |
 | `schemas/`               | JSON schemas for skills, output, and riverbed        |
+| `scripts/`               | Validation, evaluation, and build scripts            |
 
 ## Package Manager
 
@@ -41,7 +42,7 @@ Use **npm**.
 
 - Do not read or commit `.env*`, `secrets/`, `*.pem`, or `*.key`.
 - Do not make direct network calls (curl, wget, fetch) from scripts or code. Allowed CLI tools like `gh` are exempt.
-- Do not use destructive commands.
+- Do not use destructive commands (`rm -rf`, `git reset --hard`, `git push --force`, etc.).
 - Do not hand-edit `package-lock.json`.
 - Do not push directly to `main` or to already-merged PR branches. If fixes are needed after merge, create a new branch and new PR.
 - Do not omit timeout and exception handling in code that calls external APIs.
