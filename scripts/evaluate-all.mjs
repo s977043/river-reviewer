@@ -93,7 +93,8 @@ async function runPlannerEval() {
   const data = JSON.parse(fs.readFileSync(fixturePath, 'utf-8'));
   const cases = data.map((c) => ({
     ...c,
-    llmPlan: async () => c.llmPlan ?? c.plan ?? c.expectedOrder.map((id) => ({ id })),
+    llmPlan: async ({ skills, context }) =>
+      c.llmPlan ?? c.plan ?? c.expectedOrder.map((id) => ({ id })),
     skills: c.skills,
     context: c.context,
   }));
