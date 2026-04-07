@@ -1,4 +1,4 @@
-// Pre-compiled regexes for classification (avoid per-call compilation)
+// Module-scope regexes to avoid re-creation per call
 const RE_TEST_EXT = /\.(?:test|spec)\.(?:[jt]sx?|mjs)$/;
 const RE_SCHEMA_EXT = /\.schema\.[jt]s$/;
 const RE_MIGRATION = /(?:^|\/)migrations?\//;
@@ -46,15 +46,16 @@ export function classifyChangedFiles(files) {
 
 // Priority: test > schema > migration > config > infra > docs > app > unknown
 function classifyFile(file) {
-  const basename = file.split(/[/\\]/).pop() ?? '';
+  const normalized = file.replaceAll('\\', '/');
+  const basename = normalized.split('/').pop() ?? '';
 
-  if (isTest(file, basename)) return 'test';
-  if (isSchema(file, basename)) return 'schema';
-  if (isMigration(file)) return 'migration';
-  if (isConfig(file, basename)) return 'config';
-  if (isInfra(file, basename)) return 'infra';
-  if (isDocs(file, basename)) return 'docs';
-  if (isApp(file)) return 'app';
+  if (isTest(normalized, basename)) return 'test';
+  if (isSchema(normalized, basename)) return 'schema';
+  if (isMigration(normalized)) return 'migration';
+  if (isConfig(normalized, basename)) return 'config';
+  if (isInfra(normalized, basename)) return 'infra';
+  if (isDocs(normalized, basename)) return 'docs';
+  if (isApp(normalized)) return 'app';
   return 'unknown';
 }
 
