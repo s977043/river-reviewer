@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.12.0](https://github.com/s977043/river-reviewer/compare/v0.11.0...v0.12.0) (2026-04-07)
+
+
+### Features
+
+* **action:** bundle GitHub Action with ncc to eliminate cold start ([1702ba2](https://github.com/s977043/river-reviewer/commit/1702ba229f5f6dbbce9bb305d40e6e64501e2459))
+* **eval:** add failure taxonomy and categorized fixture reports ([#419](https://github.com/s977043/river-reviewer/issues/419)) ([707a8ec](https://github.com/s977043/river-reviewer/commit/707a8ec60197d0dd32aadd60ffb283e974cc6688))
+* **eval:** add unified evaluation runner and experiment ledger ([#413](https://github.com/s977043/river-reviewer/issues/413)) ([980e0bc](https://github.com/s977043/river-reviewer/commit/980e0bc9f7650e26d7204cfa66091f9885ddf080))
+* **eval:** structured fixture results and multi-axis metrics ([#417](https://github.com/s977043/river-reviewer/issues/417)) ([f261995](https://github.com/s977043/river-reviewer/commit/f261995ad9a9a0130483b1ce7a8c4cfb65e37a67))
+* **memory:** add GitHub Artifact persistence for Riverbed Memory ([#425](https://github.com/s977043/river-reviewer/issues/425)) ([b85fecf](https://github.com/s977043/river-reviewer/commit/b85fecf18dbe46c9f72573e3348a3d0ff159fadc))
+* **memory:** add Riverbed Memory v1 runtime ([#426](https://github.com/s977043/river-reviewer/issues/426)) ([4e94434](https://github.com/s977043/river-reviewer/commit/4e94434e9fc6edaf94033339d70e0508cc5369b1))
+* **review:** add ADR/spec linker and dependency impact analyzer ([#423](https://github.com/s977043/river-reviewer/issues/423)) ([0873e05](https://github.com/s977043/river-reviewer/commit/0873e05100f2b8c81270e115110eb681f9c20537))
+* **review:** add changed-files classifier ([#420](https://github.com/s977043/river-reviewer/issues/420)) ([9ba8b06](https://github.com/s977043/river-reviewer/commit/9ba8b064563a1b81227d9790cfb69c7b74af8f95))
+* **review:** add rule-based finding verifier ([#418](https://github.com/s977043/river-reviewer/issues/418)) ([9cfc28e](https://github.com/s977043/river-reviewer/commit/9cfc28e9550f833286688b24c4566020127d568f))
+* **review:** add test impact analyzer and config risk detector ([#422](https://github.com/s977043/river-reviewer/issues/422)) ([f74645b](https://github.com/s977043/river-reviewer/commit/f74645b7981e7edd9798ba4e9d52d3e1e43205ad))
+* **review:** integrate file-classifier into execution plan ([#427](https://github.com/s977043/river-reviewer/issues/427)) ([3544e4e](https://github.com/s977043/river-reviewer/commit/3544e4e74c42e8705ad3f51d8253790b567bc73b))
+* **review:** integrate verifier into review pipeline ([#430](https://github.com/s977043/river-reviewer/issues/430)) ([4d84bdc](https://github.com/s977043/river-reviewer/commit/4d84bdc01b94aa6b6ab2a71eefb66073b0c55806))
+
+
+### Bug Fixes
+
+* **docs:** deduplicate AGENT_LEARNINGS.md and fix broken GEMINI.md reference ([#414](https://github.com/s977043/river-reviewer/issues/414)) ([1194672](https://github.com/s977043/river-reviewer/commit/1194672df27f0bcd3e54ec384e0902676221a0e7))
+* restore table formatting in docs/agent-layers.md ([e405ae4](https://github.com/s977043/river-reviewer/commit/e405ae44a3385bc50e3f4f803f6287ace7725e59))
+
 ## [0.11.0](https://github.com/s977043/river-reviewer/compare/v0.10.0...v0.11.0) (2026-04-01)
 
 
