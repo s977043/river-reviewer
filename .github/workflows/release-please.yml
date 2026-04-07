@@ -13,16 +13,18 @@ concurrency:
   group: release-please-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - name: Release Please
         id: release
-        uses: google-github-actions/release-please-action@v4
+        uses: googleapis/release-please-action@v4
         with:
           release-type: node
-          package-name: river-reviewer
 
       - name: Checkout (for floating tags)
         if: ${{ steps.release.outputs.release_created }}

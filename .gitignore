@@ -20,8 +20,12 @@ artifacts/
 
 # Claude Code local-only overrides
 .claude/settings.local.json
+.claude/worktrees/
 CLAUDE.local.md
 .gemini/
+.codex/runtime-home/
+.codex/automations/
+.lycheecache
 .worktrees/
 .vale/Microsoft
 eval-results/

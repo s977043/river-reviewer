@@ -9,6 +9,7 @@ const repoRoot = path.resolve(__dirname, '..');
 
 const ROOT_ALLOWLIST = new Set([
   'AGENTS.md',
+  'AGENT_LEARNINGS.md',
   'CHANGELOG.md',
   'CLAUDE.md',
   'CODE_OF_CONDUCT.md',

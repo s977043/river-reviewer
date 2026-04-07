@@ -86,16 +86,16 @@ jobs:
         with:
           fetch-depth: 0 # merge-base を安定取得
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.10.0
+        uses: s977043/river-reviewer/runners/github-action@v0.11.0
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-タグは `@v0.10.0` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
+タグは `@v0.11.0` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
 
-最新リリース: [v0.10.0](https://github.com/s977043/river-reviewer/releases/tag/v0.10.0)
+最新リリース: [v0.11.0](https://github.com/s977043/river-reviewer/releases/tag/v0.11.0)
 
 > **ℹ️ v0.1.x からのアップグレード:** v0.2.0以降では、GitHub Actionのパスが `.github/actions/river-reviewer` から `runners/github-action` に変更されています。詳細は[移行ガイド](docs/migration/runners-architecture-guide.md)と[DEPRECATED.md](docs/deprecated.md)をご確認ください。
 
@@ -110,7 +110,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -119,7 +119,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -128,7 +128,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -142,7 +142,7 @@ review:
   steps:
     - uses: actions/checkout@v6
       with: { fetch-depth: 0 }
-    - uses: s977043/river-reviewer/runners/github-action@v0.10.0
+    - uses: s977043/river-reviewer/runners/github-action@v0.11.0
       with:
         phase: midstream
         estimate: true # コスト見積もりのみ
@@ -160,7 +160,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
         with:
           phase: midstream
           dry_run: true            # Draft はドライランでプロンプト確認のみ
@@ -173,7 +173,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.10.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
         with:
           phase: midstream
           dry_run: false           # Ready ではフルレビュー
@@ -219,6 +219,34 @@ exclude:
 6. Planner 評価（任意）: `npm run planner:eval`
 7. Review fixtures 評価（任意）: `npm run eval:fixtures`（must_include 方式）
 8. ドキュメント開発（任意）: `npm run dev`（Docusaurus）
+
+## AI エージェント運用
+
+- ルートの `AGENTS.md` が AI コーディングエージェント向けの SSOT です。
+- `AGENT_LEARNINGS.md` には、再利用できる確定済みの学びだけを追加します。
+- 秘密情報、個人情報、一時的なメモはどちらにも書きません。
+
+### Codex を project-local config で使う
+
+Codex 用の project-local config は [`.codex/config.toml`](./.codex/config.toml) にあり、**opt-in** です。通常の Codex 利用には影響しません。このリポジトリ設定を使うときだけ、以下のいずれかで起動します。
+
+```bash
+REPO_ROOT=$(git rev-parse --show-toplevel)
+CODEX_HOME="$REPO_ROOT/.codex" codex -C "$REPO_ROOT"
+npm run codex:local -- "AGENTS.md を読んで、このブランチの作業計画を出して"
+```
+
+非対話で実行したい場合:
+
+```bash
+npm run codex:exec -- "review this branch"
+```
+
+運用上の前提:
+
+- project-local config は安全寄りの既定値だけを持ち、モデル選択や web search は CLI 引数で都度上書きします。
+- レビューや PR 準備の前には、少なくとも `npm run lint` と `npm test` を実行してください。
+- `src/` と `docs/` は要確認パスです。変更が必要な場合は、先に明示的な許可を取ってください。
 
 ### ローカルレビュー実行（river run .）
 
