@@ -40,6 +40,7 @@ const RATIO_METRICS = new Set([
   'passRate',
   'falsePositiveRate',
   'evidenceRate',
+  'verifierRejectRate',
 ]);
 
 // --- arg parsing -----------------------------------------------------------

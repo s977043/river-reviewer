@@ -510,6 +510,34 @@ export async function generateReview({
     ? { ok: false, invalidCount, samples: formatChecks.filter((c) => !c.ok).slice(0, 3) }
     : { ok: true };
 
+  // Verifier pass: filter findings that fail quality checks
+  const { verifyFinding } = await import('./verifier.mjs');
+  const verifierResults = comments.map((comment) => ({
+    comment,
+    verification: verifyFinding({
+      finding: comment,
+      diff: diff.diffText,
+      skill: plan?.selected?.[0] ?? {},
+    }),
+  }));
+
+  const verified = verifierResults.filter((r) => r.verification.verified).map((r) => r.comment);
+  const rejected = verifierResults.filter((r) => !r.verification.verified);
+
+  debug.verifierRejected = rejected.map((r) => ({
+    file: r.comment.file,
+    line: r.comment.line,
+    reasons: r.verification.reasons,
+  }));
+  debug.verifierStats = {
+    total: comments.length,
+    verified: verified.length,
+    rejected: rejected.length,
+  };
+
+  // Replace comments with verified-only set
+  comments = verified;
+
   return {
     comments,
     prompt: promptInfo.prompt,
