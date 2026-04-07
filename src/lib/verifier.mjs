@@ -10,6 +10,11 @@
  * Internal vocabulary is mapped to output schema equivalents.
  * @see .claude/rules/review-core.md for the canonical mapping
  */
+// Pre-compiled patterns for finding message parsing
+const RE_EVIDENCE = /Evidence:\s*(\S.{4,})/;
+const RE_SEVERITY = /Severity:\s*(\w+)/;
+const RE_ACTIONABLE = /(?:Fix|Suggestion):\s*(.{10,})/;
+
 const SEVERITY_RANK = /** @type {const} */ ({
   info: 0,
   minor: 1,
@@ -43,7 +48,7 @@ function normalizeSeverity(raw) {
  */
 function checkEvidenceExists(finding) {
   const text = String(finding?.message ?? '');
-  const match = /Evidence:\s*(\S.{4,})/.exec(text);
+  const match = RE_EVIDENCE.exec(text);
   return match !== null;
 }
 
@@ -71,7 +76,7 @@ function checkPhaseCoherent(finding, skill) {
  */
 function checkSeverityJustified(finding, skill) {
   const text = String(finding?.message ?? '');
-  const sevMatch = /Severity:\s*(\w+)/.exec(text);
+  const sevMatch = RE_SEVERITY.exec(text);
   if (!sevMatch) return true;
 
   const skillSeverity = skill?.metadata?.severity;
@@ -94,7 +99,7 @@ function checkSeverityJustified(finding, skill) {
  */
 function checkSuggestionActionable(finding) {
   const text = String(finding?.message ?? '');
-  const match = /(?:Fix|Suggestion):\s*(.{10,})/.exec(text);
+  const match = RE_ACTIONABLE.exec(text);
   return match !== null;
 }
 

@@ -139,6 +139,13 @@ async function runFixturesEval() {
 
   const result = await evaluateReviewFixtures({ casesPath, verbose: false });
 
+  // Flatten top failure categories into metrics (preserves normalized result shape)
+  const failureCats = result.summary.failuresByCategory ?? {};
+  const topFailureMetrics = {};
+  for (const [cat, count] of Object.entries(failureCats)) {
+    topFailureMetrics[`fail_${cat}`] = count;
+  }
+
   return {
     name: 'fixtures',
     pass: result.exitCode === 0,
@@ -147,9 +154,9 @@ async function runFixturesEval() {
       passRate: result.summary.passRate,
       falsePositiveRate: result.summary.falsePositiveRate,
       evidenceRate: result.summary.evidenceRate,
+      ...topFailureMetrics,
     },
     errors: result.exitCode === 0 ? [] : ['One or more fixture checks failed'],
-    failuresByCategory: result.summary.failuresByCategory ?? {},
   };
 }
 
@@ -211,11 +218,18 @@ Options:
 
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf-8'));
 
-  // Run independent evals (planner, meta) in parallel; sequential for fixtures and gate
+  // Run independent evals in parallel; gate depends on --gate-input flag
   const parallel = [];
   if (!parsed.skip.has('planner')) {
     parallel.push(
       runPlannerEval().catch((err) => errorResult('planner', `Planner eval error: ${err.message}`))
+    );
+  }
+  if (!parsed.skip.has('fixtures')) {
+    parallel.push(
+      runFixturesEval().catch((err) =>
+        errorResult('fixtures', `Fixtures eval error: ${err.message}`)
+      )
     );
   }
   if (!parsed.skip.has('meta')) {
@@ -226,19 +240,9 @@ Options:
     );
   }
 
-  const [plannerResult, metaResult] = await Promise.all(parallel);
+  const subResults = await Promise.all(parallel);
 
-  const subResults = [];
-  if (plannerResult) subResults.push(plannerResult);
-
-  if (!parsed.skip.has('fixtures')) {
-    try {
-      subResults.push(await runFixturesEval());
-    } catch (err) {
-      subResults.push(errorResult('fixtures', `Fixtures eval error: ${err.message}`));
-    }
-  }
-
+  // Gate requires --gate-input; handle separately
   if (!parsed.skip.has('gate') && parsed.gateInput) {
     const resolvedGateInput = path.resolve(parsed.gateInput);
     if (!fs.existsSync(resolvedGateInput)) {
@@ -253,8 +257,6 @@ Options:
   } else if (!parsed.skip.has('gate') && !parsed.gateInput) {
     subResults.push(skipResult('gate'));
   }
-
-  if (metaResult) subResults.push(metaResult);
 
   // Build envelope
   const scores = {};
@@ -302,13 +304,6 @@ Options:
       if (r.errors.length) {
         for (const e of r.errors) {
           console.log(`       ! ${e}`);
-        }
-      }
-      if (r.failuresByCategory && Object.keys(r.failuresByCategory).length) {
-        const cats = Object.entries(r.failuresByCategory).sort(([, a], [, b]) => b - a);
-        console.log('       top failures:');
-        for (const [cat, count] of cats.slice(0, 3)) {
-          console.log(`         ${cat}: ${count}`);
         }
       }
     }
