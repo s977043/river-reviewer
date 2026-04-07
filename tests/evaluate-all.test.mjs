@@ -21,6 +21,7 @@ test('parseArgs: defaults', () => {
   assert.equal(result.appendLedger, false);
   assert.equal(result.description, '');
   assert.equal(result.json, false);
+  assert.equal(result.persistMemory, false);
   assert.equal(result.help, false);
   assert.equal(result.skip.size, 0);
 });
@@ -56,6 +57,11 @@ test('parseArgs: -h sets help', () => {
 
 test('parseArgs: --help sets help', () => {
   assert.ok(parseArgs(['--help']).help);
+});
+
+test('parseArgs: --persist-memory flag', () => {
+  const result = parseArgs(['--persist-memory']);
+  assert.equal(result.persistMemory, true);
 });
 
 test('parseArgs: unknown flags are ignored', () => {

@@ -10,6 +10,10 @@ artifacts/*
 artifacts/evals/*
 !artifacts/evals/.gitkeep
 
+# Riverbed memory (track directory, ignore data)
+.river/memory/*
+!.river/memory/.gitkeep
+
 # Generated schema/examples backups
 *.schema_*.json
 *_2025*.md
