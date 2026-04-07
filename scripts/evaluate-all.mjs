@@ -85,6 +85,16 @@ function gitBranch() {
   }
 }
 
+// --- result helpers ---------------------------------------------------------
+
+function errorResult(name, message) {
+  return { name, pass: false, skipped: false, metrics: {}, errors: [message] };
+}
+
+function skipResult(name) {
+  return { name, pass: true, skipped: true, metrics: {}, errors: [] };
+}
+
 // --- sub-eval runners -------------------------------------------------------
 
 async function runPlannerEval() {
@@ -104,6 +114,7 @@ async function runPlannerEval() {
   return {
     name: 'planner',
     pass: summary.coverage >= PLANNER_COVERAGE_THRESHOLD,
+    skipped: false,
     metrics: {
       exactMatch: summary.exactMatch,
       top1Match: summary.top1Match,
@@ -123,9 +134,8 @@ async function runFixturesEval() {
   return {
     name: 'fixtures',
     pass: exitCode === 0,
-    metrics: {
-      exitCode,
-    },
+    skipped: false,
+    metrics: { exitCode },
     errors: exitCode === 0 ? [] : ['One or more fixture checks failed'],
   };
 }
@@ -137,6 +147,7 @@ async function runGateEval(inputPath) {
   return {
     name: 'gate',
     pass: result.pass,
+    skipped: false,
     metrics: {},
     errors: result.pass ? [] : [result.summary],
   };
@@ -149,9 +160,8 @@ async function runMetaValidation() {
   return {
     name: 'meta',
     pass: errors.length === 0,
-    metrics: {
-      errorCount: errors.length,
-    },
+    skipped: false,
+    metrics: { errorCount: errors.length },
     errors,
   };
 }
@@ -171,7 +181,6 @@ function appendLedger(entry) {
 
 async function main() {
   const parsed = parseArgs(process.argv.slice(2));
-  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf-8'));
 
   if (parsed.help) {
     console.log(`Usage: node scripts/evaluate-all.mjs [options]
@@ -187,80 +196,54 @@ Options:
     return 0;
   }
 
-  const subResults = [];
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf-8'));
 
+  // Run independent evals (planner, meta) in parallel; sequential for fixtures and gate
+  const parallel = [];
   if (!parsed.skip.has('planner')) {
-    try {
-      subResults.push(await runPlannerEval());
-    } catch (err) {
-      subResults.push({
-        name: 'planner',
-        pass: false,
-        metrics: {},
-        errors: [`Planner eval error: ${err.message}`],
-      });
-    }
+    parallel.push(
+      runPlannerEval().catch((err) => errorResult('planner', `Planner eval error: ${err.message}`))
+    );
   }
+  if (!parsed.skip.has('meta')) {
+    parallel.push(
+      runMetaValidation().catch((err) =>
+        errorResult('meta', `Meta validation error: ${err.message}`)
+      )
+    );
+  }
+
+  const [plannerResult, metaResult] = await Promise.all(parallel);
+
+  const subResults = [];
+  if (plannerResult) subResults.push(plannerResult);
 
   if (!parsed.skip.has('fixtures')) {
     try {
       subResults.push(await runFixturesEval());
     } catch (err) {
-      subResults.push({
-        name: 'fixtures',
-        pass: false,
-        metrics: {},
-        errors: [`Fixtures eval error: ${err.message}`],
-      });
+      subResults.push(errorResult('fixtures', `Fixtures eval error: ${err.message}`));
     }
   }
 
   if (!parsed.skip.has('gate') && parsed.gateInput) {
     const resolvedGateInput = path.resolve(parsed.gateInput);
     if (!fs.existsSync(resolvedGateInput)) {
-      subResults.push({
-        name: 'gate',
-        pass: false,
-        metrics: {},
-        errors: [`Gate input file not found: ${parsed.gateInput}`],
-      });
+      subResults.push(errorResult('gate', `Gate input file not found: ${parsed.gateInput}`));
     } else {
       try {
         subResults.push(await runGateEval(resolvedGateInput));
       } catch (err) {
-        subResults.push({
-          name: 'gate',
-          pass: false,
-          metrics: {},
-          errors: [`Gate eval error: ${err.message}`],
-        });
+        subResults.push(errorResult('gate', `Gate eval error: ${err.message}`));
       }
     }
   } else if (!parsed.skip.has('gate') && !parsed.gateInput) {
-    subResults.push({
-      name: 'gate',
-      pass: true,
-      metrics: {},
-      errors: [],
-      skipped: true,
-    });
+    subResults.push(skipResult('gate'));
   }
 
-  if (!parsed.skip.has('meta')) {
-    try {
-      subResults.push(await runMetaValidation());
-    } catch (err) {
-      subResults.push({
-        name: 'meta',
-        pass: false,
-        metrics: {},
-        errors: [`Meta validation error: ${err.message}`],
-      });
-    }
-  }
+  if (metaResult) subResults.push(metaResult);
 
   // Build envelope
-  const allPass = subResults.every((r) => r.pass);
   const scores = {};
   for (const r of subResults) {
     for (const [k, v] of Object.entries(r.metrics)) {
@@ -281,7 +264,7 @@ Options:
         pass: r.pass,
         errors: r.errors,
       })),
-    status: allPass ? 'pass' : 'fail',
+    status: subResults.every((r) => r.pass) ? 'pass' : 'fail',
     description: parsed.description || undefined,
   };
 
@@ -320,7 +303,7 @@ Options:
     }
   }
 
-  return allPass ? 0 : 1;
+  return envelope.status === 'pass' ? 0 : 1;
 }
 
 export { main as evaluateAll, parseArgs, appendLedger };
