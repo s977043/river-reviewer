@@ -149,6 +149,7 @@ async function runFixturesEval() {
       evidenceRate: result.summary.evidenceRate,
     },
     errors: result.exitCode === 0 ? [] : ['One or more fixture checks failed'],
+    failuresByCategory: result.summary.failuresByCategory ?? {},
   };
 }
 
@@ -301,6 +302,13 @@ Options:
       if (r.errors.length) {
         for (const e of r.errors) {
           console.log(`       ! ${e}`);
+        }
+      }
+      if (r.failuresByCategory && Object.keys(r.failuresByCategory).length) {
+        const cats = Object.entries(r.failuresByCategory).sort(([, a], [, b]) => b - a);
+        console.log('       top failures:');
+        for (const [cat, count] of cats.slice(0, 3)) {
+          console.log(`         ${cat}: ${count}`);
         }
       }
     }
