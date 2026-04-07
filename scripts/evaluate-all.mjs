@@ -27,6 +27,12 @@ import url from 'node:url';
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 
+/** Minimum planner coverage to pass. Conservative initial baseline. */
+const PLANNER_COVERAGE_THRESHOLD = 0.5;
+
+/** Metric keys that represent 0-1 ratios (displayed as percentages). */
+const RATIO_METRICS = new Set(['exactMatch', 'top1Match', 'coverage', 'mrr']);
+
 // --- arg parsing -----------------------------------------------------------
 
 function parseArgs(argv) {
@@ -96,7 +102,7 @@ async function runPlannerEval() {
 
   return {
     name: 'planner',
-    pass: summary.coverage >= 0.5,
+    pass: summary.coverage >= PLANNER_COVERAGE_THRESHOLD,
     metrics: {
       exactMatch: summary.exactMatch,
       top1Match: summary.top1Match,
@@ -164,6 +170,7 @@ function appendLedger(entry) {
 
 async function main() {
   const parsed = parseArgs(process.argv.slice(2));
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf-8'));
 
   if (parsed.help) {
     console.log(`Usage: node scripts/evaluate-all.mjs [options]
@@ -208,16 +215,34 @@ Options:
   }
 
   if (!parsed.skip.has('gate') && parsed.gateInput) {
-    try {
-      subResults.push(await runGateEval(path.resolve(parsed.gateInput)));
-    } catch (err) {
+    const resolvedGateInput = path.resolve(parsed.gateInput);
+    if (!fs.existsSync(resolvedGateInput)) {
       subResults.push({
         name: 'gate',
         pass: false,
         metrics: {},
-        errors: [`Gate eval error: ${err.message}`],
+        errors: [`Gate input file not found: ${parsed.gateInput}`],
       });
+    } else {
+      try {
+        subResults.push(await runGateEval(resolvedGateInput));
+      } catch (err) {
+        subResults.push({
+          name: 'gate',
+          pass: false,
+          metrics: {},
+          errors: [`Gate eval error: ${err.message}`],
+        });
+      }
     }
+  } else if (!parsed.skip.has('gate') && !parsed.gateInput) {
+    subResults.push({
+      name: 'gate',
+      pass: true,
+      metrics: {},
+      errors: [],
+      skipped: true,
+    });
   }
 
   if (!parsed.skip.has('meta')) {
@@ -243,15 +268,18 @@ Options:
   }
 
   const envelope = {
+    version: pkg.version,
     timestamp: new Date().toISOString(),
     commit: gitCommit(),
     branch: gitBranch(),
     scores,
-    results: subResults.map((r) => ({
-      name: r.name,
-      pass: r.pass,
-      errors: r.errors,
-    })),
+    results: subResults
+      .filter((r) => !r.skipped)
+      .map((r) => ({
+        name: r.name,
+        pass: r.pass,
+        errors: r.errors,
+      })),
     status: allPass ? 'pass' : 'fail',
     description: parsed.description || undefined,
   };
@@ -265,11 +293,12 @@ Options:
     console.log(`Status: ${envelope.status.toUpperCase()}\n`);
 
     for (const r of subResults) {
-      const icon = r.pass ? 'PASS' : 'FAIL';
+      const icon = r.skipped ? 'SKIP' : r.pass ? 'PASS' : 'FAIL';
       console.log(`[${icon}] ${r.name}`);
       if (Object.keys(r.metrics).length) {
         for (const [k, v] of Object.entries(r.metrics)) {
-          const display = typeof v === 'number' && v <= 1 && v >= 0 ? `${(v * 100).toFixed(1)}%` : v;
+          const display =
+            typeof v === 'number' && RATIO_METRICS.has(k) ? `${(v * 100).toFixed(1)}%` : v;
           console.log(`       ${k}: ${display}`);
         }
       }
@@ -293,7 +322,7 @@ Options:
   return allPass ? 0 : 1;
 }
 
-export { main as evaluateAll };
+export { main as evaluateAll, parseArgs, appendLedger };
 
 const isDirectRun =
   process.argv[1] &&

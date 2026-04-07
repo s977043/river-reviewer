@@ -1,73 +1,82 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import url from 'node:url';
 
-test('evaluate-all: parseArgs handles all flags', async () => {
-  // Import the module to verify it loads without errors.
-  // The main function is exported as evaluateAll.
-  const mod = await import('../scripts/evaluate-all.mjs');
-  assert.ok(typeof mod.evaluateAll === 'function', 'evaluateAll should be exported');
+import { appendLedger, evaluateAll, parseArgs } from '../scripts/evaluate-all.mjs';
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const ROOT = path.join(__dirname, '..');
+
+test('exports: evaluateAll, parseArgs, appendLedger are functions', () => {
+  assert.equal(typeof evaluateAll, 'function');
+  assert.equal(typeof parseArgs, 'function');
+  assert.equal(typeof appendLedger, 'function');
 });
 
-test('evaluate-all: appendLedger creates file and appends JSONL', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rr-ledger-'));
-  const ledgerPath = path.join(tmpDir, 'results.jsonl');
-
-  const entry1 = { timestamp: '2024-01-01T00:00:00Z', status: 'pass' };
-  const entry2 = { timestamp: '2024-01-02T00:00:00Z', status: 'fail' };
-
-  fs.appendFileSync(ledgerPath, JSON.stringify(entry1) + '\n');
-  fs.appendFileSync(ledgerPath, JSON.stringify(entry2) + '\n');
-
-  const lines = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n');
-  assert.equal(lines.length, 2);
-  assert.deepEqual(JSON.parse(lines[0]), entry1);
-  assert.deepEqual(JSON.parse(lines[1]), entry2);
-
-  fs.rmSync(tmpDir, { recursive: true });
+test('parseArgs: defaults', () => {
+  const result = parseArgs([]);
+  assert.equal(result.gateInput, null);
+  assert.equal(result.appendLedger, false);
+  assert.equal(result.description, '');
+  assert.equal(result.json, false);
+  assert.equal(result.help, false);
+  assert.equal(result.skip.size, 0);
 });
 
-test('evaluate-all: envelope structure is valid', () => {
-  // Simulate building an envelope from sub-results
-  const subResults = [
-    { name: 'planner', pass: true, metrics: { coverage: 0.85 }, errors: [] },
-    { name: 'meta', pass: true, metrics: { errorCount: 0 }, errors: [] },
-  ];
+test('parseArgs: --skip collects multiple values', () => {
+  const result = parseArgs(['--skip', 'planner', '--skip', 'gate']);
+  assert.ok(result.skip.has('planner'));
+  assert.ok(result.skip.has('gate'));
+  assert.equal(result.skip.size, 2);
+});
 
-  const allPass = subResults.every((r) => r.pass);
-  const scores = {};
-  for (const r of subResults) {
-    for (const [k, v] of Object.entries(r.metrics)) {
-      scores[`${r.name}_${k}`] = v;
-    }
+test('parseArgs: all flags combined', () => {
+  const result = parseArgs([
+    '--gate-input',
+    '/tmp/out.json',
+    '--append-ledger',
+    '--description',
+    'test run',
+    '--json',
+    '--skip',
+    'meta',
+  ]);
+  assert.equal(result.gateInput, '/tmp/out.json');
+  assert.equal(result.appendLedger, true);
+  assert.equal(result.description, 'test run');
+  assert.equal(result.json, true);
+  assert.ok(result.skip.has('meta'));
+});
+
+test('parseArgs: -h sets help', () => {
+  assert.ok(parseArgs(['-h']).help);
+});
+
+test('parseArgs: --help sets help', () => {
+  assert.ok(parseArgs(['--help']).help);
+});
+
+test('parseArgs: unknown flags are ignored', () => {
+  const result = parseArgs(['--unknown', 'value']);
+  assert.equal(result.help, false);
+  assert.equal(result.gateInput, null);
+});
+
+test('appendLedger: writes valid JSONL entry', () => {
+  const ledgerPath = path.join(ROOT, 'artifacts', 'evals', 'results.jsonl');
+  const before = fs.existsSync(ledgerPath) ? fs.readFileSync(ledgerPath, 'utf8') : '';
+
+  try {
+    const marker = `__test_${Date.now()}`;
+    appendLedger({ marker, timestamp: new Date().toISOString() });
+
+    const content = fs.readFileSync(ledgerPath, 'utf8');
+    const lastLine = content.trim().split('\n').pop();
+    const parsed = JSON.parse(lastLine);
+    assert.equal(parsed.marker, marker);
+  } finally {
+    fs.writeFileSync(ledgerPath, before);
   }
-
-  const envelope = {
-    timestamp: new Date().toISOString(),
-    commit: 'abc1234',
-    branch: 'main',
-    scores,
-    results: subResults.map((r) => ({ name: r.name, pass: r.pass, errors: r.errors })),
-    status: allPass ? 'pass' : 'fail',
-  };
-
-  assert.equal(envelope.status, 'pass');
-  assert.equal(envelope.scores.planner_coverage, 0.85);
-  assert.equal(envelope.scores.meta_errorCount, 0);
-  assert.equal(envelope.results.length, 2);
-  assert.ok(envelope.timestamp);
-});
-
-test('evaluate-all: envelope status is fail when any sub-eval fails', () => {
-  const subResults = [
-    { name: 'planner', pass: true, metrics: {}, errors: [] },
-    { name: 'fixtures', pass: false, metrics: {}, errors: ['check failed'] },
-  ];
-
-  const allPass = subResults.every((r) => r.pass);
-  const status = allPass ? 'pass' : 'fail';
-
-  assert.equal(status, 'fail');
 });
