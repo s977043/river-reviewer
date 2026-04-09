@@ -248,6 +248,7 @@ export async function planLocalReview({
     plannerMode: requestedPlannerMode,
     dryRun,
     llmEnabled,
+    repoRoot,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -341,6 +342,7 @@ export async function runLocalReview({
     apiKey,
     projectRules: context.projectRules,
     fileTypes: context.plan?.fileTypes,
+    relatedADRs: context.plan?.relatedADRs,
     config: context.config,
   });
 
@@ -408,6 +410,7 @@ export async function doctorLocalReview({
         preferredModelHint,
         skills,
         llmEnabled,
+        repoRoot,
       })
     : null;
 
