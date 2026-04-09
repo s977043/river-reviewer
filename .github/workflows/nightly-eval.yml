@@ -42,7 +42,9 @@ jobs:
         if: always()
         run: |
           node -e "
-            const r = JSON.parse(require('fs').readFileSync('eval-output.json','utf8'));
+            const fs = require('fs');
+            if (!fs.existsSync('eval-output.json')) { console.log('No eval output found'); process.exit(0); }
+            const r = JSON.parse(fs.readFileSync('eval-output.json','utf8'));
             const lines = ['## Nightly Eval Summary', '',
               '| Metric | Value |', '| --- | --- |'];
             for (const [k,v] of Object.entries(r.scores)) {
@@ -50,7 +52,7 @@ jobs:
               lines.push('| ' + k + ' | ' + display + ' |');
             }
             lines.push('', 'Status: **' + r.status.toUpperCase() + '**');
-            require('fs').writeFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n'));
+            fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n'));
           "
 
       - name: Upload eval artifacts
