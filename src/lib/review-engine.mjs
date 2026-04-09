@@ -104,12 +104,37 @@ function buildADRContextSection(relatedADRs) {
   return lines.join('\n');
 }
 
+function sanitizePath(p) {
+  return String(p)
+    .replace(/[\n\r]/g, '')
+    .slice(0, 200);
+}
+
+function buildRiskAssessmentSection(riskAssessment) {
+  if (!riskAssessment) return '';
+  const { escalatedFiles, humanReviewFiles } = riskAssessment;
+  if (!escalatedFiles?.length && !humanReviewFiles?.length) return '';
+  const lines = ['\n### Risk Assessment\n'];
+  if (humanReviewFiles?.length) {
+    lines.push('以下のファイルは人間によるレビューが必須です:');
+    for (const f of humanReviewFiles) lines.push('- ' + sanitizePath(f) + ': require_human_review');
+  }
+  if (escalatedFiles?.length) {
+    lines.push('以下のファイルはエスカレーション対象です:');
+    for (const f of escalatedFiles) lines.push('- ' + sanitizePath(f) + ': escalate');
+  }
+  lines.push('これらのファイルには特に注意してレビューしてください。\n');
+  return lines.join('\n');
+}
+
 export function buildPrompt({
   diffText,
   diffFiles,
   plan,
   phase,
   projectRules,
+  riskAssessment,
+  memoryContext,
   relatedADRs,
   maxChars = MAX_PROMPT_CHARS,
   config = defaultConfig,
@@ -129,7 +154,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}${buildADRContextSection(relatedADRs)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -421,6 +446,7 @@ export async function generateReview({
   projectRules,
   fileTypes,
   relatedADRs,
+  riskAssessment,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -432,6 +458,7 @@ export async function generateReview({
     phase,
     projectRules,
     relatedADRs,
+    riskAssessment,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });

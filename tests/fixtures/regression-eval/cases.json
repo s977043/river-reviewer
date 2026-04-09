@@ -1,0 +1,90 @@
+[
+  {
+    "name": "memory-recall: query by type=wontfix returns matching entries",
+    "category": "memory_recall",
+    "memoryEntries": [
+      { "id": "wf1", "type": "wontfix", "content": "Accepted verbose logging", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test" } },
+      { "id": "r1", "type": "review", "content": "Review result", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test" } }
+    ],
+    "query": { "type": "wontfix" },
+    "expectedIds": ["wf1"]
+  },
+  {
+    "name": "memory-recall: query by tags filters correctly",
+    "category": "memory_recall",
+    "memoryEntries": [
+      { "id": "p1", "type": "pattern", "content": "Auth pattern", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "tags": ["security", "auth"] } },
+      { "id": "p2", "type": "pattern", "content": "Perf pattern", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "tags": ["perf"] } }
+    ],
+    "query": { "tags": ["security"] },
+    "expectedIds": ["p1"]
+  },
+  {
+    "name": "memory-recall: query by phase returns correct entries",
+    "category": "memory_recall",
+    "memoryEntries": [
+      { "id": "u1", "type": "pattern", "content": "Upstream", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "phase": "upstream" } },
+      { "id": "m1", "type": "pattern", "content": "Midstream", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "phase": "midstream" } }
+    ],
+    "query": { "phase": "midstream" },
+    "expectedIds": ["m1"]
+  },
+  {
+    "name": "suppression: active suppression matches by file path",
+    "category": "suppression",
+    "memoryEntries": [
+      { "id": "s1", "type": "suppression", "content": "Accepted", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "relatedFiles": ["src/auth.ts"] }, "context": { "active": true, "scope": "file" } }
+    ],
+    "changedFiles": ["src/auth.ts"],
+    "expectedSuppressionIds": ["s1"]
+  },
+  {
+    "name": "suppression: revoked suppression is excluded",
+    "category": "suppression",
+    "memoryEntries": [
+      { "id": "s1", "type": "suppression", "content": "Accepted", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "relatedFiles": ["src/auth.ts"] }, "context": { "active": true, "scope": "file" } },
+      { "id": "rev1", "type": "resurface", "content": "Revoked", "metadata": { "createdAt": "2026-01-02T00:00:00Z", "author": "test" }, "context": { "suppressionId": "s1", "action": "revoke" } }
+    ],
+    "changedFiles": ["src/auth.ts"],
+    "expectedSuppressionIds": []
+  },
+  {
+    "name": "suppression: expired suppression is excluded",
+    "category": "suppression",
+    "memoryEntries": [
+      { "id": "s1", "type": "suppression", "content": "Temporary", "metadata": { "createdAt": "2024-01-01T00:00:00Z", "author": "test", "relatedFiles": ["src/auth.ts"] }, "context": { "active": true, "scope": "file", "expiresAt": "2025-01-01T00:00:00Z" } }
+    ],
+    "changedFiles": ["src/auth.ts"],
+    "expectedSuppressionIds": []
+  },
+  {
+    "name": "suppression: subsystem scope matches related path",
+    "category": "suppression",
+    "memoryEntries": [
+      { "id": "s1", "type": "suppression", "content": "Auth subsystem", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "relatedFiles": ["src/auth/login.ts"] }, "context": { "active": true, "scope": "subsystem" } }
+    ],
+    "changedFiles": ["src/auth/oauth.ts"],
+    "expectedSuppressionIds": ["s1"]
+  },
+  {
+    "name": "resurfacing: file-scoped suppression resurfaces on same path",
+    "category": "resurfacing",
+    "suppression": { "id": "s1", "type": "suppression", "title": "Suppress auth", "content": "ok", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "relatedFiles": ["src/auth.ts"] }, "context": { "active": true, "scope": "file" } },
+    "changedFiles": ["src/auth.ts"],
+    "expectedResurface": true
+  },
+  {
+    "name": "resurfacing: file-scoped suppression does not resurface on different path",
+    "category": "resurfacing",
+    "suppression": { "id": "s1", "type": "suppression", "title": "Suppress auth", "content": "ok", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "relatedFiles": ["src/auth.ts"] }, "context": { "active": true, "scope": "file" } },
+    "changedFiles": ["src/billing.ts"],
+    "expectedResurface": false
+  },
+  {
+    "name": "resurfacing: inactive suppression does not resurface",
+    "category": "resurfacing",
+    "suppression": { "id": "s1", "type": "suppression", "title": "Inactive", "content": "ok", "metadata": { "createdAt": "2026-01-01T00:00:00Z", "author": "test", "relatedFiles": ["src/auth.ts"] }, "context": { "active": false, "scope": "file" } },
+    "changedFiles": ["src/auth.ts"],
+    "expectedResurface": false
+  }
+]
