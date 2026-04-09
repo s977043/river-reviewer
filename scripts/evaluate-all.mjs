@@ -14,7 +14,7 @@
  *   --append-ledger        Append result to artifacts/evals/results.jsonl
  *   --description <text>   Optional description for ledger entry
  *   --json                 Print result as JSON instead of human-readable
- *   --skip <name>          Skip a sub-eval (planner|fixtures|gate|meta). Repeatable
+ *   --skip <name>          Skip a sub-eval (planner|fixtures|gate|meta|regression). Repeatable
  *   --persist-memory       Write eval result as Riverbed Memory entry
  *   -h, --help             Show help
  */
