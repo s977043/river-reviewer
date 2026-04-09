@@ -166,3 +166,40 @@ test('verifyFinding: multiple failures are all reported', () => {
   assert.equal(result.checks.phaseCoherent, false);
   assert.equal(result.checks.suggestionActionable, false);
 });
+
+test('verifyFinding: evidenceInDiff passes when file is in diff', () => {
+  const result = verifyFinding({
+    finding: {
+      message:
+        'Finding:\nEvidence: hardcoded secret in src/config/auth.ts\nSeverity: warning\nFix: Move the secret to environment variables',
+    },
+    diff: 'diff --git a/src/config/auth.ts b/src/config/auth.ts\n+const secret = "abc";',
+    skill: { metadata: { severity: 'major' } },
+  });
+  assert.equal(result.checks.evidenceInDiff, true);
+});
+
+test('verifyFinding: evidenceInDiff fails when file is not in diff', () => {
+  const result = verifyFinding({
+    finding: {
+      message:
+        'Finding:\nEvidence: hardcoded secret in src/config/auth.ts\nSeverity: warning\nFix: Move the secret to environment variables',
+    },
+    diff: 'diff --git a/src/index.mjs b/src/index.mjs\n+console.log("hello");',
+    skill: { metadata: { severity: 'major' } },
+  });
+  assert.equal(result.checks.evidenceInDiff, false);
+  assert.ok(result.reasons.some((r) => r.includes('file not found in diff')));
+});
+
+test('verifyFinding: evidenceInDiff lenient when no file reference', () => {
+  const result = verifyFinding({
+    finding: {
+      message:
+        'Finding:\nEvidence: the code uses an outdated pattern\nSeverity: warning\nFix: Migrate to the newer API for better performance',
+    },
+    diff: 'diff --git a/src/index.mjs b/src/index.mjs\n+console.log("hello");',
+    skill: { metadata: { severity: 'major' } },
+  });
+  assert.equal(result.checks.evidenceInDiff, true);
+});
