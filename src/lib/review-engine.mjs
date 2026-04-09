@@ -94,12 +94,23 @@ function buildProjectRulesSection(rulesText) {
   return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
 }
 
+function buildADRContextSection(relatedADRs) {
+  if (!relatedADRs?.length) return '';
+  const lines = ['\n### Related ADRs/Specs\n'];
+  for (const adr of relatedADRs.slice(0, 5)) {
+    lines.push(`- ${adr.title} (${adr.path}) — ${adr.matchReason}`);
+  }
+  lines.push('\nこれらの設計文書との整合性を考慮してレビューしてください。\n');
+  return lines.join('\n');
+}
+
 export function buildPrompt({
   diffText,
   diffFiles,
   plan,
   phase,
   projectRules,
+  relatedADRs,
   maxChars = MAX_PROMPT_CHARS,
   config = defaultConfig,
 }) {
@@ -118,7 +129,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildADRContextSection(relatedADRs)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -409,6 +420,7 @@ export async function generateReview({
   apiKey,
   projectRules,
   fileTypes,
+  relatedADRs,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -419,6 +431,7 @@ export async function generateReview({
     plan,
     phase,
     projectRules,
+    relatedADRs,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });
