@@ -341,6 +341,7 @@ export async function runLocalReview({
     apiKey,
     projectRules: context.projectRules,
     fileTypes: context.plan?.fileTypes,
+    relatedADRs: context.plan?.relatedADRs,
     config: context.config,
   });
 
