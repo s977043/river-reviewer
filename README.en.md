@@ -32,7 +32,7 @@ Philosophy: [Why we built it](#philosophy)
 
 Review that Flows With You. 流れに寄り添う AI レビューエージェント。
 
-River Reviewer is a flow-based, metadata-driven AI review agent. It travels the SDLC so design intent, implementation choices, and test coverage stay connected.
+River Reviewer is a context engineering framework for AI code review. It is flow-based and metadata-driven, traveling the SDLC so design intent, implementation choices, and test coverage stay connected.
 
 <a id="philosophy"></a>
 
