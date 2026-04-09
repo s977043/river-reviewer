@@ -33,8 +33,9 @@ jobs:
         run: npm ci
 
       - name: Run unified evaluation
+        env:
+          DESC: ${{ github.event.inputs.description || format('nightly-{0}', github.run_id) }}
         run: |
-          DESC="${{ github.event.inputs.description || format('nightly-{0}', github.run_id) }}"
           npm run eval:all -- --json --append-ledger --description "$DESC" > eval-output.json
           cat eval-output.json
 
