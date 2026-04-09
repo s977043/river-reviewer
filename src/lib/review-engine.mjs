@@ -104,9 +104,10 @@ function buildADRContextSection(relatedADRs) {
   return lines.join('\n');
 }
 
-
 function sanitizePath(p) {
-  return String(p).replace(/[\n\r]/g, '').slice(0, 200);
+  return String(p)
+    .replace(/[\n\r]/g, '')
+    .slice(0, 200);
 }
 
 function buildRiskAssessmentSection(riskAssessment) {

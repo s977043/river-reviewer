@@ -397,10 +397,23 @@ function logPreview(title, text, maxLength, log, { leadingNewline = false } = {}
 function formatRiskSummaryMarkdown(plan) {
   const risk = plan?.riskAssessment;
   if (!risk) return '';
-  const badge = risk.aggregateAction === 'require_human_review' ? '🔴 require_human_review' : risk.aggregateAction === 'escalate' ? '🟡 escalate' : '🟢 comment_only';
+  const badge =
+    risk.aggregateAction === 'require_human_review'
+      ? '🔴 require_human_review'
+      : risk.aggregateAction === 'escalate'
+        ? '🟡 escalate'
+        : '🟢 comment_only';
   const lines = ['### リスク評価\n', '**判定**: ' + badge + '\n'];
-  if (risk.humanReviewFiles?.length) { lines.push('**人間レビュー必須**:'); for (const f of risk.humanReviewFiles) lines.push('- ' + f); lines.push(''); }
-  if (risk.escalatedFiles?.length) { lines.push('**エスカレーション対象**:'); for (const f of risk.escalatedFiles) lines.push('- ' + f); lines.push(''); }
+  if (risk.humanReviewFiles?.length) {
+    lines.push('**人間レビュー必須**:');
+    for (const f of risk.humanReviewFiles) lines.push('- ' + sanitizeForMarkdown(f));
+    lines.push('');
+  }
+  if (risk.escalatedFiles?.length) {
+    lines.push('**エスカレーション対象**:');
+    for (const f of risk.escalatedFiles) lines.push('- ' + sanitizeForMarkdown(f));
+    lines.push('');
+  }
   return lines.join('\n');
 }
 
@@ -489,7 +502,7 @@ function mapSeverity(internalSeverity) {
  */
 function extractField(message, label) {
   const regex = new RegExp(
-    `${label}:\\s*([^]*?)(?=\\s+(?:Finding|Evidence|Impact|Fix|Severity|Confidence):)|${label}:\\s*(.+)$`,
+    `${label}:\\s*([^]*?)(?=\\s+(?:Finding|Evidence|Impact|Fix|Severity|Confidence):)|${label}:\\s*(.+)$`
   );
   const match = (message ?? '').match(regex);
   return (match?.[1] ?? match?.[2] ?? '').trim();
@@ -522,7 +535,13 @@ function formatJsonOutput(result, phase) {
 
   const summary = { issueCountBySeverity, issueCountByPhase };
   const riskAssessment = result.plan?.riskAssessment;
-  if (riskAssessment) { summary.riskSummary = { aggregateAction: riskAssessment.aggregateAction, escalatedFiles: riskAssessment.escalatedFiles, humanReviewFiles: riskAssessment.humanReviewFiles }; }
+  if (riskAssessment) {
+    summary.riskSummary = {
+      aggregateAction: riskAssessment.aggregateAction,
+      escalatedFiles: riskAssessment.escalatedFiles,
+      humanReviewFiles: riskAssessment.humanReviewFiles,
+    };
+  }
   return { issues, summary };
 }
 
@@ -671,7 +690,8 @@ Dependencies: ${
         ? estimator.estimateFromDiff(context.diff, context.plan?.selected ?? [])
         : null;
 
-    const logRunHeader = parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
+    const logRunHeader =
+      parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
     logRunHeader(`River Reviewer (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}
@@ -773,7 +793,10 @@ Dependencies: ${
       ]);
     } else if (error instanceof RiskMapError) {
       console.error(error.message);
-      printHintLines(['Check `.river/risk-map.yaml` format and valid action values.', 'Valid actions: comment_only, escalate, require_human_review']);
+      printHintLines([
+        'Check `.river/risk-map.yaml` format and valid action values.',
+        'Valid actions: comment_only, escalate, require_human_review',
+      ]);
     } else if (error instanceof GitError) {
       console.error(`Git command failed: ${error.message}`);
       printHintLines([
