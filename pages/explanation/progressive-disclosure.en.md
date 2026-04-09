@@ -67,12 +67,12 @@ Each stage narrows the information, so the final context passed to the LLM is "m
 
 ## Current Implementation Status
 
-| Item                                       | Status                      |
-| ------------------------------------------ | --------------------------- |
-| `loadSkills()` — full load of all skills   | ✅ Existing                 |
+| Item | Status |
+|------|--------|
+| `loadSkills()` — full load of all skills | ✅ Existing |
 | `summarizeSkill()` — metadata-only summary | ✅ Existing (Stage 1 proto) |
-| `loadSkillMetadata()` — metadata-only load | 🔜 Planned                  |
-| Explicit Stage 2/3 separation              | 📋 Designed                 |
+| `loadSkillMetadata()` — metadata-only load | 🔜 Planned |
+| Explicit Stage 2/3 separation | 📋 Designed |
 
 ## Related
 

@@ -392,3 +392,72 @@ export async function loadSkills(options = {}) {
 
   return Array.from(skillsById.values());
 }
+
+/**
+ * Load only skill metadata (Stage 1 of Progressive Disclosure).
+ * Returns metadata and path without the body, suitable for filtering
+ * and routing before full skill loading.
+ *
+ * @param {string} filePath
+ * @param {object} [options]
+ * @param {Function} [options.validator]
+ * @param {string} [options.schemaPath]
+ * @returns {Promise<{metadata: SkillMetadata, path: string}>}
+ */
+export async function loadSkillMetadata(filePath, options = {}) {
+  const { validator, schemaPath = defaultSchemaPath } = options;
+  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
+  const parsed = await parseSkillFile(filePath);
+  const metadata = validateMetadata(parsed.metadata, compiledValidator);
+  return {
+    metadata,
+    path: filePath,
+  };
+}
+
+/**
+ * Load metadata for all skills (Stage 1 of Progressive Disclosure).
+ * Returns an array of {metadata, path} objects without skill bodies.
+ *
+ * @param {object} [options]
+ * @param {string} [options.skillsDir]
+ * @param {string} [options.schemaPath]
+ * @param {Function} [options.validator]
+ * @param {string[]} [options.excludedTags]
+ * @returns {Promise<Array<{metadata: SkillMetadata, path: string}>>}
+ */
+export async function loadAllSkillMetadata(options = {}) {
+  const {
+    skillsDir = defaultSkillsDir,
+    schemaPath = defaultSchemaPath,
+    validator: providedValidator,
+    excludedTags = ['agent'],
+  } = options;
+  const schema = providedValidator ? null : await loadSchema(schemaPath);
+  const validator = providedValidator ?? createSkillValidator(schema);
+  const files = await listSkillFiles(skillsDir);
+  const skillsById = new Map();
+
+  for (const filePath of files) {
+    try {
+      const skill = await loadSkillMetadata(filePath, { validator });
+      const id = skill?.metadata?.id;
+      if (!id) {
+        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
+        continue;
+      }
+      if (hasExcludedTag(skill.metadata, excludedTags)) {
+        continue;
+      }
+      if (skillsById.has(id)) {
+        logDuplicateSkill(id, filePath, skillsById.get(id).path);
+        continue;
+      }
+      skillsById.set(id, skill);
+    } catch (err) {
+      logSkillLoadError(filePath, err);
+    }
+  }
+
+  return Array.from(skillsById.values());
+}

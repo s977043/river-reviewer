@@ -48,3 +48,15 @@ tags: ['security', 'owasp']
 ---
 # instructions...
 ```
+
+## Loading Stages
+
+Skill fields correspond to three stages of [Progressive Disclosure](../explanation/progressive-disclosure.en.md).
+
+| Stage | Timing | Fields |
+|-------|--------|--------|
+| 1: Metadata | Always (at startup) | `id`, `name`, `description`, `phase`, `applyTo`, `tags`, `severity`, `inputContext`, `outputKind`, `modelHint`, `dependencies`, `priority` |
+| 2: Instructions | After skill selection | `body` (Markdown body) |
+| 3: References | At review execution | `prompt.system`, `prompt.user`, `fixtures/`, `golden/`, Riverbed Memory entries |
+
+Stage 1 fields are used for filtering and routing. Stage 2 and beyond are used for LLM prompt construction. The loader is designed to complete skill selection using only Stage 1 metadata.
