@@ -14,14 +14,19 @@ export function loadReviewMemory(repoRoot, { phase, changedFiles } = {}) {
         return related.some((r) => changedFiles.includes(r));
       })
     : allEntries;
-  return {
-    entries: relevant,
-    wontfixes: relevant.filter((e) => e.type === 'wontfix'),
-    patterns: relevant.filter((e) => e.type === 'pattern'),
-    decisions: relevant.filter((e) => e.type === 'decision'),
-    reviews: relevant.filter((e) => e.type === 'review'),
-    suppressions: relevant.filter((e) => e.type === 'suppression'),
+  const buckets = { wontfixes: [], patterns: [], decisions: [], reviews: [], suppressions: [] };
+  const typeMap = {
+    wontfix: 'wontfixes',
+    pattern: 'patterns',
+    decision: 'decisions',
+    review: 'reviews',
+    suppression: 'suppressions',
   };
+  for (const e of relevant) {
+    const bucket = typeMap[e.type];
+    if (bucket) buckets[bucket].push(e);
+  }
+  return { entries: relevant, ...buckets };
 }
 
 export function formatMemoryForPrompt(memoryContext, { maxChars = 1500 } = {}) {
@@ -30,7 +35,8 @@ export function formatMemoryForPrompt(memoryContext, { maxChars = 1500 } = {}) {
   const sections = [];
   if (wontfixes?.length) {
     sections.push('以下の指摘は明示的に受け入れ済みです。再指摘は不要です:');
-    for (const w of wontfixes) sections.push('- [' + w.id + '] ' + (w.title || w.content?.slice(0, 80)));
+    for (const w of wontfixes)
+      sections.push('- [' + w.id + '] ' + (w.title || w.content?.slice(0, 80)));
   }
   if (patterns?.length) {
     sections.push('以下はチーム規約として記録されています:');

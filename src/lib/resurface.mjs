@@ -1,4 +1,4 @@
-import { findActiveSuppressions, inferSubsystem } from './suppression.mjs';
+import { findActiveSuppressions, matchesScopeFiles, inferSubsystem } from './suppression.mjs';
 
 /**
  * Check for findings that should be resurfaced based on active suppressions.
@@ -34,19 +34,8 @@ export function shouldResurface(suppression, changedFiles) {
   if (expiresAt && expiresAt < new Date().toISOString()) return false;
 
   const related = suppression.metadata?.relatedFiles ?? [];
-  if (!related.length) return false;
-
   const scope = suppression.context?.scope || 'file';
-
-  if (scope === 'global') return true;
-
-  if (scope === 'subsystem') {
-    const suppressionSubs = new Set(related.map(inferSubsystem).filter(Boolean));
-    return changedFiles.some((fp) => suppressionSubs.has(inferSubsystem(fp)));
-  }
-
-  // file scope: exact path match
-  return changedFiles.some((fp) => related.includes(fp));
+  return matchesScopeFiles(scope, related, changedFiles);
 }
 
 /**
@@ -58,21 +47,18 @@ export function shouldResurface(suppression, changedFiles) {
 function buildResurfaceReason(suppression, changedFiles) {
   const related = suppression.metadata?.relatedFiles ?? [];
   const scope = suppression.context?.scope || 'file';
-  const matchedFiles = changedFiles.filter((fp) => {
-    if (scope === 'global') return true;
-    if (scope === 'subsystem') {
-      const subs = new Set(related.map(inferSubsystem).filter(Boolean));
-      return subs.has(inferSubsystem(fp));
-    }
-    return related.includes(fp);
-  });
+  const matchedFiles = changedFiles.filter((fp) => matchesScopeFiles(scope, related, [fp]));
 
   return (
     '[Resurfaced] ' +
     suppression.title +
-    ' (scope: ' + scope +
-    ', matched: ' + matchedFiles.join(', ') +
-    ', original rationale: ' + (suppression.content || 'N/A') + ')'
+    ' (scope: ' +
+    scope +
+    ', matched: ' +
+    matchedFiles.join(', ') +
+    ', original rationale: ' +
+    (suppression.content || 'N/A') +
+    ')'
   );
 }
 
@@ -87,7 +73,8 @@ export function buildResurfaceComments(candidates) {
     file: c.suppression.metadata?.relatedFiles?.[0] || 'unknown',
     line: 0,
     message:
-      'Finding: ' + c.reason +
+      'Finding: ' +
+      c.reason +
       ' Evidence: Previously suppressed finding resurfaced due to related file change.' +
       ' Impact: Review whether the original suppression rationale still applies.' +
       ' Fix: Confirm suppression is still valid or address the finding.' +
