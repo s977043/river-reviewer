@@ -1,7 +1,8 @@
 import fs from 'node:fs';
-import { queryMemory } from './riverbed-memory.mjs';
+import { loadMemory, queryMemory } from './riverbed-memory.mjs';
 import { findActiveSuppressions } from './suppression.mjs';
 import { shouldResurface } from './resurface.mjs';
+import { evaluateRisk } from './risk-map.mjs';
 
 /**
  * Run regression evaluation cases.
@@ -35,6 +36,12 @@ export async function evaluateRegression({ casesPath, verbose = false }) {
         case 'resurfacing':
           ok = runResurfacingCase(c);
           break;
+        case 'risk_map':
+          ok = runRiskMapCase(c);
+          break;
+        case 'memory_fallback':
+          ok = runMemoryFallbackCase(c);
+          break;
         default:
           error = 'Unknown category: ' + cat;
       }
@@ -58,6 +65,8 @@ export async function evaluateRegression({ casesPath, verbose = false }) {
   const memoryRecallRate = safeRate(categoryStats.memory_recall);
   const suppressionAccuracy = safeRate(categoryStats.suppression);
   const resurfaceAccuracy = safeRate(categoryStats.resurfacing);
+  const escalationAccuracy = safeRate(categoryStats.risk_map);
+  const memoryFallbackRate = safeRate(categoryStats.memory_fallback);
   const policyPassRate = total > 0 ? pass / total : 0;
 
   return {
@@ -69,9 +78,10 @@ export async function evaluateRegression({ casesPath, verbose = false }) {
       fail,
       policyPassRate,
       memoryRecallRate,
-      escalationAccuracy: 1.0, // placeholder until risk-map eval cases are added
+      escalationAccuracy,
       suppressionAccuracy,
       resurfaceAccuracy,
+      memoryFallbackRate,
     },
   };
 }
@@ -103,4 +113,27 @@ function runSuppressionCase(c) {
 function runResurfacingCase(c) {
   const result = shouldResurface(c.suppression, c.changedFiles);
   return result === c.expectedResurface;
+}
+
+function runRiskMapCase(c) {
+  const result = evaluateRisk(c.riskMap, c.changedFiles);
+  if (result.aggregateAction !== c.expectedAggregateAction) return false;
+  const escalated = [...result.escalatedFiles].sort();
+  const expectedEscalated = [...c.expectedEscalatedFiles].sort();
+  if (escalated.length !== expectedEscalated.length) return false;
+  if (!escalated.every((f, i) => f === expectedEscalated[i])) return false;
+  const human = [...result.humanReviewFiles].sort();
+  const expectedHuman = [...c.expectedHumanReviewFiles].sort();
+  if (human.length !== expectedHuman.length) return false;
+  return human.every((f, i) => f === expectedHuman[i]);
+}
+
+function runMemoryFallbackCase(c) {
+  if (c.memoryPath) {
+    const index = loadMemory(c.memoryPath);
+    return index.entries.length === c.expectedEntryCount;
+  }
+  const index = { entries: c.memoryEntries };
+  const results = queryMemory(index, c.query ?? {});
+  return results.length === c.expectedEntryCount;
 }
