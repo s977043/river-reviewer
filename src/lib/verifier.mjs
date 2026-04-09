@@ -126,14 +126,45 @@ function checkEvidenceInDiff(finding, diffText) {
 }
 
 /**
- * @param {{ finding: object, diff: string, skill: object }} params
+ * Expected phase(s) for each file type category from file-classifier.
+ * Lenient: categories not listed here are not checked.
+ */
+const FILE_TYPE_PHASE_MAP = {
+  test: ['downstream'],
+  docs: ['upstream'],
+  schema: ['upstream', 'midstream'],
+  migration: ['upstream', 'midstream'],
+};
+
+/**
+ * Check that the finding's file category is coherent with the finding's phase.
+ * Uses file-classifier output to map file → category → expected phases.
+ * Lenient: returns true when information is insufficient.
+ * @param {{ file?: string, phase?: string }} finding
+ * @param {Record<string, string[]> | null | undefined} fileTypes
+ * @returns {boolean}
+ */
+function checkFilePhaseCoherent(finding, fileTypes) {
+  if (!fileTypes || !finding?.file || !finding?.phase) return true;
+  const fileCategory = Object.entries(fileTypes).find(([, files]) =>
+    files.includes(finding.file)
+  )?.[0];
+  if (!fileCategory) return true;
+  const expectedPhases = FILE_TYPE_PHASE_MAP[fileCategory];
+  if (!expectedPhases) return true;
+  return expectedPhases.includes(finding.phase);
+}
+
+/**
+ * @param {{ finding: object, diff: string, skill: object, fileTypes?: object }} params
  * @returns {{ verified: boolean, reasons: string[], checks: object }}
  */
-export function verifyFinding({ finding, diff, skill }) {
+export function verifyFinding({ finding, diff, skill, fileTypes }) {
   const checks = {
     evidenceExists: checkEvidenceExists(finding),
     evidenceInDiff: checkEvidenceInDiff(finding, diff),
     phaseCoherent: checkPhaseCoherent(finding, skill),
+    filePhaseCoherent: checkFilePhaseCoherent(finding, fileTypes),
     severityJustified: checkSeverityJustified(finding, skill),
     suggestionActionable: checkSuggestionActionable(finding),
   };
@@ -141,6 +172,7 @@ export function verifyFinding({ finding, diff, skill }) {
   const reasons = [];
   if (!checks.evidenceExists) reasons.push('No evidence provided in finding');
   if (!checks.evidenceInDiff) reasons.push('Evidence references file not found in diff');
+  if (!checks.filePhaseCoherent) reasons.push('File type does not match finding phase');
   if (!checks.phaseCoherent)
     reasons.push(
       `Phase mismatch: finding phase does not match skill phase "${skill?.metadata?.phase}"`

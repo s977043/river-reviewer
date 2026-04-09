@@ -203,3 +203,48 @@ test('verifyFinding: evidenceInDiff lenient when no file reference', () => {
   });
   assert.equal(result.checks.evidenceInDiff, true);
 });
+
+test('verifyFinding: filePhaseCoherent passes when file type matches phase', () => {
+  const result = verifyFinding({
+    finding: {
+      file: 'tests/foo.test.mjs',
+      phase: 'downstream',
+      message:
+        'Finding:\nEvidence: test is incomplete\nSeverity: nit\nFix: Add assertion for edge case',
+    },
+    diff: 'diff --git a/tests/foo.test.mjs\n+test()',
+    skill: { metadata: { severity: 'minor' } },
+    fileTypes: { test: ['tests/foo.test.mjs'], app: ['src/index.mjs'] },
+  });
+  assert.equal(result.checks.filePhaseCoherent, true);
+});
+
+test('verifyFinding: filePhaseCoherent rejects when file type mismatches phase', () => {
+  const result = verifyFinding({
+    finding: {
+      file: 'tests/foo.test.mjs',
+      phase: 'upstream',
+      message:
+        'Finding:\nEvidence: test is incomplete\nSeverity: nit\nFix: Add assertion for edge case',
+    },
+    diff: 'diff --git a/tests/foo.test.mjs\n+test()',
+    skill: { metadata: { severity: 'minor' } },
+    fileTypes: { test: ['tests/foo.test.mjs'], app: ['src/index.mjs'] },
+  });
+  assert.equal(result.checks.filePhaseCoherent, false);
+  assert.ok(result.reasons.some((r) => r.includes('File type does not match')));
+});
+
+test('verifyFinding: filePhaseCoherent lenient when fileTypes not provided', () => {
+  const result = verifyFinding({
+    finding: {
+      file: 'tests/foo.test.mjs',
+      phase: 'upstream',
+      message:
+        'Finding:\nEvidence: test is incomplete\nSeverity: nit\nFix: Add assertion for edge case',
+    },
+    diff: 'diff --git a/tests/foo.test.mjs\n+test()',
+    skill: { metadata: { severity: 'minor' } },
+  });
+  assert.equal(result.checks.filePhaseCoherent, true);
+});
