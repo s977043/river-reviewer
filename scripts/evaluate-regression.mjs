@@ -8,7 +8,14 @@ import url from 'node:url';
 import { evaluateRegression } from '../src/lib/regression-eval.mjs';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const DEFAULT_CASES = path.join(__dirname, '..', 'tests', 'fixtures', 'regression-eval', 'cases.json');
+const DEFAULT_CASES = path.join(
+  __dirname,
+  '..',
+  'tests',
+  'fixtures',
+  'regression-eval',
+  'cases.json'
+);
 
 async function main() {
   const args = process.argv.slice(2);
@@ -25,8 +32,14 @@ async function main() {
   console.log('Fail: ' + result.summary.fail);
   console.log('Policy pass rate: ' + (result.summary.policyPassRate * 100).toFixed(1) + '%');
   console.log('Memory recall rate: ' + (result.summary.memoryRecallRate * 100).toFixed(1) + '%');
-  console.log('Suppression accuracy: ' + (result.summary.suppressionAccuracy * 100).toFixed(1) + '%');
+  console.log(
+    'Suppression accuracy: ' + (result.summary.suppressionAccuracy * 100).toFixed(1) + '%'
+  );
   console.log('Resurface accuracy: ' + (result.summary.resurfaceAccuracy * 100).toFixed(1) + '%');
+  console.log('Escalation accuracy: ' + (result.summary.escalationAccuracy * 100).toFixed(1) + '%');
+  console.log(
+    'Memory fallback rate: ' + (result.summary.memoryFallbackRate * 100).toFixed(1) + '%'
+  );
 
   if (result.summary.fail > 0) {
     console.log('\nFailing cases:');
@@ -38,4 +51,11 @@ async function main() {
   return result.exitCode;
 }
 
-main().then((code) => { process.exitCode = code; }).catch((err) => { console.error(err.message); process.exitCode = 1; });
+main()
+  .then((code) => {
+    process.exitCode = code;
+  })
+  .catch((err) => {
+    console.error(err.message);
+    process.exitCode = 1;
+  });
