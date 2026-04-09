@@ -25,7 +25,7 @@
     },
     "evalType": {
       "type": "string",
-      "enum": ["fixtures", "planner"],
+      "enum": ["fixtures", "planner", "regression"],
       "description": "Which evaluation produced this failure."
     },
     "severity": {
