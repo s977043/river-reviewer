@@ -14,7 +14,7 @@
 const RE_EVIDENCE = /Evidence:\s*(\S.{4,})/;
 const RE_SEVERITY = /Severity:\s*(\w+)/;
 const RE_ACTIONABLE = /(?:Fix|Suggestion):\s*(.{10,})/;
-const RE_FILE_REF = /[\w./-]+\.\w{1,10}/g;
+const RE_FILE_REF = /[\w/-]+(?:\.[\w]+)+/g;
 
 const SEVERITY_RANK = /** @type {const} */ ({
   info: 0,
