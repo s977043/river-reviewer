@@ -408,6 +408,7 @@ export async function generateReview({
   model,
   apiKey,
   projectRules,
+  fileTypes,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -510,6 +511,8 @@ export async function generateReview({
     ? { ok: false, invalidCount, samples: formatChecks.filter((c) => !c.ok).slice(0, 3) }
     : { ok: true };
 
+  debug.fileClassification = fileTypes ?? null;
+
   // Verifier pass: filter findings that fail quality checks
   const { verifyFinding } = await import('./verifier.mjs');
   const verifierResults = comments.map((comment) => ({
@@ -518,6 +521,7 @@ export async function generateReview({
       finding: comment,
       diff: diff.diffText,
       skill: plan?.selected?.[0] ?? {},
+      fileTypes,
     }),
   }));
 
