@@ -1,0 +1,64 @@
+name: Nightly Eval
+
+on:
+  schedule:
+    # Run daily at 04:00 JST (19:00 UTC previous day)
+    - cron: '0 19 * * *'
+  workflow_dispatch:
+    inputs:
+      description:
+        description: 'Optional description for the ledger entry'
+        required: false
+        default: ''
+
+concurrency:
+  group: nightly-eval
+  cancel-in-progress: true
+
+jobs:
+  eval:
+    name: Unified evaluation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unified evaluation
+        run: |
+          DESC="${{ github.event.inputs.description || format('nightly-{0}', github.run_id) }}"
+          npm run eval:all -- --json --append-ledger --description "$DESC" > eval-output.json
+          cat eval-output.json
+
+      - name: Generate summary
+        if: always()
+        run: |
+          node -e "
+            const r = JSON.parse(require('fs').readFileSync('eval-output.json','utf8'));
+            const lines = ['## Nightly Eval Summary', '',
+              '| Metric | Value |', '| --- | --- |'];
+            for (const [k,v] of Object.entries(r.scores)) {
+              const display = typeof v === 'number' && v <= 1 ? (v*100).toFixed(1)+'%' : v;
+              lines.push('| ' + k + ' | ' + display + ' |');
+            }
+            lines.push('', 'Status: **' + r.status.toUpperCase() + '**');
+            require('fs').writeFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n'));
+          "
+
+      - name: Upload eval artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-eval-${{ github.run_id }}
+          path: |
+            eval-output.json
+            artifacts/evals/results.jsonl
+          retention-days: 90
