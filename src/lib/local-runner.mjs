@@ -10,6 +10,7 @@ import { createOpenAIPlanner } from './openai-planner.mjs';
 import { normalizePlannerMode } from './planner-utils.mjs';
 import { buildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { loadProjectRules } from './rules.mjs';
+import { loadRiskMap } from './risk-map.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import { isLlmEnabled, parseList } from './utils.mjs';
 
@@ -109,6 +110,7 @@ async function collectLocalContext({
   const { config, path: configPath, source: configSource } = await configLoader.load(repoRoot);
   const prLabels = await resolvePullRequestLabels();
   const { rulesText: projectRules } = await loadProjectRules(repoRoot);
+  const riskMap = await loadRiskMap(repoRoot);
   const defaultBranch = await detectDefaultBranch(repoRoot);
   const mergeBase = await findMergeBase(repoRoot, defaultBranch);
   const rawDiff = await collectRepoDiff(repoRoot, mergeBase, { contextLines });
@@ -123,6 +125,7 @@ async function collectLocalContext({
     configPath,
     configSource,
     projectRules,
+    riskMap,
     defaultBranch,
     mergeBase,
     diff,
@@ -154,6 +157,7 @@ export async function planLocalReview({
   const {
     repoRoot,
     projectRules,
+    riskMap,
     defaultBranch,
     mergeBase,
     diff,
@@ -234,6 +238,7 @@ export async function planLocalReview({
     plannerMode: requestedPlannerMode,
     dryRun,
     llmEnabled,
+    riskMap,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -328,6 +333,7 @@ export async function runLocalReview(
     model,
     apiKey,
     projectRules: context.projectRules,
+    riskAssessment: context.plan?.riskAssessment ?? null,
     config: context.config,
   });
 

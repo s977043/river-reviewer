@@ -15,6 +15,7 @@ import { renderDiffText } from './lib/diff-optimizer.mjs';
 import CostEstimator from './core/cost-estimator.mjs';
 import { SkillDispatcher } from './core/skill-dispatcher.mjs';
 import { ProjectRulesError } from './lib/rules.mjs';
+import { RiskMapError } from './lib/risk-map.mjs';
 import { parseList } from './lib/utils.mjs';
 import { PLANNER_MODES } from './lib/planner-utils.mjs';
 
@@ -393,6 +394,8 @@ function logPreview(title, text, maxLength, log, { leadingNewline = false } = {}
   log(preview);
 }
 
+function formatRiskSummaryMarkdown(plan){const risk=plan?.riskAssessment;if(!risk)return'';const badge=risk.aggregateAction==="require_human_review"?"🔴 require_human_review":risk.aggregateAction==="escalate"?"🟡 escalate":"🟢 comment_only";const lines=["### リスク評価\n","**判定**: "+badge+"\n"];if(risk.humanReviewFiles?.length){lines.push("**人間レビュー必須**:");for(const f of risk.humanReviewFiles)lines.push("- \`"+sanitizeForMarkdown(f)+"\`");lines.push('');}if(risk.escalatedFiles?.length){lines.push("**エスカレーション対象**:");for(const f of risk.escalatedFiles)lines.push("- \`"+sanitizeForMarkdown(f)+"\`");lines.push('');}return lines.join("\n");}
+
 function printMarkdownReport(result, phase) {
   const header = `${COMMENT_MARKER}
 ## River Reviewer
@@ -401,8 +404,9 @@ function printMarkdownReport(result, phase) {
 ${formatDebugSummaryMarkdown(result)}
 `;
   const planSection = formatPlanMarkdown(result.plan);
+  const riskSection = formatRiskSummaryMarkdown(result.plan);
   const findings = `### 指摘\n${formatCommentsMarkdown(result.comments)}\n`;
-  console.log([header, planSection, findings].join('\n'));
+  console.log([header, planSection, riskSection, findings].join('\n'));
 }
 
 function printDebugInfo(result, { log = console.log } = {}) {
@@ -508,7 +512,7 @@ function formatJsonOutput(result, phase) {
     };
   });
 
-  return { issues, summary: { issueCountBySeverity, issueCountByPhase } };
+  const summary={issueCountBySeverity,issueCountByPhase};const riskAssessment=result.plan?.riskAssessment;if(riskAssessment){summary.riskSummary={aggregateAction:riskAssessment.aggregateAction,escalatedFiles:riskAssessment.escalatedFiles,humanReviewFiles:riskAssessment.humanReviewFiles};}return{issues,summary};
 }
 
 function countChangedLines(files) {
@@ -756,6 +760,9 @@ Dependencies: ${
         'Check `.river/rules.md` exists and is readable (or remove it to disable rules).',
         'Docs: README.md (Project-specific review rules)',
       ]);
+    } else if (error instanceof RiskMapError) {
+      console.error(error.message);
+      printHintLines(['Check  format and valid action values.','Valid actions: comment_only, escalate, require_human_review']);
     } else if (error instanceof GitError) {
       console.error(`Git command failed: ${error.message}`);
       printHintLines([

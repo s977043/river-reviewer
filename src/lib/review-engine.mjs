@@ -94,12 +94,16 @@ function buildProjectRulesSection(rulesText) {
   return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
 }
 
+function sanitizePath(p){return String(p).replace(/[\\n\\r]/g,'').slice(0,200);}
+function buildRiskAssessmentSection(ra){if(!ra)return'';const{escalatedFiles,humanReviewFiles}=ra;if(!escalatedFiles?.length&&!humanReviewFiles?.length)return'';const l=["\\n### Risk Assessment\\n"];if(humanReviewFiles?.length){l.push("以下のファイルは人間によるレビューが必須です:");for(const f of humanReviewFiles)l.push("- "+sanitizePath(f)+": require_human_review");}if(escalatedFiles?.length){l.push("以下のファイルはエスカレーション対象です:");for(const f of escalatedFiles)l.push("- "+sanitizePath(f)+": escalate");}l.push("これらのファイルには特に注意してレビューしてください。\\n");return l.join("\\n");}
+
 export function buildPrompt({
   diffText,
   diffFiles,
   plan,
   phase,
   projectRules,
+  riskAssessment,
   maxChars = MAX_PROMPT_CHARS,
   config = defaultConfig,
 }) {
@@ -118,7 +122,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -408,6 +412,7 @@ export async function generateReview({
   model,
   apiKey,
   projectRules,
+  riskAssessment,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -418,6 +423,7 @@ export async function generateReview({
     plan,
     phase,
     projectRules,
+    riskAssessment,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });

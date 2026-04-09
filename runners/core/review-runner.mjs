@@ -5,6 +5,7 @@ import { inferImpactTags } from '../../src/lib/impact-scope.mjs';
 import { classifyChangedFiles } from '../../src/lib/file-classifier.mjs';
 import { normalizePlannerMode } from '../../src/lib/planner-utils.mjs';
 import { HEURISTIC_SKILL_IDS } from '../../src/lib/heuristic-review.mjs';
+import { evaluateRisk } from '../../src/lib/risk-map.mjs';
 
 const MODEL_PRIORITY = {
   cheap: 1,
@@ -187,6 +188,7 @@ export async function buildExecutionPlan(options) {
     diffText,
     dryRun = false,
     llmEnabled = true,
+    riskMap,
   } = options;
 
   const skills = providedSkills ?? (await loadSkills());
@@ -204,6 +206,7 @@ export async function buildExecutionPlan(options) {
 
   const impactTags = inferImpactTags(changedFiles, { diffText });
   const fileTypes = classifyChangedFiles(changedFiles);
+  const riskAssessment = riskMap ? evaluateRisk(riskMap, changedFiles) : null;
 
   // If planner is provided, try LLM-based planning, fallback to deterministic rank
   const effectivePlannerMode = planner
@@ -235,6 +238,7 @@ export async function buildExecutionPlan(options) {
       ...(fallback ? { plannerError: reasons?.[0]?.reason ?? 'planner fallback' } : {}),
       impactTags,
       fileTypes,
+      ...(riskAssessment ? { riskAssessment } : {}),
     };
   }
 
@@ -246,6 +250,7 @@ export async function buildExecutionPlan(options) {
     skipped: selection.skipped,
     impactTags,
     fileTypes,
+    ...(riskAssessment ? { riskAssessment } : {}),
   };
 }
 
