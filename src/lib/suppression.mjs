@@ -74,7 +74,11 @@ export function createSuppression({
  * @param {{ author?: string, reason?: string }} options
  * @returns {object} The resurface entry
  */
-export function revokeSuppression(indexPath, suppressionId, { author = 'river-reviewer', reason = 'revoked' } = {}) {
+export function revokeSuppression(
+  indexPath,
+  suppressionId,
+  { author = 'river-reviewer', reason = 'revoked' } = {}
+) {
   const entry = {
     id: 'resurface-' + suppressionId + '-' + Date.now(),
     type: 'resurface',
@@ -96,6 +100,24 @@ export function revokeSuppression(indexPath, suppressionId, { author = 'river-re
 }
 
 /**
+ * Check if any of the changed files match the suppression's scope.
+ * Shared by findActiveSuppressions and resurface logic.
+ * @param {string} scope - 'global' | 'subsystem' | 'file'
+ * @param {string[]} relatedFiles - Files associated with the suppression
+ * @param {string[]} changedFiles - Files in the current change set
+ * @returns {boolean}
+ */
+export function matchesScopeFiles(scope, relatedFiles, changedFiles) {
+  if (!relatedFiles.length || !changedFiles.length) return false;
+  if (scope === 'global') return true;
+  if (scope === 'subsystem') {
+    const suppressionSubs = new Set(relatedFiles.map(inferSubsystem).filter(Boolean));
+    return changedFiles.some((fp) => suppressionSubs.has(inferSubsystem(fp)));
+  }
+  return changedFiles.some((fp) => relatedFiles.includes(fp));
+}
+
+/**
  * Find active suppressions that overlap with the given file paths.
  * Filters out expired and revoked suppressions.
  * @param {{ entries: object[] }} index - Loaded memory index
@@ -108,7 +130,7 @@ export function findActiveSuppressions(index, filePaths) {
     queryMemory(index, { type: 'resurface' })
       .filter((e) => e.context?.action === 'revoke')
       .map((e) => e.context?.suppressionId)
-      .filter(Boolean),
+      .filter(Boolean)
   );
 
   const now = new Date().toISOString();
@@ -119,17 +141,7 @@ export function findActiveSuppressions(index, filePaths) {
     if (s.context?.expiresAt && s.context.expiresAt < now) return false;
 
     const related = s.metadata?.relatedFiles ?? [];
-    if (!related.length) return false;
-
     const scope = s.context?.scope || 'file';
-    if (scope === 'global') return true;
-
-    if (scope === 'subsystem') {
-      const suppressionSubs = new Set(related.map(inferSubsystem).filter(Boolean));
-      return filePaths.some((fp) => suppressionSubs.has(inferSubsystem(fp)));
-    }
-
-    // default: file scope - exact path match
-    return filePaths.some((fp) => related.includes(fp));
+    return matchesScopeFiles(scope, related, filePaths);
   });
 }

@@ -92,40 +92,35 @@ function safeRate(stats) {
   return total > 0 ? stats.pass / total : 1.0;
 }
 
+function arraysEqualSorted(a, b) {
+  const sa = [...a].sort();
+  const sb = [...b].sort();
+  return sa.length === sb.length && sa.every((v, i) => v === sb[i]);
+}
+
 function runMemoryRecallCase(c) {
   const index = { entries: c.memoryEntries };
-  const results = queryMemory(index, c.query);
-  const resultIds = results.map((e) => e.id).sort();
-  const expectedIds = [...c.expectedIds].sort();
-  if (resultIds.length !== expectedIds.length) return false;
-  return resultIds.every((id, i) => id === expectedIds[i]);
+  const resultIds = queryMemory(index, c.query).map((e) => e.id);
+  return arraysEqualSorted(resultIds, c.expectedIds);
 }
 
 function runSuppressionCase(c) {
   const index = { entries: c.memoryEntries };
-  const active = findActiveSuppressions(index, c.changedFiles);
-  const activeIds = active.map((s) => s.id).sort();
-  const expectedIds = [...c.expectedSuppressionIds].sort();
-  if (activeIds.length !== expectedIds.length) return false;
-  return activeIds.every((id, i) => id === expectedIds[i]);
+  const activeIds = findActiveSuppressions(index, c.changedFiles).map((s) => s.id);
+  return arraysEqualSorted(activeIds, c.expectedSuppressionIds);
 }
 
 function runResurfacingCase(c) {
-  const result = shouldResurface(c.suppression, c.changedFiles);
-  return result === c.expectedResurface;
+  return shouldResurface(c.suppression, c.changedFiles) === c.expectedResurface;
 }
 
 function runRiskMapCase(c) {
   const result = evaluateRisk(c.riskMap, c.changedFiles);
   if (result.aggregateAction !== c.expectedAggregateAction) return false;
-  const escalated = [...result.escalatedFiles].sort();
-  const expectedEscalated = [...c.expectedEscalatedFiles].sort();
-  if (escalated.length !== expectedEscalated.length) return false;
-  if (!escalated.every((f, i) => f === expectedEscalated[i])) return false;
-  const human = [...result.humanReviewFiles].sort();
-  const expectedHuman = [...c.expectedHumanReviewFiles].sort();
-  if (human.length !== expectedHuman.length) return false;
-  return human.every((f, i) => f === expectedHuman[i]);
+  return (
+    arraysEqualSorted(result.escalatedFiles, c.expectedEscalatedFiles) &&
+    arraysEqualSorted(result.humanReviewFiles, c.expectedHumanReviewFiles)
+  );
 }
 
 function runMemoryFallbackCase(c) {
