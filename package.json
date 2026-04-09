@@ -52,7 +52,8 @@
     "codex:local": "CODEX_HOME=\"$(git rev-parse --show-toplevel)/.codex\" codex -C \"$(git rev-parse --show-toplevel)\"",
     "codex:exec": "CODEX_HOME=\"$(git rev-parse --show-toplevel)/.codex\" codex exec -C \"$(git rev-parse --show-toplevel)\"",
     "river": "node ./src/cli.mjs",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "eval:regression": "node scripts/evaluate-regression.mjs"
   },
   "dependencies": {
     "@docusaurus/core": "^3.5.0",
