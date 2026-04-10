@@ -16,46 +16,46 @@ The Review Artifact schema provides a complete record of a review execution.
 
 ### Top-Level
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `version` | `string` | Yes | Schema version. Currently always `"1"`. |
-| `timestamp` | `string` (date-time) | Yes | ISO 8601 timestamp of when the review run completed. |
-| `phase` | `string` | Yes | SDLC phase of the review. `upstream` / `midstream` / `downstream`. |
-| `status` | `string` | Yes | Terminal status. `ok` / `no-changes` / `skipped-by-label` / `error`. |
-| `plan` | `object` | No | Execution plan. See below. |
-| `findings` | `array` | No | Array of review findings. Each item conforms to the issue schema in `output.schema.json`. |
-| `context` | `object` | No | Repository and diff context. |
-| `debug` | `object` | No | Free-form debug information. Structure is not guaranteed across versions. |
+| Field       | Type                 | Required | Description                                                                               |
+| ----------- | -------------------- | -------- | ----------------------------------------------------------------------------------------- |
+| `version`   | `string`             | Yes      | Schema version. Currently always `"1"`.                                                   |
+| `timestamp` | `string` (date-time) | Yes      | ISO 8601 timestamp of when the review run completed.                                      |
+| `phase`     | `string`             | Yes      | SDLC phase of the review. `upstream` / `midstream` / `downstream`.                        |
+| `status`    | `string`             | Yes      | Terminal status. `ok` / `no-changes` / `skipped-by-label` / `error`.                      |
+| `plan`      | `object`             | No       | Execution plan. See below.                                                                |
+| `findings`  | `array`              | No       | Array of review findings. Each item conforms to the issue schema in `output.schema.json`. |
+| `context`   | `object`             | No       | Repository and diff context.                                                              |
+| `debug`     | `object`             | No       | Free-form debug information. Structure is not guaranteed across versions.                 |
 
 ### `plan` Object
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `selectedSkills` | `array` | Skills selected for execution. Each item has `id` (required), `name` (required), `phase`, and `modelHint`. |
-| `skippedSkills` | `array` | Skills excluded from the run. Each item has `id` (required) and `reasons` (required, string array). |
-| `plannerMode` | `string` | AI planner mode. `off` / `order` / `prune`. |
-| `plannerReasons` | `array` | Per-skill reasoning from the AI planner. Each item has `id` and `reason`. |
-| `impactTags` | `array` | Tags describing the impact area of changes (e.g. `security`, `performance`). |
+| Field            | Type     | Description                                                                                                |
+| ---------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `selectedSkills` | `array`  | Skills selected for execution. Each item has `id` (required), `name` (required), `phase`, and `modelHint`. |
+| `skippedSkills`  | `array`  | Skills excluded from the run. Each item has `id` (required) and `reasons` (required, string array).        |
+| `plannerMode`    | `string` | AI planner mode. `off` / `order` / `prune`.                                                                |
+| `plannerReasons` | `array`  | Per-skill reasoning from the AI planner. Each item has `id` and `reason`.                                  |
+| `impactTags`     | `array`  | Tags describing the impact area of changes (e.g. `security`, `performance`).                               |
 
 ### `context` Object
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `repoRoot` | `string` | Absolute path to the repository root. |
-| `defaultBranch` | `string` | Default branch name (e.g. `main`). |
-| `mergeBase` | `string` | Git merge-base commit SHA used for diffing. |
-| `changedFiles` | `array` | List of file paths included in the review diff. |
-| `tokenEstimate` | `number` | Estimated token count of the optimized diff text. |
-| `reduction` | `number` | Percentage of tokens saved by diff optimization (0--100). |
+| Field           | Type     | Description                                               |
+| --------------- | -------- | --------------------------------------------------------- |
+| `repoRoot`      | `string` | Absolute path to the repository root.                     |
+| `defaultBranch` | `string` | Default branch name (e.g. `main`).                        |
+| `mergeBase`     | `string` | Git merge-base commit SHA used for diffing.               |
+| `changedFiles`  | `array`  | List of file paths included in the review diff.           |
+| `tokenEstimate` | `number` | Estimated token count of the optimized diff text.         |
+| `reduction`     | `number` | Percentage of tokens saved by diff optimization (0--100). |
 
 ### `status` Values
 
-| Value | Meaning |
-|-------|---------|
-| `ok` | Review completed successfully. |
-| `no-changes` | No diff to review. |
+| Value              | Meaning                                  |
+| ------------------ | ---------------------------------------- |
+| `ok`               | Review completed successfully.           |
+| `no-changes`       | No diff to review.                       |
 | `skipped-by-label` | Run was skipped due to a PR label match. |
-| `error` | An error occurred during the run. |
+| `error`            | An error occurred during the run.        |
 
 ## Downstream Consumers
 
