@@ -2,15 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Evaluation Ledger Entry",
   "type": "object",
-  "required": [
-    "version",
-    "timestamp",
-    "commit",
-    "branch",
-    "scores",
-    "results",
-    "status"
-  ],
+  "required": ["version", "timestamp", "commit", "branch", "scores", "results", "status"],
   "properties": {
     "version": {
       "type": "string"
@@ -35,10 +27,7 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": [
-          "name",
-          "pass"
-        ],
+        "required": ["name", "pass"],
         "properties": {
           "name": {
             "type": "string"
@@ -57,10 +46,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "pass",
-        "fail"
-      ]
+      "enum": ["pass", "fail"]
     },
     "description": {
       "type": "string"
@@ -75,27 +61,17 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": [
-          "dimensionId",
-          "score"
-        ],
+        "required": ["dimensionId", "score"],
         "properties": {
           "dimensionId": {
             "type": "string"
           },
           "score": {
-            "type": [
-              "number",
-              "null"
-            ]
+            "type": ["number", "null"]
           },
           "method": {
             "type": "string",
-            "enum": [
-              "binary",
-              "ratio",
-              "manual"
-            ]
+            "enum": ["binary", "ratio", "manual"]
           },
           "details": {
             "type": "string"

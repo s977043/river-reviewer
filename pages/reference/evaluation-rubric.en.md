@@ -4,15 +4,15 @@ River Reviewer's evaluation framework provides a rubric to quantify review quali
 
 ## Dimension List
 
-| ID | Name | Description | Weight | Scoring Method | Automatable |
-| --- | --- | --- | --- | --- | --- |
-| `detection_accuracy` | Detection Accuracy | Whether the review detected expected issues | 0.25 | ratio | Yes |
-| `false_positive_rate` | False Positive Rate | Proportion of erroneous findings on guard cases | 0.20 | ratio | Yes |
-| `evidence_quality` | Evidence Quality | Whether findings include Evidence labels | 0.15 | ratio | Yes |
-| `severity_alignment` | Severity Alignment | Whether assigned severity matches expectation | 0.15 | ratio | Yes |
-| `phase_consistency` | Phase Consistency | Whether findings are consistent with the review phase | 0.10 | binary | Yes |
-| `actionability` | Actionability | Whether findings include actionable improvement suggestions | 0.10 | manual | No |
-| `token_efficiency` | Token Efficiency | Output efficiency relative to the Context Budget | 0.05 | ratio | Yes |
+| ID                    | Name                | Description                                                 | Weight | Scoring Method | Automatable |
+| --------------------- | ------------------- | ----------------------------------------------------------- | ------ | -------------- | ----------- |
+| `detection_accuracy`  | Detection Accuracy  | Whether the review detected expected issues                 | 0.25   | ratio          | Yes         |
+| `false_positive_rate` | False Positive Rate | Proportion of erroneous findings on guard cases             | 0.20   | ratio          | Yes         |
+| `evidence_quality`    | Evidence Quality    | Whether findings include Evidence labels                    | 0.15   | ratio          | Yes         |
+| `severity_alignment`  | Severity Alignment  | Whether assigned severity matches expectation               | 0.15   | ratio          | Yes         |
+| `phase_consistency`   | Phase Consistency   | Whether findings are consistent with the review phase       | 0.10   | binary         | Yes         |
+| `actionability`       | Actionability       | Whether findings include actionable improvement suggestions | 0.10   | manual         | No          |
+| `token_efficiency`    | Token Efficiency    | Output efficiency relative to the Context Budget            | 0.05   | ratio          | Yes         |
 
 Weights sum to 1.0.
 
