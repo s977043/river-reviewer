@@ -7,7 +7,16 @@
   "$defs": {
     "entryType": {
       "type": "string",
-      "enum": ["adr", "review", "wontfix", "pattern", "decision", "eval_result", "suppression", "resurface"]
+      "enum": [
+        "adr",
+        "review",
+        "wontfix",
+        "pattern",
+        "decision",
+        "eval_result",
+        "suppression",
+        "resurface"
+      ]
     },
     "phase": {
       "type": "string",

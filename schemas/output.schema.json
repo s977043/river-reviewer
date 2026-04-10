@@ -106,7 +106,10 @@
           "required": ["aggregateAction", "escalatedFiles", "humanReviewFiles"],
           "additionalProperties": false,
           "properties": {
-            "aggregateAction": { "type": "string", "enum": ["comment_only", "escalate", "require_human_review"] },
+            "aggregateAction": {
+              "type": "string",
+              "enum": ["comment_only", "escalate", "require_human_review"]
+            },
             "escalatedFiles": { "type": "array", "items": { "type": "string" } },
             "humanReviewFiles": { "type": "array", "items": { "type": "string" } }
           }
