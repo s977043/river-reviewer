@@ -35683,7 +35683,7 @@ function normalizeHeuristicComments(rawComments) {
             evidence: 'catch 内で return（ログ/再throwなし）',
             impact: '障害調査や失敗検知が困難になる',
             fix: 'ログ+再throw / 上位へ返す / 無視するなら理由コメント+計測を検討する',
-            severity: 'warning',
+            severity: 'nit',
             confidence: 'high',
           }),
         };
