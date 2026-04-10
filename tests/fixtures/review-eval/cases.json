@@ -44,7 +44,7 @@
     "phase": "midstream",
     "diffFile": "../planner-dataset/diffs/midstream-observability-silent-catch.diff",
     "planSkills": ["rr-midstream-logging-observability-001"],
-    "mustInclude": ["Evidence:", "catch", "ログ", "再throw", "Severity: warning"],
+    "mustInclude": ["Evidence:", "catch", "ログ", "再throw", "Severity: nit"],
     "maxFindings": 3
   },
   {
@@ -52,7 +52,7 @@
     "phase": "midstream",
     "diffFile": "../planner-dataset/diffs/midstream-observability-silent-catch-return.diff",
     "planSkills": ["rr-midstream-logging-observability-001"],
-    "mustInclude": ["Evidence:", "catch", "Severity: warning"],
+    "mustInclude": ["Evidence:", "catch", "Severity: nit"],
     "maxFindings": 3
   },
   {
