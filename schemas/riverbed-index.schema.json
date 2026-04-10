@@ -27,7 +27,8 @@
           "enum": ["upstream", "midstream", "downstream"]
         },
         "createdAt": { "type": "string", "format": "date-time" },
-        "summary": { "type": "string" }
+        "summary": { "type": "string" },
+        "status": { "type": "string" }
       }
     }
   },
