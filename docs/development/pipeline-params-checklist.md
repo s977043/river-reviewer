@@ -30,6 +30,12 @@
 
 - [ ] `runners/core/review-runner.mjs`—options destructuring と返却オブジェクト（planner あり/なし両方）
 - [ ] `src/lib/local-runner.mjs`—`planLocalReview` の2箇所（main path + collectLocalContext path）の `buildExecutionPlan` 呼び出し
+- [ ] `runners/node-api/src/index.ts`—TypeScript wrapper の options 型と `coreBuildExecutionPlan` への forward。wrapper は明示的に destructure するため、新フィールドを追加しないとサイレントに drop される
+- [ ] `runners/cli/src/commands/review.mjs`—`reviewCommand` 内の `buildExecutionPlan` 呼び出し（`runners/cli/` 独立 CLI パッケージ）
+- [ ] `src/lib/planner-dataset-eval.mjs`—planner dataset eval 用の `buildExecutionPlan` 呼び出し
+- [ ] `tests/review-runner.test.mjs`—`buildExecutionPlan` の主要ユニットテスト（order/prune/planner fallback/fileTypes/llmEnabled など）
+- [ ] `tests/review-runner.snapshot.test.mjs`—スナップショットテスト
+- [ ] `tests/skill-routing-regression.test.mjs`—ADR/依存有無による routing 回帰テスト
 - [ ] plan 経由で下流関数に渡される場合は下流関数のチェックリストも確認
 
 ## 確認方法
