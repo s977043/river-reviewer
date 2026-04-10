@@ -2,7 +2,7 @@
 import './sourcemap-register.cjs';import { createRequire as __WEBPACK_EXTERNAL_createRequire } from "module";
 /******/ var __webpack_modules__ = ({
 
-/***/ 779:
+/***/ 5543:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -216,14 +216,14 @@ function regex(str) {
 
 /***/ }),
 
-/***/ 2815:
+/***/ 8003:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const formats_1 = __nccwpck_require__(779);
-const limit_1 = __nccwpck_require__(1284);
-const codegen_1 = __nccwpck_require__(1436);
+const formats_1 = __nccwpck_require__(5543);
+const limit_1 = __nccwpck_require__(6440);
+const codegen_1 = __nccwpck_require__(8600);
 const fullName = new codegen_1.Name("fullFormats");
 const fastName = new codegen_1.Name("fastFormats");
 const formatsPlugin = (ajv, opts = { keywords: true }) => {
@@ -259,14 +259,14 @@ exports["default"] = formatsPlugin;
 
 /***/ }),
 
-/***/ 1284:
+/***/ 6440:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.formatLimitDefinition = void 0;
-const ajv_1 = __nccwpck_require__(2463);
-const codegen_1 = __nccwpck_require__(1436);
+const ajv_1 = __nccwpck_require__(3979);
+const codegen_1 = __nccwpck_require__(8600);
 const ops = codegen_1.operators;
 const KWDs = {
     formatMaximum: { okStr: "<=", ok: ops.LTE, fail: ops.GT },
@@ -334,16 +334,16 @@ exports["default"] = formatLimitPlugin;
 
 /***/ }),
 
-/***/ 2210:
+/***/ 7582:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MissingRefError = exports.ValidationError = exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = exports.Ajv2020 = void 0;
-const core_1 = __nccwpck_require__(3893);
-const draft2020_1 = __nccwpck_require__(4298);
-const discriminator_1 = __nccwpck_require__(8886);
-const json_schema_2020_12_1 = __nccwpck_require__(3995);
+const core_1 = __nccwpck_require__(6161);
+const draft2020_1 = __nccwpck_require__(7342);
+const discriminator_1 = __nccwpck_require__(4586);
+const json_schema_2020_12_1 = __nccwpck_require__(8663);
 const META_SCHEMA_ID = "https://json-schema.org/draft/2020-12/schema";
 class Ajv2020 extends core_1.default {
     constructor(opts = {}) {
@@ -378,33 +378,33 @@ module.exports = exports = Ajv2020;
 module.exports.Ajv2020 = Ajv2020;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = Ajv2020;
-var validate_1 = __nccwpck_require__(7881);
+var validate_1 = __nccwpck_require__(2005);
 Object.defineProperty(exports, "KeywordCxt", ({ enumerable: true, get: function () { return validate_1.KeywordCxt; } }));
-var codegen_1 = __nccwpck_require__(1436);
+var codegen_1 = __nccwpck_require__(8600);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return codegen_1._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return codegen_1.str; } }));
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return codegen_1.stringify; } }));
 Object.defineProperty(exports, "nil", ({ enumerable: true, get: function () { return codegen_1.nil; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return codegen_1.Name; } }));
 Object.defineProperty(exports, "CodeGen", ({ enumerable: true, get: function () { return codegen_1.CodeGen; } }));
-var validation_error_1 = __nccwpck_require__(3021);
+var validation_error_1 = __nccwpck_require__(1761);
 Object.defineProperty(exports, "ValidationError", ({ enumerable: true, get: function () { return validation_error_1.default; } }));
-var ref_error_1 = __nccwpck_require__(3162);
+var ref_error_1 = __nccwpck_require__(3774);
 Object.defineProperty(exports, "MissingRefError", ({ enumerable: true, get: function () { return ref_error_1.default; } }));
 //# sourceMappingURL=2020.js.map
 
 /***/ }),
 
-/***/ 2463:
+/***/ 3979:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MissingRefError = exports.ValidationError = exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = exports.Ajv = void 0;
-const core_1 = __nccwpck_require__(3893);
-const draft7_1 = __nccwpck_require__(9941);
-const discriminator_1 = __nccwpck_require__(8886);
-const draft7MetaSchema = __nccwpck_require__(2079);
+const core_1 = __nccwpck_require__(6161);
+const draft7_1 = __nccwpck_require__(1065);
+const discriminator_1 = __nccwpck_require__(4586);
+const draft7MetaSchema = __nccwpck_require__(7487);
 const META_SUPPORT_DATA = ["/properties"];
 const META_SCHEMA_ID = "http://json-schema.org/draft-07/schema";
 class Ajv extends core_1.default {
@@ -434,24 +434,24 @@ module.exports = exports = Ajv;
 module.exports.Ajv = Ajv;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = Ajv;
-var validate_1 = __nccwpck_require__(7881);
+var validate_1 = __nccwpck_require__(2005);
 Object.defineProperty(exports, "KeywordCxt", ({ enumerable: true, get: function () { return validate_1.KeywordCxt; } }));
-var codegen_1 = __nccwpck_require__(1436);
+var codegen_1 = __nccwpck_require__(8600);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return codegen_1._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return codegen_1.str; } }));
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return codegen_1.stringify; } }));
 Object.defineProperty(exports, "nil", ({ enumerable: true, get: function () { return codegen_1.nil; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return codegen_1.Name; } }));
 Object.defineProperty(exports, "CodeGen", ({ enumerable: true, get: function () { return codegen_1.CodeGen; } }));
-var validation_error_1 = __nccwpck_require__(3021);
+var validation_error_1 = __nccwpck_require__(1761);
 Object.defineProperty(exports, "ValidationError", ({ enumerable: true, get: function () { return validation_error_1.default; } }));
-var ref_error_1 = __nccwpck_require__(3162);
+var ref_error_1 = __nccwpck_require__(3774);
 Object.defineProperty(exports, "MissingRefError", ({ enumerable: true, get: function () { return ref_error_1.default; } }));
 //# sourceMappingURL=ajv.js.map
 
 /***/ }),
 
-/***/ 567:
+/***/ 7611:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -613,15 +613,15 @@ exports.regexpCode = regexpCode;
 
 /***/ }),
 
-/***/ 1436:
+/***/ 8600:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.or = exports.and = exports.not = exports.CodeGen = exports.operators = exports.varKinds = exports.ValueScopeName = exports.ValueScope = exports.Scope = exports.Name = exports.regexpCode = exports.stringify = exports.getProperty = exports.nil = exports.strConcat = exports.str = exports._ = void 0;
-const code_1 = __nccwpck_require__(567);
-const scope_1 = __nccwpck_require__(7788);
-var code_2 = __nccwpck_require__(567);
+const code_1 = __nccwpck_require__(7611);
+const scope_1 = __nccwpck_require__(9664);
+var code_2 = __nccwpck_require__(7611);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return code_2._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return code_2.str; } }));
 Object.defineProperty(exports, "strConcat", ({ enumerable: true, get: function () { return code_2.strConcat; } }));
@@ -630,7 +630,7 @@ Object.defineProperty(exports, "getProperty", ({ enumerable: true, get: function
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return code_2.stringify; } }));
 Object.defineProperty(exports, "regexpCode", ({ enumerable: true, get: function () { return code_2.regexpCode; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return code_2.Name; } }));
-var scope_2 = __nccwpck_require__(7788);
+var scope_2 = __nccwpck_require__(9664);
 Object.defineProperty(exports, "Scope", ({ enumerable: true, get: function () { return scope_2.Scope; } }));
 Object.defineProperty(exports, "ValueScope", ({ enumerable: true, get: function () { return scope_2.ValueScope; } }));
 Object.defineProperty(exports, "ValueScopeName", ({ enumerable: true, get: function () { return scope_2.ValueScopeName; } }));
@@ -1316,13 +1316,13 @@ function par(x) {
 
 /***/ }),
 
-/***/ 7788:
+/***/ 9664:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ValueScope = exports.ValueScopeName = exports.Scope = exports.varKinds = exports.UsedValueState = void 0;
-const code_1 = __nccwpck_require__(567);
+const code_1 = __nccwpck_require__(7611);
 class ValueError extends Error {
     constructor(name) {
         super(`CodeGen: "code" for ${name} not defined`);
@@ -1465,15 +1465,15 @@ exports.ValueScope = ValueScope;
 
 /***/ }),
 
-/***/ 1283:
+/***/ 4679:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.extendErrors = exports.resetErrorsCount = exports.reportExtraError = exports.reportError = exports.keyword$DataError = exports.keywordError = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const names_1 = __nccwpck_require__(630);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const names_1 = __nccwpck_require__(9994);
 exports.keywordError = {
     message: ({ keyword }) => (0, codegen_1.str) `must pass "${keyword}" keyword validation`,
 };
@@ -1594,18 +1594,18 @@ function extraErrorProps(cxt, { params, message }, keyValues) {
 
 /***/ }),
 
-/***/ 2718:
+/***/ 6210:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resolveSchema = exports.getCompilingSchema = exports.resolveRef = exports.compileSchema = exports.SchemaEnv = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const validation_error_1 = __nccwpck_require__(3021);
-const names_1 = __nccwpck_require__(630);
-const resolve_1 = __nccwpck_require__(4090);
-const util_1 = __nccwpck_require__(4464);
-const validate_1 = __nccwpck_require__(7881);
+const codegen_1 = __nccwpck_require__(8600);
+const validation_error_1 = __nccwpck_require__(1761);
+const names_1 = __nccwpck_require__(9994);
+const resolve_1 = __nccwpck_require__(5390);
+const util_1 = __nccwpck_require__(5420);
+const validate_1 = __nccwpck_require__(2005);
 class SchemaEnv {
     constructor(env) {
         var _a;
@@ -1842,12 +1842,12 @@ function getJsonPointer(parsedRef, { baseId, schema, root }) {
 
 /***/ }),
 
-/***/ 630:
+/***/ 9994:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(8600);
 const names = {
     // validation function arguments
     data: new codegen_1.Name("data"), // data passed to validation function
@@ -1876,12 +1876,12 @@ exports["default"] = names;
 
 /***/ }),
 
-/***/ 3162:
+/***/ 3774:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const resolve_1 = __nccwpck_require__(4090);
+const resolve_1 = __nccwpck_require__(5390);
 class MissingRefError extends Error {
     constructor(resolver, baseId, ref, msg) {
         super(msg || `can't resolve reference ${ref} from id ${baseId}`);
@@ -1894,15 +1894,15 @@ exports["default"] = MissingRefError;
 
 /***/ }),
 
-/***/ 4090:
+/***/ 5390:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getSchemaRefs = exports.resolveUrl = exports.normalizeId = exports._getFullPath = exports.getFullPath = exports.inlineRef = void 0;
-const util_1 = __nccwpck_require__(4464);
-const equal = __nccwpck_require__(3430);
-const traverse = __nccwpck_require__(1167);
+const util_1 = __nccwpck_require__(5420);
+const equal = __nccwpck_require__(6874);
+const traverse = __nccwpck_require__(6059);
 // TODO refactor to use keyword definitions
 const SIMPLE_INLINED = new Set([
     "type",
@@ -2055,7 +2055,7 @@ exports.getSchemaRefs = getSchemaRefs;
 
 /***/ }),
 
-/***/ 7353:
+/***/ 9629:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2087,14 +2087,14 @@ exports.getRules = getRules;
 
 /***/ }),
 
-/***/ 4464:
+/***/ 5420:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkStrictMode = exports.getErrorPath = exports.Type = exports.useFunc = exports.setEvaluated = exports.evaluatedPropsToName = exports.mergeEvaluated = exports.eachItem = exports.unescapeJsonPointer = exports.escapeJsonPointer = exports.escapeFragment = exports.unescapeFragment = exports.schemaRefOrVal = exports.schemaHasRulesButRef = exports.schemaHasRules = exports.checkUnknownRules = exports.alwaysValidSchema = exports.toHash = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const code_1 = __nccwpck_require__(567);
+const codegen_1 = __nccwpck_require__(8600);
+const code_1 = __nccwpck_require__(7611);
 // TODO refactor to use Set
 function toHash(arr) {
     const hash = {};
@@ -2271,7 +2271,7 @@ exports.checkStrictMode = checkStrictMode;
 
 /***/ }),
 
-/***/ 7692:
+/***/ 8680:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2296,15 +2296,15 @@ exports.shouldUseRule = shouldUseRule;
 
 /***/ }),
 
-/***/ 5346:
+/***/ 3446:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.boolOrEmptySchema = exports.topBoolOrEmptySchema = void 0;
-const errors_1 = __nccwpck_require__(1283);
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
+const errors_1 = __nccwpck_require__(4679);
+const codegen_1 = __nccwpck_require__(8600);
+const names_1 = __nccwpck_require__(9994);
 const boolError = {
     message: "boolean schema is false",
 };
@@ -2352,17 +2352,17 @@ function falseSchemaError(it, overrideAllErrors) {
 
 /***/ }),
 
-/***/ 6685:
+/***/ 9977:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.reportTypeError = exports.checkDataTypes = exports.checkDataType = exports.coerceAndCheckDataType = exports.getJSONTypes = exports.getSchemaTypes = exports.DataType = void 0;
-const rules_1 = __nccwpck_require__(7353);
-const applicability_1 = __nccwpck_require__(7692);
-const errors_1 = __nccwpck_require__(1283);
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const rules_1 = __nccwpck_require__(9629);
+const applicability_1 = __nccwpck_require__(8680);
+const errors_1 = __nccwpck_require__(4679);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 var DataType;
 (function (DataType) {
     DataType[DataType["Correct"] = 0] = "Correct";
@@ -2561,14 +2561,14 @@ function getTypeErrorContext(it) {
 
 /***/ }),
 
-/***/ 1699:
+/***/ 3839:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.assignDefaults = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 function assignDefaults(it, ty) {
     const { properties, items } = it.schema;
     if (ty === "object" && properties) {
@@ -2602,24 +2602,24 @@ function assignDefault(it, prop, defaultValue) {
 
 /***/ }),
 
-/***/ 7881:
+/***/ 2005:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getData = exports.KeywordCxt = exports.validateFunctionCode = void 0;
-const boolSchema_1 = __nccwpck_require__(5346);
-const dataType_1 = __nccwpck_require__(6685);
-const applicability_1 = __nccwpck_require__(7692);
-const dataType_2 = __nccwpck_require__(6685);
-const defaults_1 = __nccwpck_require__(1699);
-const keyword_1 = __nccwpck_require__(5202);
-const subschema_1 = __nccwpck_require__(6200);
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const resolve_1 = __nccwpck_require__(4090);
-const util_1 = __nccwpck_require__(4464);
-const errors_1 = __nccwpck_require__(1283);
+const boolSchema_1 = __nccwpck_require__(3446);
+const dataType_1 = __nccwpck_require__(9977);
+const applicability_1 = __nccwpck_require__(8680);
+const dataType_2 = __nccwpck_require__(9977);
+const defaults_1 = __nccwpck_require__(3839);
+const keyword_1 = __nccwpck_require__(8374);
+const subschema_1 = __nccwpck_require__(3556);
+const codegen_1 = __nccwpck_require__(8600);
+const names_1 = __nccwpck_require__(9994);
+const resolve_1 = __nccwpck_require__(5390);
+const util_1 = __nccwpck_require__(5420);
+const errors_1 = __nccwpck_require__(4679);
 // schema compilation - generates validation function, subschemaCode (below) is used for subschemas
 function validateFunctionCode(it) {
     if (isSchemaObj(it)) {
@@ -3128,16 +3128,16 @@ exports.getData = getData;
 
 /***/ }),
 
-/***/ 5202:
+/***/ 8374:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateKeywordUsage = exports.validSchemaType = exports.funcKeywordCode = exports.macroKeywordCode = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const code_1 = __nccwpck_require__(8484);
-const errors_1 = __nccwpck_require__(1283);
+const codegen_1 = __nccwpck_require__(8600);
+const names_1 = __nccwpck_require__(9994);
+const code_1 = __nccwpck_require__(5552);
+const errors_1 = __nccwpck_require__(4679);
 function macroKeywordCode(cxt, def) {
     const { gen, keyword, schema, parentSchema, it } = cxt;
     const macroSchema = def.macro.call(it.self, schema, parentSchema, it);
@@ -3258,14 +3258,14 @@ exports.validateKeywordUsage = validateKeywordUsage;
 
 /***/ }),
 
-/***/ 6200:
+/***/ 3556:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.extendSubschemaMode = exports.extendSubschemaData = exports.getSubschema = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 function getSubschema(it, { keyword, schemaProp, schema, schemaPath, errSchemaPath, topSchemaRef }) {
     if (keyword !== undefined && schema !== undefined) {
         throw new Error('both "keyword" and "schema" passed, only one allowed');
@@ -3345,31 +3345,31 @@ exports.extendSubschemaMode = extendSubschemaMode;
 
 /***/ }),
 
-/***/ 3893:
+/***/ 6161:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = void 0;
-var validate_1 = __nccwpck_require__(7881);
+var validate_1 = __nccwpck_require__(2005);
 Object.defineProperty(exports, "KeywordCxt", ({ enumerable: true, get: function () { return validate_1.KeywordCxt; } }));
-var codegen_1 = __nccwpck_require__(1436);
+var codegen_1 = __nccwpck_require__(8600);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return codegen_1._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return codegen_1.str; } }));
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return codegen_1.stringify; } }));
 Object.defineProperty(exports, "nil", ({ enumerable: true, get: function () { return codegen_1.nil; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return codegen_1.Name; } }));
 Object.defineProperty(exports, "CodeGen", ({ enumerable: true, get: function () { return codegen_1.CodeGen; } }));
-const validation_error_1 = __nccwpck_require__(3021);
-const ref_error_1 = __nccwpck_require__(3162);
-const rules_1 = __nccwpck_require__(7353);
-const compile_1 = __nccwpck_require__(2718);
-const codegen_2 = __nccwpck_require__(1436);
-const resolve_1 = __nccwpck_require__(4090);
-const dataType_1 = __nccwpck_require__(6685);
-const util_1 = __nccwpck_require__(4464);
-const $dataRefSchema = __nccwpck_require__(3837);
-const uri_1 = __nccwpck_require__(6285);
+const validation_error_1 = __nccwpck_require__(1761);
+const ref_error_1 = __nccwpck_require__(3774);
+const rules_1 = __nccwpck_require__(9629);
+const compile_1 = __nccwpck_require__(6210);
+const codegen_2 = __nccwpck_require__(8600);
+const resolve_1 = __nccwpck_require__(5390);
+const dataType_1 = __nccwpck_require__(9977);
+const util_1 = __nccwpck_require__(5420);
+const $dataRefSchema = __nccwpck_require__(4662);
+const uri_1 = __nccwpck_require__(9177);
 const defaultRegExp = (str, flags) => new RegExp(str, flags);
 defaultRegExp.code = "new RegExp";
 const META_IGNORE_OPTIONS = ["removeAdditional", "useDefaults", "coerceTypes"];
@@ -3969,19 +3969,19 @@ function schemaOrData(schema) {
 
 /***/ }),
 
-/***/ 3995:
+/***/ 8663:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const metaSchema = __nccwpck_require__(1678);
-const applicator = __nccwpck_require__(7216);
-const unevaluated = __nccwpck_require__(9547);
-const content = __nccwpck_require__(8226);
-const core = __nccwpck_require__(518);
-const format = __nccwpck_require__(4588);
-const metadata = __nccwpck_require__(5707);
-const validation = __nccwpck_require__(7082);
+const metaSchema = __nccwpck_require__(5745);
+const applicator = __nccwpck_require__(5433);
+const unevaluated = __nccwpck_require__(5056);
+const content = __nccwpck_require__(7801);
+const core = __nccwpck_require__(2151);
+const format = __nccwpck_require__(5675);
+const metadata = __nccwpck_require__(1352);
+const validation = __nccwpck_require__(8931);
 const META_SUPPORT_DATA = ["/properties"];
 function addMetaSchema2020($data) {
     ;
@@ -4005,20 +4005,20 @@ exports["default"] = addMetaSchema2020;
 
 /***/ }),
 
-/***/ 4951:
+/***/ 9091:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 // https://github.com/ajv-validator/ajv/issues/889
-const equal = __nccwpck_require__(3430);
+const equal = __nccwpck_require__(6874);
 equal.code = 'require("ajv/dist/runtime/equal").default';
 exports["default"] = equal;
 //# sourceMappingURL=equal.js.map
 
 /***/ }),
 
-/***/ 6214:
+/***/ 8514:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -4048,19 +4048,19 @@ ucs2length.code = 'require("ajv/dist/runtime/ucs2length").default';
 
 /***/ }),
 
-/***/ 6285:
+/***/ 9177:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const uri = __nccwpck_require__(4352);
+const uri = __nccwpck_require__(7868);
 uri.code = 'require("ajv/dist/runtime/uri").default';
 exports["default"] = uri;
 //# sourceMappingURL=uri.js.map
 
 /***/ }),
 
-/***/ 3021:
+/***/ 1761:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -4077,14 +4077,14 @@ exports["default"] = ValidationError;
 
 /***/ }),
 
-/***/ 3448:
+/***/ 3396:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateAdditionalItems = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 const error = {
     message: ({ params: { len } }) => (0, codegen_1.str) `must NOT have more than ${len} items`,
     params: ({ params: { len } }) => (0, codegen_1._) `{limit: ${len}}`,
@@ -4132,15 +4132,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2431:
+/***/ 1051:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const util_1 = __nccwpck_require__(4464);
+const code_1 = __nccwpck_require__(5552);
+const codegen_1 = __nccwpck_require__(8600);
+const names_1 = __nccwpck_require__(9994);
+const util_1 = __nccwpck_require__(5420);
 const error = {
     message: "must NOT have additional properties",
     params: ({ params }) => (0, codegen_1._) `{additionalProperty: ${params.additionalProperty}}`,
@@ -4244,12 +4244,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 9205:
+/***/ 265:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __nccwpck_require__(4464);
+const util_1 = __nccwpck_require__(5420);
 const def = {
     keyword: "allOf",
     schemaType: "array",
@@ -4273,12 +4273,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 9380:
+/***/ 3072:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
+const code_1 = __nccwpck_require__(5552);
 const def = {
     keyword: "anyOf",
     schemaType: "array",
@@ -4291,13 +4291,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6182:
+/***/ 6930:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 const error = {
     message: ({ params: { min, max } }) => max === undefined
         ? (0, codegen_1.str) `must contain at least ${min} valid item(s)`
@@ -4392,15 +4392,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 5826:
+/***/ 8382:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateSchemaDeps = exports.validatePropertyDeps = exports.error = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const code_1 = __nccwpck_require__(8484);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const code_1 = __nccwpck_require__(5552);
 exports.error = {
     message: ({ params: { property, depsCount, deps } }) => {
         const property_ies = depsCount === 1 ? "property" : "properties";
@@ -4483,12 +4483,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 3818:
+/***/ 2918:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dependencies_1 = __nccwpck_require__(5826);
+const dependencies_1 = __nccwpck_require__(8382);
 const def = {
     keyword: "dependentSchemas",
     type: "object",
@@ -4500,13 +4500,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8584:
+/***/ 9644:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 const error = {
     message: ({ params }) => (0, codegen_1.str) `must match "${params.ifClause}" schema`,
     params: ({ params }) => (0, codegen_1._) `{failingKeyword: ${params.ifClause}}`,
@@ -4572,27 +4572,27 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8775:
+/***/ 3715:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const additionalItems_1 = __nccwpck_require__(3448);
-const prefixItems_1 = __nccwpck_require__(6467);
-const items_1 = __nccwpck_require__(5791);
-const items2020_1 = __nccwpck_require__(2959);
-const contains_1 = __nccwpck_require__(6182);
-const dependencies_1 = __nccwpck_require__(5826);
-const propertyNames_1 = __nccwpck_require__(1372);
-const additionalProperties_1 = __nccwpck_require__(2431);
-const properties_1 = __nccwpck_require__(8778);
-const patternProperties_1 = __nccwpck_require__(664);
-const not_1 = __nccwpck_require__(8350);
-const anyOf_1 = __nccwpck_require__(9380);
-const oneOf_1 = __nccwpck_require__(2490);
-const allOf_1 = __nccwpck_require__(9205);
-const if_1 = __nccwpck_require__(8584);
-const thenElse_1 = __nccwpck_require__(6829);
+const additionalItems_1 = __nccwpck_require__(3396);
+const prefixItems_1 = __nccwpck_require__(3167);
+const items_1 = __nccwpck_require__(7147);
+const items2020_1 = __nccwpck_require__(9819);
+const contains_1 = __nccwpck_require__(6930);
+const dependencies_1 = __nccwpck_require__(8382);
+const propertyNames_1 = __nccwpck_require__(640);
+const additionalProperties_1 = __nccwpck_require__(1051);
+const properties_1 = __nccwpck_require__(7334);
+const patternProperties_1 = __nccwpck_require__(9868);
+const not_1 = __nccwpck_require__(3258);
+const anyOf_1 = __nccwpck_require__(3072);
+const oneOf_1 = __nccwpck_require__(5030);
+const allOf_1 = __nccwpck_require__(265);
+const if_1 = __nccwpck_require__(9644);
+const thenElse_1 = __nccwpck_require__(5097);
 function getApplicator(draft2020 = false) {
     const applicator = [
         // any
@@ -4622,15 +4622,15 @@ exports["default"] = getApplicator;
 
 /***/ }),
 
-/***/ 5791:
+/***/ 7147:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateTuple = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const code_1 = __nccwpck_require__(8484);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const code_1 = __nccwpck_require__(5552);
 const def = {
     keyword: "items",
     type: "array",
@@ -4680,15 +4680,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2959:
+/***/ 9819:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const code_1 = __nccwpck_require__(8484);
-const additionalItems_1 = __nccwpck_require__(3448);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const code_1 = __nccwpck_require__(5552);
+const additionalItems_1 = __nccwpck_require__(3396);
 const error = {
     message: ({ params: { len } }) => (0, codegen_1.str) `must NOT have more than ${len} items`,
     params: ({ params: { len } }) => (0, codegen_1._) `{limit: ${len}}`,
@@ -4716,12 +4716,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8350:
+/***/ 3258:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __nccwpck_require__(4464);
+const util_1 = __nccwpck_require__(5420);
 const def = {
     keyword: "not",
     schemaType: ["object", "boolean"],
@@ -4748,13 +4748,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2490:
+/***/ 5030:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 const error = {
     message: "must match exactly one schema in oneOf",
     params: ({ params }) => (0, codegen_1._) `{passingSchemas: ${params.passing}}`,
@@ -4814,15 +4814,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 664:
+/***/ 9868:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const util_2 = __nccwpck_require__(4464);
+const code_1 = __nccwpck_require__(5552);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const util_2 = __nccwpck_require__(5420);
 const def = {
     keyword: "patternProperties",
     type: "object",
@@ -4895,12 +4895,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6467:
+/***/ 3167:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const items_1 = __nccwpck_require__(5791);
+const items_1 = __nccwpck_require__(7147);
 const def = {
     keyword: "prefixItems",
     type: "array",
@@ -4913,15 +4913,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8778:
+/***/ 7334:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const validate_1 = __nccwpck_require__(7881);
-const code_1 = __nccwpck_require__(8484);
-const util_1 = __nccwpck_require__(4464);
-const additionalProperties_1 = __nccwpck_require__(2431);
+const validate_1 = __nccwpck_require__(2005);
+const code_1 = __nccwpck_require__(5552);
+const util_1 = __nccwpck_require__(5420);
+const additionalProperties_1 = __nccwpck_require__(1051);
 const def = {
     keyword: "properties",
     type: "object",
@@ -4973,13 +4973,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 1372:
+/***/ 640:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 const error = {
     message: "property name must be valid",
     params: ({ params }) => (0, codegen_1._) `{propertyName: ${params.propertyName}}`,
@@ -5017,12 +5017,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6829:
+/***/ 5097:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __nccwpck_require__(4464);
+const util_1 = __nccwpck_require__(5420);
 const def = {
     keyword: ["then", "else"],
     schemaType: ["object", "boolean"],
@@ -5036,16 +5036,16 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8484:
+/***/ 5552:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateUnion = exports.validateArray = exports.usePattern = exports.callValidateCode = exports.schemaProperties = exports.allSchemaProperties = exports.noPropertyInData = exports.propertyInData = exports.isOwnProperty = exports.hasPropFunc = exports.reportMissingProp = exports.checkMissingProp = exports.checkReportMissingProp = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const names_1 = __nccwpck_require__(630);
-const util_2 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const names_1 = __nccwpck_require__(9994);
+const util_2 = __nccwpck_require__(5420);
 function checkReportMissingProp(cxt, prop) {
     const { gen, data, it } = cxt;
     gen.if(noPropertyInData(gen, data, prop, it.opts.ownProperties), () => {
@@ -5173,7 +5173,7 @@ exports.validateUnion = validateUnion;
 
 /***/ }),
 
-/***/ 9872:
+/***/ 3420:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5189,13 +5189,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 7397:
+/***/ 8521:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const id_1 = __nccwpck_require__(9872);
-const ref_1 = __nccwpck_require__(2996);
+const id_1 = __nccwpck_require__(3420);
+const ref_1 = __nccwpck_require__(7728);
 const core = [
     "$schema",
     "$id",
@@ -5211,18 +5211,18 @@ exports["default"] = core;
 
 /***/ }),
 
-/***/ 2996:
+/***/ 7728:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.callRef = exports.getValidate = void 0;
-const ref_error_1 = __nccwpck_require__(3162);
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const compile_1 = __nccwpck_require__(2718);
-const util_1 = __nccwpck_require__(4464);
+const ref_error_1 = __nccwpck_require__(3774);
+const code_1 = __nccwpck_require__(5552);
+const codegen_1 = __nccwpck_require__(8600);
+const names_1 = __nccwpck_require__(9994);
+const compile_1 = __nccwpck_require__(6210);
+const util_1 = __nccwpck_require__(5420);
 const def = {
     keyword: "$ref",
     schemaType: "string",
@@ -5339,16 +5339,16 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8886:
+/***/ 4586:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const types_1 = __nccwpck_require__(7115);
-const compile_1 = __nccwpck_require__(2718);
-const ref_error_1 = __nccwpck_require__(3162);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const types_1 = __nccwpck_require__(9463);
+const compile_1 = __nccwpck_require__(6210);
+const ref_error_1 = __nccwpck_require__(3774);
+const util_1 = __nccwpck_require__(5420);
 const error = {
     message: ({ params: { discrError, tagName } }) => discrError === types_1.DiscrError.Tag
         ? `tag "${tagName}" must be string`
@@ -5449,7 +5449,7 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 7115:
+/***/ 9463:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5464,19 +5464,19 @@ var DiscrError;
 
 /***/ }),
 
-/***/ 4298:
+/***/ 7342:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __nccwpck_require__(7397);
-const validation_1 = __nccwpck_require__(5481);
-const applicator_1 = __nccwpck_require__(8775);
-const dynamic_1 = __nccwpck_require__(9923);
-const next_1 = __nccwpck_require__(7844);
-const unevaluated_1 = __nccwpck_require__(2010);
-const format_1 = __nccwpck_require__(2601);
-const metadata_1 = __nccwpck_require__(6620);
+const core_1 = __nccwpck_require__(8521);
+const validation_1 = __nccwpck_require__(2877);
+const applicator_1 = __nccwpck_require__(3715);
+const dynamic_1 = __nccwpck_require__(4871);
+const next_1 = __nccwpck_require__(7283);
+const unevaluated_1 = __nccwpck_require__(7646);
+const format_1 = __nccwpck_require__(3629);
+const metadata_1 = __nccwpck_require__(3304);
 const draft2020Vocabularies = [
     dynamic_1.default,
     core_1.default,
@@ -5493,16 +5493,16 @@ exports["default"] = draft2020Vocabularies;
 
 /***/ }),
 
-/***/ 9941:
+/***/ 1065:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __nccwpck_require__(7397);
-const validation_1 = __nccwpck_require__(5481);
-const applicator_1 = __nccwpck_require__(8775);
-const format_1 = __nccwpck_require__(2601);
-const metadata_1 = __nccwpck_require__(6620);
+const core_1 = __nccwpck_require__(8521);
+const validation_1 = __nccwpck_require__(2877);
+const applicator_1 = __nccwpck_require__(3715);
+const format_1 = __nccwpck_require__(3629);
+const metadata_1 = __nccwpck_require__(3304);
 const draft7Vocabularies = [
     core_1.default,
     validation_1.default,
@@ -5516,16 +5516,16 @@ exports["default"] = draft7Vocabularies;
 
 /***/ }),
 
-/***/ 8639:
+/***/ 4723:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.dynamicAnchor = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const compile_1 = __nccwpck_require__(2718);
-const ref_1 = __nccwpck_require__(2996);
+const codegen_1 = __nccwpck_require__(8600);
+const names_1 = __nccwpck_require__(9994);
+const compile_1 = __nccwpck_require__(6210);
+const ref_1 = __nccwpck_require__(7728);
 const def = {
     keyword: "$dynamicAnchor",
     schemaType: "string",
@@ -5552,15 +5552,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 5065:
+/***/ 3861:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.dynamicRef = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const ref_1 = __nccwpck_require__(2996);
+const codegen_1 = __nccwpck_require__(8600);
+const names_1 = __nccwpck_require__(9994);
+const ref_1 = __nccwpck_require__(7728);
 const def = {
     keyword: "$dynamicRef",
     schemaType: "string",
@@ -5609,28 +5609,28 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 9923:
+/***/ 4871:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dynamicAnchor_1 = __nccwpck_require__(8639);
-const dynamicRef_1 = __nccwpck_require__(5065);
-const recursiveAnchor_1 = __nccwpck_require__(9982);
-const recursiveRef_1 = __nccwpck_require__(1794);
+const dynamicAnchor_1 = __nccwpck_require__(4723);
+const dynamicRef_1 = __nccwpck_require__(3861);
+const recursiveAnchor_1 = __nccwpck_require__(8122);
+const recursiveRef_1 = __nccwpck_require__(8198);
 const dynamic = [dynamicAnchor_1.default, dynamicRef_1.default, recursiveAnchor_1.default, recursiveRef_1.default];
 exports["default"] = dynamic;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 9982:
+/***/ 8122:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dynamicAnchor_1 = __nccwpck_require__(8639);
-const util_1 = __nccwpck_require__(4464);
+const dynamicAnchor_1 = __nccwpck_require__(4723);
+const util_1 = __nccwpck_require__(5420);
 const def = {
     keyword: "$recursiveAnchor",
     schemaType: "boolean",
@@ -5646,12 +5646,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 1794:
+/***/ 8198:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dynamicRef_1 = __nccwpck_require__(5065);
+const dynamicRef_1 = __nccwpck_require__(3861);
 const def = {
     keyword: "$recursiveRef",
     schemaType: "string",
@@ -5662,12 +5662,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6402:
+/***/ 1686:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(8600);
 const error = {
     message: ({ schemaCode }) => (0, codegen_1.str) `must match format "${schemaCode}"`,
     params: ({ schemaCode }) => (0, codegen_1._) `{format: ${schemaCode}}`,
@@ -5760,19 +5760,19 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2601:
+/***/ 3629:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const format_1 = __nccwpck_require__(6402);
+const format_1 = __nccwpck_require__(1686);
 const format = [format_1.default];
 exports["default"] = format;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 6620:
+/***/ 3304:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5796,40 +5796,40 @@ exports.contentVocabulary = [
 
 /***/ }),
 
-/***/ 7844:
+/***/ 7283:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dependentRequired_1 = __nccwpck_require__(643);
-const dependentSchemas_1 = __nccwpck_require__(3818);
-const limitContains_1 = __nccwpck_require__(3907);
+const dependentRequired_1 = __nccwpck_require__(9695);
+const dependentSchemas_1 = __nccwpck_require__(2918);
+const limitContains_1 = __nccwpck_require__(7063);
 const next = [dependentRequired_1.default, dependentSchemas_1.default, limitContains_1.default];
 exports["default"] = next;
 //# sourceMappingURL=next.js.map
 
 /***/ }),
 
-/***/ 2010:
+/***/ 7646:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const unevaluatedProperties_1 = __nccwpck_require__(6855);
-const unevaluatedItems_1 = __nccwpck_require__(4144);
+const unevaluatedProperties_1 = __nccwpck_require__(5659);
+const unevaluatedItems_1 = __nccwpck_require__(980);
 const unevaluated = [unevaluatedProperties_1.default, unevaluatedItems_1.default];
 exports["default"] = unevaluated;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 4144:
+/***/ 980:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 const error = {
     message: ({ params: { len } }) => (0, codegen_1.str) `must NOT have more than ${len} items`,
     params: ({ params: { len } }) => (0, codegen_1._) `{limit: ${len}}`,
@@ -5869,14 +5869,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6855:
+/***/ 5659:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const names_1 = __nccwpck_require__(630);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const names_1 = __nccwpck_require__(9994);
 const error = {
     message: "must NOT have unevaluated properties",
     params: ({ params }) => (0, codegen_1._) `{unevaluatedProperty: ${params.unevaluatedProperty}}`,
@@ -5940,14 +5940,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8026:
+/***/ 2638:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const equal_1 = __nccwpck_require__(4951);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const equal_1 = __nccwpck_require__(9091);
 const error = {
     message: "must be equal to constant",
     params: ({ schemaCode }) => (0, codegen_1._) `{allowedValue: ${schemaCode}}`,
@@ -5971,12 +5971,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 643:
+/***/ 9695:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dependencies_1 = __nccwpck_require__(5826);
+const dependencies_1 = __nccwpck_require__(8382);
 const def = {
     keyword: "dependentRequired",
     type: "object",
@@ -5989,14 +5989,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 3200:
+/***/ 4964:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const equal_1 = __nccwpck_require__(4951);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const equal_1 = __nccwpck_require__(9091);
 const error = {
     message: "must be equal to one of the allowed values",
     params: ({ schemaCode }) => (0, codegen_1._) `{allowedValues: ${schemaCode}}`,
@@ -6043,21 +6043,21 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 5481:
+/***/ 2877:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const limitNumber_1 = __nccwpck_require__(3723);
-const multipleOf_1 = __nccwpck_require__(8132);
-const limitLength_1 = __nccwpck_require__(6962);
-const pattern_1 = __nccwpck_require__(6023);
-const limitProperties_1 = __nccwpck_require__(895);
-const required_1 = __nccwpck_require__(2123);
-const limitItems_1 = __nccwpck_require__(6296);
-const uniqueItems_1 = __nccwpck_require__(5132);
-const const_1 = __nccwpck_require__(8026);
-const enum_1 = __nccwpck_require__(3200);
+const limitNumber_1 = __nccwpck_require__(783);
+const multipleOf_1 = __nccwpck_require__(2584);
+const limitLength_1 = __nccwpck_require__(7198);
+const pattern_1 = __nccwpck_require__(5715);
+const limitProperties_1 = __nccwpck_require__(1683);
+const required_1 = __nccwpck_require__(1500);
+const limitItems_1 = __nccwpck_require__(1452);
+const uniqueItems_1 = __nccwpck_require__(8160);
+const const_1 = __nccwpck_require__(2638);
+const enum_1 = __nccwpck_require__(4964);
 const validation = [
     // number
     limitNumber_1.default,
@@ -6082,12 +6082,12 @@ exports["default"] = validation;
 
 /***/ }),
 
-/***/ 3907:
+/***/ 7063:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __nccwpck_require__(4464);
+const util_1 = __nccwpck_require__(5420);
 const def = {
     keyword: ["maxContains", "minContains"],
     type: "array",
@@ -6103,12 +6103,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6296:
+/***/ 1452:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(8600);
 const error = {
     message({ keyword, schemaCode }) {
         const comp = keyword === "maxItems" ? "more" : "fewer";
@@ -6133,14 +6133,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6962:
+/***/ 7198:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const ucs2length_1 = __nccwpck_require__(6214);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const ucs2length_1 = __nccwpck_require__(8514);
 const error = {
     message({ keyword, schemaCode }) {
         const comp = keyword === "maxLength" ? "more" : "fewer";
@@ -6166,12 +6166,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 3723:
+/***/ 783:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(8600);
 const ops = codegen_1.operators;
 const KWDs = {
     maximum: { okStr: "<=", ok: ops.LTE, fail: ops.GT },
@@ -6199,12 +6199,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 895:
+/***/ 1683:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(8600);
 const error = {
     message({ keyword, schemaCode }) {
         const comp = keyword === "maxProperties" ? "more" : "fewer";
@@ -6229,12 +6229,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8132:
+/***/ 2584:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(8600);
 const error = {
     message: ({ schemaCode }) => (0, codegen_1.str) `must be multiple of ${schemaCode}`,
     params: ({ schemaCode }) => (0, codegen_1._) `{multipleOf: ${schemaCode}}`,
@@ -6261,13 +6261,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6023:
+/***/ 5715:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
+const code_1 = __nccwpck_require__(5552);
+const codegen_1 = __nccwpck_require__(8600);
 const error = {
     message: ({ schemaCode }) => (0, codegen_1.str) `must match pattern "${schemaCode}"`,
     params: ({ schemaCode }) => (0, codegen_1._) `{pattern: ${schemaCode}}`,
@@ -6291,14 +6291,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2123:
+/***/ 1500:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const code_1 = __nccwpck_require__(5552);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
 const error = {
     message: ({ params: { missingProperty } }) => (0, codegen_1.str) `must have required property '${missingProperty}'`,
     params: ({ params: { missingProperty } }) => (0, codegen_1._) `{missingProperty: ${missingProperty}}`,
@@ -6376,15 +6376,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 5132:
+/***/ 8160:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dataType_1 = __nccwpck_require__(6685);
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const equal_1 = __nccwpck_require__(4951);
+const dataType_1 = __nccwpck_require__(9977);
+const codegen_1 = __nccwpck_require__(8600);
+const util_1 = __nccwpck_require__(5420);
+const equal_1 = __nccwpck_require__(9091);
 const error = {
     message: ({ params: { i, j } }) => (0, codegen_1.str) `must NOT have duplicate items (items ## ${j} and ${i} are identical)`,
     params: ({ params: { i, j } }) => (0, codegen_1._) `{i: ${i}, j: ${j}}`,
@@ -6446,12 +6446,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8905:
+/***/ 1653:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var isObject = __nccwpck_require__(6403);
+var isObject = __nccwpck_require__(4471);
 
 module.exports = function extend(o/*, objects*/) {
   if (!isObject(o)) { o = {}; }
@@ -6486,7 +6486,7 @@ function hasOwn(obj, key) {
 
 /***/ }),
 
-/***/ 3430:
+/***/ 6874:
 /***/ ((module) => {
 
 
@@ -6539,20 +6539,20 @@ module.exports = function equal(a, b) {
 
 /***/ }),
 
-/***/ 9599:
+/***/ 4403:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 const fs = __nccwpck_require__(9896);
-const sections = __nccwpck_require__(9495);
-const defaults = __nccwpck_require__(7545);
-const stringify = __nccwpck_require__(4710);
-const excerpt = __nccwpck_require__(7894);
-const engines = __nccwpck_require__(4452);
-const toFile = __nccwpck_require__(8073);
-const parse = __nccwpck_require__(8120);
-const utils = __nccwpck_require__(8698);
+const sections = __nccwpck_require__(5131);
+const defaults = __nccwpck_require__(9181);
+const stringify = __nccwpck_require__(2978);
+const excerpt = __nccwpck_require__(6778);
+const engines = __nccwpck_require__(3672);
+const toFile = __nccwpck_require__(1621);
+const parse = __nccwpck_require__(8060);
+const utils = __nccwpck_require__(7918);
 
 /**
  * Takes a string or object with `content` property, extracts
@@ -6774,13 +6774,13 @@ module.exports = matter;
 
 /***/ }),
 
-/***/ 7545:
+/***/ 9181:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const engines = __nccwpck_require__(4452);
-const utils = __nccwpck_require__(8698);
+const engines = __nccwpck_require__(3672);
+const utils = __nccwpck_require__(7918);
 
 module.exports = function(options) {
   const opts = Object.assign({}, options);
@@ -6799,7 +6799,7 @@ module.exports = function(options) {
 
 /***/ }),
 
-/***/ 5921:
+/***/ 6109:
 /***/ ((module) => {
 
 
@@ -6836,12 +6836,12 @@ function aliase(name) {
 
 /***/ }),
 
-/***/ 4452:
+/***/ 3672:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 
 
-const yaml = __nccwpck_require__(188);
+const yaml = __nccwpck_require__(216);
 
 /**
  * Default engines
@@ -6897,12 +6897,12 @@ engines.javascript = {
 
 /***/ }),
 
-/***/ 7894:
+/***/ 6778:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const defaults = __nccwpck_require__(7545);
+const defaults = __nccwpck_require__(9181);
 
 module.exports = function(file, options) {
   const opts = defaults(options);
@@ -6936,13 +6936,13 @@ module.exports = function(file, options) {
 
 /***/ }),
 
-/***/ 8120:
+/***/ 8060:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const getEngine = __nccwpck_require__(5921);
-const defaults = __nccwpck_require__(7545);
+const getEngine = __nccwpck_require__(6109);
+const defaults = __nccwpck_require__(9181);
 
 module.exports = function(language, str, options) {
   const opts = defaults(options);
@@ -6956,14 +6956,14 @@ module.exports = function(language, str, options) {
 
 /***/ }),
 
-/***/ 4710:
+/***/ 2978:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const typeOf = __nccwpck_require__(5140);
-const getEngine = __nccwpck_require__(5921);
-const defaults = __nccwpck_require__(7545);
+const typeOf = __nccwpck_require__(8704);
+const getEngine = __nccwpck_require__(6109);
+const defaults = __nccwpck_require__(9181);
 
 module.exports = function(file, data, options) {
   if (data == null && options == null) {
@@ -7019,14 +7019,14 @@ function newline(str) {
 
 /***/ }),
 
-/***/ 8073:
+/***/ 1621:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const typeOf = __nccwpck_require__(5140);
-const stringify = __nccwpck_require__(4710);
-const utils = __nccwpck_require__(8698);
+const typeOf = __nccwpck_require__(8704);
+const stringify = __nccwpck_require__(2978);
+const utils = __nccwpck_require__(7918);
 
 /**
  * Normalize the given value to ensure an object is returned
@@ -7069,13 +7069,13 @@ module.exports = function(file) {
 
 /***/ }),
 
-/***/ 8698:
+/***/ 7918:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 
-const stripBom = __nccwpck_require__(1389);
-const typeOf = __nccwpck_require__(5140);
+const stripBom = __nccwpck_require__(105);
+const typeOf = __nccwpck_require__(8704);
 
 exports.define = function(obj, key, val) {
   Reflect.defineProperty(obj, key, {
@@ -7142,13 +7142,13 @@ exports.startsWith = function(str, substr, len) {
 
 /***/ }),
 
-/***/ 188:
+/***/ 216:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 
-var yaml = __nccwpck_require__(993);
+var yaml = __nccwpck_require__(3117);
 
 
 module.exports = yaml;
@@ -7156,14 +7156,14 @@ module.exports = yaml;
 
 /***/ }),
 
-/***/ 993:
+/***/ 3117:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 
-var loader = __nccwpck_require__(9559);
-var dumper = __nccwpck_require__(9081);
+var loader = __nccwpck_require__(2227);
+var dumper = __nccwpck_require__(1413);
 
 
 function deprecated(name) {
@@ -7173,25 +7173,25 @@ function deprecated(name) {
 }
 
 
-module.exports.Type = __nccwpck_require__(7592);
-module.exports.Schema = __nccwpck_require__(995);
-module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(6587);
-module.exports.JSON_SCHEMA = __nccwpck_require__(5636);
-module.exports.CORE_SCHEMA = __nccwpck_require__(4773);
-module.exports.DEFAULT_SAFE_SCHEMA = __nccwpck_require__(8693);
-module.exports.DEFAULT_FULL_SCHEMA = __nccwpck_require__(1285);
+module.exports.Type = __nccwpck_require__(6244);
+module.exports.Schema = __nccwpck_require__(3407);
+module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(823);
+module.exports.JSON_SCHEMA = __nccwpck_require__(0);
+module.exports.CORE_SCHEMA = __nccwpck_require__(2209);
+module.exports.DEFAULT_SAFE_SCHEMA = __nccwpck_require__(3961);
+module.exports.DEFAULT_FULL_SCHEMA = __nccwpck_require__(3353);
 module.exports.load                = loader.load;
 module.exports.loadAll             = loader.loadAll;
 module.exports.safeLoad            = loader.safeLoad;
 module.exports.safeLoadAll         = loader.safeLoadAll;
 module.exports.dump                = dumper.dump;
 module.exports.safeDump            = dumper.safeDump;
-module.exports.YAMLException = __nccwpck_require__(7627);
+module.exports.YAMLException = __nccwpck_require__(7511);
 
 // Deprecated schema names from JS-YAML 2.0.x
-module.exports.MINIMAL_SCHEMA = __nccwpck_require__(6587);
-module.exports.SAFE_SCHEMA = __nccwpck_require__(8693);
-module.exports.DEFAULT_SCHEMA = __nccwpck_require__(1285);
+module.exports.MINIMAL_SCHEMA = __nccwpck_require__(823);
+module.exports.SAFE_SCHEMA = __nccwpck_require__(3961);
+module.exports.DEFAULT_SCHEMA = __nccwpck_require__(3353);
 
 // Deprecated functions from JS-YAML 1.x.x
 module.exports.scan           = deprecated('scan');
@@ -7202,7 +7202,7 @@ module.exports.addConstructor = deprecated('addConstructor');
 
 /***/ }),
 
-/***/ 3973:
+/***/ 9481:
 /***/ ((module) => {
 
 
@@ -7268,17 +7268,17 @@ module.exports.extend         = extend;
 
 /***/ }),
 
-/***/ 9081:
+/***/ 1413:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 /*eslint-disable no-use-before-define*/
 
-var common              = __nccwpck_require__(3973);
-var YAMLException       = __nccwpck_require__(7627);
-var DEFAULT_FULL_SCHEMA = __nccwpck_require__(1285);
-var DEFAULT_SAFE_SCHEMA = __nccwpck_require__(8693);
+var common              = __nccwpck_require__(9481);
+var YAMLException       = __nccwpck_require__(7511);
+var DEFAULT_FULL_SCHEMA = __nccwpck_require__(3353);
+var DEFAULT_SAFE_SCHEMA = __nccwpck_require__(3961);
 
 var _toString       = Object.prototype.toString;
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -8125,7 +8125,7 @@ module.exports.safeDump = safeDump;
 
 /***/ }),
 
-/***/ 7627:
+/***/ 7511:
 /***/ ((module) => {
 
 // YAML error class. http://stackoverflow.com/questions/8458984
@@ -8175,18 +8175,18 @@ module.exports = YAMLException;
 
 /***/ }),
 
-/***/ 9559:
+/***/ 2227:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 /*eslint-disable max-len,no-use-before-define*/
 
-var common              = __nccwpck_require__(3973);
-var YAMLException       = __nccwpck_require__(7627);
-var Mark                = __nccwpck_require__(1233);
-var DEFAULT_SAFE_SCHEMA = __nccwpck_require__(8693);
-var DEFAULT_FULL_SCHEMA = __nccwpck_require__(1285);
+var common              = __nccwpck_require__(9481);
+var YAMLException       = __nccwpck_require__(7511);
+var Mark                = __nccwpck_require__(421);
+var DEFAULT_SAFE_SCHEMA = __nccwpck_require__(3961);
+var DEFAULT_FULL_SCHEMA = __nccwpck_require__(3353);
 
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -9842,13 +9842,13 @@ module.exports.safeLoad    = safeLoad;
 
 /***/ }),
 
-/***/ 1233:
+/***/ 421:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 
-var common = __nccwpck_require__(3973);
+var common = __nccwpck_require__(9481);
 
 
 function Mark(name, buffer, position, line, column) {
@@ -9925,16 +9925,16 @@ module.exports = Mark;
 
 /***/ }),
 
-/***/ 995:
+/***/ 3407:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 /*eslint-disable max-len*/
 
-var common        = __nccwpck_require__(3973);
-var YAMLException = __nccwpck_require__(7627);
-var Type          = __nccwpck_require__(7592);
+var common        = __nccwpck_require__(9481);
+var YAMLException = __nccwpck_require__(7511);
+var Type          = __nccwpck_require__(6244);
 
 
 function compileList(schema, name, result) {
@@ -10040,7 +10040,7 @@ module.exports = Schema;
 
 /***/ }),
 
-/***/ 4773:
+/***/ 2209:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // Standard YAML's Core schema.
@@ -10053,19 +10053,19 @@ module.exports = Schema;
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(3407);
 
 
 module.exports = new Schema({
   include: [
-    __nccwpck_require__(5636)
+    __nccwpck_require__(0)
   ]
 });
 
 
 /***/ }),
 
-/***/ 1285:
+/***/ 3353:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // JS-YAML's default schema for `load` function.
@@ -10080,24 +10080,24 @@ module.exports = new Schema({
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(3407);
 
 
 module.exports = Schema.DEFAULT = new Schema({
   include: [
-    __nccwpck_require__(8693)
+    __nccwpck_require__(3961)
   ],
   explicit: [
-    __nccwpck_require__(1775),
-    __nccwpck_require__(7394),
-    __nccwpck_require__(9531)
+    __nccwpck_require__(6963),
+    __nccwpck_require__(3158),
+    __nccwpck_require__(519)
   ]
 });
 
 
 /***/ }),
 
-/***/ 8693:
+/***/ 3961:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // JS-YAML's default schema for `safeLoad` function.
@@ -10110,29 +10110,29 @@ module.exports = Schema.DEFAULT = new Schema({
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(3407);
 
 
 module.exports = new Schema({
   include: [
-    __nccwpck_require__(4773)
+    __nccwpck_require__(2209)
   ],
   implicit: [
-    __nccwpck_require__(5339),
-    __nccwpck_require__(4543)
+    __nccwpck_require__(9767),
+    __nccwpck_require__(1235)
   ],
   explicit: [
-    __nccwpck_require__(2946),
-    __nccwpck_require__(7742),
-    __nccwpck_require__(770),
-    __nccwpck_require__(1723)
+    __nccwpck_require__(3638),
+    __nccwpck_require__(2618),
+    __nccwpck_require__(8422),
+    __nccwpck_require__(5631)
   ]
 });
 
 
 /***/ }),
 
-/***/ 6587:
+/***/ 823:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // Standard YAML's Failsafe schema.
@@ -10142,21 +10142,21 @@ module.exports = new Schema({
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(3407);
 
 
 module.exports = new Schema({
   explicit: [
-    __nccwpck_require__(4504),
-    __nccwpck_require__(1848),
-    __nccwpck_require__(7021)
+    __nccwpck_require__(548),
+    __nccwpck_require__(7540),
+    __nccwpck_require__(8537)
   ]
 });
 
 
 /***/ }),
 
-/***/ 5636:
+/***/ 0:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // Standard YAML's JSON schema.
@@ -10170,30 +10170,30 @@ module.exports = new Schema({
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(3407);
 
 
 module.exports = new Schema({
   include: [
-    __nccwpck_require__(6587)
+    __nccwpck_require__(823)
   ],
   implicit: [
-    __nccwpck_require__(7658),
-    __nccwpck_require__(6699),
-    __nccwpck_require__(9158),
-    __nccwpck_require__(1641)
+    __nccwpck_require__(4214),
+    __nccwpck_require__(5788),
+    __nccwpck_require__(858),
+    __nccwpck_require__(6541)
   ]
 });
 
 
 /***/ }),
 
-/***/ 7592:
+/***/ 6244:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var YAMLException = __nccwpck_require__(7627);
+var YAMLException = __nccwpck_require__(7511);
 
 var TYPE_CONSTRUCTOR_OPTIONS = [
   'kind',
@@ -10256,7 +10256,7 @@ module.exports = Type;
 
 /***/ }),
 
-/***/ 2946:
+/***/ 3638:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
@@ -10271,7 +10271,7 @@ try {
   NodeBuffer = _require('buffer').Buffer;
 } catch (__) {}
 
-var Type       = __nccwpck_require__(7592);
+var Type       = __nccwpck_require__(6244);
 
 
 // [ 64, 65, 66 ] -> [ padding, CR, LF ]
@@ -10401,12 +10401,12 @@ module.exports = new Type('tag:yaml.org,2002:binary', {
 
 /***/ }),
 
-/***/ 6699:
+/***/ 5788:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 function resolveYamlBoolean(data) {
   if (data === null) return false;
@@ -10443,13 +10443,13 @@ module.exports = new Type('tag:yaml.org,2002:bool', {
 
 /***/ }),
 
-/***/ 1641:
+/***/ 6541:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var common = __nccwpck_require__(3973);
-var Type   = __nccwpck_require__(7592);
+var common = __nccwpck_require__(9481);
+var Type   = __nccwpck_require__(6244);
 
 var YAML_FLOAT_PATTERN = new RegExp(
   // 2.5e4, 2.5 and integers
@@ -10566,13 +10566,13 @@ module.exports = new Type('tag:yaml.org,2002:float', {
 
 /***/ }),
 
-/***/ 9158:
+/***/ 858:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var common = __nccwpck_require__(3973);
-var Type   = __nccwpck_require__(7592);
+var common = __nccwpck_require__(9481);
+var Type   = __nccwpck_require__(6244);
 
 function isHexCode(c) {
   return ((0x30/* 0 */ <= c) && (c <= 0x39/* 9 */)) ||
@@ -10746,7 +10746,7 @@ module.exports = new Type('tag:yaml.org,2002:int', {
 
 /***/ }),
 
-/***/ 9531:
+/***/ 519:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
@@ -10770,7 +10770,7 @@ try {
   if (typeof window !== 'undefined') esprima = window.esprima;
 }
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 function resolveJavascriptFunction(data) {
   if (data === null) return false;
@@ -10846,12 +10846,12 @@ module.exports = new Type('tag:yaml.org,2002:js/function', {
 
 /***/ }),
 
-/***/ 7394:
+/***/ 3158:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 function resolveJavascriptRegExp(data) {
   if (data === null) return false;
@@ -10913,12 +10913,12 @@ module.exports = new Type('tag:yaml.org,2002:js/regexp', {
 
 /***/ }),
 
-/***/ 1775:
+/***/ 6963:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 function resolveJavascriptUndefined() {
   return true;
@@ -10948,12 +10948,12 @@ module.exports = new Type('tag:yaml.org,2002:js/undefined', {
 
 /***/ }),
 
-/***/ 7021:
+/***/ 8537:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 module.exports = new Type('tag:yaml.org,2002:map', {
   kind: 'mapping',
@@ -10963,12 +10963,12 @@ module.exports = new Type('tag:yaml.org,2002:map', {
 
 /***/ }),
 
-/***/ 4543:
+/***/ 1235:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 function resolveYamlMerge(data) {
   return data === '<<' || data === null;
@@ -10982,12 +10982,12 @@ module.exports = new Type('tag:yaml.org,2002:merge', {
 
 /***/ }),
 
-/***/ 7658:
+/***/ 4214:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 function resolveYamlNull(data) {
   if (data === null) return true;
@@ -11023,12 +11023,12 @@ module.exports = new Type('tag:yaml.org,2002:null', {
 
 /***/ }),
 
-/***/ 7742:
+/***/ 2618:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 var _toString       = Object.prototype.toString;
@@ -11074,12 +11074,12 @@ module.exports = new Type('tag:yaml.org,2002:omap', {
 
 /***/ }),
 
-/***/ 770:
+/***/ 8422:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 var _toString = Object.prototype.toString;
 
@@ -11134,12 +11134,12 @@ module.exports = new Type('tag:yaml.org,2002:pairs', {
 
 /***/ }),
 
-/***/ 1848:
+/***/ 7540:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 module.exports = new Type('tag:yaml.org,2002:seq', {
   kind: 'sequence',
@@ -11149,12 +11149,12 @@ module.exports = new Type('tag:yaml.org,2002:seq', {
 
 /***/ }),
 
-/***/ 1723:
+/***/ 5631:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -11185,12 +11185,12 @@ module.exports = new Type('tag:yaml.org,2002:set', {
 
 /***/ }),
 
-/***/ 4504:
+/***/ 548:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 module.exports = new Type('tag:yaml.org,2002:str', {
   kind: 'scalar',
@@ -11200,12 +11200,12 @@ module.exports = new Type('tag:yaml.org,2002:str', {
 
 /***/ }),
 
-/***/ 5339:
+/***/ 9767:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(6244);
 
 var YAML_DATE_REGEXP = new RegExp(
   '^([0-9][0-9][0-9][0-9])'          + // [1] year
@@ -11295,7 +11295,7 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
 
 /***/ }),
 
-/***/ 6403:
+/***/ 4471:
 /***/ ((module) => {
 
 /*!
@@ -11315,7 +11315,7 @@ module.exports = function isExtendable(val) {
 
 /***/ }),
 
-/***/ 1167:
+/***/ 6059:
 /***/ ((module) => {
 
 
@@ -11415,7 +11415,7 @@ function escapeJsonPtr(str) {
 
 /***/ }),
 
-/***/ 5140:
+/***/ 8704:
 /***/ ((module) => {
 
 var toString = Object.prototype.toString;
@@ -11551,13 +11551,13 @@ function isBuffer(val) {
 
 /***/ }),
 
-/***/ 9495:
+/***/ 5131:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var typeOf = __nccwpck_require__(5140);
-var extend = __nccwpck_require__(8905);
+var typeOf = __nccwpck_require__(8704);
+var extend = __nccwpck_require__(1653);
 
 /**
  * Parse sections in `input` with the given `options`.
@@ -11694,7 +11694,7 @@ function isBuffer(val) {
 
 /***/ }),
 
-/***/ 1389:
+/***/ 105:
 /***/ ((module) => {
 
 /*!
@@ -11744,20 +11744,20 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 
 /***/ }),
 
-/***/ 3136:
+/***/ 755:
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
 
 /***/ }),
 
-/***/ 4352:
+/***/ 7868:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizeComponentEncoding, isIPv4, nonSimpleDomain } = __nccwpck_require__(5077)
-const { SCHEMES, getSchemeHandler } = __nccwpck_require__(5300)
+const { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizeComponentEncoding, isIPv4, nonSimpleDomain } = __nccwpck_require__(2513)
+const { SCHEMES, getSchemeHandler } = __nccwpck_require__(3136)
 
 /**
  * @template {import('./types/index').URIComponent|string} T
@@ -12098,12 +12098,12 @@ module.exports.fastUri = fastUri
 
 /***/ }),
 
-/***/ 5300:
+/***/ 3136:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const { isUUID } = __nccwpck_require__(5077)
+const { isUUID } = __nccwpck_require__(2513)
 const URN_REG = /([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-.:;=@]|%[\da-f]{2})+)/iu
 
 const supportedSchemeNames = /** @type {const} */ (['http', 'https', 'ws',
@@ -12372,7 +12372,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 5077:
+/***/ 2513:
 /***/ ((module) => {
 
 
@@ -12715,7 +12715,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 3243:
+/***/ 7167:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
@@ -16582,7 +16582,7 @@ var jsYaml = {
 
 /***/ }),
 
-/***/ 9519:
+/***/ 5619:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -16593,7 +16593,7 @@ __nccwpck_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: AST, GLOBSTAR, Minimatch, braceExpand, defaults, escape, filter, makeRe, match, sep, unescape
 
-;// CONCATENATED MODULE: ./node_modules/minimatch/node_modules/balanced-match/dist/esm/index.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/node_modules/balanced-match/dist/esm/index.js
 const balanced = (a, b, str) => {
     const ma = a instanceof RegExp ? maybeMatch(a, str) : a;
     const mb = b instanceof RegExp ? maybeMatch(b, str) : b;
@@ -16648,7 +16648,7 @@ const range = (a, b, str) => {
     return result;
 };
 //# sourceMappingURL=index.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/node_modules/brace-expansion/dist/esm/index.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/node_modules/brace-expansion/dist/esm/index.js
 
 const escSlash = '\0SLASH' + Math.random() + '\0';
 const escOpen = '\0OPEN' + Math.random() + '\0';
@@ -16846,7 +16846,7 @@ function expand_(str, max, isTop) {
     return expansions;
 }
 //# sourceMappingURL=index.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/assert-valid-pattern.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/dist/esm/assert-valid-pattern.js
 const MAX_PATTERN_LENGTH = 1024 * 64;
 const assertValidPattern = (pattern) => {
     if (typeof pattern !== 'string') {
@@ -16857,7 +16857,7 @@ const assertValidPattern = (pattern) => {
     }
 };
 //# sourceMappingURL=assert-valid-pattern.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/brace-expressions.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/dist/esm/brace-expressions.js
 // translate the various posix character classes into unicode properties
 // this works across all unicode locales
 // { <posix class>: [<translation>, /u flag required, negated]
@@ -17004,7 +17004,7 @@ const parseClass = (glob, position) => {
     return [comb, uflag, endPos - pos, true];
 };
 //# sourceMappingURL=brace-expressions.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/unescape.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/dist/esm/unescape.js
 /**
  * Un-escape a string that has been escaped with {@link escape}.
  *
@@ -17039,7 +17039,7 @@ const unescape_unescape = (s, { windowsPathsNoEscape = false, magicalBraces = tr
             .replace(/\\([^/{}])/g, '$1');
 };
 //# sourceMappingURL=unescape.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/ast.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/dist/esm/ast.js
 // parse a single path portion
 var _a;
 
@@ -17881,7 +17881,7 @@ class AST {
 }
 _a = AST;
 //# sourceMappingURL=ast.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/escape.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/dist/esm/escape.js
 /**
  * Escape all magic characters in a glob pattern.
  *
@@ -17908,7 +17908,7 @@ const escape_escape = (s, { windowsPathsNoEscape = false, magicalBraces = false,
         : s.replace(/[?*()[\]\\]/g, '\\$&');
 };
 //# sourceMappingURL=escape.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/index.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/dist/esm/index.js
 
 
 
@@ -19026,934 +19026,23 @@ minimatch.unescape = unescape_unescape;
 
 /***/ }),
 
-/***/ 4904:
+/***/ 6549:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
 // EXPORTS
 __nccwpck_require__.d(__webpack_exports__, {
-  kN: () => (/* binding */ buildExecutionPlan),
-  Ay: () => (/* binding */ rankByModelHint),
-  P0: () => (/* reexport */ summarizeSkill)
+  YOg: () => (/* reexport */ array),
+  k5n: () => (/* reexport */ schemas_enum),
+  aig: () => (/* reexport */ schemas_number),
+  Ikc: () => (/* reexport */ object),
+  YjP: () => (/* reexport */ schemas_string),
+  L5J: () => (/* reexport */ unknown)
 });
 
-// UNUSED EXPORTS: matchesPhase, selectSkills
+// UNUSED EXPORTS: $brand, $input, $output, NEVER, TimePrecision, ZodAny, ZodArray, ZodBase64, ZodBase64URL, ZodBigInt, ZodBigIntFormat, ZodBoolean, ZodCIDRv4, ZodCIDRv6, ZodCUID, ZodCUID2, ZodCatch, ZodCodec, ZodCustom, ZodCustomStringFormat, ZodDate, ZodDefault, ZodDiscriminatedUnion, ZodE164, ZodEmail, ZodEmoji, ZodEnum, ZodError, ZodExactOptional, ZodFile, ZodFirstPartyTypeKind, ZodFunction, ZodGUID, ZodIPv4, ZodIPv6, ZodISODate, ZodISODateTime, ZodISODuration, ZodISOTime, ZodIntersection, ZodIssueCode, ZodJWT, ZodKSUID, ZodLazy, ZodLiteral, ZodMAC, ZodMap, ZodNaN, ZodNanoID, ZodNever, ZodNonOptional, ZodNull, ZodNullable, ZodNumber, ZodNumberFormat, ZodObject, ZodOptional, ZodPipe, ZodPrefault, ZodPromise, ZodReadonly, ZodRealError, ZodRecord, ZodSet, ZodString, ZodStringFormat, ZodSuccess, ZodSymbol, ZodTemplateLiteral, ZodTransform, ZodTuple, ZodType, ZodULID, ZodURL, ZodUUID, ZodUndefined, ZodUnion, ZodUnknown, ZodVoid, ZodXID, ZodXor, _ZodString, _default, _function, any, base64, base64url, bigint, boolean, catch, check, cidrv4, cidrv6, clone, codec, coerce, config, core, cuid, cuid2, custom, date, decode, decodeAsync, describe, discriminatedUnion, e164, email, emoji, encode, encodeAsync, endsWith, exactOptional, file, flattenError, float32, float64, formatError, fromJSONSchema, function, getErrorMap, globalRegistry, gt, gte, guid, hash, hex, hostname, httpUrl, includes, instanceof, int, int32, int64, intersection, ipv4, ipv6, iso, json, jwt, keyof, ksuid, lazy, length, literal, locales, looseObject, looseRecord, lowercase, lt, lte, mac, map, maxLength, maxSize, meta, mime, minLength, minSize, multipleOf, nan, nanoid, nativeEnum, negative, never, nonnegative, nonoptional, nonpositive, normalize, null, nullable, nullish, optional, overwrite, parse, parseAsync, partialRecord, pipe, positive, prefault, preprocess, prettifyError, promise, property, readonly, record, refine, regex, regexes, registry, safeDecode, safeDecodeAsync, safeEncode, safeEncodeAsync, safeParse, safeParseAsync, set, setErrorMap, size, slugify, startsWith, strictObject, stringFormat, stringbool, success, superRefine, symbol, templateLiteral, toJSONSchema, toLowerCase, toUpperCase, transform, treeifyError, trim, tuple, uint32, uint64, ulid, undefined, union, uppercase, url, util, uuid, uuidv4, uuidv6, uuidv7, void, xid, xor
 
-// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
-var esm = __nccwpck_require__(9519);
-// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
-var skill_loader = __nccwpck_require__(5541);
-;// CONCATENATED MODULE: ./src/lib/skill-planner.mjs
-
-
-/**
- * Summarize a skill's metadata for LLM consumption.
- * @param {import('../../runners/core/review-runner.mjs').SkillDefinition|import('../../runners/core/review-runner.mjs').SkillMetadata} skill
- */
-function summarizeSkill(skill) {
-  const meta = skill?.metadata ?? skill;
-  return {
-    id: meta.id,
-    name: meta.name,
-    description: meta.description,
-    phase: meta.phase,
-    applyTo: meta.applyTo ?? [],
-    inputContext: meta.inputContext ?? [],
-    outputKind: meta.outputKind ?? ['findings'],
-    modelHint: meta.modelHint ?? null,
-    dependencies: meta.dependencies ?? [],
-    tags: meta.tags ?? [],
-    severity: meta.severity ?? null,
-  };
-}
-
-/**
- * Plan skills using an LLM (or provided planner function). Falls back to deterministic ordering on error.
- * @param {Object} options
- * @param {Array} options.skills - candidate skills (already filtered)
- * @param {Object} options.context - review context (e.g., changedFiles/diff summary/prompt)
- * @param {Function} [options.llmPlan] - async function receiving {skills, context}, returning [{id, priority, reason}]
- * @param {boolean} [options.appendRemaining=true] - whether to append unreferenced skills in deterministic order
- * @returns {Promise<{planned: Array, reasons: Array, fallback: boolean}>}
- */
-async function planSkills({ skills, context, llmPlan, appendRemaining = true }) {
-  const summaries = skills.map(summarizeSkill);
-
-  if (!llmPlan) {
-    return {
-      planned: rankByModelHint(skills),
-      reasons: [],
-      fallback: false,
-    };
-  }
-
-  try {
-    const plan = await llmPlan({ skills: summaries, context });
-    if (!Array.isArray(plan)) {
-      throw new Error('planner returned non-array response');
-    }
-    const order = plan;
-    const byId = new Map(summaries.map((summary, idx) => [summary.id, skills[idx]]));
-    const planned = [];
-    const reasons = [];
-    let matchedCount = 0;
-
-    for (const entry of order) {
-      if (!entry?.id) continue;
-      const candidate = byId.get(entry.id);
-      if (candidate) {
-        planned.push(candidate);
-        matchedCount += 1;
-        if (entry.reason) reasons.push({ id: entry.id, reason: entry.reason });
-        byId.delete(entry.id);
-      }
-    }
-
-    if (appendRemaining) {
-      // append any not referenced by LLM in deterministic order
-      const remaining = rankByModelHint(Array.from(byId.values()));
-      planned.push(...remaining);
-    } else if (matchedCount === 0 && order.length > 0) {
-      // In prune mode, a non-empty plan that matches nothing is almost certainly invalid output.
-      throw new Error('planner returned no known skill ids');
-    }
-
-    return { planned, reasons, fallback: false };
-  } catch (err) {
-    return {
-      planned: rankByModelHint(skills),
-      reasons: [{ id: 'fallback', reason: `planner error: ${err.message}` }],
-      fallback: true,
-    };
-  }
-}
-
-;// CONCATENATED MODULE: ./src/lib/impact-scope.mjs
-function ensureArray(value) {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function extOf(file) {
-  const idx = file.lastIndexOf('.');
-  if (idx < 0) return '';
-  return file.slice(idx + 1).toLowerCase();
-}
-
-function containsSegment(file, segment) {
-  const normalized = file.replaceAll('\\', '/');
-  return normalized.split('/').includes(segment);
-}
-
-function matchesAny(file, needles) {
-  const normalized = file.toLowerCase();
-  return needles.some(n => normalized.includes(n));
-}
-
-/**
- * Infer impact tags from changed file paths.
- * Tags are intentionally small and map to existing `skills/**` tags.
- * @param {string[]|string} changedFiles
- * @param {{diffText?: string}} [options]
- * @returns {string[]}
- */
-function inferImpactTags(changedFiles, options = {}) {
-  const files = ensureArray(changedFiles);
-  const tags = new Set();
-
-  for (const file of files) {
-    const ext = extOf(file);
-
-    if (['ts', 'tsx', 'cts', 'mts'].includes(ext)) tags.add('typescript');
-    if (['js', 'jsx', 'cjs', 'mjs'].includes(ext)) tags.add('javascript');
-    if (['md', 'mdx', 'adr'].includes(ext) || matchesAny(file, ['/docs/', '/design/']) || containsSegment(file, 'docs')) {
-      tags.add('design');
-    }
-
-    if (
-      containsSegment(file, 'tests') ||
-      containsSegment(file, 'test') ||
-      containsSegment(file, '__tests__') ||
-      matchesAny(file, ['.test.', '.spec.'])
-    ) {
-      tags.add('tests');
-    }
-
-    if (containsSegment(file, 'api') || containsSegment(file, 'routes')) tags.add('api');
-    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/'])) tags.add('reliability');
-
-    if (
-      containsSegment(file, 'auth') ||
-      containsSegment(file, 'security') ||
-      matchesAny(file, ['/oauth', '/jwt', '/session', '/cookie', '/csrf'])
-    ) {
-      tags.add('security');
-    }
-
-    if (
-      tags.has('api') ||
-      containsSegment(file, 'config') ||
-      containsSegment(file, 'db') ||
-      matchesAny(file, ['/env', '/secrets', '/headers'])
-    ) {
-      tags.add('security');
-    }
-
-    if (containsSegment(file, 'logging') || matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])) {
-      tags.add('observability');
-      tags.add('reliability');
-    }
-  }
-
-  const diffText = options?.diffText;
-  if (typeof diffText === 'string' && diffText.length) {
-    const lower = diffText.toLowerCase();
-    const hasCatch = lower.includes('catch (') || lower.includes('catch(');
-    const addsSilentReturn =
-      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) || /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
-    const mentionsIgnore = lower.includes('ignore') || lower.includes('swallow');
-    if (hasCatch && (addsSilentReturn || mentionsIgnore)) {
-      tags.add('observability');
-      tags.add('reliability');
-    }
-  }
-
-  return [...tags].sort();
-}
-
-// EXTERNAL MODULE: ./src/lib/planner-utils.mjs
-var planner_utils = __nccwpck_require__(1013);
-// EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
-var heuristic_review = __nccwpck_require__(2294);
-;// CONCATENATED MODULE: ./runners/core/review-runner.mjs
-
-
-
-
-
-
-
-const MODEL_PRIORITY = {
-  cheap: 1,
-  balanced: 2,
-  'high-accuracy': 3,
-};
-
-function getMeta(skill) {
-  return skill?.metadata ?? skill;
-}
-
-function review_runner_ensureArray(value) {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function matchesPhase(skill, phase) {
-  const meta = getMeta(skill);
-  if (Array.isArray(meta.phase)) {
-    return meta.phase.includes(phase);
-  }
-  return meta.phase === phase;
-}
-
-function matchesApplyTo(skill, changedFiles) {
-  const meta = getMeta(skill);
-  const globs = review_runner_ensureArray(meta.applyTo);
-  if (!globs.length) return false;
-  return changedFiles.some((file) =>
-    globs.some((pattern) => (0,esm/* minimatch */.xF)(file, pattern, { dot: true }))
-  );
-}
-
-function missingInputContexts(skill, availableContexts) {
-  const meta = getMeta(skill);
-  if (!meta.inputContext || meta.inputContext.length === 0) return [];
-  const available = new Set(availableContexts);
-  return meta.inputContext.filter((ctx) => !available.has(ctx));
-}
-
-function missingDependencies(skill, availableDependencies) {
-  const meta = getMeta(skill);
-  const deps = review_runner_ensureArray(meta.dependencies);
-  if (!deps.length) return [];
-  if (availableDependencies == null) return [];
-  const available = new Set(review_runner_ensureArray(availableDependencies));
-  return deps.filter((dep) => !available.has(dep));
-}
-
-function evaluateSkill(skill, options) {
-  const reasons = [];
-  const meta = getMeta(skill);
-  if (!matchesPhase(meta, options.phase)) {
-    reasons.push(`phase mismatch: ${meta.phase} !== ${options.phase}`);
-  }
-  if (!matchesApplyTo(meta, options.changedFiles)) {
-    reasons.push('applyTo did not match any changed file');
-  }
-  const missingContexts = missingInputContexts(meta, options.availableContexts);
-  if (missingContexts.length) {
-    reasons.push(`missing inputContext: ${missingContexts.join(', ')}`);
-  }
-  const depsMissing = missingDependencies(meta, options.availableDependencies);
-  if (depsMissing.length) {
-    reasons.push(`missing dependencies: ${depsMissing.join(', ')}`);
-  }
-  return {
-    ok: reasons.length === 0,
-    reasons,
-  };
-}
-
-function selectSkills(skills, options) {
-  const changedFiles = review_runner_ensureArray(options.changedFiles);
-  const availableContexts = review_runner_ensureArray(options.availableContexts);
-  const availableDependencies = options.availableDependencies ?? null;
-  const dryRun = options.dryRun ?? false;
-  const llmEnabled = options.llmEnabled ?? true;
-  const selected = [];
-  const skipped = [];
-
-  for (const skill of skills) {
-    const meta = skill.metadata ?? skill;
-    const skillId = meta.id;
-
-    // ルーティングスキル（エントリポイント）は実行対象外
-    const tags = review_runner_ensureArray(meta.tags);
-    if (tags.includes('routing')) {
-      skipped.push({ skill, reasons: ['routing skill: not an executable review skill'] });
-      continue;
-    }
-
-    // dry-run または LLM 無効時はヒューリスティック対応スキルのみ選択
-    const isLlmRestricted = dryRun || !llmEnabled;
-    if (isLlmRestricted && !heuristic_review/* HEURISTIC_SKILL_IDS */.y2.includes(skillId)) {
-      const reason = dryRun
-        ? 'dry-run: LLM必須スキル（ヒューリスティック未対応）'
-        : 'LLM disabled: LLM必須スキル（APIキー未設定）';
-      skipped.push({ skill, reasons: [reason] });
-      continue;
-    }
-
-    const result = evaluateSkill(meta, {
-      phase: options.phase,
-      changedFiles,
-      availableContexts,
-      availableDependencies,
-    });
-    if (result.ok) {
-      selected.push(skill);
-    } else {
-      skipped.push({ skill, reasons: result.reasons });
-    }
-  }
-  return { selected, skipped };
-}
-
-function rankByModelHint(skills, preferredModelHint = 'balanced') {
-  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
-  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
-  return [...skills].sort((a, b) => {
-    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
-    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
-    if (wa !== wb) return wa - wb;
-    return getMeta(a).id.localeCompare(getMeta(b).id);
-  });
-}
-
-function computeTagScore(skill, impactTags) {
-  if (!impactTags?.length) return 0;
-  const tags = new Set(getMeta(skill).tags ?? []);
-  let score = 0;
-  for (const tag of impactTags) {
-    if (tags.has(tag)) score += 1;
-  }
-  return score;
-}
-
-function rankByImpactTags(skills, impactTags, preferredModelHint = 'balanced') {
-  const scores = new Map(skills.map((s) => [getMeta(s).id, computeTagScore(s, impactTags)]));
-  const anyMatched = Array.from(scores.values()).some((v) => v > 0);
-  if (!anyMatched) {
-    return rankByModelHint(skills, preferredModelHint);
-  }
-
-  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
-  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
-
-  return [...skills].sort((a, b) => {
-    const idA = getMeta(a).id;
-    const idB = getMeta(b).id;
-    const scoreA = scores.get(idA) ?? 0;
-    const scoreB = scores.get(idB) ?? 0;
-    if (scoreA !== scoreB) return scoreB - scoreA;
-
-    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
-    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
-    if (wa !== wb) return wa - wb;
-    return idA.localeCompare(idB);
-  });
-}
-
-/**
- * Build an execution plan from skills and review context.
- * - planner 未指定: メタデと modelHint に基づく決定論的な並び替え
- * - planner 指定: LLM 等で優先度決定し、エラー時は決定論的順序にフォールバック
- *   - plannerMode=order: 優先度づけ（未参照スキルは後ろに決定論で追加）
- *   - plannerMode=prune: 絞り込み（LLM が選んだスキルのみを実行）
- */
-async function buildExecutionPlan(options) {
-  const {
-    phase,
-    changedFiles = [],
-    availableContexts = [],
-    availableDependencies = null,
-    preferredModelHint = 'balanced',
-    skills: providedSkills,
-    planner,
-    plannerMode,
-    diffText,
-    dryRun = false,
-    llmEnabled = true,
-  } = options;
-
-  const skills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
-  const selection = selectSkills(skills, {
-    phase,
-    changedFiles,
-    availableContexts,
-    availableDependencies,
-    dryRun,
-    llmEnabled,
-  });
-  if (selection.selected.length === 0) {
-    return { selected: [], skipped: selection.skipped };
-  }
-
-  const impactTags = inferImpactTags(changedFiles, { diffText });
-
-  // If planner is provided, try LLM-based planning, fallback to deterministic rank
-  const effectivePlannerMode = planner
-    ? (0,planner_utils/* normalizePlannerMode */.p)(plannerMode, { defaultMode: 'order' })
-    : 'off';
-  if (planner && effectivePlannerMode !== 'off') {
-    const context = {
-      phase,
-      changedFiles,
-      availableContexts,
-      impactTags,
-    };
-    const { planned, reasons, fallback } = await planSkills({
-      skills: selection.selected,
-      context,
-      llmPlan: planner.plan ?? planner,
-      appendRemaining: effectivePlannerMode !== 'prune',
-    });
-    const ranked = fallback
-      ? rankByImpactTags(selection.selected, impactTags, preferredModelHint)
-      : planned;
-    return {
-      selected: ranked,
-      skipped: selection.skipped,
-      plannerMode: effectivePlannerMode,
-      plannerReasons: reasons,
-      plannerFallback: fallback,
-      ...(fallback ? { plannerError: reasons?.[0]?.reason ?? 'planner fallback' } : {}),
-      impactTags,
-    };
-  }
-
-  // planner が無い場合（LLM未設定）は決定論的順位付けで実行
-  const ordered = rankByImpactTags(selection.selected, impactTags, preferredModelHint);
-
-  return {
-    selected: ordered,
-    skipped: selection.skipped,
-    impactTags,
-  };
-}
-
-// Re-export summarizeSkill for consumers that want the same view used by planner
-
-
-
-/***/ }),
-
-/***/ 5541:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  vN: () => (/* binding */ SkillLoaderError),
-  m: () => (/* binding */ createSkillValidator),
-  KJ: () => (/* binding */ defaultPaths),
-  e$: () => (/* binding */ loadSchema),
-  l1: () => (/* binding */ loadSkills),
-  eJ: () => (/* binding */ parseFrontMatter)
-});
-
-// UNUSED EXPORTS: listSkillFiles, loadSkillFile, parseSkillFile
-
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(9896);
-;// CONCATENATED MODULE: external "path"
-const external_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
-;// CONCATENATED MODULE: external "url"
-const external_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
-// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-var js_yaml = __nccwpck_require__(3243);
-// EXTERNAL MODULE: ./node_modules/gray-matter/index.js
-var gray_matter = __nccwpck_require__(9599);
-// EXTERNAL MODULE: ./node_modules/ajv/dist/2020.js
-var _2020 = __nccwpck_require__(2210);
-// EXTERNAL MODULE: ./node_modules/ajv-formats/dist/index.js
-var dist = __nccwpck_require__(2815);
-;// CONCATENATED MODULE: ./runners/core/skill-loader.mjs
-
-
-
-
-
-
-
-
-/**
- * @typedef {'upstream' | 'midstream' | 'downstream'} PhaseEnum
- * @typedef {PhaseEnum | PhaseEnum[]} Phase
- * @typedef {'info' | 'minor' | 'major' | 'critical'} Severity
- * @typedef {'diff' | 'fullFile' | 'tests' | 'adr' | 'commitMessage' | 'repoConfig'} InputContext
- * @typedef {'findings' | 'summary' | 'actions' | 'tests' | 'metrics' | 'questions'} OutputKind
- * @typedef {'cheap' | 'balanced' | 'high-accuracy'} ModelHint
- * @typedef {'code_search' | 'test_runner' | 'adr_lookup' | 'repo_metadata' | 'coverage_report' | 'tracing' | `custom:${string}`} Dependency
- *
- * @typedef {Object} SkillMetadata
- * @property {string} id
- * @property {string} name
- * @property {string} description
- * @property {Phase} phase
- * @property {string[]} applyTo
- * @property {string[]=} files
- * @property {string[]=} tags
- * @property {Severity=} severity
- * @property {InputContext[]=} inputContext
- * @property {OutputKind[]=} outputKind
- * @property {ModelHint=} modelHint
- * @property {Dependency[]=} dependencies
- * @property {{phase?: Phase, applyTo?: string[], files?: string[]}=} trigger
- * @property {number=} priority
- *
- * @typedef {Object} SkillDefinition
- * @property {SkillMetadata} metadata
- * @property {string} body
- * @property {string} path
- */
-
-const skill_loader_filename = (0,external_url_namespaceObject.fileURLToPath)(import.meta.url);
-const skill_loader_dirname = external_path_namespaceObject.dirname(skill_loader_filename);
-const repoRoot = process.env.RIVER_REPO_ROOT
-  ? external_path_namespaceObject.resolve(process.env.RIVER_REPO_ROOT)
-  : external_path_namespaceObject.resolve(skill_loader_dirname, '..', '..');
-const defaultSkillsDir = external_path_namespaceObject.join(repoRoot, 'skills');
-const defaultSchemaPath = external_path_namespaceObject.join(repoRoot, 'schemas', 'skill.schema.json');
-const markdownExtensions = new Set(['.md', '.mdx']);
-const yamlExtensions = new Set(['.yaml', '.yml']);
-const allowedExtensions = new Set([...markdownExtensions, ...yamlExtensions]);
-const ignoredSkillDirNames = new Set([
-  'references',
-  'fixtures',
-  'golden',
-  'eval',
-  'prompt',
-  'prompts',
-]);
-const ignoredFileNames = new Set(['.gitkeep', 'README.md', 'registry.yaml', 'registry.yml', '_template.md']);
-const legacySkillFiles = new Set(['skill.yaml', 'skill.yml']);
-const streamCategories = new Set(['core', 'upstream', 'midstream', 'downstream']);
-const allPhases = ['upstream', 'midstream', 'downstream'];
-
-const defaultPaths = {
-  repoRoot,
-  skillsDir: defaultSkillsDir,
-  schemaPath: defaultSchemaPath,
-};
-
-class SkillLoaderError extends Error {
-  constructor(message, details = undefined) {
-    super(message);
-    this.name = 'SkillLoaderError';
-    this.details = details;
-  }
-}
-
-async function loadSchema(schemaPath = defaultSchemaPath) {
-  const raw = await external_fs_.promises.readFile(schemaPath, 'utf8');
-  try {
-    return JSON.parse(raw);
-  } catch (err) {
-    throw new SkillLoaderError(`Failed to parse JSON schema at ${schemaPath}: ${err.message}`);
-  }
-}
-
-function createSkillValidator(schema) {
-  const ajv = new _2020({ allErrors: true, strict: false, useDefaults: true });
-  dist(ajv);
-  return ajv.compile(schema);
-}
-
-async function listSkillFiles(dir = defaultSkillsDir) {
-  const entries = await external_fs_.promises.readdir(dir, { withFileTypes: true });
-  const files = [];
-
-  const hasLegacySkillFile = entries.some(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
-  if (hasLegacySkillFile) {
-    const legacyEntry = entries.find(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
-    if (!legacyEntry) {
-      throw new Error(`skill.yaml detected but not found in ${dir}`);
-    }
-    files.push(external_path_namespaceObject.join(dir, legacyEntry.name));
-    return files.sort((a, b) => a.localeCompare(b));
-  }
-
-  for (const entry of entries) {
-    const entryPath = external_path_namespaceObject.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (ignoredSkillDirNames.has(entry.name) || entry.name.startsWith('.')) {
-        continue;
-      }
-      const nested = await listSkillFiles(entryPath);
-      files.push(...nested);
-      continue;
-    }
-
-    const ext = external_path_namespaceObject.extname(entry.name).toLowerCase();
-    if (!allowedExtensions.has(ext)) continue;
-    if (ignoredFileNames.has(entry.name)) continue;
-    if (entry.name.startsWith('_')) continue;
-    files.push(entryPath);
-  }
-
-  return files.sort((a, b) => a.localeCompare(b));
-}
-
-function normalizeStringArray(value) {
-  if (!value) return undefined;
-  const asArray = Array.isArray(value) ? value : [value];
-  const filtered = asArray
-    .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
-    .filter(Boolean);
-  return filtered.length ? filtered : undefined;
-}
-
-function normalizePhaseValue(value) {
-  if (!value) return undefined;
-  if (Array.isArray(value)) {
-    const phases = value.filter(Boolean);
-    if (phases.length === 1) return phases[0];
-    return phases.length ? phases : undefined;
-  }
-  return value;
-}
-
-function inferCategoryFromPhase(phase) {
-  if (!phase) return undefined;
-  if (Array.isArray(phase)) {
-    const unique = Array.from(new Set(phase));
-    if (unique.length === 1 && streamCategories.has(unique[0])) {
-      return unique[0];
-    }
-    if (unique.length > 1) {
-      return 'core';
-    }
-    return undefined;
-  }
-  return streamCategories.has(phase) ? phase : undefined;
-}
-
-function inferCategoryFromPath(filePath) {
-  if (!filePath) return undefined;
-  const segments = external_path_namespaceObject.normalize(filePath).split(external_path_namespaceObject.sep);
-  const skillsIndex = segments.lastIndexOf('skills');
-  const candidate = skillsIndex >= 0 ? segments[skillsIndex + 1] : undefined;
-  if (candidate && streamCategories.has(candidate)) {
-    return candidate;
-  }
-  return undefined;
-}
-
-function resolveCategory(metaCategory, { phase, filePath } = {}) {
-  if (typeof metaCategory === 'string' && streamCategories.has(metaCategory)) {
-    return metaCategory;
-  }
-  return inferCategoryFromPath(filePath) ?? inferCategoryFromPhase(phase);
-}
-
-function resolvePhase(metaPhase, category) {
-  if (category === 'core') {
-    return [...allPhases];
-  }
-  if (category && streamCategories.has(category)) {
-    return category;
-  }
-  return normalizePhaseValue(metaPhase);
-}
-
-function normalizeMetadata(metadata, { filePath } = {}) {
-  const meta = { ...metadata };
-
-  if (meta.priority !== undefined) {
-    const parsedPriority = typeof meta.priority === 'string' ? Number(meta.priority) : meta.priority;
-    if (Number.isFinite(parsedPriority)) {
-      meta.priority = parsedPriority;
-    } else {
-      delete meta.priority;
-    }
-  }
-
-  const topLevelApplyTo =
-    normalizeStringArray(meta.applyTo) ??
-    normalizeStringArray(meta.files) ??
-    normalizeStringArray(meta.path_patterns);
-  if (topLevelApplyTo) {
-    meta.applyTo = topLevelApplyTo;
-  }
-
-  const trigger =
-    meta.trigger && typeof meta.trigger === 'object' && !Array.isArray(meta.trigger)
-      ? meta.trigger
-      : null;
-  const triggerApplyTo =
-    normalizeStringArray(trigger?.applyTo) ??
-    normalizeStringArray(trigger?.files) ??
-    normalizeStringArray(trigger?.path_patterns);
-
-  if (!meta.phase && trigger?.phase) {
-    meta.phase = trigger.phase;
-  }
-  if (!meta.applyTo && triggerApplyTo) {
-    meta.applyTo = triggerApplyTo;
-  }
-
-  meta.category = resolveCategory(meta.category, { phase: meta.phase, filePath });
-  meta.phase = resolvePhase(meta.phase, meta.category);
-
-  // Trigger is consumed during normalization; avoid leaking nested state.
-  if (trigger) {
-    delete meta.trigger;
-  }
-  if ('path_patterns' in meta) {
-    delete meta.path_patterns;
-  }
-
-  return meta;
-}
-
-function parseFrontMatter(content, { filePath } = {}) {
-  const trimmed = content.trimStart();
-  if (!trimmed.startsWith('---')) {
-    throw new SkillLoaderError('Missing front matter block (---)');
-  }
-
-  let parsed;
-  try {
-    parsed = gray_matter(trimmed);
-  } catch (err) {
-    throw new SkillLoaderError(
-      `Front matter parse error${filePath ? ` (${filePath})` : ''}: ${err.message}`
-    );
-  }
-
-  const metadata = parsed.data ?? {};
-  if (typeof metadata !== 'object' || Array.isArray(metadata)) {
-    throw new SkillLoaderError('Front matter must be a mapping');
-  }
-  if (Object.keys(metadata).length === 0) {
-    throw new SkillLoaderError('Front matter is empty');
-  }
-  const normalized = normalizeMetadata(metadata, { filePath });
-  const body = (parsed.content ?? '').trim();
-  return { metadata: normalized, body };
-}
-
-async function parseSkillFile(filePath) {
-  const ext = external_path_namespaceObject.extname(filePath).toLowerCase();
-  if (!allowedExtensions.has(ext)) {
-    throw new SkillLoaderError(`Unsupported skill file extension: ${ext}`);
-  }
-  const raw = await external_fs_.promises.readFile(filePath, 'utf8');
-  if (markdownExtensions.has(ext)) {
-    return parseFrontMatter(raw, { filePath });
-  }
-
-  // YAML handling
-  let loaded = {};
-  try {
-    loaded = js_yaml/* default.load */.Ay.load(raw) ?? {};
-  } catch (err) {
-    throw new SkillLoaderError(`YAML parse error: ${err.message}`);
-  }
-  if (typeof loaded !== 'object' || Array.isArray(loaded)) {
-    throw new SkillLoaderError('Skill YAML must be a mapping');
-  }
-
-  let metadata = loaded;
-  let body = '';
-
-  // Support nested metadata block
-  if (loaded.metadata && typeof loaded.metadata === 'object' && !Array.isArray(loaded.metadata)) {
-    metadata = { ...loaded.metadata };
-    if (typeof metadata.instruction === 'string') {
-      body = metadata.instruction;
-      delete metadata.instruction;
-    } else if (typeof loaded.instruction === 'string') {
-      body = loaded.instruction;
-    }
-  } else if (typeof loaded.instruction === 'string') {
-    // Support flat structure with optional instruction field
-    body = loaded.instruction;
-    delete metadata.instruction;
-  }
-
-  metadata = normalizeMetadata(metadata, { filePath });
-  return { metadata, body };
-}
-
-function validateMetadata(metadata, validate) {
-  const metaCopy = JSON.parse(JSON.stringify(metadata ?? {}));
-  const ok = validate(metaCopy);
-  if (!ok) {
-    const details = (validate.errors ?? []).map(err => `${err.instancePath || '/'} ${err.message}`).join('; ');
-    throw new SkillLoaderError(`Validation failed: ${details}`, validate.errors);
-  }
-  return metaCopy;
-}
-
-function relativeToRepo(filePath) {
-  return filePath.startsWith(repoRoot) ? external_path_namespaceObject.relative(repoRoot, filePath) : filePath;
-}
-
-function logSkillLoadError(filePath, err) {
-  const location = relativeToRepo(filePath);
-  const reason = err instanceof Error ? err.message : String(err);
-  console.error(`⚠️  Failed to load skill ${location}: ${reason}`);
-  if (err?.details && Array.isArray(err.details)) {
-    for (const detail of err.details) {
-      const instance = detail.instancePath || '/';
-      console.error(`   - ${instance}: ${detail.message}`);
-    }
-  }
-}
-
-function logDuplicateSkill(id, filePath, originalPath) {
-  const location = relativeToRepo(filePath);
-  const first = relativeToRepo(originalPath);
-  console.warn(`⚠️  Duplicate skill id "${id}" in ${location}; already loaded from ${first}. Skipping.`);
-}
-
-function hasExcludedTag(metadata, excludedTags) {
-  if (!excludedTags?.length) return false;
-  const tags = metadata?.tags ?? [];
-  return tags.some(tag => excludedTags.includes(tag));
-}
-
-async function loadSkillFile(filePath, options = {}) {
-  const { validator, schemaPath = defaultSchemaPath } = options;
-  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
-  const parsed = await parseSkillFile(filePath);
-  const metadata = validateMetadata(parsed.metadata, compiledValidator);
-  return {
-    metadata,
-    body: parsed.body,
-    path: filePath,
-  };
-}
-
-async function loadSkills(options = {}) {
-  const {
-    skillsDir = defaultSkillsDir,
-    schemaPath = defaultSchemaPath,
-    validator: providedValidator,
-    excludedTags = ['agent'],
-  } = options;
-  const schema = providedValidator ? null : await loadSchema(schemaPath);
-  const validator = providedValidator ?? createSkillValidator(schema);
-  const files = await listSkillFiles(skillsDir);
-  const skillsById = new Map();
-
-  for (const filePath of files) {
-    try {
-      const skill = await loadSkillFile(filePath, { validator });
-      const id = skill?.metadata?.id;
-      if (!id) {
-        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
-        continue;
-      }
-      if (hasExcludedTag(skill.metadata, excludedTags)) {
-        continue;
-      }
-      if (skillsById.has(id)) {
-        logDuplicateSkill(id, filePath, skillsById.get(id).path);
-        continue;
-      }
-      skillsById.set(id, skill);
-    } catch (err) {
-      logSkillLoadError(filePath, err);
-    }
-  }
-
-  return Array.from(skillsById.values());
-}
-
-
-/***/ }),
-
-/***/ 4807:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   s: () => (/* binding */ defaultConfig),
-/* harmony export */   z: () => (/* binding */ defaultSkillConfig)
-/* harmony export */ });
-// Unified default config supporting both legacy and skill-based flows
-const defaultConfig = Object.freeze({
-  version: '1.0',
-  model: {
-    provider: 'openai',
-    modelName: 'gpt-4o-mini',
-    temperature: 0,
-    maxTokens: 600,
-  },
-  review: {
-    language: 'ja',
-    severity: 'normal',
-    additionalInstructions: [],
-  },
-  exclude: {
-    files: [],
-    prLabelsToIgnore: [],
-  },
-  skills: [],
-});
-
-// Alias kept for compatibility with newer skill-only imports
-const defaultSkillConfig = defaultConfig;
-
-
-/***/ }),
-
-/***/ 6245:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  UT: () => (/* binding */ ConfigLoader),
-  Z9: () => (/* binding */ loadConfig),
-  R2: () => (/* binding */ mergeConfig)
-});
-
-// UNUSED EXPORTS: ConfigLoaderError, ConfigMergeError
-
-// NAMESPACE OBJECT: ./node_modules/zod/v4/core/regexes.js
+// NAMESPACE OBJECT: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/regexes.js
 var regexes_namespaceObject = {};
 __nccwpck_require__.r(regexes_namespaceObject);
 __nccwpck_require__.d(regexes_namespaceObject, {
@@ -20017,7 +19106,7 @@ __nccwpck_require__.d(regexes_namespaceObject, {
   xid: () => (xid)
 });
 
-// NAMESPACE OBJECT: ./node_modules/zod/v4/classic/checks.js
+// NAMESPACE OBJECT: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/checks.js
 var classic_checks_namespaceObject = {};
 __nccwpck_require__.r(classic_checks_namespaceObject);
 __nccwpck_require__.d(classic_checks_namespaceObject, {
@@ -20052,7 +19141,7 @@ __nccwpck_require__.d(classic_checks_namespaceObject, {
   uppercase: () => (_uppercase)
 });
 
-// NAMESPACE OBJECT: ./node_modules/zod/v4/classic/iso.js
+// NAMESPACE OBJECT: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/iso.js
 var iso_namespaceObject = {};
 __nccwpck_require__.r(iso_namespaceObject);
 __nccwpck_require__.d(iso_namespaceObject, {
@@ -20066,7 +19155,7 @@ __nccwpck_require__.d(iso_namespaceObject, {
   time: () => (iso_time)
 });
 
-// NAMESPACE OBJECT: ./node_modules/zod/v4/classic/schemas.js
+// NAMESPACE OBJECT: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/schemas.js
 var classic_schemas_namespaceObject = {};
 __nccwpck_require__.r(classic_schemas_namespaceObject);
 __nccwpck_require__.d(classic_schemas_namespaceObject, {
@@ -20236,13 +19325,7 @@ __nccwpck_require__.d(classic_schemas_namespaceObject, {
   xor: () => (xor)
 });
 
-// EXTERNAL MODULE: external "node:fs/promises"
-var promises_ = __nccwpck_require__(1455);
-// EXTERNAL MODULE: external "node:path"
-var external_node_path_ = __nccwpck_require__(6760);
-// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-var js_yaml = __nccwpck_require__(3243);
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/core.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/core.js
 /** A special constant with type `never` */
 const NEVER = Object.freeze({
     status: "aborted",
@@ -20320,7 +19403,7 @@ function config(newConfig) {
     return globalConfig;
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/util.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/util.js
 // functions
 function assertEqual(val) {
     return val;
@@ -20973,7 +20056,7 @@ class Class {
     constructor(..._args) { }
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/errors.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/errors.js
 
 
 const initializer = (inst, def) => {
@@ -21157,7 +20240,7 @@ function prettifyError(error) {
     return lines.join("\n");
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/parse.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/parse.js
 
 
 
@@ -21252,7 +20335,7 @@ const _safeDecodeAsync = (_Err) => async (schema, value, _ctx) => {
 };
 const safeDecodeAsync = /* @__PURE__*/ _safeDecodeAsync($ZodRealError);
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/regexes.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/regexes.js
 
 const cuid = /^[cC][^\s-]{8,}$/;
 const cuid2 = /^[0-9a-z]+$/;
@@ -21387,7 +20470,7 @@ const sha512_hex = /^[0-9a-fA-F]{128}$/;
 const sha512_base64 = /*@__PURE__*/ fixedBase64(86, "==");
 const sha512_base64url = /*@__PURE__*/ fixedBase64url(86);
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/checks.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/checks.js
 // import { $ZodType } from "./schemas.js";
 
 
@@ -21964,7 +21047,7 @@ const $ZodCheckOverwrite = /*@__PURE__*/ $constructor("$ZodCheckOverwrite", (ins
     };
 });
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/doc.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/doc.js
 class Doc {
     constructor(args = []) {
         this.content = [];
@@ -22001,14 +21084,14 @@ class Doc {
     }
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/versions.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/versions.js
 const version = {
     major: 4,
     minor: 3,
     patch: 6,
 };
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/schemas.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/schemas.js
 
 
 
@@ -24103,7 +23186,7 @@ function handleRefineResult(result, payload, input, inst) {
     }
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ar.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ar.js
 
 const error = () => {
     const Sizable = {
@@ -24211,7 +23294,7 @@ const error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/az.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/az.js
 
 const az_error = () => {
     const Sizable = {
@@ -24318,7 +23401,7 @@ const az_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/be.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/be.js
 
 function getBelarusianPlural(count, one, few, many) {
     const absCount = Math.abs(count);
@@ -24476,7 +23559,7 @@ const be_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/bg.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/bg.js
 
 const bg_error = () => {
     const Sizable = {
@@ -24598,7 +23681,7 @@ const bg_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ca.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ca.js
 
 const ca_error = () => {
     const Sizable = {
@@ -24707,7 +23790,7 @@ const ca_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/cs.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/cs.js
 
 const cs_error = () => {
     const Sizable = {
@@ -24820,7 +23903,7 @@ const cs_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/da.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/da.js
 
 const da_error = () => {
     const Sizable = {
@@ -24937,7 +24020,7 @@ const da_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/de.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/de.js
 
 const de_error = () => {
     const Sizable = {
@@ -25047,7 +24130,7 @@ const de_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/en.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/en.js
 
 const en_error = () => {
     const Sizable = {
@@ -25158,7 +24241,7 @@ const en_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/eo.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/eo.js
 
 const eo_error = () => {
     const Sizable = {
@@ -25269,7 +24352,7 @@ const eo_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/es.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/es.js
 
 const es_error = () => {
     const Sizable = {
@@ -25403,7 +24486,7 @@ const es_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/fa.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/fa.js
 
 const fa_error = () => {
     const Sizable = {
@@ -25519,7 +24602,7 @@ const fa_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/fi.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/fi.js
 
 const fi_error = () => {
     const Sizable = {
@@ -25633,7 +24716,7 @@ const fi_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/fr.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/fr.js
 
 const fr_error = () => {
     const Sizable = {
@@ -25743,7 +24826,7 @@ const fr_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/fr-CA.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/fr-CA.js
 
 const fr_CA_error = () => {
     const Sizable = {
@@ -25852,7 +24935,7 @@ const fr_CA_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/he.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/he.js
 
 const he_error = () => {
     // Hebrew labels + grammatical gender
@@ -26068,7 +25151,7 @@ const he_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/hu.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/hu.js
 
 const hu_error = () => {
     const Sizable = {
@@ -26178,7 +25261,7 @@ const hu_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/hy.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/hy.js
 
 function getArmenianPlural(count, one, many) {
     return Math.abs(count) === 1 ? one : many;
@@ -26327,7 +25410,7 @@ const hy_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/id.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/id.js
 
 const id_error = () => {
     const Sizable = {
@@ -26435,7 +25518,7 @@ const id_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/is.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/is.js
 
 const is_error = () => {
     const Sizable = {
@@ -26546,7 +25629,7 @@ const is_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/it.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/it.js
 
 const it_error = () => {
     const Sizable = {
@@ -26656,7 +25739,7 @@ const it_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ja.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ja.js
 
 const ja_error = () => {
     const Sizable = {
@@ -26765,7 +25848,7 @@ const ja_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ka.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ka.js
 
 const ka_error = () => {
     const Sizable = {
@@ -26879,7 +25962,7 @@ const ka_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/km.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/km.js
 
 const km_error = () => {
     const Sizable = {
@@ -26991,14 +26074,14 @@ const km_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/kh.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/kh.js
 
 /** @deprecated Use `km` instead. */
 /* harmony default export */ function kh() {
     return km();
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ko.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ko.js
 
 const ko_error = () => {
     const Sizable = {
@@ -27111,7 +26194,7 @@ const ko_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/lt.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/lt.js
 
 const capitalizeFirstCharacter = (text) => {
     return text.charAt(0).toUpperCase() + text.slice(1);
@@ -27316,7 +26399,7 @@ const lt_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/mk.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/mk.js
 
 const mk_error = () => {
     const Sizable = {
@@ -27427,7 +26510,7 @@ const mk_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ms.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ms.js
 
 const ms_error = () => {
     const Sizable = {
@@ -27536,7 +26619,7 @@ const ms_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/nl.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/nl.js
 
 const nl_error = () => {
     const Sizable = {
@@ -27648,7 +26731,7 @@ const nl_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/no.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/no.js
 
 const no_error = () => {
     const Sizable = {
@@ -27758,7 +26841,7 @@ const no_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ota.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ota.js
 
 const ota_error = () => {
     const Sizable = {
@@ -27869,7 +26952,7 @@ const ota_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ps.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ps.js
 
 const ps_error = () => {
     const Sizable = {
@@ -27985,7 +27068,7 @@ const ps_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/pl.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/pl.js
 
 const pl_error = () => {
     const Sizable = {
@@ -28096,7 +27179,7 @@ const pl_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/pt.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/pt.js
 
 const pt_error = () => {
     const Sizable = {
@@ -28206,7 +27289,7 @@ const pt_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ru.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ru.js
 
 function getRussianPlural(count, one, few, many) {
     const absCount = Math.abs(count);
@@ -28364,7 +27447,7 @@ const ru_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/sl.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/sl.js
 
 const sl_error = () => {
     const Sizable = {
@@ -28475,7 +27558,7 @@ const sl_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/sv.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/sv.js
 
 const sv_error = () => {
     const Sizable = {
@@ -28587,7 +27670,7 @@ const sv_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ta.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ta.js
 
 const ta_error = () => {
     const Sizable = {
@@ -28699,7 +27782,7 @@ const ta_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/th.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/th.js
 
 const th_error = () => {
     const Sizable = {
@@ -28811,7 +27894,7 @@ const th_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/tr.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/tr.js
 
 const tr_error = () => {
     const Sizable = {
@@ -28918,7 +28001,7 @@ const tr_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/uk.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/uk.js
 
 const uk_error = () => {
     const Sizable = {
@@ -29028,14 +28111,14 @@ const uk_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ua.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ua.js
 
 /** @deprecated Use `uk` instead. */
 /* harmony default export */ function ua() {
     return uk();
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ur.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/ur.js
 
 const ur_error = () => {
     const Sizable = {
@@ -29147,7 +28230,7 @@ const ur_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/uz.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/uz.js
 
 const uz_error = () => {
     const Sizable = {
@@ -29258,7 +28341,7 @@ const uz_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/vi.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/vi.js
 
 const vi_error = () => {
     const Sizable = {
@@ -29368,7 +28451,7 @@ const vi_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/zh-CN.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/zh-CN.js
 
 const zh_CN_error = () => {
     const Sizable = {
@@ -29479,7 +28562,7 @@ const zh_CN_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/zh-TW.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/zh-TW.js
 
 const zh_TW_error = () => {
     const Sizable = {
@@ -29588,7 +28671,7 @@ const zh_TW_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/yo.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/yo.js
 
 const yo_error = () => {
     const Sizable = {
@@ -29697,7 +28780,7 @@ const yo_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/index.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/locales/index.js
 
 
 
@@ -29748,7 +28831,7 @@ const yo_error = () => {
 
 
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/registries.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/registries.js
 var _a;
 const $output = Symbol("ZodOutput");
 const $input = Symbol("ZodInput");
@@ -29801,7 +28884,7 @@ function registry() {
 (_a = globalThis).__zod_globalRegistry ?? (_a.__zod_globalRegistry = registry());
 const registries_globalRegistry = globalThis.__zod_globalRegistry;
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/api.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/api.js
 
 
 
@@ -30881,7 +29964,7 @@ function _stringFormat(Class, format, fnOrRegex, _params = {}) {
     return inst;
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/to-json-schema.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/to-json-schema.js
 
 // function initializeContext<T extends schemas.$ZodType>(inputs: JSONSchemaGeneratorParams<T>): ToJSONSchemaContext<T> {
 //   return {
@@ -31320,7 +30403,7 @@ const createStandardJSONSchemaMethod = (schema, io, processors = {}) => (params)
     return to_json_schema_finalize(ctx, schema);
 };
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/json-schema-processors.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/json-schema-processors.js
 
 
 const formatMap = {
@@ -31927,7 +31010,7 @@ function toJSONSchema(input, params) {
     return finalize(ctx, input);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/json-schema-generator.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/json-schema-generator.js
 
 
 /**
@@ -32024,7 +31107,7 @@ class JSONSchemaGenerator {
     }
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/index.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/core/index.js
 
 
 
@@ -32042,10 +31125,10 @@ class JSONSchemaGenerator {
 
 
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/checks.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/checks.js
 
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/iso.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/iso.js
 
 
 const ZodISODateTime = /*@__PURE__*/ $constructor("ZodISODateTime", (inst, def) => {
@@ -32077,7 +31160,7 @@ function iso_duration(params) {
     return _isoDuration(ZodISODuration, params);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/errors.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/errors.js
 
 
 
@@ -32127,7 +31210,7 @@ const ZodRealError = $constructor("ZodError", errors_initializer, {
 // /** @deprecated Use `z.core.$ZodErrorMapCtx` instead. */
 // export type ErrorMapCtx = core.$ZodErrorMapCtx;
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/parse.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/parse.js
 
 
 const parse_parse = /* @__PURE__ */ _parse(ZodRealError);
@@ -32144,7 +31227,7 @@ const parse_safeDecode = /* @__PURE__ */ _safeDecode(ZodRealError);
 const parse_safeEncodeAsync = /* @__PURE__ */ _safeEncodeAsync(ZodRealError);
 const parse_safeDecodeAsync = /* @__PURE__ */ _safeDecodeAsync(ZodRealError);
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/schemas.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/schemas.js
 
 
 
@@ -33303,7 +32386,7 @@ function preprocess(fn, schema) {
     return pipe(transform(fn), schema);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/compat.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/compat.js
 // Zod 3 compat layer
 
 /** @deprecated Use the raw string literal codes instead, e.g. "invalid_type". */
@@ -33336,7 +32419,7 @@ var ZodFirstPartyTypeKind;
 (function (ZodFirstPartyTypeKind) {
 })(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/from-json-schema.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/from-json-schema.js
 
 
 
@@ -33922,7 +33005,7 @@ function fromJSONSchema(schema, params) {
     return convertSchema(schema, ctx);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/coerce.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/coerce.js
 
 
 function coerce_string(params) {
@@ -33941,7 +33024,7 @@ function coerce_date(params) {
     return core._coercedDate(schemas.ZodDate, params);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/external.js
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/external.js
 
 
 
@@ -33963,29 +33046,1217 @@ config(en());
 
 
 
+
+/***/ }),
+
+/***/ 4504:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  kN: () => (/* binding */ buildExecutionPlan),
+  Ay: () => (/* binding */ rankByModelHint),
+  P0: () => (/* reexport */ summarizeSkill)
+});
+
+// UNUSED EXPORTS: matchesPhase, selectSkills
+
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/dist/esm/index.js + 7 modules
+var esm = __nccwpck_require__(5619);
+// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
+var skill_loader = __nccwpck_require__(4438);
+;// CONCATENATED MODULE: ./src/lib/skill-planner.mjs
+
+
+/**
+ * Summarize a skill's metadata for LLM consumption.
+ * @param {import('../../runners/core/review-runner.mjs').SkillDefinition|import('../../runners/core/review-runner.mjs').SkillMetadata} skill
+ */
+function summarizeSkill(skill) {
+  const meta = skill?.metadata ?? skill;
+  return {
+    id: meta.id,
+    name: meta.name,
+    description: meta.description,
+    phase: meta.phase,
+    applyTo: meta.applyTo ?? [],
+    inputContext: meta.inputContext ?? [],
+    outputKind: meta.outputKind ?? ['findings'],
+    modelHint: meta.modelHint ?? null,
+    dependencies: meta.dependencies ?? [],
+    tags: meta.tags ?? [],
+    severity: meta.severity ?? null,
+  };
+}
+
+/**
+ * Plan skills using an LLM (or provided planner function). Falls back to deterministic ordering on error.
+ * @param {Object} options
+ * @param {Array} options.skills - candidate skills (already filtered)
+ * @param {Object} options.context - review context (e.g., changedFiles/diff summary/prompt)
+ * @param {Function} [options.llmPlan] - async function receiving {skills, context}, returning [{id, priority, reason}]
+ * @param {boolean} [options.appendRemaining=true] - whether to append unreferenced skills in deterministic order
+ * @returns {Promise<{planned: Array, reasons: Array, fallback: boolean}>}
+ */
+async function planSkills({ skills, context, llmPlan, appendRemaining = true }) {
+  const summaries = skills.map(summarizeSkill);
+
+  if (!llmPlan) {
+    return {
+      planned: rankByModelHint(skills),
+      reasons: [],
+      fallback: false,
+    };
+  }
+
+  try {
+    const plan = await llmPlan({ skills: summaries, context });
+    if (!Array.isArray(plan)) {
+      throw new Error('planner returned non-array response');
+    }
+    const order = plan;
+    const byId = new Map(summaries.map((summary, idx) => [summary.id, skills[idx]]));
+    const planned = [];
+    const reasons = [];
+    let matchedCount = 0;
+
+    for (const entry of order) {
+      if (!entry?.id) continue;
+      const candidate = byId.get(entry.id);
+      if (candidate) {
+        planned.push(candidate);
+        matchedCount += 1;
+        if (entry.reason) reasons.push({ id: entry.id, reason: entry.reason });
+        byId.delete(entry.id);
+      }
+    }
+
+    if (appendRemaining) {
+      // append any not referenced by LLM in deterministic order
+      const remaining = rankByModelHint(Array.from(byId.values()));
+      planned.push(...remaining);
+    } else if (matchedCount === 0 && order.length > 0) {
+      // In prune mode, a non-empty plan that matches nothing is almost certainly invalid output.
+      throw new Error('planner returned no known skill ids');
+    }
+
+    return { planned, reasons, fallback: false };
+  } catch (err) {
+    return {
+      planned: rankByModelHint(skills),
+      reasons: [{ id: 'fallback', reason: `planner error: ${err.message}` }],
+      fallback: true,
+    };
+  }
+}
+
+;// CONCATENATED MODULE: ./src/lib/impact-scope.mjs
+function ensureArray(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function extOf(file) {
+  const idx = file.lastIndexOf('.');
+  if (idx < 0) return '';
+  return file.slice(idx + 1).toLowerCase();
+}
+
+function containsSegment(file, segment) {
+  const normalized = file.replaceAll('\\', '/');
+  return normalized.split('/').includes(segment);
+}
+
+function matchesAny(file, needles) {
+  const normalized = file.toLowerCase();
+  return needles.some(n => normalized.includes(n));
+}
+
+/**
+ * Infer impact tags from changed file paths.
+ * Tags are intentionally small and map to existing `skills/**` tags.
+ * @param {string[]|string} changedFiles
+ * @param {{diffText?: string}} [options]
+ * @returns {string[]}
+ */
+function inferImpactTags(changedFiles, options = {}) {
+  const files = ensureArray(changedFiles);
+  const tags = new Set();
+
+  for (const file of files) {
+    const ext = extOf(file);
+
+    if (['ts', 'tsx', 'cts', 'mts'].includes(ext)) tags.add('typescript');
+    if (['js', 'jsx', 'cjs', 'mjs'].includes(ext)) tags.add('javascript');
+    if (['md', 'mdx', 'adr'].includes(ext) || matchesAny(file, ['/docs/', '/design/']) || containsSegment(file, 'docs')) {
+      tags.add('design');
+    }
+
+    if (
+      containsSegment(file, 'tests') ||
+      containsSegment(file, 'test') ||
+      containsSegment(file, '__tests__') ||
+      matchesAny(file, ['.test.', '.spec.'])
+    ) {
+      tags.add('tests');
+    }
+
+    if (containsSegment(file, 'api') || containsSegment(file, 'routes')) tags.add('api');
+    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/'])) tags.add('reliability');
+
+    if (
+      containsSegment(file, 'auth') ||
+      containsSegment(file, 'security') ||
+      matchesAny(file, ['/oauth', '/jwt', '/session', '/cookie', '/csrf'])
+    ) {
+      tags.add('security');
+    }
+
+    if (
+      tags.has('api') ||
+      containsSegment(file, 'config') ||
+      containsSegment(file, 'db') ||
+      matchesAny(file, ['/env', '/secrets', '/headers'])
+    ) {
+      tags.add('security');
+    }
+
+    if (containsSegment(file, 'logging') || matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])) {
+      tags.add('observability');
+      tags.add('reliability');
+    }
+  }
+
+  const diffText = options?.diffText;
+  if (typeof diffText === 'string' && diffText.length) {
+    const lower = diffText.toLowerCase();
+    const hasCatch = lower.includes('catch (') || lower.includes('catch(');
+    const addsSilentReturn =
+      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) || /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
+    const mentionsIgnore = lower.includes('ignore') || lower.includes('swallow');
+    if (hasCatch && (addsSilentReturn || mentionsIgnore)) {
+      tags.add('observability');
+      tags.add('reliability');
+    }
+  }
+
+  return [...tags].sort();
+}
+
+;// CONCATENATED MODULE: ./src/lib/file-classifier.mjs
+// Module-scope regexes to avoid re-creation per call
+const RE_TEST_EXT = /\.(?:test|spec)\.(?:[jt]sx?|mjs)$/;
+const RE_SCHEMA_EXT = /\.schema\.[jt]s$/;
+const RE_MIGRATION = /(?:^|\/)migrations?\//;
+const RE_MIGRATE = /(?:^|\/)migrate/;
+const RE_CONFIG_EXT = /\.config\.(?:[jt]sx?|mjs)$/;
+const RE_RC_FILE = /^\.[a-z]+rc(?:\.[a-z]+)?$/;
+const RE_TSCONFIG = /^tsconfig.*\.json$/;
+const RE_DOCKERFILE = /^Dockerfile/;
+const RE_DOCKER_COMPOSE = /^docker-compose/;
+
+const CONFIG_NAMES = new Set([
+  'package.json',
+  '.river-reviewer.json',
+  '.lychee.toml',
+  '.markdownlint.json',
+  '.markdownlint-cli2.yaml',
+  '.textlintrc.json',
+]);
+
+/**
+ * Classify changed files by type for routing and evidence collection.
+ * Complementary to impact-scope.mjs which classifies by quality domain.
+ *
+ * @param {string[]} files - Array of file paths (relative to repo root)
+ * @returns {{ config: string[], schema: string[], migration: string[], app: string[], test: string[], infra: string[], docs: string[], unknown: string[] }}
+ */
+function classifyChangedFiles(files) {
+  const result = {
+    config: [],
+    schema: [],
+    migration: [],
+    app: [],
+    test: [],
+    infra: [],
+    docs: [],
+    unknown: [],
+  };
+
+  for (const file of files) {
+    result[classifyFile(file)].push(file);
+  }
+
+  return result;
+}
+
+// Priority: test > schema > migration > config > infra > docs > app > unknown
+function classifyFile(file) {
+  const normalized = file.replaceAll('\\', '/');
+  const basename = normalized.split('/').pop() ?? '';
+
+  if (isTest(normalized, basename)) return 'test';
+  if (isSchema(normalized, basename)) return 'schema';
+  if (isMigration(normalized)) return 'migration';
+  if (isConfig(normalized, basename)) return 'config';
+  if (isInfra(normalized, basename)) return 'infra';
+  if (isDocs(normalized, basename)) return 'docs';
+  if (isApp(normalized)) return 'app';
+  return 'unknown';
+}
+
+function isTest(file, basename) {
+  return file.startsWith('tests/') || file.includes('/__tests__/') || RE_TEST_EXT.test(basename);
+}
+
+function isSchema(file, basename) {
+  return (
+    file.startsWith('schemas/') || RE_SCHEMA_EXT.test(basename) || basename.endsWith('.schema.json')
+  );
+}
+
+function isMigration(file) {
+  return RE_MIGRATION.test(file) || RE_MIGRATE.test(file) || file.startsWith('db/');
+}
+
+function isConfig(file, basename) {
+  if (RE_CONFIG_EXT.test(basename)) return true;
+  if (RE_RC_FILE.test(basename)) return true;
+  if (CONFIG_NAMES.has(basename) || basename.startsWith('.env')) return true;
+  if (RE_TSCONFIG.test(basename)) return true;
+  return false;
+}
+
+function isInfra(file, basename) {
+  return (
+    file.startsWith('.github/') ||
+    file.startsWith('.husky/') ||
+    file.startsWith('scripts/') ||
+    RE_DOCKERFILE.test(basename) ||
+    RE_DOCKER_COMPOSE.test(basename)
+  );
+}
+
+function isDocs(file, basename) {
+  if (basename.endsWith('.md') || basename.endsWith('.mdx')) return true;
+  if (file.startsWith('docs/') || file.startsWith('pages/')) return true;
+  return false;
+}
+
+function isApp(file) {
+  return file.startsWith('src/') || file.startsWith('runners/');
+}
+
+// EXTERNAL MODULE: ./src/lib/planner-utils.mjs
+var planner_utils = __nccwpck_require__(5652);
+// EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
+var heuristic_review = __nccwpck_require__(641);
+// EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
+var risk_map = __nccwpck_require__(937);
+// EXTERNAL MODULE: external "node:fs"
+var external_node_fs_ = __nccwpck_require__(3024);
+// EXTERNAL MODULE: external "node:path"
+var external_node_path_ = __nccwpck_require__(6760);
+;// CONCATENATED MODULE: ./src/lib/adr-linker.mjs
+
+
+
+/**
+ * Scan known ADR/spec directories and find documents relevant to changed files.
+ *
+ * @param {string} repoRoot - Repository root path
+ * @param {{ changedFiles?: string[], keywords?: string[] }} options
+ * @returns {{ path: string, title: string, matchReason: string }[]}
+ */
+function findRelatedADRs(repoRoot, { changedFiles = [], keywords = [] } = {}) {
+  const adrDirs = ['docs/adr', 'pages/explanation', 'specs'];
+  const results = [];
+
+  for (const dir of adrDirs) {
+    const fullDir = external_node_path_.join(repoRoot, dir);
+    if (!external_node_fs_.existsSync(fullDir)) continue;
+
+    const files = external_node_fs_.readdirSync(fullDir).filter((f) => f.endsWith('.md'));
+    for (const file of files) {
+      const filePath = external_node_path_.join(dir, file);
+      const content = external_node_fs_.readFileSync(external_node_path_.join(fullDir, file), 'utf-8');
+      const title = extractTitle(content) || file;
+
+      // Match by keyword in content
+      for (const kw of keywords) {
+        if (content.toLowerCase().includes(kw.toLowerCase())) {
+          results.push({ path: filePath, title, matchReason: `keyword: ${kw}` });
+          break; // one match per file is enough
+        }
+      }
+
+      // Match by changed file mention in content
+      for (const cf of changedFiles) {
+        const basename = cf.split('/').pop();
+        if (content.includes(cf) || content.includes(basename)) {
+          if (!results.some((r) => r.path === filePath)) {
+            results.push({
+              path: filePath,
+              title,
+              matchReason: `references: ${cf}`,
+            });
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
+function extractTitle(markdown) {
+  const match = /^#\s+(.+)/m.exec(markdown);
+  return match ? match[1].trim() : null;
+}
+
+;// CONCATENATED MODULE: ./runners/core/review-runner.mjs
+
+
+
+
+
+
+
+
+
+
+const MODEL_PRIORITY = {
+  cheap: 1,
+  balanced: 2,
+  'high-accuracy': 3,
+};
+
+function getMeta(skill) {
+  return skill?.metadata ?? skill;
+}
+
+function review_runner_ensureArray(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function matchesPhase(skill, phase) {
+  const meta = getMeta(skill);
+  if (Array.isArray(meta.phase)) {
+    return meta.phase.includes(phase);
+  }
+  return meta.phase === phase;
+}
+
+function matchesApplyTo(skill, changedFiles) {
+  const meta = getMeta(skill);
+  const globs = review_runner_ensureArray(meta.applyTo);
+  if (!globs.length) return false;
+  return changedFiles.some((file) =>
+    globs.some((pattern) => (0,esm/* minimatch */.xF)(file, pattern, { dot: true }))
+  );
+}
+
+function missingInputContexts(skill, availableContexts) {
+  const meta = getMeta(skill);
+  if (!meta.inputContext || meta.inputContext.length === 0) return [];
+  const available = new Set(availableContexts);
+  return meta.inputContext.filter((ctx) => !available.has(ctx));
+}
+
+function missingDependencies(skill, availableDependencies) {
+  const meta = getMeta(skill);
+  const deps = review_runner_ensureArray(meta.dependencies);
+  if (!deps.length) return [];
+  if (availableDependencies == null) return [];
+  const available = new Set(review_runner_ensureArray(availableDependencies));
+  return deps.filter((dep) => !available.has(dep));
+}
+
+function evaluateSkill(skill, options) {
+  const reasons = [];
+  const meta = getMeta(skill);
+  if (!matchesPhase(meta, options.phase)) {
+    reasons.push(`phase mismatch: ${meta.phase} !== ${options.phase}`);
+  }
+  if (!matchesApplyTo(meta, options.changedFiles)) {
+    reasons.push('applyTo did not match any changed file');
+  }
+  const missingContexts = missingInputContexts(meta, options.availableContexts);
+  if (missingContexts.length) {
+    reasons.push(`missing inputContext: ${missingContexts.join(', ')}`);
+  }
+  const depsMissing = missingDependencies(meta, options.availableDependencies);
+  if (depsMissing.length) {
+    reasons.push(`missing dependencies: ${depsMissing.join(', ')}`);
+  }
+  return {
+    ok: reasons.length === 0,
+    reasons,
+  };
+}
+
+function selectSkills(skills, options) {
+  const changedFiles = review_runner_ensureArray(options.changedFiles);
+  const availableContexts = review_runner_ensureArray(options.availableContexts);
+  const availableDependencies = options.availableDependencies ?? null;
+  const dryRun = options.dryRun ?? false;
+  const llmEnabled = options.llmEnabled ?? true;
+  const selected = [];
+  const skipped = [];
+
+  for (const skill of skills) {
+    const meta = skill.metadata ?? skill;
+    const skillId = meta.id;
+
+    // ルーティングスキル（エントリポイント）は実行対象外
+    const tags = review_runner_ensureArray(meta.tags);
+    if (tags.includes('routing')) {
+      skipped.push({ skill, reasons: ['routing skill: not an executable review skill'] });
+      continue;
+    }
+
+    // dry-run または LLM 無効時はヒューリスティック対応スキルのみ選択
+    const isLlmRestricted = dryRun || !llmEnabled;
+    if (isLlmRestricted && !heuristic_review/* HEURISTIC_SKILL_IDS */.y2.includes(skillId)) {
+      const reason = dryRun
+        ? 'dry-run: LLM必須スキル（ヒューリスティック未対応）'
+        : 'LLM disabled: LLM必須スキル（APIキー未設定）';
+      skipped.push({ skill, reasons: [reason] });
+      continue;
+    }
+
+    const result = evaluateSkill(meta, {
+      phase: options.phase,
+      changedFiles,
+      availableContexts,
+      availableDependencies,
+    });
+    if (result.ok) {
+      selected.push(skill);
+    } else {
+      skipped.push({ skill, reasons: result.reasons });
+    }
+  }
+  return { selected, skipped };
+}
+
+function rankByModelHint(skills, preferredModelHint = 'balanced') {
+  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
+  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
+  return [...skills].sort((a, b) => {
+    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
+    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
+    if (wa !== wb) return wa - wb;
+    return getMeta(a).id.localeCompare(getMeta(b).id);
+  });
+}
+
+function computeTagScore(skill, impactTags) {
+  if (!impactTags?.length) return 0;
+  const tags = new Set(getMeta(skill).tags ?? []);
+  let score = 0;
+  for (const tag of impactTags) {
+    if (tags.has(tag)) score += 1;
+  }
+  return score;
+}
+
+function rankByImpactTags(skills, impactTags, preferredModelHint = 'balanced') {
+  const scores = new Map(skills.map((s) => [getMeta(s).id, computeTagScore(s, impactTags)]));
+  const anyMatched = Array.from(scores.values()).some((v) => v > 0);
+  if (!anyMatched) {
+    return rankByModelHint(skills, preferredModelHint);
+  }
+
+  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
+  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
+
+  return [...skills].sort((a, b) => {
+    const idA = getMeta(a).id;
+    const idB = getMeta(b).id;
+    const scoreA = scores.get(idA) ?? 0;
+    const scoreB = scores.get(idB) ?? 0;
+    if (scoreA !== scoreB) return scoreB - scoreA;
+
+    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
+    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
+    if (wa !== wb) return wa - wb;
+    return idA.localeCompare(idB);
+  });
+}
+
+/**
+ * Build an execution plan from skills and review context.
+ * - planner 未指定: メタデと modelHint に基づく決定論的な並び替え
+ * - planner 指定: LLM 等で優先度決定し、エラー時は決定論的順序にフォールバック
+ *   - plannerMode=order: 優先度づけ（未参照スキルは後ろに決定論で追加）
+ *   - plannerMode=prune: 絞り込み（LLM が選んだスキルのみを実行）
+ */
+async function buildExecutionPlan(options) {
+  const {
+    phase,
+    changedFiles = [],
+    availableContexts = [],
+    availableDependencies = null,
+    preferredModelHint = 'balanced',
+    skills: providedSkills,
+    planner,
+    plannerMode,
+    diffText,
+    dryRun = false,
+    llmEnabled = true,
+    repoRoot,
+    riskMap,
+  } = options;
+
+  const skills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
+  const selection = selectSkills(skills, {
+    phase,
+    changedFiles,
+    availableContexts,
+    availableDependencies,
+    dryRun,
+    llmEnabled,
+  });
+  if (selection.selected.length === 0) {
+    return { selected: [], skipped: selection.skipped };
+  }
+
+  const impactTags = inferImpactTags(changedFiles, { diffText });
+  const fileTypes = classifyChangedFiles(changedFiles);
+  const riskAssessment = riskMap ? (0,risk_map/* evaluateRisk */.lm)(riskMap, changedFiles) : null;
+  const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), { changedFiles, keywords: impactTags });
+
+  // If planner is provided, try LLM-based planning, fallback to deterministic rank
+  const effectivePlannerMode = planner
+    ? (0,planner_utils/* normalizePlannerMode */.p)(plannerMode, { defaultMode: 'order' })
+    : 'off';
+  if (planner && effectivePlannerMode !== 'off') {
+    const context = {
+      phase,
+      changedFiles,
+      availableContexts,
+      impactTags,
+      fileTypes,
+    };
+    const { planned, reasons, fallback } = await planSkills({
+      skills: selection.selected,
+      context,
+      llmPlan: planner.plan ?? planner,
+      appendRemaining: effectivePlannerMode !== 'prune',
+    });
+    const ranked = fallback
+      ? rankByImpactTags(selection.selected, impactTags, preferredModelHint)
+      : planned;
+    return {
+      selected: ranked,
+      skipped: selection.skipped,
+      plannerMode: effectivePlannerMode,
+      plannerReasons: reasons,
+      plannerFallback: fallback,
+      ...(fallback ? { plannerError: reasons?.[0]?.reason ?? 'planner fallback' } : {}),
+      impactTags,
+      fileTypes,
+      relatedADRs,
+    };
+  }
+
+  // planner が無い場合（LLM未設定）は決定論的順位付けで実行
+  const ordered = rankByImpactTags(selection.selected, impactTags, preferredModelHint);
+
+  return {
+    selected: ordered,
+    skipped: selection.skipped,
+    impactTags,
+    fileTypes,
+    relatedADRs,
+  };
+}
+
+// Re-export summarizeSkill for consumers that want the same view used by planner
+
+
+
+/***/ }),
+
+/***/ 4438:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  vN: () => (/* binding */ SkillLoaderError),
+  m: () => (/* binding */ createSkillValidator),
+  KJ: () => (/* binding */ defaultPaths),
+  e$: () => (/* binding */ loadSchema),
+  l1: () => (/* binding */ loadSkills),
+  eJ: () => (/* binding */ parseFrontMatter)
+});
+
+// UNUSED EXPORTS: listSkillFiles, loadAllSkillMetadata, loadSkillFile, loadSkillMetadata, parseSkillFile
+
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(9896);
+;// CONCATENATED MODULE: external "path"
+const external_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
+;// CONCATENATED MODULE: external "url"
+const external_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/js-yaml/dist/js-yaml.mjs
+var js_yaml = __nccwpck_require__(7167);
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/gray-matter/index.js
+var gray_matter = __nccwpck_require__(4403);
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/ajv/dist/2020.js
+var _2020 = __nccwpck_require__(7582);
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/ajv-formats/dist/index.js
+var dist = __nccwpck_require__(8003);
+;// CONCATENATED MODULE: ./runners/core/skill-loader.mjs
+
+
+
+
+
+
+
+
+/**
+ * @typedef {'upstream' | 'midstream' | 'downstream'} PhaseEnum
+ * @typedef {PhaseEnum | PhaseEnum[]} Phase
+ * @typedef {'info' | 'minor' | 'major' | 'critical'} Severity
+ * @typedef {'diff' | 'fullFile' | 'tests' | 'adr' | 'commitMessage' | 'repoConfig'} InputContext
+ * @typedef {'findings' | 'summary' | 'actions' | 'tests' | 'metrics' | 'questions'} OutputKind
+ * @typedef {'cheap' | 'balanced' | 'high-accuracy'} ModelHint
+ * @typedef {'code_search' | 'test_runner' | 'adr_lookup' | 'repo_metadata' | 'coverage_report' | 'tracing' | `custom:${string}`} Dependency
+ *
+ * @typedef {Object} SkillMetadata
+ * @property {string} id
+ * @property {string} name
+ * @property {string} description
+ * @property {Phase} phase
+ * @property {string[]} applyTo
+ * @property {string[]=} files
+ * @property {string[]=} tags
+ * @property {Severity=} severity
+ * @property {InputContext[]=} inputContext
+ * @property {OutputKind[]=} outputKind
+ * @property {ModelHint=} modelHint
+ * @property {Dependency[]=} dependencies
+ * @property {{phase?: Phase, applyTo?: string[], files?: string[]}=} trigger
+ * @property {number=} priority
+ *
+ * @typedef {Object} SkillDefinition
+ * @property {SkillMetadata} metadata
+ * @property {string} body
+ * @property {string} path
+ */
+
+const skill_loader_filename = (0,external_url_namespaceObject.fileURLToPath)(import.meta.url);
+const skill_loader_dirname = external_path_namespaceObject.dirname(skill_loader_filename);
+const repoRoot = process.env.RIVER_REPO_ROOT
+  ? external_path_namespaceObject.resolve(process.env.RIVER_REPO_ROOT)
+  : external_path_namespaceObject.resolve(skill_loader_dirname, '..', '..');
+const defaultSkillsDir = external_path_namespaceObject.join(repoRoot, 'skills');
+const defaultSchemaPath = external_path_namespaceObject.join(repoRoot, 'schemas', 'skill.schema.json');
+const markdownExtensions = new Set(['.md', '.mdx']);
+const yamlExtensions = new Set(['.yaml', '.yml']);
+const allowedExtensions = new Set([...markdownExtensions, ...yamlExtensions]);
+const ignoredSkillDirNames = new Set([
+  'references',
+  'fixtures',
+  'golden',
+  'eval',
+  'prompt',
+  'prompts',
+]);
+const ignoredFileNames = new Set(['.gitkeep', 'README.md', 'registry.yaml', 'registry.yml', '_template.md']);
+const legacySkillFiles = new Set(['skill.yaml', 'skill.yml']);
+const streamCategories = new Set(['core', 'upstream', 'midstream', 'downstream']);
+const allPhases = ['upstream', 'midstream', 'downstream'];
+
+const defaultPaths = {
+  repoRoot,
+  skillsDir: defaultSkillsDir,
+  schemaPath: defaultSchemaPath,
+};
+
+class SkillLoaderError extends Error {
+  constructor(message, details = undefined) {
+    super(message);
+    this.name = 'SkillLoaderError';
+    this.details = details;
+  }
+}
+
+async function loadSchema(schemaPath = defaultSchemaPath) {
+  const raw = await external_fs_.promises.readFile(schemaPath, 'utf8');
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    throw new SkillLoaderError(`Failed to parse JSON schema at ${schemaPath}: ${err.message}`);
+  }
+}
+
+function createSkillValidator(schema) {
+  const ajv = new _2020({ allErrors: true, strict: false, useDefaults: true });
+  dist(ajv);
+  return ajv.compile(schema);
+}
+
+async function listSkillFiles(dir = defaultSkillsDir) {
+  const entries = await external_fs_.promises.readdir(dir, { withFileTypes: true });
+  const files = [];
+
+  const hasLegacySkillFile = entries.some(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+  if (hasLegacySkillFile) {
+    const legacyEntry = entries.find(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+    if (!legacyEntry) {
+      throw new Error(`skill.yaml detected but not found in ${dir}`);
+    }
+    files.push(external_path_namespaceObject.join(dir, legacyEntry.name));
+    return files.sort((a, b) => a.localeCompare(b));
+  }
+
+  for (const entry of entries) {
+    const entryPath = external_path_namespaceObject.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (ignoredSkillDirNames.has(entry.name) || entry.name.startsWith('.')) {
+        continue;
+      }
+      const nested = await listSkillFiles(entryPath);
+      files.push(...nested);
+      continue;
+    }
+
+    const ext = external_path_namespaceObject.extname(entry.name).toLowerCase();
+    if (!allowedExtensions.has(ext)) continue;
+    if (ignoredFileNames.has(entry.name)) continue;
+    if (entry.name.startsWith('_')) continue;
+    files.push(entryPath);
+  }
+
+  return files.sort((a, b) => a.localeCompare(b));
+}
+
+function normalizeStringArray(value) {
+  if (!value) return undefined;
+  const asArray = Array.isArray(value) ? value : [value];
+  const filtered = asArray
+    .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
+    .filter(Boolean);
+  return filtered.length ? filtered : undefined;
+}
+
+function normalizePhaseValue(value) {
+  if (!value) return undefined;
+  if (Array.isArray(value)) {
+    const phases = value.filter(Boolean);
+    if (phases.length === 1) return phases[0];
+    return phases.length ? phases : undefined;
+  }
+  return value;
+}
+
+function inferCategoryFromPhase(phase) {
+  if (!phase) return undefined;
+  if (Array.isArray(phase)) {
+    const unique = Array.from(new Set(phase));
+    if (unique.length === 1 && streamCategories.has(unique[0])) {
+      return unique[0];
+    }
+    if (unique.length > 1) {
+      return 'core';
+    }
+    return undefined;
+  }
+  return streamCategories.has(phase) ? phase : undefined;
+}
+
+function inferCategoryFromPath(filePath) {
+  if (!filePath) return undefined;
+  const segments = external_path_namespaceObject.normalize(filePath).split(external_path_namespaceObject.sep);
+  const skillsIndex = segments.lastIndexOf('skills');
+  const candidate = skillsIndex >= 0 ? segments[skillsIndex + 1] : undefined;
+  if (candidate && streamCategories.has(candidate)) {
+    return candidate;
+  }
+  return undefined;
+}
+
+function resolveCategory(metaCategory, { phase, filePath } = {}) {
+  if (typeof metaCategory === 'string' && streamCategories.has(metaCategory)) {
+    return metaCategory;
+  }
+  return inferCategoryFromPath(filePath) ?? inferCategoryFromPhase(phase);
+}
+
+function resolvePhase(metaPhase, category) {
+  if (category === 'core') {
+    return [...allPhases];
+  }
+  if (category && streamCategories.has(category)) {
+    return category;
+  }
+  return normalizePhaseValue(metaPhase);
+}
+
+function normalizeMetadata(metadata, { filePath } = {}) {
+  const meta = { ...metadata };
+
+  if (meta.priority !== undefined) {
+    const parsedPriority = typeof meta.priority === 'string' ? Number(meta.priority) : meta.priority;
+    if (Number.isFinite(parsedPriority)) {
+      meta.priority = parsedPriority;
+    } else {
+      delete meta.priority;
+    }
+  }
+
+  const topLevelApplyTo =
+    normalizeStringArray(meta.applyTo) ??
+    normalizeStringArray(meta.files) ??
+    normalizeStringArray(meta.path_patterns);
+  if (topLevelApplyTo) {
+    meta.applyTo = topLevelApplyTo;
+  }
+
+  const trigger =
+    meta.trigger && typeof meta.trigger === 'object' && !Array.isArray(meta.trigger)
+      ? meta.trigger
+      : null;
+  const triggerApplyTo =
+    normalizeStringArray(trigger?.applyTo) ??
+    normalizeStringArray(trigger?.files) ??
+    normalizeStringArray(trigger?.path_patterns);
+
+  if (!meta.phase && trigger?.phase) {
+    meta.phase = trigger.phase;
+  }
+  if (!meta.applyTo && triggerApplyTo) {
+    meta.applyTo = triggerApplyTo;
+  }
+
+  meta.category = resolveCategory(meta.category, { phase: meta.phase, filePath });
+  meta.phase = resolvePhase(meta.phase, meta.category);
+
+  // Trigger is consumed during normalization; avoid leaking nested state.
+  if (trigger) {
+    delete meta.trigger;
+  }
+  if ('path_patterns' in meta) {
+    delete meta.path_patterns;
+  }
+
+  return meta;
+}
+
+function parseFrontMatter(content, { filePath } = {}) {
+  const trimmed = content.trimStart();
+  if (!trimmed.startsWith('---')) {
+    throw new SkillLoaderError('Missing front matter block (---)');
+  }
+
+  let parsed;
+  try {
+    parsed = gray_matter(trimmed);
+  } catch (err) {
+    throw new SkillLoaderError(
+      `Front matter parse error${filePath ? ` (${filePath})` : ''}: ${err.message}`
+    );
+  }
+
+  const metadata = parsed.data ?? {};
+  if (typeof metadata !== 'object' || Array.isArray(metadata)) {
+    throw new SkillLoaderError('Front matter must be a mapping');
+  }
+  if (Object.keys(metadata).length === 0) {
+    throw new SkillLoaderError('Front matter is empty');
+  }
+  const normalized = normalizeMetadata(metadata, { filePath });
+  const body = (parsed.content ?? '').trim();
+  return { metadata: normalized, body };
+}
+
+async function parseSkillFile(filePath) {
+  const ext = external_path_namespaceObject.extname(filePath).toLowerCase();
+  if (!allowedExtensions.has(ext)) {
+    throw new SkillLoaderError(`Unsupported skill file extension: ${ext}`);
+  }
+  const raw = await external_fs_.promises.readFile(filePath, 'utf8');
+  if (markdownExtensions.has(ext)) {
+    return parseFrontMatter(raw, { filePath });
+  }
+
+  // YAML handling
+  let loaded = {};
+  try {
+    loaded = js_yaml/* default.load */.Ay.load(raw) ?? {};
+  } catch (err) {
+    throw new SkillLoaderError(`YAML parse error: ${err.message}`);
+  }
+  if (typeof loaded !== 'object' || Array.isArray(loaded)) {
+    throw new SkillLoaderError('Skill YAML must be a mapping');
+  }
+
+  let metadata = loaded;
+  let body = '';
+
+  // Support nested metadata block
+  if (loaded.metadata && typeof loaded.metadata === 'object' && !Array.isArray(loaded.metadata)) {
+    metadata = { ...loaded.metadata };
+    if (typeof metadata.instruction === 'string') {
+      body = metadata.instruction;
+      delete metadata.instruction;
+    } else if (typeof loaded.instruction === 'string') {
+      body = loaded.instruction;
+    }
+  } else if (typeof loaded.instruction === 'string') {
+    // Support flat structure with optional instruction field
+    body = loaded.instruction;
+    delete metadata.instruction;
+  }
+
+  metadata = normalizeMetadata(metadata, { filePath });
+  return { metadata, body };
+}
+
+function validateMetadata(metadata, validate) {
+  const metaCopy = JSON.parse(JSON.stringify(metadata ?? {}));
+  const ok = validate(metaCopy);
+  if (!ok) {
+    const details = (validate.errors ?? []).map(err => `${err.instancePath || '/'} ${err.message}`).join('; ');
+    throw new SkillLoaderError(`Validation failed: ${details}`, validate.errors);
+  }
+  return metaCopy;
+}
+
+function relativeToRepo(filePath) {
+  return filePath.startsWith(repoRoot) ? external_path_namespaceObject.relative(repoRoot, filePath) : filePath;
+}
+
+function logSkillLoadError(filePath, err) {
+  const location = relativeToRepo(filePath);
+  const reason = err instanceof Error ? err.message : String(err);
+  console.error(`⚠️  Failed to load skill ${location}: ${reason}`);
+  if (err?.details && Array.isArray(err.details)) {
+    for (const detail of err.details) {
+      const instance = detail.instancePath || '/';
+      console.error(`   - ${instance}: ${detail.message}`);
+    }
+  }
+}
+
+function logDuplicateSkill(id, filePath, originalPath) {
+  const location = relativeToRepo(filePath);
+  const first = relativeToRepo(originalPath);
+  console.warn(`⚠️  Duplicate skill id "${id}" in ${location}; already loaded from ${first}. Skipping.`);
+}
+
+function hasExcludedTag(metadata, excludedTags) {
+  if (!excludedTags?.length) return false;
+  const tags = metadata?.tags ?? [];
+  return tags.some(tag => excludedTags.includes(tag));
+}
+
+async function loadSkillFile(filePath, options = {}) {
+  const { validator, schemaPath = defaultSchemaPath } = options;
+  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
+  const parsed = await parseSkillFile(filePath);
+  const metadata = validateMetadata(parsed.metadata, compiledValidator);
+  return {
+    metadata,
+    body: parsed.body,
+    path: filePath,
+  };
+}
+
+async function loadSkills(options = {}) {
+  const {
+    skillsDir = defaultSkillsDir,
+    schemaPath = defaultSchemaPath,
+    validator: providedValidator,
+    excludedTags = ['agent'],
+  } = options;
+  const schema = providedValidator ? null : await loadSchema(schemaPath);
+  const validator = providedValidator ?? createSkillValidator(schema);
+  const files = await listSkillFiles(skillsDir);
+  const skillsById = new Map();
+
+  for (const filePath of files) {
+    try {
+      const skill = await loadSkillFile(filePath, { validator });
+      const id = skill?.metadata?.id;
+      if (!id) {
+        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
+        continue;
+      }
+      if (hasExcludedTag(skill.metadata, excludedTags)) {
+        continue;
+      }
+      if (skillsById.has(id)) {
+        logDuplicateSkill(id, filePath, skillsById.get(id).path);
+        continue;
+      }
+      skillsById.set(id, skill);
+    } catch (err) {
+      logSkillLoadError(filePath, err);
+    }
+  }
+
+  return Array.from(skillsById.values());
+}
+
+/**
+ * Load only skill metadata (Stage 1 of Progressive Disclosure).
+ * Returns metadata and path without the body, suitable for filtering
+ * and routing before full skill loading.
+ *
+ * @param {string} filePath
+ * @param {object} [options]
+ * @param {Function} [options.validator]
+ * @param {string} [options.schemaPath]
+ * @returns {Promise<{metadata: SkillMetadata, path: string}>}
+ */
+async function loadSkillMetadata(filePath, options = {}) {
+  const { validator, schemaPath = defaultSchemaPath } = options;
+  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
+  const parsed = await parseSkillFile(filePath);
+  const metadata = validateMetadata(parsed.metadata, compiledValidator);
+  return {
+    metadata,
+    path: filePath,
+  };
+}
+
+/**
+ * Load metadata for all skills (Stage 1 of Progressive Disclosure).
+ * Returns an array of {metadata, path} objects without skill bodies.
+ *
+ * @param {object} [options]
+ * @param {string} [options.skillsDir]
+ * @param {string} [options.schemaPath]
+ * @param {Function} [options.validator]
+ * @param {string[]} [options.excludedTags]
+ * @returns {Promise<Array<{metadata: SkillMetadata, path: string}>>}
+ */
+async function loadAllSkillMetadata(options = {}) {
+  const {
+    skillsDir = defaultSkillsDir,
+    schemaPath = defaultSchemaPath,
+    validator: providedValidator,
+    excludedTags = ['agent'],
+  } = options;
+  const schema = providedValidator ? null : await loadSchema(schemaPath);
+  const validator = providedValidator ?? createSkillValidator(schema);
+  const files = await listSkillFiles(skillsDir);
+  const skillsById = new Map();
+
+  for (const filePath of files) {
+    try {
+      const skill = await loadSkillMetadata(filePath, { validator });
+      const id = skill?.metadata?.id;
+      if (!id) {
+        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
+        continue;
+      }
+      if (hasExcludedTag(skill.metadata, excludedTags)) {
+        continue;
+      }
+      if (skillsById.has(id)) {
+        logDuplicateSkill(id, filePath, skillsById.get(id).path);
+        continue;
+      }
+      skillsById.set(id, skill);
+    } catch (err) {
+      logSkillLoadError(filePath, err);
+    }
+  }
+
+  return Array.from(skillsById.values());
+}
+
+
+/***/ }),
+
+/***/ 7068:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   s: () => (/* binding */ defaultConfig),
+/* harmony export */   z: () => (/* binding */ defaultSkillConfig)
+/* harmony export */ });
+// Unified default config supporting both legacy and skill-based flows
+const defaultConfig = Object.freeze({
+  version: '1.0',
+  model: {
+    provider: 'openai',
+    modelName: 'gpt-4o-mini',
+    temperature: 0,
+    maxTokens: 600,
+  },
+  review: {
+    language: 'ja',
+    severity: 'normal',
+    additionalInstructions: [],
+  },
+  exclude: {
+    files: [],
+    prLabelsToIgnore: [],
+  },
+  skills: [],
+});
+
+// Alias kept for compatibility with newer skill-only imports
+const defaultSkillConfig = defaultConfig;
+
+
+/***/ }),
+
+/***/ 7557:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  UT: () => (/* binding */ ConfigLoader),
+  Z9: () => (/* binding */ loadConfig),
+  R2: () => (/* binding */ mergeConfig)
+});
+
+// UNUSED EXPORTS: ConfigLoaderError, ConfigMergeError
+
+// EXTERNAL MODULE: external "node:fs/promises"
+var promises_ = __nccwpck_require__(1455);
+// EXTERNAL MODULE: external "node:path"
+var external_node_path_ = __nccwpck_require__(6760);
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/js-yaml/dist/js-yaml.mjs
+var js_yaml = __nccwpck_require__(7167);
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/external.js + 73 modules
+var external = __nccwpck_require__(6549);
 ;// CONCATENATED MODULE: ./src/config/schema.mjs
 
 
 // --- Legacy Schema (for river run) ---
-const modelConfigSchema = object({
-  provider: schemas_enum(['google', 'openai', 'anthropic']).optional(),
-  modelName: schemas_string().min(1).optional(),
-  temperature: schemas_number().min(0).max(1).optional(),
-  maxTokens: schemas_number().int().positive().optional(),
+const modelConfigSchema = external/* object */.Ikc({
+  provider: external/* enum */.k5n(['google', 'openai', 'anthropic']).optional(),
+  modelName: external/* string */.YjP().min(1).optional(),
+  temperature: external/* number */.aig().min(0).max(1).optional(),
+  maxTokens: external/* number */.aig().int().positive().optional(),
 });
 
-const reviewConfigSchema = object({
-  language: schemas_enum(['ja', 'en']).optional(),
-  severity: schemas_enum(['strict', 'normal', 'relaxed']).optional(),
-  additionalInstructions: array(schemas_string().min(1)).optional(),
+const reviewConfigSchema = external/* object */.Ikc({
+  language: external/* enum */.k5n(['ja', 'en']).optional(),
+  severity: external/* enum */.k5n(['strict', 'normal', 'relaxed']).optional(),
+  additionalInstructions: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
 });
 
-const excludeConfigSchema = object({
-  files: array(schemas_string().min(1)).optional(),
-  prLabelsToIgnore: array(schemas_string().min(1)).optional(),
+const excludeConfigSchema = external/* object */.Ikc({
+  files: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
+  prLabelsToIgnore: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
 });
 
-const riverReviewerConfigSchema = object({
+const riverReviewerConfigSchema = external/* object */.Ikc({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
   exclude: excludeConfigSchema.optional(),
@@ -33994,7 +34265,7 @@ const riverReviewerConfigSchema = object({
 // --- New Skill-based Schema (for river skills) ---
 
 // Skill-based schemas
-const AIModelSchema = schemas_enum([
+const AIModelSchema = external/* enum */.k5n([
   'gemini-2.0-flash', // Default: Fast & Smart
   'gemini-2.0-flash-thinking', // Reasoning: For Security/Architecture
   'gemini-2.0-pro', // High Spec
@@ -34004,38 +34275,38 @@ const AIModelSchema = schemas_enum([
   'o1-mini', // OpenAI Fast Reasoning
 ]);
 
-const RuleSchema = object({
-  id: schemas_string().describe('Unique identifier for the rule'),
-  severity: schemas_enum(['info', 'warning', 'error', 'critical']),
-  description: schemas_string(),
-  context: schemas_string().describe('Why this matters (Understanding)'),
-  patterns: array(schemas_string()).describe('Keywords or patterns to look for'),
-  anti_patterns: array(schemas_string()).describe('Bad code examples'),
-  fix_guidance: schemas_string().describe('How to fix it (Expertise Transfer)'),
+const RuleSchema = external/* object */.Ikc({
+  id: external/* string */.YjP().describe('Unique identifier for the rule'),
+  severity: external/* enum */.k5n(['info', 'warning', 'error', 'critical']),
+  description: external/* string */.YjP(),
+  context: external/* string */.YjP().describe('Why this matters (Understanding)'),
+  patterns: external/* array */.YOg(external/* string */.YjP()).describe('Keywords or patterns to look for'),
+  anti_patterns: external/* array */.YOg(external/* string */.YjP()).describe('Bad code examples'),
+  fix_guidance: external/* string */.YjP().describe('How to fix it (Expertise Transfer)'),
 });
 
-const SkillSchema = object({
-  name: schemas_string(),
-  description: schemas_string().optional(),
-  files: array(schemas_string()).describe('Glob patterns for target files'),
-  exclude: array(schemas_string()).optional(),
+const SkillSchema = external/* object */.Ikc({
+  name: external/* string */.YjP(),
+  description: external/* string */.YjP().optional(),
+  files: external/* array */.YOg(external/* string */.YjP()).describe('Glob patterns for target files'),
+  exclude: external/* array */.YOg(external/* string */.YjP()).optional(),
   model: AIModelSchema.default('gemini-2.0-flash'),
-  temperature: schemas_number().min(0).max(1).default(0.2),
-  rules: array(RuleSchema),
+  temperature: external/* number */.aig().min(0).max(1).default(0.2),
+  rules: external/* array */.YOg(RuleSchema),
 });
 
-const ConfigSchema = object({
-    version: schemas_string().default('1.0'),
+const ConfigSchema = external/* object */.Ikc({
+    version: external/* string */.YjP().default('1.0'),
     model: modelConfigSchema.optional(),
     review: reviewConfigSchema.optional(),
     exclude: excludeConfigSchema.optional(),
-    skills: array(SkillSchema).default([]),
+    skills: external/* array */.YOg(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
-  .catchall(unknown());
+  .catchall(external/* unknown */.L5J());
 
 // EXTERNAL MODULE: ./src/config/default.mjs
-var config_default = __nccwpck_require__(4807);
+var config_default = __nccwpck_require__(7068);
 ;// CONCATENATED MODULE: ./src/config/loader.mjs
 
 
@@ -34192,7 +34463,7 @@ async function loadConfig(repoRoot) {
 
 /***/ }),
 
-/***/ 1092:
+/***/ 8835:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
@@ -34327,15 +34598,15 @@ function renderDiffText(files) {
 
 /***/ }),
 
-/***/ 4382:
+/***/ 5561:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
 /* harmony export */   K: () => (/* binding */ collectRepoDiff),
 /* harmony export */   r: () => (/* binding */ parseUnifiedDiff)
 /* harmony export */ });
-/* harmony import */ var _git_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(340);
-/* harmony import */ var _diff_optimizer_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1092);
+/* harmony import */ var _git_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(6028);
+/* harmony import */ var _diff_optimizer_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(8835);
 
 
 
@@ -34458,7 +34729,7 @@ async function collectRepoDiff(repoRoot, baseRef, { contextLines = 3 } = {}) {
 
 /***/ }),
 
-/***/ 340:
+/***/ 6028:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -34583,7 +34854,7 @@ function collectAddedLineHints(diffText) {
 
 /***/ }),
 
-/***/ 2294:
+/***/ 641:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
@@ -34985,7 +35256,7 @@ function buildHeuristicComments({ diff, plan }) {
 
 /***/ }),
 
-/***/ 1013:
+/***/ 5652:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
@@ -35005,7 +35276,7 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
 
 /***/ }),
 
-/***/ 5544:
+/***/ 8961:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -35016,14 +35287,14 @@ __nccwpck_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: buildPrompt, parseLineComments
 
-// EXTERNAL MODULE: ./src/config/loader.mjs + 75 modules
-var loader = __nccwpck_require__(6245);
+// EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
+var loader = __nccwpck_require__(7557);
 // EXTERNAL MODULE: ./src/config/default.mjs
-var config_default = __nccwpck_require__(4807);
-// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 2 modules
-var review_runner = __nccwpck_require__(4904);
+var config_default = __nccwpck_require__(7068);
+// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 4 modules
+var review_runner = __nccwpck_require__(4504);
 // EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
-var heuristic_review = __nccwpck_require__(2294);
+var heuristic_review = __nccwpck_require__(641);
 ;// CONCATENATED MODULE: ./src/lib/finding-format.mjs
 const FINDING_SEVERITIES = /** @type {const} */ (['blocker', 'warning', 'nit']);
 const FINDING_CONFIDENCE = /** @type {const} */ (['high', 'medium', 'low']);
@@ -35190,12 +35461,48 @@ function buildProjectRulesSection(rulesText) {
   return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
 }
 
+function buildADRContextSection(relatedADRs) {
+  if (!relatedADRs?.length) return '';
+  const lines = ['\n### Related ADRs/Specs\n'];
+  for (const adr of relatedADRs.slice(0, 5)) {
+    lines.push(`- ${adr.title} (${adr.path}) — ${adr.matchReason}`);
+  }
+  lines.push('\nこれらの設計文書との整合性を考慮してレビューしてください。\n');
+  return lines.join('\n');
+}
+
+function sanitizePath(p) {
+  return String(p)
+    .replace(/[\n\r]/g, '')
+    .slice(0, 200);
+}
+
+function buildRiskAssessmentSection(riskAssessment) {
+  if (!riskAssessment) return '';
+  const { escalatedFiles, humanReviewFiles } = riskAssessment;
+  if (!escalatedFiles?.length && !humanReviewFiles?.length) return '';
+  const lines = ['\n### Risk Assessment\n'];
+  if (humanReviewFiles?.length) {
+    lines.push('以下のファイルは人間によるレビューが必須です:');
+    for (const f of humanReviewFiles) lines.push('- ' + sanitizePath(f) + ': require_human_review');
+  }
+  if (escalatedFiles?.length) {
+    lines.push('以下のファイルはエスカレーション対象です:');
+    for (const f of escalatedFiles) lines.push('- ' + sanitizePath(f) + ': escalate');
+  }
+  lines.push('これらのファイルには特に注意してレビューしてください。\n');
+  return lines.join('\n');
+}
+
 function buildPrompt({
   diffText,
   diffFiles,
   plan,
   phase,
   projectRules,
+  riskAssessment,
+  memoryContext,
+  relatedADRs,
   maxChars = MAX_PROMPT_CHARS,
   config = config_default/* defaultConfig */.s,
 }) {
@@ -35214,7 +35521,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -35504,6 +35811,9 @@ async function generateReview({
   model,
   apiKey,
   projectRules,
+  fileTypes,
+  relatedADRs,
+  riskAssessment,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -35514,6 +35824,8 @@ async function generateReview({
     plan,
     phase,
     projectRules,
+    relatedADRs,
+    riskAssessment,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });
@@ -35606,6 +35918,37 @@ async function generateReview({
     ? { ok: false, invalidCount, samples: formatChecks.filter((c) => !c.ok).slice(0, 3) }
     : { ok: true };
 
+  debug.fileClassification = fileTypes ?? null;
+
+  // Verifier pass: filter findings that fail quality checks
+  const { verifyFinding } = await __nccwpck_require__.e(/* import() */ 458).then(__nccwpck_require__.bind(__nccwpck_require__, 6458));
+  const verifierResults = comments.map((comment) => ({
+    comment,
+    verification: verifyFinding({
+      finding: comment,
+      diff: diff.diffText,
+      skill: plan?.selected?.[0] ?? {},
+      fileTypes,
+    }),
+  }));
+
+  const verified = verifierResults.filter((r) => r.verification.verified).map((r) => r.comment);
+  const rejected = verifierResults.filter((r) => !r.verification.verified);
+
+  debug.verifierRejected = rejected.map((r) => ({
+    file: r.comment.file,
+    line: r.comment.line,
+    reasons: r.verification.reasons,
+  }));
+  debug.verifierStats = {
+    total: comments.length,
+    verified: verified.length,
+    rejected: rejected.length,
+  };
+
+  // Replace comments with verified-only set
+  comments = verified;
+
   return {
     comments,
     prompt: promptInfo.prompt,
@@ -35618,70 +35961,253 @@ async function generateReview({
 
 /***/ }),
 
-/***/ 3837:
+/***/ 937:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  _Z: () => (/* binding */ RiskMapError),
+  lm: () => (/* binding */ evaluateRisk),
+  E$: () => (/* binding */ loadRiskMap)
+});
+
+// UNUSED EXPORTS: aggregateRiskLevel
+
+// EXTERNAL MODULE: external "node:fs/promises"
+var promises_ = __nccwpck_require__(1455);
+// EXTERNAL MODULE: external "node:path"
+var external_node_path_ = __nccwpck_require__(6760);
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/js-yaml/dist/js-yaml.mjs
+var js_yaml = __nccwpck_require__(7167);
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/dist/esm/index.js + 7 modules
+var esm = __nccwpck_require__(5619);
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/zod/v4/classic/external.js + 73 modules
+var external = __nccwpck_require__(6549);
+;// CONCATENATED MODULE: ./src/config/risk-map-schema.mjs
+
+
+const RiskActionSchema = external/* enum */.k5n(['comment_only', 'escalate', 'require_human_review']);
+
+const RiskRuleSchema = external/* object */.Ikc({
+  pattern: external/* string */.YjP().min(1),
+  action: RiskActionSchema,
+  reason: external/* string */.YjP().optional(),
+});
+
+const RiskMapSchema = external/* object */.Ikc({
+  version: external/* string */.YjP().default('1'),
+  rules: external/* array */.YOg(RiskRuleSchema).min(1),
+  defaults: external/* object */.Ikc({
+      action: RiskActionSchema.default('comment_only'),
+    })
+    .default({ action: 'comment_only' }),
+});
+
+;// CONCATENATED MODULE: ./src/lib/risk-map.mjs
+
+
+
+
+
+
+const DEFAULT_RISK_MAP_PATH = external_node_path_.join('.river', 'risk-map.yaml');
+
+class RiskMapError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'RiskMapError';
+  }
+}
+
+/**
+ * Load a risk map from .river/risk-map.yaml (or a custom path).
+ * Missing files are treated as "no risk map" without error.
+ * @param {string} repoRoot
+ * @param {{ riskMapPath?: string }} [options]
+ * @returns {Promise<import('../../schemas/risk-map.schema.json') | null>}
+ */
+async function loadRiskMap(repoRoot, options = {}) {
+  const repoRootAbs = external_node_path_.resolve(repoRoot);
+  const relativePath = options.riskMapPath ?? DEFAULT_RISK_MAP_PATH;
+  const fullPath = external_node_path_.resolve(repoRootAbs, relativePath);
+
+  if (!fullPath.startsWith(repoRootAbs + external_node_path_.sep) && fullPath !== repoRootAbs) {
+    throw new RiskMapError(`Risk map path is outside of the repository: ${relativePath}`);
+  }
+
+  let raw;
+  try {
+    raw = await promises_.readFile(fullPath, 'utf8');
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return null;
+    }
+    throw new RiskMapError(`Failed to read risk map at ${fullPath}: ${error.message}`);
+  }
+
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  let parsed;
+  try {
+    parsed = js_yaml/* default.load */.Ay.load(trimmed);
+  } catch (error) {
+    throw new RiskMapError(`Failed to parse risk map YAML: ${error.message}`);
+  }
+
+  const result = RiskMapSchema.safeParse(parsed);
+  if (!result.success) {
+    const issues = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
+    throw new RiskMapError(`Invalid risk map schema: ${issues}`);
+  }
+
+  return result.data;
+}
+
+const ACTION_PRIORITY = {
+  comment_only: 0,
+  escalate: 1,
+  require_human_review: 2,
+};
+
+/**
+ * Evaluate risk for a list of changed files against a risk map.
+ * First matching rule wins per file.
+ * @param {object} riskMap - Parsed risk map config
+ * @param {string[]} filePaths - List of changed file paths
+ * @returns {{ fileRisks: Array<{ file: string, action: string, rule?: object }>, aggregateAction: string, escalatedFiles: string[], humanReviewFiles: string[] }}
+ */
+function evaluateRisk(riskMap, filePaths) {
+  if (!riskMap || !filePaths?.length) {
+    return {
+      fileRisks: [],
+      aggregateAction: riskMap?.defaults?.action ?? 'comment_only',
+      escalatedFiles: [],
+      humanReviewFiles: [],
+    };
+  }
+
+  const defaultAction = riskMap.defaults?.action ?? 'comment_only';
+  const fileRisks = [];
+
+  for (const file of filePaths) {
+    let matched = false;
+    for (const rule of riskMap.rules) {
+      if ((0,esm/* minimatch */.xF)(file, rule.pattern, { dot: true })) {
+        fileRisks.push({
+          file,
+          action: rule.action,
+          rule: { pattern: rule.pattern, reason: rule.reason },
+        });
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      fileRisks.push({ file, action: defaultAction });
+    }
+  }
+
+  const escalatedFiles = fileRisks
+    .filter((r) => r.action === 'escalate')
+    .map((r) => r.file);
+  const humanReviewFiles = fileRisks
+    .filter((r) => r.action === 'require_human_review')
+    .map((r) => r.file);
+  const aggregateAction = aggregateRiskLevel(fileRisks, defaultAction);
+
+  return { fileRisks, aggregateAction, escalatedFiles, humanReviewFiles };
+}
+
+/**
+ * Aggregate to the highest risk action across all file risks.
+ * @param {Array<{ action: string }>} fileRisks
+ * @param {string} [fallback='comment_only']
+ * @returns {string}
+ */
+function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
+  if (!fileRisks?.length) return fallback;
+
+  let maxPriority = -1;
+  let maxAction = fallback;
+  for (const { action } of fileRisks) {
+    const priority = ACTION_PRIORITY[action] ?? 0;
+    if (priority > maxPriority) {
+      maxPriority = priority;
+      maxAction = action;
+    }
+  }
+  return maxAction;
+}
+
+
+/***/ }),
+
+/***/ 4662:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$id":"https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#","description":"Meta-schema for $data reference (JSON AnySchema extension proposal)","type":"object","required":["$data"],"properties":{"$data":{"type":"string","anyOf":[{"format":"relative-json-pointer"},{"format":"json-pointer"}]}},"additionalProperties":false}');
 
 /***/ }),
 
-/***/ 7216:
+/***/ 5433:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/applicator","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/applicator":true},"$dynamicAnchor":"meta","title":"Applicator vocabulary meta-schema","type":["object","boolean"],"properties":{"prefixItems":{"$ref":"#/$defs/schemaArray"},"items":{"$dynamicRef":"#meta"},"contains":{"$dynamicRef":"#meta"},"additionalProperties":{"$dynamicRef":"#meta"},"properties":{"type":"object","additionalProperties":{"$dynamicRef":"#meta"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$dynamicRef":"#meta"},"propertyNames":{"format":"regex"},"default":{}},"dependentSchemas":{"type":"object","additionalProperties":{"$dynamicRef":"#meta"},"default":{}},"propertyNames":{"$dynamicRef":"#meta"},"if":{"$dynamicRef":"#meta"},"then":{"$dynamicRef":"#meta"},"else":{"$dynamicRef":"#meta"},"allOf":{"$ref":"#/$defs/schemaArray"},"anyOf":{"$ref":"#/$defs/schemaArray"},"oneOf":{"$ref":"#/$defs/schemaArray"},"not":{"$dynamicRef":"#meta"}},"$defs":{"schemaArray":{"type":"array","minItems":1,"items":{"$dynamicRef":"#meta"}}}}');
 
 /***/ }),
 
-/***/ 8226:
+/***/ 7801:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/content","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/content":true},"$dynamicAnchor":"meta","title":"Content vocabulary meta-schema","type":["object","boolean"],"properties":{"contentEncoding":{"type":"string"},"contentMediaType":{"type":"string"},"contentSchema":{"$dynamicRef":"#meta"}}}');
 
 /***/ }),
 
-/***/ 518:
+/***/ 2151:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/core","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/core":true},"$dynamicAnchor":"meta","title":"Core vocabulary meta-schema","type":["object","boolean"],"properties":{"$id":{"$ref":"#/$defs/uriReferenceString","$comment":"Non-empty fragments not allowed.","pattern":"^[^#]*#?$"},"$schema":{"$ref":"#/$defs/uriString"},"$ref":{"$ref":"#/$defs/uriReferenceString"},"$anchor":{"$ref":"#/$defs/anchorString"},"$dynamicRef":{"$ref":"#/$defs/uriReferenceString"},"$dynamicAnchor":{"$ref":"#/$defs/anchorString"},"$vocabulary":{"type":"object","propertyNames":{"$ref":"#/$defs/uriString"},"additionalProperties":{"type":"boolean"}},"$comment":{"type":"string"},"$defs":{"type":"object","additionalProperties":{"$dynamicRef":"#meta"}}},"$defs":{"anchorString":{"type":"string","pattern":"^[A-Za-z_][-A-Za-z0-9._]*$"},"uriString":{"type":"string","format":"uri"},"uriReferenceString":{"type":"string","format":"uri-reference"}}}');
 
 /***/ }),
 
-/***/ 4588:
+/***/ 5675:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/format-annotation","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/format-annotation":true},"$dynamicAnchor":"meta","title":"Format vocabulary meta-schema for annotation results","type":["object","boolean"],"properties":{"format":{"type":"string"}}}');
 
 /***/ }),
 
-/***/ 5707:
+/***/ 1352:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/meta-data","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/meta-data":true},"$dynamicAnchor":"meta","title":"Meta-data vocabulary meta-schema","type":["object","boolean"],"properties":{"title":{"type":"string"},"description":{"type":"string"},"default":true,"deprecated":{"type":"boolean","default":false},"readOnly":{"type":"boolean","default":false},"writeOnly":{"type":"boolean","default":false},"examples":{"type":"array","items":true}}}');
 
 /***/ }),
 
-/***/ 9547:
+/***/ 5056:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/unevaluated","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/unevaluated":true},"$dynamicAnchor":"meta","title":"Unevaluated applicator vocabulary meta-schema","type":["object","boolean"],"properties":{"unevaluatedItems":{"$dynamicRef":"#meta"},"unevaluatedProperties":{"$dynamicRef":"#meta"}}}');
 
 /***/ }),
 
-/***/ 7082:
+/***/ 8931:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/validation","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/validation":true},"$dynamicAnchor":"meta","title":"Validation vocabulary meta-schema","type":["object","boolean"],"properties":{"type":{"anyOf":[{"$ref":"#/$defs/simpleTypes"},{"type":"array","items":{"$ref":"#/$defs/simpleTypes"},"minItems":1,"uniqueItems":true}]},"const":true,"enum":{"type":"array","items":true},"multipleOf":{"type":"number","exclusiveMinimum":0},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"number"},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"number"},"maxLength":{"$ref":"#/$defs/nonNegativeInteger"},"minLength":{"$ref":"#/$defs/nonNegativeIntegerDefault0"},"pattern":{"type":"string","format":"regex"},"maxItems":{"$ref":"#/$defs/nonNegativeInteger"},"minItems":{"$ref":"#/$defs/nonNegativeIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"maxContains":{"$ref":"#/$defs/nonNegativeInteger"},"minContains":{"$ref":"#/$defs/nonNegativeInteger","default":1},"maxProperties":{"$ref":"#/$defs/nonNegativeInteger"},"minProperties":{"$ref":"#/$defs/nonNegativeIntegerDefault0"},"required":{"$ref":"#/$defs/stringArray"},"dependentRequired":{"type":"object","additionalProperties":{"$ref":"#/$defs/stringArray"}}},"$defs":{"nonNegativeInteger":{"type":"integer","minimum":0},"nonNegativeIntegerDefault0":{"$ref":"#/$defs/nonNegativeInteger","default":0},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"uniqueItems":true,"default":[]}}}');
 
 /***/ }),
 
-/***/ 1678:
+/***/ 5745:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/schema","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/core":true,"https://json-schema.org/draft/2020-12/vocab/applicator":true,"https://json-schema.org/draft/2020-12/vocab/unevaluated":true,"https://json-schema.org/draft/2020-12/vocab/validation":true,"https://json-schema.org/draft/2020-12/vocab/meta-data":true,"https://json-schema.org/draft/2020-12/vocab/format-annotation":true,"https://json-schema.org/draft/2020-12/vocab/content":true},"$dynamicAnchor":"meta","title":"Core and Validation specifications meta-schema","allOf":[{"$ref":"meta/core"},{"$ref":"meta/applicator"},{"$ref":"meta/unevaluated"},{"$ref":"meta/validation"},{"$ref":"meta/meta-data"},{"$ref":"meta/format-annotation"},{"$ref":"meta/content"}],"type":["object","boolean"],"$comment":"This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.","properties":{"definitions":{"$comment":"\\"definitions\\" has been replaced by \\"$defs\\".","type":"object","additionalProperties":{"$dynamicRef":"#meta"},"deprecated":true,"default":{}},"dependencies":{"$comment":"\\"dependencies\\" has been split and replaced by \\"dependentSchemas\\" and \\"dependentRequired\\" in order to serve their differing semantics.","type":"object","additionalProperties":{"anyOf":[{"$dynamicRef":"#meta"},{"$ref":"meta/validation#/$defs/stringArray"}]},"deprecated":true,"default":{}},"$recursiveAnchor":{"$comment":"\\"$recursiveAnchor\\" has been replaced by \\"$dynamicAnchor\\".","$ref":"meta/core#/$defs/anchorString","deprecated":true},"$recursiveRef":{"$comment":"\\"$recursiveRef\\" has been replaced by \\"$dynamicRef\\".","$ref":"meta/core#/$defs/uriReferenceString","deprecated":true}}}');
 
 /***/ }),
 
-/***/ 2079:
+/***/ 7487:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/draft-07/schema#","$id":"http://json-schema.org/draft-07/schema#","title":"Core schema meta-schema","definitions":{"schemaArray":{"type":"array","minItems":1,"items":{"$ref":"#"}},"nonNegativeInteger":{"type":"integer","minimum":0},"nonNegativeIntegerDefault0":{"allOf":[{"$ref":"#/definitions/nonNegativeInteger"},{"default":0}]},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"uniqueItems":true,"default":[]}},"type":["object","boolean"],"properties":{"$id":{"type":"string","format":"uri-reference"},"$schema":{"type":"string","format":"uri"},"$ref":{"type":"string","format":"uri-reference"},"$comment":{"type":"string"},"title":{"type":"string"},"description":{"type":"string"},"default":true,"readOnly":{"type":"boolean","default":false},"examples":{"type":"array","items":true},"multipleOf":{"type":"number","exclusiveMinimum":0},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"number"},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"number"},"maxLength":{"$ref":"#/definitions/nonNegativeInteger"},"minLength":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"pattern":{"type":"string","format":"regex"},"additionalItems":{"$ref":"#"},"items":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/schemaArray"}],"default":true},"maxItems":{"$ref":"#/definitions/nonNegativeInteger"},"minItems":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"contains":{"$ref":"#"},"maxProperties":{"$ref":"#/definitions/nonNegativeInteger"},"minProperties":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"required":{"$ref":"#/definitions/stringArray"},"additionalProperties":{"$ref":"#"},"definitions":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"properties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$ref":"#"},"propertyNames":{"format":"regex"},"default":{}},"dependencies":{"type":"object","additionalProperties":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/stringArray"}]}},"propertyNames":{"$ref":"#"},"const":true,"enum":{"type":"array","items":true,"minItems":1,"uniqueItems":true},"type":{"anyOf":[{"$ref":"#/definitions/simpleTypes"},{"type":"array","items":{"$ref":"#/definitions/simpleTypes"},"minItems":1,"uniqueItems":true}]},"format":{"type":"string"},"contentMediaType":{"type":"string"},"contentEncoding":{"type":"string"},"if":{"$ref":"#"},"then":{"$ref":"#"},"else":{"$ref":"#"},"allOf":{"$ref":"#/definitions/schemaArray"},"anyOf":{"$ref":"#/definitions/schemaArray"},"oneOf":{"$ref":"#/definitions/schemaArray"},"not":{"$ref":"#"}},"default":true}');
@@ -35849,19 +36375,19 @@ var external_node_path_ = __nccwpck_require__(6760);
 ;// CONCATENATED MODULE: external "node:process"
 const external_node_process_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:process");
 // EXTERNAL MODULE: ./src/lib/git.mjs + 2 modules
-var git = __nccwpck_require__(340);
+var git = __nccwpck_require__(6028);
 // EXTERNAL MODULE: external "node:fs/promises"
 var promises_ = __nccwpck_require__(1455);
-// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
-var esm = __nccwpck_require__(9519);
-// EXTERNAL MODULE: ./src/config/loader.mjs + 75 modules
-var loader = __nccwpck_require__(6245);
+// EXTERNAL MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/minimatch/dist/esm/index.js + 7 modules
+var esm = __nccwpck_require__(5619);
+// EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
+var loader = __nccwpck_require__(7557);
 // EXTERNAL MODULE: ./src/lib/diff.mjs
-var lib_diff = __nccwpck_require__(4382);
+var lib_diff = __nccwpck_require__(5561);
 // EXTERNAL MODULE: ./src/lib/diff-optimizer.mjs
-var diff_optimizer = __nccwpck_require__(1092);
+var diff_optimizer = __nccwpck_require__(8835);
 // EXTERNAL MODULE: ./src/lib/review-engine.mjs + 1 modules
-var review_engine = __nccwpck_require__(5544);
+var review_engine = __nccwpck_require__(8961);
 ;// CONCATENATED MODULE: ./src/lib/openai-planner.mjs
 const DEFAULT_PLANNER_MODEL =
   process.env.RIVER_PLANNER_MODEL ||
@@ -35998,9 +36524,9 @@ function createOpenAIPlanner(options = {}) {
 }
 
 // EXTERNAL MODULE: ./src/lib/planner-utils.mjs
-var planner_utils = __nccwpck_require__(1013);
-// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 2 modules
-var review_runner = __nccwpck_require__(4904);
+var planner_utils = __nccwpck_require__(5652);
+// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 4 modules
+var review_runner = __nccwpck_require__(4504);
 ;// CONCATENATED MODULE: ./src/lib/rules.mjs
 
 
@@ -36042,8 +36568,212 @@ async function loadProjectRules(repoRoot, options = {}) {
   }
 }
 
+// EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
+var risk_map = __nccwpck_require__(937);
+// EXTERNAL MODULE: external "node:fs"
+var external_node_fs_ = __nccwpck_require__(3024);
+;// CONCATENATED MODULE: ./src/lib/riverbed-memory.mjs
+
+
+
+/**
+ * Load the Riverbed Memory index from disk.
+ * Returns empty structure if file doesn't exist (stateless fallback).
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @returns {{ entries: object[], version: string }}
+ */
+function loadMemory(indexPath) {
+  try {
+    const raw = external_node_fs_.readFileSync(indexPath, 'utf-8');
+    return JSON.parse(raw);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      return { entries: [], version: '1' };
+    }
+    throw err;
+  }
+}
+
+/**
+ * Append a memory entry to the index.
+ * Creates the directory and file if they don't exist.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @param {object} entry - Entry conforming to riverbed-entry.schema.json
+ */
+function appendEntry(indexPath, entry) {
+  const index = loadMemory(indexPath);
+
+  // Validate required fields
+  if (!entry.id || !entry.type || !entry.content || !entry.metadata) {
+    throw new Error('Entry must have id, type, content, and metadata fields');
+  }
+
+  // Prevent duplicate IDs
+  if (index.entries.some((e) => e.id === entry.id)) {
+    throw new Error(`Duplicate entry ID: ${entry.id}`);
+  }
+
+  index.entries.push(entry);
+
+  const dir = path.dirname(indexPath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+}
+
+/**
+ * Query memory entries by filter criteria.
+ * All filter fields are optional; entries must match ALL provided criteria.
+ * By default, only active entries are returned.
+ *
+ * @param {{ entries: object[] }} index - Loaded memory index
+ * @param {{ type?: string, tags?: string[], phase?: string, includeInactive?: boolean }} filter
+ * @returns {object[]}
+ */
+function queryMemory(index, { type, tags, phase, includeInactive = false } = {}) {
+  return index.entries.filter((entry) => {
+    if (!includeInactive) {
+      const status = entry.status ?? 'active';
+      if (status !== 'active') return false;
+    }
+    if (type && entry.type !== type) return false;
+    if (phase && entry.metadata?.phase !== phase) return false;
+    if (tags && tags.length > 0) {
+      const entryTags = entry.metadata?.tags ?? [];
+      if (!tags.every((t) => entryTags.includes(t))) return false;
+    }
+    return true;
+  });
+}
+
+/**
+ * Supersede an entry by marking it as superseded and pointing to the new entry.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @param {string} oldId - ID of the entry to supersede
+ * @param {string} newId - ID of the superseding entry
+ */
+function supersede(indexPath, oldId, newId) {
+  const index = loadMemory(indexPath);
+  const entry = index.entries.find((e) => e.id === oldId);
+  if (!entry) {
+    throw new Error(`Entry not found: ${oldId}`);
+  }
+  entry.status = 'superseded';
+  entry.supersededBy = newId;
+  fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+}
+
+/**
+ * Archive entries whose expiresAt timestamp has passed.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @returns {number} Number of entries archived
+ */
+function expireEntries(indexPath) {
+  const index = loadMemory(indexPath);
+  const now = new Date();
+  let count = 0;
+  for (const entry of index.entries) {
+    if (
+      entry.expiresAt &&
+      new Date(entry.expiresAt) <= now &&
+      (entry.status ?? 'active') === 'active'
+    ) {
+      entry.status = 'archived';
+      count++;
+    }
+  }
+  if (count > 0) {
+    fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+  }
+  return count;
+}
+
+;// CONCATENATED MODULE: ./src/lib/memory-context.mjs
+
+
+
+const DEFAULT_MEMORY_PATH = external_node_path_.join('.river', 'memory', 'index.json');
+
+function loadReviewMemory(repoRoot, { phase, changedFiles } = {}) {
+  const indexPath = external_node_path_.resolve(repoRoot, DEFAULT_MEMORY_PATH);
+  const index = loadMemory(indexPath);
+  // includeInactive: true keeps the phase and no-phase branches symmetric and
+  // preserves pre-lifecycle semantics where historical entries were surfaced.
+  const allEntries = phase
+    ? queryMemory(index, { phase, includeInactive: true })
+    : (index.entries ?? []);
+  const relevant = changedFiles?.length
+    ? allEntries.filter((e) => {
+        const related = e.metadata?.relatedFiles ?? [];
+        if (!related.length) return true;
+        return related.some((r) => changedFiles.includes(r));
+      })
+    : allEntries;
+  const buckets = { wontfixes: [], patterns: [], decisions: [], reviews: [], suppressions: [] };
+  const typeMap = {
+    wontfix: 'wontfixes',
+    pattern: 'patterns',
+    decision: 'decisions',
+    review: 'reviews',
+    suppression: 'suppressions',
+  };
+  for (const e of relevant) {
+    const bucket = typeMap[e.type];
+    if (bucket) buckets[bucket].push(e);
+  }
+  return { entries: relevant, ...buckets };
+}
+
+function formatMemoryForPrompt(memoryContext, { maxChars = 1500 } = {}) {
+  if (!memoryContext) return '';
+  const { wontfixes, patterns, decisions } = memoryContext;
+  const sections = [];
+  if (wontfixes?.length) {
+    sections.push('以下の指摘は明示的に受け入れ済みです。再指摘は不要です:');
+    for (const w of wontfixes)
+      sections.push('- [' + w.id + '] ' + (w.title || w.content?.slice(0, 80)));
+  }
+  if (patterns?.length) {
+    sections.push('以下はチーム規約として記録されています:');
+    for (const p of patterns) sections.push('- ' + (p.title || p.content?.slice(0, 80)));
+  }
+  if (decisions?.length) {
+    sections.push('以下の設計判断が記録されています:');
+    for (const d of decisions) sections.push('- ' + (d.title || d.content?.slice(0, 80)));
+  }
+  if (!sections.length) return '';
+  const text = '\n### Memory Context (previous review decisions)\n\n' + sections.join('\n');
+  return text.length > maxChars ? text.slice(0, maxChars) + '\n...[truncated]' : text;
+}
+
+function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
+  const timestamp = new Date().toISOString();
+  const id = 'review-' + (commit || 'unknown') + '-' + Date.now();
+  const commentCount = reviewResult.comments?.length ?? 0;
+  const summary = commentCount + ' findings in ' + (phase || 'midstream') + ' phase';
+  return {
+    id,
+    type: 'review',
+    title: 'Review: ' + summary,
+    content: JSON.stringify({ commentCount, phase, changedFiles: changedFiles?.slice(0, 20) }),
+    metadata: {
+      createdAt: timestamp,
+      author: 'river-reviewer',
+      ...(phase ? { phase } : {}),
+      tags: ['review', 'automated'],
+      relatedFiles: changedFiles?.slice(0, 50) ?? [],
+      summary,
+    },
+  };
+}
+
 // EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
-var skill_loader = __nccwpck_require__(5541);
+var skill_loader = __nccwpck_require__(4438);
 ;// CONCATENATED MODULE: ./src/lib/utils.mjs
 /**
  * Parse a comma-separated list string into a trimmed array.
@@ -36085,6 +36815,8 @@ function isLlmEnabled() {
 
 
 
+
+
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
   if (['upstream', 'midstream', 'downstream'].includes(normalized)) return normalized;
@@ -36092,26 +36824,40 @@ function normalizePhase(phase) {
 }
 
 // NOTE: Keep this list in sync with schemas/skill.schema.json dependencies enum.
-const dependencyStubs = ['code_search', 'test_runner', 'coverage_report', 'adr_lookup', 'repo_metadata', 'tracing'];
+const dependencyStubs = [
+  'code_search',
+  'test_runner',
+  'coverage_report',
+  'adr_lookup',
+  'repo_metadata',
+  'tracing',
+];
 
 const configLoader = new loader/* ConfigLoader */.UT();
 
 function shouldExclude(filePath, patterns = []) {
-  return patterns.some(pattern => (0,esm/* minimatch */.xF)(filePath, pattern, { dot: true }));
+  return patterns.some((pattern) => (0,esm/* minimatch */.xF)(filePath, pattern, { dot: true }));
 }
 
 function applyFileExclusions(diff, patterns = []) {
   if (!patterns.length) return diff;
 
-  const changedFiles = (diff.changedFiles ?? []).filter(filePath => !shouldExclude(filePath, patterns));
-  const rawFiles = (diff.files ?? []).filter(file => !shouldExclude(file.path, patterns));
-  const optimizedFiles = (diff.filesForReview ?? diff.files ?? []).filter(file => !shouldExclude(file.path, patterns));
+  const changedFiles = (diff.changedFiles ?? []).filter(
+    (filePath) => !shouldExclude(filePath, patterns)
+  );
+  const rawFiles = (diff.files ?? []).filter((file) => !shouldExclude(file.path, patterns));
+  const optimizedFiles = (diff.filesForReview ?? diff.files ?? []).filter(
+    (file) => !shouldExclude(file.path, patterns)
+  );
 
   const rawDiffText = (0,diff_optimizer/* renderDiffText */.p)(rawFiles);
   const diffText = (0,diff_optimizer/* renderDiffText */.p)(optimizedFiles);
   const rawTokenEstimate = Math.ceil(rawDiffText.length / 4);
   const tokenEstimate = Math.ceil(diffText.length / 4);
-  const reduction = rawTokenEstimate === 0 ? 0 : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
+  const reduction =
+    rawTokenEstimate === 0
+      ? 0
+      : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
 
   return {
     ...diff,
@@ -36137,7 +36883,7 @@ async function resolvePullRequestLabels() {
     const raw = await promises_.readFile(eventPath, 'utf8');
     const event = JSON.parse(raw);
     const pullRequestLabels = event?.pull_request?.labels ?? event?.labels ?? [];
-    return pullRequestLabels.map(label => label?.name).filter(Boolean);
+    return pullRequestLabels.map((label) => label?.name).filter(Boolean);
   } catch {
     return [];
   }
@@ -36145,10 +36891,10 @@ async function resolvePullRequestLabels() {
 
 function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
   if (!prLabels.length || !ignorePatterns.length) return { matched: [], shouldSkip: false };
-  const normalizedLabels = prLabels.map(label => label.toLowerCase());
-  const matched = ignorePatterns.filter(pattern => {
+  const normalizedLabels = prLabels.map((label) => label.toLowerCase());
+  const matched = ignorePatterns.filter((pattern) => {
     const needle = pattern.toLowerCase();
-    return normalizedLabels.some(label => label.includes(needle));
+    return normalizedLabels.some((label) => label.includes(needle));
   });
   return { matched, shouldSkip: matched.length > 0 };
 }
@@ -36181,11 +36927,12 @@ async function collectLocalContext({
   const { config, path: configPath, source: configSource } = await configLoader.load(repoRoot);
   const prLabels = await resolvePullRequestLabels();
   const { rulesText: projectRules } = await loadProjectRules(repoRoot);
+  const riskMap = await (0,risk_map/* loadRiskMap */.E$)(repoRoot);
   const defaultBranch = await (0,git/* detectDefaultBranch */.Rd)(repoRoot);
   const mergeBase = await (0,git/* findMergeBase */.fe)(repoRoot, defaultBranch);
   const rawDiff = await (0,lib_diff/* collectRepoDiff */.K)(repoRoot, mergeBase, { contextLines });
   const diff = applyFileExclusions(rawDiff, config.exclude?.files ?? []);
-  const reviewFiles = diff.filesForReview?.map(file => file.path) ?? diff.changedFiles;
+  const reviewFiles = diff.filesForReview?.map((file) => file.path) ?? diff.changedFiles;
   const contexts = resolveAvailableContexts(availableContexts);
   const dependencies = resolveAvailableDependencies(availableDependencies);
 
@@ -36195,6 +36942,7 @@ async function collectLocalContext({
     configPath,
     configSource,
     projectRules,
+    riskMap,
     defaultBranch,
     mergeBase,
     diff,
@@ -36226,6 +36974,7 @@ async function planLocalReview({
   const {
     repoRoot,
     projectRules,
+    riskMap,
     defaultBranch,
     mergeBase,
     diff,
@@ -36244,7 +36993,7 @@ async function planLocalReview({
 
   const { matched: ignoredLabels, shouldSkip } = shouldSkipByLabel(
     prLabels,
-    config.exclude?.prLabelsToIgnore ?? [],
+    config.exclude?.prLabelsToIgnore ?? []
   );
 
   if (shouldSkip) {
@@ -36306,6 +37055,8 @@ async function planLocalReview({
     plannerMode: requestedPlannerMode,
     dryRun,
     llmEnabled,
+    repoRoot,
+    riskMap,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -36335,21 +37086,19 @@ async function planLocalReview({
   };
 }
 
-async function runLocalReview(
-  {
-    cwd = process.cwd(),
-    phase = 'midstream',
-    dryRun = false,
-    debug = false,
-    preferredModelHint = 'balanced',
-    model,
-    apiKey,
-    context: providedContext,
-    availableContexts,
-    availableDependencies,
-    plannerMode,
-  } = {},
-) {
+async function runLocalReview({
+  cwd = process.cwd(),
+  phase = 'midstream',
+  dryRun = false,
+  debug = false,
+  preferredModelHint = 'balanced',
+  model,
+  apiKey,
+  context: providedContext,
+  availableContexts,
+  availableDependencies,
+  plannerMode,
+} = {}) {
   const context =
     providedContext ??
     (await planLocalReview({
@@ -36392,6 +37141,11 @@ async function runLocalReview(
     };
   }
 
+  const memoryContext = loadReviewMemory(context.repoRoot, {
+    phase: normalizePhase(phase),
+    changedFiles: context.changedFiles,
+  });
+
   const review = await (0,review_engine/* generateReview */.G1)({
     diff: context.diff,
     plan: context.plan,
@@ -36400,6 +37154,10 @@ async function runLocalReview(
     model,
     apiKey,
     projectRules: context.projectRules,
+    riskAssessment: context.plan?.riskAssessment ?? null,
+    memoryContext,
+    fileTypes: context.plan?.fileTypes,
+    relatedADRs: context.plan?.relatedADRs,
     config: context.config,
   });
 
@@ -36444,8 +37202,16 @@ async function doctorLocalReview({
     availableContexts,
     availableDependencies,
   });
-  const { repoRoot, projectRules, defaultBranch, mergeBase, diff, reviewFiles, availableContexts: contexts, availableDependencies: dependencies } =
-    base;
+  const {
+    repoRoot,
+    projectRules,
+    defaultBranch,
+    mergeBase,
+    diff,
+    reviewFiles,
+    availableContexts: contexts,
+    availableDependencies: dependencies,
+  } = base;
 
   const llmEnabled = isLlmEnabled();
 
@@ -36459,6 +37225,7 @@ async function doctorLocalReview({
         preferredModelHint,
         skills,
         llmEnabled,
+        repoRoot,
       })
     : null;
 
@@ -36556,7 +37323,7 @@ Pricing last updated: ${this.lastUpdated}`;
 
 /* harmony default export */ const cost_estimator = (CostEstimator);
 
-;// CONCATENATED MODULE: ./node_modules/@google/generative-ai/dist/index.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/@google/generative-ai/dist/index.mjs
 /**
  * Contains the list of OpenAPI data types
  * as defined by https://swagger.io/docs/specification/data-models/data-types/
@@ -38078,7 +38845,7 @@ class GoogleGenerativeAI {
 
 //# sourceMappingURL=index.mjs.map
 
-;// CONCATENATED MODULE: ./node_modules/openai/internal/tslib.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/tslib.mjs
 function __classPrivateFieldSet(receiver, state, value, kind, f) {
     if (kind === "m")
         throw new TypeError("Private method is not writable");
@@ -38097,7 +38864,7 @@ function __classPrivateFieldGet(receiver, state, kind, f) {
 }
 
 
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/uuid.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/utils/uuid.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 /**
  * https://stackoverflow.com/a/2117523
@@ -38113,7 +38880,7 @@ let uuid4 = function () {
     return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) => (+c ^ (randomByte() & (15 >> (+c / 4)))).toString(16));
 };
 //# sourceMappingURL=uuid.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/errors.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/errors.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 function isAbortError(err) {
     return (typeof err === 'object' &&
@@ -38150,7 +38917,7 @@ const castToError = (err) => {
     return new Error(err);
 };
 //# sourceMappingURL=errors.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/error.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/core/error.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class error_OpenAIError extends Error {
@@ -38268,7 +39035,7 @@ class InvalidWebhookSignatureError extends Error {
     }
 }
 //# sourceMappingURL=error.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/values.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/utils/values.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 // https://url.spec.whatwg.org/#url-scheme-string
@@ -38363,14 +39130,14 @@ const safeJSON = (text) => {
     }
 };
 //# sourceMappingURL=values.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/sleep.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/utils/sleep.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 //# sourceMappingURL=sleep.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/version.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/version.mjs
 const VERSION = '6.22.0'; // x-release-please-version
 //# sourceMappingURL=version.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/detect-platform.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/detect-platform.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 const isRunningInBrowser = () => {
@@ -38528,7 +39295,7 @@ const getPlatformHeaders = () => {
     return (_platformHeaders ?? (_platformHeaders = getPlatformProperties()));
 };
 //# sourceMappingURL=detect-platform.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/shims.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/shims.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 function getDefaultFetch() {
     if (typeof fetch !== 'undefined') {
@@ -38614,7 +39381,7 @@ async function CancelReadableStream(stream) {
     await cancelPromise;
 }
 //# sourceMappingURL=shims.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/request-options.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/request-options.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 const FallbackEncoder = ({ headers, body }) => {
     return {
@@ -38625,7 +39392,7 @@ const FallbackEncoder = ({ headers, body }) => {
     };
 };
 //# sourceMappingURL=request-options.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/qs/formats.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/qs/formats.mjs
 const default_format = 'RFC3986';
 const default_formatter = (v) => String(v);
 const formatters = {
@@ -38635,7 +39402,7 @@ const formatters = {
 const RFC1738 = 'RFC1738';
 const RFC3986 = 'RFC3986';
 //# sourceMappingURL=formats.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/qs/utils.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/qs/utils.mjs
 
 
 let has = (obj, key) => ((has = Object.hasOwn ?? Function.prototype.call.bind(Object.prototype.hasOwnProperty)),
@@ -38853,7 +39620,7 @@ function maybe_map(val, fn) {
     return fn(val);
 }
 //# sourceMappingURL=utils.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/qs/stringify.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/qs/stringify.mjs
 
 
 
@@ -39128,7 +39895,7 @@ function stringify(object, opts = {}) {
     return joined.length > 0 ? prefix + joined : '';
 }
 //# sourceMappingURL=stringify.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/qs/index.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/qs/index.mjs
 
 const formats = {
     formatters: formatters,
@@ -39139,7 +39906,7 @@ const formats = {
 
 
 //# sourceMappingURL=index.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/bytes.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/utils/bytes.mjs
 function concatBytes(buffers) {
     let length = 0;
     for (const buffer of buffers) {
@@ -39166,7 +39933,7 @@ function decodeUTF8(bytes) {
         ((decoder = new globalThis.TextDecoder()), (decodeUTF8_ = decoder.decode.bind(decoder))))(bytes);
 }
 //# sourceMappingURL=bytes.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/decoders/line.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/decoders/line.mjs
 var _LineDecoder_buffer, _LineDecoder_carriageReturnIndex;
 
 
@@ -39275,7 +40042,7 @@ function findDoubleNewlineIndex(buffer) {
     return -1;
 }
 //# sourceMappingURL=line.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/log.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/utils/log.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 const levelNumbers = {
@@ -39355,7 +40122,7 @@ const formatRequestDetails = (details) => {
     return details;
 };
 //# sourceMappingURL=log.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/streaming.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/core/streaming.mjs
 var _Stream_client;
 
 
@@ -39644,7 +40411,7 @@ function partition(str, delimiter) {
     return [str, '', ''];
 }
 //# sourceMappingURL=streaming.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/parse.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/parse.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -39701,7 +40468,7 @@ function addRequestID(value, response) {
     });
 }
 //# sourceMappingURL=parse.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/api-promise.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/core/api-promise.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var _APIPromise_client;
 
@@ -39774,7 +40541,7 @@ class APIPromise extends Promise {
 }
 _APIPromise_client = new WeakMap();
 //# sourceMappingURL=api-promise.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/pagination.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/core/pagination.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var _AbstractPage_client;
 
@@ -39923,7 +40690,7 @@ class ConversationCursorPage extends AbstractPage {
     }
 }
 //# sourceMappingURL=pagination.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/uploads.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/uploads.mjs
 
 const checkFileSupport = () => {
     if (typeof File === 'undefined') {
@@ -40055,7 +40822,7 @@ const addFormValue = async (form, key, value) => {
     }
 };
 //# sourceMappingURL=uploads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/to-file.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/to-file.mjs
 
 
 /**
@@ -40144,10 +40911,10 @@ function propsForError(value) {
     return `; props: [${props.map((p) => `"${p}"`).join(', ')}]`;
 }
 //# sourceMappingURL=to-file.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/uploads.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/core/uploads.mjs
 
 //# sourceMappingURL=uploads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/resource.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/core/resource.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 class APIResource {
     constructor(client) {
@@ -40155,7 +40922,7 @@ class APIResource {
     }
 }
 //# sourceMappingURL=resource.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/path.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/utils/path.mjs
 
 /**
  * Percent-encode everything that isn't safe to have in a path without encoding safe chars.
@@ -40228,9 +40995,9 @@ const createPathTagFunction = (pathEncoder = encodeURIPath) => function path(sta
 /**
  * URI-encodes path params and ensures no unsafe /./ or /../ path segments are introduced.
  */
-const path = /* @__PURE__ */ createPathTagFunction(encodeURIPath);
+const path_path = /* @__PURE__ */ createPathTagFunction(encodeURIPath);
 //# sourceMappingURL=path.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/completions/messages.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/chat/completions/messages.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -40251,14 +41018,14 @@ class Messages extends APIResource {
      * ```
      */
     list(completionID, query = {}, options) {
-        return this._client.getAPIList(path `/chat/completions/${completionID}/messages`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/chat/completions/${completionID}/messages`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=messages.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/error.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/error.mjs
 
 //# sourceMappingURL=error.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/parser.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/parser.mjs
 
 function isChatCompletionFunctionTool(tool) {
     return tool !== undefined && 'function' in tool && tool.function !== undefined;
@@ -40421,7 +41188,7 @@ function validateInputTools(tools) {
     }
 }
 //# sourceMappingURL=parser.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/chatCompletionUtils.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/chatCompletionUtils.mjs
 const isAssistantMessage = (message) => {
     return message?.role === 'assistant';
 };
@@ -40432,7 +41199,7 @@ function isPresent(obj) {
     return obj != null;
 }
 //# sourceMappingURL=chatCompletionUtils.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/EventStream.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/EventStream.mjs
 var _EventStream_instances, _EventStream_connectedPromise, _EventStream_resolveConnectedPromise, _EventStream_rejectConnectedPromise, _EventStream_endPromise, _EventStream_resolveEndPromise, _EventStream_rejectEndPromise, _EventStream_listeners, _EventStream_ended, _EventStream_errored, _EventStream_aborted, _EventStream_catchingPromiseCreated, _EventStream_handleError;
 
 
@@ -40619,7 +41386,7 @@ _EventStream_connectedPromise = new WeakMap(), _EventStream_resolveConnectedProm
     return this._emit('error', new error_OpenAIError(String(error)));
 };
 //# sourceMappingURL=EventStream.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/RunnableFunction.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/RunnableFunction.mjs
 function isRunnableFunctionWithParse(fn) {
     return typeof fn.parse === 'function';
 }
@@ -40634,7 +41401,7 @@ class ParsingToolFunction {
     }
 }
 //# sourceMappingURL=RunnableFunction.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/AbstractChatCompletionRunner.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/AbstractChatCompletionRunner.mjs
 var _AbstractChatCompletionRunner_instances, _AbstractChatCompletionRunner_getFinalContent, _AbstractChatCompletionRunner_getFinalMessage, _AbstractChatCompletionRunner_getFinalFunctionToolCall, _AbstractChatCompletionRunner_getFinalFunctionToolCallResult, _AbstractChatCompletionRunner_calculateTotalUsage, _AbstractChatCompletionRunner_validateParams, _AbstractChatCompletionRunner_stringifyFunctionCallResult;
 
 
@@ -40922,7 +41689,7 @@ _AbstractChatCompletionRunner_instances = new WeakSet(), _AbstractChatCompletion
             : JSON.stringify(rawContent));
 };
 //# sourceMappingURL=AbstractChatCompletionRunner.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/ChatCompletionRunner.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/ChatCompletionRunner.mjs
 
 
 class ChatCompletionRunner extends AbstractChatCompletionRunner {
@@ -40943,7 +41710,7 @@ class ChatCompletionRunner extends AbstractChatCompletionRunner {
     }
 }
 //# sourceMappingURL=ChatCompletionRunner.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/_vendor/partial-json-parser/parser.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/_vendor/partial-json-parser/parser.mjs
 const STR = 0b000000001;
 const NUM = 0b000000010;
 const ARR = 0b000000100;
@@ -41185,10 +41952,10 @@ const _parseJSON = (jsonString, allow) => {
 const partialParse = (input) => parseJSON(input, Allow.ALL ^ Allow.NUM);
 
 //# sourceMappingURL=parser.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/streaming.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/streaming.mjs
 
 //# sourceMappingURL=streaming.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/ChatCompletionStream.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/ChatCompletionStream.mjs
 var _ChatCompletionStream_instances, _ChatCompletionStream_params, _ChatCompletionStream_choiceEventStates, _ChatCompletionStream_currentChatCompletionSnapshot, _ChatCompletionStream_beginRequest, _ChatCompletionStream_getChoiceEventState, _ChatCompletionStream_addChunk, _ChatCompletionStream_emitToolCallDoneEvent, _ChatCompletionStream_emitContentDoneEvents, _ChatCompletionStream_endRequest, _ChatCompletionStream_getAutoParseableResponseFormat, _ChatCompletionStream_accumulateChatCompletion;
 
 
@@ -41678,7 +42445,7 @@ function assertIsEmpty(obj) {
 }
 function assertNever(_x) { }
 //# sourceMappingURL=ChatCompletionStream.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/ChatCompletionStreamingRunner.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/ChatCompletionStreamingRunner.mjs
 
 class ChatCompletionStreamingRunner extends ChatCompletionStream {
     static fromReadableStream(stream) {
@@ -41699,7 +42466,7 @@ class ChatCompletionStreamingRunner extends ChatCompletionStream {
     }
 }
 //# sourceMappingURL=ChatCompletionStreamingRunner.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/completions/completions.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/chat/completions/completions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -41729,7 +42496,7 @@ class Completions extends APIResource {
      * ```
      */
     retrieve(completionID, options) {
-        return this._client.get(path `/chat/completions/${completionID}`, options);
+        return this._client.get(path_path `/chat/completions/${completionID}`, options);
     }
     /**
      * Modify a stored chat completion. Only Chat Completions that have been created
@@ -41745,7 +42512,7 @@ class Completions extends APIResource {
      * ```
      */
     update(completionID, body, options) {
-        return this._client.post(path `/chat/completions/${completionID}`, { body, ...options });
+        return this._client.post(path_path `/chat/completions/${completionID}`, { body, ...options });
     }
     /**
      * List stored Chat Completions. Only Chat Completions that have been stored with
@@ -41773,7 +42540,7 @@ class Completions extends APIResource {
      * ```
      */
     delete(completionID, options) {
-        return this._client.delete(path `/chat/completions/${completionID}`, options);
+        return this._client.delete(path_path `/chat/completions/${completionID}`, options);
     }
     parse(body, options) {
         validateInputTools(body.tools);
@@ -41806,7 +42573,7 @@ class Completions extends APIResource {
 
 Completions.Messages = Messages;
 //# sourceMappingURL=completions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/chat.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/chat/chat.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -41819,18 +42586,18 @@ class Chat extends APIResource {
 }
 Chat.Completions = Completions;
 //# sourceMappingURL=chat.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/completions/index.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/chat/completions/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
 
 //# sourceMappingURL=index.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/index.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/chat/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
 //# sourceMappingURL=index.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/headers.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/headers.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 const brand_privateNullableHeaders = /* @__PURE__ */ Symbol('brand.privateNullableHeaders');
@@ -41905,7 +42672,7 @@ const isEmptyHeaders = (headers) => {
     return true;
 };
 //# sourceMappingURL=headers.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/audio/speech.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/audio/speech.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -41935,7 +42702,7 @@ class Speech extends APIResource {
     }
 }
 //# sourceMappingURL=speech.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/audio/transcriptions.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/audio/transcriptions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -41950,7 +42717,7 @@ class Transcriptions extends APIResource {
     }
 }
 //# sourceMappingURL=transcriptions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/audio/translations.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/audio/translations.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -41960,7 +42727,7 @@ class Translations extends APIResource {
     }
 }
 //# sourceMappingURL=translations.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/audio/audio.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/audio/audio.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -41981,7 +42748,7 @@ Audio.Transcriptions = Transcriptions;
 Audio.Translations = Translations;
 Audio.Speech = Speech;
 //# sourceMappingURL=audio.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/batches.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/batches.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -41997,7 +42764,7 @@ class Batches extends APIResource {
      * Retrieves a batch.
      */
     retrieve(batchID, options) {
-        return this._client.get(path `/batches/${batchID}`, options);
+        return this._client.get(path_path `/batches/${batchID}`, options);
     }
     /**
      * List your organization's batches.
@@ -42011,11 +42778,11 @@ class Batches extends APIResource {
      * (if any) available in the output file.
      */
     cancel(batchID, options) {
-        return this._client.post(path `/batches/${batchID}/cancel`, options);
+        return this._client.post(path_path `/batches/${batchID}/cancel`, options);
     }
 }
 //# sourceMappingURL=batches.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/assistants.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/assistants.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42040,7 +42807,7 @@ class Assistants extends APIResource {
      * @deprecated
      */
     retrieve(assistantID, options) {
-        return this._client.get(path `/assistants/${assistantID}`, {
+        return this._client.get(path_path `/assistants/${assistantID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -42051,7 +42818,7 @@ class Assistants extends APIResource {
      * @deprecated
      */
     update(assistantID, body, options) {
-        return this._client.post(path `/assistants/${assistantID}`, {
+        return this._client.post(path_path `/assistants/${assistantID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42075,14 +42842,14 @@ class Assistants extends APIResource {
      * @deprecated
      */
     delete(assistantID, options) {
-        return this._client.delete(path `/assistants/${assistantID}`, {
+        return this._client.delete(path_path `/assistants/${assistantID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
     }
 }
 //# sourceMappingURL=assistants.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/realtime/sessions.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/realtime/sessions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42111,7 +42878,7 @@ class Sessions extends APIResource {
     }
 }
 //# sourceMappingURL=sessions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/realtime/transcription-sessions.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/realtime/transcription-sessions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42140,7 +42907,7 @@ class TranscriptionSessions extends APIResource {
     }
 }
 //# sourceMappingURL=transcription-sessions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/realtime/realtime.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/realtime/realtime.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42160,7 +42927,7 @@ class Realtime extends APIResource {
 Realtime.Sessions = Sessions;
 Realtime.TranscriptionSessions = TranscriptionSessions;
 //# sourceMappingURL=realtime.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/chatkit/sessions.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/chatkit/sessions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42195,14 +42962,14 @@ class sessions_Sessions extends APIResource {
      * ```
      */
     cancel(sessionID, options) {
-        return this._client.post(path `/chatkit/sessions/${sessionID}/cancel`, {
+        return this._client.post(path_path `/chatkit/sessions/${sessionID}/cancel`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]),
         });
     }
 }
 //# sourceMappingURL=sessions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/chatkit/threads.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/chatkit/threads.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42219,7 +42986,7 @@ class Threads extends APIResource {
      * ```
      */
     retrieve(threadID, options) {
-        return this._client.get(path `/chatkit/threads/${threadID}`, {
+        return this._client.get(path_path `/chatkit/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]),
         });
@@ -42253,7 +43020,7 @@ class Threads extends APIResource {
      * ```
      */
     delete(threadID, options) {
-        return this._client.delete(path `/chatkit/threads/${threadID}`, {
+        return this._client.delete(path_path `/chatkit/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]),
         });
@@ -42272,11 +43039,11 @@ class Threads extends APIResource {
      * ```
      */
     listItems(threadID, query = {}, options) {
-        return this._client.getAPIList(path `/chatkit/threads/${threadID}/items`, (ConversationCursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]) });
+        return this._client.getAPIList(path_path `/chatkit/threads/${threadID}/items`, (ConversationCursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]) });
     }
 }
 //# sourceMappingURL=threads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/chatkit/chatkit.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/chatkit/chatkit.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42293,7 +43060,7 @@ class ChatKit extends APIResource {
 ChatKit.Sessions = sessions_Sessions;
 ChatKit.Threads = Threads;
 //# sourceMappingURL=chatkit.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/threads/messages.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/threads/messages.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42309,7 +43076,7 @@ class messages_Messages extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     create(threadID, body, options) {
-        return this._client.post(path `/threads/${threadID}/messages`, {
+        return this._client.post(path_path `/threads/${threadID}/messages`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42322,7 +43089,7 @@ class messages_Messages extends APIResource {
      */
     retrieve(messageID, params, options) {
         const { thread_id } = params;
-        return this._client.get(path `/threads/${thread_id}/messages/${messageID}`, {
+        return this._client.get(path_path `/threads/${thread_id}/messages/${messageID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -42334,7 +43101,7 @@ class messages_Messages extends APIResource {
      */
     update(messageID, params, options) {
         const { thread_id, ...body } = params;
-        return this._client.post(path `/threads/${thread_id}/messages/${messageID}`, {
+        return this._client.post(path_path `/threads/${thread_id}/messages/${messageID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42346,7 +43113,7 @@ class messages_Messages extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     list(threadID, query = {}, options) {
-        return this._client.getAPIList(path `/threads/${threadID}/messages`, (CursorPage), {
+        return this._client.getAPIList(path_path `/threads/${threadID}/messages`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42359,14 +43126,14 @@ class messages_Messages extends APIResource {
      */
     delete(messageID, params, options) {
         const { thread_id } = params;
-        return this._client.delete(path `/threads/${thread_id}/messages/${messageID}`, {
+        return this._client.delete(path_path `/threads/${thread_id}/messages/${messageID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
     }
 }
 //# sourceMappingURL=messages.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/threads/runs/steps.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/threads/runs/steps.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42383,7 +43150,7 @@ class Steps extends APIResource {
      */
     retrieve(stepID, params, options) {
         const { thread_id, run_id, ...query } = params;
-        return this._client.get(path `/threads/${thread_id}/runs/${run_id}/steps/${stepID}`, {
+        return this._client.get(path_path `/threads/${thread_id}/runs/${run_id}/steps/${stepID}`, {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42396,7 +43163,7 @@ class Steps extends APIResource {
      */
     list(runID, params, options) {
         const { thread_id, ...query } = params;
-        return this._client.getAPIList(path `/threads/${thread_id}/runs/${runID}/steps`, (CursorPage), {
+        return this._client.getAPIList(path_path `/threads/${thread_id}/runs/${runID}/steps`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42404,7 +43171,7 @@ class Steps extends APIResource {
     }
 }
 //# sourceMappingURL=steps.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/base64.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/utils/base64.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42460,7 +43227,7 @@ const toFloat32Array = (base64Str) => {
     }
 };
 //# sourceMappingURL=base64.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/env.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/utils/env.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 /**
  * Read an environment variable.
@@ -42479,7 +43246,7 @@ const readEnv = (env) => {
     return undefined;
 };
 //# sourceMappingURL=env.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/internal/utils.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42488,7 +43255,7 @@ const readEnv = (env) => {
 
 
 //# sourceMappingURL=utils.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/AssistantStream.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/AssistantStream.mjs
 var _AssistantStream_instances, _a, _AssistantStream_events, _AssistantStream_runStepSnapshots, _AssistantStream_messageSnapshots, _AssistantStream_messageSnapshot, _AssistantStream_finalRun, _AssistantStream_currentContentIndex, _AssistantStream_currentContent, _AssistantStream_currentToolCallIndex, _AssistantStream_currentToolCall, _AssistantStream_currentEvent, _AssistantStream_currentRunSnapshot, _AssistantStream_currentRunStepSnapshot, _AssistantStream_addEvent, _AssistantStream_endRequest, _AssistantStream_handleMessage, _AssistantStream_handleRunStep, _AssistantStream_handleEvent, _AssistantStream_accumulateRunStep, _AssistantStream_accumulateMessage, _AssistantStream_accumulateContent, _AssistantStream_handleRun;
 
 
@@ -43038,7 +43805,7 @@ _a = AssistantStream, _AssistantStream_addEvent = function _AssistantStream_addE
 };
 function AssistantStream_assertNever(_x) { }
 //# sourceMappingURL=AssistantStream.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/threads/runs/runs.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/threads/runs/runs.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43058,7 +43825,7 @@ class Runs extends APIResource {
     }
     create(threadID, params, options) {
         const { include, ...body } = params;
-        return this._client.post(path `/threads/${threadID}/runs`, {
+        return this._client.post(path_path `/threads/${threadID}/runs`, {
             query: { include },
             body,
             ...options,
@@ -43073,7 +43840,7 @@ class Runs extends APIResource {
      */
     retrieve(runID, params, options) {
         const { thread_id } = params;
-        return this._client.get(path `/threads/${thread_id}/runs/${runID}`, {
+        return this._client.get(path_path `/threads/${thread_id}/runs/${runID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -43085,7 +43852,7 @@ class Runs extends APIResource {
      */
     update(runID, params, options) {
         const { thread_id, ...body } = params;
-        return this._client.post(path `/threads/${thread_id}/runs/${runID}`, {
+        return this._client.post(path_path `/threads/${thread_id}/runs/${runID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -43097,7 +43864,7 @@ class Runs extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     list(threadID, query = {}, options) {
-        return this._client.getAPIList(path `/threads/${threadID}/runs`, (CursorPage), {
+        return this._client.getAPIList(path_path `/threads/${threadID}/runs`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -43110,7 +43877,7 @@ class Runs extends APIResource {
      */
     cancel(runID, params, options) {
         const { thread_id } = params;
-        return this._client.post(path `/threads/${thread_id}/runs/${runID}/cancel`, {
+        return this._client.post(path_path `/threads/${thread_id}/runs/${runID}/cancel`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -43189,7 +43956,7 @@ class Runs extends APIResource {
     }
     submitToolOutputs(runID, params, options) {
         const { thread_id, ...body } = params;
-        return this._client.post(path `/threads/${thread_id}/runs/${runID}/submit_tool_outputs`, {
+        return this._client.post(path_path `/threads/${thread_id}/runs/${runID}/submit_tool_outputs`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -43216,7 +43983,7 @@ class Runs extends APIResource {
 }
 Runs.Steps = Steps;
 //# sourceMappingURL=runs.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/threads/threads.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/threads/threads.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43253,7 +44020,7 @@ class threads_Threads extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     retrieve(threadID, options) {
-        return this._client.get(path `/threads/${threadID}`, {
+        return this._client.get(path_path `/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -43264,7 +44031,7 @@ class threads_Threads extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     update(threadID, body, options) {
-        return this._client.post(path `/threads/${threadID}`, {
+        return this._client.post(path_path `/threads/${threadID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -43276,7 +44043,7 @@ class threads_Threads extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     delete(threadID, options) {
-        return this._client.delete(path `/threads/${threadID}`, {
+        return this._client.delete(path_path `/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -43308,7 +44075,7 @@ class threads_Threads extends APIResource {
 threads_Threads.Runs = Runs;
 threads_Threads.Messages = messages_Messages;
 //# sourceMappingURL=threads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/beta.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/beta/beta.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43333,7 +44100,7 @@ Beta.ChatKit = ChatKit;
 Beta.Assistants = Assistants;
 Beta.Threads = threads_Threads;
 //# sourceMappingURL=beta.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/completions.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/completions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class completions_Completions extends APIResource {
@@ -43342,7 +44109,7 @@ class completions_Completions extends APIResource {
     }
 }
 //# sourceMappingURL=completions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/containers/files/content.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/containers/files/content.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43353,7 +44120,7 @@ class Content extends APIResource {
      */
     retrieve(fileID, params, options) {
         const { container_id } = params;
-        return this._client.get(path `/containers/${container_id}/files/${fileID}/content`, {
+        return this._client.get(path_path `/containers/${container_id}/files/${fileID}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -43361,7 +44128,7 @@ class Content extends APIResource {
     }
 }
 //# sourceMappingURL=content.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/containers/files/files.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/containers/files/files.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43382,20 +44149,20 @@ class Files extends APIResource {
      * a JSON request with a file ID.
      */
     create(containerID, body, options) {
-        return this._client.post(path `/containers/${containerID}/files`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path_path `/containers/${containerID}/files`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
     /**
      * Retrieve Container File
      */
     retrieve(fileID, params, options) {
         const { container_id } = params;
-        return this._client.get(path `/containers/${container_id}/files/${fileID}`, options);
+        return this._client.get(path_path `/containers/${container_id}/files/${fileID}`, options);
     }
     /**
      * List Container files
      */
     list(containerID, query = {}, options) {
-        return this._client.getAPIList(path `/containers/${containerID}/files`, (CursorPage), {
+        return this._client.getAPIList(path_path `/containers/${containerID}/files`, (CursorPage), {
             query,
             ...options,
         });
@@ -43405,7 +44172,7 @@ class Files extends APIResource {
      */
     delete(fileID, params, options) {
         const { container_id } = params;
-        return this._client.delete(path `/containers/${container_id}/files/${fileID}`, {
+        return this._client.delete(path_path `/containers/${container_id}/files/${fileID}`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -43413,7 +44180,7 @@ class Files extends APIResource {
 }
 Files.Content = Content;
 //# sourceMappingURL=files.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/containers/containers.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/containers/containers.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43436,7 +44203,7 @@ class Containers extends APIResource {
      * Retrieve Container
      */
     retrieve(containerID, options) {
-        return this._client.get(path `/containers/${containerID}`, options);
+        return this._client.get(path_path `/containers/${containerID}`, options);
     }
     /**
      * List Containers
@@ -43448,7 +44215,7 @@ class Containers extends APIResource {
      * Delete Container
      */
     delete(containerID, options) {
-        return this._client.delete(path `/containers/${containerID}`, {
+        return this._client.delete(path_path `/containers/${containerID}`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -43456,7 +44223,7 @@ class Containers extends APIResource {
 }
 Containers.Files = Files;
 //# sourceMappingURL=containers.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/conversations/items.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/conversations/items.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43467,7 +44234,7 @@ class Items extends APIResource {
      */
     create(conversationID, params, options) {
         const { include, ...body } = params;
-        return this._client.post(path `/conversations/${conversationID}/items`, {
+        return this._client.post(path_path `/conversations/${conversationID}/items`, {
             query: { include },
             body,
             ...options,
@@ -43478,24 +44245,24 @@ class Items extends APIResource {
      */
     retrieve(itemID, params, options) {
         const { conversation_id, ...query } = params;
-        return this._client.get(path `/conversations/${conversation_id}/items/${itemID}`, { query, ...options });
+        return this._client.get(path_path `/conversations/${conversation_id}/items/${itemID}`, { query, ...options });
     }
     /**
      * List all items for a conversation with the given ID.
      */
     list(conversationID, query = {}, options) {
-        return this._client.getAPIList(path `/conversations/${conversationID}/items`, (ConversationCursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/conversations/${conversationID}/items`, (ConversationCursorPage), { query, ...options });
     }
     /**
      * Delete an item from a conversation with the given IDs.
      */
     delete(itemID, params, options) {
         const { conversation_id } = params;
-        return this._client.delete(path `/conversations/${conversation_id}/items/${itemID}`, options);
+        return this._client.delete(path_path `/conversations/${conversation_id}/items/${itemID}`, options);
     }
 }
 //# sourceMappingURL=items.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/conversations/conversations.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/conversations/conversations.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43516,24 +44283,24 @@ class Conversations extends APIResource {
      * Get a conversation
      */
     retrieve(conversationID, options) {
-        return this._client.get(path `/conversations/${conversationID}`, options);
+        return this._client.get(path_path `/conversations/${conversationID}`, options);
     }
     /**
      * Update a conversation
      */
     update(conversationID, body, options) {
-        return this._client.post(path `/conversations/${conversationID}`, { body, ...options });
+        return this._client.post(path_path `/conversations/${conversationID}`, { body, ...options });
     }
     /**
      * Delete a conversation. Items in the conversation will not be deleted.
      */
     delete(conversationID, options) {
-        return this._client.delete(path `/conversations/${conversationID}`, options);
+        return this._client.delete(path_path `/conversations/${conversationID}`, options);
     }
 }
 Conversations.Items = Items;
 //# sourceMappingURL=conversations.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/embeddings.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/embeddings.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43586,7 +44353,7 @@ class Embeddings extends APIResource {
     }
 }
 //# sourceMappingURL=embeddings.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/evals/runs/output-items.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/evals/runs/output-items.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43597,18 +44364,18 @@ class OutputItems extends APIResource {
      */
     retrieve(outputItemID, params, options) {
         const { eval_id, run_id } = params;
-        return this._client.get(path `/evals/${eval_id}/runs/${run_id}/output_items/${outputItemID}`, options);
+        return this._client.get(path_path `/evals/${eval_id}/runs/${run_id}/output_items/${outputItemID}`, options);
     }
     /**
      * Get a list of output items for an evaluation run.
      */
     list(runID, params, options) {
         const { eval_id, ...query } = params;
-        return this._client.getAPIList(path `/evals/${eval_id}/runs/${runID}/output_items`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/evals/${eval_id}/runs/${runID}/output_items`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=output-items.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/evals/runs/runs.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/evals/runs/runs.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43626,20 +44393,20 @@ class runs_Runs extends APIResource {
      * schema specified in the config of the evaluation.
      */
     create(evalID, body, options) {
-        return this._client.post(path `/evals/${evalID}/runs`, { body, ...options });
+        return this._client.post(path_path `/evals/${evalID}/runs`, { body, ...options });
     }
     /**
      * Get an evaluation run by ID.
      */
     retrieve(runID, params, options) {
         const { eval_id } = params;
-        return this._client.get(path `/evals/${eval_id}/runs/${runID}`, options);
+        return this._client.get(path_path `/evals/${eval_id}/runs/${runID}`, options);
     }
     /**
      * Get a list of runs for an evaluation.
      */
     list(evalID, query = {}, options) {
-        return this._client.getAPIList(path `/evals/${evalID}/runs`, (CursorPage), {
+        return this._client.getAPIList(path_path `/evals/${evalID}/runs`, (CursorPage), {
             query,
             ...options,
         });
@@ -43649,19 +44416,19 @@ class runs_Runs extends APIResource {
      */
     delete(runID, params, options) {
         const { eval_id } = params;
-        return this._client.delete(path `/evals/${eval_id}/runs/${runID}`, options);
+        return this._client.delete(path_path `/evals/${eval_id}/runs/${runID}`, options);
     }
     /**
      * Cancel an ongoing evaluation run.
      */
     cancel(runID, params, options) {
         const { eval_id } = params;
-        return this._client.post(path `/evals/${eval_id}/runs/${runID}`, options);
+        return this._client.post(path_path `/evals/${eval_id}/runs/${runID}`, options);
     }
 }
 runs_Runs.OutputItems = OutputItems;
 //# sourceMappingURL=runs.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/evals/evals.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/evals/evals.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43688,13 +44455,13 @@ class Evals extends APIResource {
      * Get an evaluation by ID.
      */
     retrieve(evalID, options) {
-        return this._client.get(path `/evals/${evalID}`, options);
+        return this._client.get(path_path `/evals/${evalID}`, options);
     }
     /**
      * Update certain properties of an evaluation.
      */
     update(evalID, body, options) {
-        return this._client.post(path `/evals/${evalID}`, { body, ...options });
+        return this._client.post(path_path `/evals/${evalID}`, { body, ...options });
     }
     /**
      * List evaluations for a project.
@@ -43706,12 +44473,12 @@ class Evals extends APIResource {
      * Delete an evaluation.
      */
     delete(evalID, options) {
-        return this._client.delete(path `/evals/${evalID}`, options);
+        return this._client.delete(path_path `/evals/${evalID}`, options);
     }
 }
 Evals.Runs = runs_Runs;
 //# sourceMappingURL=evals.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/files.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/files.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43750,7 +44517,7 @@ class files_Files extends APIResource {
      * Returns information about a specific file.
      */
     retrieve(fileID, options) {
-        return this._client.get(path `/files/${fileID}`, options);
+        return this._client.get(path_path `/files/${fileID}`, options);
     }
     /**
      * Returns a list of files.
@@ -43762,13 +44529,13 @@ class files_Files extends APIResource {
      * Delete a file and remove it from all vector stores.
      */
     delete(fileID, options) {
-        return this._client.delete(path `/files/${fileID}`, options);
+        return this._client.delete(path_path `/files/${fileID}`, options);
     }
     /**
      * Returns the contents of the specified file.
      */
     content(fileID, options) {
-        return this._client.get(path `/files/${fileID}/content`, {
+        return this._client.get(path_path `/files/${fileID}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -43794,13 +44561,13 @@ class files_Files extends APIResource {
     }
 }
 //# sourceMappingURL=files.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/methods.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/fine-tuning/methods.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class Methods extends APIResource {
 }
 //# sourceMappingURL=methods.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/alpha/graders.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/fine-tuning/alpha/graders.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class Graders extends APIResource {
@@ -43846,7 +44613,7 @@ class Graders extends APIResource {
     }
 }
 //# sourceMappingURL=graders.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/alpha/alpha.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/fine-tuning/alpha/alpha.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43859,7 +44626,7 @@ class Alpha extends APIResource {
 }
 Alpha.Graders = Graders;
 //# sourceMappingURL=alpha.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/checkpoints/permissions.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/fine-tuning/checkpoints/permissions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43883,7 +44650,7 @@ class Permissions extends APIResource {
      * ```
      */
     create(fineTunedModelCheckpoint, body, options) {
-        return this._client.getAPIList(path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, (Page), { body, method: 'post', ...options });
+        return this._client.getAPIList(path_path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, (Page), { body, method: 'post', ...options });
     }
     /**
      * **NOTE:** This endpoint requires an [admin API key](../admin-api-keys).
@@ -43900,7 +44667,7 @@ class Permissions extends APIResource {
      * ```
      */
     retrieve(fineTunedModelCheckpoint, query = {}, options) {
-        return this._client.get(path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, {
+        return this._client.get(path_path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, {
             query,
             ...options,
         });
@@ -43925,11 +44692,11 @@ class Permissions extends APIResource {
      */
     delete(permissionID, params, options) {
         const { fine_tuned_model_checkpoint } = params;
-        return this._client.delete(path `/fine_tuning/checkpoints/${fine_tuned_model_checkpoint}/permissions/${permissionID}`, options);
+        return this._client.delete(path_path `/fine_tuning/checkpoints/${fine_tuned_model_checkpoint}/permissions/${permissionID}`, options);
     }
 }
 //# sourceMappingURL=permissions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/checkpoints/checkpoints.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/fine-tuning/checkpoints/checkpoints.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43942,7 +44709,7 @@ class Checkpoints extends APIResource {
 }
 Checkpoints.Permissions = Permissions;
 //# sourceMappingURL=checkpoints.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/jobs/checkpoints.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/fine-tuning/jobs/checkpoints.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43962,11 +44729,11 @@ class checkpoints_Checkpoints extends APIResource {
      * ```
      */
     list(fineTuningJobID, query = {}, options) {
-        return this._client.getAPIList(path `/fine_tuning/jobs/${fineTuningJobID}/checkpoints`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/fine_tuning/jobs/${fineTuningJobID}/checkpoints`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=checkpoints.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/jobs/jobs.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/fine-tuning/jobs/jobs.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44011,7 +44778,7 @@ class Jobs extends APIResource {
      * ```
      */
     retrieve(fineTuningJobID, options) {
-        return this._client.get(path `/fine_tuning/jobs/${fineTuningJobID}`, options);
+        return this._client.get(path_path `/fine_tuning/jobs/${fineTuningJobID}`, options);
     }
     /**
      * List your organization's fine-tuning jobs
@@ -44038,7 +44805,7 @@ class Jobs extends APIResource {
      * ```
      */
     cancel(fineTuningJobID, options) {
-        return this._client.post(path `/fine_tuning/jobs/${fineTuningJobID}/cancel`, options);
+        return this._client.post(path_path `/fine_tuning/jobs/${fineTuningJobID}/cancel`, options);
     }
     /**
      * Get status updates for a fine-tuning job.
@@ -44054,7 +44821,7 @@ class Jobs extends APIResource {
      * ```
      */
     listEvents(fineTuningJobID, query = {}, options) {
-        return this._client.getAPIList(path `/fine_tuning/jobs/${fineTuningJobID}/events`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/fine_tuning/jobs/${fineTuningJobID}/events`, (CursorPage), { query, ...options });
     }
     /**
      * Pause a fine-tune job.
@@ -44067,7 +44834,7 @@ class Jobs extends APIResource {
      * ```
      */
     pause(fineTuningJobID, options) {
-        return this._client.post(path `/fine_tuning/jobs/${fineTuningJobID}/pause`, options);
+        return this._client.post(path_path `/fine_tuning/jobs/${fineTuningJobID}/pause`, options);
     }
     /**
      * Resume a fine-tune job.
@@ -44080,12 +44847,12 @@ class Jobs extends APIResource {
      * ```
      */
     resume(fineTuningJobID, options) {
-        return this._client.post(path `/fine_tuning/jobs/${fineTuningJobID}/resume`, options);
+        return this._client.post(path_path `/fine_tuning/jobs/${fineTuningJobID}/resume`, options);
     }
 }
 Jobs.Checkpoints = checkpoints_Checkpoints;
 //# sourceMappingURL=jobs.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/fine-tuning.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/fine-tuning/fine-tuning.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44110,13 +44877,13 @@ FineTuning.Jobs = Jobs;
 FineTuning.Checkpoints = Checkpoints;
 FineTuning.Alpha = Alpha;
 //# sourceMappingURL=fine-tuning.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/graders/grader-models.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/graders/grader-models.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class GraderModels extends APIResource {
 }
 //# sourceMappingURL=grader-models.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/graders/graders.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/graders/graders.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44129,7 +44896,7 @@ class graders_Graders extends APIResource {
 }
 graders_Graders.GraderModels = GraderModels;
 //# sourceMappingURL=graders.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/images.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/images.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44155,7 +44922,7 @@ class Images extends APIResource {
     }
 }
 //# sourceMappingURL=images.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/models.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/models.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44166,7 +44933,7 @@ class Models extends APIResource {
      * the owner and permissioning.
      */
     retrieve(model, options) {
-        return this._client.get(path `/models/${model}`, options);
+        return this._client.get(path_path `/models/${model}`, options);
     }
     /**
      * Lists the currently available models, and provides basic information about each
@@ -44180,11 +44947,11 @@ class Models extends APIResource {
      * delete a model.
      */
     delete(model, options) {
-        return this._client.delete(path `/models/${model}`, options);
+        return this._client.delete(path_path `/models/${model}`, options);
     }
 }
 //# sourceMappingURL=models.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/moderations.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/moderations.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class Moderations extends APIResource {
@@ -44197,7 +44964,7 @@ class Moderations extends APIResource {
     }
 }
 //# sourceMappingURL=moderations.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/realtime/calls.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/realtime/calls.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44215,7 +44982,7 @@ class Calls extends APIResource {
      * ```
      */
     accept(callID, body, options) {
-        return this._client.post(path `/realtime/calls/${callID}/accept`, {
+        return this._client.post(path_path `/realtime/calls/${callID}/accept`, {
             body,
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
@@ -44230,7 +44997,7 @@ class Calls extends APIResource {
      * ```
      */
     hangup(callID, options) {
-        return this._client.post(path `/realtime/calls/${callID}/hangup`, {
+        return this._client.post(path_path `/realtime/calls/${callID}/hangup`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -44246,7 +45013,7 @@ class Calls extends APIResource {
      * ```
      */
     refer(callID, body, options) {
-        return this._client.post(path `/realtime/calls/${callID}/refer`, {
+        return this._client.post(path_path `/realtime/calls/${callID}/refer`, {
             body,
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
@@ -44261,7 +45028,7 @@ class Calls extends APIResource {
      * ```
      */
     reject(callID, body = {}, options) {
-        return this._client.post(path `/realtime/calls/${callID}/reject`, {
+        return this._client.post(path_path `/realtime/calls/${callID}/reject`, {
             body,
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
@@ -44269,7 +45036,7 @@ class Calls extends APIResource {
     }
 }
 //# sourceMappingURL=calls.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/realtime/client-secrets.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/realtime/client-secrets.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class ClientSecrets extends APIResource {
@@ -44287,7 +45054,7 @@ class ClientSecrets extends APIResource {
     }
 }
 //# sourceMappingURL=client-secrets.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/realtime/realtime.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/realtime/realtime.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44304,7 +45071,7 @@ class realtime_Realtime extends APIResource {
 realtime_Realtime.ClientSecrets = ClientSecrets;
 realtime_Realtime.Calls = Calls;
 //# sourceMappingURL=realtime.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/ResponsesParser.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/ResponsesParser.mjs
 
 
 function maybeParseResponse(response, params) {
@@ -44465,7 +45232,7 @@ function addOutputText(rsp) {
     rsp.output_text = texts.join('');
 }
 //# sourceMappingURL=ResponsesParser.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/responses/ResponseStream.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/responses/ResponseStream.mjs
 var _ResponseStream_instances, _ResponseStream_params, _ResponseStream_currentResponseSnapshot, _ResponseStream_finalResponse, _ResponseStream_beginRequest, _ResponseStream_addEvent, _ResponseStream_endRequest, _ResponseStream_accumulateResponse;
 
 
@@ -44727,7 +45494,7 @@ function finalizeResponse(snapshot, params) {
     return maybeParseResponse(snapshot, params);
 }
 //# sourceMappingURL=ResponseStream.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/responses/input-items.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/responses/input-items.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44747,11 +45514,11 @@ class InputItems extends APIResource {
      * ```
      */
     list(responseID, query = {}, options) {
-        return this._client.getAPIList(path `/responses/${responseID}/input_items`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/responses/${responseID}/input_items`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=input-items.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/responses/input-tokens.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/responses/input-tokens.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class InputTokens extends APIResource {
@@ -44768,7 +45535,7 @@ class InputTokens extends APIResource {
     }
 }
 //# sourceMappingURL=input-tokens.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/responses/responses.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/responses/responses.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44794,7 +45561,7 @@ class Responses extends APIResource {
         });
     }
     retrieve(responseID, query = {}, options) {
-        return this._client.get(path `/responses/${responseID}`, {
+        return this._client.get(path_path `/responses/${responseID}`, {
             query,
             ...options,
             stream: query?.stream ?? false,
@@ -44816,7 +45583,7 @@ class Responses extends APIResource {
      * ```
      */
     delete(responseID, options) {
-        return this._client.delete(path `/responses/${responseID}`, {
+        return this._client.delete(path_path `/responses/${responseID}`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -44845,7 +45612,7 @@ class Responses extends APIResource {
      * ```
      */
     cancel(responseID, options) {
-        return this._client.post(path `/responses/${responseID}/cancel`, options);
+        return this._client.post(path_path `/responses/${responseID}/cancel`, options);
     }
     /**
      * Compact conversation
@@ -44864,7 +45631,7 @@ class Responses extends APIResource {
 Responses.InputItems = InputItems;
 Responses.InputTokens = InputTokens;
 //# sourceMappingURL=responses.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/skills/content.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/skills/content.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44874,7 +45641,7 @@ class content_Content extends APIResource {
      * Get Skill Content
      */
     retrieve(skillID, options) {
-        return this._client.get(path `/skills/${skillID}/content`, {
+        return this._client.get(path_path `/skills/${skillID}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -44882,7 +45649,7 @@ class content_Content extends APIResource {
     }
 }
 //# sourceMappingURL=content.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/skills/versions/content.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/skills/versions/content.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44893,7 +45660,7 @@ class versions_content_Content extends APIResource {
      */
     retrieve(version, params, options) {
         const { skill_id } = params;
-        return this._client.get(path `/skills/${skill_id}/versions/${version}/content`, {
+        return this._client.get(path_path `/skills/${skill_id}/versions/${version}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -44901,7 +45668,7 @@ class versions_content_Content extends APIResource {
     }
 }
 //# sourceMappingURL=content.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/skills/versions/versions.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/skills/versions/versions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44918,20 +45685,20 @@ class Versions extends APIResource {
      * Create Skill Version
      */
     create(skillID, body = {}, options) {
-        return this._client.post(path `/skills/${skillID}/versions`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path_path `/skills/${skillID}/versions`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
     /**
      * Get Skill Version
      */
     retrieve(version, params, options) {
         const { skill_id } = params;
-        return this._client.get(path `/skills/${skill_id}/versions/${version}`, options);
+        return this._client.get(path_path `/skills/${skill_id}/versions/${version}`, options);
     }
     /**
      * List Skill Versions
      */
     list(skillID, query = {}, options) {
-        return this._client.getAPIList(path `/skills/${skillID}/versions`, (CursorPage), {
+        return this._client.getAPIList(path_path `/skills/${skillID}/versions`, (CursorPage), {
             query,
             ...options,
         });
@@ -44941,12 +45708,12 @@ class Versions extends APIResource {
      */
     delete(version, params, options) {
         const { skill_id } = params;
-        return this._client.delete(path `/skills/${skill_id}/versions/${version}`, options);
+        return this._client.delete(path_path `/skills/${skill_id}/versions/${version}`, options);
     }
 }
 Versions.Content = versions_content_Content;
 //# sourceMappingURL=versions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/skills/skills.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/skills/skills.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44972,13 +45739,13 @@ class Skills extends APIResource {
      * Get Skill
      */
     retrieve(skillID, options) {
-        return this._client.get(path `/skills/${skillID}`, options);
+        return this._client.get(path_path `/skills/${skillID}`, options);
     }
     /**
      * Update Skill Default Version
      */
     update(skillID, body, options) {
-        return this._client.post(path `/skills/${skillID}`, { body, ...options });
+        return this._client.post(path_path `/skills/${skillID}`, { body, ...options });
     }
     /**
      * List Skills
@@ -44990,13 +45757,13 @@ class Skills extends APIResource {
      * Delete Skill
      */
     delete(skillID, options) {
-        return this._client.delete(path `/skills/${skillID}`, options);
+        return this._client.delete(path_path `/skills/${skillID}`, options);
     }
 }
 Skills.Content = content_Content;
 Skills.Versions = Versions;
 //# sourceMappingURL=skills.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/uploads/parts.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/uploads/parts.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45016,11 +45783,11 @@ class Parts extends APIResource {
      * [complete the Upload](https://platform.openai.com/docs/api-reference/uploads/complete).
      */
     create(uploadID, body, options) {
-        return this._client.post(path `/uploads/${uploadID}/parts`, multipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path_path `/uploads/${uploadID}/parts`, multipartFormRequestOptions({ body, ...options }, this._client));
     }
 }
 //# sourceMappingURL=parts.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/uploads/uploads.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/uploads/uploads.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45059,7 +45826,7 @@ class Uploads extends APIResource {
      * Cancels the Upload. No Parts may be added after an Upload is cancelled.
      */
     cancel(uploadID, options) {
-        return this._client.post(path `/uploads/${uploadID}/cancel`, options);
+        return this._client.post(path_path `/uploads/${uploadID}/cancel`, options);
     }
     /**
      * Completes the
@@ -45077,12 +45844,12 @@ class Uploads extends APIResource {
      * an Upload is completed.
      */
     complete(uploadID, body, options) {
-        return this._client.post(path `/uploads/${uploadID}/complete`, { body, ...options });
+        return this._client.post(path_path `/uploads/${uploadID}/complete`, { body, ...options });
     }
 }
 Uploads.Parts = Parts;
 //# sourceMappingURL=uploads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/Util.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/lib/Util.mjs
 /**
  * Like `Promise.allSettled()` but throws an error if any promises are rejected.
  */
@@ -45105,7 +45872,7 @@ const allSettledWithThrow = async (promises) => {
     return values;
 };
 //# sourceMappingURL=Util.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/vector-stores/file-batches.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/vector-stores/file-batches.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45118,7 +45885,7 @@ class FileBatches extends APIResource {
      * Create a vector store file batch.
      */
     create(vectorStoreID, body, options) {
-        return this._client.post(path `/vector_stores/${vectorStoreID}/file_batches`, {
+        return this._client.post(path_path `/vector_stores/${vectorStoreID}/file_batches`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45129,7 +45896,7 @@ class FileBatches extends APIResource {
      */
     retrieve(batchID, params, options) {
         const { vector_store_id } = params;
-        return this._client.get(path `/vector_stores/${vector_store_id}/file_batches/${batchID}`, {
+        return this._client.get(path_path `/vector_stores/${vector_store_id}/file_batches/${batchID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45140,7 +45907,7 @@ class FileBatches extends APIResource {
      */
     cancel(batchID, params, options) {
         const { vector_store_id } = params;
-        return this._client.post(path `/vector_stores/${vector_store_id}/file_batches/${batchID}/cancel`, {
+        return this._client.post(path_path `/vector_stores/${vector_store_id}/file_batches/${batchID}/cancel`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45157,7 +45924,7 @@ class FileBatches extends APIResource {
      */
     listFiles(batchID, params, options) {
         const { vector_store_id, ...query } = params;
-        return this._client.getAPIList(path `/vector_stores/${vector_store_id}/file_batches/${batchID}/files`, (CursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
+        return this._client.getAPIList(path_path `/vector_stores/${vector_store_id}/file_batches/${batchID}/files`, (CursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
     }
     /**
      * Wait for the given file batch to be processed.
@@ -45235,7 +46002,7 @@ class FileBatches extends APIResource {
     }
 }
 //# sourceMappingURL=file-batches.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/vector-stores/files.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/vector-stores/files.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45249,7 +46016,7 @@ class vector_stores_files_Files extends APIResource {
      * [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object).
      */
     create(vectorStoreID, body, options) {
-        return this._client.post(path `/vector_stores/${vectorStoreID}/files`, {
+        return this._client.post(path_path `/vector_stores/${vectorStoreID}/files`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45260,7 +46027,7 @@ class vector_stores_files_Files extends APIResource {
      */
     retrieve(fileID, params, options) {
         const { vector_store_id } = params;
-        return this._client.get(path `/vector_stores/${vector_store_id}/files/${fileID}`, {
+        return this._client.get(path_path `/vector_stores/${vector_store_id}/files/${fileID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45270,7 +46037,7 @@ class vector_stores_files_Files extends APIResource {
      */
     update(fileID, params, options) {
         const { vector_store_id, ...body } = params;
-        return this._client.post(path `/vector_stores/${vector_store_id}/files/${fileID}`, {
+        return this._client.post(path_path `/vector_stores/${vector_store_id}/files/${fileID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45280,7 +46047,7 @@ class vector_stores_files_Files extends APIResource {
      * Returns a list of vector store files.
      */
     list(vectorStoreID, query = {}, options) {
-        return this._client.getAPIList(path `/vector_stores/${vectorStoreID}/files`, (CursorPage), {
+        return this._client.getAPIList(path_path `/vector_stores/${vectorStoreID}/files`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45294,7 +46061,7 @@ class vector_stores_files_Files extends APIResource {
      */
     delete(fileID, params, options) {
         const { vector_store_id } = params;
-        return this._client.delete(path `/vector_stores/${vector_store_id}/files/${fileID}`, {
+        return this._client.delete(path_path `/vector_stores/${vector_store_id}/files/${fileID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45370,11 +46137,11 @@ class vector_stores_files_Files extends APIResource {
      */
     content(fileID, params, options) {
         const { vector_store_id } = params;
-        return this._client.getAPIList(path `/vector_stores/${vector_store_id}/files/${fileID}/content`, (Page), { ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
+        return this._client.getAPIList(path_path `/vector_stores/${vector_store_id}/files/${fileID}/content`, (Page), { ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
     }
 }
 //# sourceMappingURL=files.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/vector-stores/vector-stores.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/vector-stores/vector-stores.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45404,7 +46171,7 @@ class VectorStores extends APIResource {
      * Retrieves a vector store.
      */
     retrieve(vectorStoreID, options) {
-        return this._client.get(path `/vector_stores/${vectorStoreID}`, {
+        return this._client.get(path_path `/vector_stores/${vectorStoreID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45413,7 +46180,7 @@ class VectorStores extends APIResource {
      * Modifies a vector store.
      */
     update(vectorStoreID, body, options) {
-        return this._client.post(path `/vector_stores/${vectorStoreID}`, {
+        return this._client.post(path_path `/vector_stores/${vectorStoreID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45433,7 +46200,7 @@ class VectorStores extends APIResource {
      * Delete a vector store.
      */
     delete(vectorStoreID, options) {
-        return this._client.delete(path `/vector_stores/${vectorStoreID}`, {
+        return this._client.delete(path_path `/vector_stores/${vectorStoreID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45443,7 +46210,7 @@ class VectorStores extends APIResource {
      * filter.
      */
     search(vectorStoreID, body, options) {
-        return this._client.getAPIList(path `/vector_stores/${vectorStoreID}/search`, (Page), {
+        return this._client.getAPIList(path_path `/vector_stores/${vectorStoreID}/search`, (Page), {
             body,
             method: 'post',
             ...options,
@@ -45454,7 +46221,7 @@ class VectorStores extends APIResource {
 VectorStores.Files = vector_stores_files_Files;
 VectorStores.FileBatches = FileBatches;
 //# sourceMappingURL=vector-stores.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/videos.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/videos.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45472,7 +46239,7 @@ class Videos extends APIResource {
      * Retrieve a video
      */
     retrieve(videoID, options) {
-        return this._client.get(path `/videos/${videoID}`, options);
+        return this._client.get(path_path `/videos/${videoID}`, options);
     }
     /**
      * List videos
@@ -45484,13 +46251,13 @@ class Videos extends APIResource {
      * Delete a video
      */
     delete(videoID, options) {
-        return this._client.delete(path `/videos/${videoID}`, options);
+        return this._client.delete(path_path `/videos/${videoID}`, options);
     }
     /**
      * Download video content
      */
     downloadContent(videoID, query = {}, options) {
-        return this._client.get(path `/videos/${videoID}/content`, {
+        return this._client.get(path_path `/videos/${videoID}/content`, {
             query,
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
@@ -45501,11 +46268,11 @@ class Videos extends APIResource {
      * Create a video remix
      */
     remix(videoID, body, options) {
-        return this._client.post(path `/videos/${videoID}/remix`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path_path `/videos/${videoID}/remix`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
 }
 //# sourceMappingURL=videos.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/webhooks/webhooks.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/webhooks/webhooks.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var _Webhooks_instances, _Webhooks_validateSecret, _Webhooks_getRequiredHeader;
 
@@ -45603,15 +46370,15 @@ _Webhooks_instances = new WeakSet(), _Webhooks_validateSecret = function _Webhoo
     return value;
 };
 //# sourceMappingURL=webhooks.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/webhooks/index.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/webhooks/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 //# sourceMappingURL=index.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/webhooks.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/webhooks.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 //# sourceMappingURL=webhooks.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/index.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/resources/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45637,7 +46404,7 @@ _Webhooks_instances = new WeakSet(), _Webhooks_validateSecret = function _Webhoo
 
 
 //# sourceMappingURL=index.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/client.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/client.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var _OpenAI_instances, client_a, _OpenAI_encoder, _OpenAI_baseURLOverridden;
 
@@ -46208,7 +46975,7 @@ OpenAI.Containers = Containers;
 OpenAI.Skills = Skills;
 OpenAI.Videos = Videos;
 //# sourceMappingURL=client.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/azure.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/azure.mjs
 
 
 
@@ -46301,7 +47068,7 @@ const _deployments_endpoints = new Set([
     '/images/edits',
 ]);
 //# sourceMappingURL=azure.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/index.mjs
+;// CONCATENATED MODULE: ../../../Users/user/Documents/GitHub/river-reviewer/node_modules/openai/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46665,6 +47432,7 @@ class SkillDispatcher {
 }
 
 ;// CONCATENATED MODULE: ./src/cli.mjs
+
 
 
 
@@ -47053,6 +47821,29 @@ function logPreview(title, text, maxLength, log, { leadingNewline = false } = {}
   log(preview);
 }
 
+function formatRiskSummaryMarkdown(plan) {
+  const risk = plan?.riskAssessment;
+  if (!risk) return '';
+  const badge =
+    risk.aggregateAction === 'require_human_review'
+      ? '🔴 require_human_review'
+      : risk.aggregateAction === 'escalate'
+        ? '🟡 escalate'
+        : '🟢 comment_only';
+  const lines = ['### リスク評価\n', '**判定**: ' + badge + '\n'];
+  if (risk.humanReviewFiles?.length) {
+    lines.push('**人間レビュー必須**:');
+    for (const f of risk.humanReviewFiles) lines.push('- ' + sanitizeForMarkdown(f));
+    lines.push('');
+  }
+  if (risk.escalatedFiles?.length) {
+    lines.push('**エスカレーション対象**:');
+    for (const f of risk.escalatedFiles) lines.push('- ' + sanitizeForMarkdown(f));
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
 function printMarkdownReport(result, phase) {
   const header = `${COMMENT_MARKER}
 ## River Reviewer
@@ -47061,8 +47852,9 @@ function printMarkdownReport(result, phase) {
 ${formatDebugSummaryMarkdown(result)}
 `;
   const planSection = formatPlanMarkdown(result.plan);
+  const riskSection = formatRiskSummaryMarkdown(result.plan);
   const findings = `### 指摘\n${formatCommentsMarkdown(result.comments)}\n`;
-  console.log([header, planSection, findings].join('\n'));
+  console.log([header, planSection, riskSection, findings].join('\n'));
 }
 
 function printDebugInfo(result, { log = console.log } = {}) {
@@ -47137,7 +47929,7 @@ function mapSeverity(internalSeverity) {
  */
 function extractField(message, label) {
   const regex = new RegExp(
-    `${label}:\\s*([^]*?)(?=\\s+(?:Finding|Evidence|Impact|Fix|Severity|Confidence):)|${label}:\\s*(.+)$`,
+    `${label}:\\s*([^]*?)(?=\\s+(?:Finding|Evidence|Impact|Fix|Severity|Confidence):)|${label}:\\s*(.+)$`
   );
   const match = (message ?? '').match(regex);
   return (match?.[1] ?? match?.[2] ?? '').trim();
@@ -47168,7 +47960,16 @@ function formatJsonOutput(result, phase) {
     };
   });
 
-  return { issues, summary: { issueCountBySeverity, issueCountByPhase } };
+  const summary = { issueCountBySeverity, issueCountByPhase };
+  const riskAssessment = result.plan?.riskAssessment;
+  if (riskAssessment) {
+    summary.riskSummary = {
+      aggregateAction: riskAssessment.aggregateAction,
+      escalatedFiles: riskAssessment.escalatedFiles,
+      humanReviewFiles: riskAssessment.humanReviewFiles,
+    };
+  }
+  return { issues, summary };
 }
 
 function countChangedLines(files) {
@@ -47198,7 +47999,7 @@ async function main() {
   try {
     // Skills subcommands (import/export/list) – no git repo required
     if (parsed.command === 'skills' && parsed.skillsSubcommand) {
-      const { runSkillsSubcommand } = await __nccwpck_require__.e(/* import() */ 488).then(__nccwpck_require__.bind(__nccwpck_require__, 6488));
+      const { runSkillsSubcommand } = await __nccwpck_require__.e(/* import() */ 527).then(__nccwpck_require__.bind(__nccwpck_require__, 527));
       return runSkillsSubcommand(parsed);
     }
 
@@ -47239,7 +48040,7 @@ async function main() {
     }
 
     if (parsed.command === 'eval') {
-      const { evaluateReviewFixtures } = await __nccwpck_require__.e(/* import() */ 213).then(__nccwpck_require__.bind(__nccwpck_require__, 9213));
+      const { evaluateReviewFixtures } = await __nccwpck_require__.e(/* import() */ 158).then(__nccwpck_require__.bind(__nccwpck_require__, 5158));
       const casesPath =
         parsed.fixturesCasesPath ||
         external_node_path_.join(external_node_process_namespaceObject.cwd(), 'tests', 'fixtures', 'review-eval', 'cases.json');
@@ -47316,7 +48117,8 @@ Dependencies: ${
         ? estimator.estimateFromDiff(context.diff, context.plan?.selected ?? [])
         : null;
 
-    const logRunHeader = parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
+    const logRunHeader =
+      parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
     logRunHeader(`River Reviewer (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}
@@ -47415,6 +48217,12 @@ Dependencies: ${
       printHintLines([
         'Check `.river/rules.md` exists and is readable (or remove it to disable rules).',
         'Docs: README.md (Project-specific review rules)',
+      ]);
+    } else if (error instanceof risk_map/* RiskMapError */._Z) {
+      console.error(error.message);
+      printHintLines([
+        'Check `.river/risk-map.yaml` format and valid action values.',
+        'Valid actions: comment_only, escalate, require_human_review',
       ]);
     } else if (error instanceof git/* GitError */.XS) {
       console.error(`Git command failed: ${error.message}`);
