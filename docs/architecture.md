@@ -60,7 +60,7 @@ flowchart TB
 
     subgraph Runner["Review Runner"]
         RN1[Context Builder<br/>diff/files/PR]
-        RN2[LLM Client<br/>OpenAI/Anthropic]
+        RN2[LLM Client<br/>OpenAI/Gemini]
         RN3[Formatter<br/>Markdown/JSON]
     end
 

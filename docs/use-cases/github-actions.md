@@ -175,22 +175,16 @@ env:
   OPENAI_MODEL: gpt-4o # Optional, defaults to gpt-4o
 ```
 
-**Anthropic:**
+**Google Gemini:**
 
 ```yaml
 env:
-  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-  ANTHROPIC_MODEL: claude-3-5-sonnet-20241022 # Optional
+  GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+  # モデル名は config.skills[].model で指定（例: `gemini-1.5-pro`）。
+  # prefix が `gemini` のモデル名を検出すると自動的に GeminiClient が使われます。
 ```
 
-**Azure OpenAI:**
-
-```yaml
-env:
-  AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-  AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-  AZURE_OPENAI_DEPLOYMENT: gpt-4o
-```
+> **Note**: 現在 `src/ai/factory.mjs` でサポートされているのは OpenAI (`gpt-*` / `o1-*`) と Google Gemini (`gemini-*`) です。Anthropic / Azure OpenAI は未実装のため、設定しても実行時エラーになります。
 
 ### Adding Secrets to Repository
 
