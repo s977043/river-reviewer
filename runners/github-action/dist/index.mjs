@@ -19026,932 +19026,21 @@ minimatch.unescape = unescape_unescape;
 
 /***/ }),
 
-/***/ 4904:
+/***/ 3905:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
 // EXPORTS
 __nccwpck_require__.d(__webpack_exports__, {
-  kN: () => (/* binding */ buildExecutionPlan),
-  Ay: () => (/* binding */ rankByModelHint),
-  P0: () => (/* reexport */ summarizeSkill)
+  YOg: () => (/* reexport */ array),
+  k5n: () => (/* reexport */ schemas_enum),
+  aig: () => (/* reexport */ schemas_number),
+  Ikc: () => (/* reexport */ object),
+  YjP: () => (/* reexport */ schemas_string),
+  L5J: () => (/* reexport */ unknown)
 });
 
-// UNUSED EXPORTS: matchesPhase, selectSkills
-
-// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
-var esm = __nccwpck_require__(9519);
-// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
-var skill_loader = __nccwpck_require__(5541);
-;// CONCATENATED MODULE: ./src/lib/skill-planner.mjs
-
-
-/**
- * Summarize a skill's metadata for LLM consumption.
- * @param {import('../../runners/core/review-runner.mjs').SkillDefinition|import('../../runners/core/review-runner.mjs').SkillMetadata} skill
- */
-function summarizeSkill(skill) {
-  const meta = skill?.metadata ?? skill;
-  return {
-    id: meta.id,
-    name: meta.name,
-    description: meta.description,
-    phase: meta.phase,
-    applyTo: meta.applyTo ?? [],
-    inputContext: meta.inputContext ?? [],
-    outputKind: meta.outputKind ?? ['findings'],
-    modelHint: meta.modelHint ?? null,
-    dependencies: meta.dependencies ?? [],
-    tags: meta.tags ?? [],
-    severity: meta.severity ?? null,
-  };
-}
-
-/**
- * Plan skills using an LLM (or provided planner function). Falls back to deterministic ordering on error.
- * @param {Object} options
- * @param {Array} options.skills - candidate skills (already filtered)
- * @param {Object} options.context - review context (e.g., changedFiles/diff summary/prompt)
- * @param {Function} [options.llmPlan] - async function receiving {skills, context}, returning [{id, priority, reason}]
- * @param {boolean} [options.appendRemaining=true] - whether to append unreferenced skills in deterministic order
- * @returns {Promise<{planned: Array, reasons: Array, fallback: boolean}>}
- */
-async function planSkills({ skills, context, llmPlan, appendRemaining = true }) {
-  const summaries = skills.map(summarizeSkill);
-
-  if (!llmPlan) {
-    return {
-      planned: rankByModelHint(skills),
-      reasons: [],
-      fallback: false,
-    };
-  }
-
-  try {
-    const plan = await llmPlan({ skills: summaries, context });
-    if (!Array.isArray(plan)) {
-      throw new Error('planner returned non-array response');
-    }
-    const order = plan;
-    const byId = new Map(summaries.map((summary, idx) => [summary.id, skills[idx]]));
-    const planned = [];
-    const reasons = [];
-    let matchedCount = 0;
-
-    for (const entry of order) {
-      if (!entry?.id) continue;
-      const candidate = byId.get(entry.id);
-      if (candidate) {
-        planned.push(candidate);
-        matchedCount += 1;
-        if (entry.reason) reasons.push({ id: entry.id, reason: entry.reason });
-        byId.delete(entry.id);
-      }
-    }
-
-    if (appendRemaining) {
-      // append any not referenced by LLM in deterministic order
-      const remaining = rankByModelHint(Array.from(byId.values()));
-      planned.push(...remaining);
-    } else if (matchedCount === 0 && order.length > 0) {
-      // In prune mode, a non-empty plan that matches nothing is almost certainly invalid output.
-      throw new Error('planner returned no known skill ids');
-    }
-
-    return { planned, reasons, fallback: false };
-  } catch (err) {
-    return {
-      planned: rankByModelHint(skills),
-      reasons: [{ id: 'fallback', reason: `planner error: ${err.message}` }],
-      fallback: true,
-    };
-  }
-}
-
-;// CONCATENATED MODULE: ./src/lib/impact-scope.mjs
-function ensureArray(value) {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function extOf(file) {
-  const idx = file.lastIndexOf('.');
-  if (idx < 0) return '';
-  return file.slice(idx + 1).toLowerCase();
-}
-
-function containsSegment(file, segment) {
-  const normalized = file.replaceAll('\\', '/');
-  return normalized.split('/').includes(segment);
-}
-
-function matchesAny(file, needles) {
-  const normalized = file.toLowerCase();
-  return needles.some(n => normalized.includes(n));
-}
-
-/**
- * Infer impact tags from changed file paths.
- * Tags are intentionally small and map to existing `skills/**` tags.
- * @param {string[]|string} changedFiles
- * @param {{diffText?: string}} [options]
- * @returns {string[]}
- */
-function inferImpactTags(changedFiles, options = {}) {
-  const files = ensureArray(changedFiles);
-  const tags = new Set();
-
-  for (const file of files) {
-    const ext = extOf(file);
-
-    if (['ts', 'tsx', 'cts', 'mts'].includes(ext)) tags.add('typescript');
-    if (['js', 'jsx', 'cjs', 'mjs'].includes(ext)) tags.add('javascript');
-    if (['md', 'mdx', 'adr'].includes(ext) || matchesAny(file, ['/docs/', '/design/']) || containsSegment(file, 'docs')) {
-      tags.add('design');
-    }
-
-    if (
-      containsSegment(file, 'tests') ||
-      containsSegment(file, 'test') ||
-      containsSegment(file, '__tests__') ||
-      matchesAny(file, ['.test.', '.spec.'])
-    ) {
-      tags.add('tests');
-    }
-
-    if (containsSegment(file, 'api') || containsSegment(file, 'routes')) tags.add('api');
-    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/'])) tags.add('reliability');
-
-    if (
-      containsSegment(file, 'auth') ||
-      containsSegment(file, 'security') ||
-      matchesAny(file, ['/oauth', '/jwt', '/session', '/cookie', '/csrf'])
-    ) {
-      tags.add('security');
-    }
-
-    if (
-      tags.has('api') ||
-      containsSegment(file, 'config') ||
-      containsSegment(file, 'db') ||
-      matchesAny(file, ['/env', '/secrets', '/headers'])
-    ) {
-      tags.add('security');
-    }
-
-    if (containsSegment(file, 'logging') || matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])) {
-      tags.add('observability');
-      tags.add('reliability');
-    }
-  }
-
-  const diffText = options?.diffText;
-  if (typeof diffText === 'string' && diffText.length) {
-    const lower = diffText.toLowerCase();
-    const hasCatch = lower.includes('catch (') || lower.includes('catch(');
-    const addsSilentReturn =
-      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) || /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
-    const mentionsIgnore = lower.includes('ignore') || lower.includes('swallow');
-    if (hasCatch && (addsSilentReturn || mentionsIgnore)) {
-      tags.add('observability');
-      tags.add('reliability');
-    }
-  }
-
-  return [...tags].sort();
-}
-
-// EXTERNAL MODULE: ./src/lib/planner-utils.mjs
-var planner_utils = __nccwpck_require__(1013);
-// EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
-var heuristic_review = __nccwpck_require__(2294);
-;// CONCATENATED MODULE: ./runners/core/review-runner.mjs
-
-
-
-
-
-
-
-const MODEL_PRIORITY = {
-  cheap: 1,
-  balanced: 2,
-  'high-accuracy': 3,
-};
-
-function getMeta(skill) {
-  return skill?.metadata ?? skill;
-}
-
-function review_runner_ensureArray(value) {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function matchesPhase(skill, phase) {
-  const meta = getMeta(skill);
-  if (Array.isArray(meta.phase)) {
-    return meta.phase.includes(phase);
-  }
-  return meta.phase === phase;
-}
-
-function matchesApplyTo(skill, changedFiles) {
-  const meta = getMeta(skill);
-  const globs = review_runner_ensureArray(meta.applyTo);
-  if (!globs.length) return false;
-  return changedFiles.some((file) =>
-    globs.some((pattern) => (0,esm/* minimatch */.xF)(file, pattern, { dot: true }))
-  );
-}
-
-function missingInputContexts(skill, availableContexts) {
-  const meta = getMeta(skill);
-  if (!meta.inputContext || meta.inputContext.length === 0) return [];
-  const available = new Set(availableContexts);
-  return meta.inputContext.filter((ctx) => !available.has(ctx));
-}
-
-function missingDependencies(skill, availableDependencies) {
-  const meta = getMeta(skill);
-  const deps = review_runner_ensureArray(meta.dependencies);
-  if (!deps.length) return [];
-  if (availableDependencies == null) return [];
-  const available = new Set(review_runner_ensureArray(availableDependencies));
-  return deps.filter((dep) => !available.has(dep));
-}
-
-function evaluateSkill(skill, options) {
-  const reasons = [];
-  const meta = getMeta(skill);
-  if (!matchesPhase(meta, options.phase)) {
-    reasons.push(`phase mismatch: ${meta.phase} !== ${options.phase}`);
-  }
-  if (!matchesApplyTo(meta, options.changedFiles)) {
-    reasons.push('applyTo did not match any changed file');
-  }
-  const missingContexts = missingInputContexts(meta, options.availableContexts);
-  if (missingContexts.length) {
-    reasons.push(`missing inputContext: ${missingContexts.join(', ')}`);
-  }
-  const depsMissing = missingDependencies(meta, options.availableDependencies);
-  if (depsMissing.length) {
-    reasons.push(`missing dependencies: ${depsMissing.join(', ')}`);
-  }
-  return {
-    ok: reasons.length === 0,
-    reasons,
-  };
-}
-
-function selectSkills(skills, options) {
-  const changedFiles = review_runner_ensureArray(options.changedFiles);
-  const availableContexts = review_runner_ensureArray(options.availableContexts);
-  const availableDependencies = options.availableDependencies ?? null;
-  const dryRun = options.dryRun ?? false;
-  const llmEnabled = options.llmEnabled ?? true;
-  const selected = [];
-  const skipped = [];
-
-  for (const skill of skills) {
-    const meta = skill.metadata ?? skill;
-    const skillId = meta.id;
-
-    // ルーティングスキル（エントリポイント）は実行対象外
-    const tags = review_runner_ensureArray(meta.tags);
-    if (tags.includes('routing')) {
-      skipped.push({ skill, reasons: ['routing skill: not an executable review skill'] });
-      continue;
-    }
-
-    // dry-run または LLM 無効時はヒューリスティック対応スキルのみ選択
-    const isLlmRestricted = dryRun || !llmEnabled;
-    if (isLlmRestricted && !heuristic_review/* HEURISTIC_SKILL_IDS */.y2.includes(skillId)) {
-      const reason = dryRun
-        ? 'dry-run: LLM必須スキル（ヒューリスティック未対応）'
-        : 'LLM disabled: LLM必須スキル（APIキー未設定）';
-      skipped.push({ skill, reasons: [reason] });
-      continue;
-    }
-
-    const result = evaluateSkill(meta, {
-      phase: options.phase,
-      changedFiles,
-      availableContexts,
-      availableDependencies,
-    });
-    if (result.ok) {
-      selected.push(skill);
-    } else {
-      skipped.push({ skill, reasons: result.reasons });
-    }
-  }
-  return { selected, skipped };
-}
-
-function rankByModelHint(skills, preferredModelHint = 'balanced') {
-  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
-  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
-  return [...skills].sort((a, b) => {
-    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
-    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
-    if (wa !== wb) return wa - wb;
-    return getMeta(a).id.localeCompare(getMeta(b).id);
-  });
-}
-
-function computeTagScore(skill, impactTags) {
-  if (!impactTags?.length) return 0;
-  const tags = new Set(getMeta(skill).tags ?? []);
-  let score = 0;
-  for (const tag of impactTags) {
-    if (tags.has(tag)) score += 1;
-  }
-  return score;
-}
-
-function rankByImpactTags(skills, impactTags, preferredModelHint = 'balanced') {
-  const scores = new Map(skills.map((s) => [getMeta(s).id, computeTagScore(s, impactTags)]));
-  const anyMatched = Array.from(scores.values()).some((v) => v > 0);
-  if (!anyMatched) {
-    return rankByModelHint(skills, preferredModelHint);
-  }
-
-  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
-  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
-
-  return [...skills].sort((a, b) => {
-    const idA = getMeta(a).id;
-    const idB = getMeta(b).id;
-    const scoreA = scores.get(idA) ?? 0;
-    const scoreB = scores.get(idB) ?? 0;
-    if (scoreA !== scoreB) return scoreB - scoreA;
-
-    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
-    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
-    if (wa !== wb) return wa - wb;
-    return idA.localeCompare(idB);
-  });
-}
-
-/**
- * Build an execution plan from skills and review context.
- * - planner 未指定: メタデと modelHint に基づく決定論的な並び替え
- * - planner 指定: LLM 等で優先度決定し、エラー時は決定論的順序にフォールバック
- *   - plannerMode=order: 優先度づけ（未参照スキルは後ろに決定論で追加）
- *   - plannerMode=prune: 絞り込み（LLM が選んだスキルのみを実行）
- */
-async function buildExecutionPlan(options) {
-  const {
-    phase,
-    changedFiles = [],
-    availableContexts = [],
-    availableDependencies = null,
-    preferredModelHint = 'balanced',
-    skills: providedSkills,
-    planner,
-    plannerMode,
-    diffText,
-    dryRun = false,
-    llmEnabled = true,
-  } = options;
-
-  const skills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
-  const selection = selectSkills(skills, {
-    phase,
-    changedFiles,
-    availableContexts,
-    availableDependencies,
-    dryRun,
-    llmEnabled,
-  });
-  if (selection.selected.length === 0) {
-    return { selected: [], skipped: selection.skipped };
-  }
-
-  const impactTags = inferImpactTags(changedFiles, { diffText });
-
-  // If planner is provided, try LLM-based planning, fallback to deterministic rank
-  const effectivePlannerMode = planner
-    ? (0,planner_utils/* normalizePlannerMode */.p)(plannerMode, { defaultMode: 'order' })
-    : 'off';
-  if (planner && effectivePlannerMode !== 'off') {
-    const context = {
-      phase,
-      changedFiles,
-      availableContexts,
-      impactTags,
-    };
-    const { planned, reasons, fallback } = await planSkills({
-      skills: selection.selected,
-      context,
-      llmPlan: planner.plan ?? planner,
-      appendRemaining: effectivePlannerMode !== 'prune',
-    });
-    const ranked = fallback
-      ? rankByImpactTags(selection.selected, impactTags, preferredModelHint)
-      : planned;
-    return {
-      selected: ranked,
-      skipped: selection.skipped,
-      plannerMode: effectivePlannerMode,
-      plannerReasons: reasons,
-      plannerFallback: fallback,
-      ...(fallback ? { plannerError: reasons?.[0]?.reason ?? 'planner fallback' } : {}),
-      impactTags,
-    };
-  }
-
-  // planner が無い場合（LLM未設定）は決定論的順位付けで実行
-  const ordered = rankByImpactTags(selection.selected, impactTags, preferredModelHint);
-
-  return {
-    selected: ordered,
-    skipped: selection.skipped,
-    impactTags,
-  };
-}
-
-// Re-export summarizeSkill for consumers that want the same view used by planner
-
-
-
-/***/ }),
-
-/***/ 5541:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  vN: () => (/* binding */ SkillLoaderError),
-  m: () => (/* binding */ createSkillValidator),
-  KJ: () => (/* binding */ defaultPaths),
-  e$: () => (/* binding */ loadSchema),
-  l1: () => (/* binding */ loadSkills),
-  eJ: () => (/* binding */ parseFrontMatter)
-});
-
-// UNUSED EXPORTS: listSkillFiles, loadSkillFile, parseSkillFile
-
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(9896);
-;// CONCATENATED MODULE: external "path"
-const external_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
-;// CONCATENATED MODULE: external "url"
-const external_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
-// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-var js_yaml = __nccwpck_require__(3243);
-// EXTERNAL MODULE: ./node_modules/gray-matter/index.js
-var gray_matter = __nccwpck_require__(9599);
-// EXTERNAL MODULE: ./node_modules/ajv/dist/2020.js
-var _2020 = __nccwpck_require__(2210);
-// EXTERNAL MODULE: ./node_modules/ajv-formats/dist/index.js
-var dist = __nccwpck_require__(2815);
-;// CONCATENATED MODULE: ./runners/core/skill-loader.mjs
-
-
-
-
-
-
-
-
-/**
- * @typedef {'upstream' | 'midstream' | 'downstream'} PhaseEnum
- * @typedef {PhaseEnum | PhaseEnum[]} Phase
- * @typedef {'info' | 'minor' | 'major' | 'critical'} Severity
- * @typedef {'diff' | 'fullFile' | 'tests' | 'adr' | 'commitMessage' | 'repoConfig'} InputContext
- * @typedef {'findings' | 'summary' | 'actions' | 'tests' | 'metrics' | 'questions'} OutputKind
- * @typedef {'cheap' | 'balanced' | 'high-accuracy'} ModelHint
- * @typedef {'code_search' | 'test_runner' | 'adr_lookup' | 'repo_metadata' | 'coverage_report' | 'tracing' | `custom:${string}`} Dependency
- *
- * @typedef {Object} SkillMetadata
- * @property {string} id
- * @property {string} name
- * @property {string} description
- * @property {Phase} phase
- * @property {string[]} applyTo
- * @property {string[]=} files
- * @property {string[]=} tags
- * @property {Severity=} severity
- * @property {InputContext[]=} inputContext
- * @property {OutputKind[]=} outputKind
- * @property {ModelHint=} modelHint
- * @property {Dependency[]=} dependencies
- * @property {{phase?: Phase, applyTo?: string[], files?: string[]}=} trigger
- * @property {number=} priority
- *
- * @typedef {Object} SkillDefinition
- * @property {SkillMetadata} metadata
- * @property {string} body
- * @property {string} path
- */
-
-const skill_loader_filename = (0,external_url_namespaceObject.fileURLToPath)(import.meta.url);
-const skill_loader_dirname = external_path_namespaceObject.dirname(skill_loader_filename);
-const repoRoot = process.env.RIVER_REPO_ROOT
-  ? external_path_namespaceObject.resolve(process.env.RIVER_REPO_ROOT)
-  : external_path_namespaceObject.resolve(skill_loader_dirname, '..', '..');
-const defaultSkillsDir = external_path_namespaceObject.join(repoRoot, 'skills');
-const defaultSchemaPath = external_path_namespaceObject.join(repoRoot, 'schemas', 'skill.schema.json');
-const markdownExtensions = new Set(['.md', '.mdx']);
-const yamlExtensions = new Set(['.yaml', '.yml']);
-const allowedExtensions = new Set([...markdownExtensions, ...yamlExtensions]);
-const ignoredSkillDirNames = new Set([
-  'references',
-  'fixtures',
-  'golden',
-  'eval',
-  'prompt',
-  'prompts',
-]);
-const ignoredFileNames = new Set(['.gitkeep', 'README.md', 'registry.yaml', 'registry.yml', '_template.md']);
-const legacySkillFiles = new Set(['skill.yaml', 'skill.yml']);
-const streamCategories = new Set(['core', 'upstream', 'midstream', 'downstream']);
-const allPhases = ['upstream', 'midstream', 'downstream'];
-
-const defaultPaths = {
-  repoRoot,
-  skillsDir: defaultSkillsDir,
-  schemaPath: defaultSchemaPath,
-};
-
-class SkillLoaderError extends Error {
-  constructor(message, details = undefined) {
-    super(message);
-    this.name = 'SkillLoaderError';
-    this.details = details;
-  }
-}
-
-async function loadSchema(schemaPath = defaultSchemaPath) {
-  const raw = await external_fs_.promises.readFile(schemaPath, 'utf8');
-  try {
-    return JSON.parse(raw);
-  } catch (err) {
-    throw new SkillLoaderError(`Failed to parse JSON schema at ${schemaPath}: ${err.message}`);
-  }
-}
-
-function createSkillValidator(schema) {
-  const ajv = new _2020({ allErrors: true, strict: false, useDefaults: true });
-  dist(ajv);
-  return ajv.compile(schema);
-}
-
-async function listSkillFiles(dir = defaultSkillsDir) {
-  const entries = await external_fs_.promises.readdir(dir, { withFileTypes: true });
-  const files = [];
-
-  const hasLegacySkillFile = entries.some(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
-  if (hasLegacySkillFile) {
-    const legacyEntry = entries.find(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
-    if (!legacyEntry) {
-      throw new Error(`skill.yaml detected but not found in ${dir}`);
-    }
-    files.push(external_path_namespaceObject.join(dir, legacyEntry.name));
-    return files.sort((a, b) => a.localeCompare(b));
-  }
-
-  for (const entry of entries) {
-    const entryPath = external_path_namespaceObject.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (ignoredSkillDirNames.has(entry.name) || entry.name.startsWith('.')) {
-        continue;
-      }
-      const nested = await listSkillFiles(entryPath);
-      files.push(...nested);
-      continue;
-    }
-
-    const ext = external_path_namespaceObject.extname(entry.name).toLowerCase();
-    if (!allowedExtensions.has(ext)) continue;
-    if (ignoredFileNames.has(entry.name)) continue;
-    if (entry.name.startsWith('_')) continue;
-    files.push(entryPath);
-  }
-
-  return files.sort((a, b) => a.localeCompare(b));
-}
-
-function normalizeStringArray(value) {
-  if (!value) return undefined;
-  const asArray = Array.isArray(value) ? value : [value];
-  const filtered = asArray
-    .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
-    .filter(Boolean);
-  return filtered.length ? filtered : undefined;
-}
-
-function normalizePhaseValue(value) {
-  if (!value) return undefined;
-  if (Array.isArray(value)) {
-    const phases = value.filter(Boolean);
-    if (phases.length === 1) return phases[0];
-    return phases.length ? phases : undefined;
-  }
-  return value;
-}
-
-function inferCategoryFromPhase(phase) {
-  if (!phase) return undefined;
-  if (Array.isArray(phase)) {
-    const unique = Array.from(new Set(phase));
-    if (unique.length === 1 && streamCategories.has(unique[0])) {
-      return unique[0];
-    }
-    if (unique.length > 1) {
-      return 'core';
-    }
-    return undefined;
-  }
-  return streamCategories.has(phase) ? phase : undefined;
-}
-
-function inferCategoryFromPath(filePath) {
-  if (!filePath) return undefined;
-  const segments = external_path_namespaceObject.normalize(filePath).split(external_path_namespaceObject.sep);
-  const skillsIndex = segments.lastIndexOf('skills');
-  const candidate = skillsIndex >= 0 ? segments[skillsIndex + 1] : undefined;
-  if (candidate && streamCategories.has(candidate)) {
-    return candidate;
-  }
-  return undefined;
-}
-
-function resolveCategory(metaCategory, { phase, filePath } = {}) {
-  if (typeof metaCategory === 'string' && streamCategories.has(metaCategory)) {
-    return metaCategory;
-  }
-  return inferCategoryFromPath(filePath) ?? inferCategoryFromPhase(phase);
-}
-
-function resolvePhase(metaPhase, category) {
-  if (category === 'core') {
-    return [...allPhases];
-  }
-  if (category && streamCategories.has(category)) {
-    return category;
-  }
-  return normalizePhaseValue(metaPhase);
-}
-
-function normalizeMetadata(metadata, { filePath } = {}) {
-  const meta = { ...metadata };
-
-  if (meta.priority !== undefined) {
-    const parsedPriority = typeof meta.priority === 'string' ? Number(meta.priority) : meta.priority;
-    if (Number.isFinite(parsedPriority)) {
-      meta.priority = parsedPriority;
-    } else {
-      delete meta.priority;
-    }
-  }
-
-  const topLevelApplyTo =
-    normalizeStringArray(meta.applyTo) ??
-    normalizeStringArray(meta.files) ??
-    normalizeStringArray(meta.path_patterns);
-  if (topLevelApplyTo) {
-    meta.applyTo = topLevelApplyTo;
-  }
-
-  const trigger =
-    meta.trigger && typeof meta.trigger === 'object' && !Array.isArray(meta.trigger)
-      ? meta.trigger
-      : null;
-  const triggerApplyTo =
-    normalizeStringArray(trigger?.applyTo) ??
-    normalizeStringArray(trigger?.files) ??
-    normalizeStringArray(trigger?.path_patterns);
-
-  if (!meta.phase && trigger?.phase) {
-    meta.phase = trigger.phase;
-  }
-  if (!meta.applyTo && triggerApplyTo) {
-    meta.applyTo = triggerApplyTo;
-  }
-
-  meta.category = resolveCategory(meta.category, { phase: meta.phase, filePath });
-  meta.phase = resolvePhase(meta.phase, meta.category);
-
-  // Trigger is consumed during normalization; avoid leaking nested state.
-  if (trigger) {
-    delete meta.trigger;
-  }
-  if ('path_patterns' in meta) {
-    delete meta.path_patterns;
-  }
-
-  return meta;
-}
-
-function parseFrontMatter(content, { filePath } = {}) {
-  const trimmed = content.trimStart();
-  if (!trimmed.startsWith('---')) {
-    throw new SkillLoaderError('Missing front matter block (---)');
-  }
-
-  let parsed;
-  try {
-    parsed = gray_matter(trimmed);
-  } catch (err) {
-    throw new SkillLoaderError(
-      `Front matter parse error${filePath ? ` (${filePath})` : ''}: ${err.message}`
-    );
-  }
-
-  const metadata = parsed.data ?? {};
-  if (typeof metadata !== 'object' || Array.isArray(metadata)) {
-    throw new SkillLoaderError('Front matter must be a mapping');
-  }
-  if (Object.keys(metadata).length === 0) {
-    throw new SkillLoaderError('Front matter is empty');
-  }
-  const normalized = normalizeMetadata(metadata, { filePath });
-  const body = (parsed.content ?? '').trim();
-  return { metadata: normalized, body };
-}
-
-async function parseSkillFile(filePath) {
-  const ext = external_path_namespaceObject.extname(filePath).toLowerCase();
-  if (!allowedExtensions.has(ext)) {
-    throw new SkillLoaderError(`Unsupported skill file extension: ${ext}`);
-  }
-  const raw = await external_fs_.promises.readFile(filePath, 'utf8');
-  if (markdownExtensions.has(ext)) {
-    return parseFrontMatter(raw, { filePath });
-  }
-
-  // YAML handling
-  let loaded = {};
-  try {
-    loaded = js_yaml/* default.load */.Ay.load(raw) ?? {};
-  } catch (err) {
-    throw new SkillLoaderError(`YAML parse error: ${err.message}`);
-  }
-  if (typeof loaded !== 'object' || Array.isArray(loaded)) {
-    throw new SkillLoaderError('Skill YAML must be a mapping');
-  }
-
-  let metadata = loaded;
-  let body = '';
-
-  // Support nested metadata block
-  if (loaded.metadata && typeof loaded.metadata === 'object' && !Array.isArray(loaded.metadata)) {
-    metadata = { ...loaded.metadata };
-    if (typeof metadata.instruction === 'string') {
-      body = metadata.instruction;
-      delete metadata.instruction;
-    } else if (typeof loaded.instruction === 'string') {
-      body = loaded.instruction;
-    }
-  } else if (typeof loaded.instruction === 'string') {
-    // Support flat structure with optional instruction field
-    body = loaded.instruction;
-    delete metadata.instruction;
-  }
-
-  metadata = normalizeMetadata(metadata, { filePath });
-  return { metadata, body };
-}
-
-function validateMetadata(metadata, validate) {
-  const metaCopy = JSON.parse(JSON.stringify(metadata ?? {}));
-  const ok = validate(metaCopy);
-  if (!ok) {
-    const details = (validate.errors ?? []).map(err => `${err.instancePath || '/'} ${err.message}`).join('; ');
-    throw new SkillLoaderError(`Validation failed: ${details}`, validate.errors);
-  }
-  return metaCopy;
-}
-
-function relativeToRepo(filePath) {
-  return filePath.startsWith(repoRoot) ? external_path_namespaceObject.relative(repoRoot, filePath) : filePath;
-}
-
-function logSkillLoadError(filePath, err) {
-  const location = relativeToRepo(filePath);
-  const reason = err instanceof Error ? err.message : String(err);
-  console.error(`⚠️  Failed to load skill ${location}: ${reason}`);
-  if (err?.details && Array.isArray(err.details)) {
-    for (const detail of err.details) {
-      const instance = detail.instancePath || '/';
-      console.error(`   - ${instance}: ${detail.message}`);
-    }
-  }
-}
-
-function logDuplicateSkill(id, filePath, originalPath) {
-  const location = relativeToRepo(filePath);
-  const first = relativeToRepo(originalPath);
-  console.warn(`⚠️  Duplicate skill id "${id}" in ${location}; already loaded from ${first}. Skipping.`);
-}
-
-function hasExcludedTag(metadata, excludedTags) {
-  if (!excludedTags?.length) return false;
-  const tags = metadata?.tags ?? [];
-  return tags.some(tag => excludedTags.includes(tag));
-}
-
-async function loadSkillFile(filePath, options = {}) {
-  const { validator, schemaPath = defaultSchemaPath } = options;
-  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
-  const parsed = await parseSkillFile(filePath);
-  const metadata = validateMetadata(parsed.metadata, compiledValidator);
-  return {
-    metadata,
-    body: parsed.body,
-    path: filePath,
-  };
-}
-
-async function loadSkills(options = {}) {
-  const {
-    skillsDir = defaultSkillsDir,
-    schemaPath = defaultSchemaPath,
-    validator: providedValidator,
-    excludedTags = ['agent'],
-  } = options;
-  const schema = providedValidator ? null : await loadSchema(schemaPath);
-  const validator = providedValidator ?? createSkillValidator(schema);
-  const files = await listSkillFiles(skillsDir);
-  const skillsById = new Map();
-
-  for (const filePath of files) {
-    try {
-      const skill = await loadSkillFile(filePath, { validator });
-      const id = skill?.metadata?.id;
-      if (!id) {
-        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
-        continue;
-      }
-      if (hasExcludedTag(skill.metadata, excludedTags)) {
-        continue;
-      }
-      if (skillsById.has(id)) {
-        logDuplicateSkill(id, filePath, skillsById.get(id).path);
-        continue;
-      }
-      skillsById.set(id, skill);
-    } catch (err) {
-      logSkillLoadError(filePath, err);
-    }
-  }
-
-  return Array.from(skillsById.values());
-}
-
-
-/***/ }),
-
-/***/ 4807:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   s: () => (/* binding */ defaultConfig),
-/* harmony export */   z: () => (/* binding */ defaultSkillConfig)
-/* harmony export */ });
-// Unified default config supporting both legacy and skill-based flows
-const defaultConfig = Object.freeze({
-  version: '1.0',
-  model: {
-    provider: 'openai',
-    modelName: 'gpt-4o-mini',
-    temperature: 0,
-    maxTokens: 600,
-  },
-  review: {
-    language: 'ja',
-    severity: 'normal',
-    additionalInstructions: [],
-  },
-  exclude: {
-    files: [],
-    prLabelsToIgnore: [],
-  },
-  skills: [],
-});
-
-// Alias kept for compatibility with newer skill-only imports
-const defaultSkillConfig = defaultConfig;
-
-
-/***/ }),
-
-/***/ 6245:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  UT: () => (/* binding */ ConfigLoader),
-  Z9: () => (/* binding */ loadConfig),
-  R2: () => (/* binding */ mergeConfig)
-});
-
-// UNUSED EXPORTS: ConfigLoaderError, ConfigMergeError
+// UNUSED EXPORTS: $brand, $input, $output, NEVER, TimePrecision, ZodAny, ZodArray, ZodBase64, ZodBase64URL, ZodBigInt, ZodBigIntFormat, ZodBoolean, ZodCIDRv4, ZodCIDRv6, ZodCUID, ZodCUID2, ZodCatch, ZodCodec, ZodCustom, ZodCustomStringFormat, ZodDate, ZodDefault, ZodDiscriminatedUnion, ZodE164, ZodEmail, ZodEmoji, ZodEnum, ZodError, ZodExactOptional, ZodFile, ZodFirstPartyTypeKind, ZodFunction, ZodGUID, ZodIPv4, ZodIPv6, ZodISODate, ZodISODateTime, ZodISODuration, ZodISOTime, ZodIntersection, ZodIssueCode, ZodJWT, ZodKSUID, ZodLazy, ZodLiteral, ZodMAC, ZodMap, ZodNaN, ZodNanoID, ZodNever, ZodNonOptional, ZodNull, ZodNullable, ZodNumber, ZodNumberFormat, ZodObject, ZodOptional, ZodPipe, ZodPrefault, ZodPromise, ZodReadonly, ZodRealError, ZodRecord, ZodSet, ZodString, ZodStringFormat, ZodSuccess, ZodSymbol, ZodTemplateLiteral, ZodTransform, ZodTuple, ZodType, ZodULID, ZodURL, ZodUUID, ZodUndefined, ZodUnion, ZodUnknown, ZodVoid, ZodXID, ZodXor, _ZodString, _default, _function, any, base64, base64url, bigint, boolean, catch, check, cidrv4, cidrv6, clone, codec, coerce, config, core, cuid, cuid2, custom, date, decode, decodeAsync, describe, discriminatedUnion, e164, email, emoji, encode, encodeAsync, endsWith, exactOptional, file, flattenError, float32, float64, formatError, fromJSONSchema, function, getErrorMap, globalRegistry, gt, gte, guid, hash, hex, hostname, httpUrl, includes, instanceof, int, int32, int64, intersection, ipv4, ipv6, iso, json, jwt, keyof, ksuid, lazy, length, literal, locales, looseObject, looseRecord, lowercase, lt, lte, mac, map, maxLength, maxSize, meta, mime, minLength, minSize, multipleOf, nan, nanoid, nativeEnum, negative, never, nonnegative, nonoptional, nonpositive, normalize, null, nullable, nullish, optional, overwrite, parse, parseAsync, partialRecord, pipe, positive, prefault, preprocess, prettifyError, promise, property, readonly, record, refine, regex, regexes, registry, safeDecode, safeDecodeAsync, safeEncode, safeEncodeAsync, safeParse, safeParseAsync, set, setErrorMap, size, slugify, startsWith, strictObject, stringFormat, stringbool, success, superRefine, symbol, templateLiteral, toJSONSchema, toLowerCase, toUpperCase, transform, treeifyError, trim, tuple, uint32, uint64, ulid, undefined, union, uppercase, url, util, uuid, uuidv4, uuidv6, uuidv7, void, xid, xor
 
 // NAMESPACE OBJECT: ./node_modules/zod/v4/core/regexes.js
 var regexes_namespaceObject = {};
@@ -20236,12 +19325,6 @@ __nccwpck_require__.d(classic_schemas_namespaceObject, {
   xor: () => (xor)
 });
 
-// EXTERNAL MODULE: external "node:fs/promises"
-var promises_ = __nccwpck_require__(1455);
-// EXTERNAL MODULE: external "node:path"
-var external_node_path_ = __nccwpck_require__(6760);
-// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-var js_yaml = __nccwpck_require__(3243);
 ;// CONCATENATED MODULE: ./node_modules/zod/v4/core/core.js
 /** A special constant with type `never` */
 const NEVER = Object.freeze({
@@ -33963,29 +33046,1217 @@ config(en());
 
 
 
+
+/***/ }),
+
+/***/ 8647:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  kN: () => (/* binding */ buildExecutionPlan),
+  Ay: () => (/* binding */ rankByModelHint),
+  P0: () => (/* reexport */ summarizeSkill)
+});
+
+// UNUSED EXPORTS: matchesPhase, selectSkills
+
+// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
+var esm = __nccwpck_require__(9519);
+// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
+var skill_loader = __nccwpck_require__(5541);
+;// CONCATENATED MODULE: ./src/lib/skill-planner.mjs
+
+
+/**
+ * Summarize a skill's metadata for LLM consumption.
+ * @param {import('../../runners/core/review-runner.mjs').SkillDefinition|import('../../runners/core/review-runner.mjs').SkillMetadata} skill
+ */
+function summarizeSkill(skill) {
+  const meta = skill?.metadata ?? skill;
+  return {
+    id: meta.id,
+    name: meta.name,
+    description: meta.description,
+    phase: meta.phase,
+    applyTo: meta.applyTo ?? [],
+    inputContext: meta.inputContext ?? [],
+    outputKind: meta.outputKind ?? ['findings'],
+    modelHint: meta.modelHint ?? null,
+    dependencies: meta.dependencies ?? [],
+    tags: meta.tags ?? [],
+    severity: meta.severity ?? null,
+  };
+}
+
+/**
+ * Plan skills using an LLM (or provided planner function). Falls back to deterministic ordering on error.
+ * @param {Object} options
+ * @param {Array} options.skills - candidate skills (already filtered)
+ * @param {Object} options.context - review context (e.g., changedFiles/diff summary/prompt)
+ * @param {Function} [options.llmPlan] - async function receiving {skills, context}, returning [{id, priority, reason}]
+ * @param {boolean} [options.appendRemaining=true] - whether to append unreferenced skills in deterministic order
+ * @returns {Promise<{planned: Array, reasons: Array, fallback: boolean}>}
+ */
+async function planSkills({ skills, context, llmPlan, appendRemaining = true }) {
+  const summaries = skills.map(summarizeSkill);
+
+  if (!llmPlan) {
+    return {
+      planned: rankByModelHint(skills),
+      reasons: [],
+      fallback: false,
+    };
+  }
+
+  try {
+    const plan = await llmPlan({ skills: summaries, context });
+    if (!Array.isArray(plan)) {
+      throw new Error('planner returned non-array response');
+    }
+    const order = plan;
+    const byId = new Map(summaries.map((summary, idx) => [summary.id, skills[idx]]));
+    const planned = [];
+    const reasons = [];
+    let matchedCount = 0;
+
+    for (const entry of order) {
+      if (!entry?.id) continue;
+      const candidate = byId.get(entry.id);
+      if (candidate) {
+        planned.push(candidate);
+        matchedCount += 1;
+        if (entry.reason) reasons.push({ id: entry.id, reason: entry.reason });
+        byId.delete(entry.id);
+      }
+    }
+
+    if (appendRemaining) {
+      // append any not referenced by LLM in deterministic order
+      const remaining = rankByModelHint(Array.from(byId.values()));
+      planned.push(...remaining);
+    } else if (matchedCount === 0 && order.length > 0) {
+      // In prune mode, a non-empty plan that matches nothing is almost certainly invalid output.
+      throw new Error('planner returned no known skill ids');
+    }
+
+    return { planned, reasons, fallback: false };
+  } catch (err) {
+    return {
+      planned: rankByModelHint(skills),
+      reasons: [{ id: 'fallback', reason: `planner error: ${err.message}` }],
+      fallback: true,
+    };
+  }
+}
+
+;// CONCATENATED MODULE: ./src/lib/impact-scope.mjs
+function ensureArray(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function extOf(file) {
+  const idx = file.lastIndexOf('.');
+  if (idx < 0) return '';
+  return file.slice(idx + 1).toLowerCase();
+}
+
+function containsSegment(file, segment) {
+  const normalized = file.replaceAll('\\', '/');
+  return normalized.split('/').includes(segment);
+}
+
+function matchesAny(file, needles) {
+  const normalized = file.toLowerCase();
+  return needles.some(n => normalized.includes(n));
+}
+
+/**
+ * Infer impact tags from changed file paths.
+ * Tags are intentionally small and map to existing `skills/**` tags.
+ * @param {string[]|string} changedFiles
+ * @param {{diffText?: string}} [options]
+ * @returns {string[]}
+ */
+function inferImpactTags(changedFiles, options = {}) {
+  const files = ensureArray(changedFiles);
+  const tags = new Set();
+
+  for (const file of files) {
+    const ext = extOf(file);
+
+    if (['ts', 'tsx', 'cts', 'mts'].includes(ext)) tags.add('typescript');
+    if (['js', 'jsx', 'cjs', 'mjs'].includes(ext)) tags.add('javascript');
+    if (['md', 'mdx', 'adr'].includes(ext) || matchesAny(file, ['/docs/', '/design/']) || containsSegment(file, 'docs')) {
+      tags.add('design');
+    }
+
+    if (
+      containsSegment(file, 'tests') ||
+      containsSegment(file, 'test') ||
+      containsSegment(file, '__tests__') ||
+      matchesAny(file, ['.test.', '.spec.'])
+    ) {
+      tags.add('tests');
+    }
+
+    if (containsSegment(file, 'api') || containsSegment(file, 'routes')) tags.add('api');
+    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/'])) tags.add('reliability');
+
+    if (
+      containsSegment(file, 'auth') ||
+      containsSegment(file, 'security') ||
+      matchesAny(file, ['/oauth', '/jwt', '/session', '/cookie', '/csrf'])
+    ) {
+      tags.add('security');
+    }
+
+    if (
+      tags.has('api') ||
+      containsSegment(file, 'config') ||
+      containsSegment(file, 'db') ||
+      matchesAny(file, ['/env', '/secrets', '/headers'])
+    ) {
+      tags.add('security');
+    }
+
+    if (containsSegment(file, 'logging') || matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])) {
+      tags.add('observability');
+      tags.add('reliability');
+    }
+  }
+
+  const diffText = options?.diffText;
+  if (typeof diffText === 'string' && diffText.length) {
+    const lower = diffText.toLowerCase();
+    const hasCatch = lower.includes('catch (') || lower.includes('catch(');
+    const addsSilentReturn =
+      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) || /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
+    const mentionsIgnore = lower.includes('ignore') || lower.includes('swallow');
+    if (hasCatch && (addsSilentReturn || mentionsIgnore)) {
+      tags.add('observability');
+      tags.add('reliability');
+    }
+  }
+
+  return [...tags].sort();
+}
+
+;// CONCATENATED MODULE: ./src/lib/file-classifier.mjs
+// Module-scope regexes to avoid re-creation per call
+const RE_TEST_EXT = /\.(?:test|spec)\.(?:[jt]sx?|mjs)$/;
+const RE_SCHEMA_EXT = /\.schema\.[jt]s$/;
+const RE_MIGRATION = /(?:^|\/)migrations?\//;
+const RE_MIGRATE = /(?:^|\/)migrate/;
+const RE_CONFIG_EXT = /\.config\.(?:[jt]sx?|mjs)$/;
+const RE_RC_FILE = /^\.[a-z]+rc(?:\.[a-z]+)?$/;
+const RE_TSCONFIG = /^tsconfig.*\.json$/;
+const RE_DOCKERFILE = /^Dockerfile/;
+const RE_DOCKER_COMPOSE = /^docker-compose/;
+
+const CONFIG_NAMES = new Set([
+  'package.json',
+  '.river-reviewer.json',
+  '.lychee.toml',
+  '.markdownlint.json',
+  '.markdownlint-cli2.yaml',
+  '.textlintrc.json',
+]);
+
+/**
+ * Classify changed files by type for routing and evidence collection.
+ * Complementary to impact-scope.mjs which classifies by quality domain.
+ *
+ * @param {string[]} files - Array of file paths (relative to repo root)
+ * @returns {{ config: string[], schema: string[], migration: string[], app: string[], test: string[], infra: string[], docs: string[], unknown: string[] }}
+ */
+function classifyChangedFiles(files) {
+  const result = {
+    config: [],
+    schema: [],
+    migration: [],
+    app: [],
+    test: [],
+    infra: [],
+    docs: [],
+    unknown: [],
+  };
+
+  for (const file of files) {
+    result[classifyFile(file)].push(file);
+  }
+
+  return result;
+}
+
+// Priority: test > schema > migration > config > infra > docs > app > unknown
+function classifyFile(file) {
+  const normalized = file.replaceAll('\\', '/');
+  const basename = normalized.split('/').pop() ?? '';
+
+  if (isTest(normalized, basename)) return 'test';
+  if (isSchema(normalized, basename)) return 'schema';
+  if (isMigration(normalized)) return 'migration';
+  if (isConfig(normalized, basename)) return 'config';
+  if (isInfra(normalized, basename)) return 'infra';
+  if (isDocs(normalized, basename)) return 'docs';
+  if (isApp(normalized)) return 'app';
+  return 'unknown';
+}
+
+function isTest(file, basename) {
+  return file.startsWith('tests/') || file.includes('/__tests__/') || RE_TEST_EXT.test(basename);
+}
+
+function isSchema(file, basename) {
+  return (
+    file.startsWith('schemas/') || RE_SCHEMA_EXT.test(basename) || basename.endsWith('.schema.json')
+  );
+}
+
+function isMigration(file) {
+  return RE_MIGRATION.test(file) || RE_MIGRATE.test(file) || file.startsWith('db/');
+}
+
+function isConfig(file, basename) {
+  if (RE_CONFIG_EXT.test(basename)) return true;
+  if (RE_RC_FILE.test(basename)) return true;
+  if (CONFIG_NAMES.has(basename) || basename.startsWith('.env')) return true;
+  if (RE_TSCONFIG.test(basename)) return true;
+  return false;
+}
+
+function isInfra(file, basename) {
+  return (
+    file.startsWith('.github/') ||
+    file.startsWith('.husky/') ||
+    file.startsWith('scripts/') ||
+    RE_DOCKERFILE.test(basename) ||
+    RE_DOCKER_COMPOSE.test(basename)
+  );
+}
+
+function isDocs(file, basename) {
+  if (basename.endsWith('.md') || basename.endsWith('.mdx')) return true;
+  if (file.startsWith('docs/') || file.startsWith('pages/')) return true;
+  return false;
+}
+
+function isApp(file) {
+  return file.startsWith('src/') || file.startsWith('runners/');
+}
+
+// EXTERNAL MODULE: ./src/lib/planner-utils.mjs
+var planner_utils = __nccwpck_require__(1013);
+// EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
+var heuristic_review = __nccwpck_require__(2294);
+// EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
+var risk_map = __nccwpck_require__(572);
+// EXTERNAL MODULE: external "node:fs"
+var external_node_fs_ = __nccwpck_require__(3024);
+// EXTERNAL MODULE: external "node:path"
+var external_node_path_ = __nccwpck_require__(6760);
+;// CONCATENATED MODULE: ./src/lib/adr-linker.mjs
+
+
+
+/**
+ * Scan known ADR/spec directories and find documents relevant to changed files.
+ *
+ * @param {string} repoRoot - Repository root path
+ * @param {{ changedFiles?: string[], keywords?: string[] }} options
+ * @returns {{ path: string, title: string, matchReason: string }[]}
+ */
+function findRelatedADRs(repoRoot, { changedFiles = [], keywords = [] } = {}) {
+  const adrDirs = ['docs/adr', 'pages/explanation', 'specs'];
+  const results = [];
+
+  for (const dir of adrDirs) {
+    const fullDir = external_node_path_.join(repoRoot, dir);
+    if (!external_node_fs_.existsSync(fullDir)) continue;
+
+    const files = external_node_fs_.readdirSync(fullDir).filter((f) => f.endsWith('.md'));
+    for (const file of files) {
+      const filePath = external_node_path_.join(dir, file);
+      const content = external_node_fs_.readFileSync(external_node_path_.join(fullDir, file), 'utf-8');
+      const title = extractTitle(content) || file;
+
+      // Match by keyword in content
+      for (const kw of keywords) {
+        if (content.toLowerCase().includes(kw.toLowerCase())) {
+          results.push({ path: filePath, title, matchReason: `keyword: ${kw}` });
+          break; // one match per file is enough
+        }
+      }
+
+      // Match by changed file mention in content
+      for (const cf of changedFiles) {
+        const basename = cf.split('/').pop();
+        if (content.includes(cf) || content.includes(basename)) {
+          if (!results.some((r) => r.path === filePath)) {
+            results.push({
+              path: filePath,
+              title,
+              matchReason: `references: ${cf}`,
+            });
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
+function extractTitle(markdown) {
+  const match = /^#\s+(.+)/m.exec(markdown);
+  return match ? match[1].trim() : null;
+}
+
+;// CONCATENATED MODULE: ./runners/core/review-runner.mjs
+
+
+
+
+
+
+
+
+
+
+const MODEL_PRIORITY = {
+  cheap: 1,
+  balanced: 2,
+  'high-accuracy': 3,
+};
+
+function getMeta(skill) {
+  return skill?.metadata ?? skill;
+}
+
+function review_runner_ensureArray(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function matchesPhase(skill, phase) {
+  const meta = getMeta(skill);
+  if (Array.isArray(meta.phase)) {
+    return meta.phase.includes(phase);
+  }
+  return meta.phase === phase;
+}
+
+function matchesApplyTo(skill, changedFiles) {
+  const meta = getMeta(skill);
+  const globs = review_runner_ensureArray(meta.applyTo);
+  if (!globs.length) return false;
+  return changedFiles.some((file) =>
+    globs.some((pattern) => (0,esm/* minimatch */.xF)(file, pattern, { dot: true }))
+  );
+}
+
+function missingInputContexts(skill, availableContexts) {
+  const meta = getMeta(skill);
+  if (!meta.inputContext || meta.inputContext.length === 0) return [];
+  const available = new Set(availableContexts);
+  return meta.inputContext.filter((ctx) => !available.has(ctx));
+}
+
+function missingDependencies(skill, availableDependencies) {
+  const meta = getMeta(skill);
+  const deps = review_runner_ensureArray(meta.dependencies);
+  if (!deps.length) return [];
+  if (availableDependencies == null) return [];
+  const available = new Set(review_runner_ensureArray(availableDependencies));
+  return deps.filter((dep) => !available.has(dep));
+}
+
+function evaluateSkill(skill, options) {
+  const reasons = [];
+  const meta = getMeta(skill);
+  if (!matchesPhase(meta, options.phase)) {
+    reasons.push(`phase mismatch: ${meta.phase} !== ${options.phase}`);
+  }
+  if (!matchesApplyTo(meta, options.changedFiles)) {
+    reasons.push('applyTo did not match any changed file');
+  }
+  const missingContexts = missingInputContexts(meta, options.availableContexts);
+  if (missingContexts.length) {
+    reasons.push(`missing inputContext: ${missingContexts.join(', ')}`);
+  }
+  const depsMissing = missingDependencies(meta, options.availableDependencies);
+  if (depsMissing.length) {
+    reasons.push(`missing dependencies: ${depsMissing.join(', ')}`);
+  }
+  return {
+    ok: reasons.length === 0,
+    reasons,
+  };
+}
+
+function selectSkills(skills, options) {
+  const changedFiles = review_runner_ensureArray(options.changedFiles);
+  const availableContexts = review_runner_ensureArray(options.availableContexts);
+  const availableDependencies = options.availableDependencies ?? null;
+  const dryRun = options.dryRun ?? false;
+  const llmEnabled = options.llmEnabled ?? true;
+  const selected = [];
+  const skipped = [];
+
+  for (const skill of skills) {
+    const meta = skill.metadata ?? skill;
+    const skillId = meta.id;
+
+    // ルーティングスキル（エントリポイント）は実行対象外
+    const tags = review_runner_ensureArray(meta.tags);
+    if (tags.includes('routing')) {
+      skipped.push({ skill, reasons: ['routing skill: not an executable review skill'] });
+      continue;
+    }
+
+    // dry-run または LLM 無効時はヒューリスティック対応スキルのみ選択
+    const isLlmRestricted = dryRun || !llmEnabled;
+    if (isLlmRestricted && !heuristic_review/* HEURISTIC_SKILL_IDS */.y2.includes(skillId)) {
+      const reason = dryRun
+        ? 'dry-run: LLM必須スキル（ヒューリスティック未対応）'
+        : 'LLM disabled: LLM必須スキル（APIキー未設定）';
+      skipped.push({ skill, reasons: [reason] });
+      continue;
+    }
+
+    const result = evaluateSkill(meta, {
+      phase: options.phase,
+      changedFiles,
+      availableContexts,
+      availableDependencies,
+    });
+    if (result.ok) {
+      selected.push(skill);
+    } else {
+      skipped.push({ skill, reasons: result.reasons });
+    }
+  }
+  return { selected, skipped };
+}
+
+function rankByModelHint(skills, preferredModelHint = 'balanced') {
+  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
+  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
+  return [...skills].sort((a, b) => {
+    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
+    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
+    if (wa !== wb) return wa - wb;
+    return getMeta(a).id.localeCompare(getMeta(b).id);
+  });
+}
+
+function computeTagScore(skill, impactTags) {
+  if (!impactTags?.length) return 0;
+  const tags = new Set(getMeta(skill).tags ?? []);
+  let score = 0;
+  for (const tag of impactTags) {
+    if (tags.has(tag)) score += 1;
+  }
+  return score;
+}
+
+function rankByImpactTags(skills, impactTags, preferredModelHint = 'balanced') {
+  const scores = new Map(skills.map((s) => [getMeta(s).id, computeTagScore(s, impactTags)]));
+  const anyMatched = Array.from(scores.values()).some((v) => v > 0);
+  if (!anyMatched) {
+    return rankByModelHint(skills, preferredModelHint);
+  }
+
+  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
+  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
+
+  return [...skills].sort((a, b) => {
+    const idA = getMeta(a).id;
+    const idB = getMeta(b).id;
+    const scoreA = scores.get(idA) ?? 0;
+    const scoreB = scores.get(idB) ?? 0;
+    if (scoreA !== scoreB) return scoreB - scoreA;
+
+    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
+    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
+    if (wa !== wb) return wa - wb;
+    return idA.localeCompare(idB);
+  });
+}
+
+/**
+ * Build an execution plan from skills and review context.
+ * - planner 未指定: メタデと modelHint に基づく決定論的な並び替え
+ * - planner 指定: LLM 等で優先度決定し、エラー時は決定論的順序にフォールバック
+ *   - plannerMode=order: 優先度づけ（未参照スキルは後ろに決定論で追加）
+ *   - plannerMode=prune: 絞り込み（LLM が選んだスキルのみを実行）
+ */
+async function buildExecutionPlan(options) {
+  const {
+    phase,
+    changedFiles = [],
+    availableContexts = [],
+    availableDependencies = null,
+    preferredModelHint = 'balanced',
+    skills: providedSkills,
+    planner,
+    plannerMode,
+    diffText,
+    dryRun = false,
+    llmEnabled = true,
+    repoRoot,
+    riskMap,
+  } = options;
+
+  const skills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
+  const selection = selectSkills(skills, {
+    phase,
+    changedFiles,
+    availableContexts,
+    availableDependencies,
+    dryRun,
+    llmEnabled,
+  });
+  if (selection.selected.length === 0) {
+    return { selected: [], skipped: selection.skipped };
+  }
+
+  const impactTags = inferImpactTags(changedFiles, { diffText });
+  const fileTypes = classifyChangedFiles(changedFiles);
+  const riskAssessment = riskMap ? (0,risk_map/* evaluateRisk */.lm)(riskMap, changedFiles) : null;
+  const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), { changedFiles, keywords: impactTags });
+
+  // If planner is provided, try LLM-based planning, fallback to deterministic rank
+  const effectivePlannerMode = planner
+    ? (0,planner_utils/* normalizePlannerMode */.p)(plannerMode, { defaultMode: 'order' })
+    : 'off';
+  if (planner && effectivePlannerMode !== 'off') {
+    const context = {
+      phase,
+      changedFiles,
+      availableContexts,
+      impactTags,
+      fileTypes,
+    };
+    const { planned, reasons, fallback } = await planSkills({
+      skills: selection.selected,
+      context,
+      llmPlan: planner.plan ?? planner,
+      appendRemaining: effectivePlannerMode !== 'prune',
+    });
+    const ranked = fallback
+      ? rankByImpactTags(selection.selected, impactTags, preferredModelHint)
+      : planned;
+    return {
+      selected: ranked,
+      skipped: selection.skipped,
+      plannerMode: effectivePlannerMode,
+      plannerReasons: reasons,
+      plannerFallback: fallback,
+      ...(fallback ? { plannerError: reasons?.[0]?.reason ?? 'planner fallback' } : {}),
+      impactTags,
+      fileTypes,
+      relatedADRs,
+    };
+  }
+
+  // planner が無い場合（LLM未設定）は決定論的順位付けで実行
+  const ordered = rankByImpactTags(selection.selected, impactTags, preferredModelHint);
+
+  return {
+    selected: ordered,
+    skipped: selection.skipped,
+    impactTags,
+    fileTypes,
+    relatedADRs,
+  };
+}
+
+// Re-export summarizeSkill for consumers that want the same view used by planner
+
+
+
+/***/ }),
+
+/***/ 5541:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  vN: () => (/* binding */ SkillLoaderError),
+  m: () => (/* binding */ createSkillValidator),
+  KJ: () => (/* binding */ defaultPaths),
+  e$: () => (/* binding */ loadSchema),
+  l1: () => (/* binding */ loadSkills),
+  eJ: () => (/* binding */ parseFrontMatter)
+});
+
+// UNUSED EXPORTS: listSkillFiles, loadAllSkillMetadata, loadSkillFile, loadSkillMetadata, parseSkillFile
+
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(9896);
+;// CONCATENATED MODULE: external "path"
+const external_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
+;// CONCATENATED MODULE: external "url"
+const external_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
+// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
+var js_yaml = __nccwpck_require__(3243);
+// EXTERNAL MODULE: ./node_modules/gray-matter/index.js
+var gray_matter = __nccwpck_require__(9599);
+// EXTERNAL MODULE: ./node_modules/ajv/dist/2020.js
+var _2020 = __nccwpck_require__(2210);
+// EXTERNAL MODULE: ./node_modules/ajv-formats/dist/index.js
+var dist = __nccwpck_require__(2815);
+;// CONCATENATED MODULE: ./runners/core/skill-loader.mjs
+
+
+
+
+
+
+
+
+/**
+ * @typedef {'upstream' | 'midstream' | 'downstream'} PhaseEnum
+ * @typedef {PhaseEnum | PhaseEnum[]} Phase
+ * @typedef {'info' | 'minor' | 'major' | 'critical'} Severity
+ * @typedef {'diff' | 'fullFile' | 'tests' | 'adr' | 'commitMessage' | 'repoConfig'} InputContext
+ * @typedef {'findings' | 'summary' | 'actions' | 'tests' | 'metrics' | 'questions'} OutputKind
+ * @typedef {'cheap' | 'balanced' | 'high-accuracy'} ModelHint
+ * @typedef {'code_search' | 'test_runner' | 'adr_lookup' | 'repo_metadata' | 'coverage_report' | 'tracing' | `custom:${string}`} Dependency
+ *
+ * @typedef {Object} SkillMetadata
+ * @property {string} id
+ * @property {string} name
+ * @property {string} description
+ * @property {Phase} phase
+ * @property {string[]} applyTo
+ * @property {string[]=} files
+ * @property {string[]=} tags
+ * @property {Severity=} severity
+ * @property {InputContext[]=} inputContext
+ * @property {OutputKind[]=} outputKind
+ * @property {ModelHint=} modelHint
+ * @property {Dependency[]=} dependencies
+ * @property {{phase?: Phase, applyTo?: string[], files?: string[]}=} trigger
+ * @property {number=} priority
+ *
+ * @typedef {Object} SkillDefinition
+ * @property {SkillMetadata} metadata
+ * @property {string} body
+ * @property {string} path
+ */
+
+const skill_loader_filename = (0,external_url_namespaceObject.fileURLToPath)(import.meta.url);
+const skill_loader_dirname = external_path_namespaceObject.dirname(skill_loader_filename);
+const repoRoot = process.env.RIVER_REPO_ROOT
+  ? external_path_namespaceObject.resolve(process.env.RIVER_REPO_ROOT)
+  : external_path_namespaceObject.resolve(skill_loader_dirname, '..', '..');
+const defaultSkillsDir = external_path_namespaceObject.join(repoRoot, 'skills');
+const defaultSchemaPath = external_path_namespaceObject.join(repoRoot, 'schemas', 'skill.schema.json');
+const markdownExtensions = new Set(['.md', '.mdx']);
+const yamlExtensions = new Set(['.yaml', '.yml']);
+const allowedExtensions = new Set([...markdownExtensions, ...yamlExtensions]);
+const ignoredSkillDirNames = new Set([
+  'references',
+  'fixtures',
+  'golden',
+  'eval',
+  'prompt',
+  'prompts',
+]);
+const ignoredFileNames = new Set(['.gitkeep', 'README.md', 'registry.yaml', 'registry.yml', '_template.md']);
+const legacySkillFiles = new Set(['skill.yaml', 'skill.yml']);
+const streamCategories = new Set(['core', 'upstream', 'midstream', 'downstream']);
+const allPhases = ['upstream', 'midstream', 'downstream'];
+
+const defaultPaths = {
+  repoRoot,
+  skillsDir: defaultSkillsDir,
+  schemaPath: defaultSchemaPath,
+};
+
+class SkillLoaderError extends Error {
+  constructor(message, details = undefined) {
+    super(message);
+    this.name = 'SkillLoaderError';
+    this.details = details;
+  }
+}
+
+async function loadSchema(schemaPath = defaultSchemaPath) {
+  const raw = await external_fs_.promises.readFile(schemaPath, 'utf8');
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    throw new SkillLoaderError(`Failed to parse JSON schema at ${schemaPath}: ${err.message}`);
+  }
+}
+
+function createSkillValidator(schema) {
+  const ajv = new _2020({ allErrors: true, strict: false, useDefaults: true });
+  dist(ajv);
+  return ajv.compile(schema);
+}
+
+async function listSkillFiles(dir = defaultSkillsDir) {
+  const entries = await external_fs_.promises.readdir(dir, { withFileTypes: true });
+  const files = [];
+
+  const hasLegacySkillFile = entries.some(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+  if (hasLegacySkillFile) {
+    const legacyEntry = entries.find(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+    if (!legacyEntry) {
+      throw new Error(`skill.yaml detected but not found in ${dir}`);
+    }
+    files.push(external_path_namespaceObject.join(dir, legacyEntry.name));
+    return files.sort((a, b) => a.localeCompare(b));
+  }
+
+  for (const entry of entries) {
+    const entryPath = external_path_namespaceObject.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (ignoredSkillDirNames.has(entry.name) || entry.name.startsWith('.')) {
+        continue;
+      }
+      const nested = await listSkillFiles(entryPath);
+      files.push(...nested);
+      continue;
+    }
+
+    const ext = external_path_namespaceObject.extname(entry.name).toLowerCase();
+    if (!allowedExtensions.has(ext)) continue;
+    if (ignoredFileNames.has(entry.name)) continue;
+    if (entry.name.startsWith('_')) continue;
+    files.push(entryPath);
+  }
+
+  return files.sort((a, b) => a.localeCompare(b));
+}
+
+function normalizeStringArray(value) {
+  if (!value) return undefined;
+  const asArray = Array.isArray(value) ? value : [value];
+  const filtered = asArray
+    .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
+    .filter(Boolean);
+  return filtered.length ? filtered : undefined;
+}
+
+function normalizePhaseValue(value) {
+  if (!value) return undefined;
+  if (Array.isArray(value)) {
+    const phases = value.filter(Boolean);
+    if (phases.length === 1) return phases[0];
+    return phases.length ? phases : undefined;
+  }
+  return value;
+}
+
+function inferCategoryFromPhase(phase) {
+  if (!phase) return undefined;
+  if (Array.isArray(phase)) {
+    const unique = Array.from(new Set(phase));
+    if (unique.length === 1 && streamCategories.has(unique[0])) {
+      return unique[0];
+    }
+    if (unique.length > 1) {
+      return 'core';
+    }
+    return undefined;
+  }
+  return streamCategories.has(phase) ? phase : undefined;
+}
+
+function inferCategoryFromPath(filePath) {
+  if (!filePath) return undefined;
+  const segments = external_path_namespaceObject.normalize(filePath).split(external_path_namespaceObject.sep);
+  const skillsIndex = segments.lastIndexOf('skills');
+  const candidate = skillsIndex >= 0 ? segments[skillsIndex + 1] : undefined;
+  if (candidate && streamCategories.has(candidate)) {
+    return candidate;
+  }
+  return undefined;
+}
+
+function resolveCategory(metaCategory, { phase, filePath } = {}) {
+  if (typeof metaCategory === 'string' && streamCategories.has(metaCategory)) {
+    return metaCategory;
+  }
+  return inferCategoryFromPath(filePath) ?? inferCategoryFromPhase(phase);
+}
+
+function resolvePhase(metaPhase, category) {
+  if (category === 'core') {
+    return [...allPhases];
+  }
+  if (category && streamCategories.has(category)) {
+    return category;
+  }
+  return normalizePhaseValue(metaPhase);
+}
+
+function normalizeMetadata(metadata, { filePath } = {}) {
+  const meta = { ...metadata };
+
+  if (meta.priority !== undefined) {
+    const parsedPriority = typeof meta.priority === 'string' ? Number(meta.priority) : meta.priority;
+    if (Number.isFinite(parsedPriority)) {
+      meta.priority = parsedPriority;
+    } else {
+      delete meta.priority;
+    }
+  }
+
+  const topLevelApplyTo =
+    normalizeStringArray(meta.applyTo) ??
+    normalizeStringArray(meta.files) ??
+    normalizeStringArray(meta.path_patterns);
+  if (topLevelApplyTo) {
+    meta.applyTo = topLevelApplyTo;
+  }
+
+  const trigger =
+    meta.trigger && typeof meta.trigger === 'object' && !Array.isArray(meta.trigger)
+      ? meta.trigger
+      : null;
+  const triggerApplyTo =
+    normalizeStringArray(trigger?.applyTo) ??
+    normalizeStringArray(trigger?.files) ??
+    normalizeStringArray(trigger?.path_patterns);
+
+  if (!meta.phase && trigger?.phase) {
+    meta.phase = trigger.phase;
+  }
+  if (!meta.applyTo && triggerApplyTo) {
+    meta.applyTo = triggerApplyTo;
+  }
+
+  meta.category = resolveCategory(meta.category, { phase: meta.phase, filePath });
+  meta.phase = resolvePhase(meta.phase, meta.category);
+
+  // Trigger is consumed during normalization; avoid leaking nested state.
+  if (trigger) {
+    delete meta.trigger;
+  }
+  if ('path_patterns' in meta) {
+    delete meta.path_patterns;
+  }
+
+  return meta;
+}
+
+function parseFrontMatter(content, { filePath } = {}) {
+  const trimmed = content.trimStart();
+  if (!trimmed.startsWith('---')) {
+    throw new SkillLoaderError('Missing front matter block (---)');
+  }
+
+  let parsed;
+  try {
+    parsed = gray_matter(trimmed);
+  } catch (err) {
+    throw new SkillLoaderError(
+      `Front matter parse error${filePath ? ` (${filePath})` : ''}: ${err.message}`
+    );
+  }
+
+  const metadata = parsed.data ?? {};
+  if (typeof metadata !== 'object' || Array.isArray(metadata)) {
+    throw new SkillLoaderError('Front matter must be a mapping');
+  }
+  if (Object.keys(metadata).length === 0) {
+    throw new SkillLoaderError('Front matter is empty');
+  }
+  const normalized = normalizeMetadata(metadata, { filePath });
+  const body = (parsed.content ?? '').trim();
+  return { metadata: normalized, body };
+}
+
+async function parseSkillFile(filePath) {
+  const ext = external_path_namespaceObject.extname(filePath).toLowerCase();
+  if (!allowedExtensions.has(ext)) {
+    throw new SkillLoaderError(`Unsupported skill file extension: ${ext}`);
+  }
+  const raw = await external_fs_.promises.readFile(filePath, 'utf8');
+  if (markdownExtensions.has(ext)) {
+    return parseFrontMatter(raw, { filePath });
+  }
+
+  // YAML handling
+  let loaded = {};
+  try {
+    loaded = js_yaml/* default.load */.Ay.load(raw) ?? {};
+  } catch (err) {
+    throw new SkillLoaderError(`YAML parse error: ${err.message}`);
+  }
+  if (typeof loaded !== 'object' || Array.isArray(loaded)) {
+    throw new SkillLoaderError('Skill YAML must be a mapping');
+  }
+
+  let metadata = loaded;
+  let body = '';
+
+  // Support nested metadata block
+  if (loaded.metadata && typeof loaded.metadata === 'object' && !Array.isArray(loaded.metadata)) {
+    metadata = { ...loaded.metadata };
+    if (typeof metadata.instruction === 'string') {
+      body = metadata.instruction;
+      delete metadata.instruction;
+    } else if (typeof loaded.instruction === 'string') {
+      body = loaded.instruction;
+    }
+  } else if (typeof loaded.instruction === 'string') {
+    // Support flat structure with optional instruction field
+    body = loaded.instruction;
+    delete metadata.instruction;
+  }
+
+  metadata = normalizeMetadata(metadata, { filePath });
+  return { metadata, body };
+}
+
+function validateMetadata(metadata, validate) {
+  const metaCopy = JSON.parse(JSON.stringify(metadata ?? {}));
+  const ok = validate(metaCopy);
+  if (!ok) {
+    const details = (validate.errors ?? []).map(err => `${err.instancePath || '/'} ${err.message}`).join('; ');
+    throw new SkillLoaderError(`Validation failed: ${details}`, validate.errors);
+  }
+  return metaCopy;
+}
+
+function relativeToRepo(filePath) {
+  return filePath.startsWith(repoRoot) ? external_path_namespaceObject.relative(repoRoot, filePath) : filePath;
+}
+
+function logSkillLoadError(filePath, err) {
+  const location = relativeToRepo(filePath);
+  const reason = err instanceof Error ? err.message : String(err);
+  console.error(`⚠️  Failed to load skill ${location}: ${reason}`);
+  if (err?.details && Array.isArray(err.details)) {
+    for (const detail of err.details) {
+      const instance = detail.instancePath || '/';
+      console.error(`   - ${instance}: ${detail.message}`);
+    }
+  }
+}
+
+function logDuplicateSkill(id, filePath, originalPath) {
+  const location = relativeToRepo(filePath);
+  const first = relativeToRepo(originalPath);
+  console.warn(`⚠️  Duplicate skill id "${id}" in ${location}; already loaded from ${first}. Skipping.`);
+}
+
+function hasExcludedTag(metadata, excludedTags) {
+  if (!excludedTags?.length) return false;
+  const tags = metadata?.tags ?? [];
+  return tags.some(tag => excludedTags.includes(tag));
+}
+
+async function loadSkillFile(filePath, options = {}) {
+  const { validator, schemaPath = defaultSchemaPath } = options;
+  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
+  const parsed = await parseSkillFile(filePath);
+  const metadata = validateMetadata(parsed.metadata, compiledValidator);
+  return {
+    metadata,
+    body: parsed.body,
+    path: filePath,
+  };
+}
+
+async function loadSkills(options = {}) {
+  const {
+    skillsDir = defaultSkillsDir,
+    schemaPath = defaultSchemaPath,
+    validator: providedValidator,
+    excludedTags = ['agent'],
+  } = options;
+  const schema = providedValidator ? null : await loadSchema(schemaPath);
+  const validator = providedValidator ?? createSkillValidator(schema);
+  const files = await listSkillFiles(skillsDir);
+  const skillsById = new Map();
+
+  for (const filePath of files) {
+    try {
+      const skill = await loadSkillFile(filePath, { validator });
+      const id = skill?.metadata?.id;
+      if (!id) {
+        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
+        continue;
+      }
+      if (hasExcludedTag(skill.metadata, excludedTags)) {
+        continue;
+      }
+      if (skillsById.has(id)) {
+        logDuplicateSkill(id, filePath, skillsById.get(id).path);
+        continue;
+      }
+      skillsById.set(id, skill);
+    } catch (err) {
+      logSkillLoadError(filePath, err);
+    }
+  }
+
+  return Array.from(skillsById.values());
+}
+
+/**
+ * Load only skill metadata (Stage 1 of Progressive Disclosure).
+ * Returns metadata and path without the body, suitable for filtering
+ * and routing before full skill loading.
+ *
+ * @param {string} filePath
+ * @param {object} [options]
+ * @param {Function} [options.validator]
+ * @param {string} [options.schemaPath]
+ * @returns {Promise<{metadata: SkillMetadata, path: string}>}
+ */
+async function loadSkillMetadata(filePath, options = {}) {
+  const { validator, schemaPath = defaultSchemaPath } = options;
+  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
+  const parsed = await parseSkillFile(filePath);
+  const metadata = validateMetadata(parsed.metadata, compiledValidator);
+  return {
+    metadata,
+    path: filePath,
+  };
+}
+
+/**
+ * Load metadata for all skills (Stage 1 of Progressive Disclosure).
+ * Returns an array of {metadata, path} objects without skill bodies.
+ *
+ * @param {object} [options]
+ * @param {string} [options.skillsDir]
+ * @param {string} [options.schemaPath]
+ * @param {Function} [options.validator]
+ * @param {string[]} [options.excludedTags]
+ * @returns {Promise<Array<{metadata: SkillMetadata, path: string}>>}
+ */
+async function loadAllSkillMetadata(options = {}) {
+  const {
+    skillsDir = defaultSkillsDir,
+    schemaPath = defaultSchemaPath,
+    validator: providedValidator,
+    excludedTags = ['agent'],
+  } = options;
+  const schema = providedValidator ? null : await loadSchema(schemaPath);
+  const validator = providedValidator ?? createSkillValidator(schema);
+  const files = await listSkillFiles(skillsDir);
+  const skillsById = new Map();
+
+  for (const filePath of files) {
+    try {
+      const skill = await loadSkillMetadata(filePath, { validator });
+      const id = skill?.metadata?.id;
+      if (!id) {
+        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
+        continue;
+      }
+      if (hasExcludedTag(skill.metadata, excludedTags)) {
+        continue;
+      }
+      if (skillsById.has(id)) {
+        logDuplicateSkill(id, filePath, skillsById.get(id).path);
+        continue;
+      }
+      skillsById.set(id, skill);
+    } catch (err) {
+      logSkillLoadError(filePath, err);
+    }
+  }
+
+  return Array.from(skillsById.values());
+}
+
+
+/***/ }),
+
+/***/ 4807:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   s: () => (/* binding */ defaultConfig),
+/* harmony export */   z: () => (/* binding */ defaultSkillConfig)
+/* harmony export */ });
+// Unified default config supporting both legacy and skill-based flows
+const defaultConfig = Object.freeze({
+  version: '1.0',
+  model: {
+    provider: 'openai',
+    modelName: 'gpt-4o-mini',
+    temperature: 0,
+    maxTokens: 600,
+  },
+  review: {
+    language: 'ja',
+    severity: 'normal',
+    additionalInstructions: [],
+  },
+  exclude: {
+    files: [],
+    prLabelsToIgnore: [],
+  },
+  skills: [],
+});
+
+// Alias kept for compatibility with newer skill-only imports
+const defaultSkillConfig = defaultConfig;
+
+
+/***/ }),
+
+/***/ 3833:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  UT: () => (/* binding */ ConfigLoader),
+  Z9: () => (/* binding */ loadConfig),
+  R2: () => (/* binding */ mergeConfig)
+});
+
+// UNUSED EXPORTS: ConfigLoaderError, ConfigMergeError
+
+// EXTERNAL MODULE: external "node:fs/promises"
+var promises_ = __nccwpck_require__(1455);
+// EXTERNAL MODULE: external "node:path"
+var external_node_path_ = __nccwpck_require__(6760);
+// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
+var js_yaml = __nccwpck_require__(3243);
+// EXTERNAL MODULE: ./node_modules/zod/v4/classic/external.js + 73 modules
+var external = __nccwpck_require__(3905);
 ;// CONCATENATED MODULE: ./src/config/schema.mjs
 
 
 // --- Legacy Schema (for river run) ---
-const modelConfigSchema = object({
-  provider: schemas_enum(['google', 'openai', 'anthropic']).optional(),
-  modelName: schemas_string().min(1).optional(),
-  temperature: schemas_number().min(0).max(1).optional(),
-  maxTokens: schemas_number().int().positive().optional(),
+const modelConfigSchema = external/* object */.Ikc({
+  provider: external/* enum */.k5n(['google', 'openai', 'anthropic']).optional(),
+  modelName: external/* string */.YjP().min(1).optional(),
+  temperature: external/* number */.aig().min(0).max(1).optional(),
+  maxTokens: external/* number */.aig().int().positive().optional(),
 });
 
-const reviewConfigSchema = object({
-  language: schemas_enum(['ja', 'en']).optional(),
-  severity: schemas_enum(['strict', 'normal', 'relaxed']).optional(),
-  additionalInstructions: array(schemas_string().min(1)).optional(),
+const reviewConfigSchema = external/* object */.Ikc({
+  language: external/* enum */.k5n(['ja', 'en']).optional(),
+  severity: external/* enum */.k5n(['strict', 'normal', 'relaxed']).optional(),
+  additionalInstructions: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
 });
 
-const excludeConfigSchema = object({
-  files: array(schemas_string().min(1)).optional(),
-  prLabelsToIgnore: array(schemas_string().min(1)).optional(),
+const excludeConfigSchema = external/* object */.Ikc({
+  files: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
+  prLabelsToIgnore: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
 });
 
-const riverReviewerConfigSchema = object({
+const riverReviewerConfigSchema = external/* object */.Ikc({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
   exclude: excludeConfigSchema.optional(),
@@ -33994,7 +34265,7 @@ const riverReviewerConfigSchema = object({
 // --- New Skill-based Schema (for river skills) ---
 
 // Skill-based schemas
-const AIModelSchema = schemas_enum([
+const AIModelSchema = external/* enum */.k5n([
   'gemini-2.0-flash', // Default: Fast & Smart
   'gemini-2.0-flash-thinking', // Reasoning: For Security/Architecture
   'gemini-2.0-pro', // High Spec
@@ -34004,35 +34275,35 @@ const AIModelSchema = schemas_enum([
   'o1-mini', // OpenAI Fast Reasoning
 ]);
 
-const RuleSchema = object({
-  id: schemas_string().describe('Unique identifier for the rule'),
-  severity: schemas_enum(['info', 'warning', 'error', 'critical']),
-  description: schemas_string(),
-  context: schemas_string().describe('Why this matters (Understanding)'),
-  patterns: array(schemas_string()).describe('Keywords or patterns to look for'),
-  anti_patterns: array(schemas_string()).describe('Bad code examples'),
-  fix_guidance: schemas_string().describe('How to fix it (Expertise Transfer)'),
+const RuleSchema = external/* object */.Ikc({
+  id: external/* string */.YjP().describe('Unique identifier for the rule'),
+  severity: external/* enum */.k5n(['info', 'warning', 'error', 'critical']),
+  description: external/* string */.YjP(),
+  context: external/* string */.YjP().describe('Why this matters (Understanding)'),
+  patterns: external/* array */.YOg(external/* string */.YjP()).describe('Keywords or patterns to look for'),
+  anti_patterns: external/* array */.YOg(external/* string */.YjP()).describe('Bad code examples'),
+  fix_guidance: external/* string */.YjP().describe('How to fix it (Expertise Transfer)'),
 });
 
-const SkillSchema = object({
-  name: schemas_string(),
-  description: schemas_string().optional(),
-  files: array(schemas_string()).describe('Glob patterns for target files'),
-  exclude: array(schemas_string()).optional(),
+const SkillSchema = external/* object */.Ikc({
+  name: external/* string */.YjP(),
+  description: external/* string */.YjP().optional(),
+  files: external/* array */.YOg(external/* string */.YjP()).describe('Glob patterns for target files'),
+  exclude: external/* array */.YOg(external/* string */.YjP()).optional(),
   model: AIModelSchema.default('gemini-2.0-flash'),
-  temperature: schemas_number().min(0).max(1).default(0.2),
-  rules: array(RuleSchema),
+  temperature: external/* number */.aig().min(0).max(1).default(0.2),
+  rules: external/* array */.YOg(RuleSchema),
 });
 
-const ConfigSchema = object({
-    version: schemas_string().default('1.0'),
+const ConfigSchema = external/* object */.Ikc({
+    version: external/* string */.YjP().default('1.0'),
     model: modelConfigSchema.optional(),
     review: reviewConfigSchema.optional(),
     exclude: excludeConfigSchema.optional(),
-    skills: array(SkillSchema).default([]),
+    skills: external/* array */.YOg(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
-  .catchall(unknown());
+  .catchall(external/* unknown */.L5J());
 
 // EXTERNAL MODULE: ./src/config/default.mjs
 var config_default = __nccwpck_require__(4807);
@@ -35016,12 +35287,12 @@ __nccwpck_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: buildPrompt, parseLineComments
 
-// EXTERNAL MODULE: ./src/config/loader.mjs + 75 modules
-var loader = __nccwpck_require__(6245);
+// EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
+var loader = __nccwpck_require__(3833);
 // EXTERNAL MODULE: ./src/config/default.mjs
 var config_default = __nccwpck_require__(4807);
-// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 2 modules
-var review_runner = __nccwpck_require__(4904);
+// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 4 modules
+var review_runner = __nccwpck_require__(8647);
 // EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
 var heuristic_review = __nccwpck_require__(2294);
 ;// CONCATENATED MODULE: ./src/lib/finding-format.mjs
@@ -35190,12 +35461,48 @@ function buildProjectRulesSection(rulesText) {
   return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
 }
 
+function buildADRContextSection(relatedADRs) {
+  if (!relatedADRs?.length) return '';
+  const lines = ['\n### Related ADRs/Specs\n'];
+  for (const adr of relatedADRs.slice(0, 5)) {
+    lines.push(`- ${adr.title} (${adr.path}) — ${adr.matchReason}`);
+  }
+  lines.push('\nこれらの設計文書との整合性を考慮してレビューしてください。\n');
+  return lines.join('\n');
+}
+
+function sanitizePath(p) {
+  return String(p)
+    .replace(/[\n\r]/g, '')
+    .slice(0, 200);
+}
+
+function buildRiskAssessmentSection(riskAssessment) {
+  if (!riskAssessment) return '';
+  const { escalatedFiles, humanReviewFiles } = riskAssessment;
+  if (!escalatedFiles?.length && !humanReviewFiles?.length) return '';
+  const lines = ['\n### Risk Assessment\n'];
+  if (humanReviewFiles?.length) {
+    lines.push('以下のファイルは人間によるレビューが必須です:');
+    for (const f of humanReviewFiles) lines.push('- ' + sanitizePath(f) + ': require_human_review');
+  }
+  if (escalatedFiles?.length) {
+    lines.push('以下のファイルはエスカレーション対象です:');
+    for (const f of escalatedFiles) lines.push('- ' + sanitizePath(f) + ': escalate');
+  }
+  lines.push('これらのファイルには特に注意してレビューしてください。\n');
+  return lines.join('\n');
+}
+
 function buildPrompt({
   diffText,
   diffFiles,
   plan,
   phase,
   projectRules,
+  riskAssessment,
+  memoryContext,
+  relatedADRs,
   maxChars = MAX_PROMPT_CHARS,
   config = config_default/* defaultConfig */.s,
 }) {
@@ -35214,7 +35521,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -35504,6 +35811,9 @@ async function generateReview({
   model,
   apiKey,
   projectRules,
+  fileTypes,
+  relatedADRs,
+  riskAssessment,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -35514,6 +35824,8 @@ async function generateReview({
     plan,
     phase,
     projectRules,
+    relatedADRs,
+    riskAssessment,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });
@@ -35606,6 +35918,37 @@ async function generateReview({
     ? { ok: false, invalidCount, samples: formatChecks.filter((c) => !c.ok).slice(0, 3) }
     : { ok: true };
 
+  debug.fileClassification = fileTypes ?? null;
+
+  // Verifier pass: filter findings that fail quality checks
+  const { verifyFinding } = await __nccwpck_require__.e(/* import() */ 341).then(__nccwpck_require__.bind(__nccwpck_require__, 9341));
+  const verifierResults = comments.map((comment) => ({
+    comment,
+    verification: verifyFinding({
+      finding: comment,
+      diff: diff.diffText,
+      skill: plan?.selected?.[0] ?? {},
+      fileTypes,
+    }),
+  }));
+
+  const verified = verifierResults.filter((r) => r.verification.verified).map((r) => r.comment);
+  const rejected = verifierResults.filter((r) => !r.verification.verified);
+
+  debug.verifierRejected = rejected.map((r) => ({
+    file: r.comment.file,
+    line: r.comment.line,
+    reasons: r.verification.reasons,
+  }));
+  debug.verifierStats = {
+    total: comments.length,
+    verified: verified.length,
+    rejected: rejected.length,
+  };
+
+  // Replace comments with verified-only set
+  comments = verified;
+
   return {
     comments,
     prompt: promptInfo.prompt,
@@ -35613,6 +35956,189 @@ async function generateReview({
     llmModel: openAIConfig.model,
     debug,
   };
+}
+
+
+/***/ }),
+
+/***/ 572:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  _Z: () => (/* binding */ RiskMapError),
+  lm: () => (/* binding */ evaluateRisk),
+  E$: () => (/* binding */ loadRiskMap)
+});
+
+// UNUSED EXPORTS: aggregateRiskLevel
+
+// EXTERNAL MODULE: external "node:fs/promises"
+var promises_ = __nccwpck_require__(1455);
+// EXTERNAL MODULE: external "node:path"
+var external_node_path_ = __nccwpck_require__(6760);
+// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
+var js_yaml = __nccwpck_require__(3243);
+// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
+var esm = __nccwpck_require__(9519);
+// EXTERNAL MODULE: ./node_modules/zod/v4/classic/external.js + 73 modules
+var external = __nccwpck_require__(3905);
+;// CONCATENATED MODULE: ./src/config/risk-map-schema.mjs
+
+
+const RiskActionSchema = external/* enum */.k5n(['comment_only', 'escalate', 'require_human_review']);
+
+const RiskRuleSchema = external/* object */.Ikc({
+  pattern: external/* string */.YjP().min(1),
+  action: RiskActionSchema,
+  reason: external/* string */.YjP().optional(),
+});
+
+const RiskMapSchema = external/* object */.Ikc({
+  version: external/* string */.YjP().default('1'),
+  rules: external/* array */.YOg(RiskRuleSchema).min(1),
+  defaults: external/* object */.Ikc({
+      action: RiskActionSchema.default('comment_only'),
+    })
+    .default({ action: 'comment_only' }),
+});
+
+;// CONCATENATED MODULE: ./src/lib/risk-map.mjs
+
+
+
+
+
+
+const DEFAULT_RISK_MAP_PATH = external_node_path_.join('.river', 'risk-map.yaml');
+
+class RiskMapError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'RiskMapError';
+  }
+}
+
+/**
+ * Load a risk map from .river/risk-map.yaml (or a custom path).
+ * Missing files are treated as "no risk map" without error.
+ * @param {string} repoRoot
+ * @param {{ riskMapPath?: string }} [options]
+ * @returns {Promise<import('../../schemas/risk-map.schema.json') | null>}
+ */
+async function loadRiskMap(repoRoot, options = {}) {
+  const repoRootAbs = external_node_path_.resolve(repoRoot);
+  const relativePath = options.riskMapPath ?? DEFAULT_RISK_MAP_PATH;
+  const fullPath = external_node_path_.resolve(repoRootAbs, relativePath);
+
+  if (!fullPath.startsWith(repoRootAbs + external_node_path_.sep) && fullPath !== repoRootAbs) {
+    throw new RiskMapError(`Risk map path is outside of the repository: ${relativePath}`);
+  }
+
+  let raw;
+  try {
+    raw = await promises_.readFile(fullPath, 'utf8');
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return null;
+    }
+    throw new RiskMapError(`Failed to read risk map at ${fullPath}: ${error.message}`);
+  }
+
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  let parsed;
+  try {
+    parsed = js_yaml/* default.load */.Ay.load(trimmed);
+  } catch (error) {
+    throw new RiskMapError(`Failed to parse risk map YAML: ${error.message}`);
+  }
+
+  const result = RiskMapSchema.safeParse(parsed);
+  if (!result.success) {
+    const issues = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
+    throw new RiskMapError(`Invalid risk map schema: ${issues}`);
+  }
+
+  return result.data;
+}
+
+const ACTION_PRIORITY = {
+  comment_only: 0,
+  escalate: 1,
+  require_human_review: 2,
+};
+
+/**
+ * Evaluate risk for a list of changed files against a risk map.
+ * First matching rule wins per file.
+ * @param {object} riskMap - Parsed risk map config
+ * @param {string[]} filePaths - List of changed file paths
+ * @returns {{ fileRisks: Array<{ file: string, action: string, rule?: object }>, aggregateAction: string, escalatedFiles: string[], humanReviewFiles: string[] }}
+ */
+function evaluateRisk(riskMap, filePaths) {
+  if (!riskMap || !filePaths?.length) {
+    return {
+      fileRisks: [],
+      aggregateAction: riskMap?.defaults?.action ?? 'comment_only',
+      escalatedFiles: [],
+      humanReviewFiles: [],
+    };
+  }
+
+  const defaultAction = riskMap.defaults?.action ?? 'comment_only';
+  const fileRisks = [];
+
+  for (const file of filePaths) {
+    let matched = false;
+    for (const rule of riskMap.rules) {
+      if ((0,esm/* minimatch */.xF)(file, rule.pattern, { dot: true })) {
+        fileRisks.push({
+          file,
+          action: rule.action,
+          rule: { pattern: rule.pattern, reason: rule.reason },
+        });
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      fileRisks.push({ file, action: defaultAction });
+    }
+  }
+
+  const escalatedFiles = fileRisks
+    .filter((r) => r.action === 'escalate')
+    .map((r) => r.file);
+  const humanReviewFiles = fileRisks
+    .filter((r) => r.action === 'require_human_review')
+    .map((r) => r.file);
+  const aggregateAction = aggregateRiskLevel(fileRisks, defaultAction);
+
+  return { fileRisks, aggregateAction, escalatedFiles, humanReviewFiles };
+}
+
+/**
+ * Aggregate to the highest risk action across all file risks.
+ * @param {Array<{ action: string }>} fileRisks
+ * @param {string} [fallback='comment_only']
+ * @returns {string}
+ */
+function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
+  if (!fileRisks?.length) return fallback;
+
+  let maxPriority = -1;
+  let maxAction = fallback;
+  for (const { action } of fileRisks) {
+    const priority = ACTION_PRIORITY[action] ?? 0;
+    if (priority > maxPriority) {
+      maxPriority = priority;
+      maxAction = action;
+    }
+  }
+  return maxAction;
 }
 
 
@@ -35854,8 +36380,8 @@ var git = __nccwpck_require__(340);
 var promises_ = __nccwpck_require__(1455);
 // EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
 var esm = __nccwpck_require__(9519);
-// EXTERNAL MODULE: ./src/config/loader.mjs + 75 modules
-var loader = __nccwpck_require__(6245);
+// EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
+var loader = __nccwpck_require__(3833);
 // EXTERNAL MODULE: ./src/lib/diff.mjs
 var lib_diff = __nccwpck_require__(4382);
 // EXTERNAL MODULE: ./src/lib/diff-optimizer.mjs
@@ -35999,8 +36525,8 @@ function createOpenAIPlanner(options = {}) {
 
 // EXTERNAL MODULE: ./src/lib/planner-utils.mjs
 var planner_utils = __nccwpck_require__(1013);
-// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 2 modules
-var review_runner = __nccwpck_require__(4904);
+// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 4 modules
+var review_runner = __nccwpck_require__(8647);
 ;// CONCATENATED MODULE: ./src/lib/rules.mjs
 
 
@@ -36040,6 +36566,210 @@ async function loadProjectRules(repoRoot, options = {}) {
     }
     throw new ProjectRulesError(`Failed to read project rules at ${rulesPath}: ${error.message}`);
   }
+}
+
+// EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
+var risk_map = __nccwpck_require__(572);
+// EXTERNAL MODULE: external "node:fs"
+var external_node_fs_ = __nccwpck_require__(3024);
+;// CONCATENATED MODULE: ./src/lib/riverbed-memory.mjs
+
+
+
+/**
+ * Load the Riverbed Memory index from disk.
+ * Returns empty structure if file doesn't exist (stateless fallback).
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @returns {{ entries: object[], version: string }}
+ */
+function loadMemory(indexPath) {
+  try {
+    const raw = external_node_fs_.readFileSync(indexPath, 'utf-8');
+    return JSON.parse(raw);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      return { entries: [], version: '1' };
+    }
+    throw err;
+  }
+}
+
+/**
+ * Append a memory entry to the index.
+ * Creates the directory and file if they don't exist.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @param {object} entry - Entry conforming to riverbed-entry.schema.json
+ */
+function appendEntry(indexPath, entry) {
+  const index = loadMemory(indexPath);
+
+  // Validate required fields
+  if (!entry.id || !entry.type || !entry.content || !entry.metadata) {
+    throw new Error('Entry must have id, type, content, and metadata fields');
+  }
+
+  // Prevent duplicate IDs
+  if (index.entries.some((e) => e.id === entry.id)) {
+    throw new Error(`Duplicate entry ID: ${entry.id}`);
+  }
+
+  index.entries.push(entry);
+
+  const dir = path.dirname(indexPath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+}
+
+/**
+ * Query memory entries by filter criteria.
+ * All filter fields are optional; entries must match ALL provided criteria.
+ * By default, only active entries are returned.
+ *
+ * @param {{ entries: object[] }} index - Loaded memory index
+ * @param {{ type?: string, tags?: string[], phase?: string, includeInactive?: boolean }} filter
+ * @returns {object[]}
+ */
+function queryMemory(index, { type, tags, phase, includeInactive = false } = {}) {
+  return index.entries.filter((entry) => {
+    if (!includeInactive) {
+      const status = entry.status ?? 'active';
+      if (status !== 'active') return false;
+    }
+    if (type && entry.type !== type) return false;
+    if (phase && entry.metadata?.phase !== phase) return false;
+    if (tags && tags.length > 0) {
+      const entryTags = entry.metadata?.tags ?? [];
+      if (!tags.every((t) => entryTags.includes(t))) return false;
+    }
+    return true;
+  });
+}
+
+/**
+ * Supersede an entry by marking it as superseded and pointing to the new entry.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @param {string} oldId - ID of the entry to supersede
+ * @param {string} newId - ID of the superseding entry
+ */
+function supersede(indexPath, oldId, newId) {
+  const index = loadMemory(indexPath);
+  const entry = index.entries.find((e) => e.id === oldId);
+  if (!entry) {
+    throw new Error(`Entry not found: ${oldId}`);
+  }
+  entry.status = 'superseded';
+  entry.supersededBy = newId;
+  fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+}
+
+/**
+ * Archive entries whose expiresAt timestamp has passed.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @returns {number} Number of entries archived
+ */
+function expireEntries(indexPath) {
+  const index = loadMemory(indexPath);
+  const now = new Date();
+  let count = 0;
+  for (const entry of index.entries) {
+    if (
+      entry.expiresAt &&
+      new Date(entry.expiresAt) <= now &&
+      (entry.status ?? 'active') === 'active'
+    ) {
+      entry.status = 'archived';
+      count++;
+    }
+  }
+  if (count > 0) {
+    fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+  }
+  return count;
+}
+
+;// CONCATENATED MODULE: ./src/lib/memory-context.mjs
+
+
+
+const DEFAULT_MEMORY_PATH = external_node_path_.join('.river', 'memory', 'index.json');
+
+function loadReviewMemory(repoRoot, { phase, changedFiles } = {}) {
+  const indexPath = external_node_path_.resolve(repoRoot, DEFAULT_MEMORY_PATH);
+  const index = loadMemory(indexPath);
+  // includeInactive: true keeps the phase and no-phase branches symmetric and
+  // preserves pre-lifecycle semantics where historical entries were surfaced.
+  const allEntries = phase
+    ? queryMemory(index, { phase, includeInactive: true })
+    : (index.entries ?? []);
+  const relevant = changedFiles?.length
+    ? allEntries.filter((e) => {
+        const related = e.metadata?.relatedFiles ?? [];
+        if (!related.length) return true;
+        return related.some((r) => changedFiles.includes(r));
+      })
+    : allEntries;
+  const buckets = { wontfixes: [], patterns: [], decisions: [], reviews: [], suppressions: [] };
+  const typeMap = {
+    wontfix: 'wontfixes',
+    pattern: 'patterns',
+    decision: 'decisions',
+    review: 'reviews',
+    suppression: 'suppressions',
+  };
+  for (const e of relevant) {
+    const bucket = typeMap[e.type];
+    if (bucket) buckets[bucket].push(e);
+  }
+  return { entries: relevant, ...buckets };
+}
+
+function formatMemoryForPrompt(memoryContext, { maxChars = 1500 } = {}) {
+  if (!memoryContext) return '';
+  const { wontfixes, patterns, decisions } = memoryContext;
+  const sections = [];
+  if (wontfixes?.length) {
+    sections.push('以下の指摘は明示的に受け入れ済みです。再指摘は不要です:');
+    for (const w of wontfixes)
+      sections.push('- [' + w.id + '] ' + (w.title || w.content?.slice(0, 80)));
+  }
+  if (patterns?.length) {
+    sections.push('以下はチーム規約として記録されています:');
+    for (const p of patterns) sections.push('- ' + (p.title || p.content?.slice(0, 80)));
+  }
+  if (decisions?.length) {
+    sections.push('以下の設計判断が記録されています:');
+    for (const d of decisions) sections.push('- ' + (d.title || d.content?.slice(0, 80)));
+  }
+  if (!sections.length) return '';
+  const text = '\n### Memory Context (previous review decisions)\n\n' + sections.join('\n');
+  return text.length > maxChars ? text.slice(0, maxChars) + '\n...[truncated]' : text;
+}
+
+function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
+  const timestamp = new Date().toISOString();
+  const id = 'review-' + (commit || 'unknown') + '-' + Date.now();
+  const commentCount = reviewResult.comments?.length ?? 0;
+  const summary = commentCount + ' findings in ' + (phase || 'midstream') + ' phase';
+  return {
+    id,
+    type: 'review',
+    title: 'Review: ' + summary,
+    content: JSON.stringify({ commentCount, phase, changedFiles: changedFiles?.slice(0, 20) }),
+    metadata: {
+      createdAt: timestamp,
+      author: 'river-reviewer',
+      ...(phase ? { phase } : {}),
+      tags: ['review', 'automated'],
+      relatedFiles: changedFiles?.slice(0, 50) ?? [],
+      summary,
+    },
+  };
 }
 
 // EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
@@ -36085,6 +36815,8 @@ function isLlmEnabled() {
 
 
 
+
+
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
   if (['upstream', 'midstream', 'downstream'].includes(normalized)) return normalized;
@@ -36092,26 +36824,40 @@ function normalizePhase(phase) {
 }
 
 // NOTE: Keep this list in sync with schemas/skill.schema.json dependencies enum.
-const dependencyStubs = ['code_search', 'test_runner', 'coverage_report', 'adr_lookup', 'repo_metadata', 'tracing'];
+const dependencyStubs = [
+  'code_search',
+  'test_runner',
+  'coverage_report',
+  'adr_lookup',
+  'repo_metadata',
+  'tracing',
+];
 
 const configLoader = new loader/* ConfigLoader */.UT();
 
 function shouldExclude(filePath, patterns = []) {
-  return patterns.some(pattern => (0,esm/* minimatch */.xF)(filePath, pattern, { dot: true }));
+  return patterns.some((pattern) => (0,esm/* minimatch */.xF)(filePath, pattern, { dot: true }));
 }
 
 function applyFileExclusions(diff, patterns = []) {
   if (!patterns.length) return diff;
 
-  const changedFiles = (diff.changedFiles ?? []).filter(filePath => !shouldExclude(filePath, patterns));
-  const rawFiles = (diff.files ?? []).filter(file => !shouldExclude(file.path, patterns));
-  const optimizedFiles = (diff.filesForReview ?? diff.files ?? []).filter(file => !shouldExclude(file.path, patterns));
+  const changedFiles = (diff.changedFiles ?? []).filter(
+    (filePath) => !shouldExclude(filePath, patterns)
+  );
+  const rawFiles = (diff.files ?? []).filter((file) => !shouldExclude(file.path, patterns));
+  const optimizedFiles = (diff.filesForReview ?? diff.files ?? []).filter(
+    (file) => !shouldExclude(file.path, patterns)
+  );
 
   const rawDiffText = (0,diff_optimizer/* renderDiffText */.p)(rawFiles);
   const diffText = (0,diff_optimizer/* renderDiffText */.p)(optimizedFiles);
   const rawTokenEstimate = Math.ceil(rawDiffText.length / 4);
   const tokenEstimate = Math.ceil(diffText.length / 4);
-  const reduction = rawTokenEstimate === 0 ? 0 : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
+  const reduction =
+    rawTokenEstimate === 0
+      ? 0
+      : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
 
   return {
     ...diff,
@@ -36137,7 +36883,7 @@ async function resolvePullRequestLabels() {
     const raw = await promises_.readFile(eventPath, 'utf8');
     const event = JSON.parse(raw);
     const pullRequestLabels = event?.pull_request?.labels ?? event?.labels ?? [];
-    return pullRequestLabels.map(label => label?.name).filter(Boolean);
+    return pullRequestLabels.map((label) => label?.name).filter(Boolean);
   } catch {
     return [];
   }
@@ -36145,10 +36891,10 @@ async function resolvePullRequestLabels() {
 
 function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
   if (!prLabels.length || !ignorePatterns.length) return { matched: [], shouldSkip: false };
-  const normalizedLabels = prLabels.map(label => label.toLowerCase());
-  const matched = ignorePatterns.filter(pattern => {
+  const normalizedLabels = prLabels.map((label) => label.toLowerCase());
+  const matched = ignorePatterns.filter((pattern) => {
     const needle = pattern.toLowerCase();
-    return normalizedLabels.some(label => label.includes(needle));
+    return normalizedLabels.some((label) => label.includes(needle));
   });
   return { matched, shouldSkip: matched.length > 0 };
 }
@@ -36181,11 +36927,12 @@ async function collectLocalContext({
   const { config, path: configPath, source: configSource } = await configLoader.load(repoRoot);
   const prLabels = await resolvePullRequestLabels();
   const { rulesText: projectRules } = await loadProjectRules(repoRoot);
+  const riskMap = await (0,risk_map/* loadRiskMap */.E$)(repoRoot);
   const defaultBranch = await (0,git/* detectDefaultBranch */.Rd)(repoRoot);
   const mergeBase = await (0,git/* findMergeBase */.fe)(repoRoot, defaultBranch);
   const rawDiff = await (0,lib_diff/* collectRepoDiff */.K)(repoRoot, mergeBase, { contextLines });
   const diff = applyFileExclusions(rawDiff, config.exclude?.files ?? []);
-  const reviewFiles = diff.filesForReview?.map(file => file.path) ?? diff.changedFiles;
+  const reviewFiles = diff.filesForReview?.map((file) => file.path) ?? diff.changedFiles;
   const contexts = resolveAvailableContexts(availableContexts);
   const dependencies = resolveAvailableDependencies(availableDependencies);
 
@@ -36195,6 +36942,7 @@ async function collectLocalContext({
     configPath,
     configSource,
     projectRules,
+    riskMap,
     defaultBranch,
     mergeBase,
     diff,
@@ -36226,6 +36974,7 @@ async function planLocalReview({
   const {
     repoRoot,
     projectRules,
+    riskMap,
     defaultBranch,
     mergeBase,
     diff,
@@ -36244,7 +36993,7 @@ async function planLocalReview({
 
   const { matched: ignoredLabels, shouldSkip } = shouldSkipByLabel(
     prLabels,
-    config.exclude?.prLabelsToIgnore ?? [],
+    config.exclude?.prLabelsToIgnore ?? []
   );
 
   if (shouldSkip) {
@@ -36306,6 +37055,8 @@ async function planLocalReview({
     plannerMode: requestedPlannerMode,
     dryRun,
     llmEnabled,
+    repoRoot,
+    riskMap,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -36335,21 +37086,19 @@ async function planLocalReview({
   };
 }
 
-async function runLocalReview(
-  {
-    cwd = process.cwd(),
-    phase = 'midstream',
-    dryRun = false,
-    debug = false,
-    preferredModelHint = 'balanced',
-    model,
-    apiKey,
-    context: providedContext,
-    availableContexts,
-    availableDependencies,
-    plannerMode,
-  } = {},
-) {
+async function runLocalReview({
+  cwd = process.cwd(),
+  phase = 'midstream',
+  dryRun = false,
+  debug = false,
+  preferredModelHint = 'balanced',
+  model,
+  apiKey,
+  context: providedContext,
+  availableContexts,
+  availableDependencies,
+  plannerMode,
+} = {}) {
   const context =
     providedContext ??
     (await planLocalReview({
@@ -36392,6 +37141,11 @@ async function runLocalReview(
     };
   }
 
+  const memoryContext = loadReviewMemory(context.repoRoot, {
+    phase: normalizePhase(phase),
+    changedFiles: context.changedFiles,
+  });
+
   const review = await (0,review_engine/* generateReview */.G1)({
     diff: context.diff,
     plan: context.plan,
@@ -36400,6 +37154,10 @@ async function runLocalReview(
     model,
     apiKey,
     projectRules: context.projectRules,
+    riskAssessment: context.plan?.riskAssessment ?? null,
+    memoryContext,
+    fileTypes: context.plan?.fileTypes,
+    relatedADRs: context.plan?.relatedADRs,
     config: context.config,
   });
 
@@ -36444,8 +37202,16 @@ async function doctorLocalReview({
     availableContexts,
     availableDependencies,
   });
-  const { repoRoot, projectRules, defaultBranch, mergeBase, diff, reviewFiles, availableContexts: contexts, availableDependencies: dependencies } =
-    base;
+  const {
+    repoRoot,
+    projectRules,
+    defaultBranch,
+    mergeBase,
+    diff,
+    reviewFiles,
+    availableContexts: contexts,
+    availableDependencies: dependencies,
+  } = base;
 
   const llmEnabled = isLlmEnabled();
 
@@ -36459,6 +37225,7 @@ async function doctorLocalReview({
         preferredModelHint,
         skills,
         llmEnabled,
+        repoRoot,
       })
     : null;
 
@@ -40228,7 +40995,7 @@ const createPathTagFunction = (pathEncoder = encodeURIPath) => function path(sta
 /**
  * URI-encodes path params and ensures no unsafe /./ or /../ path segments are introduced.
  */
-const path = /* @__PURE__ */ createPathTagFunction(encodeURIPath);
+const path_path = /* @__PURE__ */ createPathTagFunction(encodeURIPath);
 //# sourceMappingURL=path.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/completions/messages.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
@@ -40251,7 +41018,7 @@ class Messages extends APIResource {
      * ```
      */
     list(completionID, query = {}, options) {
-        return this._client.getAPIList(path `/chat/completions/${completionID}/messages`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/chat/completions/${completionID}/messages`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=messages.mjs.map
@@ -41729,7 +42496,7 @@ class Completions extends APIResource {
      * ```
      */
     retrieve(completionID, options) {
-        return this._client.get(path `/chat/completions/${completionID}`, options);
+        return this._client.get(path_path `/chat/completions/${completionID}`, options);
     }
     /**
      * Modify a stored chat completion. Only Chat Completions that have been created
@@ -41745,7 +42512,7 @@ class Completions extends APIResource {
      * ```
      */
     update(completionID, body, options) {
-        return this._client.post(path `/chat/completions/${completionID}`, { body, ...options });
+        return this._client.post(path_path `/chat/completions/${completionID}`, { body, ...options });
     }
     /**
      * List stored Chat Completions. Only Chat Completions that have been stored with
@@ -41773,7 +42540,7 @@ class Completions extends APIResource {
      * ```
      */
     delete(completionID, options) {
-        return this._client.delete(path `/chat/completions/${completionID}`, options);
+        return this._client.delete(path_path `/chat/completions/${completionID}`, options);
     }
     parse(body, options) {
         validateInputTools(body.tools);
@@ -41997,7 +42764,7 @@ class Batches extends APIResource {
      * Retrieves a batch.
      */
     retrieve(batchID, options) {
-        return this._client.get(path `/batches/${batchID}`, options);
+        return this._client.get(path_path `/batches/${batchID}`, options);
     }
     /**
      * List your organization's batches.
@@ -42011,7 +42778,7 @@ class Batches extends APIResource {
      * (if any) available in the output file.
      */
     cancel(batchID, options) {
-        return this._client.post(path `/batches/${batchID}/cancel`, options);
+        return this._client.post(path_path `/batches/${batchID}/cancel`, options);
     }
 }
 //# sourceMappingURL=batches.mjs.map
@@ -42040,7 +42807,7 @@ class Assistants extends APIResource {
      * @deprecated
      */
     retrieve(assistantID, options) {
-        return this._client.get(path `/assistants/${assistantID}`, {
+        return this._client.get(path_path `/assistants/${assistantID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -42051,7 +42818,7 @@ class Assistants extends APIResource {
      * @deprecated
      */
     update(assistantID, body, options) {
-        return this._client.post(path `/assistants/${assistantID}`, {
+        return this._client.post(path_path `/assistants/${assistantID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42075,7 +42842,7 @@ class Assistants extends APIResource {
      * @deprecated
      */
     delete(assistantID, options) {
-        return this._client.delete(path `/assistants/${assistantID}`, {
+        return this._client.delete(path_path `/assistants/${assistantID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -42195,7 +42962,7 @@ class sessions_Sessions extends APIResource {
      * ```
      */
     cancel(sessionID, options) {
-        return this._client.post(path `/chatkit/sessions/${sessionID}/cancel`, {
+        return this._client.post(path_path `/chatkit/sessions/${sessionID}/cancel`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]),
         });
@@ -42219,7 +42986,7 @@ class Threads extends APIResource {
      * ```
      */
     retrieve(threadID, options) {
-        return this._client.get(path `/chatkit/threads/${threadID}`, {
+        return this._client.get(path_path `/chatkit/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]),
         });
@@ -42253,7 +43020,7 @@ class Threads extends APIResource {
      * ```
      */
     delete(threadID, options) {
-        return this._client.delete(path `/chatkit/threads/${threadID}`, {
+        return this._client.delete(path_path `/chatkit/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]),
         });
@@ -42272,7 +43039,7 @@ class Threads extends APIResource {
      * ```
      */
     listItems(threadID, query = {}, options) {
-        return this._client.getAPIList(path `/chatkit/threads/${threadID}/items`, (ConversationCursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]) });
+        return this._client.getAPIList(path_path `/chatkit/threads/${threadID}/items`, (ConversationCursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]) });
     }
 }
 //# sourceMappingURL=threads.mjs.map
@@ -42309,7 +43076,7 @@ class messages_Messages extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     create(threadID, body, options) {
-        return this._client.post(path `/threads/${threadID}/messages`, {
+        return this._client.post(path_path `/threads/${threadID}/messages`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42322,7 +43089,7 @@ class messages_Messages extends APIResource {
      */
     retrieve(messageID, params, options) {
         const { thread_id } = params;
-        return this._client.get(path `/threads/${thread_id}/messages/${messageID}`, {
+        return this._client.get(path_path `/threads/${thread_id}/messages/${messageID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -42334,7 +43101,7 @@ class messages_Messages extends APIResource {
      */
     update(messageID, params, options) {
         const { thread_id, ...body } = params;
-        return this._client.post(path `/threads/${thread_id}/messages/${messageID}`, {
+        return this._client.post(path_path `/threads/${thread_id}/messages/${messageID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42346,7 +43113,7 @@ class messages_Messages extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     list(threadID, query = {}, options) {
-        return this._client.getAPIList(path `/threads/${threadID}/messages`, (CursorPage), {
+        return this._client.getAPIList(path_path `/threads/${threadID}/messages`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42359,7 +43126,7 @@ class messages_Messages extends APIResource {
      */
     delete(messageID, params, options) {
         const { thread_id } = params;
-        return this._client.delete(path `/threads/${thread_id}/messages/${messageID}`, {
+        return this._client.delete(path_path `/threads/${thread_id}/messages/${messageID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -42383,7 +43150,7 @@ class Steps extends APIResource {
      */
     retrieve(stepID, params, options) {
         const { thread_id, run_id, ...query } = params;
-        return this._client.get(path `/threads/${thread_id}/runs/${run_id}/steps/${stepID}`, {
+        return this._client.get(path_path `/threads/${thread_id}/runs/${run_id}/steps/${stepID}`, {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -42396,7 +43163,7 @@ class Steps extends APIResource {
      */
     list(runID, params, options) {
         const { thread_id, ...query } = params;
-        return this._client.getAPIList(path `/threads/${thread_id}/runs/${runID}/steps`, (CursorPage), {
+        return this._client.getAPIList(path_path `/threads/${thread_id}/runs/${runID}/steps`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -43058,7 +43825,7 @@ class Runs extends APIResource {
     }
     create(threadID, params, options) {
         const { include, ...body } = params;
-        return this._client.post(path `/threads/${threadID}/runs`, {
+        return this._client.post(path_path `/threads/${threadID}/runs`, {
             query: { include },
             body,
             ...options,
@@ -43073,7 +43840,7 @@ class Runs extends APIResource {
      */
     retrieve(runID, params, options) {
         const { thread_id } = params;
-        return this._client.get(path `/threads/${thread_id}/runs/${runID}`, {
+        return this._client.get(path_path `/threads/${thread_id}/runs/${runID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -43085,7 +43852,7 @@ class Runs extends APIResource {
      */
     update(runID, params, options) {
         const { thread_id, ...body } = params;
-        return this._client.post(path `/threads/${thread_id}/runs/${runID}`, {
+        return this._client.post(path_path `/threads/${thread_id}/runs/${runID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -43097,7 +43864,7 @@ class Runs extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     list(threadID, query = {}, options) {
-        return this._client.getAPIList(path `/threads/${threadID}/runs`, (CursorPage), {
+        return this._client.getAPIList(path_path `/threads/${threadID}/runs`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -43110,7 +43877,7 @@ class Runs extends APIResource {
      */
     cancel(runID, params, options) {
         const { thread_id } = params;
-        return this._client.post(path `/threads/${thread_id}/runs/${runID}/cancel`, {
+        return this._client.post(path_path `/threads/${thread_id}/runs/${runID}/cancel`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -43189,7 +43956,7 @@ class Runs extends APIResource {
     }
     submitToolOutputs(runID, params, options) {
         const { thread_id, ...body } = params;
-        return this._client.post(path `/threads/${thread_id}/runs/${runID}/submit_tool_outputs`, {
+        return this._client.post(path_path `/threads/${thread_id}/runs/${runID}/submit_tool_outputs`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -43253,7 +44020,7 @@ class threads_Threads extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     retrieve(threadID, options) {
-        return this._client.get(path `/threads/${threadID}`, {
+        return this._client.get(path_path `/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -43264,7 +44031,7 @@ class threads_Threads extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     update(threadID, body, options) {
-        return this._client.post(path `/threads/${threadID}`, {
+        return this._client.post(path_path `/threads/${threadID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -43276,7 +44043,7 @@ class threads_Threads extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     delete(threadID, options) {
-        return this._client.delete(path `/threads/${threadID}`, {
+        return this._client.delete(path_path `/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -43353,7 +44120,7 @@ class Content extends APIResource {
      */
     retrieve(fileID, params, options) {
         const { container_id } = params;
-        return this._client.get(path `/containers/${container_id}/files/${fileID}/content`, {
+        return this._client.get(path_path `/containers/${container_id}/files/${fileID}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -43382,20 +44149,20 @@ class Files extends APIResource {
      * a JSON request with a file ID.
      */
     create(containerID, body, options) {
-        return this._client.post(path `/containers/${containerID}/files`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path_path `/containers/${containerID}/files`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
     /**
      * Retrieve Container File
      */
     retrieve(fileID, params, options) {
         const { container_id } = params;
-        return this._client.get(path `/containers/${container_id}/files/${fileID}`, options);
+        return this._client.get(path_path `/containers/${container_id}/files/${fileID}`, options);
     }
     /**
      * List Container files
      */
     list(containerID, query = {}, options) {
-        return this._client.getAPIList(path `/containers/${containerID}/files`, (CursorPage), {
+        return this._client.getAPIList(path_path `/containers/${containerID}/files`, (CursorPage), {
             query,
             ...options,
         });
@@ -43405,7 +44172,7 @@ class Files extends APIResource {
      */
     delete(fileID, params, options) {
         const { container_id } = params;
-        return this._client.delete(path `/containers/${container_id}/files/${fileID}`, {
+        return this._client.delete(path_path `/containers/${container_id}/files/${fileID}`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -43436,7 +44203,7 @@ class Containers extends APIResource {
      * Retrieve Container
      */
     retrieve(containerID, options) {
-        return this._client.get(path `/containers/${containerID}`, options);
+        return this._client.get(path_path `/containers/${containerID}`, options);
     }
     /**
      * List Containers
@@ -43448,7 +44215,7 @@ class Containers extends APIResource {
      * Delete Container
      */
     delete(containerID, options) {
-        return this._client.delete(path `/containers/${containerID}`, {
+        return this._client.delete(path_path `/containers/${containerID}`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -43467,7 +44234,7 @@ class Items extends APIResource {
      */
     create(conversationID, params, options) {
         const { include, ...body } = params;
-        return this._client.post(path `/conversations/${conversationID}/items`, {
+        return this._client.post(path_path `/conversations/${conversationID}/items`, {
             query: { include },
             body,
             ...options,
@@ -43478,20 +44245,20 @@ class Items extends APIResource {
      */
     retrieve(itemID, params, options) {
         const { conversation_id, ...query } = params;
-        return this._client.get(path `/conversations/${conversation_id}/items/${itemID}`, { query, ...options });
+        return this._client.get(path_path `/conversations/${conversation_id}/items/${itemID}`, { query, ...options });
     }
     /**
      * List all items for a conversation with the given ID.
      */
     list(conversationID, query = {}, options) {
-        return this._client.getAPIList(path `/conversations/${conversationID}/items`, (ConversationCursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/conversations/${conversationID}/items`, (ConversationCursorPage), { query, ...options });
     }
     /**
      * Delete an item from a conversation with the given IDs.
      */
     delete(itemID, params, options) {
         const { conversation_id } = params;
-        return this._client.delete(path `/conversations/${conversation_id}/items/${itemID}`, options);
+        return this._client.delete(path_path `/conversations/${conversation_id}/items/${itemID}`, options);
     }
 }
 //# sourceMappingURL=items.mjs.map
@@ -43516,19 +44283,19 @@ class Conversations extends APIResource {
      * Get a conversation
      */
     retrieve(conversationID, options) {
-        return this._client.get(path `/conversations/${conversationID}`, options);
+        return this._client.get(path_path `/conversations/${conversationID}`, options);
     }
     /**
      * Update a conversation
      */
     update(conversationID, body, options) {
-        return this._client.post(path `/conversations/${conversationID}`, { body, ...options });
+        return this._client.post(path_path `/conversations/${conversationID}`, { body, ...options });
     }
     /**
      * Delete a conversation. Items in the conversation will not be deleted.
      */
     delete(conversationID, options) {
-        return this._client.delete(path `/conversations/${conversationID}`, options);
+        return this._client.delete(path_path `/conversations/${conversationID}`, options);
     }
 }
 Conversations.Items = Items;
@@ -43597,14 +44364,14 @@ class OutputItems extends APIResource {
      */
     retrieve(outputItemID, params, options) {
         const { eval_id, run_id } = params;
-        return this._client.get(path `/evals/${eval_id}/runs/${run_id}/output_items/${outputItemID}`, options);
+        return this._client.get(path_path `/evals/${eval_id}/runs/${run_id}/output_items/${outputItemID}`, options);
     }
     /**
      * Get a list of output items for an evaluation run.
      */
     list(runID, params, options) {
         const { eval_id, ...query } = params;
-        return this._client.getAPIList(path `/evals/${eval_id}/runs/${runID}/output_items`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/evals/${eval_id}/runs/${runID}/output_items`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=output-items.mjs.map
@@ -43626,20 +44393,20 @@ class runs_Runs extends APIResource {
      * schema specified in the config of the evaluation.
      */
     create(evalID, body, options) {
-        return this._client.post(path `/evals/${evalID}/runs`, { body, ...options });
+        return this._client.post(path_path `/evals/${evalID}/runs`, { body, ...options });
     }
     /**
      * Get an evaluation run by ID.
      */
     retrieve(runID, params, options) {
         const { eval_id } = params;
-        return this._client.get(path `/evals/${eval_id}/runs/${runID}`, options);
+        return this._client.get(path_path `/evals/${eval_id}/runs/${runID}`, options);
     }
     /**
      * Get a list of runs for an evaluation.
      */
     list(evalID, query = {}, options) {
-        return this._client.getAPIList(path `/evals/${evalID}/runs`, (CursorPage), {
+        return this._client.getAPIList(path_path `/evals/${evalID}/runs`, (CursorPage), {
             query,
             ...options,
         });
@@ -43649,14 +44416,14 @@ class runs_Runs extends APIResource {
      */
     delete(runID, params, options) {
         const { eval_id } = params;
-        return this._client.delete(path `/evals/${eval_id}/runs/${runID}`, options);
+        return this._client.delete(path_path `/evals/${eval_id}/runs/${runID}`, options);
     }
     /**
      * Cancel an ongoing evaluation run.
      */
     cancel(runID, params, options) {
         const { eval_id } = params;
-        return this._client.post(path `/evals/${eval_id}/runs/${runID}`, options);
+        return this._client.post(path_path `/evals/${eval_id}/runs/${runID}`, options);
     }
 }
 runs_Runs.OutputItems = OutputItems;
@@ -43688,13 +44455,13 @@ class Evals extends APIResource {
      * Get an evaluation by ID.
      */
     retrieve(evalID, options) {
-        return this._client.get(path `/evals/${evalID}`, options);
+        return this._client.get(path_path `/evals/${evalID}`, options);
     }
     /**
      * Update certain properties of an evaluation.
      */
     update(evalID, body, options) {
-        return this._client.post(path `/evals/${evalID}`, { body, ...options });
+        return this._client.post(path_path `/evals/${evalID}`, { body, ...options });
     }
     /**
      * List evaluations for a project.
@@ -43706,7 +44473,7 @@ class Evals extends APIResource {
      * Delete an evaluation.
      */
     delete(evalID, options) {
-        return this._client.delete(path `/evals/${evalID}`, options);
+        return this._client.delete(path_path `/evals/${evalID}`, options);
     }
 }
 Evals.Runs = runs_Runs;
@@ -43750,7 +44517,7 @@ class files_Files extends APIResource {
      * Returns information about a specific file.
      */
     retrieve(fileID, options) {
-        return this._client.get(path `/files/${fileID}`, options);
+        return this._client.get(path_path `/files/${fileID}`, options);
     }
     /**
      * Returns a list of files.
@@ -43762,13 +44529,13 @@ class files_Files extends APIResource {
      * Delete a file and remove it from all vector stores.
      */
     delete(fileID, options) {
-        return this._client.delete(path `/files/${fileID}`, options);
+        return this._client.delete(path_path `/files/${fileID}`, options);
     }
     /**
      * Returns the contents of the specified file.
      */
     content(fileID, options) {
-        return this._client.get(path `/files/${fileID}/content`, {
+        return this._client.get(path_path `/files/${fileID}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -43883,7 +44650,7 @@ class Permissions extends APIResource {
      * ```
      */
     create(fineTunedModelCheckpoint, body, options) {
-        return this._client.getAPIList(path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, (Page), { body, method: 'post', ...options });
+        return this._client.getAPIList(path_path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, (Page), { body, method: 'post', ...options });
     }
     /**
      * **NOTE:** This endpoint requires an [admin API key](../admin-api-keys).
@@ -43900,7 +44667,7 @@ class Permissions extends APIResource {
      * ```
      */
     retrieve(fineTunedModelCheckpoint, query = {}, options) {
-        return this._client.get(path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, {
+        return this._client.get(path_path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, {
             query,
             ...options,
         });
@@ -43925,7 +44692,7 @@ class Permissions extends APIResource {
      */
     delete(permissionID, params, options) {
         const { fine_tuned_model_checkpoint } = params;
-        return this._client.delete(path `/fine_tuning/checkpoints/${fine_tuned_model_checkpoint}/permissions/${permissionID}`, options);
+        return this._client.delete(path_path `/fine_tuning/checkpoints/${fine_tuned_model_checkpoint}/permissions/${permissionID}`, options);
     }
 }
 //# sourceMappingURL=permissions.mjs.map
@@ -43962,7 +44729,7 @@ class checkpoints_Checkpoints extends APIResource {
      * ```
      */
     list(fineTuningJobID, query = {}, options) {
-        return this._client.getAPIList(path `/fine_tuning/jobs/${fineTuningJobID}/checkpoints`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/fine_tuning/jobs/${fineTuningJobID}/checkpoints`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=checkpoints.mjs.map
@@ -44011,7 +44778,7 @@ class Jobs extends APIResource {
      * ```
      */
     retrieve(fineTuningJobID, options) {
-        return this._client.get(path `/fine_tuning/jobs/${fineTuningJobID}`, options);
+        return this._client.get(path_path `/fine_tuning/jobs/${fineTuningJobID}`, options);
     }
     /**
      * List your organization's fine-tuning jobs
@@ -44038,7 +44805,7 @@ class Jobs extends APIResource {
      * ```
      */
     cancel(fineTuningJobID, options) {
-        return this._client.post(path `/fine_tuning/jobs/${fineTuningJobID}/cancel`, options);
+        return this._client.post(path_path `/fine_tuning/jobs/${fineTuningJobID}/cancel`, options);
     }
     /**
      * Get status updates for a fine-tuning job.
@@ -44054,7 +44821,7 @@ class Jobs extends APIResource {
      * ```
      */
     listEvents(fineTuningJobID, query = {}, options) {
-        return this._client.getAPIList(path `/fine_tuning/jobs/${fineTuningJobID}/events`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/fine_tuning/jobs/${fineTuningJobID}/events`, (CursorPage), { query, ...options });
     }
     /**
      * Pause a fine-tune job.
@@ -44067,7 +44834,7 @@ class Jobs extends APIResource {
      * ```
      */
     pause(fineTuningJobID, options) {
-        return this._client.post(path `/fine_tuning/jobs/${fineTuningJobID}/pause`, options);
+        return this._client.post(path_path `/fine_tuning/jobs/${fineTuningJobID}/pause`, options);
     }
     /**
      * Resume a fine-tune job.
@@ -44080,7 +44847,7 @@ class Jobs extends APIResource {
      * ```
      */
     resume(fineTuningJobID, options) {
-        return this._client.post(path `/fine_tuning/jobs/${fineTuningJobID}/resume`, options);
+        return this._client.post(path_path `/fine_tuning/jobs/${fineTuningJobID}/resume`, options);
     }
 }
 Jobs.Checkpoints = checkpoints_Checkpoints;
@@ -44166,7 +44933,7 @@ class Models extends APIResource {
      * the owner and permissioning.
      */
     retrieve(model, options) {
-        return this._client.get(path `/models/${model}`, options);
+        return this._client.get(path_path `/models/${model}`, options);
     }
     /**
      * Lists the currently available models, and provides basic information about each
@@ -44180,7 +44947,7 @@ class Models extends APIResource {
      * delete a model.
      */
     delete(model, options) {
-        return this._client.delete(path `/models/${model}`, options);
+        return this._client.delete(path_path `/models/${model}`, options);
     }
 }
 //# sourceMappingURL=models.mjs.map
@@ -44215,7 +44982,7 @@ class Calls extends APIResource {
      * ```
      */
     accept(callID, body, options) {
-        return this._client.post(path `/realtime/calls/${callID}/accept`, {
+        return this._client.post(path_path `/realtime/calls/${callID}/accept`, {
             body,
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
@@ -44230,7 +44997,7 @@ class Calls extends APIResource {
      * ```
      */
     hangup(callID, options) {
-        return this._client.post(path `/realtime/calls/${callID}/hangup`, {
+        return this._client.post(path_path `/realtime/calls/${callID}/hangup`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -44246,7 +45013,7 @@ class Calls extends APIResource {
      * ```
      */
     refer(callID, body, options) {
-        return this._client.post(path `/realtime/calls/${callID}/refer`, {
+        return this._client.post(path_path `/realtime/calls/${callID}/refer`, {
             body,
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
@@ -44261,7 +45028,7 @@ class Calls extends APIResource {
      * ```
      */
     reject(callID, body = {}, options) {
-        return this._client.post(path `/realtime/calls/${callID}/reject`, {
+        return this._client.post(path_path `/realtime/calls/${callID}/reject`, {
             body,
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
@@ -44747,7 +45514,7 @@ class InputItems extends APIResource {
      * ```
      */
     list(responseID, query = {}, options) {
-        return this._client.getAPIList(path `/responses/${responseID}/input_items`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path_path `/responses/${responseID}/input_items`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=input-items.mjs.map
@@ -44794,7 +45561,7 @@ class Responses extends APIResource {
         });
     }
     retrieve(responseID, query = {}, options) {
-        return this._client.get(path `/responses/${responseID}`, {
+        return this._client.get(path_path `/responses/${responseID}`, {
             query,
             ...options,
             stream: query?.stream ?? false,
@@ -44816,7 +45583,7 @@ class Responses extends APIResource {
      * ```
      */
     delete(responseID, options) {
-        return this._client.delete(path `/responses/${responseID}`, {
+        return this._client.delete(path_path `/responses/${responseID}`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -44845,7 +45612,7 @@ class Responses extends APIResource {
      * ```
      */
     cancel(responseID, options) {
-        return this._client.post(path `/responses/${responseID}/cancel`, options);
+        return this._client.post(path_path `/responses/${responseID}/cancel`, options);
     }
     /**
      * Compact conversation
@@ -44874,7 +45641,7 @@ class content_Content extends APIResource {
      * Get Skill Content
      */
     retrieve(skillID, options) {
-        return this._client.get(path `/skills/${skillID}/content`, {
+        return this._client.get(path_path `/skills/${skillID}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -44893,7 +45660,7 @@ class versions_content_Content extends APIResource {
      */
     retrieve(version, params, options) {
         const { skill_id } = params;
-        return this._client.get(path `/skills/${skill_id}/versions/${version}/content`, {
+        return this._client.get(path_path `/skills/${skill_id}/versions/${version}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -44918,20 +45685,20 @@ class Versions extends APIResource {
      * Create Skill Version
      */
     create(skillID, body = {}, options) {
-        return this._client.post(path `/skills/${skillID}/versions`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path_path `/skills/${skillID}/versions`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
     /**
      * Get Skill Version
      */
     retrieve(version, params, options) {
         const { skill_id } = params;
-        return this._client.get(path `/skills/${skill_id}/versions/${version}`, options);
+        return this._client.get(path_path `/skills/${skill_id}/versions/${version}`, options);
     }
     /**
      * List Skill Versions
      */
     list(skillID, query = {}, options) {
-        return this._client.getAPIList(path `/skills/${skillID}/versions`, (CursorPage), {
+        return this._client.getAPIList(path_path `/skills/${skillID}/versions`, (CursorPage), {
             query,
             ...options,
         });
@@ -44941,7 +45708,7 @@ class Versions extends APIResource {
      */
     delete(version, params, options) {
         const { skill_id } = params;
-        return this._client.delete(path `/skills/${skill_id}/versions/${version}`, options);
+        return this._client.delete(path_path `/skills/${skill_id}/versions/${version}`, options);
     }
 }
 Versions.Content = versions_content_Content;
@@ -44972,13 +45739,13 @@ class Skills extends APIResource {
      * Get Skill
      */
     retrieve(skillID, options) {
-        return this._client.get(path `/skills/${skillID}`, options);
+        return this._client.get(path_path `/skills/${skillID}`, options);
     }
     /**
      * Update Skill Default Version
      */
     update(skillID, body, options) {
-        return this._client.post(path `/skills/${skillID}`, { body, ...options });
+        return this._client.post(path_path `/skills/${skillID}`, { body, ...options });
     }
     /**
      * List Skills
@@ -44990,7 +45757,7 @@ class Skills extends APIResource {
      * Delete Skill
      */
     delete(skillID, options) {
-        return this._client.delete(path `/skills/${skillID}`, options);
+        return this._client.delete(path_path `/skills/${skillID}`, options);
     }
 }
 Skills.Content = content_Content;
@@ -45016,7 +45783,7 @@ class Parts extends APIResource {
      * [complete the Upload](https://platform.openai.com/docs/api-reference/uploads/complete).
      */
     create(uploadID, body, options) {
-        return this._client.post(path `/uploads/${uploadID}/parts`, multipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path_path `/uploads/${uploadID}/parts`, multipartFormRequestOptions({ body, ...options }, this._client));
     }
 }
 //# sourceMappingURL=parts.mjs.map
@@ -45059,7 +45826,7 @@ class Uploads extends APIResource {
      * Cancels the Upload. No Parts may be added after an Upload is cancelled.
      */
     cancel(uploadID, options) {
-        return this._client.post(path `/uploads/${uploadID}/cancel`, options);
+        return this._client.post(path_path `/uploads/${uploadID}/cancel`, options);
     }
     /**
      * Completes the
@@ -45077,7 +45844,7 @@ class Uploads extends APIResource {
      * an Upload is completed.
      */
     complete(uploadID, body, options) {
-        return this._client.post(path `/uploads/${uploadID}/complete`, { body, ...options });
+        return this._client.post(path_path `/uploads/${uploadID}/complete`, { body, ...options });
     }
 }
 Uploads.Parts = Parts;
@@ -45118,7 +45885,7 @@ class FileBatches extends APIResource {
      * Create a vector store file batch.
      */
     create(vectorStoreID, body, options) {
-        return this._client.post(path `/vector_stores/${vectorStoreID}/file_batches`, {
+        return this._client.post(path_path `/vector_stores/${vectorStoreID}/file_batches`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45129,7 +45896,7 @@ class FileBatches extends APIResource {
      */
     retrieve(batchID, params, options) {
         const { vector_store_id } = params;
-        return this._client.get(path `/vector_stores/${vector_store_id}/file_batches/${batchID}`, {
+        return this._client.get(path_path `/vector_stores/${vector_store_id}/file_batches/${batchID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45140,7 +45907,7 @@ class FileBatches extends APIResource {
      */
     cancel(batchID, params, options) {
         const { vector_store_id } = params;
-        return this._client.post(path `/vector_stores/${vector_store_id}/file_batches/${batchID}/cancel`, {
+        return this._client.post(path_path `/vector_stores/${vector_store_id}/file_batches/${batchID}/cancel`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45157,7 +45924,7 @@ class FileBatches extends APIResource {
      */
     listFiles(batchID, params, options) {
         const { vector_store_id, ...query } = params;
-        return this._client.getAPIList(path `/vector_stores/${vector_store_id}/file_batches/${batchID}/files`, (CursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
+        return this._client.getAPIList(path_path `/vector_stores/${vector_store_id}/file_batches/${batchID}/files`, (CursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
     }
     /**
      * Wait for the given file batch to be processed.
@@ -45249,7 +46016,7 @@ class vector_stores_files_Files extends APIResource {
      * [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object).
      */
     create(vectorStoreID, body, options) {
-        return this._client.post(path `/vector_stores/${vectorStoreID}/files`, {
+        return this._client.post(path_path `/vector_stores/${vectorStoreID}/files`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45260,7 +46027,7 @@ class vector_stores_files_Files extends APIResource {
      */
     retrieve(fileID, params, options) {
         const { vector_store_id } = params;
-        return this._client.get(path `/vector_stores/${vector_store_id}/files/${fileID}`, {
+        return this._client.get(path_path `/vector_stores/${vector_store_id}/files/${fileID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45270,7 +46037,7 @@ class vector_stores_files_Files extends APIResource {
      */
     update(fileID, params, options) {
         const { vector_store_id, ...body } = params;
-        return this._client.post(path `/vector_stores/${vector_store_id}/files/${fileID}`, {
+        return this._client.post(path_path `/vector_stores/${vector_store_id}/files/${fileID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45280,7 +46047,7 @@ class vector_stores_files_Files extends APIResource {
      * Returns a list of vector store files.
      */
     list(vectorStoreID, query = {}, options) {
-        return this._client.getAPIList(path `/vector_stores/${vectorStoreID}/files`, (CursorPage), {
+        return this._client.getAPIList(path_path `/vector_stores/${vectorStoreID}/files`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45294,7 +46061,7 @@ class vector_stores_files_Files extends APIResource {
      */
     delete(fileID, params, options) {
         const { vector_store_id } = params;
-        return this._client.delete(path `/vector_stores/${vector_store_id}/files/${fileID}`, {
+        return this._client.delete(path_path `/vector_stores/${vector_store_id}/files/${fileID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45370,7 +46137,7 @@ class vector_stores_files_Files extends APIResource {
      */
     content(fileID, params, options) {
         const { vector_store_id } = params;
-        return this._client.getAPIList(path `/vector_stores/${vector_store_id}/files/${fileID}/content`, (Page), { ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
+        return this._client.getAPIList(path_path `/vector_stores/${vector_store_id}/files/${fileID}/content`, (Page), { ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
     }
 }
 //# sourceMappingURL=files.mjs.map
@@ -45404,7 +46171,7 @@ class VectorStores extends APIResource {
      * Retrieves a vector store.
      */
     retrieve(vectorStoreID, options) {
-        return this._client.get(path `/vector_stores/${vectorStoreID}`, {
+        return this._client.get(path_path `/vector_stores/${vectorStoreID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45413,7 +46180,7 @@ class VectorStores extends APIResource {
      * Modifies a vector store.
      */
     update(vectorStoreID, body, options) {
-        return this._client.post(path `/vector_stores/${vectorStoreID}`, {
+        return this._client.post(path_path `/vector_stores/${vectorStoreID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45433,7 +46200,7 @@ class VectorStores extends APIResource {
      * Delete a vector store.
      */
     delete(vectorStoreID, options) {
-        return this._client.delete(path `/vector_stores/${vectorStoreID}`, {
+        return this._client.delete(path_path `/vector_stores/${vectorStoreID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45443,7 +46210,7 @@ class VectorStores extends APIResource {
      * filter.
      */
     search(vectorStoreID, body, options) {
-        return this._client.getAPIList(path `/vector_stores/${vectorStoreID}/search`, (Page), {
+        return this._client.getAPIList(path_path `/vector_stores/${vectorStoreID}/search`, (Page), {
             body,
             method: 'post',
             ...options,
@@ -45472,7 +46239,7 @@ class Videos extends APIResource {
      * Retrieve a video
      */
     retrieve(videoID, options) {
-        return this._client.get(path `/videos/${videoID}`, options);
+        return this._client.get(path_path `/videos/${videoID}`, options);
     }
     /**
      * List videos
@@ -45484,13 +46251,13 @@ class Videos extends APIResource {
      * Delete a video
      */
     delete(videoID, options) {
-        return this._client.delete(path `/videos/${videoID}`, options);
+        return this._client.delete(path_path `/videos/${videoID}`, options);
     }
     /**
      * Download video content
      */
     downloadContent(videoID, query = {}, options) {
-        return this._client.get(path `/videos/${videoID}/content`, {
+        return this._client.get(path_path `/videos/${videoID}/content`, {
             query,
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
@@ -45501,7 +46268,7 @@ class Videos extends APIResource {
      * Create a video remix
      */
     remix(videoID, body, options) {
-        return this._client.post(path `/videos/${videoID}/remix`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path_path `/videos/${videoID}/remix`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
 }
 //# sourceMappingURL=videos.mjs.map
@@ -46678,6 +47445,7 @@ class SkillDispatcher {
 
 
 
+
 const MAX_PROMPT_PREVIEW_LENGTH = 800;
 const MAX_DIFF_PREVIEW_LINES = 200;
 const COMMENT_MARKER = '<!-- river-reviewer -->';
@@ -47053,6 +47821,29 @@ function logPreview(title, text, maxLength, log, { leadingNewline = false } = {}
   log(preview);
 }
 
+function formatRiskSummaryMarkdown(plan) {
+  const risk = plan?.riskAssessment;
+  if (!risk) return '';
+  const badge =
+    risk.aggregateAction === 'require_human_review'
+      ? '🔴 require_human_review'
+      : risk.aggregateAction === 'escalate'
+        ? '🟡 escalate'
+        : '🟢 comment_only';
+  const lines = ['### リスク評価\n', '**判定**: ' + badge + '\n'];
+  if (risk.humanReviewFiles?.length) {
+    lines.push('**人間レビュー必須**:');
+    for (const f of risk.humanReviewFiles) lines.push('- ' + sanitizeForMarkdown(f));
+    lines.push('');
+  }
+  if (risk.escalatedFiles?.length) {
+    lines.push('**エスカレーション対象**:');
+    for (const f of risk.escalatedFiles) lines.push('- ' + sanitizeForMarkdown(f));
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
 function printMarkdownReport(result, phase) {
   const header = `${COMMENT_MARKER}
 ## River Reviewer
@@ -47061,8 +47852,9 @@ function printMarkdownReport(result, phase) {
 ${formatDebugSummaryMarkdown(result)}
 `;
   const planSection = formatPlanMarkdown(result.plan);
+  const riskSection = formatRiskSummaryMarkdown(result.plan);
   const findings = `### 指摘\n${formatCommentsMarkdown(result.comments)}\n`;
-  console.log([header, planSection, findings].join('\n'));
+  console.log([header, planSection, riskSection, findings].join('\n'));
 }
 
 function printDebugInfo(result, { log = console.log } = {}) {
@@ -47137,7 +47929,7 @@ function mapSeverity(internalSeverity) {
  */
 function extractField(message, label) {
   const regex = new RegExp(
-    `${label}:\\s*([^]*?)(?=\\s+(?:Finding|Evidence|Impact|Fix|Severity|Confidence):)|${label}:\\s*(.+)$`,
+    `${label}:\\s*([^]*?)(?=\\s+(?:Finding|Evidence|Impact|Fix|Severity|Confidence):)|${label}:\\s*(.+)$`
   );
   const match = (message ?? '').match(regex);
   return (match?.[1] ?? match?.[2] ?? '').trim();
@@ -47168,7 +47960,16 @@ function formatJsonOutput(result, phase) {
     };
   });
 
-  return { issues, summary: { issueCountBySeverity, issueCountByPhase } };
+  const summary = { issueCountBySeverity, issueCountByPhase };
+  const riskAssessment = result.plan?.riskAssessment;
+  if (riskAssessment) {
+    summary.riskSummary = {
+      aggregateAction: riskAssessment.aggregateAction,
+      escalatedFiles: riskAssessment.escalatedFiles,
+      humanReviewFiles: riskAssessment.humanReviewFiles,
+    };
+  }
+  return { issues, summary };
 }
 
 function countChangedLines(files) {
@@ -47316,7 +48117,8 @@ Dependencies: ${
         ? estimator.estimateFromDiff(context.diff, context.plan?.selected ?? [])
         : null;
 
-    const logRunHeader = parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
+    const logRunHeader =
+      parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
     logRunHeader(`River Reviewer (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}
@@ -47415,6 +48217,12 @@ Dependencies: ${
       printHintLines([
         'Check `.river/rules.md` exists and is readable (or remove it to disable rules).',
         'Docs: README.md (Project-specific review rules)',
+      ]);
+    } else if (error instanceof risk_map/* RiskMapError */._Z) {
+      console.error(error.message);
+      printHintLines([
+        'Check `.river/risk-map.yaml` format and valid action values.',
+        'Valid actions: comment_only, escalate, require_human_review',
       ]);
     } else if (error instanceof git/* GitError */.XS) {
       console.error(`Git command failed: ${error.message}`);
