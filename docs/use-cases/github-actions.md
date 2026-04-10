@@ -165,9 +165,9 @@ jobs:
 
 ### LLM Provider Setup
 
-River Reviewer supports multiple LLM providers. Configure via environment variables:
+The GitHub Action review flow currently supports **OpenAI only**. Configure via environment variables:
 
-**OpenAI (Recommended):**
+**OpenAI:**
 
 ```yaml
 env:
@@ -175,16 +175,11 @@ env:
   OPENAI_MODEL: gpt-4o # Optional, defaults to gpt-4o
 ```
 
-**Google Gemini:**
+You can also use `RIVER_OPENAI_API_KEY` / `RIVER_OPENAI_MODEL` to avoid clashing with other tools that rely on the standard `OPENAI_*` variables, and `RIVER_OPENAI_BASE_URL` to point the client at an OpenAI-compatible endpoint.
 
-```yaml
-env:
-  GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-  # モデル名は config.skills[].model で指定（例: `gemini-1.5-pro`）。
-  # prefix が `gemini` のモデル名を検出すると自動的に GeminiClient が使われます。
-```
-
-> **Note**: 現在 `src/ai/factory.mjs` でサポートされているのは OpenAI (`gpt-*` / `o1-*`) と Google Gemini (`gemini-*`) です。Anthropic / Azure OpenAI は未実装のため、設定しても実行時エラーになります。
+> **Note**: At the time of writing, the core review pipeline invoked by the GitHub Action is hard-wired to the OpenAI chat-completions API. Non-OpenAI providers (Anthropic, Azure OpenAI, Google Gemini, …) are not called by this path—configuring them will cause the LLM step to be skipped with a `provider ... is not supported yet` message.
+>
+> A separate dispatcher (`river skills`, driven by `src/core/skill-dispatcher.mjs`) does support additional providers (OpenAI + Google Gemini) via `AIClientFactory`, but that code path is not used by the GitHub Action workflow documented here.
 
 ### Adding Secrets to Repository
 
