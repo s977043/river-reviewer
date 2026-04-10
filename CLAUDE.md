@@ -44,7 +44,7 @@ If a check fails, show the failure output and proposed fix before applying.
 
 ## Improvement Flow
 
-When a retrospective identifies a recurring mistake or missing guardrail, follow the codification process in `docs/development/improvement-flow.md`: retrospect → classify → draft → self-review → multi-agent review → PR → save memory. This flow produced the `/propose-issue`, `/plan-merge-order`, and `pipeline-params-checklist.md` artifacts, plus the five most recent AI Misoperation Guards above.
+When a retrospective identifies a recurring mistake or missing guardrail, follow the codification process in `docs/development/improvement-flow.md`: retrospect → classify → draft → self-review → multi-agent review → PR → save memory. This flow produced the `/propose-issue` and `/plan-merge-order` commands, `pipeline-params-checklist.md`, and the AI Misoperation Guards "Research before proposing", "Propagate signatures", "Plan merge order", "Commit before branch switches", and "Verify git output before chaining".
 
 ## Tooling
 
