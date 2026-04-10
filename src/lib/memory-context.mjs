@@ -6,7 +6,11 @@ const DEFAULT_MEMORY_PATH = path.join('.river', 'memory', 'index.json');
 export function loadReviewMemory(repoRoot, { phase, changedFiles } = {}) {
   const indexPath = path.resolve(repoRoot, DEFAULT_MEMORY_PATH);
   const index = loadMemory(indexPath);
-  const allEntries = phase ? queryMemory(index, { phase }) : (index.entries ?? []);
+  // includeInactive: true keeps the phase and no-phase branches symmetric and
+  // preserves pre-lifecycle semantics where historical entries were surfaced.
+  const allEntries = phase
+    ? queryMemory(index, { phase, includeInactive: true })
+    : (index.entries ?? []);
   const relevant = changedFiles?.length
     ? allEntries.filter((e) => {
         const related = e.metadata?.relatedFiles ?? [];

@@ -52,13 +52,18 @@ export function appendEntry(indexPath, entry) {
 /**
  * Query memory entries by filter criteria.
  * All filter fields are optional; entries must match ALL provided criteria.
+ * By default, only active entries are returned.
  *
  * @param {{ entries: object[] }} index - Loaded memory index
- * @param {{ type?: string, tags?: string[], phase?: string }} filter
+ * @param {{ type?: string, tags?: string[], phase?: string, includeInactive?: boolean }} filter
  * @returns {object[]}
  */
-export function queryMemory(index, { type, tags, phase } = {}) {
+export function queryMemory(index, { type, tags, phase, includeInactive = false } = {}) {
   return index.entries.filter((entry) => {
+    if (!includeInactive) {
+      const status = entry.status ?? 'active';
+      if (status !== 'active') return false;
+    }
     if (type && entry.type !== type) return false;
     if (phase && entry.metadata?.phase !== phase) return false;
     if (tags && tags.length > 0) {
@@ -67,4 +72,48 @@ export function queryMemory(index, { type, tags, phase } = {}) {
     }
     return true;
   });
+}
+
+/**
+ * Supersede an entry by marking it as superseded and pointing to the new entry.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @param {string} oldId - ID of the entry to supersede
+ * @param {string} newId - ID of the superseding entry
+ */
+export function supersede(indexPath, oldId, newId) {
+  const index = loadMemory(indexPath);
+  const entry = index.entries.find((e) => e.id === oldId);
+  if (!entry) {
+    throw new Error(`Entry not found: ${oldId}`);
+  }
+  entry.status = 'superseded';
+  entry.supersededBy = newId;
+  fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+}
+
+/**
+ * Archive entries whose expiresAt timestamp has passed.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @returns {number} Number of entries archived
+ */
+export function expireEntries(indexPath) {
+  const index = loadMemory(indexPath);
+  const now = new Date();
+  let count = 0;
+  for (const entry of index.entries) {
+    if (
+      entry.expiresAt &&
+      new Date(entry.expiresAt) <= now &&
+      (entry.status ?? 'active') === 'active'
+    ) {
+      entry.status = 'archived';
+      count++;
+    }
+  }
+  if (count > 0) {
+    fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+  }
+  return count;
 }

@@ -4,7 +4,13 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { loadMemory, appendEntry, queryMemory } from '../src/lib/riverbed-memory.mjs';
+import {
+  loadMemory,
+  appendEntry,
+  queryMemory,
+  supersede,
+  expireEntries,
+} from '../src/lib/riverbed-memory.mjs';
 
 function tmpIndex() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rr-memory-'));
@@ -95,7 +101,7 @@ test('queryMemory: filters by tags', () => {
   assert.equal(result[0].id, 'a');
 });
 
-test('queryMemory: empty filter returns all', () => {
+test('queryMemory: empty filter returns all active', () => {
   const entries = [makeEntry({ id: 'a' }), makeEntry({ id: 'b' })];
   const result = queryMemory({ entries });
   assert.equal(result.length, 2);
@@ -122,4 +128,58 @@ test('queryMemory: combined filters are AND', () => {
   const result = queryMemory({ entries }, { type: 'adr', phase: 'upstream' });
   assert.equal(result.length, 1);
   assert.equal(result[0].id, 'a');
+});
+
+test('queryMemory: filters out non-active by default', () => {
+  const entries = [
+    makeEntry({ id: 'a', status: 'active' }),
+    makeEntry({ id: 'b', status: 'superseded' }),
+    makeEntry({ id: 'c' }), // no status = active
+  ];
+  const result = queryMemory({ entries });
+  assert.equal(result.length, 2);
+});
+
+test('queryMemory: includeInactive returns all', () => {
+  const entries = [
+    makeEntry({ id: 'a', status: 'active' }),
+    makeEntry({ id: 'b', status: 'superseded' }),
+    makeEntry({ id: 'c', status: 'archived' }),
+  ];
+  const result = queryMemory({ entries }, { includeInactive: true });
+  assert.equal(result.length, 3);
+});
+
+test('supersede: marks entry as superseded', () => {
+  const { dir, indexPath } = tmpIndex();
+  appendEntry(indexPath, makeEntry({ id: 'old-adr' }));
+  appendEntry(indexPath, makeEntry({ id: 'new-adr' }));
+  supersede(indexPath, 'old-adr', 'new-adr');
+  const mem = loadMemory(indexPath);
+  const old = mem.entries.find((e) => e.id === 'old-adr');
+  assert.equal(old.status, 'superseded');
+  assert.equal(old.supersededBy, 'new-adr');
+  cleanup(dir);
+});
+
+test('supersede: throws for unknown id', () => {
+  const { dir, indexPath } = tmpIndex();
+  appendEntry(indexPath, makeEntry({ id: 'exists' }));
+  assert.throws(() => supersede(indexPath, 'missing', 'exists'), /not found/);
+  cleanup(dir);
+});
+
+test('expireEntries: archives expired entries', () => {
+  const { dir, indexPath } = tmpIndex();
+  const past = new Date(Date.now() - 86400000).toISOString();
+  const future = new Date(Date.now() + 86400000).toISOString();
+  appendEntry(indexPath, makeEntry({ id: 'expired', expiresAt: past }));
+  appendEntry(indexPath, makeEntry({ id: 'valid', expiresAt: future }));
+  appendEntry(indexPath, makeEntry({ id: 'no-expiry' }));
+  const count = expireEntries(indexPath);
+  assert.equal(count, 1);
+  const mem = loadMemory(indexPath);
+  assert.equal(mem.entries.find((e) => e.id === 'expired').status, 'archived');
+  assert.equal(mem.entries.find((e) => e.id === 'valid').status, undefined);
+  cleanup(dir);
 });
