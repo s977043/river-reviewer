@@ -42,6 +42,10 @@ If a check fails, show the failure output and proposed fix before applying.
 - **Commit before branch switches**: Before `git checkout`/`git switch` with uncommitted work, create a throwaway safety commit on a new branch: `git switch -c wip/<topic> && git add -A && git commit -m "wip" --no-verify`. Stash-then-switch chains have lost work when combined with the lint-staged auto-stash. Does not authorize `git stash drop`, `git reset --hard`, or `git push --force` — those remain prohibited per AGENTS.md Safety.
 - **Verify git output before chaining**: Extends **Run before claiming**. After `git commit`, `git push`, `git switch`, and `gh pr merge`, read the branch name, commit hash, and status line in the output and confirm they match the intended target before running the next command. Verify with `git status -sb` or `git rev-parse --abbrev-ref HEAD` if the output is ambiguous.
 
+## Improvement Flow
+
+When a retrospective identifies a recurring mistake or missing guardrail, follow the codification process in `docs/development/improvement-flow.md`: retrospect → classify → draft → self-review → multi-agent review → PR → save memory. This flow produced the `/propose-issue`, `/plan-merge-order`, and `pipeline-params-checklist.md` artifacts, plus the five most recent AI Misoperation Guards above.
+
 ## Tooling
 
 | Component   | Location                           | Behavior                                                       |
