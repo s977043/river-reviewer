@@ -100,7 +100,8 @@ function arraysEqualSorted(a, b) {
 
 function runMemoryRecallCase(c) {
   const index = { entries: c.memoryEntries };
-  const resultIds = queryMemory(index, c.query).map((e) => e.id);
+  // Regression fixtures encode expected IDs against pre-lifecycle semantics.
+  const resultIds = queryMemory(index, { ...c.query, includeInactive: true }).map((e) => e.id);
   return arraysEqualSorted(resultIds, c.expectedIds);
 }
 
@@ -129,6 +130,6 @@ function runMemoryFallbackCase(c) {
     return index.entries.length === c.expectedEntryCount;
   }
   const index = { entries: c.memoryEntries };
-  const results = queryMemory(index, c.query ?? {});
+  const results = queryMemory(index, { ...(c.query ?? {}), includeInactive: true });
   return results.length === c.expectedEntryCount;
 }

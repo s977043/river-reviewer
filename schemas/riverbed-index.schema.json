@@ -37,7 +37,10 @@
         },
         "createdAt": { "type": "string", "format": "date-time" },
         "summary": { "type": "string" },
-        "status": { "type": "string" }
+        "status": {
+          "type": "string",
+          "enum": ["active", "superseded", "archived"]
+        }
       }
     }
   },

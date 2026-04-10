@@ -125,9 +125,12 @@ export function matchesScopeFiles(scope, relatedFiles, changedFiles) {
  * @returns {object[]}
  */
 export function findActiveSuppressions(index, filePaths) {
-  const suppressions = queryMemory(index, { type: 'suppression' });
+  // includeInactive: true preserves pre-lifecycle behavior. Revocations via
+  // resurface must survive supersession so that a once-revoked suppression
+  // does not silently reactivate when the revoking entry is superseded.
+  const suppressions = queryMemory(index, { type: 'suppression', includeInactive: true });
   const revocations = new Set(
-    queryMemory(index, { type: 'resurface' })
+    queryMemory(index, { type: 'resurface', includeInactive: true })
       .filter((e) => e.context?.action === 'revoke')
       .map((e) => e.context?.suppressionId)
       .filter(Boolean)
