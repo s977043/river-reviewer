@@ -1,9 +1,18 @@
 name: Prose Lint
 on:
   pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prose-lint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   vale:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: errata-ai/vale-action@v2

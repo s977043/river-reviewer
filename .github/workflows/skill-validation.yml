@@ -5,9 +5,14 @@ on:
     - cron: '0 3 * * 1'
   workflow_dispatch:
 
+concurrency:
+  group: scheduled-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   scheduled-validation:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
       issues: write
@@ -67,7 +72,7 @@ jobs:
 
       - name: Upload log files
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: validation-logs
           path: '*.log'

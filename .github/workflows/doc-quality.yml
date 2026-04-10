@@ -13,10 +13,15 @@ on:
     - cron: '30 2 * * 1'
   workflow_dispatch:
 
+concurrency:
+  group: doc-quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   doc-quality:
     name: Document quality checks
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
       issues: write
@@ -49,7 +54,7 @@ jobs:
 
       - name: Upload log files
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: doc-quality-logs
           path: '*.log'

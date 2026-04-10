@@ -34,6 +34,10 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+  actions: read
+
 concurrency:
   group: skill-eval-${{ github.ref }}
   cancel-in-progress: true
@@ -42,6 +46,7 @@ jobs:
   discover-skills:
     name: Discover skills with eval configs
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       skills: ${{ steps.find-skills.outputs.skills }}
       has_skills: ${{ steps.find-skills.outputs.has_skills }}
@@ -84,6 +89,7 @@ jobs:
     # Continue on error - evaluations are informational and shouldn't block PRs
     continue-on-error: true
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -172,7 +178,7 @@ jobs:
 
       - name: Upload evaluation results
         if: always() && github.event.inputs.dry_run != 'true' && steps.check-keys.outputs.has_keys == 'true'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: eval-results-${{ matrix.skill }}
           path: skills/${{ matrix.skill }}/eval/results.json
@@ -183,9 +189,13 @@ jobs:
     needs: [discover-skills, evaluate]
     if: always() && needs.discover-skills.outputs.has_skills == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v7
         with:
           path: results
           pattern: eval-results-*

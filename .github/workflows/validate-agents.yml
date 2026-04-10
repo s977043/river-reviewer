@@ -19,10 +19,18 @@ on:
       - 'package.json'
       - 'scripts/validate-agents.mjs'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-agents-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   schema:
     name: Validate agent schema
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -34,7 +42,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run agent schema validation
         run: npm run agents:validate

@@ -8,9 +8,15 @@ on:
   schedule:
     - cron: '0 2 * * 1'
   workflow_dispatch: # Allow manual trigger for maintainers
+
+concurrency:
+  group: link-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lychee:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
       issues: write
@@ -95,7 +101,7 @@ jobs:
               throw err;
             }
       - name: Upload report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: lychee-report
           path: /tmp/lychee.md
