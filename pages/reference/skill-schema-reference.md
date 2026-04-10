@@ -53,10 +53,10 @@ tags: ['security', 'owasp']
 
 スキルのフィールドは、[Progressive Disclosure](../explanation/progressive-disclosure.md) の 3 段階に対応しています。
 
-| Stage | タイミング | フィールド |
-|-------|-----------|-----------|
-| 1: Metadata | 常時（起動時） | `id`, `name`, `description`, `phase`, `applyTo`, `tags`, `severity`, `inputContext`, `outputKind`, `modelHint`, `dependencies`, `priority` |
-| 2: Instructions | スキル選択後 | `body`（Markdown 本文） |
-| 3: References | レビュー実行時 | `prompt.system`, `prompt.user`, `fixtures/`, `golden/`, Riverbed Memory entries |
+| Stage           | タイミング     | フィールド                                                                                                                                 |
+| --------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1: Metadata     | 常時（起動時） | `id`, `name`, `description`, `phase`, `applyTo`, `tags`, `severity`, `inputContext`, `outputKind`, `modelHint`, `dependencies`, `priority` |
+| 2: Instructions | スキル選択後   | `body`（Markdown 本文）                                                                                                                    |
+| 3: References   | レビュー実行時 | `prompt.system`, `prompt.user`, `fixtures/`, `golden/`, Riverbed Memory entries                                                            |
 
 Stage 1 のフィールドはフィルタリングとルーティングに使用され、Stage 2 以降は LLM プロンプトの構築に使用されます。ローダーは Stage 1 のメタデータのみでスキル選択を完了できるように設計されています。
