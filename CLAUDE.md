@@ -36,6 +36,9 @@ If a check fails, show the failure output and proposed fix before applying.
 - **No silent skips**: If a required validation fails, report it — do not silently omit it from the report.
 - **Search before inventing**: When uncertain about a convention, search `skills/`, `docs/`, and existing code before creating a new pattern.
 - **Diff only what exists**: In reviews, do not comment on code that is not in the diff.
+- **Research before proposing**: Do not create GitHub issues without first confirming the feature is not already implemented. See `/propose-issue`.
+- **Propagate signatures**: When adding parameters to pipeline functions (`generateReview`, `verifyFinding`, `buildExecutionPlan`), consult `docs/development/pipeline-params-checklist.md` to avoid call-site gaps.
+- **Plan merge order**: When creating multiple PRs that touch overlapping files, run `/plan-merge-order` before merging to minimize rebase cost.
 
 ## Tooling
 
@@ -48,12 +51,14 @@ If a check fails, show the failure output and proposed fix before applying.
 
 ## Custom Commands
 
-| Command         | Purpose                                   |
-| --------------- | ----------------------------------------- |
-| `/check`        | Run quality checks (lint + test)          |
-| `/pr`           | Draft PR description                      |
-| `/skill`        | Find or create skill definition           |
-| `/review-local` | Self-review current diff                  |
-| `/challenge`    | Adversarial review (pre-mortem, war game) |
+| Command             | Purpose                                                   |
+| ------------------- | --------------------------------------------------------- |
+| `/check`            | Run quality checks (lint + test)                          |
+| `/pr`               | Draft PR description                                      |
+| `/skill`            | Find or create skill definition                           |
+| `/review-local`     | Self-review current diff                                  |
+| `/challenge`        | Adversarial review (pre-mortem, war game)                 |
+| `/propose-issue`    | Research codebase before creating an issue                |
+| `/plan-merge-order` | Plan merge order for multiple PRs to minimize rebase cost |
 
 Details: `.claude/commands/`
