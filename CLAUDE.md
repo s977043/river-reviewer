@@ -39,8 +39,8 @@ If a check fails, show the failure output and proposed fix before applying.
 - **Research before proposing**: Do not create GitHub issues without first confirming the feature is not already implemented. See `/propose-issue`.
 - **Propagate signatures**: When adding parameters to pipeline functions (`generateReview`, `verifyFinding`, `buildExecutionPlan`), consult `docs/development/pipeline-params-checklist.md` to avoid call-site gaps.
 - **Plan merge order**: When creating multiple PRs that touch overlapping files, run `/plan-merge-order` before merging to minimize rebase cost.
-- **Commit before risky git ops**: Before `git stash`, `git checkout`, `git reset --hard`, or any branch switch with uncommitted work, create a WIP commit on a dedicated branch. Stash + checkout + rebase chains have repeatedly lost work in this repo.
-- **Read command output fully**: Always parse git/gh command output for branch name, commit hash, and status line. Silent branch drift has caused commits to land on the wrong branch more than once. Do not chain to the next step until the current output is verified.
+- **Commit before branch switches**: Before `git checkout`/`git switch` with uncommitted work, create a throwaway safety commit on a new branch: `git switch -c wip/<topic> && git add -A && git commit -m "wip" --no-verify`. Stash-then-switch chains have lost work when combined with the lint-staged auto-stash. Does not authorize `git stash drop`, `git reset --hard`, or `git push --force` — those remain prohibited per AGENTS.md Safety.
+- **Verify git output before chaining**: Extends **Run before claiming**. After `git commit`, `git push`, `git switch`, and `gh pr merge`, read the branch name, commit hash, and status line in the output and confirm they match the intended target before running the next command. Verify with `git status -sb` or `git rev-parse --abbrev-ref HEAD` if the output is ambiguous.
 
 ## Tooling
 
