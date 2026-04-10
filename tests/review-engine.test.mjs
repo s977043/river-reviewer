@@ -91,6 +91,48 @@ test('generateReview: verifier stats exist in debug output', async () => {
   assert.ok(Array.isArray(result.debug.verifierRejected), 'verifierRejected should be an array');
 });
 
+test('buildPrompt includes ADR context section when relatedADRs provided', () => {
+  const relatedADRs = [
+    { title: 'ADR-001 Eval Loop', path: 'docs/adr/001-eval.md', matchReason: 'keyword: evaluation' },
+    { title: 'ADR-002 Scoring', path: 'docs/adr/002-scoring.md', matchReason: 'references: src/app.ts' },
+  ];
+  const { prompt } = buildPrompt({
+    diffText,
+    diffFiles: diff.files,
+    plan,
+    phase: 'midstream',
+    projectRules: null,
+    relatedADRs,
+  });
+  assert.match(prompt, /Related ADRs\/Specs/);
+  assert.match(prompt, /ADR-001 Eval Loop/);
+  assert.match(prompt, /ADR-002 Scoring/);
+  assert.match(prompt, /設計文書との整合性/);
+});
+
+test('buildPrompt omits ADR context section when relatedADRs is empty', () => {
+  const { prompt } = buildPrompt({
+    diffText,
+    diffFiles: diff.files,
+    plan,
+    phase: 'midstream',
+    projectRules: null,
+    relatedADRs: [],
+  });
+  assert.ok(!prompt.includes('Related ADRs/Specs'));
+});
+
+test('buildPrompt omits ADR context section when relatedADRs is undefined', () => {
+  const { prompt } = buildPrompt({
+    diffText,
+    diffFiles: diff.files,
+    plan,
+    phase: 'midstream',
+    projectRules: null,
+  });
+  assert.ok(!prompt.includes('Related ADRs/Specs'));
+});
+
 test('buildPrompt switches language based on config', () => {
   const { prompt, language } = buildPrompt({
     diffText,

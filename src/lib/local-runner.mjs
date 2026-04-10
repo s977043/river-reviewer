@@ -10,6 +10,8 @@ import { createOpenAIPlanner } from './openai-planner.mjs';
 import { normalizePlannerMode } from './planner-utils.mjs';
 import { buildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { loadProjectRules } from './rules.mjs';
+import { loadRiskMap } from './risk-map.mjs';
+import { loadReviewMemory } from './memory-context.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import { isLlmEnabled, parseList } from './utils.mjs';
 
@@ -20,26 +22,40 @@ function normalizePhase(phase) {
 }
 
 // NOTE: Keep this list in sync with schemas/skill.schema.json dependencies enum.
-const dependencyStubs = ['code_search', 'test_runner', 'coverage_report', 'adr_lookup', 'repo_metadata', 'tracing'];
+const dependencyStubs = [
+  'code_search',
+  'test_runner',
+  'coverage_report',
+  'adr_lookup',
+  'repo_metadata',
+  'tracing',
+];
 
 const configLoader = new ConfigLoader();
 
 function shouldExclude(filePath, patterns = []) {
-  return patterns.some(pattern => minimatch(filePath, pattern, { dot: true }));
+  return patterns.some((pattern) => minimatch(filePath, pattern, { dot: true }));
 }
 
 function applyFileExclusions(diff, patterns = []) {
   if (!patterns.length) return diff;
 
-  const changedFiles = (diff.changedFiles ?? []).filter(filePath => !shouldExclude(filePath, patterns));
-  const rawFiles = (diff.files ?? []).filter(file => !shouldExclude(file.path, patterns));
-  const optimizedFiles = (diff.filesForReview ?? diff.files ?? []).filter(file => !shouldExclude(file.path, patterns));
+  const changedFiles = (diff.changedFiles ?? []).filter(
+    (filePath) => !shouldExclude(filePath, patterns)
+  );
+  const rawFiles = (diff.files ?? []).filter((file) => !shouldExclude(file.path, patterns));
+  const optimizedFiles = (diff.filesForReview ?? diff.files ?? []).filter(
+    (file) => !shouldExclude(file.path, patterns)
+  );
 
   const rawDiffText = renderDiffText(rawFiles);
   const diffText = renderDiffText(optimizedFiles);
   const rawTokenEstimate = Math.ceil(rawDiffText.length / 4);
   const tokenEstimate = Math.ceil(diffText.length / 4);
-  const reduction = rawTokenEstimate === 0 ? 0 : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
+  const reduction =
+    rawTokenEstimate === 0
+      ? 0
+      : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
 
   return {
     ...diff,
@@ -65,7 +81,7 @@ async function resolvePullRequestLabels() {
     const raw = await fs.readFile(eventPath, 'utf8');
     const event = JSON.parse(raw);
     const pullRequestLabels = event?.pull_request?.labels ?? event?.labels ?? [];
-    return pullRequestLabels.map(label => label?.name).filter(Boolean);
+    return pullRequestLabels.map((label) => label?.name).filter(Boolean);
   } catch {
     return [];
   }
@@ -73,10 +89,10 @@ async function resolvePullRequestLabels() {
 
 function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
   if (!prLabels.length || !ignorePatterns.length) return { matched: [], shouldSkip: false };
-  const normalizedLabels = prLabels.map(label => label.toLowerCase());
-  const matched = ignorePatterns.filter(pattern => {
+  const normalizedLabels = prLabels.map((label) => label.toLowerCase());
+  const matched = ignorePatterns.filter((pattern) => {
     const needle = pattern.toLowerCase();
-    return normalizedLabels.some(label => label.includes(needle));
+    return normalizedLabels.some((label) => label.includes(needle));
   });
   return { matched, shouldSkip: matched.length > 0 };
 }
@@ -109,11 +125,12 @@ async function collectLocalContext({
   const { config, path: configPath, source: configSource } = await configLoader.load(repoRoot);
   const prLabels = await resolvePullRequestLabels();
   const { rulesText: projectRules } = await loadProjectRules(repoRoot);
+  const riskMap = await loadRiskMap(repoRoot);
   const defaultBranch = await detectDefaultBranch(repoRoot);
   const mergeBase = await findMergeBase(repoRoot, defaultBranch);
   const rawDiff = await collectRepoDiff(repoRoot, mergeBase, { contextLines });
   const diff = applyFileExclusions(rawDiff, config.exclude?.files ?? []);
-  const reviewFiles = diff.filesForReview?.map(file => file.path) ?? diff.changedFiles;
+  const reviewFiles = diff.filesForReview?.map((file) => file.path) ?? diff.changedFiles;
   const contexts = resolveAvailableContexts(availableContexts);
   const dependencies = resolveAvailableDependencies(availableDependencies);
 
@@ -123,6 +140,7 @@ async function collectLocalContext({
     configPath,
     configSource,
     projectRules,
+    riskMap,
     defaultBranch,
     mergeBase,
     diff,
@@ -154,6 +172,7 @@ export async function planLocalReview({
   const {
     repoRoot,
     projectRules,
+    riskMap,
     defaultBranch,
     mergeBase,
     diff,
@@ -172,7 +191,7 @@ export async function planLocalReview({
 
   const { matched: ignoredLabels, shouldSkip } = shouldSkipByLabel(
     prLabels,
-    config.exclude?.prLabelsToIgnore ?? [],
+    config.exclude?.prLabelsToIgnore ?? []
   );
 
   if (shouldSkip) {
@@ -234,6 +253,8 @@ export async function planLocalReview({
     plannerMode: requestedPlannerMode,
     dryRun,
     llmEnabled,
+    repoRoot,
+    riskMap,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -263,21 +284,19 @@ export async function planLocalReview({
   };
 }
 
-export async function runLocalReview(
-  {
-    cwd = process.cwd(),
-    phase = 'midstream',
-    dryRun = false,
-    debug = false,
-    preferredModelHint = 'balanced',
-    model,
-    apiKey,
-    context: providedContext,
-    availableContexts,
-    availableDependencies,
-    plannerMode,
-  } = {},
-) {
+export async function runLocalReview({
+  cwd = process.cwd(),
+  phase = 'midstream',
+  dryRun = false,
+  debug = false,
+  preferredModelHint = 'balanced',
+  model,
+  apiKey,
+  context: providedContext,
+  availableContexts,
+  availableDependencies,
+  plannerMode,
+} = {}) {
   const context =
     providedContext ??
     (await planLocalReview({
@@ -320,6 +339,11 @@ export async function runLocalReview(
     };
   }
 
+  const memoryContext = loadReviewMemory(context.repoRoot, {
+    phase: normalizePhase(phase),
+    changedFiles: context.changedFiles,
+  });
+
   const review = await generateReview({
     diff: context.diff,
     plan: context.plan,
@@ -328,6 +352,10 @@ export async function runLocalReview(
     model,
     apiKey,
     projectRules: context.projectRules,
+    riskAssessment: context.plan?.riskAssessment ?? null,
+    memoryContext,
+    fileTypes: context.plan?.fileTypes,
+    relatedADRs: context.plan?.relatedADRs,
     config: context.config,
   });
 
@@ -372,8 +400,16 @@ export async function doctorLocalReview({
     availableContexts,
     availableDependencies,
   });
-  const { repoRoot, projectRules, defaultBranch, mergeBase, diff, reviewFiles, availableContexts: contexts, availableDependencies: dependencies } =
-    base;
+  const {
+    repoRoot,
+    projectRules,
+    defaultBranch,
+    mergeBase,
+    diff,
+    reviewFiles,
+    availableContexts: contexts,
+    availableDependencies: dependencies,
+  } = base;
 
   const llmEnabled = isLlmEnabled();
 
@@ -387,6 +423,7 @@ export async function doctorLocalReview({
         preferredModelHint,
         skills,
         llmEnabled,
+        repoRoot,
       })
     : null;
 

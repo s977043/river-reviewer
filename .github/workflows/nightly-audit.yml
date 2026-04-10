@@ -1,0 +1,83 @@
+name: Nightly Measure & Audit
+
+on:
+  schedule:
+    - cron: '0 18 * * *' # 03:00 JST
+  workflow_dispatch:
+
+concurrency:
+  group: nightly-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    name: Measure review quality signals
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Run unified evaluation
+        id: eval
+        run: |
+          set +e
+          node scripts/evaluate-all.mjs \
+            --json \
+            --append-ledger \
+            --description "nightly-audit $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            > eval-output.json 2>eval-stderr.log
+          echo "eval_exit=$?" >> $GITHUB_OUTPUT
+          set -e
+          cat eval-output.json
+
+      - name: Generate audit report
+        run: |
+          if [ ! -s eval-output.json ]; then
+            echo "::error::eval-output.json is empty or missing. Check eval-stderr.log for details."
+            if [ -f eval-stderr.log ]; then
+              echo "=== evaluate-all stderr ==="
+              cat eval-stderr.log
+            fi
+            exit 1
+          fi
+          node scripts/generate-audit-report.mjs eval-output.json
+
+      - name: Write GitHub Step Summary
+        if: always()
+        run: |
+          if [ -f audit-report.md ]; then
+            cat audit-report.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload eval artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-audit-${{ github.run_number }}
+          path: |
+            eval-output.json
+            eval-stderr.log
+            audit-report.md
+            artifacts/evals/results.jsonl
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Upload ledger for long-term retention
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-ledger-${{ github.run_number }}
+          path: artifacts/evals/results.jsonl
+          retention-days: 365
+          if-no-files-found: ignore

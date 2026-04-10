@@ -53,6 +53,19 @@ npm run agents:validate
 npm test
 ```
 
+## Eval Ledger（skill / planner / routing 変更時）
+
+> skill、planner、routing、output policy に影響する変更では、[採否基準](../pages/reference/eval-keep-discard-policy.md)に基づいて keep/discard を判断してください。
+
+- [ ] 変更前: `npm run eval:all -- --append-ledger --description "baseline"`
+- [ ] 変更後: `npm run eval:all -- --append-ledger --description "candidate: <変更内容>"`
+- [ ] `artifacts/evals/results.jsonl` の直近 2 エントリを比較
+- [ ] keep/discard 判定根拠:
+
+```text
+（ここに比較結果を貼付）
+```
+
 ## Checklist / チェックリスト
 
 - [ ] Added or updated tests related to the changes.（変更内容に関連するテストを追加・修正しました。）

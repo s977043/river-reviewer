@@ -41,6 +41,11 @@ const RATIO_METRICS = new Set([
   'falsePositiveRate',
   'evidenceRate',
   'verifierRejectRate',
+  'policyPassRate',
+  'memoryRecallRate',
+  'escalationAccuracy',
+  'suppressionAccuracy',
+  'resurfaceAccuracy',
 ]);
 
 // --- arg parsing -----------------------------------------------------------
@@ -191,6 +196,26 @@ async function runMetaValidation() {
   };
 }
 
+
+async function runRegressionEval() {
+  const { evaluateRegression } = await import('../src/lib/regression-eval.mjs');
+  const casesPath = path.join(ROOT, 'tests', 'fixtures', 'regression-eval', 'cases.json');
+  const result = await evaluateRegression({ casesPath, verbose: false });
+  return {
+    name: 'regression',
+    pass: result.exitCode === 0,
+    skipped: false,
+    metrics: {
+      policyPassRate: result.summary.policyPassRate,
+      memoryRecallRate: result.summary.memoryRecallRate,
+      escalationAccuracy: result.summary.escalationAccuracy,
+      suppressionAccuracy: result.summary.suppressionAccuracy,
+      resurfaceAccuracy: result.summary.resurfaceAccuracy,
+    },
+    errors: result.exitCode === 0 ? [] : ['One or more regression checks failed'],
+  };
+}
+
 // --- ledger -----------------------------------------------------------------
 
 function appendLedger(entry) {
@@ -235,6 +260,13 @@ Options:
     parallel.push(
       runFixturesEval().catch((err) =>
         errorResult('fixtures', `Fixtures eval error: ${err.message}`)
+      )
+    );
+  }
+  if (!parsed.skip.has('regression')) {
+    parallel.push(
+      runRegressionEval().catch((err) =>
+        errorResult('regression', `Regression eval error: ${err.message}`)
       )
     );
   }

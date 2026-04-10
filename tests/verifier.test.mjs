@@ -166,3 +166,85 @@ test('verifyFinding: multiple failures are all reported', () => {
   assert.equal(result.checks.phaseCoherent, false);
   assert.equal(result.checks.suggestionActionable, false);
 });
+
+test('verifyFinding: evidenceInDiff passes when file is in diff', () => {
+  const result = verifyFinding({
+    finding: {
+      message:
+        'Finding:\nEvidence: hardcoded secret in src/config/auth.ts\nSeverity: warning\nFix: Move the secret to environment variables',
+    },
+    diff: 'diff --git a/src/config/auth.ts b/src/config/auth.ts\n+const secret = "abc";',
+    skill: { metadata: { severity: 'major' } },
+  });
+  assert.equal(result.checks.evidenceInDiff, true);
+});
+
+test('verifyFinding: evidenceInDiff fails when file is not in diff', () => {
+  const result = verifyFinding({
+    finding: {
+      message:
+        'Finding:\nEvidence: hardcoded secret in src/config/auth.ts\nSeverity: warning\nFix: Move the secret to environment variables',
+    },
+    diff: 'diff --git a/src/index.mjs b/src/index.mjs\n+console.log("hello");',
+    skill: { metadata: { severity: 'major' } },
+  });
+  assert.equal(result.checks.evidenceInDiff, false);
+  assert.ok(result.reasons.some((r) => r.includes('file not found in diff')));
+});
+
+test('verifyFinding: evidenceInDiff lenient when no file reference', () => {
+  const result = verifyFinding({
+    finding: {
+      message:
+        'Finding:\nEvidence: the code uses an outdated pattern\nSeverity: warning\nFix: Migrate to the newer API for better performance',
+    },
+    diff: 'diff --git a/src/index.mjs b/src/index.mjs\n+console.log("hello");',
+    skill: { metadata: { severity: 'major' } },
+  });
+  assert.equal(result.checks.evidenceInDiff, true);
+});
+
+test('verifyFinding: filePhaseCoherent passes when file type matches phase', () => {
+  const result = verifyFinding({
+    finding: {
+      file: 'tests/foo.test.mjs',
+      phase: 'downstream',
+      message:
+        'Finding:\nEvidence: test is incomplete\nSeverity: nit\nFix: Add assertion for edge case',
+    },
+    diff: 'diff --git a/tests/foo.test.mjs\n+test()',
+    skill: { metadata: { severity: 'minor' } },
+    fileTypes: { test: ['tests/foo.test.mjs'], app: ['src/index.mjs'] },
+  });
+  assert.equal(result.checks.filePhaseCoherent, true);
+});
+
+test('verifyFinding: filePhaseCoherent rejects when file type mismatches phase', () => {
+  const result = verifyFinding({
+    finding: {
+      file: 'tests/foo.test.mjs',
+      phase: 'upstream',
+      message:
+        'Finding:\nEvidence: test is incomplete\nSeverity: nit\nFix: Add assertion for edge case',
+    },
+    diff: 'diff --git a/tests/foo.test.mjs\n+test()',
+    skill: { metadata: { severity: 'minor' } },
+    fileTypes: { test: ['tests/foo.test.mjs'], app: ['src/index.mjs'] },
+  });
+  assert.equal(result.checks.filePhaseCoherent, false);
+  assert.ok(result.reasons.some((r) => r.includes('File type does not match')));
+});
+
+test('verifyFinding: filePhaseCoherent lenient when fileTypes not provided', () => {
+  const result = verifyFinding({
+    finding: {
+      file: 'tests/foo.test.mjs',
+      phase: 'upstream',
+      message:
+        'Finding:\nEvidence: test is incomplete\nSeverity: nit\nFix: Add assertion for edge case',
+    },
+    diff: 'diff --git a/tests/foo.test.mjs\n+test()',
+    skill: { metadata: { severity: 'minor' } },
+  });
+  assert.equal(result.checks.filePhaseCoherent, true);
+});

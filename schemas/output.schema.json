@@ -99,6 +99,20 @@
         "notes": {
           "type": "string",
           "description": "Optional run-level notes or caveats."
+        },
+        "riskSummary": {
+          "type": "object",
+          "description": "Risk assessment summary from risk map evaluation.",
+          "required": ["aggregateAction", "escalatedFiles", "humanReviewFiles"],
+          "additionalProperties": false,
+          "properties": {
+            "aggregateAction": {
+              "type": "string",
+              "enum": ["comment_only", "escalate", "require_human_review"]
+            },
+            "escalatedFiles": { "type": "array", "items": { "type": "string" } },
+            "humanReviewFiles": { "type": "array", "items": { "type": "string" } }
+          }
         }
       }
     }

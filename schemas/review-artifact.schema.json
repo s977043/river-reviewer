@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "River Reviewer Review Artifact",
+  "description": "Structured output for a complete River Reviewer run, covering plan, context, findings, and debug info.",
+  "type": "object",
+  "required": ["version", "timestamp", "phase", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1",
+      "description": "Schema version. Always \"1\" for this revision."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the review run completed."
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["upstream", "midstream", "downstream"],
+      "description": "SDLC phase the review was executed against."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ok", "no-changes", "skipped-by-label", "error"],
+      "description": "Terminal status of the review run."
+    },
+    "plan": {
+      "type": "object",
+      "description": "Execution plan computed before the review.",
+      "additionalProperties": false,
+      "properties": {
+        "selectedSkills": {
+          "type": "array",
+          "description": "Skills that were selected for execution.",
+          "items": {
+            "type": "object",
+            "required": ["id", "name"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique skill identifier."
+              },
+              "name": {
+                "type": "string",
+                "description": "Human-readable skill name."
+              },
+              "phase": {
+                "type": "string",
+                "enum": ["upstream", "midstream", "downstream"],
+                "description": "Phase the skill targets."
+              },
+              "modelHint": {
+                "type": "string",
+                "description": "Preferred model tier hint (e.g. balanced, fast, strong)."
+              }
+            }
+          }
+        },
+        "skippedSkills": {
+          "type": "array",
+          "description": "Skills that were excluded from the run and the reasons why.",
+          "items": {
+            "type": "object",
+            "required": ["id", "reasons"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique skill identifier."
+              },
+              "reasons": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "List of reasons the skill was skipped."
+              }
+            }
+          }
+        },
+        "plannerMode": {
+          "type": "string",
+          "enum": ["off", "order", "prune"],
+          "description": "Mode the AI planner was invoked with."
+        },
+        "plannerReasons": {
+          "type": "array",
+          "description": "Per-skill reasoning produced by the AI planner.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Skill identifier."
+              },
+              "reason": {
+                "type": "string",
+                "description": "Explanation from the planner."
+              }
+            }
+          }
+        },
+        "impactTags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tags describing the impact area of the changes (e.g. security, performance)."
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "Review findings produced during the run. Each item conforms to the issue schema in output.schema.json.",
+      "items": { "type": "object" }
+    },
+    "context": {
+      "type": "object",
+      "description": "Repository and diff context captured at review time.",
+      "additionalProperties": false,
+      "properties": {
+        "repoRoot": {
+          "type": "string",
+          "description": "Absolute path to the repository root."
+        },
+        "defaultBranch": {
+          "type": "string",
+          "description": "Default branch name (e.g. main)."
+        },
+        "mergeBase": {
+          "type": "string",
+          "description": "Git merge-base commit SHA used for diffing."
+        },
+        "changedFiles": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of file paths included in the review diff."
+        },
+        "tokenEstimate": {
+          "type": "number",
+          "description": "Estimated token count of the optimized diff text."
+        },
+        "reduction": {
+          "type": "number",
+          "description": "Percentage of tokens saved by diff optimization (0-100)."
+        }
+      }
+    },
+    "debug": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Free-form debug information. Structure is not guaranteed across versions."
+    }
+  }
+}

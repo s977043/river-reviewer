@@ -13,7 +13,16 @@
         "id": { "type": "string" },
         "type": {
           "type": "string",
-          "enum": ["adr", "review", "wontfix", "pattern", "decision", "eval_result"]
+          "enum": [
+            "adr",
+            "review",
+            "wontfix",
+            "pattern",
+            "decision",
+            "eval_result",
+            "suppression",
+            "resurface"
+          ]
         },
         "path": { "type": "string", "description": "Relative path to the entry JSON file." },
         "title": { "type": "string" },

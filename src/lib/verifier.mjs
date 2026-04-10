@@ -14,6 +14,7 @@
 const RE_EVIDENCE = /Evidence:\s*(\S.{4,})/;
 const RE_SEVERITY = /Severity:\s*(\w+)/;
 const RE_ACTIONABLE = /(?:Fix|Suggestion):\s*(.{10,})/;
+const RE_FILE_REF = /[\w/-]+(?:\.[\w]+)+/g;
 
 const SEVERITY_RANK = /** @type {const} */ ({
   info: 0,
@@ -104,19 +105,74 @@ function checkSuggestionActionable(finding) {
 }
 
 /**
- * @param {{ finding: object, diff: string, skill: object }} params
+ * Check that file names referenced in the Evidence text actually appear
+ * in the diff. Lenient: returns true when no file references are found
+ * in the evidence (to avoid false negatives on prose-only evidence).
+ * @param {{ message?: string }} finding
+ * @param {string} diffText
+ * @returns {boolean}
+ */
+function checkEvidenceInDiff(finding, diffText) {
+  const text = String(finding?.message ?? '');
+  const evidenceMatch = RE_EVIDENCE.exec(text);
+  if (!evidenceMatch) return true;
+
+  const evidenceText = evidenceMatch[1];
+  const fileRefs = evidenceText.match(RE_FILE_REF);
+  if (!fileRefs || fileRefs.length === 0) return true;
+
+  const diff = String(diffText ?? '');
+  return fileRefs.some((ref) => diff.includes(ref));
+}
+
+/**
+ * Expected phase(s) for each file type category from file-classifier.
+ * Lenient: categories not listed here are not checked.
+ */
+const FILE_TYPE_PHASE_MAP = {
+  test: ['downstream'],
+  docs: ['upstream', 'midstream'],
+  schema: ['upstream', 'midstream'],
+  migration: ['upstream', 'midstream'],
+};
+
+/**
+ * Check that the finding's file category is coherent with the finding's phase.
+ * Uses file-classifier output to map file → category → expected phases.
+ * Lenient: returns true when information is insufficient.
+ * @param {{ file?: string, phase?: string }} finding
+ * @param {Record<string, string[]> | null | undefined} fileTypes
+ * @returns {boolean}
+ */
+function checkFilePhaseCoherent(finding, fileTypes) {
+  if (!fileTypes || !finding?.file || !finding?.phase) return true;
+  const fileCategory = Object.entries(fileTypes).find(([, files]) =>
+    files.includes(finding.file)
+  )?.[0];
+  if (!fileCategory) return true;
+  const expectedPhases = FILE_TYPE_PHASE_MAP[fileCategory];
+  if (!expectedPhases) return true;
+  return expectedPhases.includes(finding.phase);
+}
+
+/**
+ * @param {{ finding: object, diff: string, skill: object, fileTypes?: object }} params
  * @returns {{ verified: boolean, reasons: string[], checks: object }}
  */
-export function verifyFinding({ finding, diff, skill }) {
+export function verifyFinding({ finding, diff, skill, fileTypes }) {
   const checks = {
     evidenceExists: checkEvidenceExists(finding),
+    evidenceInDiff: checkEvidenceInDiff(finding, diff),
     phaseCoherent: checkPhaseCoherent(finding, skill),
+    filePhaseCoherent: checkFilePhaseCoherent(finding, fileTypes),
     severityJustified: checkSeverityJustified(finding, skill),
     suggestionActionable: checkSuggestionActionable(finding),
   };
 
   const reasons = [];
   if (!checks.evidenceExists) reasons.push('No evidence provided in finding');
+  if (!checks.evidenceInDiff) reasons.push('Evidence references file not found in diff');
+  if (!checks.filePhaseCoherent) reasons.push('File type does not match finding phase');
   if (!checks.phaseCoherent)
     reasons.push(
       `Phase mismatch: finding phase does not match skill phase "${skill?.metadata?.phase}"`
