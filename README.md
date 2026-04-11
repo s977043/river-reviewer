@@ -211,7 +211,7 @@ exclude:
 
 ## クイックスタート（ローカル）
 
-1. 環境: Node 22+ 推奨（CI も Node 22 系で運用）
+1. 環境: Node 22+ 推奨（CI は主に Node 22 系で運用、Unit tests は 20.x も検証）
 2. 依存導入: `npm install`
 3. スキル検証: `npm run skills:validate`
 4. Agent Skills 検証（任意）: `npm run agent-skills:validate`
