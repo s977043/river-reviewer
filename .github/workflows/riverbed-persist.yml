@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: riverbed-persist-${{ github.run_id }}
+  group: riverbed-persist
   cancel-in-progress: false
 
 jobs:

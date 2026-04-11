@@ -23,6 +23,8 @@ jobs:
           fetch-depth: 0
 
       - uses: ./.github/actions/setup-node-deps
+        with:
+          node-version: '22'
 
       - name: Run unified evaluation
         id: eval

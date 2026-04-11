@@ -6,7 +6,7 @@ inputs:
     required: false
     default: '20.x'
   cache:
-    description: 'Cache strategy (npm or none)'
+    description: 'actions/setup-node cache input (e.g. "npm", "yarn", "pnpm"). Set to "" to disable.'
     required: false
     default: 'npm'
 runs:
