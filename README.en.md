@@ -91,7 +91,7 @@ Latest release: [v0.12.0](https://github.com/s977043/river-reviewer/releases/tag
 
 ## Quick start (local)
 
-1. Environment: Node 20+ recommended (CI also runs on Node 20 series)
+1. Environment: Node 22+ recommended (CI runs on Node 22; Unit tests also validate Node 20.x)
 2. Install dependencies: `npm install`
 3. Validate skills: `npm run skills:validate`
 4. Tests: `npm test`

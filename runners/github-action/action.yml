@@ -36,7 +36,7 @@ inputs:
   node_version:
     description: 'Node.js version to use.'
     required: false
-    default: '20'
+    default: '22'
   output_format:
     description: 'Output format (text|markdown|json).'
     required: false
