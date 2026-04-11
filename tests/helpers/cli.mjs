@@ -15,12 +15,15 @@
 //   { code: number, stdout: string, stderr: string }
 
 import { execFile } from 'node:child_process';
-import { resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
-const DEFAULT_CLI_PATH = resolve('src/cli.mjs');
+// このヘルパーファイル自身からの相対パスで src/cli.mjs を解決する。
+// `resolve('src/cli.mjs')` だと実行時の cwd に依存して壊れるため、
+// import.meta.url ベースの絶対パスに固定する。
+const DEFAULT_CLI_PATH = fileURLToPath(new URL('../../src/cli.mjs', import.meta.url));
 
 /**
  * 子プロセスとして river CLI を起動する。
@@ -52,13 +55,19 @@ export async function runCliAsSubprocess(argv, options = {}) {
 
 /**
  * process.env / process.argv / process.cwd をテスト実行中のみ上書きし、終了後に復元する。
+ *
  * @template T
- * @param {{ argv?: string[], env?: Record<string,string>, cwd?: string }} overrides
+ * @param {{
+ *   argv?: string[],
+ *   env?: Record<string,string>,
+ *   cwd?: string,
+ *   cliPath?: string,  // process.argv[1] として使用する CLI スクリプトパス
+ * }} overrides
  * @param {() => T | Promise<T>} fn
  * @returns {Promise<T>}
  */
 async function withProcessOverrides(overrides, fn) {
-  const { argv, env, cwd } = overrides;
+  const { argv, env, cwd, cliPath = DEFAULT_CLI_PATH } = overrides;
 
   const envBackup = {};
   if (env) {
@@ -76,7 +85,7 @@ async function withProcessOverrides(overrides, fn) {
 
   const argvBackup = argv ? [...process.argv] : null;
   if (argv) {
-    process.argv = [process.argv[0], DEFAULT_CLI_PATH, ...argv];
+    process.argv = [process.argv[0], cliPath, ...argv];
   }
 
   const cwdBackup = cwd ? process.cwd() : null;
@@ -197,19 +206,20 @@ export async function runCliInProcess(argv, options = {}) {
   const { cwd, env, cliPath = DEFAULT_CLI_PATH } = options;
 
   if (!cliModuleCache || cliModuleCachePath !== cliPath) {
-    cliModuleCache = await import(`file://${cliPath}`);
+    // Windows パス対応のため pathToFileURL を経由する
+    cliModuleCache = await import(pathToFileURL(cliPath).href);
     cliModuleCachePath = cliPath;
   }
   const mod = cliModuleCache;
   if (typeof mod.main !== 'function') {
     throw new Error(
       'runCliInProcess: src/cli.mjs does not export main(). ' +
-        'This helper requires Phase 1.2 (cli.mjs export refactor).',
+        'This helper requires Phase 1.2 (cli.mjs export refactor).'
     );
   }
 
   let code = 0;
-  const captured = await withProcessOverrides({ argv, env, cwd }, () =>
+  const captured = await withProcessOverrides({ argv, env, cwd, cliPath }, () =>
     captureConsole(async () => {
       try {
         const result = await mod.main(argv);
@@ -222,7 +232,7 @@ export async function runCliInProcess(argv, options = {}) {
         console.error(`${error.stack || error.message}`);
         code = 1;
       }
-    }),
+    })
   );
 
   return { code, stdout: captured.stdout, stderr: captured.stderr };

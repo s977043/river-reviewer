@@ -9,19 +9,9 @@ import {
   supersede,
   expireEntries,
 } from '../src/lib/riverbed-memory.mjs';
-import { createTempMemory, makeMemoryEntry } from './helpers/memory.mjs';
+import { createTempMemory, makeMemoryEntry as makeEntry } from './helpers/memory.mjs';
 
-function tmpIndex() {
-  const { dir, indexPath, cleanup } = createTempMemory({
-    layout: 'flat',
-    prefix: 'rr-memory-',
-  });
-  return { dir, indexPath, cleanup };
-}
-
-function makeEntry(overrides = {}) {
-  return makeMemoryEntry(overrides);
-}
+const tmpIndex = () => createTempMemory({ layout: 'flat', prefix: 'rr-memory-' });
 
 test('loadMemory: returns empty structure for missing file', () => {
   const { cleanup, indexPath } = tmpIndex();

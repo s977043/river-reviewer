@@ -16,11 +16,10 @@
 
 import assert from 'node:assert';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import test, { describe } from 'node:test';
 
-import { runCliAsSubprocess, runCliInProcess } from './helpers/cli.mjs';
+import { runCliInProcess } from './helpers/cli.mjs';
 import {
   createTempGitRepo,
   createRepoWithSilentCatchChange,
@@ -273,10 +272,3 @@ describe('river skills subcommands', () => {
     assert.match(result.stdout + result.stderr, /No Agent Skills/);
   });
 });
-
-// Keep a reference to runCliAsSubprocess so lint / unused-import warnings don't
-// fire — it remains exported from helpers for future tests that need true
-// process isolation, even though this file migrated to in-process.
-void runCliAsSubprocess;
-// writeFile is re-exported for potential use in follow-up tests.
-void writeFile;

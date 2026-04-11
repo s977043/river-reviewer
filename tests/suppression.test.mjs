@@ -10,9 +10,7 @@ import {
 import { loadMemory } from '../src/lib/riverbed-memory.mjs';
 import { createTempMemory } from './helpers/memory.mjs';
 
-function tmpIndex() {
-  return createTempMemory({ layout: 'nested', prefix: 'river-supp-' });
-}
+const tmpIndex = () => createTempMemory({ layout: 'nested', prefix: 'river-supp-' });
 
 test('hashFinding produces stable hash for same input', () => {
   const h1 = hashFinding({ file: 'a.ts', message: 'test', ruleId: 'r1' });

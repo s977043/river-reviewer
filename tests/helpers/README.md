@@ -30,6 +30,21 @@
 
 `runCliInProcess` は内部で `process.env` / `process.argv` / `process.cwd` を一時的に差し替える。テスト終了時に必ず元の値に戻すので、呼び出し側が追加で cleanup する必要はない。
 
+ただし、**グローバルなプロセス状態を差し替える性質上、`runCliInProcess` の呼び出しは
+同一プロセス内で逐次実行しなければならない**。`Promise.all([runCliInProcess(...), runCliInProcess(...)])`
+のような並行呼び出しはお互いの override を上書きし合い、意図しない状態リークを起こす。
+node:test の `describe` 内テストはデフォルトで逐次実行なので、通常の利用では問題ないが、
+明示的に `{ concurrency: true }` を指定した describe 内で複数の runCliInProcess を
+走らせないこと。環境変数・CWD 依存のないテストでもサブコマンド出力が混ざる。
+
+## ambient な `process.env` の取り扱い
+
+in-process 化により、ホストプロセスの `process.env.RIVER_PHASE` / `RIVER_PLANNER_MODE`
+といった CLI デフォルト値に影響する環境変数は、テストに直接漏れ込む。テスト実行時の
+環境にこれらが設定されている場合、`parseArgs` のデフォルトが変わって誤判定する可能性がある。
+デフォルト値に依存するテストは `runCliInProcess` の `env` オプションで明示的にクリア
+（`env: { RIVER_PHASE: undefined }`）するか、`withCleanEnv` 相当のラッパーで囲むこと。
+
 ## stdio 差し替えに関する注意
 
 `captureConsole` は `console.log` / `console.error` / `console.warn` / `console.info` のみを差し替える。`process.stdout.write` / `process.stderr.write` は**差し替えない**（node:test ランナー自身が TAP 出力に使っているため、ここを横取りすると後続のサブテストが silently drop される）。`src/cli.mjs` の出力はほぼ console 経由なので問題はないが、`src/lib/agent-skill-bridge.mjs` などで直接 `process.stderr.write` しているケースはキャプチャされず実 stderr に出る。テストのアサーションはこの点を前提に組むこと。

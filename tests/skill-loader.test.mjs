@@ -9,19 +9,17 @@ import {
   loadSkillFile,
   loadSkills,
 } from '../runners/core/skill-loader.mjs';
-import { withTempDir as sharedWithTempDir, createTempDirAsync } from './helpers/temp-dir.mjs';
+import { withTempDir, createTempDirAsync } from './helpers/temp-dir.mjs';
+
+const TMP_PREFIX = 'skill-loader-';
 
 async function buildValidator(schemaPath = defaultPaths.schemaPath) {
   const schema = await loadSchema(schemaPath);
   return createSkillValidator(schema);
 }
 
-// skill-loader テスト専用の prefix 付きラッパー
-function withTempDir(fn) {
-  return sharedWithTempDir(fn, { prefix: 'skill-loader-' });
-}
 async function createTempSkillDir() {
-  return createTempDirAsync({ prefix: 'skill-loader-' });
+  return createTempDirAsync({ prefix: TMP_PREFIX });
 }
 
 test('loads existing sample skill and applies default outputKind', async () => {

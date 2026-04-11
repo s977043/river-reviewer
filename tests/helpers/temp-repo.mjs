@@ -59,37 +59,38 @@ export function writeFileRelative(rootDir, relPath, content) {
  * @returns {Promise<{ dir: string, cleanup: () => Promise<void> }>}
  */
 export async function createTempGitRepo(options = {}) {
-  const {
-    initialFiles,
-    changedFiles,
-    rules,
-    branch = 'main',
-    prefix = 'river-repo-',
-  } = options;
+  const { initialFiles, changedFiles, rules, branch = 'main', prefix = 'river-repo-' } = options;
 
   const dir = createTempDir({ prefix });
-  await runGit(['init', '-b', branch], dir);
-  await runGit(['config', 'user.email', 'test@example.com'], dir);
-  await runGit(['config', 'user.name', 'River Tester'], dir);
+  // セットアップ中に失敗したときは一時ディレクトリをリークさせないよう、
+  // 個別のエラーをキャッチして cleanup を実行してから再 throw する。
+  try {
+    await runGit(['init', '-b', branch], dir);
+    await runGit(['config', 'user.email', 'test@example.com'], dir);
+    await runGit(['config', 'user.name', 'River Tester'], dir);
 
-  if (initialFiles && Object.keys(initialFiles).length > 0) {
-    for (const [relPath, content] of Object.entries(initialFiles)) {
-      writeFileRelative(dir, relPath, content);
+    if (initialFiles && Object.keys(initialFiles).length > 0) {
+      for (const [relPath, content] of Object.entries(initialFiles)) {
+        writeFileRelative(dir, relPath, content);
+      }
+      await runGit(['add', '.'], dir);
+      await runGit(['commit', '-m', 'init'], dir);
+    } else {
+      await runGit(['commit', '--allow-empty', '-m', 'init'], dir);
     }
-    await runGit(['add', '.'], dir);
-    await runGit(['commit', '-m', 'init'], dir);
-  } else {
-    await runGit(['commit', '--allow-empty', '-m', 'init'], dir);
-  }
 
-  if (changedFiles) {
-    for (const [relPath, content] of Object.entries(changedFiles)) {
-      writeFileRelative(dir, relPath, content);
+    if (changedFiles) {
+      for (const [relPath, content] of Object.entries(changedFiles)) {
+        writeFileRelative(dir, relPath, content);
+      }
     }
-  }
 
-  if (typeof rules === 'string') {
-    writeFileRelative(dir, '.river/rules.md', rules);
+    if (typeof rules === 'string') {
+      writeFileRelative(dir, '.river/rules.md', rules);
+    }
+  } catch (error) {
+    await cleanupTempDirAsync(dir);
+    throw error;
   }
 
   const cleanup = () => cleanupTempDirAsync(dir);

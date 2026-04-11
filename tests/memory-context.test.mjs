@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import test from 'node:test';
 
@@ -9,28 +9,20 @@ import {
   buildReviewEntry,
 } from '../src/lib/memory-context.mjs';
 import { createTempDir, cleanupTempDir } from './helpers/temp-dir.mjs';
-import { makeMemoryEntry } from './helpers/memory.mjs';
-
-function tempCtxDir() {
-  return createTempDir({ prefix: 'river-mem-ctx-' });
-}
+import { makeMemoryEntry as makeEntry, writeMemoryIndex } from './helpers/memory.mjs';
 
 // memory-context.mjs は <repoRoot>/.river/memory/index.json を期待するため、
-// 既存ディレクトリ直下に nested layout を書き込む専用ヘルパーを使う。
-// helpers/memory.mjs の createTempMemory は自前で新しい一時ディレクトリを
-// 作るので、ここでは直接 fs で作成する。
+// createTempDir が作成した既存の一時ディレクトリ直下に nested layout を
+// 書き込む必要がある。createTempMemory は新しい一時ディレクトリを作るため、
+// ここではディレクトリ作成だけ自前で行い、ファイル書き込みは helper に委譲する。
 function writeIndexSync(dir, entries) {
   const memDir = join(dir, '.river', 'memory');
   mkdirSync(memDir, { recursive: true });
-  writeFileSync(join(memDir, 'index.json'), JSON.stringify({ entries, version: '1' }, null, 2));
-}
-
-function makeEntry(overrides = {}) {
-  return makeMemoryEntry(overrides);
+  writeMemoryIndex(join(memDir, 'index.json'), entries);
 }
 
 test('loadReviewMemory returns empty buckets when index missing', () => {
-  const dir = tempCtxDir();
+  const dir = createTempDir({ prefix: 'river-mem-ctx-' });
   try {
     const ctx = loadReviewMemory(dir);
     assert.deepEqual(ctx.entries, []);
@@ -42,7 +34,7 @@ test('loadReviewMemory returns empty buckets when index missing', () => {
 });
 
 test('loadReviewMemory buckets entries by type', () => {
-  const dir = tempCtxDir();
+  const dir = createTempDir({ prefix: 'river-mem-ctx-' });
   try {
     writeIndexSync(dir, [
       makeEntry({ id: 'w1', type: 'wontfix' }),
@@ -63,7 +55,7 @@ test('loadReviewMemory buckets entries by type', () => {
 });
 
 test('loadReviewMemory filters by phase', () => {
-  const dir = tempCtxDir();
+  const dir = createTempDir({ prefix: 'river-mem-ctx-' });
   try {
     writeIndexSync(dir, [
       makeEntry({
@@ -86,7 +78,7 @@ test('loadReviewMemory filters by phase', () => {
 });
 
 test('loadReviewMemory filters by relatedFiles overlap', () => {
-  const dir = tempCtxDir();
+  const dir = createTempDir({ prefix: 'river-mem-ctx-' });
   try {
     writeIndexSync(dir, [
       makeEntry({
@@ -117,7 +109,7 @@ test('loadReviewMemory filters by relatedFiles overlap', () => {
 });
 
 test('loadReviewMemory includes entries without relatedFiles', () => {
-  const dir = tempCtxDir();
+  const dir = createTempDir({ prefix: 'river-mem-ctx-' });
   try {
     writeIndexSync(dir, [
       makeEntry({

@@ -1,6 +1,5 @@
 import assert from 'node:assert';
 import fs from 'node:fs';
-import { mkdir } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import test from 'node:test';
 
@@ -17,18 +16,19 @@ async function applySampleDiff(repoDir) {
     .filter((line) => line.startsWith('+') && !line.startsWith('+++'))
     .map((line) => line.slice(1));
   const targetPath = join(repoDir, 'src', 'utils');
-  await mkdir(targetPath, { recursive: true });
+  await fs.promises.mkdir(targetPath, { recursive: true });
   await fs.promises.writeFile(join(targetPath, 'math.ts'), `${lines.join('\n')}\n`, 'utf8');
 }
 
 async function setupRepoWithDiff() {
-  const { dir, cleanup } = await createTempGitRepo({ prefix: 'river-int-' });
+  const rulesText = await fs.promises.readFile(SAMPLE_RULES, 'utf8');
+  const { dir, cleanup } = await createTempGitRepo({
+    prefix: 'river-int-',
+    rules: rulesText,
+  });
   await applySampleDiff(dir);
   // 新規ファイルは git add しないと diff に現れないため明示的にステージする
   await runGit(['add', '.'], dir);
-  const rulesDir = join(dir, '.river');
-  await mkdir(rulesDir, { recursive: true });
-  await fs.promises.copyFile(SAMPLE_RULES, join(rulesDir, 'rules.md'));
   return { dir, cleanup };
 }
 
