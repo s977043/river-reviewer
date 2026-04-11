@@ -12,24 +12,24 @@
 
 ### 必須: `generateReview` / `buildPrompt` に新パラメータを追加した場合
 
-- [ ] `src/lib/review-engine.mjs` — 関数シグネチャと内部ロジック
-- [ ] `src/lib/local-runner.mjs` — `runLocalReview` 内の `generateReview` 呼び出し
-- [ ] `src/lib/review-fixtures-eval.mjs` — eval 呼び出し
-- [ ] `tests/review-engine.test.mjs` — 新パラメータ有無のテスト最低2件
-- [ ] `tests/review-eval.test.mjs` — 既存の eval テスト
-- [ ] `tests/finding-format.test.mjs` — フォーマット検証テスト
-- [ ] `tests/integration/local-review.test.mjs` — 統合テスト（関連する場合）
+- [ ] `src/lib/review-engine.mjs`—関数シグネチャと内部ロジック
+- [ ] `src/lib/local-runner.mjs`—`runLocalReview` 内の `generateReview` 呼び出し
+- [ ] `src/lib/review-fixtures-eval.mjs`—eval 呼び出し
+- [ ] `tests/review-engine.test.mjs`—新パラメータ有無のテスト最低2件
+- [ ] `tests/review-eval.test.mjs`—既存の eval テスト
+- [ ] `tests/finding-format.test.mjs`—フォーマット検証テスト
+- [ ] `tests/integration/local-review.test.mjs`—統合テスト（関連する場合）
 
 ### 必須: `verifyFinding` に新パラメータを追加した場合
 
-- [ ] `src/lib/verifier.mjs` — 関数シグネチャと checks オブジェクト
-- [ ] `src/lib/review-engine.mjs` — `generateReview` 内の `verifyFinding` 呼び出し（`await import('./verifier.mjs')` 箇所）
-- [ ] `tests/verifier.test.mjs` — 新チェックの pass/fail/lenient 3パターン
+- [ ] `src/lib/verifier.mjs`—関数シグネチャと checks オブジェクト
+- [ ] `src/lib/review-engine.mjs`—`generateReview` 内の `verifyFinding` 呼び出し（`await import('./verifier.mjs')` 箇所）
+- [ ] `tests/verifier.test.mjs`—新チェックの pass/fail/lenient 3パターン
 
 ### 必須: `buildExecutionPlan` に新パラメータを追加した場合
 
-- [ ] `runners/core/review-runner.mjs` — options destructuring と返却オブジェクト（planner あり/なし両方）
-- [ ] `src/lib/local-runner.mjs` — `planLocalReview` の2箇所（main path + collectLocalContext path）の `buildExecutionPlan` 呼び出し
+- [ ] `runners/core/review-runner.mjs`—options destructuring と返却オブジェクト（planner あり/なし両方）
+- [ ] `src/lib/local-runner.mjs`—`planLocalReview` の2箇所（main path + collectLocalContext path）の `buildExecutionPlan` 呼び出し
 - [ ] plan 経由で下流関数に渡される場合は下流関数のチェックリストも確認
 
 ## 確認方法
