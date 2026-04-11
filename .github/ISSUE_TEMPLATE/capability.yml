@@ -46,17 +46,18 @@ body:
     validations:
       required: false
 
-  - type: textarea
+  - type: checkboxes
     id: pre_implementation
     attributes:
       label: Pre-implementation checklist
       description: 着手前に必ず満たすこと。既存資産確認と実行計画の用意は必須。
-      value: |
-        - [ ] 既存コードベース・skill・docs を確認して重複や前提を洗い出した
-        - [ ] 実行計画（変更対象ファイル、影響範囲、検証手順）を本 Issue または PR に記載した
-        - [ ] Why と Non-goals が現状でも妥当か再確認した
-    validations:
-      required: true
+      options:
+        - label: 既存コードベース・skill・docs を確認して重複や前提を洗い出した
+          required: true
+        - label: 実行計画（変更対象ファイル、影響範囲、検証手順）を本 Issue または PR に記載した
+          required: true
+        - label: Why と Non-goals が現状でも妥当か再確認した
+          required: true
 
   - type: textarea
     id: notes
