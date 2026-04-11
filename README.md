@@ -31,7 +31,7 @@ Philosophy: [なぜ作ったのか](#philosophy)
 
 開発手順は [docs/runbook/dev.md](docs/runbook/dev.md) を参照してください。
 
-**River ReviewerはSkill Registry中心のコードレビューフレームワークです。**
+**River Reviewer は Context Engineering に基づく Skill Registry 中心のコードレビューフレームワークです。**
 
 チーム固有のレビュー知識を「スキル」として明示化・バージョン管理し、GitHub Actions/CLI/Node APIなど、あらゆる環境で再利用できます。スキルはテスト可能で、継続的に改善できる資産です。
 
@@ -86,16 +86,16 @@ jobs:
         with:
           fetch-depth: 0 # merge-base を安定取得
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.11.0
+        uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-タグは `@v0.11.0` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
+タグは `@v0.12.0` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
 
-最新リリース: [v0.11.0](https://github.com/s977043/river-reviewer/releases/tag/v0.11.0)
+最新リリース: [v0.12.0](https://github.com/s977043/river-reviewer/releases/tag/v0.12.0)
 
 > **ℹ️ v0.1.x からのアップグレード:** v0.2.0以降では、GitHub Actionのパスが `.github/actions/river-reviewer` から `runners/github-action` に変更されています。詳細は[移行ガイド](docs/migration/runners-architecture-guide.md)と[DEPRECATED.md](docs/deprecated.md)をご確認ください。
 
@@ -110,7 +110,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -119,7 +119,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -128,7 +128,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -142,7 +142,7 @@ review:
   steps:
     - uses: actions/checkout@v6
       with: { fetch-depth: 0 }
-    - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+    - uses: s977043/river-reviewer/runners/github-action@v0.12.0
       with:
         phase: midstream
         estimate: true # コスト見積もりのみ
@@ -160,7 +160,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream
           dry_run: true            # Draft はドライランでプロンプト確認のみ
@@ -173,7 +173,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream
           dry_run: false           # Ready ではフルレビュー
@@ -211,7 +211,7 @@ exclude:
 
 ## クイックスタート（ローカル）
 
-1. 環境: Node 20+ 推奨（CI も Node 20 系で運用）
+1. 環境: Node 22+ 推奨（CI は主に Node 22 系で運用、Unit tests は 20.x も検証）
 2. 依存導入: `npm install`
 3. スキル検証: `npm run skills:validate`
 4. Agent Skills 検証（任意）: `npm run agent-skills:validate`

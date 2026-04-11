@@ -1,0 +1,87 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import { classifyChangedFiles } from '../src/lib/file-classifier.mjs';
+
+test('classifyChangedFiles: categorizes mixed file set', () => {
+  const result = classifyChangedFiles([
+    'src/lib/review-engine.mjs',
+    'tests/verifier.test.mjs',
+    'schemas/skill.schema.json',
+    '.github/workflows/test.yml',
+    'package.json',
+    'docs/architecture.md',
+    'pages/reference/eval-keep-discard-policy.md',
+    'db/migrations/001_init.sql',
+    'unknown-file.xyz',
+  ]);
+
+  assert.deepEqual(result.app, ['src/lib/review-engine.mjs']);
+  assert.deepEqual(result.test, ['tests/verifier.test.mjs']);
+  assert.deepEqual(result.schema, ['schemas/skill.schema.json']);
+  assert.deepEqual(result.infra, ['.github/workflows/test.yml']);
+  assert.deepEqual(result.config, ['package.json']);
+  assert.deepEqual(result.docs, [
+    'docs/architecture.md',
+    'pages/reference/eval-keep-discard-policy.md',
+  ]);
+  assert.deepEqual(result.migration, ['db/migrations/001_init.sql']);
+  assert.deepEqual(result.unknown, ['unknown-file.xyz']);
+});
+
+test('classifyChangedFiles: test files take priority over app', () => {
+  const result = classifyChangedFiles(['src/lib/__tests__/foo.test.mjs']);
+  assert.deepEqual(result.test, ['src/lib/__tests__/foo.test.mjs']);
+  assert.deepEqual(result.app, []);
+});
+
+test('classifyChangedFiles: empty input returns empty categories', () => {
+  const result = classifyChangedFiles([]);
+  assert.equal(Object.values(result).flat().length, 0);
+});
+
+test('classifyChangedFiles: config patterns', () => {
+  const result = classifyChangedFiles([
+    'tsconfig.json',
+    '.eslintrc.json',
+    '.env.example',
+    'jest.config.js',
+    '.river-reviewer.json',
+  ]);
+  assert.equal(result.config.length, 5);
+});
+
+test('classifyChangedFiles: schema files', () => {
+  const result = classifyChangedFiles([
+    'schemas/eval-failure.schema.json',
+    'schemas/output.schema.json',
+  ]);
+  assert.equal(result.schema.length, 2);
+});
+
+test('classifyChangedFiles: infra patterns', () => {
+  const result = classifyChangedFiles([
+    '.github/workflows/deploy.yml',
+    'Dockerfile',
+    '.husky/pre-commit',
+    'scripts/setup.sh',
+  ]);
+  assert.equal(result.infra.length, 4);
+});
+
+test('classifyChangedFiles: docs from various locations', () => {
+  const result = classifyChangedFiles([
+    'README.md',
+    'docs/adr/001-eval-driven-improvement-loop.md',
+    'AGENTS.md',
+  ]);
+  assert.equal(result.docs.length, 3);
+});
+
+test('classifyChangedFiles: migration patterns', () => {
+  const result = classifyChangedFiles([
+    'db/migrations/001_init.sql',
+    'src/migrations/20240101_add_users.ts',
+  ]);
+  assert.equal(result.migration.length, 2);
+});

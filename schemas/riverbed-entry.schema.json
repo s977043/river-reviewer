@@ -7,7 +7,16 @@
   "$defs": {
     "entryType": {
       "type": "string",
-      "enum": ["adr", "review", "wontfix", "pattern", "decision"]
+      "enum": [
+        "adr",
+        "review",
+        "wontfix",
+        "pattern",
+        "decision",
+        "eval_result",
+        "suppression",
+        "resurface"
+      ]
     },
     "phase": {
       "type": "string",
@@ -93,6 +102,21 @@
       "type": "object",
       "additionalProperties": true,
       "description": "Optional contextual metadata (e.g., related ADR IDs, PR numbers)."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "superseded", "archived"],
+      "default": "active",
+      "description": "Entry lifecycle status."
+    },
+    "supersededBy": {
+      "type": "string",
+      "description": "ID of the entry that supersedes this one."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional expiration timestamp."
     }
   }
 }

@@ -1,0 +1,31 @@
+name: Riverbed Memory Persist
+
+on:
+  workflow_call:
+    inputs:
+      memory-path:
+        description: 'Path to the memory index file'
+        required: false
+        default: '.river/memory/index.json'
+        type: string
+
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download previous memory artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: riverbed-memory
+          path: .river/memory
+        continue-on-error: true
+
+      - name: Upload memory artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: riverbed-memory
+          path: ${{ inputs.memory-path }}
+          retention-days: 90
+          if-no-files-found: ignore

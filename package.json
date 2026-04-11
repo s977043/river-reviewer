@@ -1,11 +1,11 @@
 {
   "name": "river-reviewer",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "private": true,
   "description": "River Reviewer docs, schemas, and validation utilities.",
   "license": "MIT",
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "repository": {
     "type": "git",
@@ -44,20 +44,23 @@
     "planner:eval:dataset": "node scripts/evaluate-planner-dataset.mjs",
     "eval:fixtures": "node scripts/evaluate-review-fixtures.mjs",
     "meta:validate": "node scripts/validate-meta-consistency.mjs",
+    "eval:all": "node scripts/evaluate-all.mjs",
     "check:bilingual": "node scripts/check-bilingual-pairs.mjs",
     "check:doc-placement": "node scripts/check-doc-placement.mjs",
     "check:docs": "npm run check:bilingual && npm run check:doc-placement",
+    "build:action": "ncc build runners/github-action/src/index.mjs -o runners/github-action/dist --source-map --license licenses.txt",
     "codex:local": "CODEX_HOME=\"$(git rev-parse --show-toplevel)/.codex\" codex -C \"$(git rev-parse --show-toplevel)\"",
     "codex:exec": "CODEX_HOME=\"$(git rev-parse --show-toplevel)/.codex\" codex exec -C \"$(git rev-parse --show-toplevel)\"",
     "river": "node ./src/cli.mjs",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "eval:regression": "node scripts/evaluate-regression.mjs"
   },
   "dependencies": {
     "@docusaurus/core": "^3.5.0",
     "@docusaurus/preset-classic": "^3.5.0",
     "@docusaurus/theme-mermaid": "^3.9.2",
     "@google/generative-ai": "^0.24.1",
-    "@inquirer/prompts": "^8.2.0",
+    "@inquirer/prompts": "^8.3.2",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.68.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.211.0",
@@ -74,17 +77,18 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.4",
     "recharts": "^3.6.0",
-    "zod": "^4.3.5"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.4.2",
+    "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.3.1",
+    "@vercel/ncc": "^0.38.4",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "glob": "^13.0.0",
+    "glob": "^13.0.6",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "markdownlint-cli": "^0.47.0",
+    "markdownlint-cli": "^0.48.0",
     "prettier": "^3.8.1",
     "prh": "^5.4.4",
     "textlint": "^15.5.2",

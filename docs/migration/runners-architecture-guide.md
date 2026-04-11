@@ -359,7 +359,7 @@ jobs:
 | `debug`        | Print debug information                              | `false`     |
 | `estimate`     | Estimate cost only                                   | `false`     |
 | `max_cost`     | Abort if cost exceeds value (USD)                    | -           |
-| `node_version` | Node.js version                                      | `20`        |
+| `node_version` | Node.js version                                      | `22`        |
 
 ### Multi-Phase Review
 

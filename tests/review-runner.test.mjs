@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { loadSkills } from '../runners/core/skill-loader.mjs';
-import { buildExecutionPlan, rankByModelHint, selectSkills } from '../runners/core/review-runner.mjs';
+import {
+  buildExecutionPlan,
+  rankByModelHint,
+  selectSkills,
+} from '../runners/core/review-runner.mjs';
 
 test('selects skills by phase and applyTo glob', async () => {
   const skills = await loadSkills();
@@ -10,8 +14,11 @@ test('selects skills by phase and applyTo glob', async () => {
     changedFiles: ['src/app.ts'],
     availableContexts: ['diff'],
   });
-  const ids = selected.map(s => s.metadata.id);
-  assert.ok(ids.includes('rr-midstream-code-quality-sample-001'), 'midstream skill should be selected');
+  const ids = selected.map((s) => s.metadata.id);
+  assert.ok(
+    ids.includes('rr-midstream-code-quality-sample-001'),
+    'midstream skill should be selected'
+  );
 });
 
 test('skips when required inputContext is missing', () => {
@@ -34,7 +41,7 @@ test('skips when required inputContext is missing', () => {
   });
   assert.equal(selected.length, 0);
   assert.equal(skipped.length, 1);
-  assert.ok(skipped[0].reasons.some(r => r.includes('missing')));
+  assert.ok(skipped[0].reasons.some((r) => r.includes('missing')));
 });
 
 test('skips when dependencies are not available', () => {
@@ -58,7 +65,7 @@ test('skips when dependencies are not available', () => {
   });
   assert.equal(selected.length, 0);
   assert.equal(skipped.length, 1);
-  assert.ok(skipped[0].reasons.some(r => r.includes('missing dependencies')));
+  assert.ok(skipped[0].reasons.some((r) => r.includes('missing dependencies')));
 });
 
 test('selects when dependencies are available', () => {
@@ -87,10 +94,19 @@ test('selects when dependencies are available', () => {
 test('ranks skills using modelHint proximity', () => {
   const skills = [
     { metadata: { id: 'cheap', phase: 'midstream', applyTo: ['src/**'], modelHint: 'cheap' } },
-    { metadata: { id: 'balanced', phase: 'midstream', applyTo: ['src/**'], modelHint: 'balanced' } },
-    { metadata: { id: 'accurate', phase: 'midstream', applyTo: ['src/**'], modelHint: 'high-accuracy' } },
+    {
+      metadata: { id: 'balanced', phase: 'midstream', applyTo: ['src/**'], modelHint: 'balanced' },
+    },
+    {
+      metadata: {
+        id: 'accurate',
+        phase: 'midstream',
+        applyTo: ['src/**'],
+        modelHint: 'high-accuracy',
+      },
+    },
   ];
-  const ordered = rankByModelHint(skills, 'high-accuracy').map(s => s.metadata.id);
+  const ordered = rankByModelHint(skills, 'high-accuracy').map((s) => s.metadata.id);
   assert.deepEqual(ordered, ['accurate', 'balanced', 'cheap']);
 });
 
@@ -123,7 +139,7 @@ test('buildExecutionPlan can use planner when provided', async () => {
     planner,
     skills: providedSkills,
   });
-  const ids = plan.selected.map(s => s.metadata.id);
+  const ids = plan.selected.map((s) => s.metadata.id);
   assert.deepEqual(ids, ['b', 'a']);
   assert.equal(plan.plannerFallback, false);
 });
@@ -145,7 +161,7 @@ test('buildExecutionPlan supports prune mode (planner-selected subset only)', as
     plannerMode: 'prune',
     skills: providedSkills,
   });
-  const ids = plan.selected.map(s => s.metadata.id);
+  const ids = plan.selected.map((s) => s.metadata.id);
   assert.deepEqual(ids, ['b']);
   assert.equal(plan.plannerFallback, false);
   assert.equal(plan.plannerMode, 'prune');
@@ -167,7 +183,7 @@ test('buildExecutionPlan falls back when planner output is invalid in prune mode
     plannerMode: 'prune',
     skills: providedSkills,
   });
-  const ids = plan.selected.map(s => s.metadata.id);
+  const ids = plan.selected.map((s) => s.metadata.id);
   assert.deepEqual(ids, ['a', 'b']);
   assert.equal(plan.plannerFallback, true);
 });
@@ -197,19 +213,34 @@ test('selectSkills skips LLM-only skills when llmEnabled is false', () => {
     llmEnabled: false,
   });
 
-  const ids = selected.map(s => s.metadata.id);
+  const ids = selected.map((s) => s.metadata.id);
   assert.equal(ids.length, 1);
   assert.ok(ids.includes('rr-midstream-security-basic-001'), 'heuristic skill should be selected');
   assert.ok(!ids.includes('llm-only-skill'), 'LLM skill should be skipped');
 
-  const llmSkip = skipped.find(s => s.skill.metadata.id === 'llm-only-skill');
+  const llmSkip = skipped.find((s) => s.skill.metadata.id === 'llm-only-skill');
   assert.ok(llmSkip, 'LLM skill should be in skipped list');
   assert.ok(llmSkip.reasons[0].includes('LLM disabled'), 'Reason should be LLM disabled');
 });
 
+test('buildExecutionPlan includes fileTypes in result', async () => {
+  const plan = await buildExecutionPlan({
+    phase: 'midstream',
+    changedFiles: ['src/lib/review-engine.mjs', 'tests/verifier.test.mjs', 'package.json'],
+    availableContexts: ['diff'],
+    dryRun: true,
+  });
+  assert.ok(plan.fileTypes);
+  assert.ok(Array.isArray(plan.fileTypes.app));
+  assert.ok(Array.isArray(plan.fileTypes.test));
+  assert.ok(Array.isArray(plan.fileTypes.config));
+});
+
 test('buildExecutionPlan propagates llmEnabled: false to selectSkills', async () => {
   const skills = [
-    { metadata: { id: 'rr-midstream-security-basic-001', phase: 'midstream', applyTo: ['src/**'] } },
+    {
+      metadata: { id: 'rr-midstream-security-basic-001', phase: 'midstream', applyTo: ['src/**'] },
+    },
     { metadata: { id: 'llm-only-skill', phase: 'midstream', applyTo: ['src/**'] } },
   ];
 
@@ -221,10 +252,10 @@ test('buildExecutionPlan propagates llmEnabled: false to selectSkills', async ()
     llmEnabled: false,
   });
 
-  const selectedIds = plan.selected.map(s => s.metadata.id);
+  const selectedIds = plan.selected.map((s) => s.metadata.id);
   assert.ok(selectedIds.includes('rr-midstream-security-basic-001'));
   assert.ok(!selectedIds.includes('llm-only-skill'));
 
-  const skippedIds = plan.skipped.map(s => s.skill.metadata.id);
+  const skippedIds = plan.skipped.map((s) => s.skill.metadata.id);
   assert.ok(skippedIds.includes('llm-only-skill'));
 });

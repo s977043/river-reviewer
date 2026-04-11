@@ -11,6 +11,8 @@
 - Capture one learning per bullet with enough context to reuse it.
 - Record secrets, personal data, transient debugging notes, and branch-specific TODOs nowhere in this file.
 - Prefer facts that change slowly: command shapes, package boundaries, validation rules, source-of-truth files, and recurring pitfalls.
+- Do not duplicate facts already stated in `AGENTS.md`. Only record what is not obvious from the canonical instructions.
+- Remove or update entries when the underlying fact changes. Review during major refactors.
 
 ## Entry Format
 
@@ -20,12 +22,9 @@
 
 ## Current Learnings
 
-- `2026-04-03`: `README.md` is the Japanese source of truth, and `README.en.md` is best effort only.
-  - `Applies to`: docs updates, content parity checks, and agent instructions.
-  - `Evidence`: repository README files and existing project guidance.
-- `2026-04-03`: The root package uses `npm`; validation is `npm run lint` and `npm test`, while the root has no `typecheck` script.
-  - `Applies to`: routine verification and agent planning.
-  - `Evidence`: root `package.json`.
-- `2026-04-03`: `runners/node-api/` is a separate TypeScript package and its compile check is `npm run build` (`tsc`) inside that directory.
-  - `Applies to`: changes to the Node API runner or its published types.
-  - `Evidence`: `runners/node-api/package.json`.
+- `2026-04-03`: LLM feature guards use `isLlmEnabled()` from `src/lib/utils.mjs`. It checks both OpenAI (`OPENAI_API_KEY`, `RIVER_OPENAI_API_KEY`) and Google Gemini (`GOOGLE_API_KEY`) keys.
+  - `Applies to`: any code that conditionally enables LLM-powered features.
+  - `Evidence`: `src/lib/utils.mjs`, `src/lib/local-runner.mjs`, `src/core/skill-dispatcher.mjs`.
+- `2026-04-03`: Use Git Worktrees for parallel agent tasks. Setup and teardown steps are documented in `docs/runbook/dev.md` § 並行タスク。
+  - `Applies to`: concurrent branch work and multi-agent workflows.
+  - `Evidence`: `docs/runbook/dev.md`「並行タスク（Git Worktree）」セクション。

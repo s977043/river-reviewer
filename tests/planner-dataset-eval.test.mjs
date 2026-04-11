@@ -11,7 +11,7 @@ test('evaluatePlannerDataset loads fixture cases', async () => {
   const { summary, cases } = await evaluatePlannerDataset({ datasetDir });
   assert.ok(summary.cases >= 10);
   assert.strictEqual(cases.length, summary.cases);
-  assert.ok(cases.every(c => typeof c.name === 'string' && c.name.length > 0));
+  assert.ok(cases.every((c) => typeof c.name === 'string' && c.name.length > 0));
 });
 
 test('evaluatePlannerDataset keeps stable baseline metrics (coverage/top1Match)', async () => {
@@ -24,5 +24,21 @@ test('evaluatePlannerDataset keeps stable baseline metrics (coverage/top1Match)'
   // top1Match is defined only for cases that set expectedTop1.
   if (summary.top1MatchCases > 0) {
     assert.ok(summary.top1Match >= 0.9);
+  }
+});
+
+test('evaluatePlannerDataset: results include failures array', async () => {
+  const datasetDir = path.join(__dirname, 'fixtures', 'planner-dataset');
+
+  try {
+    const result = await evaluatePlannerDataset({ datasetDir });
+    for (const c of result.cases) {
+      assert.ok(Array.isArray(c.failures), `case ${c.name} should have failures array`);
+    }
+    assert.ok(result.summary.failuresByCategory !== undefined);
+  } catch (err) {
+    // Skip if dataset not available
+    if (err.code === 'ENOENT') return;
+    throw err;
   }
 });

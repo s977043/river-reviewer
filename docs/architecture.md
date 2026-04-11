@@ -4,7 +4,7 @@
 
 ## Overview
 
-River Reviewer is a **Skill Registry-based AI code review framework** that transforms implicit team knowledge into reproducible, version-controlled agent skills.
+River Reviewer is a **context engineering framework for AI code review**, built around a Skill Registry that transforms implicit team knowledge into reproducible, version-controlled agent skills.
 
 The core philosophy: **"Skills are the main feature."** Everything else—GitHub Actions, CLI, Node API—are just interfaces to execute these skills.
 
@@ -26,6 +26,11 @@ The core philosophy: **"Skills are the main feature."** Everything else—GitHub
 4. **Evaluation-Driven Development**
    - Every skill includes test fixtures and golden outputs
    - promptfoo integration enables regression testing and quality measurement
+
+5. **Context Engineering**
+   - Manage what enters the LLM prompt, when, and at what fidelity
+   - Progressive disclosure: load metadata first, full instructions only for selected skills
+   - Context budget awareness: select the smallest high-signal context that produces quality review output
 
 ## Core Components
 
@@ -55,7 +60,7 @@ flowchart TB
 
     subgraph Runner["Review Runner"]
         RN1[Context Builder<br/>diff/files/PR]
-        RN2[LLM Client<br/>OpenAI/Anthropic]
+        RN2[LLM Client<br/>OpenAI]
         RN3[Formatter<br/>Markdown/JSON]
     end
 

@@ -1,63 +1,103 @@
 # Riverbed Memory を使用する
 
-:::caution[Draft / 計画中の機能]
-このガイドは計画中の機能について説明しています。現在のバージョン (v0) はステートレスであり、Riverbed Memory は実装されていません。以下の手順は将来のバージョンで利用可能になる予定です。
-:::
+Riverbed Memory は過去のレビュー判断を構造化レコードとして保存し、後続のレビュー実行で参照可能にする仕組みです。
 
-Riverbed Memory は過去のレビューコンテキストを保存し、将来のフローの一貫性を保ちます。
+## 前提条件
 
-## 手順
+- Node.js 22 以上
+- `npm ci` 済み
 
-1. 決定の記録: Upstream 設計の選択については PR の説明に短いメモを追加し、関連する場合にスキルの指示からリンクする。
-2. シグナルの永続化: 承認されたレビュー結果（例: `logs/` やデータベース層）をスキル ID とフェーズをキーとして保存する。
-   例えば、`logs/review_outcomes.json` を以下のように保持する:
+## エンドツーエンドの使い方
 
-   ```json
-   {
-     "skill-123": {
-       "phase": "upstream",
-       "outcome": "approved",
-       "notes": "Design aligns with upstream architecture."
-     },
-     "skill-456": {
-       "phase": "midstream",
-       "outcome": "approved",
-       "notes": "Code meets performance requirements."
-     }
-   }
-   ```
+### 1. eval 実行時にメモリを保存する
 
-3. コンテキストの再利用: 新しいスキルを作成する際、重複した警告や矛盾したガイダンスを避けるために、以前の決定を参照する。
-4. 古いメモリの期限切れ: 定期的なリズム（例: 毎月）を設定して、古い決定を整理し、前提条件を更新する。
+`npm run eval:all` に `--persist-memory` フラグを付けると、eval 結果が `.river/memory/index.json` に自動保存されます。
 
-## 運用例（Shared Memory の配置）
-
-AI レビュー運用の Shared Memory を `.river/` 配下に整理する例です。
-
-- Static（変えにくいルール）: `.river/ai-review/static/`
-- Dynamic（学習ログ）: `.river/ai-review/dynamic/`
-
-例:
-
-```text
-.river/ai-review/
-  static/
-    overview.md
-    bot-commands.md
-    config-guide.md
-    integration.md
-    security.md
-    plans-and-costs.md
-  dynamic/
-    changelog-template.md
-    tuning-log.md
+```bash
+npm run eval:all -- --persist-memory --append-ledger --description "baseline"
 ```
+
+実行後、`.river/memory/index.json` にエントリが追加されます。
+
+### 2. メモリを手動で追加する
+
+`src/lib/riverbed-memory.mjs` の API を直接使用してレコードを追加できます。
+
+```javascript
+import { appendEntry } from './src/lib/riverbed-memory.mjs';
+
+appendEntry('.river/memory/index.json', {
+  id: 'wontfix-silent-catch-utils',
+  type: 'wontfix',
+  title: 'utils.mjs の silent catch は意図的',
+  content: 'エラーログは上位で処理済みのため、catch 内での再 throw は不要。',
+  metadata: {
+    createdAt: new Date().toISOString(),
+    author: 'reviewer',
+    phase: 'midstream',
+    tags: ['observability', 'silent-catch'],
+    confidence: 0.9,
+  },
+  context: {
+    sourcePR: 'https://github.com/example/repo/pull/42',
+  },
+});
+```
+
+### 3. メモリを検索する
+
+```javascript
+import { loadMemory, queryMemory } from './src/lib/riverbed-memory.mjs';
+
+const index = loadMemory('.river/memory/index.json');
+
+// type でフィルタ
+const wontfixEntries = queryMemory(index, { type: 'wontfix' });
+
+// phase + tags でフィルタ
+const midstreamSecurity = queryMemory(index, {
+  phase: 'midstream',
+  tags: ['security'],
+});
+```
+
+### 4. CI で永続化する（GitHub Artifact）
+
+`.github/workflows/riverbed-persist.yml` が GitHub Artifact 経由でメモリを永続化します。
+
+```yaml
+# 他のワークフローから呼び出す
+jobs:
+  persist:
+    uses: ./.github/workflows/riverbed-persist.yml
+```
+
+前回のアーティファクトを自動ダウンロードし、更新後にアップロードします（90 日 retention）。メモリが見つからない場合も正常動作します（stateless fallback）。
+
+## レコード型
+
+| type          | 用途                                          |
+| ------------- | --------------------------------------------- |
+| `adr`         | ADR への紐付け                                |
+| `review`      | レビュー結果の記録                            |
+| `wontfix`     | 意図的に対応しない判断                        |
+| `pattern`     | 繰り返し出現するパターン                      |
+| `decision`    | 設計判断の記録                                |
+| `eval_result` | 評価実行結果（`--persist-memory` で自動生成） |
+
+## スキーマ
+
+レコードは `schemas/riverbed-entry.schema.json` に準拠します。必須フィールド:
+
+- `id` — 一意識別子
+- `type` — 上記のレコード型
+- `content` — 本文
+- `metadata.createdAt` — ISO タイムスタンプ
+- `metadata.author` — 作成者
 
 ## 関連
 
-- Riverbed Memory の背景とスコープ: `pages/explanation/riverbed-memory.md`
-
-## グッドプラクティス
-
-- メモリエントリは小さく、アクション指向（何が変わったか、なぜか、そしてフェーズ）に保つ。
-- 自動化ツールがレビューアに情報を注入できるように、構造化されたフォーマット（JSON/YAML）を推奨する。
+- スキーマ定義: `schemas/riverbed-entry.schema.json`
+- インデックススキーマ: `schemas/riverbed-index.schema.json`
+- 永続化ワークフロー: `.github/workflows/riverbed-persist.yml`
+- 背景と設計思想: `pages/explanation/riverbed-memory.md`

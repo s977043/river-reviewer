@@ -1,0 +1,68 @@
+name: 'Capability'
+description: 機能・責務単位の中位 Issue。Why と Done when を保ったまま Task に落とすための器。
+title: 'Capability: '
+labels: ['capability', 'status:triage']
+body:
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: なぜこの Capability が必要か。背景・課題・狙いを書く。
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: 今回やること。実装・設計・運用の対象範囲。
+    validations:
+      required: true
+
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: 今回やらないこと。スコープ外を明記する。
+    validations:
+      required: true
+
+  - type: textarea
+    id: done_when
+    attributes:
+      label: Done when
+      description: 完了条件。Yes/No で確認できる状態。
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: 依存 Issue・前提・親 Epic。
+      placeholder: |
+        - Epic: #NN
+        - Depends on: #NN
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: pre_implementation
+    attributes:
+      label: Pre-implementation checklist
+      description: 着手前に必ず満たすこと。既存資産確認と実行計画の用意は必須。
+      options:
+        - label: 既存コードベース・skill・docs を確認して重複や前提を洗い出した
+          required: true
+        - label: 実行計画（変更対象ファイル、影響範囲、検証手順）を本 Issue または PR に記載した
+          required: true
+        - label: Why と Non-goals が現状でも妥当か再確認した
+          required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: 補足、検討メモ、リンク。
+    validations:
+      required: false

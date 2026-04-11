@@ -4,8 +4,15 @@ node_modules
 build/
 .docusaurus/
 
-# Runner outputs
-artifacts/
+# Runner outputs (track evals directory for ledger)
+artifacts/*
+!artifacts/evals/
+artifacts/evals/*
+!artifacts/evals/.gitkeep
+
+# Riverbed memory (track directory, ignore data)
+.river/memory/*
+!.river/memory/.gitkeep
 
 # Generated schema/examples backups
 *.schema_*.json
@@ -32,4 +39,5 @@ eval-results/
 reports/
 **/eval/results.json
 dist/
+!runners/github-action/dist/
 run_log.txt

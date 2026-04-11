@@ -60,6 +60,26 @@ export async function evaluatePlannerDataset({
       const top1Match = expectedTop1.length ? (expectedTop1.includes(top1) ? 1 : 0) : null;
       const missingExpected = expectedAny.filter((id) => !selectedIds.includes(id));
 
+      const failures = [];
+      if (missingExpected.length > 0) {
+        for (const skillId of missingExpected) {
+          failures.push({
+            category: 'routing_miss',
+            caseRef: c.name,
+            evalType: 'planner',
+            description: `Expected skill ${skillId} not selected`,
+          });
+        }
+      }
+      if (top1Match === 0 && expectedTop1.length > 0) {
+        failures.push({
+          category: 'phase_miss',
+          caseRef: c.name,
+          evalType: 'planner',
+          description: `Top-1 mismatch: got ${top1}, expected one of ${expectedTop1.join(', ')}`,
+        });
+      }
+
       return {
         name: c.name,
         phase: c.phase,
@@ -74,6 +94,7 @@ export async function evaluatePlannerDataset({
         coverage,
         top1Match,
         missingExpected,
+        failures,
         skipped: plan.skipped.map((s) => ({
           id: getMeta(s.skill).id,
           reasons: s.reasons,
@@ -83,12 +104,18 @@ export async function evaluatePlannerDataset({
   );
 
   const definedTop1 = results.map((r) => r.top1Match).filter((v) => v != null);
+  const allFailures = results.flatMap((r) => r.failures ?? []);
+  const failuresByCategory = {};
+  for (const f of allFailures) {
+    failuresByCategory[f.category] = (failuresByCategory[f.category] ?? 0) + 1;
+  }
   return {
     summary: {
       cases: results.length,
       coverage: average(results.map((r) => r.coverage)),
       top1Match: definedTop1.length ? average(definedTop1) : 0,
       top1MatchCases: definedTop1.length,
+      failuresByCategory,
     },
     cases: results,
   };

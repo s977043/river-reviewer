@@ -1,0 +1,11 @@
+# Enforce LF line endings for the bundled GitHub Action dist so that
+# cross-platform rebuilds (macOS arm64, Linux x64, Windows) produce
+# deterministic output for the `Action dist freshness` CI check.
+#
+# The tslib runtime helpers bundled into dist/index.mjs by ncc contain
+# CRLF in their upstream source. Without this normalization, macOS builds
+# retain the CR characters while git's `autocrlf=input` strips them on
+# commit, causing every CI build to show a phantom diff.
+runners/github-action/dist/*.mjs text eol=lf
+runners/github-action/dist/*.map text eol=lf
+runners/github-action/dist/*.cjs text eol=lf

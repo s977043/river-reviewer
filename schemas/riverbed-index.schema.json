@@ -13,7 +13,16 @@
         "id": { "type": "string" },
         "type": {
           "type": "string",
-          "enum": ["adr", "review", "wontfix", "pattern", "decision"]
+          "enum": [
+            "adr",
+            "review",
+            "wontfix",
+            "pattern",
+            "decision",
+            "eval_result",
+            "suppression",
+            "resurface"
+          ]
         },
         "path": { "type": "string", "description": "Relative path to the entry JSON file." },
         "title": { "type": "string" },
@@ -27,7 +36,11 @@
           "enum": ["upstream", "midstream", "downstream"]
         },
         "createdAt": { "type": "string", "format": "date-time" },
-        "summary": { "type": "string" }
+        "summary": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["active", "superseded", "archived"]
+        }
       }
     }
   },

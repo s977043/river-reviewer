@@ -32,7 +32,7 @@ Philosophy: [Why we built it](#philosophy)
 
 Review that Flows With You. 流れに寄り添う AI レビューエージェント。
 
-River Reviewer is a flow-based, metadata-driven AI review agent. It travels the SDLC so design intent, implementation choices, and test coverage stay connected.
+River Reviewer is a context engineering framework for AI code review. It is flow-based and metadata-driven, traveling the SDLC so design intent, implementation choices, and test coverage stay connected.
 
 <a id="philosophy"></a>
 
@@ -76,22 +76,22 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.11.0
+        uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-Pin to a release tag such as `@v0.11.0` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
+Pin to a release tag such as `@v0.12.0` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
 
-Latest release: [v0.11.0](https://github.com/s977043/river-reviewer/releases/tag/v0.11.0)
+Latest release: [v0.12.0](https://github.com/s977043/river-reviewer/releases/tag/v0.12.0)
 
 > **ℹ️ Upgrading from v0.1.x:** v0.2.0 and later use the new GitHub Action path `runners/github-action` instead of `.github/actions/river-reviewer`. See [Migration Guide](docs/migration/runners-architecture-guide.md) and [DEPRECATED.md](docs/deprecated.md) for details.
 
 ## Quick start (local)
 
-1. Environment: Node 20+ recommended (CI also runs on Node 20 series)
+1. Environment: Node 22+ recommended (CI runs on Node 22; Unit tests also validate Node 20.x)
 2. Install dependencies: `npm install`
 3. Validate skills: `npm run skills:validate`
 4. Tests: `npm test`

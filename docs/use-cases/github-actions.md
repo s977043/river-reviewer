@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0 # Required for git diff
 
       - name: Run River Reviewer
-        uses: s977043/river-reviewer/runners/github-action@v0.11.0
+        uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream
         env:
@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -81,7 +81,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -95,7 +95,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -122,7 +122,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: ${{ matrix.phase }} }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -140,7 +140,7 @@ jobs:
 ### Example: Custom Skills Directory
 
 ```yaml
-- uses: s977043/river-reviewer/runners/github-action@v0.11.0
+- uses: s977043/river-reviewer/runners/github-action@v0.12.0
   with:
     phase: midstream
     skills-dir: custom-skills # Use custom skill location
@@ -149,7 +149,7 @@ jobs:
 ### Example: JSON Output
 
 ```yaml
-- uses: s977043/river-reviewer/runners/github-action@v0.11.0
+- uses: s977043/river-reviewer/runners/github-action@v0.12.0
   with:
     phase: midstream
     output-format: json
@@ -165,9 +165,9 @@ jobs:
 
 ### LLM Provider Setup
 
-River Reviewer supports multiple LLM providers. Configure via environment variables:
+The GitHub Action review flow currently supports **OpenAI only**. Configure via environment variables:
 
-**OpenAI (Recommended):**
+**OpenAI:**
 
 ```yaml
 env:
@@ -175,22 +175,11 @@ env:
   OPENAI_MODEL: gpt-4o # Optional, defaults to gpt-4o
 ```
 
-**Anthropic:**
+You can also use `RIVER_OPENAI_API_KEY` / `RIVER_OPENAI_MODEL` to avoid clashing with other tools that rely on the standard `OPENAI_*` variables, and `RIVER_OPENAI_BASE_URL` to point the client at an OpenAI-compatible endpoint.
 
-```yaml
-env:
-  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-  ANTHROPIC_MODEL: claude-3-5-sonnet-20241022 # Optional
-```
-
-**Azure OpenAI:**
-
-```yaml
-env:
-  AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-  AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-  AZURE_OPENAI_DEPLOYMENT: gpt-4o
-```
+> **Note**: At the time of writing, the core review pipeline invoked by the GitHub Action is hard-wired to the OpenAI chat-completions API. Non-OpenAI providers (Anthropic, Azure OpenAI, Google Gemini, …) are not called by this path—configuring them will cause the LLM step to be skipped with a `provider ... is not supported yet` message.
+>
+> A separate dispatcher (`river skills`, driven by `src/core/skill-dispatcher.mjs`) does support additional providers (OpenAI + Google Gemini) via `AIClientFactory`, but that code path is not used by the GitHub Action workflow documented here.
 
 ### Adding Secrets to Repository
 
@@ -224,7 +213,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -249,7 +238,7 @@ jobs:
           repository: your-org/shared-skills
           path: shared-skills
 
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream
           skills-dir: shared-skills
@@ -268,7 +257,7 @@ jobs:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
 
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream
         env:
@@ -309,7 +298,7 @@ jobs:
           ref: refs/pull/${{ inputs.pr_number }}/head
           fetch-depth: 0
 
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: ${{ inputs.phase }}
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
@@ -333,7 +322,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -445,7 +434,7 @@ Line 15: ...
 ## Best Practices
 
 1. **Use Specific Phases** - Run only relevant skills to save time and costs
-2. **Pin Action Versions** - Use `@v0.11.0` instead of `@main` for stability
+2. **Pin Action Versions** - Use `@v0.12.0` instead of `@main` for stability
 3. **Set Permissions Explicitly** - Define minimum required permissions
 4. **Monitor API Usage** - Track LLM API costs and set budgets
 5. **Test Locally First** - Validate skills work before running in CI
@@ -473,7 +462,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -485,7 +474,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -518,7 +507,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.11.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with: { phase: ${{ matrix.phase }} }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```

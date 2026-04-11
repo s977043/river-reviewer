@@ -18,6 +18,6 @@
 
 ### Development Tips
 
-開発上のヒントについては、[AGENTS.md](./AGENTS.md) の「9. AI実装メモ」を参照してください。
+開発上のヒントについては、[AGENTS.md](./AGENTS.md) の「Local References」セクションと [AGENT_LEARNINGS.md](./AGENT_LEARNINGS.md) を参照してください。
 
 > ルール変更や運用メモは `AGENTS.md` に集約し、このファイルは最小限に保ってください。
