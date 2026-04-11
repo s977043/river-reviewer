@@ -4,7 +4,7 @@ Riverbed Memory stores past review decisions as structured records that subseque
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 22+
 - `npm ci` completed
 
 ## End-to-End Usage

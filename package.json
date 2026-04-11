@@ -5,7 +5,7 @@
   "description": "River Reviewer docs, schemas, and validation utilities.",
   "license": "MIT",
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "repository": {
     "type": "git",
