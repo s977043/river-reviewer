@@ -1,0 +1,75 @@
+name: 'Epic'
+description: 上位の意思決定を固定するための親 Issue。Why を厚く、Capability を束ねる。
+title: 'Epic: '
+labels: ['epic', 'status:triage']
+body:
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: なぜこの Epic が必要か。背景・課題・狙いを書く。
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: 今回やることの全体像。実装・設計・運用の対象範囲。
+    validations:
+      required: true
+
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: 今回やらないこと。誤解を防ぐために明示する。
+    validations:
+      required: true
+
+  - type: textarea
+    id: done_when
+    attributes:
+      label: Done when
+      description: 完了条件。レビュー時に Yes/No で確認できる状態。
+    validations:
+      required: true
+
+  - type: textarea
+    id: capabilities
+    attributes:
+      label: Capabilities
+      description: この Epic にぶら下がる Capability Issue のチェックリスト。
+      placeholder: |
+        - [ ] #NN Capability: ...
+        - [ ] #NN Capability: ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: 依存 Issue・前提・ブロッカー。
+    validations:
+      required: false
+
+  - type: textarea
+    id: pre_implementation
+    attributes:
+      label: Pre-implementation checklist
+      description: 着手前に必ず満たすこと。既存資産確認と実行計画の用意は必須。
+      value: |
+        - [ ] 既存コードベース・skill・docs を確認して重複や前提を洗い出した
+        - [ ] 実行計画（変更対象ファイル、影響範囲、検証手順）を本 Issue または PR に記載した
+        - [ ] Why と Non-goals が現状でも妥当か再確認した
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: 補足、検討メモ、リンク。
+    validations:
+      required: false
