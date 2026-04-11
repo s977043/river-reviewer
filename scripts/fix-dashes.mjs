@@ -48,7 +48,7 @@ function normalizeTextSegment(line) {
     return { newLine, modified };
 }
 
-function processMarkdownFile(filePath) {
+function processMarkdownFile(filePath, { check = false } = {}) {
     const content = fs.readFileSync(filePath, 'utf8');
     const lines = content.split(/\r?\n/);
     let inCodeFence = false;
@@ -96,6 +96,15 @@ function processMarkdownFile(filePath) {
             continue;
         }
 
+        // Skip markdown table rows. Table cells often use `—` as a placeholder
+        // with padding whitespace for alignment, which the dash regex would
+        // otherwise collapse. Prettier then reintroduces the padding, causing
+        // fix-dashes and prettier to fight in an infinite loop.
+        if (/^\s*\|/.test(line)) {
+            newLines.push(line);
+            continue;
+        }
+
         // Headings: lines starting with # (one or more)
         if (/^#+\s+/.test(line)) {
             const prefix = line.match(/^#+\s+/)[0];
@@ -121,7 +130,7 @@ function processMarkdownFile(filePath) {
         newLines.push(line);
     }
 
-    if (changed) {
+    if (changed && !check) {
         fs.writeFileSync(filePath, newLines.join('\n'), 'utf8');
     }
     return changed;
@@ -143,11 +152,12 @@ function collectTargetFiles() {
 function listAdd(arr, set) { for (const a of arr) set.add(a); }
 
 function main() {
+    const check = process.argv.includes('--check');
     const files = collectTargetFiles();
     const modifiedFiles = [];
     for (const file of files) {
         try {
-            const changed = processMarkdownFile(file);
+            const changed = processMarkdownFile(file, { check });
             if (changed) modifiedFiles.push(file);
         } catch (err) {
             console.error(`Error processing ${file}:`, err.message);
@@ -156,6 +166,11 @@ function main() {
     if (modifiedFiles.length === 0) {
         console.log('No heading/title dash normalizations needed.');
         process.exit(0);
+    }
+    if (check) {
+        console.error('Files need dash normalization (run `node scripts/fix-dashes.mjs` to fix):');
+        for (const f of modifiedFiles) console.error(' -', f);
+        process.exit(1);
     }
     console.log('Modified files:');
     for (const f of modifiedFiles) console.log(' -', f);
