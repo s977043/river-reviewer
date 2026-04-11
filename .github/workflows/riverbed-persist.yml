@@ -9,9 +9,17 @@ on:
         default: '.river/memory/index.json'
         type: string
 
+permissions:
+  contents: read
+
+concurrency:
+  group: riverbed-persist
+  cancel-in-progress: false
+
 jobs:
   persist:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
 

@@ -4,28 +4,30 @@ on:
   schedule:
     - cron: '0 3 * * 6' # Every Saturday 03:00 UTC (6:00 JST)
 
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-fix-dashes
+  cancel-in-progress: false
+
 jobs:
   auto-fix-dashes:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - uses: ./.github/actions/setup-node-deps
 
       - name: Run fix-dashes
         run: npm run fix:dashes
 
       - name: Create PR if changes
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'chore(docs): auto-fix dash spacing'
