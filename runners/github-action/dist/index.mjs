@@ -35683,7 +35683,7 @@ function normalizeHeuristicComments(rawComments) {
             evidence: 'catch 内で return（ログ/再throwなし）',
             impact: '障害調査や失敗検知が困難になる',
             fix: 'ログ+再throw / 上位へ返す / 無視するなら理由コメント+計測を検討する',
-            severity: 'warning',
+            severity: 'nit',
             confidence: 'high',
           }),
         };
@@ -47982,8 +47982,8 @@ function countChangedLines(files) {
   return lines;
 }
 
-async function main() {
-  const parsed = parseArgs(external_node_process_namespaceObject.argv.slice(2));
+async function main(argv = external_node_process_namespaceObject.argv.slice(2)) {
+  const parsed = parseArgs(argv);
   if (parsed.command === 'help' || !parsed.command) {
     printHelp();
     return 0;
@@ -48238,11 +48238,17 @@ Dependencies: ${
   }
 }
 
-main().then((code) => {
-  if (typeof code === 'number' && code !== 0) {
-    external_node_process_namespaceObject.exitCode = code;
-  }
-});
+
+
+// この CLI が直接起動されたときのみ main() を実行する。
+// import された場合（テストなど）は副作用を起こさない。
+if (import.meta.url === `file://${external_node_process_namespaceObject.argv[1]}`) {
+  main().then((code) => {
+    if (typeof code === 'number' && code !== 0) {
+      external_node_process_namespaceObject.exitCode = code;
+    }
+  });
+}
 
 ;// CONCATENATED MODULE: ./runners/github-action/src/index.mjs
 // Bundle entry point for the GitHub Action.
