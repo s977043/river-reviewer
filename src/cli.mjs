@@ -555,8 +555,8 @@ function countChangedLines(files) {
   return lines;
 }
 
-async function main() {
-  const parsed = parseArgs(process.argv.slice(2));
+async function main(argv = process.argv.slice(2)) {
+  const parsed = parseArgs(argv);
   if (parsed.command === 'help' || !parsed.command) {
     printHelp();
     return 0;
@@ -811,8 +811,14 @@ Dependencies: ${
   }
 }
 
-main().then((code) => {
-  if (typeof code === 'number' && code !== 0) {
-    process.exitCode = code;
-  }
-});
+export { parseArgs, main };
+
+// この CLI が直接起動されたときのみ main() を実行する。
+// import された場合（テストなど）は副作用を起こさない。
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().then((code) => {
+    if (typeof code === 'number' && code !== 0) {
+      process.exitCode = code;
+    }
+  });
+}
