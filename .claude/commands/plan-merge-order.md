@@ -1,12 +1,40 @@
 ---
 description: 複数 PR のマージ順序を事前計画してリベースコストを最小化する
 argument-hint: '[PR numbers or branch names]'
-allowed-tools: Bash(gh pr list:*), Bash(gh pr view:*), Bash(gh pr diff:*), Bash(git log:*)
+allowed-tools: Bash(gh pr list:*), Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh api:*), Bash(git log:*), Bash(git fetch:*)
 ---
 
 複数の PR を作成・マージする際の順序を事前計画してください。対象: $ARGUMENTS
 
 ## 手順
+
+### 0. Preflight 検証 (前提)
+
+マージ順序を計算する前に、**対象 PR が本当にマージ対象かを検証**する。`/preflight $ARGUMENTS` を先に実行するか、以下を直接実行する:
+
+```bash
+git fetch origin main
+git log origin/main --oneline -15                                    # main に関連コミットが既にあるか目視
+
+# 対象 PR ごとに REST API で state を直接取得 (gh pr view の GraphQL はキャッシュ遅延あり)
+for pr in <PR numbers>; do
+  gh api repos/OWNER/REPO/pulls/$pr --jq '{number, state, merged, merged_at, mergeable_state}'
+done
+
+# 類似キーワードで並行 in-flight PR を検索
+gh pr list --state open --search "<keyword>" --json number,title,headRefName,author
+
+# 直近 close 済 PR も確認 (並行作業の痕跡)
+gh pr list --state closed --search "<keyword>" --limit 5 --json number,title,mergedAt
+```
+
+判定基準:
+
+- **対象 PR に merged=true が含まれる** → その PR を対象から除外してユーザーに報告
+- **類似 keyword の別 open PR が存在** → 並行作業あり、続行前にユーザー確認
+- **main に同内容のコミット既に存在** → タスク obsolete の可能性、続行前にユーザー確認
+
+この Step を飛ばして依存グラフ作成に進んではならない。`gh pr list` のキャッシュ遅延で closed PR を OPEN と誤判定し、**重複作業・force-push 計画・stale commits 分析に時間を費やした事例が複数回発生している** (2026-04-11 セッションで 4 重複 PR)。
 
 ### 1. 対象 PR の収集
 
@@ -79,6 +107,8 @@ git log --format= --name-only --since=6.months | sort | uniq -c | sort -rn | hea
 
 ## 禁止事項
 
+- **Step 0 の Preflight 検証を省略して Step 1 以降に進んではならない**
 - 依存関係を調べずにマージ順序を決めてはならない
 - Hot file の複数 PR 同時マージを推奨してはならない
 - 「順序は適当で大丈夫」と断定してはならない
+- `gh pr list` / `gh pr view` の GraphQL 結果のみで state を信頼してはならない (必ず `gh api repos/.../pulls/{N}` で裏取り)
