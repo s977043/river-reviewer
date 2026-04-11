@@ -22,6 +22,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: validate-agents-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   schema:
     name: Validate agent schema

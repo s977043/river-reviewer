@@ -7,6 +7,10 @@ permissions:
   pull-requests: write
   checks: write
 
+concurrency:
+  group: prose-lint-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   vale:
     runs-on: ubuntu-latest

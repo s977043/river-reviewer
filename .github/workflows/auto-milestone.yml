@@ -7,6 +7,10 @@ on:
 permissions:
   issues: write
 
+concurrency:
+  group: auto-milestone-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   assign:
     runs-on: ubuntu-latest

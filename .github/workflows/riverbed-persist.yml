@@ -12,6 +12,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: riverbed-persist-${{ github.run_id }}
+  cancel-in-progress: false
+
 jobs:
   persist:
     runs-on: ubuntu-latest

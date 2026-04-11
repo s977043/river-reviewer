@@ -17,6 +17,10 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: doc-quality-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   doc-quality:
     name: Document quality checks

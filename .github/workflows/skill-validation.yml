@@ -9,6 +9,10 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: skill-validation
+  cancel-in-progress: false
+
 jobs:
   scheduled-validation:
     runs-on: ubuntu-latest

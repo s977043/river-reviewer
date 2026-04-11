@@ -8,6 +8,10 @@ permissions:
   contents: read
   pull-requests: write
 
+concurrency:
+  group: diataxis-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   remind:
     runs-on: ubuntu-latest
