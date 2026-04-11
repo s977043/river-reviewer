@@ -1,9 +1,16 @@
 name: Prose Lint
 on:
   pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
 jobs:
   vale:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: errata-ai/vale-action@v2

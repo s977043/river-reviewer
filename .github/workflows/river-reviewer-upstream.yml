@@ -38,12 +38,14 @@ on:
       - '.github/workflows/river-reviewer-upstream.yml'
       - '.river-reviewer.json'
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   river-reviewer:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6

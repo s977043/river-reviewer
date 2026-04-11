@@ -8,12 +8,15 @@ on:
   schedule:
     - cron: '0 2 * * 1'
   workflow_dispatch: # Allow manual trigger for maintainers
+
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   lychee:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - name: Link Checker

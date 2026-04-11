@@ -5,13 +5,15 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   river-reviewer:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v6

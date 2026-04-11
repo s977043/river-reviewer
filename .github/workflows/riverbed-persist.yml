@@ -9,9 +9,13 @@ on:
         default: '.river/memory/index.json'
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   persist:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 

@@ -19,10 +19,14 @@ on:
       - 'package.json'
       - 'scripts/validate-agents.mjs'
 
+permissions:
+  contents: read
+
 jobs:
   schema:
     name: Validate agent schema
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository

@@ -10,6 +10,7 @@ permissions:
 jobs:
   assign:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Assign milestone
         uses: actions/github-script@v8

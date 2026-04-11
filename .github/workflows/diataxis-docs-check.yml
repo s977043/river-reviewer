@@ -11,6 +11,7 @@ permissions:
 jobs:
   remind:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Remind Diátaxis type for docs changes
         uses: actions/github-script@v8
