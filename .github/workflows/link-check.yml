@@ -8,16 +8,23 @@ on:
   schedule:
     - cron: '0 2 * * 1'
   workflow_dispatch: # Allow manual trigger for maintainers
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: link-check-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lychee:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - name: Link Checker
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
         id: lychee
         continue-on-error: true
         with:

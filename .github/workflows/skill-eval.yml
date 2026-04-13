@@ -38,10 +38,15 @@ concurrency:
   group: skill-eval-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   discover-skills:
     name: Discover skills with eval configs
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       skills: ${{ steps.find-skills.outputs.skills }}
       has_skills: ${{ steps.find-skills.outputs.has_skills }}
@@ -84,6 +89,7 @@ jobs:
     # Continue on error - evaluations are informational and shouldn't block PRs
     continue-on-error: true
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -92,14 +98,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - uses: ./.github/actions/setup-node-deps
 
       - name: Install promptfoo
         run: npm install -g promptfoo
@@ -183,6 +182,7 @@ jobs:
     needs: [discover-skills, evaluate]
     if: always() && needs.discover-skills.outputs.has_skills == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v8
