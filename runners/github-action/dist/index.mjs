@@ -36370,10 +36370,14 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /************************************************************************/
 var __webpack_exports__ = {};
 
+// EXTERNAL MODULE: external "node:fs"
+var external_node_fs_ = __nccwpck_require__(3024);
 // EXTERNAL MODULE: external "node:path"
 var external_node_path_ = __nccwpck_require__(6760);
 ;// CONCATENATED MODULE: external "node:process"
 const external_node_process_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:process");
+// EXTERNAL MODULE: external "node:url"
+var external_node_url_ = __nccwpck_require__(3136);
 // EXTERNAL MODULE: ./src/lib/git.mjs + 2 modules
 var git = __nccwpck_require__(340);
 // EXTERNAL MODULE: external "node:fs/promises"
@@ -36410,7 +36414,11 @@ function resolveOpenAIConfig(options = {}) {
 }
 
 function resolvePlannerTimeoutMs(options = {}) {
-  if (typeof options.timeoutMs === 'number' && Number.isFinite(options.timeoutMs) && options.timeoutMs > 0) {
+  if (
+    typeof options.timeoutMs === 'number' &&
+    Number.isFinite(options.timeoutMs) &&
+    options.timeoutMs > 0
+  ) {
     return options.timeoutMs;
   }
   const value = Number(process.env.RIVER_PLANNER_TIMEOUT);
@@ -36421,10 +36429,12 @@ function resolvePlannerTimeoutMs(options = {}) {
 function buildPlannerPrompt({ skills, context }) {
   const phase = context?.phase ?? 'midstream';
   const changedFiles = Array.isArray(context?.changedFiles) ? context.changedFiles : [];
-  const availableContexts = Array.isArray(context?.availableContexts) ? context.availableContexts : [];
+  const availableContexts = Array.isArray(context?.availableContexts)
+    ? context.availableContexts
+    : [];
   const impactTags = Array.isArray(context?.impactTags) ? context.impactTags : [];
   const skillsText = (skills || [])
-    .map(s => `- ${s.id}: ${s.name} (${s.phase}) — ${s.description}`)
+    .map((s) => `- ${s.id}: ${s.name} (${s.phase}) — ${s.description}`)
     .join('\n');
 
   return `You are River Reviewer, an AI skill planner.
@@ -36499,6 +36509,9 @@ function parsePlannerJson(text) {
   }
 }
 
+// --- テスト用 named export (内部ヘルパー) ---
+
+
 function createOpenAIPlanner(options = {}) {
   const config = resolveOpenAIConfig(options);
   const timeoutMs = resolvePlannerTimeoutMs(options);
@@ -36570,8 +36583,6 @@ async function loadProjectRules(repoRoot, options = {}) {
 
 // EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
 var risk_map = __nccwpck_require__(572);
-// EXTERNAL MODULE: external "node:fs"
-var external_node_fs_ = __nccwpck_require__(3024);
 ;// CONCATENATED MODULE: ./src/lib/riverbed-memory.mjs
 
 
@@ -36953,6 +36964,9 @@ async function collectLocalContext({
     debug,
   };
 }
+
+// --- テスト用 named export (内部ヘルパー) ---
+
 
 async function planLocalReview({
   cwd = process.cwd(),
@@ -47091,7 +47105,8 @@ function isRetriableError(err) {
   const status = err?.status ?? err?.response?.status;
   if (status === 429 || (status >= 500 && status < 600)) return true;
   if (err?.name === 'AbortError') return true;
-  if (err?.code === 'ETIMEDOUT' || err?.code === 'ECONNRESET' || err?.code === 'ENOTFOUND') return true;
+  if (err?.code === 'ETIMEDOUT' || err?.code === 'ECONNRESET' || err?.code === 'ENOTFOUND')
+    return true;
   return false;
 }
 
@@ -47115,10 +47130,13 @@ async function withRetry(fn) {
         // eslint-disable-next-line no-console
         console.warn(`[AI retry] attempt ${attempt} failed (${err?.message || err}); retrying...`);
       }
-      await new Promise(res => setTimeout(res, RETRY_DELAY_MS * attempt));
+      await new Promise((res) => setTimeout(res, RETRY_DELAY_MS * attempt));
     }
   }
 }
+
+// --- テスト用 named export (内部ヘルパー) ---
+
 
 class AIClientFactory {
   static create({ modelName, temperature }) {
@@ -47167,7 +47185,7 @@ class GeminiClient {
           { role: 'user', parts: [{ text: systemPrompt }] },
           { role: 'user', parts: [{ text: `Here is the code diff to review:\n\n${diff}` }] },
         ],
-      }),
+      })
     );
 
     return result.response.text();
@@ -47204,7 +47222,7 @@ class OpenAIClient {
         model: this.modelName,
         messages,
         temperature: this.temperature,
-      }),
+      })
     );
 
     return response.choices[0].message.content || '';
@@ -47432,6 +47450,8 @@ class SkillDispatcher {
 }
 
 ;// CONCATENATED MODULE: ./src/cli.mjs
+
+
 
 
 
@@ -47982,8 +48002,8 @@ function countChangedLines(files) {
   return lines;
 }
 
-async function main() {
-  const parsed = parseArgs(external_node_process_namespaceObject.argv.slice(2));
+async function main(argv = external_node_process_namespaceObject.argv.slice(2)) {
+  const parsed = parseArgs(argv);
   if (parsed.command === 'help' || !parsed.command) {
     printHelp();
     return 0;
@@ -48238,11 +48258,42 @@ Dependencies: ${
   }
 }
 
-main().then((code) => {
-  if (typeof code === 'number' && code !== 0) {
-    external_node_process_namespaceObject.exitCode = code;
+
+
+/**
+ * この CLI が直接起動されたときのみ `main()` を実行する。
+ *
+ * `import.meta.url === \`file://${process.argv[1]}\`` という素朴な比較は、
+ * 以下のケースで偽になり自動起動が走らない:
+ *
+ *   1. npm `bin` 経由（`npm install -g`）: `process.argv[1]` が symlink の
+ *      `.../node_modules/.bin/river` のままで、`import.meta.url` は実体の
+ *      `.../src/cli.mjs` を指す。
+ *   2. macOS の `/tmp` → `/private/tmp` など、プラットフォーム固有の
+ *      canonical path 展開。
+ *   3. Windows のバックスラッシュ区切り path（`file:///C:/...` 形式でない）。
+ *
+ * そのため `realpathSync` で symlink を解決し、`pathToFileURL` で URL に
+ * 変換した上で比較する。比較に失敗してもアプリは落とさない（import-only
+ * シナリオを壊さない）。
+ */
+function isDirectInvocation() {
+  if (!external_node_process_namespaceObject.argv[1]) return false;
+  try {
+    const real = (0,external_node_fs_.realpathSync)(external_node_process_namespaceObject.argv[1]);
+    return (0,external_node_url_.fileURLToPath)(import.meta.url) === real || import.meta.url === (0,external_node_url_.pathToFileURL)(real).href;
+  } catch {
+    return false;
   }
-});
+}
+
+if (isDirectInvocation()) {
+  main().then((code) => {
+    if (typeof code === 'number' && code !== 0) {
+      external_node_process_namespaceObject.exitCode = code;
+    }
+  });
+}
 
 ;// CONCATENATED MODULE: ./runners/github-action/src/index.mjs
 // Bundle entry point for the GitHub Action.
