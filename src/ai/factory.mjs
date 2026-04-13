@@ -10,7 +10,8 @@ function isRetriableError(err) {
   const status = err?.status ?? err?.response?.status;
   if (status === 429 || (status >= 500 && status < 600)) return true;
   if (err?.name === 'AbortError') return true;
-  if (err?.code === 'ETIMEDOUT' || err?.code === 'ECONNRESET' || err?.code === 'ENOTFOUND') return true;
+  if (err?.code === 'ETIMEDOUT' || err?.code === 'ECONNRESET' || err?.code === 'ENOTFOUND')
+    return true;
   return false;
 }
 
@@ -34,10 +35,13 @@ async function withRetry(fn) {
         // eslint-disable-next-line no-console
         console.warn(`[AI retry] attempt ${attempt} failed (${err?.message || err}); retrying...`);
       }
-      await new Promise(res => setTimeout(res, RETRY_DELAY_MS * attempt));
+      await new Promise((res) => setTimeout(res, RETRY_DELAY_MS * attempt));
     }
   }
 }
+
+// --- テスト用 named export (内部ヘルパー) ---
+export { isRetriableError, withRetry };
 
 export class AIClientFactory {
   static create({ modelName, temperature }) {
@@ -86,7 +90,7 @@ class GeminiClient {
           { role: 'user', parts: [{ text: systemPrompt }] },
           { role: 'user', parts: [{ text: `Here is the code diff to review:\n\n${diff}` }] },
         ],
-      }),
+      })
     );
 
     return result.response.text();
@@ -123,7 +127,7 @@ class OpenAIClient {
         model: this.modelName,
         messages,
         temperature: this.temperature,
-      }),
+      })
     );
 
     return response.choices[0].message.content || '';

@@ -152,6 +152,15 @@ async function collectLocalContext({
   };
 }
 
+// --- テスト用 named export (内部ヘルパー) ---
+export {
+  normalizePhase,
+  shouldExclude,
+  shouldSkipByLabel,
+  resolveAvailableContexts,
+  resolveAvailableDependencies,
+};
+
 export async function planLocalReview({
   cwd = process.cwd(),
   phase = 'midstream',
