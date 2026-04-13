@@ -75,7 +75,7 @@ git commit -m "chore(action): rebuild github-action dist"
 
 ## 関連
 
-- CLAUDE.md § AI Misoperation Guards — "Match CI Node version for dist rebuilds"
-- `.nvmrc` — リポジトリ Node version の SSoT
-- `.github/workflows/test.yml` — `dist-check` ジョブ定義
-- `runners/github-action/package.json` — `build:action` スクリプト
+- CLAUDE.md § AI Misoperation Guards—"Match CI Node version for dist rebuilds"
+- `.nvmrc`—リポジトリ Node version の SSoT
+- `.github/workflows/test.yml`—`dist-check` ジョブ定義
+- `runners/github-action/package.json`—`build:action` スクリプト
