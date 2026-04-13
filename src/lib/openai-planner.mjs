@@ -19,7 +19,11 @@ function resolveOpenAIConfig(options = {}) {
 }
 
 function resolvePlannerTimeoutMs(options = {}) {
-  if (typeof options.timeoutMs === 'number' && Number.isFinite(options.timeoutMs) && options.timeoutMs > 0) {
+  if (
+    typeof options.timeoutMs === 'number' &&
+    Number.isFinite(options.timeoutMs) &&
+    options.timeoutMs > 0
+  ) {
     return options.timeoutMs;
   }
   const value = Number(process.env.RIVER_PLANNER_TIMEOUT);
@@ -30,10 +34,12 @@ function resolvePlannerTimeoutMs(options = {}) {
 function buildPlannerPrompt({ skills, context }) {
   const phase = context?.phase ?? 'midstream';
   const changedFiles = Array.isArray(context?.changedFiles) ? context.changedFiles : [];
-  const availableContexts = Array.isArray(context?.availableContexts) ? context.availableContexts : [];
+  const availableContexts = Array.isArray(context?.availableContexts)
+    ? context.availableContexts
+    : [];
   const impactTags = Array.isArray(context?.impactTags) ? context.impactTags : [];
   const skillsText = (skills || [])
-    .map(s => `- ${s.id}: ${s.name} (${s.phase}) — ${s.description}`)
+    .map((s) => `- ${s.id}: ${s.name} (${s.phase}) — ${s.description}`)
     .join('\n');
 
   return `You are River Reviewer, an AI skill planner.
@@ -107,6 +113,9 @@ function parsePlannerJson(text) {
     throw new Error('planner output is not valid JSON');
   }
 }
+
+// --- テスト用 named export (内部ヘルパー) ---
+export { resolveOpenAIConfig, resolvePlannerTimeoutMs, buildPlannerPrompt, parsePlannerJson };
 
 export function createOpenAIPlanner(options = {}) {
   const config = resolveOpenAIConfig(options);
