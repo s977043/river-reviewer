@@ -67,11 +67,11 @@ git commit -m "chore(action): rebuild github-action dist"
 
 ## トラブルシューティング
 
-| 症状 | 原因 | 対応 |
-| --- | --- | --- |
-| ローカルで `git diff --quiet runners/github-action/dist/` は通るのに CI で fail | ローカル Node が `.nvmrc` と違う | `nvm use` で揃えて再 build |
-| rebuild しても差分が残り続ける | `node_modules` が stale | `npm ci` で依存再解決後に `npm run build:action` |
-| `index.mjs.map` のみの大量差分 | sourcemap の決定論性問題 | Node を `.nvmrc` に揃えれば通常解消 |
+| 症状                                                                            | 原因                             | 対応                                             |
+| ------------------------------------------------------------------------------- | -------------------------------- | ------------------------------------------------ |
+| ローカルで `git diff --quiet runners/github-action/dist/` は通るのに CI で fail | ローカル Node が `.nvmrc` と違う | `nvm use` で揃えて再 build                       |
+| rebuild しても差分が残り続ける                                                  | `node_modules` が stale          | `npm ci` で依存再解決後に `npm run build:action` |
+| `index.mjs.map` のみの大量差分                                                  | sourcemap の決定論性問題         | Node を `.nvmrc` に揃えれば通常解消              |
 
 ## 関連
 
