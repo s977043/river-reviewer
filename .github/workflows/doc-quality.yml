@@ -59,7 +59,7 @@ jobs:
             steps.bilingual.outcome == 'failure' ||
             steps.placement.outcome == 'failure'
           )
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           OUTCOME_BILINGUAL: ${{ steps.bilingual.outcome }}
           OUTCOME_PLACEMENT: ${{ steps.placement.outcome }}
