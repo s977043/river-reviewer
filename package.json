@@ -60,7 +60,7 @@
     "@docusaurus/preset-classic": "^3.5.0",
     "@docusaurus/theme-mermaid": "^3.9.2",
     "@google/generative-ai": "^0.24.1",
-    "@inquirer/prompts": "^8.3.2",
+    "@inquirer/prompts": "^8.4.1",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.68.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.211.0",
@@ -76,7 +76,7 @@
     "ora": "^9.3.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.4",
-    "recharts": "^3.6.0",
+    "recharts": "^3.8.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -87,7 +87,7 @@
     "ajv-formats": "^3.0.1",
     "glob": "^13.0.6",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
+    "lint-staged": "^16.4.0",
     "markdownlint-cli": "^0.48.0",
     "prettier": "^3.8.1",
     "prh": "^5.4.4",

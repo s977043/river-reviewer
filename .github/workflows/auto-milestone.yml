@@ -7,9 +7,14 @@ on:
 permissions:
   issues: write
 
+concurrency:
+  group: auto-milestone-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   assign:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Assign milestone
         uses: actions/github-script@v8

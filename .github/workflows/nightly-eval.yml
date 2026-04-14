@@ -15,22 +15,19 @@ concurrency:
   group: nightly-eval
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   eval:
     name: Unified evaluation
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - uses: ./.github/actions/setup-node-deps
 
       - name: Run unified evaluation
         env:
@@ -58,7 +55,7 @@ jobs:
 
       - name: Upload eval artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nightly-eval-${{ github.run_id }}
           path: |

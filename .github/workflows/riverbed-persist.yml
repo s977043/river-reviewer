@@ -9,21 +9,29 @@ on:
         default: '.river/memory/index.json'
         type: string
 
+permissions:
+  contents: read
+
+concurrency:
+  group: riverbed-persist
+  cancel-in-progress: false
+
 jobs:
   persist:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Download previous memory artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: riverbed-memory
           path: .river/memory
         continue-on-error: true
 
       - name: Upload memory artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: riverbed-memory
           path: ${{ inputs.memory-path }}

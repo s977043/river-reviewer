@@ -1,66 +1,42 @@
+// tests/cli.test.mjs
+//
+// river CLI の end-to-end テスト。
+// 通常は runCliInProcess() で in-process 実行し、subprocess 経由が必要な
+// テスト（process.exitCode の厳密検証）だけ runCliAsSubprocess() を使う。
+//
+// グルーピング:
+//   - river run - dry-run outputs
+//   - river run - markdown output
+//   - river run - guards & error paths
+//   - river doctor
+//   - river skills subcommands
+//
+// 重複していた createRepoWithChange / runCli / runGit は
+// tests/helpers/ に統合済み。
+
 import assert from 'node:assert';
-import { execFile } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { tmpdir } from 'node:os';
-import { promisify } from 'node:util';
-import test from 'node:test';
+import test, { describe } from 'node:test';
 
-const execFileAsync = promisify(execFile);
-const CLI_PATH = resolve('src/cli.mjs');
+import { runCliInProcess } from './helpers/cli.mjs';
+import {
+  createTempGitRepo,
+  createRepoWithSilentCatchChange,
+  runGit,
+} from './helpers/temp-repo.mjs';
+import { createTempDir, cleanupTempDirAsync } from './helpers/temp-dir.mjs';
 
-async function runCli(args, cwd, env = {}) {
-  try {
-    const { stdout, stderr } = await execFileAsync('node', [CLI_PATH, ...args], {
-      cwd,
-      env: { ...process.env, ...env },
-    });
-    return { code: 0, stdout: stdout.toString(), stderr: stderr?.toString() ?? '' };
-  } catch (error) {
-    return {
-      code: error.code ?? 1,
-      stdout: error.stdout?.toString() ?? '',
-      stderr: error.stderr?.toString() ?? '',
-    };
-  }
-}
+// -----------------------------------------------------------------------------
+// river run - dry-run outputs
+// -----------------------------------------------------------------------------
 
-async function runGit(args, cwd) {
-  return execFileAsync('git', args, { cwd });
-}
+describe('river run - dry-run outputs', () => {
+  test('emits review comments in dry-run mode', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
 
-async function createRepoWithChange() {
-  const dir = mkdtempSync(join(tmpdir(), 'river-cli-'));
-  await runGit(['init', '-b', 'main'], dir);
-  await runGit(['config', 'user.email', 'cli@example.com'], dir);
-  await runGit(['config', 'user.name', 'CLI Tester'], dir);
-
-  const srcDir = join(dir, 'src');
-  await mkdir(srcDir, { recursive: true });
-  const app = join(srcDir, 'app.js');
-  writeFileSync(app, 'export const value = 1;\n');
-  await runGit(['add', '.'], dir);
-  await runGit(['commit', '-m', 'init'], dir);
-
-  // ヒューリスティックが検出するパターンを含める（silent catch）
-  writeFileSync(app, `export const value = 2;
-export function test() {
-  try {
-    run();
-  } catch(e) {
-    return;
-  }
-}
-`);
-
-  return { dir, app };
-}
-
-test('river run emits review comments in dry-run mode', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    const result = await runCli(['run', '.', '--dry-run', '--debug'], dir);
+    const result = await runCliInProcess(['run', '.', '--dry-run', '--debug'], { cwd: dir });
 
     assert.strictEqual(result.code, 0, result.stderr);
     assert.match(result.stdout, /River Reviewer/);
@@ -68,229 +44,231 @@ test('river run emits review comments in dry-run mode', async () => {
     assert.match(result.stdout, /src\/app.js:/);
     assert.match(result.stdout, /LLM:/);
     assert.match(result.stdout, /Changed files/);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
+  });
 
-test('river run supports markdown output for PR comments', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    const result = await runCli(['run', '.', '--dry-run', '--output', 'markdown'], dir);
-    assert.strictEqual(result.code, 0, result.stderr);
-    assert.match(result.stdout, /^<!-- river-reviewer -->/);
-    assert.match(result.stdout, /## River Reviewer/);
-    assert.match(result.stdout, /### 指摘/);
-    // Verify skill grouping header is present (skillId is sanitized, so hyphens are escaped)
-    assert.match(result.stdout, /#### 🔍 rr\\-midstream\\-logging\\-observability\\-001/);
-    assert.doesNotMatch(result.stdout, /--- diff preview ---/);
-    assert.match(result.stderr, /River Reviewer \(local\)/);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
+  test('falls back gracefully without API key', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
 
-test('river run writes debug output to stderr when markdown output is selected', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    const result = await runCli(['run', '.', '--dry-run', '--output', 'markdown', '--debug'], dir);
-    assert.strictEqual(result.code, 0, result.stderr);
-    assert.doesNotMatch(result.stdout, /--- diff preview ---/);
-    assert.match(result.stderr, /--- diff preview ---/);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
-
-test('river run reports when there are no changes', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    await runGit(['add', '.'], dir);
-    await runGit(['commit', '-m', 'apply change'], dir);
-
-    const result = await runCli(['run', '.'], dir);
-    assert.strictEqual(result.code, 0, result.stderr);
-    assert.match(result.stdout, /No changes to review/);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
-
-test('river run skips when PR labels match exclude list', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    const configPath = join(dir, '.river-reviewer.json');
-    writeFileSync(
-      configPath,
-      JSON.stringify({ exclude: { prLabelsToIgnore: ['skip-review'] } }, null, 2),
-      'utf8',
-    );
-
-    const result = await runCli(['run', '.'], dir, { RIVER_PR_LABELS: 'skip-review' });
-
-    assert.strictEqual(result.code, 0, result.stderr);
-    assert.match(result.stdout, /Review skipped: PR labels matched exclude patterns/);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
-
-test('river run falls back gracefully without API key', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    const result = await runCli(['run', '.', '--debug'], dir);
+    const result = await runCliInProcess(['run', '.', '--debug'], { cwd: dir });
     assert.strictEqual(result.code, 0, result.stderr);
     assert.match(result.stdout, /River Reviewer/);
     assert.match(result.stdout, /LLM: OPENAI_API_KEY/i);
     assert.match(result.stdout, /Planner: off/i);
     assert.match(result.stdout, /Review comments/);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
+  });
 
-test('river run reports planner skip reason when requested without API key', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    const result = await runCli(['run', '.', '--planner', 'order', '--debug'], dir);
+  test('reports planner skip reason when requested without API key', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const result = await runCliInProcess(['run', '.', '--planner', 'order', '--debug'], {
+      cwd: dir,
+    });
     assert.strictEqual(result.code, 0, result.stderr);
     assert.match(result.stdout, /Planner: order skipped/i);
     assert.match(result.stdout, /OPENAI_API_KEY/i);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
+  });
 
-test('river run injects project rules into prompt when present', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
+  test('injects project rules into prompt when present', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
     const rulesDir = join(dir, '.river');
-    await mkdir(rulesDir, { recursive: true });
+    mkdirSync(rulesDir, { recursive: true });
     writeFileSync(join(rulesDir, 'rules.md'), '- Use App Router\n- Prefer server components');
 
-    const result = await runCli(['run', '.', '--dry-run', '--debug'], dir);
+    const result = await runCliInProcess(['run', '.', '--dry-run', '--debug'], { cwd: dir });
     assert.strictEqual(result.code, 0, result.stderr);
     assert.match(result.stdout, /Project rules: present/);
     assert.match(result.stdout, /Project-specific review rules/i);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
+  });
 
-test('river run supports cost estimation only', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    const result = await runCli(['run', '.', '--estimate'], dir);
-    assert.strictEqual(result.code, 0, result.stderr);
-    assert.match(result.stdout, /Cost Estimate/);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
+  test('reports when there are no changes', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
 
-test('river run aborts when max-cost is exceeded', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    const result = await runCli(['run', '.', '--max-cost', '0.0001'], dir);
-    assert.notStrictEqual(result.code, 0);
-    assert.match(result.stdout + result.stderr, /exceeds max-cost/i);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
-
-test('river run rejects negative max-cost value', async () => {
-  const { dir } = await createRepoWithChange();
-  try {
-    const result = await runCli(['run', '.', '--max-cost', '-1'], dir);
-    assert.strictEqual(result.code, 0);
-    assert.match(result.stderr, /requires a non-negative numeric value/i);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-});
-
-test('river run skips markdown-only changes after optimization', async () => {
-  const dir = mkdtempSync(join(tmpdir(), 'river-cli-md-'));
-  try {
-    await runGit(['init', '-b', 'main'], dir);
-    await runGit(['config', 'user.email', 'cli@example.com'], dir);
-    await runGit(['config', 'user.name', 'CLI Tester'], dir);
-    const doc = join(dir, 'README.md');
-    writeFileSync(doc, '# first\n');
     await runGit(['add', '.'], dir);
-    await runGit(['commit', '-m', 'init'], dir);
-    writeFileSync(doc, '# second\n');
+    await runGit(['commit', '-m', 'apply change'], dir);
 
-    const result = await runCli(['run', '.', '--dry-run'], dir);
+    const result = await runCliInProcess(['run', '.'], { cwd: dir });
     assert.strictEqual(result.code, 0, result.stderr);
     assert.match(result.stdout, /No changes to review/);
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
+  });
 });
 
-test('river run fails gracefully outside git repos', async () => {
-  const dir = mkdtempSync(join(tmpdir(), 'river-cli-empty-'));
-  await mkdir(resolve(dir, 'nested'));
-  const result = await runCli(['run', '.'], dir);
+// -----------------------------------------------------------------------------
+// river run - markdown output
+// -----------------------------------------------------------------------------
 
-  assert.notStrictEqual(result.code, 0);
-  assert.match(result.stderr, /Not a git repository/);
-  await rm(dir, { recursive: true, force: true });
+describe('river run - markdown output', () => {
+  test('supports markdown output for PR comments', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const result = await runCliInProcess(['run', '.', '--dry-run', '--output', 'markdown'], {
+      cwd: dir,
+    });
+    assert.strictEqual(result.code, 0, result.stderr);
+    assert.match(result.stdout, /^<!-- river-reviewer -->/);
+    assert.match(result.stdout, /## River Reviewer/);
+    assert.match(result.stdout, /### 指摘/);
+    // skill id はサニタイズでハイフンがエスケープされる
+    assert.match(result.stdout, /#### 🔍 rr\\-midstream\\-logging\\-observability\\-001/);
+    assert.doesNotMatch(result.stdout, /--- diff preview ---/);
+    assert.match(result.stderr, /River Reviewer \(local\)/);
+  });
+
+  test('writes debug output to stderr when markdown output is selected', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const result = await runCliInProcess(
+      ['run', '.', '--dry-run', '--output', 'markdown', '--debug'],
+      { cwd: dir }
+    );
+    assert.strictEqual(result.code, 0, result.stderr);
+    assert.doesNotMatch(result.stdout, /--- diff preview ---/);
+    assert.match(result.stderr, /--- diff preview ---/);
+  });
 });
 
-test('river doctor reports basic setup status', async t => {
-  const { dir } = await createRepoWithChange();
-  t.after(async () => rm(dir, { recursive: true, force: true }));
+// -----------------------------------------------------------------------------
+// river run - guards & error paths
+// -----------------------------------------------------------------------------
 
-  const result = await runCli(['doctor', '.', '--debug'], dir);
-  assert.strictEqual(result.code, 0, result.stderr);
-  assert.match(result.stdout, /River Reviewer doctor/);
-  assert.match(result.stdout, /Skills loaded:/);
-  assert.match(result.stdout, /Merge base:/);
-  assert.match(result.stdout, /--- diff preview ---/);
+describe('river run - guards & error paths', () => {
+  test('skips when PR labels match exclude list', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const configPath = join(dir, '.river-reviewer.json');
+    writeFileSync(
+      configPath,
+      JSON.stringify({ exclude: { prLabelsToIgnore: ['skip-review'] } }, null, 2),
+      'utf8'
+    );
+
+    const result = await runCliInProcess(['run', '.'], {
+      cwd: dir,
+      env: { RIVER_PR_LABELS: 'skip-review' },
+    });
+
+    assert.strictEqual(result.code, 0, result.stderr);
+    assert.match(result.stdout, /Review skipped: PR labels matched exclude patterns/);
+  });
+
+  test('supports cost estimation only', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const result = await runCliInProcess(['run', '.', '--estimate'], { cwd: dir });
+    assert.strictEqual(result.code, 0, result.stderr);
+    assert.match(result.stdout, /Cost Estimate/);
+  });
+
+  test('aborts when max-cost is exceeded', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const result = await runCliInProcess(['run', '.', '--max-cost', '0.0001'], { cwd: dir });
+    assert.notStrictEqual(result.code, 0);
+    assert.match(result.stdout + result.stderr, /exceeds max-cost/i);
+  });
+
+  test('rejects negative max-cost value', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const result = await runCliInProcess(['run', '.', '--max-cost', '-1'], { cwd: dir });
+    assert.strictEqual(result.code, 0);
+    assert.match(result.stderr, /requires a non-negative numeric value/i);
+  });
+
+  test('skips markdown-only changes after optimization', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({
+      prefix: 'river-cli-md-',
+      initialFiles: { 'README.md': '# first\n' },
+      changedFiles: { 'README.md': '# second\n' },
+    });
+    t.after(cleanup);
+
+    const result = await runCliInProcess(['run', '.', '--dry-run'], { cwd: dir });
+    assert.strictEqual(result.code, 0, result.stderr);
+    assert.match(result.stdout, /No changes to review/);
+  });
+
+  test('fails gracefully outside git repos', async (t) => {
+    const dir = createTempDir({ prefix: 'river-cli-empty-' });
+    t.after(() => cleanupTempDirAsync(dir));
+    mkdirSync(resolve(dir, 'nested'));
+
+    const result = await runCliInProcess(['run', '.'], { cwd: dir });
+    assert.notStrictEqual(result.code, 0);
+    assert.match(result.stderr, /Not a git repository/);
+  });
 });
 
-test('river doctor fails gracefully outside git repos', async t => {
-  const dir = mkdtempSync(join(tmpdir(), 'river-cli-empty-'));
-  t.after(async () => rm(dir, { recursive: true, force: true }));
-  await mkdir(resolve(dir, 'nested'));
-  const result = await runCli(['doctor', '.'], dir);
+// -----------------------------------------------------------------------------
+// river doctor
+// -----------------------------------------------------------------------------
 
-  assert.notStrictEqual(result.code, 0);
-  assert.match(result.stderr, /Not a git repository/);
+describe('river doctor', () => {
+  test('reports basic setup status', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const result = await runCliInProcess(['doctor', '.', '--debug'], { cwd: dir });
+    assert.strictEqual(result.code, 0, result.stderr);
+    assert.match(result.stdout, /River Reviewer doctor/);
+    assert.match(result.stdout, /Skills loaded:/);
+    assert.match(result.stdout, /Merge base:/);
+    assert.match(result.stdout, /--- diff preview ---/);
+  });
+
+  test('fails gracefully outside git repos', async (t) => {
+    const dir = createTempDir({ prefix: 'river-cli-empty-' });
+    t.after(() => cleanupTempDirAsync(dir));
+    mkdirSync(resolve(dir, 'nested'));
+
+    const result = await runCliInProcess(['doctor', '.'], { cwd: dir });
+    assert.notStrictEqual(result.code, 0);
+    assert.match(result.stderr, /Not a git repository/);
+  });
 });
 
-// ---------------------------------------------------------------------------
-// skills subcommands
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// river skills subcommands
+// -----------------------------------------------------------------------------
 
-test('river skills import --loose --dry-run exits 0 with summary', async t => {
-  const fixturesDir = resolve('tests', 'fixtures', 'agent-skills');
-  const result = await runCli(
-    ['skills', 'import', '--from', fixturesDir, '--loose', '--dry-run'],
-    process.cwd(),
-  );
-  assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
-  assert.match(result.stdout, /Import complete/);
-});
+describe('river skills subcommands', () => {
+  test('import --loose --dry-run exits 0 with summary', async () => {
+    const fixturesDir = resolve('tests', 'fixtures', 'agent-skills');
+    const result = await runCliInProcess(
+      ['skills', 'import', '--from', fixturesDir, '--loose', '--dry-run'],
+      { cwd: process.cwd() }
+    );
+    assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
+    assert.match(result.stdout, /Import complete/);
+  });
 
-test('river skills list --source rr exits 0 and shows table', async t => {
-  const result = await runCli(['skills', 'list', '--source', 'rr'], process.cwd());
-  assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
-  assert.match(result.stdout, /ID/);
-  assert.match(result.stdout, /Total:/);
-});
+  test('list --source rr exits 0 and shows table', async () => {
+    const result = await runCliInProcess(['skills', 'list', '--source', 'rr'], {
+      cwd: process.cwd(),
+    });
+    assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
+    assert.match(result.stdout, /ID/);
+    assert.match(result.stdout, /Total:/);
+  });
 
-test('river skills import with empty dir emits warning and exits 0', async t => {
-  const emptyDir = mkdtempSync(join(tmpdir(), 'river-cli-empty-skills-'));
-  t.after(async () => rm(emptyDir, { recursive: true, force: true }));
+  test('import with empty dir emits warning and exits 0', async (t) => {
+    const emptyDir = createTempDir({ prefix: 'river-cli-empty-skills-' });
+    t.after(() => cleanupTempDirAsync(emptyDir));
 
-  const result = await runCli(
-    ['skills', 'import', '--from', emptyDir, '--dry-run'],
-    process.cwd(),
-  );
-  assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
-  assert.match(result.stdout + result.stderr, /No Agent Skills/);
+    const result = await runCliInProcess(['skills', 'import', '--from', emptyDir, '--dry-run'], {
+      cwd: process.cwd(),
+    });
+    assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
+    assert.match(result.stdout + result.stderr, /No Agent Skills/);
+  });
 });

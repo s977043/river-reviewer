@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
-import os from 'node:os';
 import path from 'node:path';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
   createSkillValidator,
@@ -10,19 +9,17 @@ import {
   loadSkillFile,
   loadSkills,
 } from '../runners/core/skill-loader.mjs';
+import { withTempDir, createTempDirAsync } from './helpers/temp-dir.mjs';
+
+const TMP_PREFIX = 'skill-loader-';
 
 async function buildValidator(schemaPath = defaultPaths.schemaPath) {
   const schema = await loadSchema(schemaPath);
   return createSkillValidator(schema);
 }
 
-async function withTempDir(fn) {
-  const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'skill-loader-'));
-  try {
-    return await fn(tmpDir);
-  } finally {
-    await rm(tmpDir, { recursive: true, force: true });
-  }
+async function createTempSkillDir() {
+  return createTempDirAsync({ prefix: TMP_PREFIX });
 }
 
 test('loads existing sample skill and applies default outputKind', async () => {
@@ -41,7 +38,7 @@ test('loads existing sample skill and applies default outputKind', async () => {
 
 test('loads skill with extended metadata fields', async () => {
   const validator = await buildValidator();
-  const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'skill-loader-'));
+  const tmpDir = await createTempSkillDir();
   const skillPath = path.join(tmpDir, 'with-extensions.md');
   const content = `---
 id: rr-downstream-newmeta-001
@@ -76,7 +73,7 @@ Body content
 
 test('loads skill with trigger container and normalizes phase/applyTo', async () => {
   const validator = await buildValidator();
-  const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'skill-loader-'));
+  const tmpDir = await createTempSkillDir();
   const skillPath = path.join(tmpDir, 'with-trigger.md');
   const content = `---
 id: rr-midstream-trigger-001
@@ -99,7 +96,7 @@ Body content
 
 test('trigger does not override top-level phase/applyTo', async () => {
   const validator = await buildValidator();
-  const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'skill-loader-'));
+  const tmpDir = await createTempSkillDir();
   const skillPath = path.join(tmpDir, 'with-trigger-precedence.md');
   const content = `---
 id: rr-midstream-trigger-002
@@ -181,7 +178,7 @@ Body content
 
 test('fails when dependencies contain unsupported values', async () => {
   const validator = await buildValidator();
-  const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'skill-loader-'));
+  const tmpDir = await createTempSkillDir();
   const skillPath = path.join(tmpDir, 'invalid-deps.md');
   const content = `---
 id: rr-upstream-invalid-deps-001
@@ -204,7 +201,7 @@ dependencies:
 
 test('fails validation when required fields are missing', async () => {
   const validator = await buildValidator();
-  const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'skill-loader-'));
+  const tmpDir = await createTempSkillDir();
   const skillPath = path.join(tmpDir, 'invalid-skill.md');
   const content = `---
 id: rr-upstream-missing-applyto-001

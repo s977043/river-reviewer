@@ -1,0 +1,22 @@
+name: 'Setup Node and install deps'
+description: 'Setup Node.js with npm cache and run npm ci'
+inputs:
+  node-version:
+    description: 'Node.js version to install'
+    required: false
+    default: '22.x'
+  cache:
+    description: 'actions/setup-node cache input (e.g. "npm", "yarn", "pnpm"). Set to "" to disable.'
+    required: false
+    default: 'npm'
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: ${{ inputs.cache }}
+    - name: Install dependencies
+      shell: bash
+      run: npm ci

@@ -1,7 +1,5 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 import test from 'node:test';
 
 import {
@@ -11,64 +9,63 @@ import {
   supersede,
   expireEntries,
 } from '../src/lib/riverbed-memory.mjs';
+import { createTempMemory, makeMemoryEntry as makeEntry } from './helpers/memory.mjs';
 
-function tmpIndex() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rr-memory-'));
-  return { dir, indexPath: path.join(dir, 'index.json') };
-}
-
-function cleanup(dir) {
-  fs.rmSync(dir, { recursive: true });
-}
-
-function makeEntry(overrides = {}) {
-  return {
-    id: `test-${Date.now()}`,
-    type: 'review',
-    content: 'Test content',
-    metadata: { createdAt: new Date().toISOString(), author: 'test' },
-    ...overrides,
-  };
-}
+const tmpIndex = () => createTempMemory({ layout: 'flat', prefix: 'rr-memory-' });
 
 test('loadMemory: returns empty structure for missing file', () => {
-  const { dir, indexPath } = tmpIndex();
-  const mem = loadMemory(indexPath);
-  assert.deepEqual(mem.entries, []);
-  assert.equal(mem.version, '1');
-  cleanup(dir);
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const mem = loadMemory(indexPath);
+    assert.deepEqual(mem.entries, []);
+    assert.equal(mem.version, '1');
+  } finally {
+    cleanup();
+  }
 });
 
 test('loadMemory: reads existing index', () => {
-  const { dir, indexPath } = tmpIndex();
-  const data = { entries: [makeEntry()], version: '1' };
-  fs.writeFileSync(indexPath, JSON.stringify(data));
-  const mem = loadMemory(indexPath);
-  assert.equal(mem.entries.length, 1);
-  cleanup(dir);
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const data = { entries: [makeEntry()], version: '1' };
+    fs.writeFileSync(indexPath, JSON.stringify(data));
+    const mem = loadMemory(indexPath);
+    assert.equal(mem.entries.length, 1);
+  } finally {
+    cleanup();
+  }
 });
 
 test('appendEntry: creates file and adds entry', () => {
-  const { dir, indexPath } = tmpIndex();
-  const entry = makeEntry({ id: 'e1' });
-  appendEntry(indexPath, entry);
-  const mem = loadMemory(indexPath);
-  assert.equal(mem.entries.length, 1);
-  assert.equal(mem.entries[0].id, 'e1');
-  cleanup(dir);
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const entry = makeEntry({ id: 'e1' });
+    appendEntry(indexPath, entry);
+    const mem = loadMemory(indexPath);
+    assert.equal(mem.entries.length, 1);
+    assert.equal(mem.entries[0].id, 'e1');
+  } finally {
+    cleanup();
+  }
 });
 
 test('appendEntry: rejects duplicate ID', () => {
-  const { dir, indexPath } = tmpIndex();
-  appendEntry(indexPath, makeEntry({ id: 'dup' }));
-  assert.throws(() => appendEntry(indexPath, makeEntry({ id: 'dup' })), /Duplicate/);
-  cleanup(dir);
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    appendEntry(indexPath, makeEntry({ id: 'dup' }));
+    assert.throws(() => appendEntry(indexPath, makeEntry({ id: 'dup' })), /Duplicate/);
+  } finally {
+    cleanup();
+  }
 });
 
 test('appendEntry: rejects entry without required fields', () => {
-  const { dir, indexPath } = tmpIndex();
-  assert.throws(() => appendEntry(indexPath, { id: 'x' }), /must have/);
-  cleanup(dir);
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    assert.throws(() => appendEntry(indexPath, { id: 'x' }), /must have/);
+  } finally {
+    cleanup();
+  }
 });
 
 test('queryMemory: filters by type', () => {
@@ -151,35 +148,44 @@ test('queryMemory: includeInactive returns all', () => {
 });
 
 test('supersede: marks entry as superseded', () => {
-  const { dir, indexPath } = tmpIndex();
-  appendEntry(indexPath, makeEntry({ id: 'old-adr' }));
-  appendEntry(indexPath, makeEntry({ id: 'new-adr' }));
-  supersede(indexPath, 'old-adr', 'new-adr');
-  const mem = loadMemory(indexPath);
-  const old = mem.entries.find((e) => e.id === 'old-adr');
-  assert.equal(old.status, 'superseded');
-  assert.equal(old.supersededBy, 'new-adr');
-  cleanup(dir);
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    appendEntry(indexPath, makeEntry({ id: 'old-adr' }));
+    appendEntry(indexPath, makeEntry({ id: 'new-adr' }));
+    supersede(indexPath, 'old-adr', 'new-adr');
+    const mem = loadMemory(indexPath);
+    const old = mem.entries.find((e) => e.id === 'old-adr');
+    assert.equal(old.status, 'superseded');
+    assert.equal(old.supersededBy, 'new-adr');
+  } finally {
+    cleanup();
+  }
 });
 
 test('supersede: throws for unknown id', () => {
-  const { dir, indexPath } = tmpIndex();
-  appendEntry(indexPath, makeEntry({ id: 'exists' }));
-  assert.throws(() => supersede(indexPath, 'missing', 'exists'), /not found/);
-  cleanup(dir);
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    appendEntry(indexPath, makeEntry({ id: 'exists' }));
+    assert.throws(() => supersede(indexPath, 'missing', 'exists'), /not found/);
+  } finally {
+    cleanup();
+  }
 });
 
 test('expireEntries: archives expired entries', () => {
-  const { dir, indexPath } = tmpIndex();
-  const past = new Date(Date.now() - 86400000).toISOString();
-  const future = new Date(Date.now() + 86400000).toISOString();
-  appendEntry(indexPath, makeEntry({ id: 'expired', expiresAt: past }));
-  appendEntry(indexPath, makeEntry({ id: 'valid', expiresAt: future }));
-  appendEntry(indexPath, makeEntry({ id: 'no-expiry' }));
-  const count = expireEntries(indexPath);
-  assert.equal(count, 1);
-  const mem = loadMemory(indexPath);
-  assert.equal(mem.entries.find((e) => e.id === 'expired').status, 'archived');
-  assert.equal(mem.entries.find((e) => e.id === 'valid').status, undefined);
-  cleanup(dir);
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const past = new Date(Date.now() - 86400000).toISOString();
+    const future = new Date(Date.now() + 86400000).toISOString();
+    appendEntry(indexPath, makeEntry({ id: 'expired', expiresAt: past }));
+    appendEntry(indexPath, makeEntry({ id: 'valid', expiresAt: future }));
+    appendEntry(indexPath, makeEntry({ id: 'no-expiry' }));
+    const count = expireEntries(indexPath);
+    assert.equal(count, 1);
+    const mem = loadMemory(indexPath);
+    assert.equal(mem.entries.find((e) => e.id === 'expired').status, 'archived');
+    assert.equal(mem.entries.find((e) => e.id === 'valid').status, undefined);
+  } finally {
+    cleanup();
+  }
 });

@@ -16,6 +16,7 @@ allowed-tools: Bash(gh pr list:*), Bash(gh pr view:*), Bash(gh api:*), Bash(gh i
 - main 修正 / CI 失敗の解消タスクを開始しようとしている
 - 新しい PR を作成しようとしている
 - `gh pr list` の結果を信頼して作業計画を立てようとしている
+- `.github/workflows/*.yml` の `node-version` / action pin / `permissions` を変更する PR を作ろうとしている（Node baseline / action version / permissions 系の並行 PR と衝突しやすい）
 
 ## 調査手順
 

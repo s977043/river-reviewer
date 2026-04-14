@@ -1,6 +1,8 @@
 #!/usr/bin/env node
+import { realpathSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   GitError,
   GitRepoNotFoundError,
@@ -555,8 +557,8 @@ function countChangedLines(files) {
   return lines;
 }
 
-async function main() {
-  const parsed = parseArgs(process.argv.slice(2));
+async function main(argv = process.argv.slice(2)) {
+  const parsed = parseArgs(argv);
   if (parsed.command === 'help' || !parsed.command) {
     printHelp();
     return 0;
@@ -811,8 +813,39 @@ Dependencies: ${
   }
 }
 
-main().then((code) => {
-  if (typeof code === 'number' && code !== 0) {
-    process.exitCode = code;
+export { parseArgs, main };
+
+/**
+ * この CLI が直接起動されたときのみ `main()` を実行する。
+ *
+ * `import.meta.url === \`file://${process.argv[1]}\`` という素朴な比較は、
+ * 以下のケースで偽になり自動起動が走らない:
+ *
+ *   1. npm `bin` 経由（`npm install -g`）: `process.argv[1]` が symlink の
+ *      `.../node_modules/.bin/river` のままで、`import.meta.url` は実体の
+ *      `.../src/cli.mjs` を指す。
+ *   2. macOS の `/tmp` → `/private/tmp` など、プラットフォーム固有の
+ *      canonical path 展開。
+ *   3. Windows のバックスラッシュ区切り path（`file:///C:/...` 形式でない）。
+ *
+ * そのため `realpathSync` で symlink を解決し、`pathToFileURL` で URL に
+ * 変換した上で比較する。比較に失敗してもアプリは落とさない（import-only
+ * シナリオを壊さない）。
+ */
+function isDirectInvocation() {
+  if (!process.argv[1]) return false;
+  try {
+    const real = realpathSync(process.argv[1]);
+    return fileURLToPath(import.meta.url) === real || import.meta.url === pathToFileURL(real).href;
+  } catch {
+    return false;
   }
-});
+}
+
+if (isDirectInvocation()) {
+  main().then((code) => {
+    if (typeof code === 'number' && code !== 0) {
+      process.exitCode = code;
+    }
+  });
+}

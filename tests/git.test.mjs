@@ -1,0 +1,248 @@
+import assert from 'node:assert/strict';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import test, { describe } from 'node:test';
+
+import {
+  ensureGitRepo,
+  detectDefaultBranch,
+  findMergeBase,
+  listChangedFiles,
+  diffWithContext,
+  collectAddedLineHints,
+  GitError,
+  GitRepoNotFoundError,
+} from '../src/lib/git.mjs';
+import { createTempGitRepo, runGit, writeFileRelative } from './helpers/temp-repo.mjs';
+import { createTempDir, cleanupTempDir } from './helpers/temp-dir.mjs';
+
+// ---------------------------------------------------------------------------
+// ensureGitRepo
+// ---------------------------------------------------------------------------
+
+describe('ensureGitRepo', () => {
+  test('returns repo root for valid git repo', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo();
+    t.after(cleanup);
+    const root = await ensureGitRepo(dir);
+    // macOS realpath: /tmp -> /private/tmp
+    assert.ok(root.endsWith(dir.replace(/^\/private/, '')) || dir.endsWith(root.replace(/^\/private/, '')));
+  });
+
+  test('throws GitRepoNotFoundError for non-repo directory', async (t) => {
+    const dir = createTempDir({ prefix: 'git-no-repo-' });
+    t.after(() => cleanupTempDir(dir));
+    await assert.rejects(ensureGitRepo(dir), (err) => {
+      assert.ok(err instanceof GitRepoNotFoundError);
+      assert.match(err.message, /Not a git repository/);
+      return true;
+    });
+  });
+
+  test('throws for non-existent path', async () => {
+    await assert.rejects(ensureGitRepo('/tmp/nonexistent-path-xyz-' + Date.now()), (err) => {
+      assert.ok(err instanceof GitError);
+      return true;
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// detectDefaultBranch
+// ---------------------------------------------------------------------------
+
+describe('detectDefaultBranch', () => {
+  test('returns main for repo with main branch', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({ branch: 'main' });
+    t.after(cleanup);
+    const branch = await detectDefaultBranch(dir);
+    assert.equal(branch, 'main');
+  });
+
+  test('returns master for repo with master branch', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({ branch: 'master' });
+    t.after(cleanup);
+    const branch = await detectDefaultBranch(dir);
+    assert.equal(branch, 'master');
+  });
+
+  test('returns HEAD as fallback when no main/master branch', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({ branch: 'develop' });
+    t.after(cleanup);
+    const branch = await detectDefaultBranch(dir);
+    assert.equal(branch, 'HEAD');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// findMergeBase
+// ---------------------------------------------------------------------------
+
+describe('findMergeBase', () => {
+  test('returns merge base commit', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({
+      initialFiles: { 'a.txt': 'initial\n' },
+    });
+    t.after(cleanup);
+    // create a second commit on main
+    writeFileRelative(dir, 'b.txt', 'second\n');
+    await runGit(['add', '.'], dir);
+    await runGit(['commit', '-m', 'second'], dir);
+
+    const base = await findMergeBase(dir, 'main');
+    assert.ok(base);
+    assert.match(base, /^[0-9a-f]{40}$/);
+  });
+
+  test('falls back to HEAD when baseRef does not exist', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({
+      initialFiles: { 'a.txt': 'initial\n' },
+    });
+    t.after(cleanup);
+    const base = await findMergeBase(dir, 'nonexistent-branch');
+    const head = (await runGit(['rev-parse', 'HEAD'], dir)).stdout.trim();
+    assert.equal(base, head);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// listChangedFiles
+// ---------------------------------------------------------------------------
+
+describe('listChangedFiles', () => {
+  test('lists added files', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({
+      initialFiles: { 'a.txt': 'initial\n' },
+      changedFiles: { 'b.txt': 'new file\n' },
+    });
+    t.after(cleanup);
+    await runGit(['add', '.'], dir);
+    const head = (await runGit(['rev-parse', 'HEAD'], dir)).stdout.trim();
+    const files = await listChangedFiles(dir, head);
+    assert.ok(files.includes('b.txt'));
+  });
+
+  test('lists modified files', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({
+      initialFiles: { 'a.txt': 'initial\n' },
+      changedFiles: { 'a.txt': 'modified\n' },
+    });
+    t.after(cleanup);
+    const head = (await runGit(['rev-parse', 'HEAD'], dir)).stdout.trim();
+    const files = await listChangedFiles(dir, head);
+    assert.ok(files.includes('a.txt'));
+  });
+
+  test('returns empty array when no changes', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({
+      initialFiles: { 'a.txt': 'initial\n' },
+    });
+    t.after(cleanup);
+    const head = (await runGit(['rev-parse', 'HEAD'], dir)).stdout.trim();
+    const files = await listChangedFiles(dir, head);
+    assert.deepEqual(files, []);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// diffWithContext
+// ---------------------------------------------------------------------------
+
+describe('diffWithContext', () => {
+  test('returns unified diff text', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({
+      initialFiles: { 'src/app.js': 'const a = 1;\n' },
+      changedFiles: { 'src/app.js': 'const a = 2;\n' },
+    });
+    t.after(cleanup);
+    const head = (await runGit(['rev-parse', 'HEAD'], dir)).stdout.trim();
+    const diff = await diffWithContext(dir, head);
+    assert.match(diff, /--- a\/src\/app\.js/);
+    assert.match(diff, /\+\+\+ b\/src\/app\.js/);
+    assert.match(diff, /const a = 2/);
+  });
+
+  test('respects unified context lines option', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({
+      initialFiles: { 'x.txt': 'line1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\n' },
+      changedFiles: { 'x.txt': 'line1\nline2\nline3\nCHANGED\nline5\nline6\nline7\nline8\n' },
+    });
+    t.after(cleanup);
+    const head = (await runGit(['rev-parse', 'HEAD'], dir)).stdout.trim();
+
+    const diff0 = await diffWithContext(dir, head, { unified: 0 });
+    const diff5 = await diffWithContext(dir, head, { unified: 5 });
+    // With 0 context, diff is shorter
+    assert.ok(diff0.length < diff5.length);
+  });
+
+  test('returns empty string when no changes', async (t) => {
+    const { dir, cleanup } = await createTempGitRepo({
+      initialFiles: { 'a.txt': 'stable\n' },
+    });
+    t.after(cleanup);
+    const head = (await runGit(['rev-parse', 'HEAD'], dir)).stdout.trim();
+    const diff = await diffWithContext(dir, head);
+    assert.equal(diff, '');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// collectAddedLineHints
+// ---------------------------------------------------------------------------
+
+describe('collectAddedLineHints', () => {
+  test('extracts first hunk start line per file', () => {
+    const diff = `diff --git a/src/app.js b/src/app.js
+--- a/src/app.js
++++ b/src/app.js
+@@ -1,3 +1,4 @@
+ const a = 1;
++const b = 2;
+ const c = 3;
+diff --git a/src/utils.js b/src/utils.js
+--- a/src/utils.js
++++ b/src/utils.js
+@@ -10,2 +10,5 @@
+ function helper() {}
++function newHelper() {}
+`;
+    const hints = collectAddedLineHints(diff);
+    assert.equal(hints.get('src/app.js'), 1);
+    assert.equal(hints.get('src/utils.js'), 10);
+    assert.equal(hints.size, 2);
+  });
+
+  test('returns empty map for empty diff', () => {
+    assert.equal(collectAddedLineHints('').size, 0);
+  });
+
+  test('only records first hunk per file', () => {
+    const diff = `diff --git a/f.js b/f.js
+--- a/f.js
++++ b/f.js
+@@ -5,3 +5,4 @@
+ line5
++added1
+@@ -20,3 +21,4 @@
+ line20
++added2
+`;
+    const hints = collectAddedLineHints(diff);
+    assert.equal(hints.get('f.js'), 5);
+    assert.equal(hints.size, 1);
+  });
+
+  test('handles new file diff (no --- a/ header)', () => {
+    const diff = `diff --git a/new.js b/new.js
+--- /dev/null
++++ b/new.js
+@@ -0,0 +1,3 @@
++const x = 1;
++const y = 2;
++const z = 3;
+`;
+    const hints = collectAddedLineHints(diff);
+    assert.equal(hints.get('new.js'), 1);
+  });
+});
