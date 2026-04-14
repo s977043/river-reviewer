@@ -27,6 +27,8 @@
 import {
   loadSkills as coreLoadSkills,
   loadSkillFile as coreLoadSkillFile,
+  loadSkillMetadata as coreLoadSkillMetadata,
+  loadAllSkillMetadata as coreLoadAllSkillMetadata,
   defaultPaths,
   SkillLoaderError,
 } from '@river-reviewer/core-runner/skill-loader';
@@ -132,6 +134,54 @@ export async function loadSkillFile(
   options: Pick<LoadSkillsOptions, 'schemaPath'> = {}
 ): Promise<SkillDefinition> {
   return coreLoadSkillFile(filePath, options);
+}
+
+/**
+ * Load only skill metadata for a single file (Stage 1 of Progressive Disclosure).
+ *
+ * Unlike {@link loadSkillFile}, the returned object does not include the skill `body`.
+ * Use this when you need to filter or route skills before committing to the cost of
+ * loading the full instruction text.
+ *
+ * @param filePath - Absolute path to the skill file
+ * @param options - Optional loading options
+ * @returns Promise resolving to `{ metadata, path }`
+ *
+ * @example
+ * ```typescript
+ * const { metadata, path } = await loadSkillMetadata('/path/to/skill.md');
+ * console.log(metadata.id, path);
+ * ```
+ */
+export async function loadSkillMetadata(
+  filePath: string,
+  options: Pick<LoadSkillsOptions, 'schemaPath'> = {}
+): Promise<{ metadata: SkillDefinition['metadata']; path: string }> {
+  return coreLoadSkillMetadata(filePath, options);
+}
+
+/**
+ * Load metadata for all skills under the skills directory
+ * (Stage 1 of Progressive Disclosure).
+ *
+ * Returns an array of `{ metadata, path }` objects without skill bodies. Validation,
+ * excluded-tag filtering, and duplicate-id handling match {@link loadSkills}.
+ *
+ * @param options - Options for loading skills
+ * @returns Promise resolving to array of `{ metadata, path }` entries
+ *
+ * @example
+ * ```typescript
+ * const summaries = await loadAllSkillMetadata();
+ * for (const { metadata, path } of summaries) {
+ *   console.log(metadata.id, path);
+ * }
+ * ```
+ */
+export async function loadAllSkillMetadata(
+  options: Pick<LoadSkillsOptions, 'skillsDir' | 'schemaPath'> = {}
+): Promise<Array<{ metadata: SkillDefinition['metadata']; path: string }>> {
+  return coreLoadAllSkillMetadata(options);
 }
 
 /**
