@@ -34071,7 +34071,16 @@ async function loadSkillFile(filePath, options = {}) {
   };
 }
 
-async function loadSkills(options = {}) {
+/**
+ * Shared loader loop used by {@link loadSkills} and {@link loadAllSkillMetadata}.
+ * Differs only in the per-file loader function (`loaderFn`), so the skill-discovery
+ * semantics (schema validation, excluded tags, duplicate-id handling) stay in sync
+ * across the two public entry points.
+ *
+ * @param {(filePath: string, options: { validator: Function }) => Promise<{ metadata: SkillMetadata, path: string }>} loaderFn
+ * @param {object} options
+ */
+async function _loadFromDir(loaderFn, options = {}) {
   const {
     skillsDir = defaultSkillsDir,
     schemaPath = defaultSchemaPath,
@@ -34085,7 +34094,7 @@ async function loadSkills(options = {}) {
 
   for (const filePath of files) {
     try {
-      const skill = await loadSkillFile(filePath, { validator });
+      const skill = await loaderFn(filePath, { validator });
       const id = skill?.metadata?.id;
       if (!id) {
         logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
@@ -34105,6 +34114,10 @@ async function loadSkills(options = {}) {
   }
 
   return Array.from(skillsById.values());
+}
+
+async function loadSkills(options = {}) {
+  return _loadFromDir(loadSkillFile, options);
 }
 
 /**
@@ -34141,39 +34154,7 @@ async function loadSkillMetadata(filePath, options = {}) {
  * @returns {Promise<Array<{metadata: SkillMetadata, path: string}>>}
  */
 async function loadAllSkillMetadata(options = {}) {
-  const {
-    skillsDir = defaultSkillsDir,
-    schemaPath = defaultSchemaPath,
-    validator: providedValidator,
-    excludedTags = ['agent'],
-  } = options;
-  const schema = providedValidator ? null : await loadSchema(schemaPath);
-  const validator = providedValidator ?? createSkillValidator(schema);
-  const files = await listSkillFiles(skillsDir);
-  const skillsById = new Map();
-
-  for (const filePath of files) {
-    try {
-      const skill = await loadSkillMetadata(filePath, { validator });
-      const id = skill?.metadata?.id;
-      if (!id) {
-        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
-        continue;
-      }
-      if (hasExcludedTag(skill.metadata, excludedTags)) {
-        continue;
-      }
-      if (skillsById.has(id)) {
-        logDuplicateSkill(id, filePath, skillsById.get(id).path);
-        continue;
-      }
-      skillsById.set(id, skill);
-    } catch (err) {
-      logSkillLoadError(filePath, err);
-    }
-  }
-
-  return Array.from(skillsById.values());
+  return _loadFromDir(loadSkillMetadata, options);
 }
 
 
