@@ -69,9 +69,10 @@
           "score": {
             "type": ["number", "null"]
           },
-          "method": {
+          "scoringMethod": {
             "type": "string",
-            "enum": ["binary", "ratio", "manual"]
+            "enum": ["binary", "ratio", "manual"],
+            "description": "Scoring method used for this dimension. Must match the dimension's scoringMethod in eval/rubric.yaml."
           },
           "details": {
             "type": "string"
