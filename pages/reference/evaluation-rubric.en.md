@@ -2,19 +2,28 @@
 
 River Reviewer's evaluation framework provides a rubric to quantify review quality across multiple dimensions. Each dimension has an independent score, and a weighted sum produces the overall score.
 
+> **Status**: This document is a specification. Runtime integration (wiring `dimensionScores` generation into `scripts/evaluate-review-fixtures.mjs` / `src/lib/review-fixtures-eval.mjs`) is tracked in a follow-up issue. At present only the schema, rubric definitions, and the consistency test (`tests/eval-rubric.test.mjs`) are implemented.
+
 ## Dimension List
 
-| ID                    | Name                | Description                                                 | Weight | Scoring Method | Automatable |
-| --------------------- | ------------------- | ----------------------------------------------------------- | ------ | -------------- | ----------- |
-| `detection_accuracy`  | Detection Accuracy  | Whether the review detected expected issues                 | 0.25   | ratio          | Yes         |
-| `false_positive_rate` | False Positive Rate | Proportion of erroneous findings on guard cases             | 0.20   | ratio          | Yes         |
-| `evidence_quality`    | Evidence Quality    | Whether findings include Evidence labels                    | 0.15   | ratio          | Yes         |
-| `severity_alignment`  | Severity Alignment  | Whether assigned severity matches expectation               | 0.15   | ratio          | Yes         |
-| `phase_consistency`   | Phase Consistency   | Whether findings are consistent with the review phase       | 0.10   | binary         | Yes         |
-| `actionability`       | Actionability       | Whether findings include actionable improvement suggestions | 0.10   | manual         | No          |
-| `token_efficiency`    | Token Efficiency    | Output efficiency relative to the Context Budget            | 0.05   | ratio          | Yes         |
+| ID                    | Name                | Description                                                 | Weight | Scoring Method | Direction        | Automatable |
+| --------------------- | ------------------- | ----------------------------------------------------------- | ------ | -------------- | ---------------- | ----------- |
+| `detection_accuracy`  | Detection Accuracy  | Whether the review detected expected issues                 | 0.25   | ratio          | higher_is_better | Yes         |
+| `false_positive_rate` | False Positive Rate | Proportion of erroneous findings on guard cases             | 0.20   | ratio          | lower_is_better  | Yes         |
+| `evidence_quality`    | Evidence Quality    | Whether findings include Evidence labels                    | 0.15   | ratio          | higher_is_better | Yes         |
+| `severity_alignment`  | Severity Alignment  | Whether assigned severity matches expectation               | 0.15   | ratio          | higher_is_better | Yes         |
+| `phase_consistency`   | Phase Consistency   | Whether findings are consistent with the review phase       | 0.10   | binary         | higher_is_better | Yes         |
+| `actionability`       | Actionability       | Whether findings include actionable improvement suggestions | 0.10   | manual         | higher_is_better | No          |
+| `token_efficiency`    | Token Efficiency    | Output efficiency relative to the Context Budget            | 0.05   | ratio          | higher_is_better | Yes         |
 
-Weights sum to 1.0.
+Weights sum to 1.0 (validated by `tests/eval-rubric.test.mjs`).
+
+## Direction (Sign Correction)
+
+Each dimension declares a `direction` field indicating whether a higher or lower score is better. When computing the weighted sum, `lower_is_better` dimensions must be transformed via `(1 - score)` before summing.
+
+- `higher_is_better` (default): a higher score is better.
+- `lower_is_better`: a lower score is better (e.g. `false_positive_rate`).
 
 ## Scoring Methods
 
@@ -49,13 +58,13 @@ A `dimensionScores` array has been added to each evaluation entry.
     {
       "dimensionId": "detection_accuracy",
       "score": 0.85,
-      "method": "ratio",
+      "scoringMethod": "ratio",
       "details": "17/20 expected findings detected"
     },
     {
       "dimensionId": "actionability",
       "score": null,
-      "method": "manual",
+      "scoringMethod": "manual",
       "details": "Pending human review"
     }
   ]
@@ -64,7 +73,7 @@ A `dimensionScores` array has been added to each evaluation entry.
 
 - `dimensionId` (string, required): Corresponds to `id` in `eval-rubric.schema.json`
 - `score` (number | null, required): Score value. `null` when manual evaluation is pending.
-- `method` (string): Scoring method used.
+- `scoringMethod` (string): Scoring method used (matches the rubric's `scoringMethod`).
 - `details` (string): Supplementary explanation.
 
 ## Relationship to Existing Fixtures

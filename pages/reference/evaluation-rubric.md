@@ -2,19 +2,28 @@
 
 River Reviewer の評価フレームワークは、レビュー品質を多次元で定量化するルーブリックを提供します。各次元は独立したスコアを持ち、加重合計により総合スコアを算出します。
 
+> **Status**: 本書は仕様であり、ランタイム統合（`scripts/evaluate-review-fixtures.mjs` / `src/lib/review-fixtures-eval.mjs` への `dimensionScores` 生成ロジックの組み込み）は後続 Issue で追跡します。現時点ではスキーマ・ルーブリック定義と整合性テスト（`tests/eval-rubric.test.mjs`）のみが実装済みです。
+
 ## 次元一覧
 
-| ID                    | 名前               | 説明                                     | Weight | スコアリング方式 | 自動化 |
-| --------------------- | ------------------ | ---------------------------------------- | ------ | ---------------- | ------ |
-| `detection_accuracy`  | 検出精度           | レビューが期待された問題を検出できたか   | 0.25   | ratio            | Yes    |
-| `false_positive_rate` | 偽陽性率           | guard case で誤って指摘を出した割合      | 0.20   | ratio            | Yes    |
-| `evidence_quality`    | エビデンス品質     | 指摘に Evidence ラベルが含まれているか   | 0.15   | ratio            | Yes    |
-| `severity_alignment`  | 重要度適切性       | 付与された severity が期待値と一致するか | 0.15   | ratio            | Yes    |
-| `phase_consistency`   | フェーズ一貫性     | 指摘がレビューフェーズと一貫しているか   | 0.10   | binary           | Yes    |
-| `actionability`       | アクショナビリティ | 指摘が実行可能な改善提案を含むか         | 0.10   | manual           | No     |
-| `token_efficiency`    | トークン効率       | Context Budget に対する出力の効率        | 0.05   | ratio            | Yes    |
+| ID                    | 名前               | 説明                                     | Weight | スコアリング方式 | Direction        | 自動化 |
+| --------------------- | ------------------ | ---------------------------------------- | ------ | ---------------- | ---------------- | ------ |
+| `detection_accuracy`  | 検出精度           | レビューが期待された問題を検出できたか   | 0.25   | ratio            | higher_is_better | Yes    |
+| `false_positive_rate` | 偽陽性率           | guard case で誤って指摘を出した割合      | 0.20   | ratio            | lower_is_better  | Yes    |
+| `evidence_quality`    | エビデンス品質     | 指摘に Evidence ラベルが含まれているか   | 0.15   | ratio            | higher_is_better | Yes    |
+| `severity_alignment`  | 重要度適切性       | 付与された severity が期待値と一致するか | 0.15   | ratio            | higher_is_better | Yes    |
+| `phase_consistency`   | フェーズ一貫性     | 指摘がレビューフェーズと一貫しているか   | 0.10   | binary           | higher_is_better | Yes    |
+| `actionability`       | アクショナビリティ | 指摘が実行可能な改善提案を含むか         | 0.10   | manual           | higher_is_better | No     |
+| `token_efficiency`    | トークン効率       | Context Budget に対する出力の効率        | 0.05   | ratio            | higher_is_better | Yes    |
 
-Weight 合計は 1.0 です。
+Weight 合計は 1.0 です（`tests/eval-rubric.test.mjs` で検証）。
+
+## Direction（方向補正）
+
+各次元は `direction` フィールドで「高いほど良い」か「低いほど良い」かを明示します。加重合計を計算する際、`lower_is_better` の次元は `(1 - score)` に変換してから合計する必要があります。
+
+- `higher_is_better`（デフォルト）: スコアが高いほど良い
+- `lower_is_better`: スコアが低いほど良い（例: `false_positive_rate`）
 
 ## スコアリング方式
 
@@ -49,13 +58,13 @@ Weight 合計は 1.0 です。
     {
       "dimensionId": "detection_accuracy",
       "score": 0.85,
-      "method": "ratio",
+      "scoringMethod": "ratio",
       "details": "17/20 expected findings detected"
     },
     {
       "dimensionId": "actionability",
       "score": null,
-      "method": "manual",
+      "scoringMethod": "manual",
       "details": "Pending human review"
     }
   ]
@@ -64,7 +73,7 @@ Weight 合計は 1.0 です。
 
 - `dimensionId`（string, required）: `eval-rubric.schema.json` の `id` と対応
 - `score`（number | null, required）: スコア値。manual 未評価時は `null`
-- `method`（string）: 使用したスコアリング方式
+- `scoringMethod`（string）: 使用したスコアリング方式（rubric の `scoringMethod` と一致）
 - `details`（string）: 補足説明
 
 ## 既存フィクスチャとの関係

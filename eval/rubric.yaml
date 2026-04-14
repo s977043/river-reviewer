@@ -47,40 +47,47 @@ dimensions:
     description: レビューが期待された問題を検出できたか
     weight: 0.25
     scoringMethod: ratio
+    direction: higher_is_better
     automatable: true
   - id: false_positive_rate
     name: 偽陽性率
     description: guard case で誤って指摘を出した割合
     weight: 0.2
     scoringMethod: ratio
+    direction: lower_is_better
     automatable: true
   - id: evidence_quality
     name: エビデンス品質
     description: 指摘に Evidence ラベルが含まれているか
     weight: 0.15
     scoringMethod: ratio
+    direction: higher_is_better
     automatable: true
   - id: severity_alignment
     name: 重要度適切性
     description: 付与された severity が期待値と一致するか
     weight: 0.15
     scoringMethod: ratio
+    direction: higher_is_better
     automatable: true
   - id: phase_consistency
     name: フェーズ一貫性
     description: 指摘がレビューフェーズと一貫しているか
     weight: 0.1
     scoringMethod: binary
+    direction: higher_is_better
     automatable: true
   - id: actionability
     name: アクショナビリティ
     description: 指摘が実行可能な改善提案を含むか
     weight: 0.1
     scoringMethod: manual
+    direction: higher_is_better
     automatable: false
   - id: token_efficiency
     name: トークン効率
     description: Context Budget に対する出力の効率
     weight: 0.05
     scoringMethod: ratio
+    direction: higher_is_better
     automatable: true
