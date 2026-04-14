@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://river-reviewer.vercel.app/schemas/review-artifact.schema.json",
   "title": "River Reviewer Review Artifact",
   "description": "Structured output for a complete River Reviewer run, covering plan, context, findings, and debug info.",
   "type": "object",
@@ -9,7 +10,7 @@
     "version": {
       "type": "string",
       "const": "1",
-      "description": "Schema version. Always \"1\" for this revision."
+      "description": "Schema version. Always \"1\" for this revision. New schemas should be created as separate files (e.g. review-artifact.v2.schema.json) per the versioning policy in pages/reference/stable-interfaces.md."
     },
     "timestamp": {
       "type": "string",
@@ -54,7 +55,8 @@
               },
               "modelHint": {
                 "type": "string",
-                "description": "Preferred model tier hint (e.g. balanced, fast, strong)."
+                "enum": ["cheap", "balanced", "high-accuracy"],
+                "description": "Preferred model tier hint. Mirrors the ModelHintEnum used in src/lib/skillYamlSchema.mjs."
               }
             }
           }
@@ -89,6 +91,7 @@
           "description": "Per-skill reasoning produced by the AI planner.",
           "items": {
             "type": "object",
+            "required": ["id", "reason"],
             "additionalProperties": false,
             "properties": {
               "id": {
@@ -112,7 +115,7 @@
     "findings": {
       "type": "array",
       "description": "Review findings produced during the run. Each item conforms to the issue schema in output.schema.json.",
-      "items": { "type": "object" }
+      "items": { "$ref": "#/$defs/finding" }
     },
     "context": {
       "type": "object",
@@ -138,10 +141,18 @@
         },
         "tokenEstimate": {
           "type": "number",
+          "minimum": 0,
           "description": "Estimated token count of the optimized diff text."
+        },
+        "rawTokenEstimate": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated token count of the raw (unoptimized) diff text."
         },
         "reduction": {
           "type": "number",
+          "minimum": 0,
+          "maximum": 100,
           "description": "Percentage of tokens saved by diff optimization (0-100)."
         }
       }
@@ -150,6 +161,60 @@
       "type": "object",
       "additionalProperties": true,
       "description": "Free-form debug information. Structure is not guaranteed across versions."
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "description": "A single review finding. Mirrors the issue schema in output.schema.json so that findings can be cross-validated by both schemas.",
+      "required": ["id", "ruleId", "title", "message", "severity", "phase", "file"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the issue within this run.",
+          "minLength": 1
+        },
+        "ruleId": {
+          "type": "string",
+          "description": "Identifier of the rule or skill that produced the issue.",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "description": "Short human-readable title for the issue.",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string",
+          "description": "Detailed explanation of the issue and context.",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "string",
+          "description": "Severity level assigned to the issue.",
+          "enum": ["info", "minor", "major", "critical"]
+        },
+        "phase": {
+          "type": "string",
+          "description": "SDLC phase where this issue was found.",
+          "enum": ["upstream", "midstream", "downstream"]
+        },
+        "file": {
+          "type": "string",
+          "description": "File path or logical name relevant to the issue.",
+          "minLength": 1
+        },
+        "line": {
+          "type": "integer",
+          "description": "Line number related to the issue when applicable.",
+          "minimum": 1
+        },
+        "suggestion": {
+          "type": "string",
+          "description": "Optional fix or follow-up hint."
+        }
+      }
     }
   }
 }
