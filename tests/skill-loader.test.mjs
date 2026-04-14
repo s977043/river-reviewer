@@ -8,6 +8,8 @@ import {
   loadSchema,
   loadSkillFile,
   loadSkills,
+  loadSkillMetadata,
+  loadAllSkillMetadata,
 } from '../runners/core/skill-loader.mjs';
 import { withTempDir, createTempDirAsync } from './helpers/temp-dir.mjs';
 
@@ -360,4 +362,121 @@ test('loadSkills loads all skill files under default directory', async () => {
     assert.ok(Array.isArray(skill.metadata.outputKind));
     assert.ok(skill.metadata.outputKind.length >= 1);
   }
+});
+
+test('loadSkillMetadata returns only {metadata, path} without body', async () => {
+  await withTempDir(async (tmpDir) => {
+    const validator = await buildValidator();
+    const skillPath = path.join(tmpDir, 'metadata-only.md');
+    await writeFile(
+      skillPath,
+      `---
+id: rr-test-metadata-only-001
+name: Metadata Only Skill
+description: Progressive disclosure stage 1 target
+phase: midstream
+applyTo:
+  - 'src/**/*.ts'
+---
+This body text should not be returned
+`
+    );
+
+    const loaded = await loadSkillMetadata(skillPath, { validator });
+    assert.deepEqual(Object.keys(loaded).sort(), ['metadata', 'path']);
+    assert.equal(loaded.metadata.id, 'rr-test-metadata-only-001');
+    assert.equal(loaded.path, skillPath);
+    assert.ok(!('body' in loaded), 'body property must not be present');
+  });
+});
+
+test('loadAllSkillMetadata excludes skills tagged "agent" by default', async () => {
+  await withTempDir(async (tmpDir) => {
+    const validator = await buildValidator();
+    const keptPath = path.join(tmpDir, 'kept.md');
+    const agentPath = path.join(tmpDir, 'agent.md');
+    await writeFile(
+      keptPath,
+      `---
+id: rr-test-meta-keep-001
+name: Kept Skill
+description: Visible skill
+phase: midstream
+applyTo:
+  - 'src/**/*.ts'
+---
+Body
+`
+    );
+    await writeFile(
+      agentPath,
+      `---
+id: rr-test-meta-agent-001
+name: Agent Skill
+description: Should be excluded by default
+phase: midstream
+applyTo:
+  - 'src/**/*.ts'
+tags: [agent]
+---
+Agent body
+`
+    );
+
+    const defaultLoaded = await loadAllSkillMetadata({ skillsDir: tmpDir, validator });
+    assert.equal(defaultLoaded.length, 1);
+    assert.equal(defaultLoaded[0].metadata.id, 'rr-test-meta-keep-001');
+    assert.ok(!('body' in defaultLoaded[0]));
+
+    const allLoaded = await loadAllSkillMetadata({
+      skillsDir: tmpDir,
+      validator,
+      excludedTags: [],
+    });
+    const ids = allLoaded.map((s) => s.metadata.id).sort();
+    assert.deepEqual(ids, ['rr-test-meta-agent-001', 'rr-test-meta-keep-001']);
+  });
+});
+
+test('loadSkillMetadata and loadAllSkillMetadata skip duplicate ids with a warning', async () => {
+  await withTempDir(async (tmpDir) => {
+    const validator = await buildValidator();
+    const firstPath = path.join(tmpDir, 'a-first.md');
+    const secondPath = path.join(tmpDir, 'b-second.md');
+    const body = (name) => `---
+id: rr-test-meta-dup-001
+name: ${name}
+description: Duplicate id check
+phase: midstream
+applyTo:
+  - 'src/**/*.ts'
+---
+Body
+`;
+    await writeFile(firstPath, body('First copy'));
+    await writeFile(secondPath, body('Second copy'));
+
+    const warnings = [];
+    const originalWarn = console.warn;
+    console.warn = (...args) => warnings.push(args.join(' '));
+    try {
+      const loaded = await loadAllSkillMetadata({ skillsDir: tmpDir, validator });
+      assert.equal(loaded.length, 1);
+      assert.equal(loaded[0].metadata.name, 'First copy');
+      assert.ok(
+        warnings.some((line) => line.includes('Duplicate skill id "rr-test-meta-dup-001"')),
+        'duplicate warning must be emitted'
+      );
+    } finally {
+      console.warn = originalWarn;
+    }
+
+    // loadSkillMetadata (single file) succeeds independently and has no body.
+    const singleFirst = await loadSkillMetadata(firstPath, { validator });
+    const singleSecond = await loadSkillMetadata(secondPath, { validator });
+    assert.equal(singleFirst.metadata.id, 'rr-test-meta-dup-001');
+    assert.equal(singleSecond.metadata.id, 'rr-test-meta-dup-001');
+    assert.ok(!('body' in singleFirst));
+    assert.ok(!('body' in singleSecond));
+  });
 });
