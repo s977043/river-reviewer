@@ -16,37 +16,38 @@ The Review Artifact schema provides a complete record of a review execution.
 
 ### Top-Level
 
-| Field       | Type                 | Required | Description                                                                               |
-| ----------- | -------------------- | -------- | ----------------------------------------------------------------------------------------- |
-| `version`   | `string`             | Yes      | Schema version. Currently always `"1"`.                                                   |
-| `timestamp` | `string` (date-time) | Yes      | ISO 8601 timestamp of when the review run completed.                                      |
-| `phase`     | `string`             | Yes      | SDLC phase of the review. `upstream` / `midstream` / `downstream`.                        |
-| `status`    | `string`             | Yes      | Terminal status. `ok` / `no-changes` / `skipped-by-label` / `error`.                      |
-| `plan`      | `object`             | No       | Execution plan. See below.                                                                |
-| `findings`  | `array`              | No       | Array of review findings. Each item conforms to the issue schema in `output.schema.json`. |
-| `context`   | `object`             | No       | Repository and diff context.                                                              |
-| `debug`     | `object`             | No       | Free-form debug information. Structure is not guaranteed across versions.                 |
+| Field       | Type                 | Required | Description                                                                                                                          |
+| ----------- | -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `version`   | `string`             | Yes      | Schema version. Currently always `"1"`.                                                                                              |
+| `timestamp` | `string` (date-time) | Yes      | ISO 8601 timestamp of when the review run completed.                                                                                 |
+| `phase`     | `string`             | Yes      | SDLC phase of the review. `upstream` / `midstream` / `downstream`.                                                                   |
+| `status`    | `string`             | Yes      | Terminal status. `ok` / `no-changes` / `skipped-by-label` / `error`.                                                                 |
+| `plan`      | `object`             | No       | Execution plan. See below.                                                                                                           |
+| `findings`  | `array`              | No       | Array of review findings. Each item is compatible with the issue schema in `output.schema.json` (defined inline as `$defs/finding`). |
+| `context`   | `object`             | No       | Repository and diff context.                                                                                                         |
+| `debug`     | `object`             | No       | Free-form debug information. Structure is not guaranteed across versions.                                                            |
 
 ### `plan` Object
 
-| Field            | Type     | Description                                                                                                |
-| ---------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
-| `selectedSkills` | `array`  | Skills selected for execution. Each item has `id` (required), `name` (required), `phase`, and `modelHint`. |
-| `skippedSkills`  | `array`  | Skills excluded from the run. Each item has `id` (required) and `reasons` (required, string array).        |
-| `plannerMode`    | `string` | AI planner mode. `off` / `order` / `prune`.                                                                |
-| `plannerReasons` | `array`  | Per-skill reasoning from the AI planner. Each item has `id` and `reason`.                                  |
-| `impactTags`     | `array`  | Tags describing the impact area of changes (e.g. `security`, `performance`).                               |
+| Field            | Type     | Description                                                                                                                                                |
+| ---------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `selectedSkills` | `array`  | Skills selected for execution. Each item has `id` (required), `name` (required), `phase`, and `modelHint` (one of `cheap` / `balanced` / `high-accuracy`). |
+| `skippedSkills`  | `array`  | Skills excluded from the run. Each item has `id` (required) and `reasons` (required, string array).                                                        |
+| `plannerMode`    | `string` | AI planner mode. `off` / `order` / `prune`.                                                                                                                |
+| `plannerReasons` | `array`  | Per-skill reasoning from the AI planner. Each item has `id` (required) and `reason` (required).                                                            |
+| `impactTags`     | `array`  | Tags describing the impact area of changes (e.g. `security`, `performance`).                                                                               |
 
 ### `context` Object
 
-| Field           | Type     | Description                                               |
-| --------------- | -------- | --------------------------------------------------------- |
-| `repoRoot`      | `string` | Absolute path to the repository root.                     |
-| `defaultBranch` | `string` | Default branch name (e.g. `main`).                        |
-| `mergeBase`     | `string` | Git merge-base commit SHA used for diffing.               |
-| `changedFiles`  | `array`  | List of file paths included in the review diff.           |
-| `tokenEstimate` | `number` | Estimated token count of the optimized diff text.         |
-| `reduction`     | `number` | Percentage of tokens saved by diff optimization (0--100). |
+| Field              | Type     | Description                                                 |
+| ------------------ | -------- | ----------------------------------------------------------- |
+| `repoRoot`         | `string` | Absolute path to the repository root.                       |
+| `defaultBranch`    | `string` | Default branch name (e.g. `main`).                          |
+| `mergeBase`        | `string` | Git merge-base commit SHA used for diffing.                 |
+| `changedFiles`     | `array`  | List of file paths included in the review diff.             |
+| `tokenEstimate`    | `number` | Estimated token count of the optimized diff text (>= 0).    |
+| `rawTokenEstimate` | `number` | Estimated token count of the raw (unoptimized) diff (>= 0). |
+| `reduction`        | `number` | Percentage of tokens saved by diff optimization (0--100).   |
 
 ### `status` Values
 

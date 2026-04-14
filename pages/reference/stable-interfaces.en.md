@@ -92,3 +92,14 @@ Changing the following requires a major version bump as a breaking change:
 - Changing required fields in Skill Schema, or changing meanings of existing fields
 
 For stable Action behavior, we recommend **pinning to a release tag** (e.g., `@v0.1.1`) instead of `@main`.
+
+## Schema Versioning Policy
+
+JSON Schema files under `schemas/` carry a `version` field (for example `"version": { "const": "1" }` in `review-artifact.schema.json`).
+
+- Backward-compatible additions (optional fields, new `enum` values) stay in the same schema file.
+- Breaking changes (new required fields, changing an existing field's type or meaning, removing `enum` values) follow one of:
+  1. Create a new schema file (e.g. `review-artifact.v2.schema.json`), assign `version: const "2"`, and keep the old schema for at least one major version.
+  2. Use `oneOf` in the existing schema so old and new versions coexist. Discriminate on the `version` field so a single `$ref` can handle multiple versions.
+
+When adding a new schema, remember to update related documentation (`pages/reference/_meta.json`, etc.).
