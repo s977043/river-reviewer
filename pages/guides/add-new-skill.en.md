@@ -13,14 +13,15 @@ For detailed writing guidelines (Anti-patterns, Evidence, Non-goals, False posit
 
 ## 1) Create Skill from Template
 
-1. Copy `skills/_template.md` and place it under the target phase directory.
+1. Copy `skills/_template.md` and place it under the target category directory.
    - Example: `skills/midstream/rr-midstream-my-skill-001.md`
 2. Fill in the minimum YAML frontmatter (Refer to `schemas/skill.schema.json` for required fields).
    - `id`: Unique ID (e.g., `rr-midstream-my-skill-001`)
    - `name`: Skill name
    - `description`: What to detect/point out (short)
-   - `phase`: `upstream|midstream|downstream`
-   - `applyTo`: Glob for target files (Recommend narrowing scope initially)
+   - `category`: one of `core` / `upstream` / `midstream` / `downstream` (the primary routing key)
+   - `applyTo`: Glob for target files (Recommend narrowing scope initially). `files` / `path_patterns` are accepted aliases.
+   - `phase`: include only when backward compatibility is required (new skills only need `category`)
 
 See `pages/reference/metadata-fields.en.md` for metadata details.
 
