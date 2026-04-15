@@ -1,0 +1,126 @@
+---
+title: Artifact Input Contract（アーティファクト入力コントラクト）
+---
+
+River Reviewer は PlanGate などの上流ワークフローが生成する成果物（artifact）を **外部入力** として受け取り、レビュー・QA・W チェックを実行する review agent です。本ドキュメントは River Reviewer が安定して読み取れる入力アーティファクトの契約（input contract）を定義します。
+
+> 関連 Issue: #516（Task）/ #508（Capability）/ #507（Epic）
+
+## 方針
+
+- River Reviewer は **artifact-driven** に動作し、PlanGate 内部コマンドや特定のディレクトリ構成に依存しない。
+- 入力は **ファイルパスベース** で受け取り、内容形式（Markdown / JSON / XML / plain）のみを契約する。
+- ファイルが存在しない場合の挙動（スキップ・デグレード・エラー）を各アーティファクトごとに定義する。
+- 新たな artifact を追加する際は本ドキュメントを更新し、後方互換を維持する。
+
+## 対象アーティファクト一覧
+
+River Reviewer が認識する入力アーティファクトは以下の通りです。列の意味は末尾の「凡例」を参照してください。
+
+| ID                | ファイル名例         | 形式         | 必須/任意      | スキーマ / 参考                                     | 役割                                        |
+| ----------------- | -------------------- | ------------ | -------------- | --------------------------------------------------- | ------------------------------------------- |
+| `pbi-input`       | `pbi-input.md`       | Markdown     | 任意（推奨）   | フリーフォーム                                      | PBI（Product Backlog Item）の入力仕様・背景 |
+| `plan`            | `plan.md`            | Markdown     | 任意（推奨）   | フリーフォーム                                      | 実装計画・設計判断の記録                    |
+| `todo`            | `todo.md`            | Markdown     | 任意           | フリーフォーム（チェックリスト）                    | 実装タスクと進捗                            |
+| `test-cases`      | `test-cases.md`      | Markdown     | 任意           | フリーフォーム（箇条書き／表）                      | テストケース設計                            |
+| `review-self`     | `review-self.md`     | Markdown     | 任意           | フリーフォーム                                      | 実装者によるセルフレビュー                  |
+| `review-external` | `review-external.md` | Markdown     | 任意           | フリーフォーム                                      | 外部レビュー結果（既存の AI/人間レビュー）  |
+| `diff`            | `diff.patch`         | unified diff | 必須（代替可） | `git diff` 互換                                     | レビュー対象の差分。未指定時は git から取得 |
+| `junit`           | `junit.xml`          | XML          | 任意           | JUnit XML                                           | 単体/結合テストの結果                       |
+| `coverage`        | `coverage.xml` など  | XML / JSON   | 任意           | Cobertura / LCOV / Istanbul JSON のいずれか         | カバレッジレポート                          |
+| `lint`            | `lint.json` など     | JSON / plain | 任意           | ESLint JSON、stylelint JSON、または tool 固有 plain | Lint 実行結果                               |
+| `typecheck`       | `typecheck.txt` など | plain / JSON | 任意           | tsc `--pretty=false` または tool 固有 plain         | 型検査の実行結果                            |
+
+### 凡例
+
+- **必須/任意**
+  - `必須`: 指定がなければ River Reviewer は実行を中断する。
+  - `必須（代替可）`: 当該 artifact が存在しない場合、代替手段（例: `git diff` による自動取得）が利用される。
+  - `任意`: 欠損してもレビューは継続。該当観点のレビューはスキップまたはデグレードする。
+  - `任意（推奨）`: 欠損は許容されるが、レビュー品質が有意に低下する。
+- **形式**: ファイル内容のエンコーディングおよび構文。複数形式に対応するものはカンマ区切りで併記する。
+
+## アーティファクト別の契約詳細
+
+### `pbi-input` / `plan` / `todo` / `test-cases`
+
+- **形式**: UTF-8 Markdown。見出し構造・箇条書きは自由。
+- **サイズ目安**: 1 ファイルあたり 100KB 以下を推奨。上限を超える場合 River Reviewer は差分最適化（要約・トリム）を適用する場合がある。
+- **欠損時**: 該当 artifact を参照する skill はその観点をスキップし、`skippedSkills` にその旨を記録する。
+
+### `review-self` / `review-external`
+
+- **形式**: UTF-8 Markdown。既存の AI reviewer（River Reviewer 自身を含む）や人間レビュワーの出力をそのまま格納できる。
+- **欠損時**: W チェック（二重レビュー）系 skill はスキップされる。
+- **互換**: 出力の形式は [`schemas/output.schema.json`](../../schemas/output.schema.json) の `issue` 定義と互換性があると解釈される場合があるが、必須ではない。
+
+### `diff`
+
+- **形式**: unified diff（`git diff` 互換）。バイナリ差分は無視される。
+- **必須性**: レビュー対象差分は **必ずいずれかの手段で供給される必要がある**。指定が無い場合 River Reviewer は `git diff <mergeBase>..HEAD` を内部で実行する。
+- **欠損時**: `status` を `no-changes` とし、レビューは実行されない。
+
+### `junit`
+
+- **形式**: [JUnit XML](https://github.com/testmoapp/junitxml) 互換。ネストした `<testsuite>` を許容。
+- **欠損時**: テスト成功/失敗観点の skill はスキップされる。
+
+### `coverage`
+
+- **形式**: Cobertura XML、LCOV、または Istanbul JSON のいずれか。
+- **欠損時**: カバレッジ観点の skill はスキップされる。
+- **注意**: カバレッジ閾値の判定は skill 側の責務であり、本契約はスキーマの受け渡しのみを規定する。
+
+### `lint` / `typecheck`
+
+- **形式**: 優先順に JSON（ESLint/stylelint/tsc JSON）→ plain テキスト。plain の場合、skill 側でツール名に応じた簡易パースを行う。
+- **欠損時**: 静的解析観点の skill はスキップされる。
+
+## 指定方法（入力チャネル）
+
+River Reviewer は以下の順でアーティファクトを解決します。
+
+1. **CLI / GitHub Action の引数**（将来拡張予定）。例: `--artifact pbi-input=./path/to/pbi-input.md`
+2. **設定ファイル経由**（将来拡張予定）。`river.config.*` 内の `artifacts` セクション。
+3. **カレントディレクトリ検出**（フォールバック）。ワークスペース直下から上記の既定ファイル名を探索する。
+
+どのチャネルも未指定の artifact については「欠損」と扱い、前節の「欠損時」挙動に従います。
+
+## 後続システムとの接続
+
+### CLI
+
+- `river run` は解決した artifact 一覧を [Review Artifact](./review-artifact.md) の `context` / `debug` セクションに記録する。
+- 解決失敗（必須 artifact の欠損）時は終了コード `1` を返す。参考: [Stable Interfaces](./stable-interfaces.md)。
+
+### Skill
+
+- 個別 skill は必要な artifact ID を宣言的に参照する（詳細は後続 Issue #510 の skill pack 設計で定義）。
+- 未解決 artifact を要求する skill は自動的にスキップされ `plan.skippedSkills` に記録される。
+
+### CI
+
+- GitHub Action の inputs（参考: `runners/github-action/action.yml`）から artifact 指定を渡せるようにする（詳細は後続 Issue #511）。
+- CI の失敗判定は `Review Artifact` の `status` と `findings` の severity を見る運用を推奨する。
+
+## PlanGate 非依存性について
+
+本契約は PlanGate を **一つの生成元候補** として扱い、以下を意図的に避けています。
+
+- PlanGate 固有のディレクトリ構成（例: `plangate/<phase>/` 等）をデフォルトパスとして固定化すること。
+- PlanGate の内部コマンドや実行モデルに依存する artifact 名の採用。
+- PlanGate のバージョンと River Reviewer の skill バージョンを同期させる前提。
+
+これにより、PlanGate 以外のワークフローや手作業で生成した artifact でも River Reviewer を利用可能にします。
+
+## バージョン管理
+
+- 本 contract はドキュメントバージョン `1` として管理する（将来、JSON スキーマ化した際は `version` フィールドを追加する）。
+- artifact の追加・形式変更は SemVer のマイナーバンプ相当（後方互換を保つ）として扱い、削除はメジャーバンプ相当とする。
+
+## 関連ドキュメント
+
+- [Review Artifact](./review-artifact.md) — レビュー実行結果の出力スキーマ
+- [Stable Interfaces](./stable-interfaces.md) — CLI / GitHub Actions の安定契約
+- [Runner CLI Reference](./runner-cli-reference.md) — Runner CLI の使い方
+- [Review Policy](./review-policy.md) — AI レビュー標準ポリシー
