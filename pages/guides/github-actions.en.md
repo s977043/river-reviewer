@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.1.1
+        uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream # upstream|midstream|downstream
           dry_run: true # Post PR comments without calling external APIs (fallback)
@@ -32,4 +32,4 @@ jobs:
 
 `issues: write` is required to post comments on PRs. Review workflow `permissions` if you encounter permission errors.
 
-> Replace `@v0.1.1` with the latest tag. Pinning to a release tag is recommended for stability.
+> The example pins to `@v0.12.0`. Replace it with a newer tag once one is released. Pinning to a release tag is recommended for stability.

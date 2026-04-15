@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.1.1
+        uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream # upstream|midstream|downstream
           dry_run: true # 外部 API を呼ばずに PR コメントを投稿する（フォールバック）
@@ -32,4 +32,4 @@ jobs:
 
 PR へのコメント投稿には `issues: write` が必要です。権限不足の場合は workflow の `permissions` を見直してください。
 
-> 最新タグが出ている場合は `@v0.1.1` を置き換えてください。安定動作のため、可能な限りリリースタグへピン留めしてください。
+> 例では `@v0.12.0` に固定しています。新しいリリースが出た場合はそのタグへ置き換えてください。安定動作のため、可能な限りリリースタグへピン留めしてください。

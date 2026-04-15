@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@v0.1.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.12.0
         with:
           phase: midstream
           dry_run: true
@@ -31,7 +31,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-> 安定性のために `@v0.1.0` のようなリリースタグを指定する。
+> 安定性のために `@v0.12.0` のようなリリースタグを指定する。
 
 ## 2. クレデンシャルをフローから分離する
 
