@@ -1,25 +1,22 @@
 # Riverbed Memory Storage Design
 
-Riverbed Memory is a lightweight storage system for leveraging past decisions and patterns in LLM reviews. It saves data as JSON files under `.river/memory/` in the repository and regenerates indexes as needed.
+Riverbed Memory is a lightweight storage system for leveraging past decisions and patterns in LLM reviews. In v1 it operates by appending entries to a single JSON file at `.river/memory/index.json` inside the repository (`src/lib/riverbed-memory.mjs`).
 
 ## Directory Structure
 
 ```text
 .river/memory/
-  entries/
-    adr-example.json
-    review-2024-11-01.json
-    pattern-react-query.json
   index.json
 ```
 
-- `entries/*.json`: Individual entries. See `schemas/riverbed-entry.schema.json`.
-- `index.json`: List of entries and metadata. See `schemas/riverbed-index.schema.json`.
+- `index.json`: A single file that holds the entries array and a version field. It conforms to `schemas/riverbed-index.schema.json`, and each entry conforms to `schemas/riverbed-entry.schema.json`.
+
+Disk I/O goes through functions like `loadMemory` / `appendEntry` / `queryMemory` / `supersedeEntry`. When the file does not exist, a stateless fallback returns `{ entries: [], version: "1" }`.
 
 ## Entry Specification (Excerpt)
 
 - `id`: Unique string (e.g., `adr-001`, `pattern-react-query`)
-- `type`: `adr | review | wontfix | pattern | decision`
+- `type`: `adr | review | wontfix | pattern | decision | eval_result`
 - `content`: Body text. Markdown/Text assumed.
 - `metadata`:
   - `createdAt` (ISO8601), `updatedAt` (Optional)
@@ -27,27 +24,27 @@ Riverbed Memory is a lightweight storage system for leveraging past decisions an
   - `phase` (`upstream | midstream | downstream`, Optional)
   - `tags`, `relatedFiles`, `links`, `summary`
 - `context`: Arbitrary additional info (PR number, related ADR ID, etc.)
+- `status`: `active | superseded` (defaults to `active`)
 
 See `schemas/riverbed-entry.schema.json` for details.
 
 ## Index Specification (Excerpt)
 
-- `generatedAt`: Index generation time
-- `entries[]`:
-  - `id`, `type`, `path`
-  - `title`, `tags`, `phase`, `createdAt`, `summary`
+- `version`: schema version (currently `"1"`)
+- `entries[]`: the array of entries described above
 
 ## Generation and Usage Flow
 
-1. Add change history or ADRs in JSON format to `.river/memory/entries/`.
-2. Update `index.json` with index generation script (future `npm run riverbed:index`).
-3. Search for nearby entries during review and inject them into the prompt.
+1. Running `npm run eval:all -- --persist-memory` appends eval results as `eval_result` entries to `.river/memory/index.json`.
+2. To add entries manually, call `appendEntry(indexPath, entry)` from `src/lib/riverbed-memory.mjs`.
+3. During a review, use `loadMemory` + `queryMemory` to search relevant entries and inject them into the prompt.
+4. In CI, `.github/workflows/riverbed-persist.yml` persists `index.json` via GitHub Artifacts with 90-day retention.
 
 ### Storage Policy
 
-- Assumes Git management. Do not include sensitive information.
+- You can either check `.river/memory/index.json` into Git or keep it local via `.gitignore`. Do not include sensitive information.
 - UTF-8 encoding.
-- Corrupted files are skipped, logged, and review continues.
+- Corrupted files throw on load. Review runs continue via the stateless fallback.
 
 ## Sample Data
 
