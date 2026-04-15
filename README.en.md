@@ -116,7 +116,8 @@ Skills are Markdown files with YAML frontmatter; River Reviewer uses the metadat
 id: rr-midstream-code-quality-sample-001
 name: Sample Code Quality Pass
 description: Checks common code quality and maintainability risks.
-phase: midstream
+category: midstream
+phase: midstream # kept for backward compatibility
 applyTo:
   - 'src/**/*.ts'
 tags: [style, maintainability, midstream]
@@ -129,7 +130,7 @@ severity: minor
 - Sample skills: `skills/upstream/sample-architecture-review.md`, `skills/midstream/sample-code-quality.md`, `skills/downstream/sample-test-review.md`
 - Examples: `examples/README.md`
 - Schemas: `schemas/skill.schema.json` (skill metadata) and `schemas/output.schema.json` (structured review output)
-- References: Skill schema details live in `pages/reference/skill-schema-reference.md`; Riverbed Memory design draft lives in `pages/explanation/riverbed-memory.md`.
+- References: Skill schema details live in `pages/reference/skill-schema-reference.md`; Riverbed Memory v1 (shipped in #474) is documented in `pages/explanation/riverbed-memory.md` and `pages/guides/use-riverbed-memory.md`.
 - Known limitations: `pages/reference/known-limitations.md`
 - Troubleshooting: `pages/guides/troubleshooting.md`
 
