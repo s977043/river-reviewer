@@ -57,8 +57,8 @@ The input artifacts recognized by River Reviewer are listed below. See "Legend" 
 ### `diff`
 
 - **Format**: unified diff (`git diff` compatible). Binary diffs are ignored.
-- **Requirement**: A diff must be supplied by **some channel**. When absent, River Reviewer internally runs `git diff <mergeBase>..HEAD`.
-- **When absent**: Status becomes `no-changes` and the review is not executed.
+- **Requirement**: A diff must be supplied by **some channel**. When no artifact is specified, River Reviewer internally runs `git diff <mergeBase>..HEAD` and uses the result as the diff.
+- **When the resulting diff is empty**: If the supplied diff (explicit or fallback) is empty, `status` is set to `no-changes` and review skills are not executed.
 
 ### `junit`
 
