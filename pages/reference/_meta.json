@@ -15,5 +15,6 @@
   "evaluation-fixture-format": "評価フィクスチャ形式",
   "evaluation-rubric": "評価ルーブリック",
   "glossary": "用語集",
-  "eval-keep-discard-policy": "評価ベースの採否基準"
+  "eval-keep-discard-policy": "評価ベースの採否基準",
+  "cli-review-exec-spec": "CLI Spec — river review exec"
 }
