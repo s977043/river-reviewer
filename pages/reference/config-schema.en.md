@@ -7,7 +7,7 @@ Place `.river-reviewer.json` in the repository root to customize review model se
 ### Support Items and Defaults
 
 - `model`
-  - `provider`: `openai` (Default. Currently the only supported provider. `google`/`anthropic` are placeholders for future expansion)
+  - `provider`: `openai` (Default). The config schema also accepts `google` / `anthropic`, but the current review pipeline is OpenAI-only (see #490).
   - `modelName`: `gpt-4o-mini` (Default)
   - `temperature`: `0`
   - `maxTokens`: `600`
@@ -46,12 +46,12 @@ Place `.river-reviewer.json` in the repository root to customize review model se
 River Reviewer defines skills and outputs using JSON Schema. Skills assume YAML frontmatter, outputs assume JSON.
 
 - `schemas/skill.schema.json`
-  - Required: `id` / `name` / `phase` / `applyTo` / `description`
-  - Optional: `tags` / `severity`
-  - `phase`: `upstream` / `midstream` / `downstream`
+  - Required: `id` / `name` / `description` / `category` (plus one of `phase` / `category` / `trigger`, and one of `applyTo` / `files` / `path_patterns` / `trigger`)
+  - Optional: `tags` / `severity` / `inputContext` / `outputKind` / `modelHint` / `dependencies`
+  - `category` is one of `core` / `upstream` / `midstream` / `downstream` and is the primary routing key. `phase` is kept for backward compatibility.
 
 - `schemas/output.schema.json`
   - Required: `issue` / `rationale` / `impact` / `suggestion` / `priority` / `skill_id`
   - `priority`: `P0` to `P3`
 
-Skills are placed as Markdown files in `skills/{phase}/` and can be schema-validated with `scripts/rr_validate_skills.py`.
+Skills are placed as Markdown files in `skills/{category}/` and can be schema-validated with `npm run skills:validate`.

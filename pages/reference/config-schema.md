@@ -7,7 +7,7 @@
 ### サポート項目とデフォルト
 
 - `model`
-  - `provider`: `openai`（デフォルト。現在サポートされている唯一のプロバイダー。`google`/`anthropic` は将来拡張用のプレースホルダー）
+  - `provider`: `openai`（デフォルト）。設定スキーマ上は `google` / `anthropic` も受理されるが、現在のレビューパイプラインは OpenAI 専用である (#490 参照)。
   - `modelName`: `gpt-4o-mini`（デフォルト）
   - `temperature`: `0`
   - `maxTokens`: `600`
@@ -46,12 +46,12 @@
 River Reviewer では、スキルや出力を JSON Schema で定義する。スキルは YAML frontmatter、出力は JSON を想定している。
 
 - `schemas/skill.schema.json`
-  - 必須: `id` / `name` / `phase` / `applyTo` / `description`
-  - 任意: `tags` / `severity`
-  - `phase` は `upstream` / `midstream` / `downstream`
+  - 必須: `id` / `name` / `description` / `category` （加えて `phase` / `category` / `trigger` のいずれか、`applyTo` / `files` / `path_patterns` / `trigger` のいずれかが必要）
+  - 任意: `tags` / `severity` / `inputContext` / `outputKind` / `modelHint` / `dependencies`
+  - `category` は `core` / `upstream` / `midstream` / `downstream` で、ルーティングの第一キー。`phase` は後方互換のため残されている。
 
 - `schemas/output.schema.json`
   - 必須: `issue` / `rationale` / `impact` / `suggestion` / `priority` / `skill_id`
   - `priority` は `P0`〜`P3` のいずれか
 
-スキルは Markdown ファイルとして `skills/{phase}/` に配置し、`scripts/rr_validate_skills.py` でスキーマ検証ができる。
+スキルは Markdown ファイルとして `skills/{category}/` に配置し、`npm run skills:validate` でスキーマ検証ができる。

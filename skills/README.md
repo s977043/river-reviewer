@@ -88,7 +88,7 @@ This interactive tool will:
    cp skills/_template.md skills/<phase>/<skill-id>.md
    ```
 
-2. Fill in the YAML frontmatter (id, name, description, phase/applyTo, inputContext, outputKind, priority, etc.)
+2. Fill in the YAML frontmatter (id, name, description, category, applyTo, inputContext, outputKind, priority, etc.)
 3. Keep the body concise with Guidance / Non-goals / False-positive guards
 4. (Optional) Add fixtures or promptfoo configs under a sibling directory if you need evaluations
 
