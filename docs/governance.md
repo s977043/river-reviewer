@@ -26,6 +26,44 @@
 - 外部コントリビューターからの PR は、メンテナによるレビュー（少なくとも 1 回の承認）後にマージします
 - メンテナによる変更でも、可能な限りセルフレビューを行い、レビュー観点を PR 本文に記載します
 
+### マージ前チェックリスト
+
+CLAUDE.md "AI Misoperation Guards" の運用ガードのうち、PR マージ判断に直結するものを本セクションに集約します。CLAUDE.md は要旨のみを残し、詳細手順はここを正とします。
+
+#### 1. CI green の確認
+
+`gh pr merge` の前に `gh pr checks` を実行し、必須チェックがすべて `pass` バケットに入っていることを確認します。`fail` / `pending` / `cancel` が残るマージは不可です。
+
+```bash
+gh pr checks <N> --json name,bucket --jq '.[] | select(.bucket != "skipping")'
+```
+
+- `SKIPPED` チェックは `bucket == "skipping"` で除外できます。
+- 必須チェック (`Lint`, `Unit tests` など) が pre-existing 失敗の場合も、本 PR を直接マージしてはいけません。`main` 向けの fix PR を先に出して main を green に戻し、その後本 PR をリベースしてマージします。
+
+#### 2. レビュアーコメントの確認
+
+CI green は line-level コメント（`Copilot`, `sentry[bot]`, 人間レビュアー）を覆いません。マージ前には次節「レビュアーコメントの扱い」の手順で全件を列挙し、disposition を確定させてください。
+
+#### 3. multi-PR 作業の preflight
+
+複数 PR の連続マージ、main CI 失敗の修正 PR、`.github/workflows/*.yml` の `node-version` / action pin / `permissions` を変える PR など、書き込み系の handoff タスクに着手する前に `/preflight <keyword or PR numbers>` を実行し、対象タスクが既にマージ済み/obsolete/並行作業中ではないことを確認します。
+
+- `gh pr list` は GraphQL キャッシュの影響で recently merged な PR を `open` と返すことがあります。判定には `gh api repos/:owner/:repo/pulls/{N}` (REST) を併用してください。
+- 過去の累計で 1 セッション中に 4 件の重複 PR (#485, #489, #492, #496) を生んだ実績があります。
+
+#### 4. dist 再ビルド時の Node バージョン整合
+
+`runners/github-action/src/**` を変更した場合、または `Action dist freshness` CI が失敗した場合は、`runners/github-action/dist/` を `.nvmrc` (リポジトリ全体の SSoT) でピンされた Node バージョンで再ビルドしてください。
+
+- `npm run build:action` は Node メジャーが異なると CI 再現性のあるアウトプットになりません。
+- 切り替え例: `nvm use` (`.nvmrc` を読む) または同等の version manager コマンド。
+- トラブルシュートは `docs/development/dist-check-rebuild-guide.md` を参照。
+
+#### 5. git 出力の検証
+
+`git commit` / `git push` / `git switch` / `gh pr merge` の直後は、出力されたブランチ名・コミットハッシュ・status 行を読み、意図したターゲットに作用したことを確認してから次のコマンドへ進んでください。曖昧な場合は `git status -sb` または `git rev-parse --abbrev-ref HEAD` で再確認します。
+
 ### レビュアーコメントの扱い
 
 CI の成否は行単位のレビュアーコメント（`Copilot` / `sentry[bot]` などの AI レビュアー、および人間レビュアー）をカバーしません。これらは CI を失敗させないため見落としやすい一方、実バグを指摘していることがあります。マージ前には本セクションの手順で必ず列挙・評価してください。
