@@ -2,14 +2,17 @@
 
 ## 前提
 
-- Node.js 22.x
+- Node.js—リポジトリ直下の `.nvmrc` でピン留めされたバージョン (現状 `22.22.2`) を使用する。`nvm use` または同等の version manager で揃える。CI も同じ `.nvmrc` を SSoT として参照する。
 - npm
 
 ## 初期セットアップ
 
 ```bash
+nvm use      # .nvmrc を読み込む (任意の version manager 可)
 npm ci
 ```
+
+CI ではこれらの手順を `.github/actions/setup-node-deps` (composite action) に集約しており、`actions/setup-node@v6` + `npm ci --prefer-offline` を一括で実行する。
 
 ## 日常の検証コマンド
 
@@ -64,3 +67,7 @@ npm test
 npm run agents:validate
 npm run skills:validate
 ```
+
+`runners/github-action/src/**` を変更した場合、または CI の "Action dist freshness" が失敗した場合は、`.nvmrc` の Node バージョンに揃えてから `npm run build:action` で `runners/github-action/dist/` を再生成する。詳細は `docs/development/dist-check-rebuild-guide.md` を参照。
+
+PR マージ前のチェックリスト（CI green / レビュアーコメント disposition / preflight など）は `docs/governance.md` § "PR レビューとマージ" にまとまっている。
