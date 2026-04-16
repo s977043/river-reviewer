@@ -1,7 +1,7 @@
 ---
 id: rr-upstream-plangate-plan-integrity-001
-name: PlanGate Plan Integrity
-description: Check integrity between pbi-input, plan, todo, and test-cases artifacts so downstream implementation inherits a coherent specification.
+name: PlanGate 計画整合性チェック
+description: pbi-input, plan, todo, test-cases 間の整合性をチェックし、実装着手前の仕様漏れを検知する
 version: 0.1.0
 category: upstream
 phase: upstream
@@ -15,7 +15,6 @@ severity: major
 inputContext: [diff, fullFile]
 outputKind: [summary, findings, actions, questions]
 modelHint: balanced
-dependencies: [repo_metadata]
 ---
 
 ## Pattern declaration
@@ -112,7 +111,7 @@ Why: PlanGate の計画成果物（pbi-input / plan / todo / test-cases）を横
 - `minor`: 用語の揺れ、スコープの微小なズレ、未決事項の決定者/期限の不備。
 - `info`: 記述の補足推奨（未決であることが明示されている等）。
 
-内部語彙との対応は `.claude/rules/review-core.md` の Severity マッピングに従う（blocker→critical, warning→major, nit→minor）。
+内部語彙との対応は、プロジェクト標準の Severity マッピング（blocker→critical, warning→major, nit→minor, info→info）に従う。詳細は `docs/review/output-format.md`（severity の SSoT）を参照。
 
 ## Heuristics / 判定の手がかり
 
@@ -144,4 +143,3 @@ Why: PlanGate の計画成果物（pbi-input / plan / todo / test-cases）を横
 
 - `pages/reference/artifact-input-contract.md` — 入力 artifact の契約（ID / 形式 / 欠損時挙動）
 - `docs/review/output-format.md` — severity とコメント形式の SSoT
-- `.claude/rules/review-core.md` — 内部語彙と出力スキーマのマッピング
