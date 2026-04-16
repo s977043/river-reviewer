@@ -65,6 +65,39 @@ River Reviewer は、単にコードをAIに読ませるツールではありま
 - **下流（テスト/QA）**: テスト指向のスキルがカバレッジ不足や失敗パスを浮かび上がらせます。
 - **フェーズ指向ルーティング**: `phase` とファイルメタデータを見て、開発段階に合ったスキルを選択します。
 
+## ポジション: artifact-driven review agent
+
+River Reviewer は **PlanGate 非依存の artifact-driven review agent** です。PlanGate v6 などの上流ワークフローに特別な統合を前提とせず、外部から渡されるアーティファクト（`plan` / `diff` / `test-cases` / `junit` ほか）を入力として読み取り、`findings` を含むレビュー結果を出力します。入力の契約は [Artifact Input Contract](pages/reference/artifact-input-contract.md) で、出力スキーマは [Review Artifact](pages/reference/review-artifact.md) で定義されています。
+
+### 4 つのユースケース
+
+同じ CLI（`river review plan` / `river review exec`）が、入力として渡すアーティファクトの組み合わせでユースケースを切り替えます。
+
+- **設計レビュー**: `pbi-input` / `plan` を入力に、計画の整合性・網羅性を上流 skill で検査します（例: `skills/upstream/rr-upstream-plangate-plan-integrity-001/`）。
+- **実装レビュー**: `plan` と `diff` を入力に、実装差分が計画と一致しているかを検査します（例: `skills/upstream/rr-upstream-plangate-exec-conformance-001/`）。
+- **QA レビュー**: `test-cases` / `junit` / `coverage` を入力に、テストカバレッジや失敗パスの抜けを下流 skill で浮かび上がらせます。
+- **W チェック（二重レビュー）**: 既存の AI / 人間レビュー結果を `review-self` / `review-external` として渡し、レビューそのものを再点検します。
+
+### CLI 利用例
+
+詳細な仕様は [`river review plan` CLI 仕様](pages/reference/cli-review-plan-spec.md) / [`river review exec` CLI 仕様](pages/reference/cli-review-exec-spec.md) を参照してください。
+
+```bash
+# 設計レビュー: plan 単体を検査
+river review plan --artifact plan=./artifacts/plan.md
+
+# 実装レビュー: plan と diff の整合性を検査
+river review exec \
+  --artifact plan=./artifacts/plan.md \
+  --artifact diff=./artifacts/diff.patch
+
+# QA レビュー: テスト観点のアーティファクトを追加
+river review exec \
+  --artifact diff=./artifacts/diff.patch \
+  --artifact test-cases=./artifacts/test-cases.md \
+  --artifact junit=./artifacts/junit.xml
+```
+
 ## クイックスタート（GitHub Actions）
 
 `v1` タグを使った最小構成のワークフロー例です。`phase` は将来拡張を見据えた任意入力で、SDLC のフェーズごとにスキルを振り分けます。Permissions/fetch-depth などを明示して安定動作させます。
