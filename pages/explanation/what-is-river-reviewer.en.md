@@ -5,7 +5,7 @@ title: What is River Reviewer
 
 River Reviewer is a **Context Engineering-driven, Skill Registry-centric code review framework** — a flow-based agent that carries review perspectives along three phases (Upstream, Midstream, Downstream) as reusable **Agent Skills**.
 
-By defining team-specific judgment criteria and procedures as version-controlled Agent Skills, it makes review findings reproducible while keeping operating costs in check.
+By defining team-specific judgment criteria and procedures as version-controlled **Agent Skills**, it makes review findings reproducible while keeping operating costs in check.
 
 ## Purpose
 
