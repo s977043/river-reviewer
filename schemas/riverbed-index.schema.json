@@ -1,58 +1,26 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://river-reviewer.vercel.app/schemas/riverbed-index.schema.json",
   "title": "Riverbed Memory Index Schema",
+  "description": "Schema for .river/memory/index.json written by src/lib/riverbed-memory.mjs. v1 stores full entries inline (not references to separate JSON files).",
   "type": "object",
-  "required": ["entries"],
+  "required": ["version", "entries"],
   "additionalProperties": false,
-  "$defs": {
-    "entryReference": {
-      "type": "object",
-      "required": ["id", "type", "path"],
-      "additionalProperties": false,
-      "properties": {
-        "id": { "type": "string" },
-        "type": {
-          "type": "string",
-          "enum": [
-            "adr",
-            "review",
-            "wontfix",
-            "pattern",
-            "decision",
-            "eval_result",
-            "suppression",
-            "resurface"
-          ]
-        },
-        "path": { "type": "string", "description": "Relative path to the entry JSON file." },
-        "title": { "type": "string" },
-        "tags": {
-          "type": "array",
-          "items": { "type": "string" },
-          "uniqueItems": true
-        },
-        "phase": {
-          "type": "string",
-          "enum": ["upstream", "midstream", "downstream"]
-        },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "summary": { "type": "string" },
-        "status": {
-          "type": "string",
-          "enum": ["active", "superseded", "archived"]
-        }
-      }
-    }
-  },
   "properties": {
+    "version": {
+      "type": "string",
+      "const": "1",
+      "description": "Index schema version. Currently fixed at \"1\"."
+    },
     "generatedAt": {
       "type": "string",
       "format": "date-time",
-      "description": "Timestamp when this index was generated."
+      "description": "Optional timestamp when this index was last generated/written."
     },
     "entries": {
       "type": "array",
-      "items": { "$ref": "#/$defs/entryReference" }
+      "description": "Full entry objects conforming to riverbed-entry.schema.json, stored inline.",
+      "items": { "$ref": "./riverbed-entry.schema.json" }
     }
   }
 }
