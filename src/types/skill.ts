@@ -2,7 +2,14 @@ export type Phase = 'upstream' | 'midstream' | 'downstream';
 export type StreamCategory = 'core' | Phase;
 export type Severity = 'info' | 'minor' | 'major' | 'critical';
 export type InputContext = 'diff' | 'fullFile' | 'tests' | 'adr' | 'commitMessage' | 'repoConfig';
-export type OutputKind = 'findings' | 'summary' | 'actions' | 'tests' | 'metrics' | 'questions';
+export type OutputKind =
+  | 'findings'
+  | 'summary'
+  | 'actions'
+  | 'tests'
+  | 'metrics'
+  | 'questions'
+  | 'review-audit';
 export type ModelHint = 'cheap' | 'balanced' | 'high-accuracy';
 export type Dependency =
   | 'code_search'
