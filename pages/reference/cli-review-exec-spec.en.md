@@ -66,12 +66,12 @@ Resolution priority (CLI > config > directory detection) follows the contract.
 
 ### Execution control
 
-| Option             | Type   | Default | Description                                                                                                |
-| ------------------ | ------ | ------- | ---------------------------------------------------------------------------------------------------------- |
-| `--dry-run`        | bool   | `false` | Resolve inputs and compute plan only; skip LLM calls. `status` is `ok` or `no-changes`.                    |
-| `--estimate`       | bool   | `false` | Cost-estimate only. No skill execution; estimate is recorded in Review Artifact `debug`; `status` is `ok`. |
-| `--max-cost <usd>` | number | (none)  | Abort skill execution (exit `1`) when the estimate exceeds this budget. May combine with `--estimate`.     |
-| `--debug`          | bool   | `false` | Verbose logs to stderr; richer `debug` field in the Review Artifact.                                       |
+| Option             | Type   | Default | Description                                                                                                                                                                                                    |
+| ------------------ | ------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--dry-run`        | bool   | `false` | Resolve inputs and compute plan only; skip LLM calls. `status` is `ok` or `no-changes`.                                                                                                                        |
+| `--estimate`       | bool   | `false` | Cost-estimate only. No skill execution; estimate is recorded in Review Artifact `debug`; `status` is `ok`.                                                                                                     |
+| `--max-cost <usd>` | number | (none)  | Abort skill execution (exit `1`) when the estimate exceeds this budget. When combined with `--estimate`, no skills run in the first place, so exec reports the estimate and returns exit `0` without aborting. |
+| `--debug`          | bool   | `false` | Verbose logs to stderr; richer `debug` field in the Review Artifact.                                                                                                                                           |
 
 ### Output
 
@@ -82,6 +82,8 @@ Resolution priority (CLI > config > directory detection) follows the contract.
 | `--no-write`       | bool                 | `false`                            | Print to stdout only; do not create files.                          |
 
 The combination follows [Review Artifact](./review-artifact.en.md) for JSON and the existing Action contract ([Stable Interfaces](./stable-interfaces.en.md)) for Markdown.
+
+> Note: The minimal CLI reference in [Stable Interfaces](./stable-interfaces.en.md) uses `--output <text|markdown>` as the output format. The `river review exec` subcommand splits this into **output path** (`--output`) and **output format** (`--format`) because `exec` writes an artifact file. This is an `exec`-specific extension and does not change the option semantics of the existing `river run` command.
 
 ## Input artifacts
 
@@ -126,6 +128,8 @@ Exit codes are fixed so CI can rely on them.
 
 `findings` severity (`critical` / `major` / `minor` / `info`) does not directly affect exit code. CI is expected to read the Review Artifact `findings` for gating ([Stable Interfaces](./stable-interfaces.en.md)).
 
+> Note: The minimal CLI contract in [Stable Interfaces](./stable-interfaces.en.md) only defines exit codes `0` and `1`. Exit code `2` (configuration error) is an `exec`-specific extension. CI that treats unknown exit codes as failure remains backward compatible because `2 != 0`.
+
 ### `status` to exit-code mapping
 
 | `status`           | Exit | Meaning                                                |
@@ -143,7 +147,7 @@ Exit codes are fixed so CI can rely on them.
 - The required artifact (`diff` or `git diff` fallback) cannot be resolved.
 - The JSON given to `--plan` violates the schema.
 - An uncaught, non-retryable exception occurs during skill execution.
-- The cost estimate exceeds `--max-cost` (except when `--estimate` is used alone).
+- The cost estimate exceeds `--max-cost` (not applicable when combined with `--estimate` — skills do not execute, so exec returns `status: ok` + exit `0`).
 
 Syntax errors for `--config` / `--artifact` / `--phase` / `--planner` (unknown values, invalid format) return Exit `2`.
 
@@ -152,7 +156,7 @@ Syntax errors for `--config` / `--artifact` / `--phase` / `--planner` (unknown v
 - **`diff` not specified**: per contract, internally run `git diff <mergeBase>..HEAD`; `mergeBase` is inferred from `context.defaultBranch`.
 - **Optional artifact missing**: skip the corresponding skill and record it in `plan.skippedSkills`. Does not affect exit code.
 - **`--plan` not specified**: `exec` performs the plan computation internally, honoring `--planner`.
-- **LLM call failure**: retry per skill, then record the failure in `findings`. Unrecoverable failure becomes `status: error`.
+- **LLM call failure**: retry per skill. Skills that remain failing after retry are recorded in `plan.skippedSkills` with a reason, and a reporter-sourced `info`-level entry is added to `findings`. If **at least one skill completes successfully** and the exec pipeline can continue, the overall run returns `status: ok` + exit `0` (partial success is allowed). Only when **every skill fails** — or an unrecoverable internal exception occurs — does exec return `status: error` + exit `1`. CI that needs to detect partial failure should read `plan.skippedSkills` and `findings` in the Review Artifact.
 
 ## See Also
 
