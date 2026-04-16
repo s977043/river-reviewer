@@ -11,7 +11,7 @@ applyTo:
 tags: [plangate, verification, w-check, audit, upstream]
 severity: major
 inputContext: [diff, fullFile]
-outputKind: [summary, findings, actions, questions]
+outputKind: [summary, findings, actions, questions, review-audit]
 modelHint: balanced
 ---
 

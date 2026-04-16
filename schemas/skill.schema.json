@@ -43,7 +43,7 @@
     },
     "outputKind": {
       "type": "string",
-      "enum": ["findings", "summary", "actions", "tests", "metrics", "questions"]
+      "enum": ["findings", "summary", "actions", "tests", "metrics", "questions", "review-audit"]
     },
     "modelHint": {
       "type": "string",
