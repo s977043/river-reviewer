@@ -32,7 +32,6 @@ Do NOT flag:
 すべて日本語。`<file>:<line>: <message>` 形式。
 
 - 先頭: `(summary):1: <計画整合性の総評>`
-- 指摘: `[severity=critical|major|minor|info]` を `<message>` に含める
-- severity 内部語彙: blocker/warning/nit/info → critical/major/minor/info (`docs/review/output-format.md`)
+- 指摘: `[severity=critical|major|minor|info]` を `<message>` に含める（内部語彙 blocker/warning/nit/info からの変換結果。詳細は `docs/review/output-format.md` 参照）
 - 1指摘1行、最小アクション (`Fix: ...`) を併記
 - 健全時は `NO_ISSUES` を返す

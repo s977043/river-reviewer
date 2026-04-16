@@ -33,7 +33,7 @@ Do NOT flag:
 
 すべて日本語。`<file>:<line>: <message>` 形式。
 
-- severity 内部語彙: `blocker|warning|nit` を使用、スキーマ側 `critical|major|minor|info` は `review-core` ルールが変換
+- severity 内部語彙: `[severity=blocker|warning|nit]` をメッセージの先頭に使用（スキーマ側 critical|major|minor|info は review-core ルールが変換）
 - サマリ行: `(summary):1: 方針整合 <件数> / todo 網羅 <件数> / テスト整合 <件数> / 質問 <件数>`
-- 各 finding は diff 側の `<file>:<line>` と artifact 側の見出し/行/チェックリスト項目を Evidence としてペアで示し、最小の Fix を併記
+- 各 finding は `Evidence — diff: <file>:<line>, <artifact>: <見出し/行/項目>` および `Fix: <最小の是正案>` を含める
 - 質問は `(questions):1: [q] ...` 形式
