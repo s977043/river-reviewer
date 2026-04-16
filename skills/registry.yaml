@@ -683,6 +683,17 @@ skills:
     recommended: false
     description: 'PRテンプレートの必須項目（日本語記載、Diataxis、検証コマンド、チェックリスト）が明確かを確認し、抜けや誤解を生む文言を指摘する'
 
+  - id: rr-upstream-plangate-plan-integrity-001
+    version: '0.1.0'
+    name: 'PlanGate 計画整合性チェック'
+    path: skills/upstream/rr-upstream-plangate-plan-integrity-001/SKILL.md
+    category: upstream
+    phase: upstream
+    tags: [plangate, planning, integrity, traceability, upstream]
+    severity: major
+    recommended: false
+    description: 'pbi-input, plan, todo, test-cases 間の整合性をチェックし、実装着手前の仕様漏れを検知する'
+
 # Recommended skill sets
 recommendations:
   basic:
