@@ -40,7 +40,7 @@ Why: 運用上蓄積された review findings / retrospective を観察し、再
 
 このスキルは以下の条件が**すべて**満たされない限り`NO_REVIEW`を返す。
 
-- [ ] 入力として `review-self` / `review-external` / `findings-pool`（過去 Review Artifact の `findings[]` 集約） のいずれか1つ以上が解決できている、または `retrospective` / `decision-log` のいずれかが解決できている
+- [ ] 入力として `review-self` / `review-external` / `findings-pool` artifact（`pages/reference/artifact-input-contract.md` 参照） のいずれか1つ以上が解決できている、または `retrospective` / `decision-log` のいずれかが解決できている
 - [ ] inputContext に `fullFile` が含まれ、対象アーティファクトの本文が読み取れる
 
 ゲート不成立時の出力: `NO_REVIEW: rr-upstream-plangate-rule-promotion-001 — 昇格判定に必要な findings プールまたは retrospective 入力が不足`

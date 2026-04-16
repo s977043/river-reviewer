@@ -17,19 +17,20 @@ River Reviewer is a review agent that consumes artifacts produced by upstream wo
 
 The input artifacts recognized by River Reviewer are listed below. See "Legend" at the end for column semantics.
 
-| ID                | Example filename     | Format       | Required        | Schema / reference                                  | Role                                                     |
-| ----------------- | -------------------- | ------------ | --------------- | --------------------------------------------------- | -------------------------------------------------------- |
-| `pbi-input`       | `pbi-input.md`       | Markdown     | Optional (rec.) | Free-form                                           | Input spec / background of the Product Backlog Item      |
-| `plan`            | `plan.md`            | Markdown     | Optional (rec.) | Free-form                                           | Implementation plan and design rationale                 |
-| `todo`            | `todo.md`            | Markdown     | Optional        | Free-form (checklist)                               | Implementation tasks and progress                        |
-| `test-cases`      | `test-cases.md`      | Markdown     | Optional        | Free-form (bullets or tables)                       | Test case design                                         |
-| `review-self`     | `review-self.md`     | Markdown     | Optional        | Free-form                                           | Self-review by the author                                |
-| `review-external` | `review-external.md` | Markdown     | Optional        | Free-form                                           | External review (AI or human)                            |
-| `diff`            | `diff.patch`         | unified diff | Required (alt.) | `git diff` compatible                               | Review target diff; falls back to `git diff` when absent |
-| `junit`           | `junit.xml`          | XML          | Optional        | JUnit XML                                           | Unit/integration test results                            |
-| `coverage`        | `coverage.xml` etc.  | XML / JSON   | Optional        | One of Cobertura / LCOV / Istanbul JSON             | Coverage report                                          |
-| `lint`            | `lint.json` etc.     | JSON / plain | Optional        | ESLint JSON, stylelint JSON, or tool-specific plain | Lint result                                              |
-| `typecheck`       | `typecheck.txt` etc. | plain / JSON | Optional        | tsc `--pretty=false` or tool-specific plain         | Type checker result                                      |
+| ID                | Example filename     | Format       | Required        | Schema / reference                                  | Role                                                           |
+| ----------------- | -------------------- | ------------ | --------------- | --------------------------------------------------- | -------------------------------------------------------------- |
+| `pbi-input`       | `pbi-input.md`       | Markdown     | Optional (rec.) | Free-form                                           | Input spec / background of the Product Backlog Item            |
+| `plan`            | `plan.md`            | Markdown     | Optional (rec.) | Free-form                                           | Implementation plan and design rationale                       |
+| `todo`            | `todo.md`            | Markdown     | Optional        | Free-form (checklist)                               | Implementation tasks and progress                              |
+| `test-cases`      | `test-cases.md`      | Markdown     | Optional        | Free-form (bullets or tables)                       | Test case design                                               |
+| `review-self`     | `review-self.md`     | Markdown     | Optional        | Free-form                                           | Self-review by the author                                      |
+| `review-external` | `review-external.md` | Markdown     | Optional        | Free-form                                           | External review (AI or human)                                  |
+| `diff`            | `diff.patch`         | unified diff | Required (alt.) | `git diff` compatible                               | Review target diff; falls back to `git diff` when absent       |
+| `junit`           | `junit.xml`          | XML          | Optional        | JUnit XML                                           | Unit/integration test results                                  |
+| `coverage`        | `coverage.xml` etc.  | XML / JSON   | Optional        | One of Cobertura / LCOV / Istanbul JSON             | Coverage report                                                |
+| `lint`            | `lint.json` etc.     | JSON / plain | Optional        | ESLint JSON, stylelint JSON, or tool-specific plain | Lint result                                                    |
+| `typecheck`       | `typecheck.txt` etc. | plain / JSON | Optional        | tsc `--pretty=false` or tool-specific plain         | Type checker result                                            |
+| `findings-pool`   | `findings-pool.json` | JSON         | Optional        | `findings-pool` section in this document            | Aggregated `findings[]` history from multiple Review Artifacts |
 
 ### Legend
 
@@ -53,6 +54,42 @@ The input artifacts recognized by River Reviewer are listed below. See "Legend" 
 - **Format**: UTF-8 Markdown. Existing AI reviewer (including River Reviewer itself) or human review output may be stored verbatim.
 - **When absent**: Double-check (W-check) skills are skipped.
 - **Compatibility**: Content may follow the `issue` definition in [`schemas/output.schema.json`](../../schemas/output.schema.json), but this is not required.
+
+### `findings-pool`
+
+- **Format**: UTF-8 JSON. An aggregation of `findings[]` collected from multiple Review Artifacts (execution history of `river review exec` / `river review verify`).
+- **Size guideline**: 5 MB or less recommended (typically hundreds of findings). When exceeded, apply rotation or time-window filtering on the CLI side.
+- **Schema (provisional)**:
+
+  ```json
+  {
+    "version": "1",
+    "entries": [
+      {
+        "timestamp": "2026-04-17T00:00:00Z",
+        "phase": "exec",
+        "skillId": "rr-upstream-plangate-plan-integrity-001",
+        "severity": "major",
+        "file": "path/to/file.ts",
+        "line": 42,
+        "message": "description",
+        "source": "path/to/review-artifact.json"
+      }
+    ]
+  }
+  ```
+
+  - `version`: Fixed string `"1"` (bumped on incompatible changes).
+  - `entries[]`: One entry per finding.
+  - `entries[].phase`: `exec` or `verify`.
+  - `entries[].skillId`: ID of the skill that produced the finding.
+  - `entries[].severity`: External vocabulary (`critical` / `major` / `minor` / `info`).
+  - `entries[].file` / `entries[].line`: Target location. Omittable for findings that reference outside the diff.
+  - `entries[].message`: Human-readable description of the finding.
+  - `entries[].source` (optional): Path of the originating Review Artifact. Recommended to preserve provenance.
+
+- **Construction**: CLI consumers are expected to build this artifact by reading multiple `review-artifact.json` files and concatenating their `findings[]` into `entries[]` (implementation tracked in follow-up issue).
+- **When absent**: Skills that require this artifact, such as `rr-upstream-plangate-rule-promotion-001`, return `NO_REVIEW` at the Pre-execution Gate and skip the promotion-judgement process.
 
 ### `diff`
 
