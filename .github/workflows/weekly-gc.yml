@@ -1,0 +1,148 @@
+name: Weekly GC
+
+# Runs the deterministic subset of `river gc` maintenance checks on a weekly
+# cadence, separate from per-PR CI. The workflow orchestrates the existing
+# npm scripts that already encode the deterministic rules (lint, structure
+# test, build). Dead-code / unused-export / typecheck coverage is intentionally
+# not wired yet — those require new tooling (see Issue #522 Non-goals).
+
+on:
+  schedule:
+    # 09:00 JST on Monday (00:00 UTC Monday)
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-gc
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  gc:
+    name: Weekly GC checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-node-deps
+
+      - name: Lint
+        id: lint
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Structure test (unit + structure)
+        id: structure_test
+        continue-on-error: true
+        run: npm test
+
+      - name: Build (docusaurus)
+        id: build
+        continue-on-error: true
+        run: npm run build
+
+      - name: Summarize GC results
+        id: summary
+        run: |
+          {
+            echo "# Weekly GC Summary"
+            echo ""
+            echo "| Check | Outcome |"
+            echo "| --- | --- |"
+            echo "| lint | ${{ steps.lint.outcome }} |"
+            echo "| structure test | ${{ steps.structure_test.outcome }} |"
+            echo "| build | ${{ steps.build.outcome }} |"
+            echo ""
+            echo "Deterministic rules currently covered: lint, structure test, build."
+            echo "Deferred (require new tooling / human judgement): typecheck, dead code, unused export."
+          } | tee "$GITHUB_STEP_SUMMARY"
+
+          # Aggregate outcome for downstream steps.
+          if [ "${{ steps.lint.outcome }}" != "success" ] \
+             || [ "${{ steps.structure_test.outcome }}" != "success" ] \
+             || [ "${{ steps.build.outcome }}" != "success" ]; then
+            echo "gc_failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "gc_failed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub issue on failure (schedule only)
+        if: github.event_name == 'schedule' && steps.summary.outputs.gc_failed == 'true'
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = '定期チェック: Weekly GC が失敗しました';
+            const labelName = 'scheduled-check';
+
+            const openIssues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner,
+                repo,
+                state: 'open',
+                labels: labelName,
+                per_page: 100,
+              },
+            );
+            if (openIssues.some(issue => issue.title === title)) {
+              console.log('既存の Issue があるため新規作成をスキップします。');
+              return;
+            }
+
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const body = [
+              '週次 GC CI (`.github/workflows/weekly-gc.yml`) が失敗しました。',
+              '',
+              `- 実行: ${runUrl}`,
+              '- 対象チェック: lint / structure test / build',
+              '- 失敗したステップの詳細は上記ラン URL の Step Summary を参照してください。',
+              '',
+              '破壊的な自動修正は行いません (Issue #522 Non-goals)。',
+              '人間が内容を確認し、対応が不要なら Issue を close してください。',
+            ].join('\n');
+
+            let useLabelForIssue = true;
+            try {
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: labelName,
+                color: 'f29513',
+                description: '定期実行の自動検証で見つかった問題',
+              });
+            } catch (err) {
+              if (err.status !== 422) {
+                console.warn(`ラベル作成に失敗しましたが、処理を継続します: ${err.message}`);
+                useLabelForIssue = false;
+              }
+            }
+
+            try {
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body,
+                labels: useLabelForIssue ? [labelName] : [],
+              });
+              console.log(`Issue を作成しました: ${title}`);
+            } catch (err) {
+              console.error(`Issue 作成に失敗しました: ${err.message}`);
+              throw err;
+            }
+
+      - name: Fail workflow if any GC check failed
+        if: steps.summary.outputs.gc_failed == 'true'
+        run: |
+          echo "::error::One or more weekly GC checks failed. See the Step Summary for details."
+          exit 1
