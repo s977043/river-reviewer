@@ -24,6 +24,7 @@ export const OutputKindEnum = z.enum([
   'tests',
   'metrics',
   'questions',
+  'review-audit',
 ]);
 export const ModelHintEnum = z.enum(['cheap', 'balanced', 'high-accuracy']);
 
