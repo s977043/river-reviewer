@@ -18,5 +18,6 @@
   "glossary": "用語集",
   "eval-keep-discard-policy": "評価ベースの採否基準",
   "cli-review-exec-spec": "CLI Spec — river review exec",
-  "cli-review-verify-spec": "CLI Spec — river review verify"
+  "cli-review-verify-spec": "CLI Spec — river review verify",
+  "cli-gc-spec": "CLI Spec — river gc"
 }
