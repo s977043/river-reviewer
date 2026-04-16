@@ -67,7 +67,7 @@ River Reviewer は、単にコードをAIに読ませるツールではありま
 
 ## ポジション: artifact-driven review agent
 
-River Reviewer は **PlanGate 非依存の artifact-driven review agent** です。PlanGate v6 などの上流ワークフローに特別な統合を前提とせず、外部から渡されるアーティファクト（`plan` / `diff` / `test-cases` / `junit` ほか）を入力として読み取り、`findings` を含むレビュー結果を出力します。入力の契約は [Artifact Input Contract](pages/reference/artifact-input-contract.md) で、出力スキーマは [Review Artifact](pages/reference/review-artifact.md) で固定されています。
+River Reviewer は **PlanGate 非依存の artifact-driven review agent** です。PlanGate v6 などの上流ワークフローに特別な統合を前提とせず、外部から渡されるアーティファクト（`plan` / `diff` / `test-cases` / `junit` ほか）を入力として読み取り、`findings` を含むレビュー結果を出力します。入力の契約は [Artifact Input Contract](pages/reference/artifact-input-contract.md) で、出力スキーマは [Review Artifact](pages/reference/review-artifact.md) で定義されています。
 
 ### 4 つのユースケース
 
@@ -86,12 +86,12 @@ River Reviewer は **PlanGate 非依存の artifact-driven review agent** です
 # 設計レビュー: plan 単体を検査
 river review plan --artifact plan=./artifacts/plan.md
 
-# 実装レビュー: plan と diff の整合を検査
+# 実装レビュー: plan と diff の整合性を検査
 river review exec \
   --artifact plan=./artifacts/plan.md \
   --artifact diff=./artifacts/diff.patch
 
-# QA レビュー: テスト観点の artifact を追加
+# QA レビュー: テスト観点のアーティファクトを追加
 river review exec \
   --artifact diff=./artifacts/diff.patch \
   --artifact test-cases=./artifacts/test-cases.md \
