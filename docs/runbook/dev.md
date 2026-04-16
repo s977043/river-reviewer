@@ -24,6 +24,18 @@ npm run skills:validate
 npm run agent-skills:validate
 ```
 
+### テスト構成
+
+`npm test` は `node --test` で `tests/**/*.test.mjs` を実行する。レイアウトは:
+
+- `tests/*.test.mjs`—ユニットテスト本体（フラット配置）
+- `tests/core/`—コアロジック単位のユニットテスト
+- `tests/integration/`—`local-runner` などの統合テスト
+- `tests/helpers/`—`createTempMemory` / `createTempDir` など複数テストで共有するヘルパー (#506 で導入)
+- `tests/fixtures/`—eval / レビュー / Riverbed Memory のフィクスチャ
+
+CI ではカバレッジを `NODE_V8_COVERAGE=coverage npm test` で取得し、Codecov へ OIDC (`id-token: write`) でアップロードする (`.github/workflows/test.yml` `unit-tests` ジョブ)。Codecov を呼び出すジョブには `permissions.id-token: write` が必須で、無いと OIDC トークン取得に失敗する (#546 で修正済み)。
+
 ## よくある詰まりどころ
 
 - `npm run check:links` が失敗する場合:
