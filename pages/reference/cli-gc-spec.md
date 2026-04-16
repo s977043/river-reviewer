@@ -61,7 +61,7 @@ river gc --force --exclude 'artifacts/keep/**'
 | `--scope <value>`  | `memory` / `evals` / `review-artifacts` / `tmp` / `all` | `all`  | 繰り返し可。複数指定した場合は union。`all` は 4 scope すべてを含む。      |
 | `--exclude <glob>` | string                                                  | -      | 繰り返し可。削除対象から除外するパス glob。`.gitignore` と同じ glob 構文。 |
 
-`--exclude` に一致したパスは retention policy の判定結果にかかわらず **常に保持** される。ただし出力 JSON の `removed[].reason: "exclude-override"` としては出現しない（「除外されたので消さなかった」ものは記録対象外。`keptSummary` のカウントのみに影響する）。
+`--exclude` に一致したパスは retention policy の判定結果にかかわらず **常に保持** される。除外されて保持されたファイルは `removed[]` に現れず、`keptSummary` のカウントのみに影響する。
 
 ### Mode（動作モード）
 
@@ -106,7 +106,7 @@ river gc --force --exclude 'artifacts/keep/**'
   "scopes": ["memory", "evals", ...],
   "retention": { "days": N, "maxEntries": N, "maxSizeMb": N },
   "removed": [
-    { "path": "...", "sizeBytes": N, "reason": "age" | "count" | "size" | "exclude-override" },
+    { "path": "...", "sizeBytes": N, "reason": "age" | "count" | "size" },
     ...
   ],
   "keptSummary": {
@@ -138,11 +138,11 @@ river gc --force --exclude 'artifacts/keep/**'
 
 ## 終了コード
 
-| Exit | 意味                                                                                                                                      |
-| ---- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `0`  | 成功。dry-run と force のどちらでも、`errors` が空なら `0`。                                                                              |
-| `1`  | ランタイム失敗。削除エラーや IO エラーが `errors` に 1 件以上含まれる、または実行中に retention knob の解釈エラーが発生した場合。         |
-| `2`  | 設定エラー。未知の `--scope` 値、不正な glob、`--retention-days` / `--max-entries` / `--max-size-mb` の数値パース失敗、相互排他違反など。 |
+| Exit | 意味                                                                                                                                                                                                                           |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `0`  | 成功。dry-run と force のどちらでも、`errors` が空なら `0`。                                                                                                                                                                   |
+| `1`  | ランタイム失敗。削除エラー・IO エラー・権限エラー等のランタイム障害が `errors` に 1 件以上含まれる場合。                                                                                                                       |
+| `2`  | 設定エラー。未知の `--scope` 値、不正な glob、`--retention-days` / `--max-entries` / `--max-size-mb` の数値パース失敗、相互排他違反など。引数バリデーションは起動時に完結するため、この種のエラーは skill 実行前に検出される。 |
 
 `--dry-run` と `--force` を両方指定した場合は前述のとおり `--dry-run` が優先されるため、それ自体は設定エラーにならない。
 

@@ -61,7 +61,7 @@ river gc --force --exclude 'artifacts/keep/**'
 | `--scope <value>`  | `memory` / `evals` / `review-artifacts` / `tmp` / `all` | `all`   | Repeatable. Multiple values are unioned. `all` expands to the four concrete scopes. |
 | `--exclude <glob>` | string                                                  | -       | Repeatable glob (`.gitignore` syntax) of paths to protect from deletion.            |
 
-Files matching `--exclude` are **always kept**, regardless of retention policy. They do not appear in `removed[]` with reason `exclude-override` — "not deleted because excluded" is not logged; the exclusion is reflected only in `keptSummary` counts.
+Files matching `--exclude` are **always kept**, regardless of retention policy. Excluded files never appear in `removed[]`; the exclusion is reflected only in `keptSummary` counts.
 
 ### Mode
 
@@ -106,7 +106,7 @@ Shape emitted when `--json` is set:
   "scopes": ["memory", "evals", ...],
   "retention": { "days": N, "maxEntries": N, "maxSizeMb": N },
   "removed": [
-    { "path": "...", "sizeBytes": N, "reason": "age" | "count" | "size" | "exclude-override" },
+    { "path": "...", "sizeBytes": N, "reason": "age" | "count" | "size" },
     ...
   ],
   "keptSummary": {
@@ -138,11 +138,11 @@ Shape emitted when `--json` is set:
 
 ## Exit codes
 
-| Exit | Meaning                                                                                                                                                       |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `0`  | Success. Both dry-run and force exit `0` when `errors` is empty.                                                                                              |
-| `1`  | Runtime failure. `errors` has at least one entry (delete / IO error), or a retention knob threw a parse error mid-run.                                        |
-| `2`  | Config error. Unknown `--scope` value, malformed glob, non-numeric `--retention-days` / `--max-entries` / `--max-size-mb`, or mutually exclusive flag misuse. |
+| Exit | Meaning                                                                                                                                                                                                                                                   |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0`  | Success. Both dry-run and force exit `0` when `errors` is empty.                                                                                                                                                                                          |
+| `1`  | Runtime failure. `errors` has at least one entry (delete / IO / permission error during execution).                                                                                                                                                       |
+| `2`  | Config error. Unknown `--scope` value, malformed glob, non-numeric `--retention-days` / `--max-entries` / `--max-size-mb`, or mutually exclusive flag misuse. Argument validation completes at startup, so these errors are caught before any skill runs. |
 
 Supplying both `--dry-run` and `--force` is not a config error — `--dry-run` wins, as stated above.
 
