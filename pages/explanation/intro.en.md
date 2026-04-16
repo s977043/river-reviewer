@@ -3,7 +3,7 @@ id: intro-en
 title: Welcome to River Reviewer
 ---
 
-River Reviewer (RR) is a framework for organizing and executing team review perspectives along the **Upstream → Midstream → Downstream** flow. Skills are defined using YAML frontmatter + Markdown and validated against `schemas/skill.schema.json`.
+River Reviewer (RR) is a **Context Engineering-driven, Skill Registry-centric code review framework** that captures team-specific tacit knowledge as reusable **Agent Skills** and runs them along the **Upstream → Midstream → Downstream** flow. Skills are defined using YAML frontmatter + Markdown and validated against `schemas/skill.schema.json`.
 
 This documentation covers:
 
