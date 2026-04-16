@@ -87,15 +87,7 @@ river review verify --advisory-only \
 
 `--output` と `--format` の組み合わせは [Review Artifact](./review-artifact.md) スキーマ（JSON）と既存 Action の Markdown 出力契約（[Stable Interfaces](./stable-interfaces.md)）に準じます。
 
-### 失敗判定の閾値
-
-| オプション             | 型   | 既定値     | 説明                                                                                                       |
-| ---------------------- | ---- | ---------- | ---------------------------------------------------------------------------------------------------------- |
-| `--fail-on <severity>` | enum | `critical` | `critical` / `major` / `minor` / `info`。指定 severity 以上の META finding が 1 件でもあれば fail と判定。 |
-| `--warn-on <severity>` | enum | `major`    | `--fail-on` には届かないが warn と扱う閾値。                                                               |
-| `--advisory-only`      | flag | false      | severity に関わらず常に成功扱い（exit `0`）。発見事項は出力されるが CI を落とさない。                      |
-
-severity の語彙と内部語彙の対応は [`.claude/rules/review-core.md`](../../.claude/rules/review-core.md) および [`schemas/output.schema.json`](../../schemas/output.schema.json) に準ずる。不明な severity 値は fail-safe として `major` に分類される。
+META finding の severity 語彙は [`schemas/output.schema.json`](../../schemas/output.schema.json) と `.claude/rules/review-core.md` の severity マッピングに準ずる（`critical` / `major` / `minor` / `info`）。不明な severity 値は fail-safe として `major` に分類される。severity に応じた fail / warn 判定は `exec` と同様に CLI では行わず、Review Artifact の `findings` を読んだ CI 側のゲートで判定する運用を推奨する。
 
 ## Skill 選択（verify ファミリー制限）
 
@@ -130,7 +122,7 @@ severity の語彙と内部語彙の対応は [`.claude/rules/review-core.md`](.
 - `version`: 常に `"1"`。
 - `timestamp`: 実行完了時の ISO 8601。
 - `phase`: `--phase` の値（既定 `upstream`）。
-- `status`: 後述の「終了ステータス」表に従う。`no-review-input` を含む。
+- `status`: 後述の「`status` と終了コードの対応」表に従う。
 - `plan`: 採用した実行計画。`selectedSkills` は verify 系のみ、`skippedSkills` に `not-verify-skill` 等の理由を記録。
 - `findings`: verify 系 skill が生成した **META finding** の配列。対象は既存 `review-self` / `review-external` の指摘品質（抜け・誤検知・ハルシネーション・根拠欠落など）であり、元コードへの直接指摘ではない点に留意する。各要素は `output.schema.json` の `issue` と互換。
 - `context`: `repoRoot` / `defaultBranch` / `mergeBase` / `changedFiles` / `tokenEstimate` / `rawTokenEstimate` / `reduction` を埋める（取得不能なフィールドは省略）。
@@ -142,32 +134,31 @@ severity の語彙と内部語彙の対応は [`.claude/rules/review-core.md`](.
 
 CI から安定して判定できるよう、終了コードを以下の通り固定します。`exec` と同じ 3 値（`0` / `1` / `2`）の shape を採用します。
 
-| Exit | 用途                              | 代表的な状況                                                                                                                     |
-| ---- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `0`  | 成功                              | `status` が `ok` / `skipped-by-label` のいずれかで、`--max-cost` 超過もない。                                                    |
-| `1`  | 失敗（ユーザー入力 / ランタイム） | `review-self` / `review-external` が両方とも解決不能（`no-review-input`）、必須 artifact 解決失敗、`--max-cost` 超過、内部例外。 |
-| `2`  | 設定エラー                        | `--config` の読み込み失敗、未知の `--artifact id`、未知の `--phase` / `--planner` 値。                                           |
+| Exit | 用途                              | 代表的な状況                                                                                                                                                     |
+| ---- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0`  | 成功                              | `status` が `ok` / `skipped-by-label` のいずれかで、`--max-cost` 超過もない。                                                                                    |
+| `1`  | 失敗（ユーザー入力 / ランタイム） | `review-self` / `review-external` が両方とも解決できない、必須 artifact 解決失敗、`--max-cost` 超過、内部例外。いずれも `status: error` として Exit `1` を返す。 |
+| `2`  | 設定エラー                        | `--config` の読み込み失敗、未知の `--artifact id`、未知の `--phase` / `--planner` 値。                                                                           |
 
-`findings` の severity は既定では終了コードに直接影響しません。`--fail-on` / `--warn-on` を指定した場合は [`river review plan`](./cli-review-plan-spec.md) と同じ閾値判定ロジックで fail / warn / advisory を決定します（`--advisory-only` 指定時は常に `0`）。
+`findings` の severity（`critical` / `major` / `minor` / `info`）は終了コードに直接は影響しません。CI 側で Review Artifact の `findings` を読んでゲート判定する運用を推奨します（[Stable Interfaces](./stable-interfaces.md) に準拠）。
 
-> 備考: [Stable Interfaces](./stable-interfaces.md) の最小 CLI 契約では終了コードを `0` / `1` の 2 値に絞っています。本 spec の `2`（設定エラー）は `verify` サブコマンド固有の拡張であり、CI で `2` を未知扱いとした場合も `!= 0` として失敗扱いになるため後方互換を壊しません。
+> 備考: [Stable Interfaces](./stable-interfaces.md) の最小 CLI 契約では終了コードを `0` / `1` の 2 値に絞っています。本 spec の `2`（設定エラー）は `exec` と共通の拡張であり、CI で `2` を未知扱いとした場合も `!= 0` として失敗扱いになるため後方互換を壊しません。
 
 ### `status` と終了コードの対応
 
-| `status`           | Exit | 意味                                                                                                 |
-| ------------------ | ---- | ---------------------------------------------------------------------------------------------------- |
-| `ok`               | `0`  | 全 verify skill 実行が正常完了した（META `findings` が空でも `ok`）。                                |
-| `skipped-by-label` | `0`  | PR ラベル等の運用ルールにより verify を意図的にスキップした。                                        |
-| `no-review-input`  | `1`  | `review-self` / `review-external` のいずれも解決できず、W チェック対象が存在しない（誤用と見なす）。 |
-| `error`            | `1`  | 実行時エラー。詳細は `debug` および stderr。                                                         |
+| `status`           | Exit | 意味                                                                  |
+| ------------------ | ---- | --------------------------------------------------------------------- |
+| `ok`               | `0`  | 全 verify skill 実行が正常完了した（META `findings` が空でも `ok`）。 |
+| `skipped-by-label` | `0`  | PR ラベル等の運用ルールにより verify を意図的にスキップした。         |
+| `error`            | `1`  | 実行時エラー。詳細は `debug` および stderr。                          |
 
-`verify` は `exec` と異なり **`no-changes` を `0` とは扱いません**。差分が空でも既存レビュー自体の監査は意味があるため、`status` は `ok` のままとします。一方で、レビュー入力そのものが無い `no-review-input` は誤用として Exit `1` にマップします。
+`verify` は `exec` と異なり **`no-changes` status を採用しません**。差分が空でも既存レビュー自体の監査は意味があるため、`status` は `ok`（Exit `0`）のまま verify を続行します。一方で、レビュー入力そのもの（`review-self` / `review-external`）が両方とも解決できない場合は監査対象が存在しない誤用と見なし、`status: error` + Exit `1` にマップします。
 
 ## 失敗条件（fail conditions）
 
-`verify` は次の条件で `status: error`（または `status: no-review-input`）+ Exit `1` を返します。
+`verify` は次の条件で `status: error` + Exit `1` を返します。
 
-- `review-self` / `review-external` のいずれも解決できない（`status: no-review-input`）。stderr に次のメッセージを出力する: `rr-cli-verify: review-self / review-external のいずれも解決できませんでした`。
+- `review-self` / `review-external` のいずれも解決できない。stderr に次のメッセージを出力する: `rr-cli-verify: review-self / review-external のいずれも解決できませんでした`。
 - `--artifact` で指定されたパスが存在しない、または読み込めない。
 - `--plan` で指定された JSON がスキーマ違反である。
 - verify skill 実行中に未捕捉例外が発生し、リトライ可能でない。

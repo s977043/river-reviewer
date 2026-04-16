@@ -72,7 +72,7 @@ Resolution priority (CLI > config > directory detection) follows the contract. I
 
 | Option             | Type   | Default | Description                                                                                                                                                                                                      |
 | ------------------ | ------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--dry-run`        | bool   | `false` | Resolve inputs and compute plan only; skip LLM calls. `status` is `ok` or `no-review-input`.                                                                                                                     |
+| `--dry-run`        | bool   | `false` | Resolve inputs and compute plan only; skip LLM calls. `status` is `ok` (or `error` if required review inputs are missing).                                                                                       |
 | `--estimate`       | bool   | `false` | Cost-estimate only. No skill execution; estimate is recorded in Review Artifact `debug`; `status` is `ok`.                                                                                                       |
 | `--max-cost <usd>` | number | (none)  | Abort skill execution (exit `1`) when the estimate exceeds this budget. When combined with `--estimate`, no skills run in the first place, so verify reports the estimate and returns exit `0` without aborting. |
 | `--debug`          | bool   | `false` | Verbose logs to stderr; richer `debug` field in the Review Artifact.                                                                                                                                             |
@@ -87,15 +87,7 @@ Resolution priority (CLI > config > directory detection) follows the contract. I
 
 The combination follows [Review Artifact](./review-artifact.en.md) for JSON and the existing Action contract ([Stable Interfaces](./stable-interfaces.en.md)) for Markdown.
 
-### Fail / warn thresholds
-
-| Option                 | Type | Default    | Description                                                                                             |
-| ---------------------- | ---- | ---------- | ------------------------------------------------------------------------------------------------------- |
-| `--fail-on <severity>` | enum | `critical` | `critical` / `major` / `minor` / `info`. A single META finding at or above this severity fails the run. |
-| `--warn-on <severity>` | enum | `major`    | Threshold treated as warn when below `--fail-on`.                                                       |
-| `--advisory-only`      | flag | false      | Always exit `0` regardless of severity. Findings are emitted but never fail CI.                         |
-
-The severity vocabulary and its internal mapping follow [`.claude/rules/review-core.md`](../../.claude/rules/review-core.md) and [`schemas/output.schema.json`](../../schemas/output.schema.json). Unknown severity values default to `major` as a fail-safe.
+The META finding severity vocabulary follows [`schemas/output.schema.json`](../../schemas/output.schema.json) and the severity mapping in `.claude/rules/review-core.md` (`critical` / `major` / `minor` / `info`). Unknown severity values default to `major` as a fail-safe. As with `exec`, the CLI does not perform fail / warn gating based on severity; CI should read the Review Artifact `findings` and gate there (see [Stable Interfaces](./stable-interfaces.en.md)).
 
 ## Skill selection (verify-family restriction)
 
@@ -112,8 +104,8 @@ Non-verify skills are excluded from `plan.selectedSkills` and recorded in `plan.
 
 | Artifact ID                         | Used by                                                             | When absent                                                                                                                                      |
 | ----------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `review-self`                       | Self-review output. Primary W-check target.                         | If `review-external` also fails to resolve, `status: no-review-input` + Exit `1`.                                                                |
-| `review-external`                   | External (AI/human) review output. Primary W-check target.          | If `review-self` also fails to resolve, `status: no-review-input` + Exit `1`.                                                                    |
+| `review-self`                       | Self-review output. Primary W-check target.                         | If `review-external` also fails to resolve, `status: error` + Exit `1` (see Fail conditions).                                                    |
+| `review-external`                   | External (AI/human) review output. Primary W-check target.          | If `review-self` also fails to resolve, `status: error` + Exit `1` (see Fail conditions).                                                        |
 | `plan`                              | Upstream plan; references the design intent the review relied on.   | Optional. When absent, the related skill is recorded in `plan.skippedSkills` and skipped.                                                        |
 | `diff`                              | Review target diff; required for hallucination checks.              | Falls back to `git diff <mergeBase>..HEAD`. An empty diff weakens W-checks but does not change `status` to `no-changes` — verify still proceeds. |
 | `test-cases`                        | Used to check consistency between test expectations and the review. | Optional. Missing → skill skipped and recorded.                                                                                                  |
@@ -130,7 +122,7 @@ The output of `river review verify` is JSON conforming to the [Review Artifact s
 - `version`: always `"1"`.
 - `timestamp`: ISO 8601 at completion.
 - `phase`: value of `--phase` (default `upstream`).
-- `status`: per the "Exit status" table below, including `no-review-input`.
+- `status`: per the "`status` to exit-code mapping" table below.
 - `plan`: the plan that was used. `selectedSkills` contains verify-family skills only; `skippedSkills` records reasons such as `not-verify-skill`.
 - `findings`: array of **META findings** produced by verify-family skills. These comment on the quality of the existing `review-self` / `review-external` (omissions, false positives, hallucinations, missing grounding), not directly on the code under review. Each entry is compatible with the `issue` definition in `output.schema.json`.
 - `context`: `repoRoot` / `defaultBranch` / `mergeBase` / `changedFiles` / `tokenEstimate` / `rawTokenEstimate` / `reduction` (omit fields that cannot be obtained).
@@ -142,32 +134,31 @@ The output of `river review verify` is JSON conforming to the [Review Artifact s
 
 Exit codes are fixed so CI can rely on them and share the three-value shape (`0` / `1` / `2`) with `exec`.
 
-| Exit | Use                            | Typical cause                                                                                                                                      |
-| ---- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `0`  | Success                        | `status` is `ok` or `skipped-by-label`, and `--max-cost` was not exceeded.                                                                         |
-| `1`  | Failure (user input / runtime) | Neither `review-self` nor `review-external` resolved (`no-review-input`), required artifact unresolved, `--max-cost` exceeded, internal exception. |
-| `2`  | Configuration error            | `--config` cannot be loaded; unknown `--artifact id`; unknown `--phase` / `--planner` value.                                                       |
+| Exit | Use                            | Typical cause                                                                                                                                                            |
+| ---- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `0`  | Success                        | `status` is `ok` or `skipped-by-label`, and `--max-cost` was not exceeded.                                                                                               |
+| `1`  | Failure (user input / runtime) | Neither `review-self` nor `review-external` resolved, required artifact unresolved, `--max-cost` exceeded, internal exception. All map to `status: error` with Exit `1`. |
+| `2`  | Configuration error            | `--config` cannot be loaded; unknown `--artifact id`; unknown `--phase` / `--planner` value.                                                                             |
 
-By default `findings` severity does not directly affect the exit code. When `--fail-on` / `--warn-on` are supplied, the fail / warn / advisory decision follows the same threshold logic as [`river review plan`](./cli-review-plan-spec.en.md) (`--advisory-only` always returns `0`).
+`findings` severity (`critical` / `major` / `minor` / `info`) does not directly affect the exit code. CI should read the Review Artifact `findings` and gate there ([Stable Interfaces](./stable-interfaces.en.md)).
 
-> Note: The minimal CLI contract in [Stable Interfaces](./stable-interfaces.en.md) only defines exit codes `0` and `1`. Exit code `2` (configuration error) is a `verify`-specific extension. CI that treats unknown exit codes as failure remains backward compatible because `2 != 0`.
+> Note: The minimal CLI contract in [Stable Interfaces](./stable-interfaces.en.md) only defines exit codes `0` and `1`. Exit code `2` (configuration error) is an extension shared with `exec`. CI that treats unknown exit codes as failure remains backward compatible because `2 != 0`.
 
 ### `status` to exit-code mapping
 
-| `status`           | Exit | Meaning                                                                                      |
-| ------------------ | ---- | -------------------------------------------------------------------------------------------- |
-| `ok`               | `0`  | All verify skill runs completed (META `findings` may be empty).                              |
-| `skipped-by-label` | `0`  | verify was intentionally skipped by an operational rule.                                     |
-| `no-review-input`  | `1`  | Neither `review-self` nor `review-external` resolved; no W-check target (treated as misuse). |
-| `error`            | `1`  | Runtime error; details in `debug` and stderr.                                                |
+| `status`           | Exit | Meaning                                                         |
+| ------------------ | ---- | --------------------------------------------------------------- |
+| `ok`               | `0`  | All verify skill runs completed (META `findings` may be empty). |
+| `skipped-by-label` | `0`  | verify was intentionally skipped by an operational rule.        |
+| `error`            | `1`  | Runtime error; details in `debug` and stderr.                   |
 
-Unlike `exec`, `verify` **does NOT treat `no-changes` as `0`**. An empty diff still leaves the review audit meaningful, so `status` stays `ok`. Conversely, `no-review-input` (no review to audit) is a misuse and maps to Exit `1`.
+Unlike `exec`, `verify` **does not use the `no-changes` status**. Even when the diff is empty, auditing the existing review remains meaningful, so `status` stays `ok` (Exit `0`) and verify proceeds. Conversely, when no review input exists at all (neither `review-self` nor `review-external` resolves), verify is considered misused and returns `status: error` + Exit `1`.
 
 ## Fail conditions
 
-`verify` returns `status: error` (or `status: no-review-input`) + Exit `1` in the following cases:
+`verify` returns `status: error` + Exit `1` in the following cases:
 
-- Neither `review-self` nor `review-external` can be resolved (`status: no-review-input`). stderr prints: `rr-cli-verify: review-self / review-external のいずれも解決できませんでした`.
+- Neither `review-self` nor `review-external` can be resolved. stderr prints: `rr-cli-verify: review-self / review-external could not be resolved`.
 - A path supplied via `--artifact` cannot be opened.
 - The JSON given to `--plan` violates the schema.
 - An uncaught, non-retryable exception occurs during verify skill execution.
