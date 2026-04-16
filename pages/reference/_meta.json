@@ -9,6 +9,7 @@
   "review-output-example": "レビュー出力例",
   "review-artifact": "レビューアーティファクト",
   "artifact-input-contract": "アーティファクト入力コントラクト",
+  "cli-review-plan-spec": "river review plan CLI 仕様",
   "riverbed-storage": "Riverbed Memory ストレージ設計",
   "stable-interfaces": "安定インターフェース（CLI / GitHub Actions）",
   "runner-cli-reference": "Runner CLI リファレンス",

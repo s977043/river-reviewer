@@ -1,0 +1,153 @@
+---
+title: river review plan CLI 仕様
+---
+
+`river review plan` は River Reviewer が提供する CLI サブコマンドのうち、上流アーティファクトに対して **レビュー計画（plan）を生成・実行する** エントリポイントです。本ドキュメントは引数、入力アーティファクト、出力フォーマット、終了コード、severity 区分（fail / warn / advisory）、machine-readable 出力方針を定義します。
+
+> 関連 Issue: #517（Task）/ #509（Capability）/ #507（Epic）
+> 前提: 入力アーティファクトの契約は [Artifact Input Contract](./artifact-input-contract.md) に従う。
+
+## 位置づけ
+
+- `river review plan` は **PlanGate v6** をはじめとする上流ワークフローが生成した artifact を入力とし、レビュー計画（実行対象 skill の選定・順序）と、その計画に基づく実行結果を [Review Artifact](./review-artifact.md) スキーマで出力する。
+- 既存の `river run` がローカル開発者向けの汎用エントリであるのに対し、`river review plan` は **CI / バッチ実行で安定した契約** を提供することを目的とする。
+- 安定性ラベルは **Beta**（参考: [Stable Interfaces](./stable-interfaces.md)）。CLI オプションの追加は minor、削除/意味変更は major bump とする。
+
+## Usage
+
+```bash
+river review plan [options]
+```
+
+### 最小例
+
+```bash
+# 入力 artifact をカレントディレクトリから自動検出してレビュー計画を実行
+river review plan
+
+# 明示的に artifact を指定し、JSON 出力をファイルへ書き出す
+river review plan \
+  --artifact pbi-input=./artifacts/pbi-input.md \
+  --artifact plan=./artifacts/plan.md \
+  --artifact diff=./artifacts/diff.patch \
+  --output json \
+  --output-file ./artifacts/review-artifact.json
+
+# 計画のみを生成（実行しない）
+river review plan --plan-only --output json
+```
+
+## 引数
+
+### artifact 指定
+
+| オプション               | 型     | 必須 | 説明                                                                                                                |
+| ------------------------ | ------ | ---- | ------------------------------------------------------------------------------------------------------------------- |
+| `--artifact <id>=<path>` | 反復可 | 任意 | [Artifact Input Contract](./artifact-input-contract.md) で定義された artifact ID とファイルパスのペア。複数指定可。 |
+| `--artifacts-dir <path>` | string | 任意 | artifact 既定ファイル名を探索するベースディレクトリ。未指定時はカレントディレクトリ。                               |
+| `--config <path>`        | string | 任意 | `river.config.*` のパス。設定ファイルの `artifacts` セクションが `--artifact` で上書きされる。                      |
+
+artifact 解決の優先順位は Artifact Input Contract「指定方法（入力チャネル）」に従う（CLI 引数 → 設定ファイル → ディレクトリ自動検出）。
+
+### 計画制御
+
+| オプション             | 型     | デフォルト  | 説明                                                                                        |
+| ---------------------- | ------ | ----------- | ------------------------------------------------------------------------------------------- |
+| `--phase <value>`      | enum   | `midstream` | `upstream` / `midstream` / `downstream`。レビューフェーズ。                                 |
+| `--planner <value>`    | enum   | `off`       | `off` / `order` / `prune`。AI プランナーのモード。                                          |
+| `--plan-only`          | flag   | false       | レビュー計画のみを生成し、skill を実行しない。`status` は `ok`、`findings` は空配列となる。 |
+| `--include-skill <id>` | 反復可 | -           | 計画で必ず含める skill ID。                                                                 |
+| `--exclude-skill <id>` | 反復可 | -           | 計画から除外する skill ID。                                                                 |
+| `--max-cost <usd>`     | number | -           | 計画の見積もりコストが上限を超えた場合は実行せず終了コード `1` で終了する。                 |
+
+### 出力制御
+
+| オプション              | 型     | デフォルト | 説明                                                                                   |
+| ----------------------- | ------ | ---------- | -------------------------------------------------------------------------------------- |
+| `--output <format>`     | enum   | `text`     | `text` / `markdown` / `json`。`json` は machine-readable 出力（後述）。                |
+| `--output-file <path>`  | string | -          | 出力先ファイル。未指定時は標準出力。                                                   |
+| `--summary-file <path>` | string | -          | 人間向けサマリ（Markdown）を別ファイルへ書き出す。`--output json` と併用する想定。     |
+| `--quiet`               | flag   | false      | stdout への進捗ログを抑制（エラーは stderr に出力）。CI 用。                           |
+| `--debug`               | flag   | false      | デバッグ情報を [Review Artifact](./review-artifact.md) の `debug` フィールドに含める。 |
+
+### 失敗判定の閾値
+
+| オプション             | 型   | デフォルト | 説明                                                                                                  |
+| ---------------------- | ---- | ---------- | ----------------------------------------------------------------------------------------------------- |
+| `--fail-on <severity>` | enum | `critical` | `critical` / `major` / `minor` / `info`。指定 severity 以上の finding が 1 件でもあれば fail と判定。 |
+| `--warn-on <severity>` | enum | `major`    | `--fail-on` には届かないが warn と扱う閾値。                                                          |
+| `--advisory-only`      | flag | false      | severity に関わらず常に成功扱い（exit `0`）。発見事項は出力されるが CI を落とさない。                 |
+
+severity の語彙は [`schemas/output.schema.json`](../../schemas/output.schema.json) と `.claude/rules/review-core.md` の severity マッピングに準ずる（`critical` / `major` / `minor` / `info`）。
+
+## 入力アーティファクト
+
+`river review plan` が認識する artifact は [Artifact Input Contract](./artifact-input-contract.md) の「対象アーティファクト一覧」と完全に一致する。具体的には `pbi-input` / `plan` / `todo` / `test-cases` / `review-self` / `review-external` / `diff` / `junit` / `coverage` / `lint` / `typecheck` の 11 種類を対象とします。
+
+- artifact ID とファイル形式の追加・変更・削除は本仕様ではなく Artifact Input Contract 側で管理する。
+- `diff` artifact が未指定で `git diff` フォールバックも空の場合、`status` を `no-changes` とし、skill は実行されない（exit `0`）。
+- 必須 artifact の解決に失敗した場合は exit `1`（後述）。
+
+## 出力フォーマット
+
+### `--output text`（デフォルト）
+
+人間が読める要約を stdout に出力する。フォーマットは安定契約の対象外（minor で変更可能）。
+
+### `--output markdown`
+
+GitHub Actions のコメント投稿などで利用する Markdown を出力する。書式は [Review Output Example](./review-output-example.md) と整合する。
+
+### `--output json`（machine-readable / 安定契約）
+
+[`schemas/review-artifact.schema.json`](../../schemas/review-artifact.schema.json) に準拠した JSON を出力する。
+
+- スキーマバージョンは `version` フィールドで管理（現行 `"1"`）。
+- `findings` 配列の各要素は `output.schema.json` の issue 定義と互換。
+- `--debug` 指定時のみ `debug` セクションを含める。
+- `--plan-only` 指定時は `findings` を空配列、`status` を `ok` とし、`plan.selectedSkills` のみが意味を持つ。
+
+JSON 出力は **唯一の安定 machine-readable 契約** とする。後続パイプライン（Riverbed Memory 取り込み、評価、CI gate）は本 JSON のみを参照することを推奨する。
+
+## Severity 区分（fail / warn / advisory）
+
+| 区分       | 判定基準                                                                                              | 既定の振る舞い                             |
+| ---------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `fail`     | severity が `--fail-on` 以上（既定 `critical`）の finding が 1 件以上                                 | exit `1` で終了。CI を落とす。             |
+| `warn`     | `--fail-on` 未満かつ `--warn-on` 以上（既定 `major`）の finding が 1 件以上                           | exit `2` で終了。CI 設定で扱いを選択可能。 |
+| `advisory` | 上記いずれにも該当しないが finding が存在する（`minor` / `info` のみ、または `--advisory-only` 指定） | exit `0` で終了。情報提供のみ。            |
+
+severity の内部語彙（`blocker` / `warning` / `nit`）と JSON スキーマ語彙（`critical` / `major` / `minor` / `info`）の対応は `.claude/rules/review-core.md` を参照する。JSON スキーマ語彙のうち `info` は内部語彙に直接対応するトークンを持たず、severity が未指定の finding（`.claude/rules/review-core.md` の「(なし)」列）に割り当てられる補助レベルで、現時点では内部語彙からの変換には使用されない。不明な severity 値は fail-safe として `major` に分類される。
+
+## 終了コード
+
+| Exit | 意味                                                                                                                         |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `0`  | 成功。`status` が `ok` / `no-changes` / `skipped-by-label` で、かつ fail / warn 判定なし。                                   |
+| `1`  | 失敗。`--fail-on` 閾値到達（`--advisory-only` 未指定時）、必須 artifact 欠損、計画/実行エラー、`--max-cost` 超過、いずれか。 |
+| `2`  | 警告のみ。`--warn-on` 閾値に達したが `--fail-on` には届かない finding が存在する。                                           |
+| `3`  | 設定エラー。引数バリデーション失敗、設定ファイル読み込み失敗など。                                                           |
+
+`--advisory-only` を指定した場合、`fail` / `warn` 判定は無効化され、内部エラー（artifact 欠損・実行エラー）以外は常に exit `0`。
+
+## CI / 後続システムとの接続
+
+- **Review Artifact**: `--output json --output-file <path>` を CI の artifact upload で永続化することを推奨する。
+- **GitHub Action**: `runners/github-action/action.yml` の inputs から本 CLI へのマッピングを提供する（詳細は後続 Issue #511）。
+- **Riverbed Memory**: 取り込み入力としては JSON 出力のみを正とする（参考: [Riverbed Storage](./riverbed-storage.md)）。
+- **PR コメント**: idempotent 更新（`<!-- river-reviewer -->` marker）の方針は [Stable Interfaces](./stable-interfaces.md) を継承する。
+
+## 互換性ポリシー
+
+- `--artifact` で渡せる ID 集合は Artifact Input Contract に従い拡張される。
+- フラグ追加は minor、フラグの削除・意味変更・既定値変更は major bump とする。
+- exit code の意味（`0` / `1` / `2` / `3`）は **Stable Contract** として扱い、変更には major bump を要する。
+- JSON 出力スキーマの破壊的変更は [Review Artifact](./review-artifact.md) のバージョニングに従う。
+
+## 関連ドキュメント
+
+- [Artifact Input Contract](./artifact-input-contract.md) — 入力アーティファクトの契約
+- [Review Artifact](./review-artifact.md) — 出力 JSON スキーマ
+- [Stable Interfaces](./stable-interfaces.md) — CLI / GitHub Actions 安定契約
+- [Runner CLI Reference](./runner-cli-reference.md) — Runner CLI（バリデータ）の使い方
+- [Review Policy](./review-policy.md) — AI レビュー標準ポリシー
