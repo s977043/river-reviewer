@@ -55,6 +55,39 @@ We define team-specific judgment criteria and review procedures as reusable **Ag
 - **Downstream (tests/QA)**: test-focused skills highlight coverage gaps and failure paths.
 - **Phase-aware routing**: skills are selected by `phase` and file metadata, so feedback matches where you are in the stream.
 
+## Positioning: artifact-driven review agent
+
+River Reviewer is a **PlanGate-independent, artifact-driven review agent**. It does not require a special integration with PlanGate v6 or any other upstream workflow. Instead, it consumes externally supplied artifacts (`plan` / `diff` / `test-cases` / `junit`, etc.) and produces review results that include `findings`. The input contract is defined in the [Artifact Input Contract](pages/reference/artifact-input-contract.en.md), and the output schema in the [Review Artifact](pages/reference/review-artifact.en.md) reference.
+
+### Four use cases
+
+The same CLI (`river review plan` / `river review exec`) switches use cases based on which artifacts you supply.
+
+- **Design review**: pass `pbi-input` / `plan` to check plan integrity and completeness with upstream skills (e.g. `skills/upstream/rr-upstream-plangate-plan-integrity-001/`).
+- **Implementation review**: pass `plan` + `diff` to check that the code change matches the plan (e.g. `skills/upstream/rr-upstream-plangate-exec-conformance-001/`).
+- **QA review**: pass `test-cases` / `junit` / `coverage` so downstream skills can surface coverage gaps and failure paths.
+- **Double-check (W-check)**: pass existing AI or human review output as `review-self` / `review-external` to review the review itself.
+
+### CLI examples
+
+See [`river review plan` CLI spec](pages/reference/cli-review-plan-spec.en.md) and [`river review exec` CLI spec](pages/reference/cli-review-exec-spec.en.md) for full details.
+
+```bash
+# Design review: inspect the plan alone
+river review plan --artifact plan=./artifacts/plan.md
+
+# Implementation review: check the diff against the plan
+river review exec \
+  --artifact plan=./artifacts/plan.md \
+  --artifact diff=./artifacts/diff.patch
+
+# QA review: add test-related artifacts
+river review exec \
+  --artifact diff=./artifacts/diff.patch \
+  --artifact test-cases=./artifacts/test-cases.md \
+  --artifact junit=./artifacts/junit.xml
+```
+
 ## Quick start (GitHub Actions)
 
 Minimal workflow using the v1 action tag. `phase` is a future/optional input that will route skills per SDLC phase.
