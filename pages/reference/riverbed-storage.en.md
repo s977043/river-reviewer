@@ -11,12 +11,12 @@ Riverbed Memory is a lightweight storage system for leveraging past decisions an
 
 - `index.json`: A single file that holds the entries array and a version field. It conforms to `schemas/riverbed-index.schema.json`, and each entry conforms to `schemas/riverbed-entry.schema.json`.
 
-Disk I/O goes through functions like `loadMemory` / `appendEntry` / `queryMemory` / `supersedeEntry`. When the file does not exist, a stateless fallback returns `{ entries: [], version: "1" }`.
+Disk I/O goes through functions like `loadMemory` / `appendEntry` / `queryMemory` / `supersede` / `expireEntries`. When the file does not exist, a stateless fallback returns `{ entries: [], version: "1" }`. `expireEntries` transitions entries whose `expiresAt` has passed into `status: archived`.
 
 ## Entry Specification (Excerpt)
 
 - `id`: Unique string (e.g., `adr-001`, `pattern-react-query`)
-- `type`: `adr | review | wontfix | pattern | decision | eval_result`
+- `type`: `adr | review | wontfix | pattern | decision | eval_result | suppression | resurface`
 - `content`: Body text. Markdown/Text assumed.
 - `metadata`:
   - `createdAt` (ISO8601), `updatedAt` (Optional)
@@ -24,7 +24,7 @@ Disk I/O goes through functions like `loadMemory` / `appendEntry` / `queryMemory
   - `phase` (`upstream | midstream | downstream`, Optional)
   - `tags`, `relatedFiles`, `links`, `summary`
 - `context`: Arbitrary additional info (PR number, related ADR ID, etc.)
-- `status`: `active | superseded` (defaults to `active`)
+- `status`: `active | superseded | archived` (defaults to `active`; `archived` is set by `expireEntries`)
 
 See `schemas/riverbed-entry.schema.json` for details.
 
@@ -36,7 +36,7 @@ See `schemas/riverbed-entry.schema.json` for details.
 ## Generation and Usage Flow
 
 1. Running `npm run eval:all -- --persist-memory` appends eval results as `eval_result` entries to `.river/memory/index.json`.
-2. To add entries manually, call `appendEntry(indexPath, entry)` from `src/lib/riverbed-memory.mjs`.
+2. To add entries manually, call `appendEntry(indexPath, entry)` from `src/lib/riverbed-memory.mjs`. Use `supersede(indexPath, oldId, newId)` to logically replace an older entry, or `expireEntries(indexPath)` to batch-archive entries past their `expiresAt`.
 3. During a review, use `loadMemory` + `queryMemory` to search relevant entries and inject them into the prompt.
 4. In CI, `.github/workflows/riverbed-persist.yml` persists `index.json` via GitHub Artifacts with 90-day retention.
 
