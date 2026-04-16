@@ -1,0 +1,395 @@
+name: PlanGate Review (PR)
+
+# PR で PlanGate アーティファクトに対する River Reviewer を実行し、
+# severity ごとの fail / warn / comment ポリシーを適用するワークフロー。
+#
+# - spec: pages/reference/cli-review-plan-spec.md (Issue #517)
+# - spec: pages/reference/cli-review-exec-spec.md (Issue #518)
+# - input contract: pages/reference/artifact-input-contract.md (Issue #516)
+# - skills:
+#   - skills/upstream/rr-upstream-plangate-plan-integrity-001/ (#519)
+#   - skills/upstream/rr-upstream-plangate-exec-conformance-001/ (#520)
+# - parent: Capability #511 / Epic #507 / Task #521
+#
+# 注意: `river review plan` / `river review exec` / `river review verify` の
+# CLI 実装は Issue #509 で進行中。実装が揃うまで、各ステップは実コマンドを
+# 試行しつつ、失敗した場合はプレースホルダとして成功扱いにする feature-flag
+# 方式で動作する。CLI 実装完了後は PLANGATE_REVIEW_CLI_READY=true を設定して
+# 実コマンドのみを走らせる運用に切り替える。
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: plangate-review-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # CLI 実装 (#509) 完了後に true へ切り替える。false の間は CLI 不在でも
+  # ワークフロー自体が緑で通るよう、各ステップがデグレード動作する。
+  PLANGATE_REVIEW_CLI_READY: 'false'
+  ARTIFACTS_DIR: artifacts/plangate
+  PLAN_JSON: artifacts/plangate/plan.json
+  EXEC_JSON: artifacts/plangate/review-artifact.json
+  VERIFY_JSON: artifacts/plangate/verify.json
+  SUMMARY_MD: artifacts/plangate/summary.md
+
+jobs:
+  plan-review:
+    name: river review plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      plan_status: ${{ steps.run-plan.outputs.status }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-node-deps
+
+      - name: Prepare artifacts directory
+        run: mkdir -p "$ARTIFACTS_DIR"
+
+      - name: Run river review plan
+        id: run-plan
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -o pipefail
+          if [ "$PLANGATE_REVIEW_CLI_READY" = 'true' ]; then
+            # CLI 実装完了後の正規動線。
+            # spec: pages/reference/cli-review-plan-spec.md
+            npx --no-install river review plan \
+              --phase upstream \
+              --planner off \
+              --output json \
+              --output-file "$PLAN_JSON" \
+              --summary-file "$SUMMARY_MD" \
+              --quiet
+          else
+            echo "PlanGate review CLI is not yet implemented (tracking: #509)."
+            echo "Emitting placeholder plan artifact so downstream jobs can proceed."
+            cat > "$PLAN_JSON" <<'JSON'
+          {
+            "version": "1",
+            "status": "skipped-by-label",
+            "phase": "upstream",
+            "plan": { "selectedSkills": [], "skippedSkills": [] },
+            "findings": [],
+            "context": { "note": "PlanGate review CLI not ready (#509)" }
+          }
+          JSON
+          fi
+          echo "status=$(node -e "console.log(require('./${PLAN_JSON}').status || 'unknown')")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload plan artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: plangate-plan
+          path: ${{ env.PLAN_JSON }}
+          if-no-files-found: warn
+          retention-days: 14
+
+  exec-review:
+    name: river review exec
+    runs-on: ubuntu-latest
+    needs: plan-review
+    timeout-minutes: 20
+    outputs:
+      exec_status: ${{ steps.run-exec.outputs.status }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-node-deps
+
+      - name: Prepare artifacts directory
+        run: mkdir -p "$ARTIFACTS_DIR"
+
+      - name: Download plan artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: plangate-plan
+          path: ${{ env.ARTIFACTS_DIR }}
+
+      - name: Run river review exec
+        id: run-exec
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -o pipefail
+          if [ "$PLANGATE_REVIEW_CLI_READY" = 'true' ]; then
+            # spec: pages/reference/cli-review-exec-spec.md
+            npx --no-install river review exec \
+              --phase upstream \
+              --plan "$PLAN_JSON" \
+              --output "$EXEC_JSON" \
+              --format json
+          else
+            echo "PlanGate review CLI is not yet implemented (tracking: #509)."
+            echo "Emitting placeholder review artifact so verify job can proceed."
+            cat > "$EXEC_JSON" <<'JSON'
+          {
+            "version": "1",
+            "status": "skipped-by-label",
+            "phase": "upstream",
+            "plan": { "selectedSkills": [], "skippedSkills": [] },
+            "findings": [],
+            "context": { "note": "PlanGate review CLI not ready (#509)" }
+          }
+          JSON
+          fi
+          echo "status=$(node -e "console.log(require('./${EXEC_JSON}').status || 'unknown')")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload review artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: plangate-review-artifact
+          path: ${{ env.EXEC_JSON }}
+          if-no-files-found: warn
+          retention-days: 14
+
+  verify:
+    name: verify & comment
+    runs-on: ubuntu-latest
+    needs: [plan-review, exec-review]
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-deps
+
+      - name: Prepare artifacts directory
+        run: mkdir -p "$ARTIFACTS_DIR"
+
+      - name: Download plan artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: plangate-plan
+          path: ${{ env.ARTIFACTS_DIR }}
+
+      - name: Download review artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: plangate-review-artifact
+          path: ${{ env.ARTIFACTS_DIR }}
+
+      - name: Run river review verify
+        id: run-verify
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -o pipefail
+          if [ "$PLANGATE_REVIEW_CLI_READY" = 'true' ]; then
+            # verify サブコマンドは Review Artifact を読み取り、severity 集計と
+            # fail/warn 判定を行う想定 (spec: #511 / #517 / #518)。
+            npx --no-install river review verify \
+              --input "$EXEC_JSON" \
+              --output "$VERIFY_JSON" \
+              --fail-on critical \
+              --warn-on major
+          else
+            echo "PlanGate verify CLI is not yet implemented (tracking: #509)."
+            # Review Artifact から severity を自前で集計してプレースホルダを生成。
+            node <<'NODE'
+          const fs = require('node:fs');
+          const path = process.env.EXEC_JSON;
+          const out = process.env.VERIFY_JSON;
+          let artifact = { findings: [] };
+          try {
+            artifact = JSON.parse(fs.readFileSync(path, 'utf8'));
+          } catch (err) {
+            console.warn(`Failed to parse ${path}: ${err.message}`);
+          }
+          const findings = Array.isArray(artifact.findings) ? artifact.findings : [];
+          const counts = { critical: 0, major: 0, minor: 0, info: 0 };
+          for (const f of findings) {
+            const sev = counts[f?.severity] !== undefined ? f.severity : 'major';
+            counts[sev] += 1;
+          }
+          const decision = counts.critical > 0 ? 'fail'
+            : counts.major > 0 ? 'warn'
+            : 'pass';
+          fs.writeFileSync(out, JSON.stringify({
+            version: '1',
+            decision,
+            counts,
+            source: path,
+            note: 'placeholder verify (CLI not ready, #509)'
+          }, null, 2));
+          console.log(`verify decision=${decision} counts=${JSON.stringify(counts)}`);
+          NODE
+          fi
+
+      - name: Evaluate severity policy
+        id: policy
+        env:
+          # severity ごとの CI ポリシー (spec: cli-review-plan-spec.md)。
+          # critical: fail / major: fail-if-required (現状 warn) / minor: comment-only / info: skipped
+          FAIL_ON: critical
+          WARN_ON: major
+        run: |
+          set -o pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const verifyPath = process.env.VERIFY_JSON;
+          const execPath = process.env.EXEC_JSON;
+          const failOn = process.env.FAIL_ON;
+          const warnOn = process.env.WARN_ON;
+
+          const order = ['info', 'minor', 'major', 'critical'];
+          const rank = (s) => {
+            const i = order.indexOf(s);
+            return i >= 0 ? i : order.indexOf('major'); // unknown -> major (fail-safe)
+          };
+
+          let verify = {};
+          try {
+            verify = JSON.parse(fs.readFileSync(verifyPath, 'utf8'));
+          } catch (err) {
+            console.warn(`verify artifact missing/invalid: ${err.message}`);
+          }
+
+          let counts = verify.counts;
+          if (!counts) {
+            let artifact = { findings: [] };
+            try {
+              artifact = JSON.parse(fs.readFileSync(execPath, 'utf8'));
+            } catch (err) {
+              console.warn(`review artifact missing/invalid: ${err.message}`);
+            }
+            counts = { critical: 0, major: 0, minor: 0, info: 0 };
+            for (const f of (artifact.findings || [])) {
+              const sev = counts[f?.severity] !== undefined ? f.severity : 'major';
+              counts[sev] += 1;
+            }
+          }
+
+          const exceeds = (sev) =>
+            order.slice(rank(sev)).some((s) => (counts[s] || 0) > 0);
+
+          let decision = 'pass';
+          if (exceeds(failOn)) decision = 'fail';
+          else if (exceeds(warnOn)) decision = 'warn';
+
+          const summary = [
+            `PlanGate review decision: **${decision}**`,
+            '',
+            '| severity | count | policy |',
+            '| --- | --- | --- |',
+            `| critical | ${counts.critical || 0} | fail |`,
+            `| major | ${counts.major || 0} | fail-if-required / warn |`,
+            `| minor | ${counts.minor || 0} | comment-only |`,
+            `| info | ${counts.info || 0} | skipped |`,
+          ].join('\n');
+
+          fs.writeFileSync(process.env.SUMMARY_MD, summary + '\n');
+          const gh = process.env.GITHUB_OUTPUT;
+          fs.appendFileSync(gh, `decision=${decision}\n`);
+          fs.appendFileSync(gh, `critical=${counts.critical || 0}\n`);
+          fs.appendFileSync(gh, `major=${counts.major || 0}\n`);
+          fs.appendFileSync(gh, `minor=${counts.minor || 0}\n`);
+          fs.appendFileSync(gh, `info=${counts.info || 0}\n`);
+          console.log(summary);
+          NODE
+
+      - name: Upload verify artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: plangate-verify
+          path: |
+            ${{ env.VERIFY_JSON }}
+            ${{ env.SUMMARY_MD }}
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Post / update PR comment
+        if: always() && github.event.pull_request.number != null
+        uses: actions/github-script@v9
+        env:
+          DECISION: ${{ steps.policy.outputs.decision }}
+          CRITICAL: ${{ steps.policy.outputs.critical }}
+          MAJOR: ${{ steps.policy.outputs.major }}
+          MINOR: ${{ steps.policy.outputs.minor }}
+          INFO: ${{ steps.policy.outputs.info }}
+          PLAN_STATUS: ${{ needs.plan-review.outputs.plan_status }}
+          EXEC_STATUS: ${{ needs.exec-review.outputs.exec_status }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('node:fs');
+            const MARKER = '<!-- plangate-review -->';
+            const summaryPath = process.env.SUMMARY_MD;
+            let summary = '';
+            try {
+              summary = fs.readFileSync(summaryPath, 'utf8');
+            } catch (err) {
+              summary = '_summary not generated._';
+            }
+
+            const body = [
+              MARKER,
+              '### PlanGate Review',
+              '',
+              `- decision: **${process.env.DECISION || 'unknown'}**`,
+              `- plan status: \`${process.env.PLAN_STATUS || 'unknown'}\``,
+              `- exec status: \`${process.env.EXEC_STATUS || 'unknown'}\``,
+              '',
+              summary,
+              '',
+              '<sub>ポリシー: critical=fail / major=fail-if-required (warn) / minor=comment-only / info=skipped — spec: `pages/reference/cli-review-plan-spec.md`</sub>',
+            ].join('\n');
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number, per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => typeof c.body === 'string' && c.body.includes(MARKER),
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner, repo, comment_id: existing.id, body,
+              });
+              core.info(`Updated PlanGate review comment (${existing.id}).`);
+            } else {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number, body,
+              });
+              core.info('Created PlanGate review comment.');
+            }
+
+      - name: Apply severity policy
+        env:
+          DECISION: ${{ steps.policy.outputs.decision }}
+        run: |
+          case "$DECISION" in
+            fail)
+              echo "::error::PlanGate review found critical findings; failing the workflow."
+              exit 1
+              ;;
+            warn)
+              echo "::warning::PlanGate review found major findings (warn only)."
+              ;;
+            pass|'')
+              echo "PlanGate review passed (or no findings)."
+              ;;
+            *)
+              echo "::warning::Unknown decision '${DECISION}'; treating as warn (fail-safe)."
+              ;;
+          esac
