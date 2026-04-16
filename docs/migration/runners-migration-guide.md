@@ -2,9 +2,11 @@
 
 This guide helps you migrate from River Reviewer v0.1.x to v0.2.0+, which introduces the new runners architecture.
 
+> **Status (as of 2026-04):** The current release line is **v0.12.x**, distributed under `runners/github-action`. v0.1.x is a legacy frozen release that predates the runners architecture and receives no further updates. If you are still pinned to `@v0.1.x`, follow this guide to move to the latest release tag (see [README](../../README.md) for the current version).
+
 ## Overview
 
-River Reviewer v0.2.0 refactors the codebase to clearly separate skills (the product) from execution environments (adapters). This change aligns with the "Skills as First-Class Assets" philosophy established in Epic #225.
+River Reviewer v0.2.0 refactored the codebase to clearly separate skills (the product) from execution environments (adapters). This change aligns with the "Skills as First-Class Assets" philosophy established in Epic #225.
 
 ## What Changed?
 
@@ -249,13 +251,13 @@ If migration causes problems:
 
 ### Q: Do I need to migrate immediately?
 
-**A:** No. If you're using v0.1.x with the old path (`@v0.1.1`), it will continue to work. However:
+**A:** Yes—v0.1.x is a frozen legacy release and is no longer maintained as of the v0.12 line. While the v0.1.1 tag still resolves and the action _may_ continue to execute, no further fixes (including security fixes) are being shipped against it. Migrate to the current release tag at your earliest opportunity. See [README](../../README.md) for the latest tag.
 
-- New features and fixes will only be added to v0.2.0+
-- You'll miss out on new interfaces (CLI, Node API)
-- Migration will be required eventually for security updates
+What you miss while staying on v0.1.x:
 
-**Recommendation:** Migrate when convenient, ideally within 1-2 months.
+- All features and fixes shipped in v0.2.0–v0.12.x (planner / Riverbed Memory v1 / Agent Skills bridge / Codex CLI integration / etc.)
+- New interfaces (CLI runner, Node API)
+- Compatibility with current schemas (`skills/`, `schemas/`)
 
 ### Q: Will my existing skills break?
 
@@ -266,10 +268,7 @@ If migration causes problems:
 
 ### Q: Can I use both versions simultaneously?
 
-**A:** Not recommended. Mixing versions can cause confusion. Choose one:
-
-- **Stick with v0.1.1:** Keep old path, no migration needed (frozen version)
-- **Migrate to v0.2.0+:** New path, access to new features
+**A:** Not recommended. Mixing versions causes confusion and v0.1.x is unmaintained. Pin every workflow to the current release tag (see [README](../../README.md)) under the `runners/github-action` path.
 
 ### Q: What if I have custom forks?
 
@@ -293,14 +292,15 @@ See [Epic #242](https://github.com/s977043/river-reviewer/issues/242) for implem
 
 ## Timeline
 
-| Date       | Event                           |
-| ---------- | ------------------------------- |
-| 2025-12-29 | v0.2.0 released with new paths  |
-| 2026-01-29 | Migration recommended (1 month) |
-| 2026-02-28 | Migration encouraged (2 months) |
-| TBD        | v0.1.x support ends (v1.0.0+)   |
+| Date       | Event                                                                |
+| ---------- | -------------------------------------------------------------------- |
+| 2025-12-29 | v0.2.0 released with new paths                                       |
+| 2026-01-29 | Migration recommended (1 month)                                      |
+| 2026-02-28 | Migration encouraged (2 months)                                      |
+| 2026-04    | v0.12.x is the current release line; v0.1.x is unmaintained (frozen) |
+| TBD        | v0.1.x tags may eventually be removed (v1.0.0+)                      |
 
-v0.1.x will receive critical security fixes only. All feature development happens on v0.2.0+.
+All feature and fix development happens on the current release line. v0.1.x receives no further updates.
 
 ## Additional Resources
 
