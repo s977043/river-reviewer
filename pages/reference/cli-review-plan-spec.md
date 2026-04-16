@@ -117,16 +117,16 @@ JSON 出力は **唯一の安定 machine-readable 契約** とする。後続パ
 | `warn`     | `--fail-on` 未満かつ `--warn-on` 以上（既定 `major`）の finding が 1 件以上                           | exit `2` で終了。CI 設定で扱いを選択可能。 |
 | `advisory` | 上記いずれにも該当しないが finding が存在する（`minor` / `info` のみ、または `--advisory-only` 指定） | exit `0` で終了。情報提供のみ。            |
 
-severity の内部語彙（`blocker` / `warning` / `nit`）と JSON スキーマ語彙（`critical` / `major` / `minor` / `info`）の対応は `.claude/rules/review-core.md` を参照する。不明な severity 値は fail-safe として `major` に分類される。
+severity の内部語彙（`blocker` / `warning` / `nit`）と JSON スキーマ語彙（`critical` / `major` / `minor` / `info`）の対応は `.claude/rules/review-core.md` を参照する。JSON スキーマ語彙のうち `info` は内部語彙に直接対応するトークンを持たず、severity が未指定の finding（`.claude/rules/review-core.md` の「(なし)」列）に割り当てられる補助レベルで、現時点では内部語彙からの変換には使用されない。不明な severity 値は fail-safe として `major` に分類される。
 
 ## 終了コード
 
-| Exit | 意味                                                                                           |
-| ---- | ---------------------------------------------------------------------------------------------- |
-| `0`  | 成功。`status` が `ok` / `no-changes` / `skipped-by-label` で、かつ fail / warn 判定なし。     |
-| `1`  | 失敗。`--fail-on` 閾値到達、必須 artifact 欠損、計画/実行エラー、`--max-cost` 超過、いずれか。 |
-| `2`  | 警告のみ。`--warn-on` 閾値に達したが `--fail-on` には届かない finding が存在する。             |
-| `3`  | 設定エラー。引数バリデーション失敗、設定ファイル読み込み失敗など。                             |
+| Exit | 意味                                                                                                                         |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `0`  | 成功。`status` が `ok` / `no-changes` / `skipped-by-label` で、かつ fail / warn 判定なし。                                   |
+| `1`  | 失敗。`--fail-on` 閾値到達（`--advisory-only` 未指定時）、必須 artifact 欠損、計画/実行エラー、`--max-cost` 超過、いずれか。 |
+| `2`  | 警告のみ。`--warn-on` 閾値に達したが `--fail-on` には届かない finding が存在する。                                           |
+| `3`  | 設定エラー。引数バリデーション失敗、設定ファイル読み込み失敗など。                                                           |
 
 `--advisory-only` を指定した場合、`fail` / `warn` 判定は無効化され、内部エラー（artifact 欠損・実行エラー）以外は常に exit `0`。
 

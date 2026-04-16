@@ -51,14 +51,14 @@ Resolution order matches Artifact Input Contract "Input Channels" (CLI args → 
 
 ### Plan control
 
-| Option                 | Type    | Default     | Description                                                                                            |
-| ---------------------- | ------- | ----------- | ------------------------------------------------------------------------------------------------------ |
-| `--phase <value>`      | enum    | `midstream` | One of `upstream` / `midstream` / `downstream`. Review phase.                                          |
-| `--planner <value>`    | enum    | `off`       | One of `off` / `order` / `prune`. AI planner mode.                                                     |
-| `--plan-only`          | flag    | false       | Generate the plan only; do not execute skills. `status` becomes `ok` and `findings` is an empty array. |
-| `--include-skill <id>` | repeat. | -           | Skill ID that must be included in the plan.                                                            |
-| `--exclude-skill <id>` | repeat. | -           | Skill ID to exclude from the plan.                                                                     |
-| `--max-cost <usd>`     | number  | -           | If estimated cost exceeds this threshold, abort without executing and exit with code `1`.              |
+| Option                 | Type       | Default     | Description                                                                                            |
+| ---------------------- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------ |
+| `--phase <value>`      | enum       | `midstream` | One of `upstream` / `midstream` / `downstream`. Review phase.                                          |
+| `--planner <value>`    | enum       | `off`       | One of `off` / `order` / `prune`. AI planner mode.                                                     |
+| `--plan-only`          | flag       | false       | Generate the plan only; do not execute skills. `status` becomes `ok` and `findings` is an empty array. |
+| `--include-skill <id>` | repeatable | -           | Skill ID that must be included in the plan.                                                            |
+| `--exclude-skill <id>` | repeatable | -           | Skill ID to exclude from the plan.                                                                     |
+| `--max-cost <usd>`     | number     | -           | If estimated cost exceeds this threshold, abort without executing and exit with code `1`.              |
 
 ### Output control
 
@@ -117,16 +117,16 @@ JSON output is the **single stable machine-readable contract**. Downstream pipel
 | `warn`     | One or more findings below `--fail-on` but at or above `--warn-on` (default `major`). | Exit `2`. CI may choose how to treat it. |
 | `advisory` | Neither of the above; only `minor` / `info` findings, or `--advisory-only` is set.    | Exit `0`. Informational only.            |
 
-The mapping between internal severity tokens (`blocker` / `warning` / `nit`) and JSON schema tokens (`critical` / `major` / `minor` / `info`) is defined in `.claude/rules/review-core.md`. Unknown severity values fall back to `major` for safety.
+The mapping between internal severity tokens (`blocker` / `warning` / `nit`) and JSON schema tokens (`critical` / `major` / `minor` / `info`) is defined in `.claude/rules/review-core.md`. Among the JSON schema tokens, `info` has no direct internal counterpart; it is the auxiliary level assigned to findings without a severity token (the "(なし)" row in `.claude/rules/review-core.md`) and is not produced by any internal-token conversion today. Unknown severity values fall back to `major` for safety.
 
 ## Exit Codes
 
-| Exit | Meaning                                                                                              |
-| ---- | ---------------------------------------------------------------------------------------------------- |
-| `0`  | Success. `status` is `ok` / `no-changes` / `skipped-by-label`, with no fail/warn findings.           |
-| `1`  | Failure. Reached `--fail-on` threshold, required artifact missing, plan/exec error, or `--max-cost`. |
-| `2`  | Warn-only. `--warn-on` threshold reached but `--fail-on` not met.                                    |
-| `3`  | Configuration error. Argument validation failed, config could not be loaded, etc.                    |
+| Exit | Meaning                                                                                                                         |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `0`  | Success. `status` is `ok` / `no-changes` / `skipped-by-label`, with no fail/warn findings.                                      |
+| `1`  | Failure. Reached `--fail-on` threshold (unless `--advisory-only`), required artifact missing, plan/exec error, or `--max-cost`. |
+| `2`  | Warn-only. `--warn-on` threshold reached but `--fail-on` not met.                                                               |
+| `3`  | Configuration error. Argument validation failed, config could not be loaded, etc.                                               |
 
 When `--advisory-only` is set, fail/warn judgement is disabled and only internal errors (missing artifacts, execution errors) yield non-zero exit.
 
