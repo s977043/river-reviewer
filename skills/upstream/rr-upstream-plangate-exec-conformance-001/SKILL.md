@@ -93,17 +93,17 @@ Why: plan/todo/test-cases を基準として差分を突き合わせる照合型
 ## Output / 出力
 
 - すべて日本語。コメントは River Reviewer の `<file>:<line>: <message>` 形式。
-- severity マッピング（`review-core` 準拠）:
-  - `blocker` (出力スキーマ上は `critical`): plan の明示的な方針に反する破壊的変更、todo 完了マーク済みだが未実装。
-  - `warning` (`major`): 計画外の依存追加、test-cases 宣言分のテスト欠落、影響範囲外への意図外変更。
-  - `nit` (`minor`): 軽微な命名・配置の計画との差異。
-  - (severity なし = `info`): 参考情報や補足の質問。
+- severity は内部語彙 `blocker|warning|nit` を使用し、スキーマ側 `critical|major|minor|info` への変換は `review-core` ルールに委ねる。分類ガイド:
+  - `blocker`: plan の明示的な方針に反する破壊的変更、todo 完了マーク済みだが未実装。
+  - `warning`: 計画外の依存追加、test-cases 宣言分のテスト欠落、影響範囲外への意図外変更。
+  - `nit`: 軽微な命名・配置の計画との差異。
+  - severity 省略: 参考情報や補足の質問。
 - サマリ行: `(summary):1: 方針整合 <件数> / todo 網羅 <件数> / テスト整合 <件数> / 質問 <件数>`
 - 個別 finding の推奨構造:
   - Finding: 何がどの artifact とどう食い違うか（1 文）。
   - Evidence: `diff: <file>:<line>` と `plan|todo|test-cases: <見出しまたは行>`。
   - Fix: 最小の是正案（実装追加 / plan 追記 / スコープ分割など）。
-- 質問は `[q] <確認したいこと>` 形式で別セクションに集約する。
+- 質問は `(questions):1: [q] <確認したいこと>` のように疑似ファイル名付きで 1 件 1 行で出力する（パーサが `<file>:<line>: <message>` 形式のみ抽出するため、自由文の別セクションは無視される）。
 
 ## Heuristics / 判定の手がかり
 
