@@ -3,7 +3,9 @@ id: intro
 title: River Reviewer へようこそ
 ---
 
-River Reviewer (RR) は、**Upstream → Midstream → Downstream** の流れに沿ってチームのレビュー観点を整理・実行するためのフレームワークです。スキルは YAML フロントマター + Markdown で記述し、`schemas/skill.schema.json` で検証します。
+River Reviewer (RR) は **Context Engineering に基づく Skill Registry 中心のコードレビューフレームワーク**です。チーム固有の暗黙知を再利用可能な「Agent Skills」として明示化・バージョン管理し、**Upstream → Midstream → Downstream** の流れに沿って実行します。
+
+スキルは YAML フロントマター + Markdown で記述し、`schemas/skill.schema.json` で検証します。
 
 このドキュメントでは以下をカバーします。
 

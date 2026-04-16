@@ -3,7 +3,9 @@ id: what-is-river-reviewer
 title: River Reviewer とは
 ---
 
-River Reviewer は、上流 (upstream)、中流 (midstream)、下流 (downstream) の3フェーズに沿ってレビュー観点を運び続けるフロー型のエージェントです。
+River Reviewer は **Context Engineering に基づく Skill Registry 中心のコードレビューフレームワーク**です。上流 (upstream)、中流 (midstream)、下流 (downstream) の 3 フェーズに沿って、レビュー観点を「Agent Skills」として運び続けるフロー型のエージェントです。
+
+チーム固有の判断基準・手順といった暗黙知を、バージョン管理可能な「Agent Skills」として定義することで、レビューの再現性と運用コストを両立します。
 
 ## 目的
 
