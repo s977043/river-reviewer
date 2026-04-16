@@ -20,15 +20,16 @@
 
 ## サブコマンド対応表
 
-| 用途                                | メイン CLI                                          | Runner CLI                             |
-| ----------------------------------- | --------------------------------------------------- | -------------------------------------- |
-| ローカル差分のレビュー実行          | `river run <path>`                                  | `river review [files...]` (簡易確認用) |
-| スキルファイル単体の検証            | `river skills list` / `npm run skills:validate`     | `river eval <skill>`                   |
-| 全スキル評価                        | `npm run eval:all` (`scripts/evaluate-all.mjs`)     | `river eval --all`                     |
-| 新規スキルの雛形生成                | `npm run create:skill` (`scripts/create-skill.mjs`) | `river create skill` (interactive)     |
-| Agent Skills の入出力               | `river skills import` / `river skills export`       | (なし)                                 |
-| 設定診断                            | `river doctor <path>`                               | (なし)                                 |
-| Fixtures eval (must_include checks) | `river eval --cases <path>`                         | (なし)                                 |
+| 用途                                | メイン CLI                                                                | Runner CLI                             |
+| ----------------------------------- | ------------------------------------------------------------------------- | -------------------------------------- |
+| ローカル差分のレビュー実行          | `river run <path>`                                                        | `river review [files...]` (簡易確認用) |
+| スキル一覧表示                      | `river skills list` (RR + Agent Skills 一覧)                              | (なし)                                 |
+| スキルファイル単体の検証            | `npm run skills:validate` (リポジトリ全体、`scripts/validate-skills.mjs`) | `river eval <skill>`                   |
+| 全スキル評価                        | `npm run eval:all` (`scripts/evaluate-all.mjs`)                           | `river eval --all`                     |
+| 新規スキルの雛形生成                | `npm run create:skill` (`scripts/create-skill.mjs`)                       | `river create skill` (interactive)     |
+| Agent Skills の入出力               | `river skills import` / `river skills export`                             | (なし)                                 |
+| 設定診断                            | `river doctor <path>`                                                     | (なし)                                 |
+| Fixtures eval (must_include checks) | `river eval --cases <path>`                                               | (なし)                                 |
 
 「同じ名前で別物」なサブコマンド (`eval`) があるため、ドキュメントでは必ずどちらの CLI かを明示する。
 
@@ -42,12 +43,12 @@
 
 - メイン CLI のオプション仕様: `pages/reference/stable-interfaces.md` § "CLI (`river`) リファレンス（最小）"
 - Runner CLI のヘルプ: `runners/cli/README.md`
-- スキーマ検証コマンドの導入: `pages/reference/runner-cli-reference.md`
+- スキーマ検証コマンド (Python ランナー / `npm run *:validate`): `pages/reference/runner-cli-reference.md` (注: タイトルは「Runner CLI リファレンス」だが内容は本ドキュメントで言う「Runner CLI = `runners/cli/`」とは別物で、Python 製のスキーマ検証スクリプト群を扱う)
 - 新スキル作成手順: `pages/guides/add-new-skill.md`
 
 ## 既知の境界 / 注意点
 
 - ルートの `package.json#bin` がメイン CLI (`src/cli.mjs`) にしか登録されていないため、`npx river review …` は **Runner CLI ではなくメイン CLI** に解釈され、メイン CLI には `review` コマンドが無いので unknown command エラーになる。Runner CLI を呼ぶ場合は `node runners/cli/bin/river …` あるいは `runners/cli` 内で `npm exec river …` を使う。
 - GitHub Action は `runners/github-action/dist/` 配下のバンドル済み JS を実行するため、`runners/github-action/src/**` を変更したら `npm run build:action` で `dist/` を再生成しないと CI の "Action dist freshness" が落ちる (`docs/development/dist-check-rebuild-guide.md` 参照)。
-- 両 CLI ともデフォルト `phase` は `midstream`。`RIVER_PHASE` 環境変数はメイン CLI でのみ参照される (Runner CLI は `--phase` 明示が必要)。
+- 両 CLI ともデフォルト `phase` は `midstream`。`RIVER_PHASE` / `RIVER_PLANNER_MODE` / `RIVER_AVAILABLE_CONTEXTS` / `RIVER_AVAILABLE_DEPENDENCIES` などの `RIVER_*` 環境変数はメイン CLI でのみ参照される (Runner CLI は対応する `--phase` / `--context` / `--dependency` オプションでの明示が必要)。
 - Runner CLI は `commander` の自動 help を使うため、メイン CLI の `printHelp()` (`src/cli.mjs`) と書式が揃っていない。両ヘルプを同期する責務は今のところ無い。
