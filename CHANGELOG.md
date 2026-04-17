@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.13.0](https://github.com/s977043/river-reviewer/compare/v0.12.0...v0.13.0) (2026-04-16)
+
+
+### Features
+
+* **ci:** add nightly eval workflow for review quality monitoring ([#458](https://github.com/s977043/river-reviewer/issues/458)) ([daa0833](https://github.com/s977043/river-reviewer/commit/daa0833d8515307ef49d0a51ddfd4ebff59db5bb))
+* **ci:** add PlanGate PR review workflow (closes [#521](https://github.com/s977043/river-reviewer/issues/521)) ([#572](https://github.com/s977043/river-reviewer/issues/572)) ([d6b5405](https://github.com/s977043/river-reviewer/commit/d6b540566d7499dcd98c47cab275e976366cfc0b))
+* **ci:** add weekly GC workflow for deterministic maintenance checks ([#570](https://github.com/s977043/river-reviewer/issues/570)) ([a01992f](https://github.com/s977043/river-reviewer/commit/a01992f583da029e9c30be6931c1db02191acc94)), closes [#522](https://github.com/s977043/river-reviewer/issues/522)
+* **ci:** introduce setup-node-deps composite action and apply CI best practices ([#528](https://github.com/s977043/river-reviewer/issues/528)) ([39fe95f](https://github.com/s977043/river-reviewer/commit/39fe95f252fcb5e8f2d37ec688f648848b4bd7ed))
+* **commands:** add /preflight to verify task state before multi-PR work ([#501](https://github.com/s977043/river-reviewer/issues/501)) ([6268549](https://github.com/s977043/river-reviewer/commit/62685491e47387977cd430d6edf22eced8e787a2))
+* **eval:** add eval ledger section to PR template ([#454](https://github.com/s977043/river-reviewer/issues/454)) ([5e0ba5c](https://github.com/s977043/river-reviewer/commit/5e0ba5c3cc11cb15857063f7221adcab64d28a03)), closes [#438](https://github.com/s977043/river-reviewer/issues/438)
+* **evals:** add nightly measure and audit pipeline ([#433](https://github.com/s977043/river-reviewer/issues/433)) ([1c802fc](https://github.com/s977043/river-reviewer/commit/1c802fca42effc2b4ff66a613999cce20ef098e0))
+* **evals:** add risk-map and memory-fallback regression eval fixtures ([#469](https://github.com/s977043/river-reviewer/issues/469)) ([3ddc973](https://github.com/s977043/river-reviewer/commit/3ddc973343fdeef3c9f8005d1531f7fa81554443)), closes [#435](https://github.com/s977043/river-reviewer/issues/435)
+* **memory:** add memory-context bridge for pipeline integration ([#432](https://github.com/s977043/river-reviewer/issues/432)) ([e1aee7e](https://github.com/s977043/river-reviewer/commit/e1aee7e76cfaf7eb5ff590a92eedbaa97de390ae))
+* **policy:** add risk map and escalation policy ([#462](https://github.com/s977043/river-reviewer/issues/462)) ([9c560de](https://github.com/s977043/river-reviewer/commit/9c560de80cf3b3a5329c839554a78d792e81c554))
+* **policy:** add suppression and resurfacing mechanism ([#434](https://github.com/s977043/river-reviewer/issues/434)) ([4b6029b](https://github.com/s977043/river-reviewer/commit/4b6029b5b9c32d5b048cb8415c3bc38986852a3e))
+* progressive disclosure を明示的なスキルローディング原則として導入 ([#459](https://github.com/s977043/river-reviewer/issues/459)) ([37fcb37](https://github.com/s977043/river-reviewer/commit/37fcb374ce8a1e8fab5f5803ab10f08f69f770af))
+* **review:** integrate adr-linker into review pipeline ([#456](https://github.com/s977043/river-reviewer/issues/456)) ([1a35681](https://github.com/s977043/river-reviewer/commit/1a35681092a26bffed0bb359b91707943a100034))
+* **review:** integrate file-classifier into verifier with debug output ([#457](https://github.com/s977043/river-reviewer/issues/457)) ([e1d3f42](https://github.com/s977043/river-reviewer/commit/e1d3f427e3c51a6d55e8ddb4171e6d516f31252f))
+* Riverbed Memory v1 ライフサイクルと置換モデルを実装 ([#474](https://github.com/s977043/river-reviewer/issues/474)) ([f222087](https://github.com/s977043/river-reviewer/commit/f222087ac54f8243dd517045923bf89d56270aff))
+* **schema:** add review-audit to outputKind enum (closes [#585](https://github.com/s977043/river-reviewer/issues/585)) ([#587](https://github.com/s977043/river-reviewer/issues/587)) ([1559408](https://github.com/s977043/river-reviewer/commit/155940864e40d92b5ae7b7e7c949881ce994c6a9))
+* **skill:** add PlanGate evals fixtures (closes [#523](https://github.com/s977043/river-reviewer/issues/523)) ([#574](https://github.com/s977043/river-reviewer/issues/574)) ([ef3f386](https://github.com/s977043/river-reviewer/commit/ef3f386d884fb0fa065fc231ae56f166f662f144))
+* **skill:** add plangate-exec-conformance spec ([#561](https://github.com/s977043/river-reviewer/issues/561)) ([de20ba1](https://github.com/s977043/river-reviewer/commit/de20ba121e298a6638e250df0f965a25c8c8df97)), closes [#520](https://github.com/s977043/river-reviewer/issues/520)
+* **skill:** add plangate-plan-integrity spec ([#560](https://github.com/s977043/river-reviewer/issues/560)) ([448ecb9](https://github.com/s977043/river-reviewer/commit/448ecb9ef70edad67bfe85c7b425bc0ad3cda69d))
+* 構造化レビューアーティファクトスキーマを追加 ([#460](https://github.com/s977043/river-reviewer/issues/460)) ([0cf1e2f](https://github.com/s977043/river-reviewer/commit/0cf1e2f13ecba2fcb89cbf80f58053d8803f0d2c))
+* 評価を多次元レビュールーブリックに拡張 ([#470](https://github.com/s977043/river-reviewer/issues/470)) ([fc6bba6](https://github.com/s977043/river-reviewer/commit/fc6bba678e3f168bea51736a83f7793d65b62b83))
+
+
+### Bug Fixes
+
+* **ci:** grant id-token: write to unit-tests for codecov OIDC ([#546](https://github.com/s977043/river-reviewer/issues/546)) ([81127bc](https://github.com/s977043/river-reviewer/commit/81127bc14fd25f36804f82aef404f1ddaeb2deb0)), closes [#545](https://github.com/s977043/river-reviewer/issues/545)
+* **docs:** clarify that review pipeline is OpenAI-only ([#490](https://github.com/s977043/river-reviewer/issues/490)) ([5fed8c1](https://github.com/s977043/river-reviewer/commit/5fed8c1da37e7c51e9eb47b0b31222bb13e4788c))
+* **eval:** rubric schema scope, direction field, terminology, integrity tests ([#547](https://github.com/s977043/river-reviewer/issues/547)) ([f869ecb](https://github.com/s977043/river-reviewer/commit/f869ecb05e164476f7c683a9689f981edde0daa4)), closes [#481](https://github.com/s977043/river-reviewer/issues/481)
+* **evals:** prevent stderr leak and silent failure in nightly-audit ([#472](https://github.com/s977043/river-reviewer/issues/472)) ([#473](https://github.com/s977043/river-reviewer/issues/473)) ([8ba8d8c](https://github.com/s977043/river-reviewer/commit/8ba8d8c9925bde340a704c28e19dc2a8ac4b8754))
+* **review:** align silent-catch heuristic severity with skill severity ([#494](https://github.com/s977043/river-reviewer/issues/494)) ([dfbae3b](https://github.com/s977043/river-reviewer/commit/dfbae3b0b467c3575f2a4ae928976af497c7fae4))
+* **schema:** align riverbed-index schema with v1 inline-entries impl (closes [#565](https://github.com/s977043/river-reviewer/issues/565)) ([#566](https://github.com/s977043/river-reviewer/issues/566)) ([432ea5f](https://github.com/s977043/river-reviewer/commit/432ea5f035b8a90dae099ad26d13f54e6097472b))
+* **schemas:** tighten review-artifact schema and add ajv validation tests ([#548](https://github.com/s977043/river-reviewer/issues/548)) ([f2b08da](https://github.com/s977043/river-reviewer/commit/f2b08dab7ec9d2521248255531238c640494ba7e))
+* **scripts:** respect --check flag and skip markdown table rows ([#504](https://github.com/s977043/river-reviewer/issues/504)) ([5583f80](https://github.com/s977043/river-reviewer/commit/5583f80febeca1bf58f751ed24d5546e872a87c9))
+
 ## [0.12.0](https://github.com/s977043/river-reviewer/compare/v0.11.0...v0.12.0) (2026-04-07)
 
 
