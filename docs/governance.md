@@ -41,6 +41,28 @@ gh pr checks <N> --json name,bucket --jq '.[] | select(.bucket != "skipping")'
 - `SKIPPED` チェックは `bucket == "skipping"` で除外できます。
 - 必須チェック (`Lint`, `Unit tests` など) が pre-existing 失敗の場合も、本 PR を直接マージしてはいけません。`main` 向けの fix PR を先に出して main を green に戻し、その後本 PR をリベースしてマージします。
 
+#### 1.1 Branch protection の概要
+
+main ブランチには GitHub branch protection rule により以下の Required status check が設定されています（#483 で導入）。これらが `pass` でない限りマージできません。
+
+- `Lint`
+- `Unit tests (20.x)` / `Unit tests (22.x)`
+- `Skill schema validation`
+- `Meta consistency`
+- `Action dist freshness`
+- `Integration (CLI)`
+
+`strict: true` で PR が最新 main にリベース済みであることが求められ、`enforce_admins: true` のためメンテナも bypass できません。`allow_force_pushes: false` / `allow_deletions: false` により main への force push / 削除も不可です。
+
+現在の設定の確認:
+
+```bash
+gh api /repos/s977043/river-reviewer/branches/main/protection --jq \
+  '{checks: .required_status_checks.contexts, strict: .required_status_checks.strict, enforce_admins: .enforce_admins.enabled}'
+```
+
+リリース等で一時的に無効化が必要な場合は、`gh api -X PUT .../protection` でルールを編集してから実行し、終了後に再有効化します。設定の技術詳細は Issue #483 を参照。
+
 #### 2. レビュアーコメントの確認
 
 CI green は line-level コメント（`Copilot`, `sentry[bot]`, 人間レビュアー）を覆いません。マージ前には次節「レビュアーコメントの扱い」の手順で全件を列挙し、disposition を確定させてください。
