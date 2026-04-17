@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.1](https://github.com/s977043/river-reviewer/compare/v0.13.0...v0.13.1) (2026-04-17)
+
+
+### Bug Fixes
+
+* **docs:** bump action tag references to v0.13.0 ([#590](https://github.com/s977043/river-reviewer/issues/590)) ([adf3b7d](https://github.com/s977043/river-reviewer/commit/adf3b7d8c575769b0c89808a96a56143b845c4f9))
+
 ## [0.13.0](https://github.com/s977043/river-reviewer/compare/v0.12.0...v0.13.0) (2026-04-16)
 
 
