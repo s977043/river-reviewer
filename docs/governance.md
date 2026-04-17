@@ -57,7 +57,7 @@ main ブランチには GitHub branch protection rule により以下の Require
 現在の設定の確認:
 
 ```bash
-gh api /repos/s977043/river-reviewer/branches/main/protection --jq \
+gh api 'repos/:owner/:repo/branches/main/protection' --jq \
   '{checks: .required_status_checks.contexts, strict: .required_status_checks.strict, enforce_admins: .enforce_admins.enabled}'
 ```
 
