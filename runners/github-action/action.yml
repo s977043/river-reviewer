@@ -38,7 +38,7 @@ inputs:
     required: false
     default: '22'
   output_format:
-    description: 'Output format (text|markdown|json).'
+    description: 'Output format (text|markdown|json|yaml).'
     required: false
     default: 'markdown'
 outputs:

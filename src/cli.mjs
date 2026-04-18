@@ -20,6 +20,8 @@ import { ProjectRulesError } from './lib/rules.mjs';
 import { RiskMapError } from './lib/risk-map.mjs';
 import { parseList } from './lib/utils.mjs';
 import { PLANNER_MODES } from './lib/planner-utils.mjs';
+import { scoreReview } from './lib/scoring/engine.mjs';
+import { AXES, AXIS_LABELS_JA } from './lib/scoring/rubric.mjs';
 
 const MAX_PROMPT_PREVIEW_LENGTH = 800;
 const MAX_DIFF_PREVIEW_LINES = 200;
@@ -60,7 +62,7 @@ Options:
   --debug           Print debug information (merge base, files, token estimate)
   --estimate        Print cost estimate only (no review)
   --max-cost <usd>  Abort if estimated cost exceeds this USD amount
-  --output <mode>   Output format: text|markdown|json. Default: text
+  --output <mode>   Output format: text|markdown|json|yaml. Default: text
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
@@ -176,8 +178,10 @@ function parseArgs(argv) {
         break;
       }
       const mode = value.toLowerCase();
-      if (!['text', 'markdown', 'json'].includes(mode)) {
-        console.error(`Error: --output must be one of: text, markdown, json (got "${value}").`);
+      if (!['text', 'markdown', 'json', 'yaml'].includes(mode)) {
+        console.error(
+          `Error: --output must be one of: text, markdown, json, yaml (got "${value}").`
+        );
         parsed.command = 'help';
         break;
       }
@@ -428,8 +432,31 @@ ${formatDebugSummaryMarkdown(result)}
 `;
   const planSection = formatPlanMarkdown(result.plan);
   const riskSection = formatRiskSummaryMarkdown(result.plan);
+  const scoreSection = formatScoreSectionMarkdown(result, phase);
   const findings = `### 指摘\n${formatCommentsMarkdown(result.comments)}\n`;
-  console.log([header, planSection, riskSection, findings].join('\n'));
+  console.log(
+    [header, planSection, riskSection, scoreSection, findings].filter(Boolean).join('\n')
+  );
+}
+
+function formatScoreSectionMarkdown(result, phase) {
+  const artifact = formatJsonOutput(result, phase);
+  const score = scoreReview(artifact.issues ?? []);
+  const lines = ['### スコア (参考値)'];
+  lines.push('');
+  lines.push(`結果(スコア): **${score.overall}/100**`);
+  lines.push(`判定: **${score.verdict}**`);
+  lines.push('');
+  lines.push('内訳:');
+  for (const axis of AXES) {
+    lines.push(`- ${AXIS_LABELS_JA[axis]}: ${score.axes[axis]}/100`);
+  }
+  lines.push('');
+  lines.push(
+    '> スコアは severity と axis から決定論的に算出された **参考値** (`derived: true`)。HITL レビューと併用してください。'
+  );
+  lines.push('');
+  return lines.join('\n');
 }
 
 function printDebugInfo(result, { log = console.log } = {}) {
@@ -759,13 +786,22 @@ Dependencies: ${
       console.log(JSON.stringify(formatJsonOutput(result, parsed.phase), null, 2));
     } else if (parsed.output === 'markdown') {
       printMarkdownReport(result, parsed.phase);
+    } else if (parsed.output === 'yaml') {
+      const { formatYamlOutput } = await import('./lib/output-formatters/yaml.mjs');
+      const artifact = {
+        phase: parsed.phase,
+        timestamp: new Date().toISOString(),
+        findings: formatJsonOutput(result, parsed.phase).issues,
+        plan: result.plan,
+      };
+      console.log(formatYamlOutput(artifact));
     } else {
       printPlan(result.plan);
       printComments(result.comments);
     }
 
     if (parsed.debug) {
-      if (parsed.output === 'markdown' || parsed.output === 'json') {
+      if (parsed.output === 'markdown' || parsed.output === 'json' || parsed.output === 'yaml') {
         console.error('\nDebug info (not included in output):');
         printDebugInfo(result, { log: console.error });
       } else {
