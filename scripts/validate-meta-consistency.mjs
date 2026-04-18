@@ -17,8 +17,7 @@ async function readText(filePath) {
  * Extract all @vX.Y.Z action tag references from text.
  */
 export function extractActionTags(text) {
-  const matches =
-    text.match(/river-reviewer\/runners\/github-action@v[\d.]+/g) || [];
+  const matches = text.match(/river-reviewer\/runners\/github-action@v[\d.]+/g) || [];
   return [...new Set(matches.map((m) => m.split('@')[1]))];
 }
 
@@ -26,9 +25,7 @@ export function extractActionTags(text) {
  * Extract "Latest release: [vX.Y.Z]" version from text.
  */
 export function extractLatestRelease(text) {
-  const match = text.match(
-    /(?:最新リリース|Latest release):\s*\[v([\d.]+)\]/,
-  );
+  const match = text.match(/(?:最新リリース|Latest release):\s*\[v([\d.]+)\]/);
   return match ? match[1] : null;
 }
 
@@ -42,31 +39,42 @@ export async function validateMeta() {
   const pkg = await readJson('package.json');
   const expectedVersion = pkg.version; // e.g. "0.10.0"
 
-  // Check README and docs files that reference action tags
-  const checkFiles = [
-    'README.md',
-    'README.en.md',
-    'docs/use-cases/github-actions.md',
-  ];
-  for (const readmePath of checkFiles) {
+  // README / README.en.md は release-please の extra-files で "Latest release" 行のみ
+  // 自動更新される（#592）。action tag 例はチュートリアル用途で pinned だが、
+  // ファイル内での一貫性（全 tag 参照が同じバージョン）は引き続き検証する。
+  const releaseTrackedFiles = ['README.md', 'README.en.md'];
+  for (const readmePath of releaseTrackedFiles) {
     const text = await readText(readmePath);
 
-    // Check action tags
-    const tags = extractActionTags(text);
-    for (const tag of tags) {
-      if (tag !== `v${expectedVersion}`) {
-        errors.push(
-          `${readmePath}: action tag ${tag} does not match package.json version v${expectedVersion}`,
-        );
-      }
+    // Check "Latest release" matches package.json.
+    // Null = 行が見つからない（マーカー削除や regex 不一致）= release-please
+    // 自動同期が効かなくなる前兆のため明示エラー化する。
+    const releaseVersion = extractLatestRelease(text);
+    if (releaseVersion === null) {
+      errors.push(
+        `${readmePath}: "Latest release" line not found; release-please extra-files sync is broken`
+      );
+    } else if (releaseVersion !== expectedVersion) {
+      errors.push(
+        `${readmePath}: "Latest release" says v${releaseVersion}, expected v${expectedVersion}`
+      );
     }
 
-    // Check latest release line
-    const releaseVersion = extractLatestRelease(text);
-    if (releaseVersion && releaseVersion !== expectedVersion) {
-      errors.push(
-        `${readmePath}: "Latest release" says v${releaseVersion}, expected v${expectedVersion}`,
-      );
+    // Check all action tag references within the file are internally consistent
+    const tags = extractActionTags(text);
+    if (tags.length > 1) {
+      errors.push(`${readmePath}: action tag references are inconsistent: ${tags.join(', ')}`);
+    }
+  }
+
+  // docs/use-cases/github-actions.md はチュートリアル資料のため、
+  // ファイル内 tag 一貫性のみ検証する（package.json との一致は不要）。
+  const tutorialFiles = ['docs/use-cases/github-actions.md'];
+  for (const tutorialPath of tutorialFiles) {
+    const text = await readText(tutorialPath);
+    const tags = extractActionTags(text);
+    if (tags.length > 1) {
+      errors.push(`${tutorialPath}: action tag references are inconsistent: ${tags.join(', ')}`);
     }
   }
 
@@ -74,7 +82,7 @@ export async function validateMeta() {
   const homepage = pkg.homepage || '';
   if (!homepage.startsWith('https://river-reviewer.vercel.app')) {
     errors.push(
-      `package.json: homepage "${homepage}" should point to https://river-reviewer.vercel.app`,
+      `package.json: homepage "${homepage}" should point to https://river-reviewer.vercel.app`
     );
   }
 

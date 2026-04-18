@@ -25,7 +25,8 @@ jobs:
         id: release
         uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4.4.0
         with:
-          release-type: node
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
       - name: Checkout (for floating tags)
         if: ${{ steps.release.outputs.release_created }}

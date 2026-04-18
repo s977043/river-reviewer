@@ -128,7 +128,11 @@ jobs:
 
 タグは `@v0.13.1` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
 
+<!-- x-release-please-start-version -->
+
 最新リリース: [v0.13.1](https://github.com/s977043/river-reviewer/releases/tag/v0.13.1)
+
+<!-- x-release-please-end -->
 
 > **ℹ️ v0.1.x からのアップグレード:** v0.2.0以降では、GitHub Actionのパスが `.github/actions/river-reviewer` から `runners/github-action` に変更されています。詳細は[移行ガイド](docs/migration/runners-architecture-guide.md)と[DEPRECATED.md](docs/deprecated.md)をご確認ください。
 
