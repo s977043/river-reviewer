@@ -46,9 +46,15 @@ export async function validateMeta() {
   for (const readmePath of releaseTrackedFiles) {
     const text = await readText(readmePath);
 
-    // Check "Latest release" matches package.json
+    // Check "Latest release" matches package.json.
+    // Null = 行が見つからない（マーカー削除や regex 不一致）= release-please
+    // 自動同期が効かなくなる前兆のため明示エラー化する。
     const releaseVersion = extractLatestRelease(text);
-    if (releaseVersion && releaseVersion !== expectedVersion) {
+    if (releaseVersion === null) {
+      errors.push(
+        `${readmePath}: "Latest release" line not found; release-please extra-files sync is broken`
+      );
+    } else if (releaseVersion !== expectedVersion) {
       errors.push(
         `${readmePath}: "Latest release" says v${releaseVersion}, expected v${expectedVersion}`
       );
