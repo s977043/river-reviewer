@@ -130,7 +130,7 @@ jobs:
 
 <!-- x-release-please-start-version -->
 
-最新リリース: [v0.14.0](https://github.com/s977043/river-reviewer/releases/tag/v0.14.0)
+最新リリース: [v0.14.1](https://github.com/s977043/river-reviewer/releases/tag/v0.14.0)
 
 <!-- x-release-please-end -->
 
