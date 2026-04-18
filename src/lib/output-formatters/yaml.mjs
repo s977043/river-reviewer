@@ -7,7 +7,7 @@
  * (v1) without mutating it. See docs/review/output-format-yaml.md for details.
  */
 
-import { scoreReview } from '../scoring/engine.mjs';
+import { classifyAxis, scoreReview } from '../scoring/engine.mjs';
 import { AXES, AXIS_LABELS_JA } from '../scoring/rubric.mjs';
 
 const HIGH_RISK_IMPACT_TAGS = new Set(['security', 'migration', 'auth', 'payment']);
@@ -123,20 +123,37 @@ function deriveHighRiskReasons(impactTags, findings) {
   return [...reasons];
 }
 
+/**
+ * Derive the `category` value shown in YAML findings from the same axis
+ * classifier used by scoring. This keeps YAML category and score axis in sync;
+ * when the classifier falls back to `maintainability`, we report `general`
+ * instead to avoid implying a specific maintainability concern.
+ */
 function inferCategoryFromFinding(finding) {
-  const ruleId = finding.ruleId ?? '';
-  if (/sec|security|auth/i.test(ruleId)) return 'security';
-  if (/perf|n-?plus-?one|n1/i.test(ruleId)) return 'performance';
-  if (/arch|depend|layer/i.test(ruleId)) return 'architecture';
-  if (/read|name|complexity/i.test(ruleId)) return 'readability';
-  if (/test|coverage/i.test(ruleId)) return 'testing';
-  return 'general';
+  const axis = classifyAxis(finding);
+  if (!finding.ruleId && !finding.category) return 'general';
+  if (axis === 'maintainability') {
+    // axis fallback = maintainability; surface as "general" unless ruleId
+    // actually hints at maintenance (test/coverage/doc).
+    const ruleId = finding.ruleId ?? '';
+    if (!/\b(test|coverage|maint|maintainability|doc|comment)/i.test(ruleId)) {
+      return 'general';
+    }
+  }
+  return axis;
 }
 
+/**
+ * Escape a value for use inside a double-quoted YAML scalar.
+ * Preserves newlines as `\n` escape sequences so downstream YAML parsers can
+ * reconstruct the original multi-line content (see PR #596 review).
+ */
 function escapeYamlString(value) {
   return String(value ?? '')
     .replace(/\\/g, '\\\\')
     .replace(/"/g, '\\"')
-    .replace(/\n/g, ' ')
-    .replace(/\r/g, '');
+    .replace(/\r\n/g, '\\n')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\n')
+    .replace(/\t/g, '\\t');
 }

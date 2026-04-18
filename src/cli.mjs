@@ -720,7 +720,9 @@ Dependencies: ${
         : null;
 
     const logRunHeader =
-      parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
+      parsed.output === 'markdown' || parsed.output === 'json' || parsed.output === 'yaml'
+        ? console.error
+        : console.log;
     logRunHeader(`River Reviewer (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}

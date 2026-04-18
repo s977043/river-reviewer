@@ -36129,9 +36129,10 @@ function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   lS: () => (/* binding */ scoreReview)
+/* harmony export */   lS: () => (/* binding */ scoreReview),
+/* harmony export */   w8: () => (/* binding */ classifyAxis)
 /* harmony export */ });
-/* unused harmony exports classifyAxis, computeAxisScores, computeOverallScore, countBySeverity, deriveVerdict */
+/* unused harmony exports computeAxisScores, computeOverallScore, countBySeverity, deriveVerdict */
 /* harmony import */ var _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(5034);
 /**
  * Review scoring engine.
@@ -48410,7 +48411,9 @@ Dependencies: ${
         : null;
 
     const logRunHeader =
-      parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
+      parsed.output === 'markdown' || parsed.output === 'json' || parsed.output === 'yaml'
+        ? console.error
+        : console.log;
     logRunHeader(`River Reviewer (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}
