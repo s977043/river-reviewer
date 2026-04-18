@@ -67,6 +67,6 @@ When a retrospective identifies a recurring mistake or missing guardrail, follow
 | `/challenge`        | Adversarial review (pre-mortem, war game)                 |
 | `/propose-issue`    | Research codebase before creating an issue                |
 | `/plan-merge-order` | Plan merge order for multiple PRs to minimize rebase cost |
-| `/preflight`        | Verify task state before multi-PR work to prevent dupes   |
+| `/preflight`        | Verify tasks are not obsolete or in parallel before work  |
 
 Details: `.claude/commands/`
