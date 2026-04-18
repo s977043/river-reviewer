@@ -36125,6 +36125,267 @@ function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
 
 /***/ }),
 
+/***/ 9487:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   lS: () => (/* binding */ scoreReview),
+/* harmony export */   w8: () => (/* binding */ classifyAxis)
+/* harmony export */ });
+/* unused harmony exports computeAxisScores, computeOverallScore, countBySeverity, deriveVerdict */
+/* harmony import */ var _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(5034);
+/**
+ * Review scoring engine.
+ *
+ * Deterministic (no AI): derives axis scores, overall score, and verdict from
+ * structured findings. Inspired by unilabo/site-management-system's scoring
+ * rubric, adapted to river-reviewer's HITL-first posture.
+ *
+ * The output is always flagged `derived: true` to signal that this is a
+ * heuristic indicator, not an authoritative quality metric.
+ */
+
+
+
+/**
+ * Classify a finding into one of the 5 axes based on its ruleId.
+ * Falls back to `maintainability` when no pattern matches.
+ *
+ * @param {{ ruleId?: string, category?: string }} finding
+ * @returns {typeof AXES[number]}
+ */
+function classifyAxis(finding) {
+  if (finding?.category && _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXES */ .gR.includes(finding.category)) {
+    return finding.category;
+  }
+  const ruleId = finding?.ruleId ?? '';
+  for (const { axis, pattern } of _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXIS_PATTERNS */ .SZ) {
+    if (pattern.test(ruleId)) return axis;
+  }
+  return 'maintainability';
+}
+
+/**
+ * Compute axis scores from findings.
+ *
+ * @param {Array<{severity: string, ruleId?: string, category?: string}>} findings
+ * @param {object} [options]
+ * @param {object} [options.deductions] - Override default deduction table.
+ * @returns {Record<typeof AXES[number], number>}
+ */
+function computeAxisScores(findings, options = {}) {
+  const deductions = options.deductions ?? _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .DEFAULT_DEDUCTIONS */ .Fh;
+  const scores = Object.fromEntries(_rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXES */ .gR.map((a) => [a, 100]));
+
+  for (const finding of findings ?? []) {
+    const axis = classifyAxis(finding);
+    const severity = normalizeSeverity(finding.severity);
+    const deduction = deductions[axis]?.[severity] ?? 0;
+    scores[axis] = Math.max(0, scores[axis] - deduction);
+  }
+
+  return scores;
+}
+
+/**
+ * Compute overall score as the mean of axis scores.
+ *
+ * @param {Record<typeof AXES[number], number>} axisScores
+ * @returns {number}
+ */
+function computeOverallScore(axisScores) {
+  const values = _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXES */ .gR.map((a) => axisScores[a] ?? 100);
+  const sum = values.reduce((a, b) => a + b, 0);
+  return Math.round(sum / values.length);
+}
+
+/**
+ * Count findings per severity.
+ *
+ * @param {Array<{severity: string}>} findings
+ * @returns {{critical: number, major: number, minor: number, info: number}}
+ */
+function countBySeverity(findings) {
+  const counts = { critical: 0, major: 0, minor: 0, info: 0 };
+  for (const f of findings ?? []) {
+    const s = normalizeSeverity(f.severity);
+    counts[s]++;
+  }
+  return counts;
+}
+
+/**
+ * Derive verdict from overall score, axis scores, and severity counts.
+ *
+ * Return values:
+ * - `auto-approve`: Recommendation only; does NOT bypass HITL policy.
+ * - `human-review-recommended`: Notable findings but not blocking.
+ * - `human-review-required`: Critical findings or very low score.
+ *
+ * @param {{overall: number, axes: Record<string, number>, counts: object}} args
+ * @returns {'auto-approve' | 'human-review-recommended' | 'human-review-required'}
+ */
+function deriveVerdict({ overall, axes, counts }) {
+  const t = _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .VERDICT_THRESHOLDS */ .n;
+
+  if (counts.critical > t.humanReviewRecommended.maxCritical) {
+    return 'human-review-required';
+  }
+  if (overall < t.humanReviewRecommended.minOverall) {
+    return 'human-review-required';
+  }
+  if (
+    overall >= t.autoApprove.minOverall &&
+    (axes.security ?? 100) >= t.autoApprove.minSecurity &&
+    counts.critical <= t.autoApprove.maxCritical &&
+    counts.major <= t.autoApprove.maxMajor
+  ) {
+    return 'auto-approve';
+  }
+  return 'human-review-recommended';
+}
+
+/**
+ * Complete scoring entry point.
+ *
+ * @param {Array<object>} findings - Findings with at least `severity` and `ruleId`.
+ * @returns {{
+ *   overall: number,
+ *   axes: Record<typeof AXES[number], number>,
+ *   verdict: string,
+ *   counts: {critical: number, major: number, minor: number, info: number},
+ *   derived: true,
+ * }}
+ */
+function scoreReview(findings) {
+  const axes = computeAxisScores(findings);
+  const overall = computeOverallScore(axes);
+  const counts = countBySeverity(findings);
+  const verdict = deriveVerdict({ overall, axes, counts });
+  return { overall, axes, verdict, counts, derived: true };
+}
+
+/**
+ * Normalize severity to the canonical vocabulary used by the scoring engine.
+ * Accepts both the output schema values (critical/major/minor/info) and
+ * internal values (blocker/warning/nit) via fall-through.
+ *
+ * @param {string} severity
+ * @returns {'critical' | 'major' | 'minor' | 'info'}
+ */
+function normalizeSeverity(severity) {
+  const s = String(severity ?? '')
+    .toLowerCase()
+    .trim();
+  if (s === 'critical' || s === 'blocker') return 'critical';
+  if (s === 'major' || s === 'warning') return 'major';
+  if (s === 'minor' || s === 'nit') return 'minor';
+  return 'info';
+}
+
+
+/***/ }),
+
+/***/ 5034:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   Fh: () => (/* binding */ DEFAULT_DEDUCTIONS),
+/* harmony export */   SZ: () => (/* binding */ AXIS_PATTERNS),
+/* harmony export */   Sf: () => (/* binding */ AXIS_LABELS_JA),
+/* harmony export */   gR: () => (/* binding */ AXES),
+/* harmony export */   n: () => (/* binding */ VERDICT_THRESHOLDS)
+/* harmony export */ });
+/**
+ * Default scoring rubric for deterministic review scoring.
+ *
+ * Derived from unilabo/site-management-system's review-prompt.md, adapted to
+ * river-reviewer's skill taxonomy. Scores are **derived from finding severity
+ * and axis**, not AI-generated. See docs/review/scoring-model.md for rationale.
+ */
+
+const AXES = /** @type {const} */ ([
+  'readability',
+  'extensibility',
+  'performance',
+  'security',
+  'maintainability',
+]);
+
+const AXIS_LABELS_JA = {
+  readability: '可読性',
+  extensibility: '拡張性',
+  performance: 'パフォーマンス',
+  security: 'セキュリティ',
+  maintainability: '保守性',
+};
+
+/**
+ * Regex patterns mapping ruleId to axis. First match wins.
+ * Falls back to `maintainability` when no pattern matches.
+ *
+ * Patterns use a leading `\b` to anchor at word boundary, but intentionally
+ * omit a trailing `\b` so that keyword prefixes match extended identifiers
+ * (e.g. `depend` matches `dependency`, `read` matches `readability`).
+ */
+const AXIS_PATTERNS = [
+  {
+    axis: 'security',
+    pattern: /\b(sec|security|auth|authz|authn|injection|xss|csrf|crypto)/i,
+  },
+  {
+    axis: 'performance',
+    pattern: /\b(perf|performance|n-?plus-?one|n1\b|slow|query|memory)/i,
+  },
+  {
+    axis: 'extensibility',
+    pattern: /\b(arch|architecture|depend|layer|fat|coupling|boundary)/i,
+  },
+  {
+    axis: 'readability',
+    pattern: /\b(read|readability|naming|complexity|style|clarity)/i,
+  },
+  {
+    axis: 'maintainability',
+    pattern: /\b(test|coverage|maint|maintainability|doc|comment)/i,
+  },
+];
+
+/**
+ * Default deduction table.
+ * Per-severity deductions per axis. Security is penalized more heavily.
+ */
+const DEFAULT_DEDUCTIONS = {
+  security: { critical: 50, major: 30, minor: 15, info: 5 },
+  readability: { critical: 30, major: 20, minor: 10, info: 3 },
+  extensibility: { critical: 30, major: 20, minor: 10, info: 3 },
+  performance: { critical: 30, major: 20, minor: 10, info: 3 },
+  maintainability: { critical: 30, major: 20, minor: 10, info: 3 },
+};
+
+/**
+ * Verdict thresholds (display only; HITL-respecting).
+ *
+ * `auto-approve` is a recommendation for automation (e.g. CI bot), NOT a policy
+ * to merge without human review. river-reviewer remains HITL-first.
+ */
+const VERDICT_THRESHOLDS = {
+  autoApprove: {
+    minOverall: 90,
+    minSecurity: 95,
+    maxCritical: 0,
+    maxMajor: 0,
+  },
+  humanReviewRecommended: {
+    minOverall: 70,
+    maxCritical: 0,
+  },
+  // below humanReviewRecommended threshold -> humanReviewRequired
+};
+
+
+/***/ }),
+
 /***/ 3837:
 /***/ ((module) => {
 
@@ -47430,7 +47691,13 @@ class SkillDispatcher {
 
 }
 
+// EXTERNAL MODULE: ./src/lib/scoring/engine.mjs
+var engine = __nccwpck_require__(9487);
+// EXTERNAL MODULE: ./src/lib/scoring/rubric.mjs
+var rubric = __nccwpck_require__(5034);
 ;// CONCATENATED MODULE: ./src/cli.mjs
+
+
 
 
 
@@ -47486,7 +47753,7 @@ Options:
   --debug           Print debug information (merge base, files, token estimate)
   --estimate        Print cost estimate only (no review)
   --max-cost <usd>  Abort if estimated cost exceeds this USD amount
-  --output <mode>   Output format: text|markdown|json. Default: text
+  --output <mode>   Output format: text|markdown|json|yaml. Default: text
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
@@ -47602,8 +47869,10 @@ function parseArgs(argv) {
         break;
       }
       const mode = value.toLowerCase();
-      if (!['text', 'markdown', 'json'].includes(mode)) {
-        console.error(`Error: --output must be one of: text, markdown, json (got "${value}").`);
+      if (!['text', 'markdown', 'json', 'yaml'].includes(mode)) {
+        console.error(
+          `Error: --output must be one of: text, markdown, json, yaml (got "${value}").`
+        );
         parsed.command = 'help';
         break;
       }
@@ -47854,8 +48123,31 @@ ${formatDebugSummaryMarkdown(result)}
 `;
   const planSection = formatPlanMarkdown(result.plan);
   const riskSection = formatRiskSummaryMarkdown(result.plan);
+  const scoreSection = formatScoreSectionMarkdown(result, phase);
   const findings = `### 指摘\n${formatCommentsMarkdown(result.comments)}\n`;
-  console.log([header, planSection, riskSection, findings].join('\n'));
+  console.log(
+    [header, planSection, riskSection, scoreSection, findings].filter(Boolean).join('\n')
+  );
+}
+
+function formatScoreSectionMarkdown(result, phase) {
+  const artifact = formatJsonOutput(result, phase);
+  const score = (0,engine/* scoreReview */.lS)(artifact.issues ?? []);
+  const lines = ['### スコア (参考値)'];
+  lines.push('');
+  lines.push(`結果(スコア): **${score.overall}/100**`);
+  lines.push(`判定: **${score.verdict}**`);
+  lines.push('');
+  lines.push('内訳:');
+  for (const axis of rubric/* AXES */.gR) {
+    lines.push(`- ${rubric/* AXIS_LABELS_JA */.Sf[axis]}: ${score.axes[axis]}/100`);
+  }
+  lines.push('');
+  lines.push(
+    '> スコアは severity と axis から決定論的に算出された **参考値** (`derived: true`)。HITL レビューと併用してください。'
+  );
+  lines.push('');
+  return lines.join('\n');
 }
 
 function printDebugInfo(result, { log = console.log } = {}) {
@@ -48119,7 +48411,9 @@ Dependencies: ${
         : null;
 
     const logRunHeader =
-      parsed.output === 'markdown' || parsed.output === 'json' ? console.error : console.log;
+      parsed.output === 'markdown' || parsed.output === 'json' || parsed.output === 'yaml'
+        ? console.error
+        : console.log;
     logRunHeader(`River Reviewer (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}
@@ -48185,13 +48479,22 @@ Dependencies: ${
       console.log(JSON.stringify(formatJsonOutput(result, parsed.phase), null, 2));
     } else if (parsed.output === 'markdown') {
       printMarkdownReport(result, parsed.phase);
+    } else if (parsed.output === 'yaml') {
+      const { formatYamlOutput } = await __nccwpck_require__.e(/* import() */ 610).then(__nccwpck_require__.bind(__nccwpck_require__, 4610));
+      const artifact = {
+        phase: parsed.phase,
+        timestamp: new Date().toISOString(),
+        findings: formatJsonOutput(result, parsed.phase).issues,
+        plan: result.plan,
+      };
+      console.log(formatYamlOutput(artifact));
     } else {
       printPlan(result.plan);
       printComments(result.comments);
     }
 
     if (parsed.debug) {
-      if (parsed.output === 'markdown' || parsed.output === 'json') {
+      if (parsed.output === 'markdown' || parsed.output === 'json' || parsed.output === 'yaml') {
         console.error('\nDebug info (not included in output):');
         printDebugInfo(result, { log: console.error });
       } else {
