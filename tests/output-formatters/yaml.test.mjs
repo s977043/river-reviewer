@@ -24,7 +24,13 @@ describe('formatYamlOutput', () => {
       phase: 'midstream',
       findings: [],
     });
-    for (const axis of ['readability', 'extensibility', 'performance', 'security', 'maintainability']) {
+    for (const axis of [
+      'readability',
+      'extensibility',
+      'performance',
+      'security',
+      'maintainability',
+    ]) {
       assert.match(output, new RegExp(`${axis}: \\d+`));
     }
   });

@@ -49,7 +49,13 @@ describe('classifyAxis', () => {
 describe('computeAxisScores', () => {
   it('returns 100 for all axes when no findings', () => {
     const scores = computeAxisScores([]);
-    for (const axis of ['readability', 'extensibility', 'performance', 'security', 'maintainability']) {
+    for (const axis of [
+      'readability',
+      'extensibility',
+      'performance',
+      'security',
+      'maintainability',
+    ]) {
       assert.equal(scores[axis], 100);
     }
   });
@@ -129,7 +135,13 @@ describe('deriveVerdict', () => {
   });
 
   it('returns human-review-required when critical exists', () => {
-    const axes = { security: 100, readability: 100, extensibility: 100, performance: 100, maintainability: 100 };
+    const axes = {
+      security: 100,
+      readability: 100,
+      extensibility: 100,
+      performance: 100,
+      maintainability: 100,
+    };
     const verdict = deriveVerdict({
       overall: 90,
       axes,
@@ -139,7 +151,13 @@ describe('deriveVerdict', () => {
   });
 
   it('returns human-review-required when overall < 70', () => {
-    const axes = { security: 60, readability: 60, extensibility: 60, performance: 60, maintainability: 60 };
+    const axes = {
+      security: 60,
+      readability: 60,
+      extensibility: 60,
+      performance: 60,
+      maintainability: 60,
+    };
     const verdict = deriveVerdict({
       overall: 60,
       axes,
@@ -149,7 +167,13 @@ describe('deriveVerdict', () => {
   });
 
   it('returns human-review-recommended for moderate findings', () => {
-    const axes = { security: 100, readability: 80, extensibility: 80, performance: 80, maintainability: 80 };
+    const axes = {
+      security: 100,
+      readability: 80,
+      extensibility: 80,
+      performance: 80,
+      maintainability: 80,
+    };
     const verdict = deriveVerdict({
       overall: 84,
       axes,
@@ -159,7 +183,13 @@ describe('deriveVerdict', () => {
   });
 
   it('blocks auto-approve when security below threshold', () => {
-    const axes = { security: 90, readability: 100, extensibility: 100, performance: 100, maintainability: 100 };
+    const axes = {
+      security: 90,
+      readability: 100,
+      extensibility: 100,
+      performance: 100,
+      maintainability: 100,
+    };
     const verdict = deriveVerdict({
       overall: 98,
       axes,
