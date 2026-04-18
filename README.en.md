@@ -120,7 +120,7 @@ Pin to a release tag such as `@v0.13.1` for stability. Optionally, you can maint
 
 <!-- x-release-please-start-version -->
 
-Latest release: [v0.14.0](https://github.com/s977043/river-reviewer/releases/tag/v0.13.1)
+Latest release: [v0.14.0](https://github.com/s977043/river-reviewer/releases/tag/v0.14.0)
 
 <!-- x-release-please-end -->
 
