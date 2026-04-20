@@ -41,7 +41,7 @@ npm run codex:exec -- "review this branch"
 
 - 設定: `.codex/config.toml`（承認ポリシー / サンドボックス）
 - 環境変数は最小限のみ forward する（PATH, HOME, USER, SHELL, LANG, LC_ALL）
-- 承認ポリシーは`full-auto`（sandbox_modeで安全性を担保）。`--model`、`--profile`、`--search`、`--add-dir`は実行時に上書きする
+- 承認ポリシーは`on-request`（`sandbox_mode=workspace-write` と併用で CLI の `--full-auto` 相当。sandbox_modeで安全性を担保）。`--model`、`--profile`、`--search`、`--add-dir`は実行時に上書きする
 - web search や sandbox bypass は repo 既定値にしない
 
 ## Quick Reference
