@@ -94,7 +94,7 @@ overall は 5 axis の平均値。
 | -------------------------- | ------------------------------------------------------- | ------------------------------------------------------------- |
 | `auto-approve`             | overall ≥90 AND security ≥95 AND critical=0 AND major=0 | 自動承認 **推奨**。ただし HITL 方針のため実マージは人間判断。 |
 | `human-review-recommended` | 上記に該当しない AND critical=0 AND overall ≥70         | 人間レビュー推奨。                                            |
-| `human-review-required`    | critical ≥1 OR overall <70                              | 人間レビュー必須。                                            |
+| `human-review-required`    | critical ≥1 OR overall &lt;70                           | 人間レビュー必須。                                            |
 
 ## 重要な注意事項
 
