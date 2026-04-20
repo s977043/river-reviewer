@@ -91,7 +91,7 @@ Changing the following requires a major version bump as a breaking change:
 - Changing/Removing Action inputs / outputs
 - Changing required fields in Skill Schema, or changing meanings of existing fields
 
-For stable Action behavior, we recommend **pinning to a release tag** (e.g., `@v0.13.1`) instead of `@main`.
+For stable Action behavior, we recommend **pinning to a release tag** (e.g., `@v0.14.1`) instead of `@main`.
 
 ## Schema Versioning Policy
 
