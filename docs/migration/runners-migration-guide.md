@@ -2,7 +2,7 @@
 
 This guide helps you migrate from River Reviewer v0.1.x to v0.2.0+, which introduces the new runners architecture.
 
-> **Status (as of 2026-04):** The current release line is **v0.12.x**, distributed under `runners/github-action`. v0.1.x is a legacy frozen release that predates the runners architecture and receives no further updates. If you are still pinned to `@v0.1.x`, follow this guide to move to the latest release tag (see [README](../../README.md) for the current version).
+> **Status (as of 2026-04):** The current release line is **v0.14.x**, distributed under `runners/github-action`. v0.1.x is a legacy frozen release that predates the runners architecture and receives no further updates. If you are still pinned to `@v0.1.x`, follow this guide to move to the latest release tag (see [README](../../README.md) for the current version).
 
 ## Overview
 
@@ -255,7 +255,7 @@ If migration causes problems:
 
 What you miss while staying on v0.1.x:
 
-- All features and fixes shipped in v0.2.0–v0.12.x (planner / Riverbed Memory v1 / Agent Skills bridge / Codex CLI integration / etc.)
+- All features and fixes shipped in v0.2.0–v0.14.x (planner / Riverbed Memory v1 / Agent Skills bridge / Codex CLI integration / etc.)
 - New interfaces (CLI runner, Node API)
 - Compatibility with current schemas (`skills/`, `schemas/`)
 
@@ -297,7 +297,7 @@ See [Epic #242](https://github.com/s977043/river-reviewer/issues/242) for implem
 | 2025-12-29 | v0.2.0 released with new paths                                       |
 | 2026-01-29 | Migration recommended (1 month)                                      |
 | 2026-02-28 | Migration encouraged (2 months)                                      |
-| 2026-04    | v0.12.x is the current release line; v0.1.x is unmaintained (frozen) |
+| 2026-04    | v0.14.x is the current release line; v0.1.x is unmaintained (frozen) |
 | TBD        | v0.1.x tags may eventually be removed (v1.0.0+)                      |
 
 All feature and fix development happens on the current release line. v0.1.x receives no further updates.
