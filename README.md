@@ -119,14 +119,14 @@ jobs:
         with:
           fetch-depth: 0 # merge-base を安定取得
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.13.1
+        uses: s977043/river-reviewer/runners/github-action@v0.14.1
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-タグは `@v0.13.1` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
+タグは `@v0.14.1` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
 
 <!-- x-release-please-start-version -->
 
@@ -147,7 +147,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.13.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.14.1
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -156,7 +156,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.13.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.14.1
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -165,7 +165,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.13.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.14.1
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -179,7 +179,7 @@ review:
   steps:
     - uses: actions/checkout@v6
       with: { fetch-depth: 0 }
-    - uses: s977043/river-reviewer/runners/github-action@v0.13.1
+    - uses: s977043/river-reviewer/runners/github-action@v0.14.1
       with:
         phase: midstream
         estimate: true # コスト見積もりのみ
@@ -197,7 +197,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.13.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.14.1
         with:
           phase: midstream
           dry_run: true            # Draft はドライランでプロンプト確認のみ
@@ -210,7 +210,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.13.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.14.1
         with:
           phase: midstream
           dry_run: false           # Ready ではフルレビュー
