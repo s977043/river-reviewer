@@ -1,5 +1,5 @@
 ---
-id: output-format-yaml
+id: output-format-yaml-en
 title: YAML Output Format (Scoring + Verdict)
 description: River Reviewer YAML output format with scoring and verdict model.
 ---
@@ -94,7 +94,7 @@ Each axis starts at 100 and is deducted per finding by severity.
 | -------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `auto-approve`             | overall ≥90 AND security ≥95 AND critical=0 AND major=0 | Recommended for auto-approval. **HITL policy still applies**; humans make the final merge call. |
 | `human-review-recommended` | Not the above AND critical=0 AND overall ≥70            | Human review recommended.                                                                       |
-| `human-review-required`    | critical ≥1 OR overall <70                              | Human review required.                                                                          |
+| `human-review-required`    | critical ≥1 OR overall &lt;70                           | Human review required.                                                                          |
 
 ## Important caveats
 
