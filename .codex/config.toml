@@ -10,8 +10,9 @@
 #   --add-dir <DIR>
 #
 # Do not set web search or sandbox-bypass flags here.
-# approval_policy is full-auto; safety relies on sandbox_mode and shell_environment_policy.
-approval_policy = "full-auto"
+# approval_policy is on-request (equivalent to `--full-auto` when combined with
+# sandbox_mode = workspace-write); safety relies on sandbox_mode and shell_environment_policy.
+approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 
 # Optional tuning (uncomment only after team agreement)
