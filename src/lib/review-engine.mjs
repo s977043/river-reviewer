@@ -2,7 +2,12 @@ import { mergeConfig } from '../config/loader.mjs';
 import { defaultConfig } from '../config/default.mjs';
 import { summarizeSkill } from '../../runners/core/review-runner.mjs';
 import { buildHeuristicComments, HEURISTIC_SKILL_IDS } from './heuristic-review.mjs';
-import { formatFindingMessage, validateFindingMessage } from './finding-format.mjs';
+import {
+  formatFindingMessage,
+  validateFindingMessage,
+  parseFindingMessage,
+  normalizeSeverity,
+} from './finding-format.mjs';
 
 const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
 const MAX_PROMPT_CHARS = 12000;
@@ -582,8 +587,33 @@ export async function generateReview({
   // Replace comments with verified-only set
   comments = verified;
 
+  // Build structured findings from verified comments
+  const findings = comments.map((c, i) => {
+    const parsed = parseFindingMessage(c.message);
+    const severity = normalizeSeverity(parsed.severity);
+    const confidence =
+      parsed.confidence && ['high', 'medium', 'low'].includes(parsed.confidence)
+        ? parsed.confidence
+        : 'medium';
+    return {
+      id: `rr-${i + 1}`,
+      ruleId: c.skillId || 'unknown',
+      file: c.file,
+      lineStart: c.line ?? null,
+      lineEnd: c.line ?? null,
+      title: parsed.title || c.message.slice(0, 80),
+      message: c.message,
+      severity,
+      confidence,
+      status: /** @type {'open'} */ ('open'),
+      evidence: parsed.evidence,
+      suggestion: parsed.suggestion || null,
+    };
+  });
+
   return {
     comments,
+    findings,
     prompt: promptInfo.prompt,
     promptTruncated: promptInfo.truncated,
     llmModel: openAIConfig.model,

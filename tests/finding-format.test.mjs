@@ -4,7 +4,12 @@ import fs from 'node:fs';
 
 import { parseUnifiedDiff } from '../src/lib/diff.mjs';
 import { generateReview } from '../src/lib/review-engine.mjs';
-import { formatFindingMessage, validateFindingMessage } from '../src/lib/finding-format.mjs';
+import {
+  formatFindingMessage,
+  validateFindingMessage,
+  parseFindingMessage,
+  normalizeSeverity,
+} from '../src/lib/finding-format.mjs';
 
 test('formatFindingMessage produces a valid labeled message', () => {
   const msg = formatFindingMessage({
@@ -19,13 +24,69 @@ test('formatFindingMessage produces a valid labeled message', () => {
   assert.equal(validated.ok, true);
 });
 
+test('parseFindingMessage extracts all labeled fields', () => {
+  const msg = formatFindingMessage({
+    finding: 'トークンが平文',
+    evidence: 'SECRET_TOKEN = "abc"',
+    impact: '情報漏洩',
+    fix: '環境変数に移す',
+    severity: 'blocker',
+    confidence: 'high',
+  });
+  const parsed = parseFindingMessage(msg);
+  assert.equal(parsed.title, 'トークンが平文');
+  assert.deepEqual(parsed.evidence, ['SECRET_TOKEN = "abc"']);
+  assert.equal(parsed.severity, 'blocker');
+  assert.equal(parsed.confidence, 'high');
+  assert.ok(parsed.suggestion.length > 0);
+});
+
+test('parseFindingMessage returns empty evidence array when field is missing', () => {
+  const parsed = parseFindingMessage('Finding: something Severity: warning Confidence: low');
+  assert.deepEqual(parsed.evidence, []);
+});
+
+test('normalizeSeverity maps internal vocabulary to schema vocabulary', () => {
+  assert.equal(normalizeSeverity('blocker'), 'critical');
+  assert.equal(normalizeSeverity('warning'), 'major');
+  assert.equal(normalizeSeverity('nit'), 'minor');
+  assert.equal(normalizeSeverity('info'), 'info');
+  assert.equal(normalizeSeverity('critical'), 'critical');
+  assert.equal(normalizeSeverity('major'), 'major');
+  assert.equal(normalizeSeverity('unknown'), 'major');
+  assert.equal(normalizeSeverity(null), 'major');
+});
+
+test('generateReview returns structured findings[]', async () => {
+  const diffText = fs.readFileSync(
+    'tests/fixtures/planner-dataset/diffs/midstream-security-hardcoded-token.diff',
+    'utf8'
+  );
+  const parsed = parseUnifiedDiff(diffText);
+  const diff = { diffText, files: parsed.files, changedFiles: parsed.files.map((f) => f.path) };
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }], skipped: [] };
+
+  const result = await generateReview({ diff, plan, phase: 'midstream', dryRun: true });
+  assert.ok(Array.isArray(result.findings), 'findings should be an array');
+  assert.equal(result.findings.length, result.comments.length);
+
+  const f = result.findings[0];
+  assert.ok(f.id, 'finding should have id');
+  assert.ok(['critical', 'major', 'minor', 'info'].includes(f.severity), 'severity is normalized');
+  assert.ok(['high', 'medium', 'low'].includes(f.confidence), 'confidence is set');
+  assert.equal(f.status, 'open');
+  assert.ok(Array.isArray(f.evidence));
+  assert.ok(f.title.length > 0);
+  assert.ok(f.file.length > 0);
+});
+
 test('generateReview uses labeled format for heuristic findings', async () => {
   const diffText = fs.readFileSync(
     'tests/fixtures/planner-dataset/diffs/midstream-security-hardcoded-token.diff',
-    'utf8',
+    'utf8'
   );
   const parsed = parseUnifiedDiff(diffText);
-  const diff = { diffText, files: parsed.files, changedFiles: parsed.files.map(f => f.path) };
+  const diff = { diffText, files: parsed.files, changedFiles: parsed.files.map((f) => f.path) };
   const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }], skipped: [] };
 
   const result = await generateReview({ diff, plan, phase: 'midstream', dryRun: true });
