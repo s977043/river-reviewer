@@ -8,8 +8,7 @@ Here is a minimal workflow example to run River Reviewer on GitHub Actions. Plac
 name: River Reviewer
 on:
   pull_request:
-  push:
-    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
 jobs:
   river-reviewer:
     runs-on: ubuntu-latest
@@ -22,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.12.0
+        uses: s977043/river-reviewer/runners/github-action@v0.14.1
         with:
           phase: midstream # upstream|midstream|downstream
           dry_run: true # Post PR comments without calling external APIs (fallback)
@@ -32,4 +31,4 @@ jobs:
 
 `issues: write` is required to post comments on PRs. Review workflow `permissions` if you encounter permission errors.
 
-> The example pins to `@v0.12.0`. Replace it with a newer tag once one is released. Pinning to a release tag is recommended for stability.
+> The example pins to `@v0.14.1`. Replace it with a newer tag once one is released. Pinning to a release tag is recommended for stability.
