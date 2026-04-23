@@ -28,10 +28,16 @@ artifacts/evals/*
 # Claude Code local-only overrides
 .claude/settings.local.json
 .claude/worktrees/
+.claude/scheduled_tasks.lock
 CLAUDE.local.md
 .gemini/
 .codex/runtime-home/
 .codex/automations/
+.codex/sessions/
+.codex/logs_*.sqlite
+.codex/state_*.sqlite
+.codex/tmp/
+.codex/skills/.system/
 .lycheecache
 .worktrees/
 .vale/Microsoft

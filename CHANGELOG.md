@@ -7,7 +7,7 @@
 
 * **release-please:** emit plain tag format and guard alias generation ([#597](https://github.com/s977043/river-reviewer/issues/597)) ([#598](https://github.com/s977043/river-reviewer/issues/598)) ([2de682a](https://github.com/s977043/river-reviewer/commit/2de682ad13a5dc6d7054e392a2444cbb93983d07))
 
-## [0.14.0](https://github.com/s977043/river-reviewer/compare/river-reviewer-v0.13.1...river-reviewer-v0.14.0) (2026-04-18)
+## [0.14.0](https://github.com/s977043/river-reviewer/compare/v0.13.1...v0.14.0) (2026-04-18)
 
 
 ### Features

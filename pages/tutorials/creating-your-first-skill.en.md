@@ -9,7 +9,7 @@ Build a simple River Reviewer skill that follows the Upstream → Midstream → 
 
 ## 1. Draft the skill metadata
 
-Create a new file under `skills/` (for example `skills/rr-hello.yml`) and include metadata that matches `/schemas/skill.schema.json`:
+Create a new Markdown file under `skills/` (for example `skills/midstream/rr-midstream-hello-skill-001.md`) and include metadata that matches `/schemas/skill.schema.json`:
 
 ```yaml
 ---
