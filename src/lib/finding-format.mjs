@@ -39,6 +39,55 @@ export function formatFindingMessage({ finding, evidence, impact, fix, severity,
   ].join(' ');
 }
 
+const LABEL_NAMES = ['Finding', 'Evidence', 'Impact', 'Fix', 'Severity', 'Confidence'];
+const LABEL_ALTERNATION = LABEL_NAMES.join('|');
+
+/**
+ * Parse a labeled finding message string into structured fields.
+ * @param {string} message
+ * @returns {{ title: string, evidence: string[], impact: string, suggestion: string, severity: string|null, confidence: string|null }}
+ */
+export function parseFindingMessage(message) {
+  const text = String(message ?? '');
+  const get = (label) => {
+    const re = new RegExp(`${label}:\\s*([^]*?)(?=\\s+(?:${LABEL_ALTERNATION}):|$)`, 'm');
+    return (text.match(re)?.[1] ?? '').trim();
+  };
+  const evidenceText = get('Evidence');
+  return {
+    title: get('Finding'),
+    evidence: evidenceText ? [evidenceText] : [],
+    impact: get('Impact'),
+    suggestion: get('Fix'),
+    severity: get('Severity') || null,
+    confidence: get('Confidence') || null,
+  };
+}
+
+/**
+ * Map internal severity vocabulary (blocker/warning/nit) to output schema vocabulary.
+ * Accepts both vocabularies; unknown values default to 'major' (fail-safe).
+ * @param {string|null|undefined} internalSeverity
+ * @returns {'critical'|'major'|'minor'|'info'}
+ */
+export function normalizeSeverity(internalSeverity) {
+  switch ((internalSeverity ?? '').toLowerCase().trim()) {
+    case 'blocker':
+    case 'critical':
+      return 'critical';
+    case 'warning':
+    case 'major':
+      return 'major';
+    case 'nit':
+    case 'minor':
+      return 'minor';
+    case 'info':
+      return 'info';
+    default:
+      return 'major';
+  }
+}
+
 /**
  * Validate whether a finding message contains the required labeled fields.
  * @param {string} message
@@ -57,7 +106,8 @@ export function validateFindingMessage(message) {
 
   const invalid = [];
   if (severity && !FINDING_SEVERITIES.includes(severity)) invalid.push(`Severity:${severity}`);
-  if (confidence && !FINDING_CONFIDENCE.includes(confidence)) invalid.push(`Confidence:${confidence}`);
+  if (confidence && !FINDING_CONFIDENCE.includes(confidence))
+    invalid.push(`Confidence:${confidence}`);
 
   return {
     ok: missing.length === 0 && invalid.length === 0,

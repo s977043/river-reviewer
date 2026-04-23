@@ -62,6 +62,26 @@
           "description": "Line number related to the issue when applicable.",
           "minimum": 1
         },
+        "lineEnd": {
+          "type": "integer",
+          "description": "End line number for multi-line issues.",
+          "minimum": 1
+        },
+        "confidence": {
+          "type": "string",
+          "description": "Confidence level of the finding.",
+          "enum": ["high", "medium", "low"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Current lifecycle status of the finding.",
+          "enum": ["open", "suppressed", "verified"]
+        },
+        "evidence": {
+          "type": "array",
+          "description": "Evidence snippets supporting this finding.",
+          "items": { "type": "string" }
+        },
         "suggestion": {
           "type": "string",
           "description": "Optional fix or follow-up hint."
