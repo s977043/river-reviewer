@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.14.2](https://github.com/s977043/river-reviewer/compare/v0.14.1...v0.14.2) (2026-04-23)
+
+
+### Bug Fixes
+
+* **codex:** replace invalid approval_policy `full-auto` with `on-request` ([#609](https://github.com/s977043/river-reviewer/issues/609)) ([26af19b](https://github.com/s977043/river-reviewer/commit/26af19b3505bab903244809a10a5d61ff94ba6bc))
+* **docs:** bump action tag references to v0.14.1 ([#610](https://github.com/s977043/river-reviewer/issues/610)) ([9d2cfaa](https://github.com/s977043/river-reviewer/commit/9d2cfaa9c55e065a6031dc3b9e929b064ccb9274))
+* **docs:** correct CHANGELOG compare URL for v0.14.0 ([#614](https://github.com/s977043/river-reviewer/issues/614)) ([7abfec9](https://github.com/s977043/river-reviewer/commit/7abfec910401c43ccabc711d93e12705b84aa62f))
+
 ## [0.14.1](https://github.com/s977043/river-reviewer/compare/v0.14.0...v0.14.1) (2026-04-18)
 
 
