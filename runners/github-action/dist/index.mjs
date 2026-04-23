@@ -35318,6 +35318,55 @@ function formatFindingMessage({ finding, evidence, impact, fix, severity, confid
   ].join(' ');
 }
 
+const LABEL_NAMES = ['Finding', 'Evidence', 'Impact', 'Fix', 'Severity', 'Confidence'];
+const LABEL_ALTERNATION = LABEL_NAMES.join('|');
+
+/**
+ * Parse a labeled finding message string into structured fields.
+ * @param {string} message
+ * @returns {{ title: string, evidence: string[], impact: string, suggestion: string, severity: string|null, confidence: string|null }}
+ */
+function parseFindingMessage(message) {
+  const text = String(message ?? '');
+  const get = (label) => {
+    const re = new RegExp(`${label}:\\s*([^]*?)(?=\\s+(?:${LABEL_ALTERNATION}):|$)`, 'm');
+    return (text.match(re)?.[1] ?? '').trim();
+  };
+  const evidenceText = get('Evidence');
+  return {
+    title: get('Finding'),
+    evidence: evidenceText ? [evidenceText] : [],
+    impact: get('Impact'),
+    suggestion: get('Fix'),
+    severity: get('Severity') || null,
+    confidence: get('Confidence') || null,
+  };
+}
+
+/**
+ * Map internal severity vocabulary (blocker/warning/nit) to output schema vocabulary.
+ * Accepts both vocabularies; unknown values default to 'major' (fail-safe).
+ * @param {string|null|undefined} internalSeverity
+ * @returns {'critical'|'major'|'minor'|'info'}
+ */
+function normalizeSeverity(internalSeverity) {
+  switch ((internalSeverity ?? '').toLowerCase().trim()) {
+    case 'blocker':
+    case 'critical':
+      return 'critical';
+    case 'warning':
+    case 'major':
+      return 'major';
+    case 'nit':
+    case 'minor':
+      return 'minor';
+    case 'info':
+      return 'info';
+    default:
+      return 'major';
+  }
+}
+
 /**
  * Validate whether a finding message contains the required labeled fields.
  * @param {string} message
@@ -35336,7 +35385,8 @@ function validateFindingMessage(message) {
 
   const invalid = [];
   if (severity && !FINDING_SEVERITIES.includes(severity)) invalid.push(`Severity:${severity}`);
-  if (confidence && !FINDING_CONFIDENCE.includes(confidence)) invalid.push(`Confidence:${confidence}`);
+  if (confidence && !FINDING_CONFIDENCE.includes(confidence))
+    invalid.push(`Confidence:${confidence}`);
 
   return {
     ok: missing.length === 0 && invalid.length === 0,
@@ -35930,8 +35980,34 @@ async function generateReview({
   // Replace comments with verified-only set
   comments = verified;
 
+  // Build structured findings from verified comments
+  const findings = comments.map((c, i) => {
+    const parsed = parseFindingMessage(c.message);
+    const severity = normalizeSeverity(parsed.severity);
+    const confidence =
+      parsed.confidence && ['high', 'medium', 'low'].includes(parsed.confidence)
+        ? parsed.confidence
+        : 'medium';
+    return {
+      id: `rr-${i + 1}`,
+      ruleId: c.skillId || 'unknown',
+      reviewer: c.skillId || 'unknown',
+      file: c.file,
+      lineStart: c.line ?? null,
+      lineEnd: c.line ?? null,
+      title: parsed.title || c.message.slice(0, 80),
+      message: c.message,
+      severity,
+      confidence,
+      status: /** @type {'open'} */ ('open'),
+      evidence: parsed.evidence,
+      suggestion: parsed.suggestion || null,
+    };
+  });
+
   return {
     comments,
+    findings,
     prompt: promptInfo.prompt,
     promptTruncated: promptInfo.truncated,
     llmModel: openAIConfig.model,
@@ -48566,62 +48642,31 @@ function printDebugInfo(result, { log = console.log } = {}) {
 }
 
 /**
- * Map finding severity to output schema severity.
- * Accepts both internal vocabulary (blocker/warning/nit) and schema vocabulary (critical/major/minor/info).
- * Unknown values default to 'major' (fail-safe).
- */
-function mapSeverity(internalSeverity) {
-  const normalized = (internalSeverity ?? '').toLowerCase().trim();
-  switch (normalized) {
-    case 'blocker':
-    case 'critical':
-      return 'critical';
-    case 'warning':
-    case 'major':
-      return 'major';
-    case 'nit':
-    case 'minor':
-      return 'minor';
-    case 'info':
-      return 'info';
-    default:
-      return 'major';
-  }
-}
-
-/**
- * Extract labeled field value from a finding message string.
- */
-function extractField(message, label) {
-  const regex = new RegExp(
-    `${label}:\\s*([^]*?)(?=\\s+(?:Finding|Evidence|Impact|Fix|Severity|Confidence):)|${label}:\\s*(.+)$`
-  );
-  const match = (message ?? '').match(regex);
-  return (match?.[1] ?? match?.[2] ?? '').trim();
-}
-
-/**
  * Format review result as JSON conforming to schemas/output.schema.json.
+ * Uses pre-structured findings[] when available (Finding Pipeline), falls back
+ * to parsing raw comments for backward compatibility.
  */
 function formatJsonOutput(result, phase) {
-  const comments = result.comments ?? [];
   const issueCountBySeverity = { info: 0, minor: 0, major: 0, critical: 0 };
   const issueCountByPhase = { upstream: 0, midstream: 0, downstream: 0 };
 
-  const issues = comments.map((c, i) => {
-    const severity = mapSeverity(extractField(c.message, 'Severity'));
-    issueCountBySeverity[severity]++;
+  const issues = (result.findings ?? []).map((f) => {
+    issueCountBySeverity[f.severity]++;
     issueCountByPhase[phase] = (issueCountByPhase[phase] ?? 0) + 1;
-    const finding = extractField(c.message, 'Finding');
     return {
-      id: `rr-${i + 1}`,
-      ruleId: c.skillId || 'unknown',
-      title: finding || c.message.slice(0, 80),
-      message: c.message,
-      severity,
+      id: f.id,
+      ruleId: f.ruleId,
+      title: f.title,
+      message: f.message,
+      severity: f.severity,
+      confidence: f.confidence,
+      status: f.status,
+      evidence: f.evidence,
       phase,
-      file: c.file,
-      ...(c.line ? { line: c.line } : {}),
+      file: f.file,
+      ...(f.lineStart ? { line: f.lineStart } : {}),
+      ...(f.lineEnd && f.lineEnd !== f.lineStart ? { lineEnd: f.lineEnd } : {}),
+      ...(f.suggestion ? { suggestion: f.suggestion } : {}),
     };
   });
 
