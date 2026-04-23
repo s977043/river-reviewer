@@ -9,7 +9,7 @@ Upstream → Midstream → Downstream のフローに従うシンプルな River
 
 ## 1. スキルメタデータの作成
 
-`skills/` 配下に新しいファイルを作成し（例: `skills/rr-hello.yml`）、`/schemas/skill.schema.json` に一致するメタデータを含めます:
+`skills/` 配下に新しい Markdown ファイルを作成し（例: `skills/midstream/rr-midstream-hello-skill-001.md`）、`/schemas/skill.schema.json` に一致するメタデータを含めます:
 
 ```yaml
 ---
