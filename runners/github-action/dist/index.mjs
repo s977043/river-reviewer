@@ -39290,6 +39290,37 @@ class InvalidWebhookSignatureError extends Error {
         super(message);
     }
 }
+/**
+ * Error thrown by the API server during OAuth token exchange.
+ * Can have status codes 400, 401, or 403.
+ * Other status codes from OAuth endpoints are raised as normal APIError types.
+ */
+class OAuthError extends APIError {
+    constructor(status, error, headers) {
+        let finalMessage = 'OAuth2 authentication error';
+        let error_code = undefined;
+        if (error && typeof error === 'object') {
+            const errorData = error;
+            error_code = errorData['error'];
+            const description = errorData['error_description'];
+            if (description && typeof description === 'string') {
+                finalMessage = description;
+            }
+            else if (error_code) {
+                finalMessage = error_code;
+            }
+        }
+        super(status, error, finalMessage, headers);
+        this.error_code = error_code;
+    }
+}
+class SubjectTokenProviderError extends error_OpenAIError {
+    constructor(message, provider, cause) {
+        super(message);
+        this.provider = provider;
+        this.cause = cause;
+    }
+}
 //# sourceMappingURL=error.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/values.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
@@ -39391,7 +39422,7 @@ const safeJSON = (text) => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 //# sourceMappingURL=sleep.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/version.mjs
-const VERSION = '6.22.0'; // x-release-please-version
+const VERSION = '6.34.0'; // x-release-please-version
 //# sourceMappingURL=version.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/internal/detect-platform.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
@@ -40151,17 +40182,13 @@ function stringify(object, opts = {}) {
     return joined.length > 0 ? prefix + joined : '';
 }
 //# sourceMappingURL=stringify.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/qs/index.mjs
+;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/query.mjs
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-const formats = {
-    formatters: formatters,
-    RFC1738: RFC1738,
-    RFC3986: RFC3986,
-    default: default_format,
-};
-
-
-//# sourceMappingURL=index.mjs.map
+function stringifyQuery(query) {
+    return stringify(query, { arrayFormat: 'brackets' });
+}
+//# sourceMappingURL=query.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/bytes.mjs
 function concatBytes(buffers) {
     let length = 0;
@@ -40396,7 +40423,7 @@ class Stream {
         this.controller = controller;
         __classPrivateFieldSet(this, _Stream_client, client, "f");
     }
-    static fromSSEResponse(response, controller, client) {
+    static fromSSEResponse(response, controller, client, synthesizeEventData) {
         let consumed = false;
         const logger = client ? loggerFor(client) : console;
         async function* iterator() {
@@ -40426,7 +40453,7 @@ class Stream {
                         if (data && data.error) {
                             throw new APIError(undefined, data.error, undefined, response.headers);
                         }
-                        yield data;
+                        yield synthesizeEventData ? { event: sse.event, data } : data;
                     }
                     else {
                         let data;
@@ -40679,9 +40706,9 @@ async function defaultParseResponse(client, props) {
             // Note: there is an invariant here that isn't represented in the type system
             // that if you set `stream: true` the response type must also be `Stream<T>`
             if (props.options.__streamClass) {
-                return props.options.__streamClass.fromSSEResponse(response, props.controller, client);
+                return props.options.__streamClass.fromSSEResponse(response, props.controller, client, props.options.__synthesizeEventData);
             }
-            return Stream.fromSSEResponse(response, props.controller, client);
+            return Stream.fromSSEResponse(response, props.controller, client, props.options.__synthesizeEventData);
         }
         // fetch refuses to read the body when the status code is 204.
         if (response.status === 204) {
@@ -40946,6 +40973,94 @@ class ConversationCursorPage extends AbstractPage {
     }
 }
 //# sourceMappingURL=pagination.mjs.map
+;// CONCATENATED MODULE: ./node_modules/openai/auth/workload-identity-auth.mjs
+
+
+const SUBJECT_TOKEN_TYPES = {
+    jwt: 'urn:ietf:params:oauth:token-type:jwt',
+    id: 'urn:ietf:params:oauth:token-type:id_token',
+};
+const TOKEN_EXCHANGE_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:token-exchange';
+class WorkloadIdentityAuth {
+    constructor(config, fetch) {
+        this.cachedToken = null;
+        this.refreshPromise = null;
+        this.tokenExchangeUrl = 'https://auth.openai.com/oauth/token';
+        this.config = config;
+        this.fetch = fetch ?? getDefaultFetch();
+    }
+    async getToken() {
+        if (!this.cachedToken || this.isTokenExpired(this.cachedToken)) {
+            if (this.refreshPromise) {
+                return await this.refreshPromise;
+            }
+            this.refreshPromise = this.refreshToken();
+            try {
+                const token = await this.refreshPromise;
+                return token;
+            }
+            finally {
+                this.refreshPromise = null;
+            }
+        }
+        if (this.needsRefresh(this.cachedToken) && !this.refreshPromise) {
+            this.refreshPromise = this.refreshToken().finally(() => {
+                this.refreshPromise = null;
+            });
+        }
+        return this.cachedToken.token;
+    }
+    async refreshToken() {
+        const subjectToken = await this.config.provider.getToken();
+        const response = await this.fetch(this.tokenExchangeUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                grant_type: TOKEN_EXCHANGE_GRANT_TYPE,
+                client_id: this.config.clientId,
+                subject_token: subjectToken,
+                subject_token_type: SUBJECT_TOKEN_TYPES[this.config.provider.tokenType],
+                identity_provider_id: this.config.identityProviderId,
+                service_account_id: this.config.serviceAccountId,
+            }),
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            let body = undefined;
+            try {
+                body = JSON.parse(errorText);
+            }
+            catch { }
+            if (response.status === 400 || response.status === 401 || response.status === 403) {
+                throw new OAuthError(response.status, body, response.headers);
+            }
+            throw APIError.generate(response.status, body, `Token exchange failed with status ${response.status}`, response.headers);
+        }
+        const tokenResponse = (await response.json());
+        const expiresIn = tokenResponse.expires_in || 3600;
+        const expiresAt = Date.now() + expiresIn * 1000;
+        this.cachedToken = {
+            token: tokenResponse.access_token,
+            expiresAt,
+        };
+        return tokenResponse.access_token;
+    }
+    isTokenExpired(cachedToken) {
+        return Date.now() >= cachedToken.expiresAt;
+    }
+    needsRefresh(cachedToken) {
+        const bufferSeconds = this.config.refreshBufferSeconds ?? 1200;
+        const bufferMs = bufferSeconds * 1000;
+        return Date.now() >= cachedToken.expiresAt - bufferMs;
+    }
+    invalidateToken() {
+        this.cachedToken = null;
+        this.refreshPromise = null;
+    }
+}
+//# sourceMappingURL=workload-identity-auth.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/internal/uploads.mjs
 
 const checkFileSupport = () => {
@@ -41258,6 +41373,9 @@ const path_path = /* @__PURE__ */ createPathTagFunction(encodeURIPath);
 
 
 
+/**
+ * Given a list of messages comprising a conversation, the model will return a response.
+ */
 class Messages extends APIResource {
     /**
      * Get the messages in a stored chat completion. Only Chat Completions that have
@@ -42733,6 +42851,9 @@ class ChatCompletionStreamingRunner extends ChatCompletionStream {
 
 
 
+/**
+ * Given a list of messages comprising a conversation, the model will return a response.
+ */
 class Completions extends APIResource {
     constructor() {
         super(...arguments);
@@ -42932,16 +43053,21 @@ const isEmptyHeaders = (headers) => {
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
+/**
+ * Turn audio into text or text into audio.
+ */
 class Speech extends APIResource {
     /**
      * Generates audio from the input text.
+     *
+     * Returns the audio file content, or a stream of audio events.
      *
      * @example
      * ```ts
      * const speech = await client.audio.speech.create({
      *   input: 'input',
      *   model: 'string',
-     *   voice: 'ash',
+     *   voice: 'string',
      * });
      *
      * const content = await speech.blob();
@@ -42962,6 +43088,9 @@ class Speech extends APIResource {
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
+/**
+ * Turn audio into text or text into audio.
+ */
 class Transcriptions extends APIResource {
     create(body, options) {
         return this._client.post('/audio/transcriptions', multipartFormRequestOptions({
@@ -42977,6 +43106,9 @@ class Transcriptions extends APIResource {
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
+/**
+ * Turn audio into text or text into audio.
+ */
 class Translations extends APIResource {
     create(body, options) {
         return this._client.post('/audio/translations', multipartFormRequestOptions({ body, ...options, __metadata: { model: body.model } }, this._client));
@@ -43009,6 +43141,9 @@ Audio.Speech = Speech;
 
 
 
+/**
+ * Create large batches of API requests to run asynchronously.
+ */
 class Batches extends APIResource {
     /**
      * Creates and executes a batch from an uploaded file of requests
@@ -43044,6 +43179,9 @@ class Batches extends APIResource {
 
 
 
+/**
+ * Build Assistants that can call models and use tools.
+ */
 class Assistants extends APIResource {
     /**
      * Create an assistant with a model and instructions.
@@ -43190,7 +43328,7 @@ Realtime.TranscriptionSessions = TranscriptionSessions;
 
 class sessions_Sessions extends APIResource {
     /**
-     * Create a ChatKit session
+     * Create a ChatKit session.
      *
      * @example
      * ```ts
@@ -43209,7 +43347,9 @@ class sessions_Sessions extends APIResource {
         });
     }
     /**
-     * Cancel a ChatKit session
+     * Cancel an active ChatKit session and return its most recent metadata.
+     *
+     * Cancelling prevents new requests from using the issued client secret.
      *
      * @example
      * ```ts
@@ -43233,7 +43373,7 @@ class sessions_Sessions extends APIResource {
 
 class Threads extends APIResource {
     /**
-     * Retrieve a ChatKit thread
+     * Retrieve a ChatKit thread by its identifier.
      *
      * @example
      * ```ts
@@ -43248,7 +43388,7 @@ class Threads extends APIResource {
         });
     }
     /**
-     * List ChatKit threads
+     * List ChatKit threads with optional pagination and user filters.
      *
      * @example
      * ```ts
@@ -43266,7 +43406,7 @@ class Threads extends APIResource {
         });
     }
     /**
-     * Delete a ChatKit thread
+     * Delete a ChatKit thread along with its items and stored attachments.
      *
      * @example
      * ```ts
@@ -43282,7 +43422,7 @@ class Threads extends APIResource {
         });
     }
     /**
-     * List ChatKit thread items
+     * List items that belong to a ChatKit thread.
      *
      * @example
      * ```ts
@@ -43323,6 +43463,8 @@ ChatKit.Threads = Threads;
 
 
 /**
+ * Build Assistants that can call models and use tools.
+ *
  * @deprecated The Assistants API is deprecated in favor of the Responses API
  */
 class messages_Messages extends APIResource {
@@ -43396,6 +43538,8 @@ class messages_Messages extends APIResource {
 
 
 /**
+ * Build Assistants that can call models and use tools.
+ *
  * @deprecated The Assistants API is deprecated in favor of the Responses API
  */
 class Steps extends APIResource {
@@ -43504,6 +43648,7 @@ const readEnv = (env) => {
 //# sourceMappingURL=env.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/internal/utils.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
 
 
 
@@ -44072,6 +44217,8 @@ function AssistantStream_assertNever(_x) { }
 
 
 /**
+ * Build Assistants that can call models and use tools.
+ *
  * @deprecated The Assistants API is deprecated in favor of the Responses API
  */
 class Runs extends APIResource {
@@ -44087,6 +44234,7 @@ class Runs extends APIResource {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
             stream: params.stream ?? false,
+            __synthesizeEventData: true,
         });
     }
     /**
@@ -44217,6 +44365,7 @@ class Runs extends APIResource {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
             stream: params.stream ?? false,
+            __synthesizeEventData: true,
         });
     }
     /**
@@ -44250,6 +44399,8 @@ Runs.Steps = Steps;
 
 
 /**
+ * Build Assistants that can call models and use tools.
+ *
  * @deprecated The Assistants API is deprecated in favor of the Responses API
  */
 class threads_Threads extends APIResource {
@@ -44310,6 +44461,7 @@ class threads_Threads extends APIResource {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
             stream: body.stream ?? false,
+            __synthesizeEventData: true,
         });
     }
     /**
@@ -44359,6 +44511,9 @@ Beta.Threads = threads_Threads;
 ;// CONCATENATED MODULE: ./node_modules/openai/resources/completions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+/**
+ * Given a prompt, the model will return one or more predicted completions, and can also return the probabilities of alternative tokens at each position.
+ */
 class completions_Completions extends APIResource {
     create(body, options) {
         return this._client.post('/completions', { body, ...options, stream: body.stream ?? false });
@@ -44484,6 +44639,9 @@ Containers.Files = Files;
 
 
 
+/**
+ * Manage conversations and conversation items.
+ */
 class Items extends APIResource {
     /**
      * Create items in a conversation with the given ID.
@@ -44524,6 +44682,9 @@ class Items extends APIResource {
 
 
 
+/**
+ * Manage conversations and conversation items.
+ */
 class Conversations extends APIResource {
     constructor() {
         super(...arguments);
@@ -44560,6 +44721,9 @@ Conversations.Items = Items;
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
+/**
+ * Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.
+ */
 class Embeddings extends APIResource {
     /**
      * Creates an embedding vector representing the input text.
@@ -44614,6 +44778,9 @@ class Embeddings extends APIResource {
 
 
 
+/**
+ * Manage and run evals in the OpenAI platform.
+ */
 class OutputItems extends APIResource {
     /**
      * Get an evaluation run output item by ID.
@@ -44638,6 +44805,9 @@ class OutputItems extends APIResource {
 
 
 
+/**
+ * Manage and run evals in the OpenAI platform.
+ */
 class runs_Runs extends APIResource {
     constructor() {
         super(...arguments);
@@ -44691,6 +44861,9 @@ runs_Runs.OutputItems = OutputItems;
 
 
 
+/**
+ * Manage and run evals in the OpenAI platform.
+ */
 class Evals extends APIResource {
     constructor() {
         super(...arguments);
@@ -44743,6 +44916,9 @@ Evals.Runs = runs_Runs;
 
 
 
+/**
+ * Files are used to upload documents that can be used with features like Assistants and Fine-tuning.
+ */
 class files_Files extends APIResource {
     /**
      * Upload a file that can be used across various endpoints. Individual files can be
@@ -44826,6 +45002,9 @@ class Methods extends APIResource {
 ;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/alpha/graders.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+/**
+ * Manage fine-tuning jobs to tailor a model to your specific training data.
+ */
 class Graders extends APIResource {
     /**
      * Run a grader.
@@ -44887,6 +45066,9 @@ Alpha.Graders = Graders;
 
 
 
+/**
+ * Manage fine-tuning jobs to tailor a model to your specific training data.
+ */
 class Permissions extends APIResource {
     /**
      * **NOTE:** Calling this endpoint requires an [admin API key](../admin-api-keys).
@@ -44914,19 +45096,32 @@ class Permissions extends APIResource {
      * Organization owners can use this endpoint to view all permissions for a
      * fine-tuned model checkpoint.
      *
-     * @example
-     * ```ts
-     * const permission =
-     *   await client.fineTuning.checkpoints.permissions.retrieve(
-     *     'ft-AF1WoRqd3aJAHsqc9NY7iL8F',
-     *   );
-     * ```
+     * @deprecated Retrieve is deprecated. Please swap to the paginated list method instead.
      */
     retrieve(fineTunedModelCheckpoint, query = {}, options) {
         return this._client.get(path_path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, {
             query,
             ...options,
         });
+    }
+    /**
+     * **NOTE:** This endpoint requires an [admin API key](../admin-api-keys).
+     *
+     * Organization owners can use this endpoint to view all permissions for a
+     * fine-tuned model checkpoint.
+     *
+     * @example
+     * ```ts
+     * // Automatically fetches more pages as needed.
+     * for await (const permissionListResponse of client.fineTuning.checkpoints.permissions.list(
+     *   'ft-AF1WoRqd3aJAHsqc9NY7iL8F',
+     * )) {
+     *   // ...
+     * }
+     * ```
+     */
+    list(fineTunedModelCheckpoint, query = {}, options) {
+        return this._client.getAPIList(path_path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, (ConversationCursorPage), { query, ...options });
     }
     /**
      * **NOTE:** This endpoint requires an [admin API key](../admin-api-keys).
@@ -44970,6 +45165,9 @@ Checkpoints.Permissions = Permissions;
 
 
 
+/**
+ * Manage fine-tuning jobs to tailor a model to your specific training data.
+ */
 class checkpoints_Checkpoints extends APIResource {
     /**
      * List checkpoints for a fine-tuning job.
@@ -44996,6 +45194,9 @@ class checkpoints_Checkpoints extends APIResource {
 
 
 
+/**
+ * Manage fine-tuning jobs to tailor a model to your specific training data.
+ */
 class Jobs extends APIResource {
     constructor() {
         super(...arguments);
@@ -45156,6 +45357,9 @@ graders_Graders.GraderModels = GraderModels;
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
+/**
+ * Given a prompt and/or an input image, the model will generate a new image.
+ */
 class Images extends APIResource {
     /**
      * Creates a variation of a given image. This endpoint only supports `dall-e-2`.
@@ -45183,6 +45387,9 @@ class Images extends APIResource {
 
 
 
+/**
+ * List and describe the various models available in the API.
+ */
 class Models extends APIResource {
     /**
      * Retrieves a model instance, providing basic information about the model such as
@@ -45210,6 +45417,9 @@ class Models extends APIResource {
 ;// CONCATENATED MODULE: ./node_modules/openai/resources/moderations.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+/**
+ * Given text and/or image inputs, classifies if those inputs are potentially harmful.
+ */
 class Moderations extends APIResource {
     /**
      * Classifies if text and/or image inputs are potentially harmful. Learn more in
@@ -45298,6 +45508,20 @@ class Calls extends APIResource {
 class ClientSecrets extends APIResource {
     /**
      * Create a Realtime client secret with an associated session configuration.
+     *
+     * Client secrets are short-lived tokens that can be passed to a client app, such
+     * as a web frontend or mobile client, which grants access to the Realtime API
+     * without leaking your main API key. You can configure a custom TTL for each
+     * client secret.
+     *
+     * You can also attach session configuration options to the client secret, which
+     * will be applied to any sessions created using that client secret, but these can
+     * also be overridden by the client connection.
+     *
+     * [Learn more about authentication with client secrets over WebRTC](https://platform.openai.com/docs/guides/realtime-webrtc).
+     *
+     * Returns the created client secret and the effective session object. The client
+     * secret is a string that looks like `ek_1234`.
      *
      * @example
      * ```ts
@@ -45779,7 +46003,10 @@ class InputItems extends APIResource {
 
 class InputTokens extends APIResource {
     /**
-     * Get input token counts
+     * Returns input token counts of the request.
+     *
+     * Returns an object with `object` set to `response.input_tokens` and an
+     * `input_tokens` count.
      *
      * @example
      * ```ts
@@ -45871,12 +46098,17 @@ class Responses extends APIResource {
         return this._client.post(path_path `/responses/${responseID}/cancel`, options);
     }
     /**
-     * Compact conversation
+     * Compact a conversation. Returns a compacted response object.
+     *
+     * Learn when and how to compact long-running conversations in the
+     * [conversation state guide](https://platform.openai.com/docs/guides/conversation-state#managing-the-context-window).
+     * For ZDR-compatible compaction details, see
+     * [Compaction (advanced)](https://platform.openai.com/docs/guides/conversation-state#compaction-advanced).
      *
      * @example
      * ```ts
      * const compactedResponse = await client.responses.compact({
-     *   model: 'gpt-5.2',
+     *   model: 'gpt-5.4',
      * });
      * ```
      */
@@ -45894,7 +46126,7 @@ Responses.InputTokens = InputTokens;
 
 class content_Content extends APIResource {
     /**
-     * Get Skill Content
+     * Download a skill zip bundle by its ID.
      */
     retrieve(skillID, options) {
         return this._client.get(path_path `/skills/${skillID}/content`, {
@@ -45912,7 +46144,7 @@ class content_Content extends APIResource {
 
 class versions_content_Content extends APIResource {
     /**
-     * Get Skill Version Content
+     * Download a skill version zip bundle.
      */
     retrieve(version, params, options) {
         const { skill_id } = params;
@@ -45938,20 +46170,20 @@ class Versions extends APIResource {
         this.content = new versions_content_Content(this._client);
     }
     /**
-     * Create Skill Version
+     * Create a new immutable skill version.
      */
     create(skillID, body = {}, options) {
         return this._client.post(path_path `/skills/${skillID}/versions`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
     /**
-     * Get Skill Version
+     * Get a specific skill version.
      */
     retrieve(version, params, options) {
         const { skill_id } = params;
         return this._client.get(path_path `/skills/${skill_id}/versions/${version}`, options);
     }
     /**
-     * List Skill Versions
+     * List skill versions for a skill.
      */
     list(skillID, query = {}, options) {
         return this._client.getAPIList(path_path `/skills/${skillID}/versions`, (CursorPage), {
@@ -45960,7 +46192,7 @@ class Versions extends APIResource {
         });
     }
     /**
-     * Delete Skill Version
+     * Delete a skill version.
      */
     delete(version, params, options) {
         const { skill_id } = params;
@@ -45986,31 +46218,31 @@ class Skills extends APIResource {
         this.versions = new Versions(this._client);
     }
     /**
-     * Create Skill
+     * Create a new skill.
      */
     create(body = {}, options) {
         return this._client.post('/skills', maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
     /**
-     * Get Skill
+     * Get a skill by its ID.
      */
     retrieve(skillID, options) {
         return this._client.get(path_path `/skills/${skillID}`, options);
     }
     /**
-     * Update Skill Default Version
+     * Update the default version pointer for a skill.
      */
     update(skillID, body, options) {
         return this._client.post(path_path `/skills/${skillID}`, { body, ...options });
     }
     /**
-     * List Skills
+     * List all skills for the current project.
      */
     list(query = {}, options) {
         return this._client.getAPIList('/skills', (CursorPage), { query, ...options });
     }
     /**
-     * Delete Skill
+     * Delete a skill by its ID.
      */
     delete(skillID, options) {
         return this._client.delete(path_path `/skills/${skillID}`, options);
@@ -46024,6 +46256,9 @@ Skills.Versions = Versions;
 
 
 
+/**
+ * Use Uploads to upload large files in multiple parts.
+ */
 class Parts extends APIResource {
     /**
      * Adds a
@@ -46049,6 +46284,9 @@ class Parts extends APIResource {
 
 
 
+/**
+ * Use Uploads to upload large files in multiple parts.
+ */
 class Uploads extends APIResource {
     constructor() {
         super(...arguments);
@@ -46074,12 +46312,16 @@ class Uploads extends APIResource {
      * For guidance on the proper filename extensions for each purpose, please follow
      * the documentation on
      * [creating a File](https://platform.openai.com/docs/api-reference/files/create).
+     *
+     * Returns the Upload object with status `pending`.
      */
     create(body, options) {
         return this._client.post('/uploads', { body, ...options });
     }
     /**
      * Cancels the Upload. No Parts may be added after an Upload is cancelled.
+     *
+     * Returns the Upload object with status `cancelled`.
      */
     cancel(uploadID, options) {
         return this._client.post(path_path `/uploads/${uploadID}/cancel`, options);
@@ -46097,7 +46339,9 @@ class Uploads extends APIResource {
      *
      * The number of bytes uploaded upon completion must match the number of bytes
      * initially specified when creating the Upload object. No Parts may be added after
-     * an Upload is completed.
+     * an Upload is completed. Returns the Upload object with status `completed`,
+     * including an additional `file` property containing the created usable File
+     * object.
      */
     complete(uploadID, body, options) {
         return this._client.post(path_path `/uploads/${uploadID}/complete`, { body, ...options });
@@ -46486,31 +46730,39 @@ VectorStores.FileBatches = FileBatches;
 
 class Videos extends APIResource {
     /**
-     * Create a video
+     * Create a new video generation job from a prompt and optional reference assets.
      */
     create(body, options) {
-        return this._client.post('/videos', maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post('/videos', multipartFormRequestOptions({ body, ...options }, this._client));
     }
     /**
-     * Retrieve a video
+     * Fetch the latest metadata for a generated video.
      */
     retrieve(videoID, options) {
         return this._client.get(path_path `/videos/${videoID}`, options);
     }
     /**
-     * List videos
+     * List recently generated videos for the current project.
      */
     list(query = {}, options) {
         return this._client.getAPIList('/videos', (ConversationCursorPage), { query, ...options });
     }
     /**
-     * Delete a video
+     * Permanently delete a completed or failed video and its stored assets.
      */
     delete(videoID, options) {
         return this._client.delete(path_path `/videos/${videoID}`, options);
     }
     /**
-     * Download video content
+     * Create a character from an uploaded video.
+     */
+    createCharacter(body, options) {
+        return this._client.post('/videos/characters', multipartFormRequestOptions({ body, ...options }, this._client));
+    }
+    /**
+     * Download the generated video bytes or a derived preview asset.
+     *
+     * Streams the rendered video content for the specified video job.
      */
     downloadContent(videoID, query = {}, options) {
         return this._client.get(path_path `/videos/${videoID}/content`, {
@@ -46521,7 +46773,26 @@ class Videos extends APIResource {
         });
     }
     /**
-     * Create a video remix
+     * Create a new video generation job by editing a source video or existing
+     * generated video.
+     */
+    edit(body, options) {
+        return this._client.post('/videos/edits', multipartFormRequestOptions({ body, ...options }, this._client));
+    }
+    /**
+     * Create an extension of a completed video.
+     */
+    extend(body, options) {
+        return this._client.post('/videos/extensions', multipartFormRequestOptions({ body, ...options }, this._client));
+    }
+    /**
+     * Fetch a character.
+     */
+    getCharacter(characterID, options) {
+        return this._client.get(path_path `/videos/characters/${characterID}`, options);
+    }
+    /**
+     * Create a remix of a completed video using a refreshed prompt.
      */
     remix(videoID, body, options) {
         return this._client.post(path_path `/videos/${videoID}/remix`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
@@ -46705,6 +46976,9 @@ var _OpenAI_instances, client_a, _OpenAI_encoder, _OpenAI_baseURLOverridden;
 
 
 
+
+
+const WORKLOAD_IDENTITY_API_KEY_PLACEHOLDER = 'workload-identity-auth';
 /**
  * API Client for interfacing with the OpenAI API.
  */
@@ -46725,39 +46999,76 @@ class OpenAI {
      * @param {Record<string, string | undefined>} opts.defaultQuery - Default query parameters to include with every request to the API.
      * @param {boolean} [opts.dangerouslyAllowBrowser=false] - By default, client-side use of this library is not allowed, as it risks exposing your secret API credentials to attackers.
      */
-    constructor({ baseURL = readEnv('OPENAI_BASE_URL'), apiKey = readEnv('OPENAI_API_KEY'), organization = readEnv('OPENAI_ORG_ID') ?? null, project = readEnv('OPENAI_PROJECT_ID') ?? null, webhookSecret = readEnv('OPENAI_WEBHOOK_SECRET') ?? null, ...opts } = {}) {
+    constructor({ baseURL = readEnv('OPENAI_BASE_URL'), apiKey = readEnv('OPENAI_API_KEY'), organization = readEnv('OPENAI_ORG_ID') ?? null, project = readEnv('OPENAI_PROJECT_ID') ?? null, webhookSecret = readEnv('OPENAI_WEBHOOK_SECRET') ?? null, workloadIdentity, ...opts } = {}) {
         _OpenAI_instances.add(this);
         _OpenAI_encoder.set(this, void 0);
+        /**
+         * Given a prompt, the model will return one or more predicted completions, and can also return the probabilities of alternative tokens at each position.
+         */
         this.completions = new completions_Completions(this);
         this.chat = new Chat(this);
+        /**
+         * Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.
+         */
         this.embeddings = new Embeddings(this);
+        /**
+         * Files are used to upload documents that can be used with features like Assistants and Fine-tuning.
+         */
         this.files = new files_Files(this);
+        /**
+         * Given a prompt and/or an input image, the model will generate a new image.
+         */
         this.images = new Images(this);
         this.audio = new Audio(this);
+        /**
+         * Given text and/or image inputs, classifies if those inputs are potentially harmful.
+         */
         this.moderations = new Moderations(this);
+        /**
+         * List and describe the various models available in the API.
+         */
         this.models = new Models(this);
         this.fineTuning = new FineTuning(this);
         this.graders = new graders_Graders(this);
         this.vectorStores = new VectorStores(this);
         this.webhooks = new Webhooks(this);
         this.beta = new Beta(this);
+        /**
+         * Create large batches of API requests to run asynchronously.
+         */
         this.batches = new Batches(this);
+        /**
+         * Use Uploads to upload large files in multiple parts.
+         */
         this.uploads = new Uploads(this);
         this.responses = new Responses(this);
         this.realtime = new realtime_Realtime(this);
+        /**
+         * Manage conversations and conversation items.
+         */
         this.conversations = new Conversations(this);
+        /**
+         * Manage and run evals in the OpenAI platform.
+         */
         this.evals = new Evals(this);
         this.containers = new Containers(this);
         this.skills = new Skills(this);
         this.videos = new Videos(this);
-        if (apiKey === undefined) {
-            throw new error_OpenAIError('Missing credentials. Please pass an `apiKey`, or set the `OPENAI_API_KEY` environment variable.');
+        if (workloadIdentity) {
+            if (apiKey && apiKey !== WORKLOAD_IDENTITY_API_KEY_PLACEHOLDER) {
+                throw new error_OpenAIError('The `apiKey` and `workloadIdentity` arguments are mutually exclusive; only one can be passed at a time.');
+            }
+            apiKey = WORKLOAD_IDENTITY_API_KEY_PLACEHOLDER;
+        }
+        else if (apiKey === undefined) {
+            throw new error_OpenAIError('Missing credentials. Please pass an `apiKey`, `workloadIdentity`, or set the `OPENAI_API_KEY` environment variable.');
         }
         const options = {
             apiKey,
             organization,
             project,
             webhookSecret,
+            workloadIdentity,
             ...opts,
             baseURL: baseURL || `https://api.openai.com/v1`,
         };
@@ -46779,6 +47090,9 @@ class OpenAI {
         this.fetch = options.fetch ?? getDefaultFetch();
         __classPrivateFieldSet(this, _OpenAI_encoder, FallbackEncoder, "f");
         this._options = options;
+        if (workloadIdentity) {
+            this._workloadIdentityAuth = new WorkloadIdentityAuth(workloadIdentity, this.fetch);
+        }
         this.apiKey = typeof apiKey === 'string' ? apiKey : 'Missing Key';
         this.organization = organization;
         this.project = project;
@@ -46798,6 +47112,7 @@ class OpenAI {
             fetch: this.fetch,
             fetchOptions: this.fetchOptions,
             apiKey: this.apiKey,
+            workloadIdentity: this._options.workloadIdentity,
             organization: this.organization,
             project: this.project,
             webhookSecret: this.webhookSecret,
@@ -46815,7 +47130,7 @@ class OpenAI {
         return buildHeaders([{ Authorization: `Bearer ${this.apiKey}` }]);
     }
     stringifyQuery(query) {
-        return stringify(query, { arrayFormat: 'brackets' });
+        return stringifyQuery(query);
     }
     getUserAgent() {
         return `${this.constructor.name}/JS ${VERSION}`;
@@ -46853,8 +47168,9 @@ class OpenAI {
             new URL(path)
             : new URL(baseURL + (baseURL.endsWith('/') && path.startsWith('/') ? path.slice(1) : path));
         const defaultQuery = this.defaultQuery();
-        if (!isEmptyObj(defaultQuery)) {
-            query = { ...defaultQuery, ...query };
+        const pathQuery = Object.fromEntries(url.searchParams);
+        if (!isEmptyObj(defaultQuery) || !isEmptyObj(pathQuery)) {
+            query = { ...pathQuery, ...defaultQuery, ...query };
         }
         if (typeof query === 'object' && query && !Array.isArray(query)) {
             url.search = this.stringifyQuery(query);
@@ -46923,7 +47239,7 @@ class OpenAI {
             throw new APIUserAbortError();
         }
         const controller = new AbortController();
-        const response = await this.fetchWithTimeout(url, req, timeout, controller).catch(castToError);
+        const response = await this.fetchWithAuth(url, req, timeout, controller).catch(castToError);
         const headersTime = Date.now();
         if (response instanceof globalThis.Error) {
             const retryMessage = `retrying, ${retriesRemaining} attempts remaining`;
@@ -46953,6 +47269,9 @@ class OpenAI {
                 durationMs: headersTime - startTime,
                 message: response.message,
             }));
+            if (response instanceof OAuthError || response instanceof SubjectTokenProviderError) {
+                throw response;
+            }
             if (isTimeout) {
                 throw new APIConnectionTimeoutError();
             }
@@ -46964,6 +47283,20 @@ class OpenAI {
             .join('');
         const responseInfo = `[${requestLogID}${retryLogStr}${specialHeaders}] ${req.method} ${url} ${response.ok ? 'succeeded' : 'failed'} with status ${response.status} in ${headersTime - startTime}ms`;
         if (!response.ok) {
+            if (response.status === 401 &&
+                this._workloadIdentityAuth &&
+                !options.__metadata?.['hasStreamingBody'] &&
+                !options.__metadata?.['workloadIdentityTokenRefreshed']) {
+                await CancelReadableStream(response.body);
+                this._workloadIdentityAuth.invalidateToken();
+                return this.makeRequest({
+                    ...options,
+                    __metadata: {
+                        ...options.__metadata,
+                        workloadIdentityTokenRefreshed: true,
+                    },
+                }, retriesRemaining, retryOfRequestLogID ?? requestLogID);
+            }
             const shouldRetry = await this.shouldRetry(response);
             if (retriesRemaining && shouldRetry) {
                 const retryMessage = `retrying, ${retriesRemaining} attempts remaining`;
@@ -47013,6 +47346,18 @@ class OpenAI {
     requestAPIList(Page, options) {
         const request = this.makeRequest(options, null, undefined);
         return new PagePromise(this, request, Page);
+    }
+    async fetchWithAuth(url, init, timeout, controller) {
+        if (this._workloadIdentityAuth) {
+            const headers = init.headers;
+            const authHeader = headers.get('Authorization');
+            if (!authHeader || authHeader === `Bearer ${WORKLOAD_IDENTITY_API_KEY_PLACEHOLDER}`) {
+                const token = await this._workloadIdentityAuth.getToken();
+                headers.set('Authorization', `Bearer ${token}`);
+            }
+        }
+        const response = await this.fetchWithTimeout(url, init, timeout, controller);
+        return response;
     }
     async fetchWithTimeout(url, init, ms, controller) {
         const { signal, method, ...options } = init || {};
@@ -47084,9 +47429,9 @@ class OpenAI {
                 timeoutMillis = Date.parse(retryAfterHeader) - Date.now();
             }
         }
-        // If the API asks us to wait a certain amount of time (and it's a reasonable amount),
-        // just do what it says, but otherwise calculate a default
-        if (!(timeoutMillis && 0 <= timeoutMillis && timeoutMillis < 60 * 1000)) {
+        // If the API asks us to wait a certain amount of time, just do what it
+        // says, but otherwise calculate a default
+        if (timeoutMillis === undefined) {
             const maxRetries = options.maxRetries ?? this.maxRetries;
             timeoutMillis = this.calculateDefaultRetryTimeoutMillis(retriesRemaining, maxRetries);
         }
@@ -47110,7 +47455,13 @@ class OpenAI {
         if ('timeout' in options)
             validatePositiveInteger('timeout', options.timeout);
         options.timeout = options.timeout ?? this.timeout;
-        const { bodyHeaders, body } = this.buildBody({ options });
+        const { bodyHeaders, body, isStreamingBody } = this.buildBody({ options });
+        if (isStreamingBody) {
+            inputOptions.__metadata = {
+                ...inputOptions.__metadata,
+                hasStreamingBody: true,
+            };
+        }
         const reqHeaders = await this.buildHeaders({ options: inputOptions, method, bodyHeaders, retryCount });
         const req = {
             method,
@@ -47157,9 +47508,18 @@ class OpenAI {
     }
     buildBody({ options: { body, headers: rawHeaders } }) {
         if (!body) {
-            return { bodyHeaders: undefined, body: undefined };
+            return { bodyHeaders: undefined, body: undefined, isStreamingBody: false };
         }
         const headers = buildHeaders([rawHeaders]);
+        const isReadableStream = typeof globalThis.ReadableStream !== 'undefined' &&
+            body instanceof globalThis.ReadableStream;
+        const isRetryableBody = !isReadableStream &&
+            (typeof body === 'string' ||
+                body instanceof ArrayBuffer ||
+                ArrayBuffer.isView(body) ||
+                (typeof globalThis.Blob !== 'undefined' && body instanceof globalThis.Blob) ||
+                body instanceof URLSearchParams ||
+                body instanceof FormData);
         if (
         // Pass raw type verbatim
         ArrayBuffer.isView(body) ||
@@ -47175,16 +47535,28 @@ class OpenAI {
             // `URLSearchParams` -> `application/x-www-form-urlencoded`
             body instanceof URLSearchParams ||
             // Send chunked stream (each chunk has own `length`)
-            (globalThis.ReadableStream && body instanceof globalThis.ReadableStream)) {
-            return { bodyHeaders: undefined, body: body };
+            isReadableStream) {
+            return { bodyHeaders: undefined, body: body, isStreamingBody: !isRetryableBody };
         }
         else if (typeof body === 'object' &&
             (Symbol.asyncIterator in body ||
                 (Symbol.iterator in body && 'next' in body && typeof body.next === 'function'))) {
-            return { bodyHeaders: undefined, body: ReadableStreamFrom(body) };
+            return {
+                bodyHeaders: undefined,
+                body: ReadableStreamFrom(body),
+                isStreamingBody: true,
+            };
+        }
+        else if (typeof body === 'object' &&
+            headers.values.get('content-type') === 'application/x-www-form-urlencoded') {
+            return {
+                bodyHeaders: { 'content-type': 'application/x-www-form-urlencoded' },
+                body: this.stringifyQuery(body),
+                isStreamingBody: false,
+            };
         }
         else {
-            return __classPrivateFieldGet(this, _OpenAI_encoder, "f").call(this, { body, headers });
+            return { ...__classPrivateFieldGet(this, _OpenAI_encoder, "f").call(this, { body, headers }), isStreamingBody: false };
         }
     }
 }
