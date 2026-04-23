@@ -28,6 +28,7 @@ artifacts/evals/*
 # Claude Code local-only overrides
 .claude/settings.local.json
 .claude/worktrees/
+.claude/scheduled_tasks.lock
 CLAUDE.local.md
 .gemini/
 .codex/runtime-home/
