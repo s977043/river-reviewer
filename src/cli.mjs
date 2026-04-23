@@ -503,62 +503,31 @@ function printDebugInfo(result, { log = console.log } = {}) {
 }
 
 /**
- * Map finding severity to output schema severity.
- * Accepts both internal vocabulary (blocker/warning/nit) and schema vocabulary (critical/major/minor/info).
- * Unknown values default to 'major' (fail-safe).
- */
-function mapSeverity(internalSeverity) {
-  const normalized = (internalSeverity ?? '').toLowerCase().trim();
-  switch (normalized) {
-    case 'blocker':
-    case 'critical':
-      return 'critical';
-    case 'warning':
-    case 'major':
-      return 'major';
-    case 'nit':
-    case 'minor':
-      return 'minor';
-    case 'info':
-      return 'info';
-    default:
-      return 'major';
-  }
-}
-
-/**
- * Extract labeled field value from a finding message string.
- */
-function extractField(message, label) {
-  const regex = new RegExp(
-    `${label}:\\s*([^]*?)(?=\\s+(?:Finding|Evidence|Impact|Fix|Severity|Confidence):)|${label}:\\s*(.+)$`
-  );
-  const match = (message ?? '').match(regex);
-  return (match?.[1] ?? match?.[2] ?? '').trim();
-}
-
-/**
  * Format review result as JSON conforming to schemas/output.schema.json.
+ * Consumes the structured findings[] produced by the Finding Pipeline.
  */
 function formatJsonOutput(result, phase) {
-  const comments = result.comments ?? [];
   const issueCountBySeverity = { info: 0, minor: 0, major: 0, critical: 0 };
   const issueCountByPhase = { upstream: 0, midstream: 0, downstream: 0 };
 
-  const issues = comments.map((c, i) => {
-    const severity = mapSeverity(extractField(c.message, 'Severity'));
-    issueCountBySeverity[severity]++;
+  const issues = (result.findings ?? []).map((f) => {
+    issueCountBySeverity[f.severity]++;
     issueCountByPhase[phase] = (issueCountByPhase[phase] ?? 0) + 1;
-    const finding = extractField(c.message, 'Finding');
     return {
-      id: `rr-${i + 1}`,
-      ruleId: c.skillId || 'unknown',
-      title: finding || c.message.slice(0, 80),
-      message: c.message,
-      severity,
+      id: f.id,
+      ruleId: f.ruleId,
+      reviewer: f.reviewer,
+      title: f.title,
+      message: f.message,
+      severity: f.severity,
+      confidence: f.confidence,
+      status: f.status,
+      evidence: f.evidence,
       phase,
-      file: c.file,
-      ...(c.line ? { line: c.line } : {}),
+      file: f.file,
+      ...(f.lineStart ? { line: f.lineStart } : {}),
+      ...(f.lineEnd && f.lineEnd !== f.lineStart ? { lineEnd: f.lineEnd } : {}),
+      ...(f.suggestion ? { suggestion: f.suggestion } : {}),
     };
   });
 
