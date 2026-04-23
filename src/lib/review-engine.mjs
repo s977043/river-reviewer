@@ -598,7 +598,6 @@ export async function generateReview({
     return {
       id: `rr-${i + 1}`,
       ruleId: c.skillId || 'unknown',
-      reviewer: c.skillId || 'unknown',
       file: c.file,
       lineStart: c.line ?? null,
       lineEnd: c.line ?? null,

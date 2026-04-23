@@ -504,8 +504,7 @@ function printDebugInfo(result, { log = console.log } = {}) {
 
 /**
  * Format review result as JSON conforming to schemas/output.schema.json.
- * Uses pre-structured findings[] when available (Finding Pipeline), falls back
- * to parsing raw comments for backward compatibility.
+ * Consumes the structured findings[] produced by the Finding Pipeline.
  */
 function formatJsonOutput(result, phase) {
   const issueCountBySeverity = { info: 0, minor: 0, major: 0, critical: 0 };
@@ -517,6 +516,7 @@ function formatJsonOutput(result, phase) {
     return {
       id: f.id,
       ruleId: f.ruleId,
+      reviewer: f.reviewer,
       title: f.title,
       message: f.message,
       severity: f.severity,
