@@ -48654,6 +48654,7 @@ function formatJsonOutput(result, phase) {
     return {
       id: f.id,
       ruleId: f.ruleId,
+      reviewer: f.reviewer,
       title: f.title,
       message: f.message,
       severity: f.severity,

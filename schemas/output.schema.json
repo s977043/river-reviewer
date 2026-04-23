@@ -82,6 +82,10 @@
           "description": "Evidence snippets supporting this finding.",
           "items": { "type": "string" }
         },
+        "reviewer": {
+          "type": "string",
+          "description": "Identifier of the skill or agent that produced this finding."
+        },
         "suggestion": {
           "type": "string",
           "description": "Optional fix or follow-up hint."
