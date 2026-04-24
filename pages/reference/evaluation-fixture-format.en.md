@@ -36,7 +36,7 @@ Each case has the following fields:
     "Evidence:",
     "Fix:",
     "GitHub Secrets",
-    "Severity: blocker",
+    "Severity: critical",
     "Confidence: high"
   ],
   "maxFindings": 3
