@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.0](https://github.com/s977043/river-reviewer/compare/v0.14.2...v0.15.0) (2026-04-23)
+
+
+### Features
+
+* **review:** introduce Finding Pipeline with structured findings ([#624](https://github.com/s977043/river-reviewer/issues/624)) ([dc8a17c](https://github.com/s977043/river-reviewer/commit/dc8a17c89b3c5b5147700dc13223517efeae5e92))
+
 ## [0.14.2](https://github.com/s977043/river-reviewer/compare/v0.14.1...v0.14.2) (2026-04-23)
 
 
