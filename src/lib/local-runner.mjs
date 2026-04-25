@@ -15,6 +15,7 @@ import { loadRiskMap } from './risk-map.mjs';
 import { loadReviewMemory } from './memory-context.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import { isLlmEnabled, parseList } from './utils.mjs';
+import { annotateFingerprints } from './finding-fingerprint.mjs';
 
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
@@ -386,7 +387,7 @@ export async function runLocalReview({
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
     comments: review.comments,
-    findings: review.findings,
+    findings: annotateFingerprints(review.findings ?? []),
     classified: review.classified,
     reviewerResults: review.reviewerResults ?? null,
     tokenEstimate: context.diff.tokenEstimate,

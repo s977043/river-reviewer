@@ -66,6 +66,7 @@ Options:
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
   --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap)
+  --baseline <path> Path to a previous review JSON (findings array) for regression comparison
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
   --verbose         (eval) Print detailed per-case results
   -h, --help        Show this help message
@@ -90,6 +91,7 @@ function parseArgs(argv) {
     availableContexts: null,
     availableDependencies: null,
     reviewers: null,
+    baseline: null,
     // skills subcommand fields
     skillsSubcommand: null,
     fromPath: null,
@@ -208,6 +210,16 @@ function parseArgs(argv) {
         break;
       }
       parsed.reviewers = parseList(value);
+      continue;
+    }
+    if (arg === '--baseline') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --baseline option requires a file path.');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.baseline = value;
       continue;
     }
     // Skills subcommand options
@@ -784,6 +796,25 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
       reviewers: parsed.reviewers,
     });
+
+    // Regression comparison when --baseline is provided
+    if (parsed.baseline && result.status === 'ok') {
+      try {
+        const { diffReviews, formatRegressionSummary } = await import('./lib/review-differ.mjs');
+        const baselineRaw = await import('node:fs/promises').then((fs) =>
+          fs.readFile(parsed.baseline, 'utf8')
+        );
+        const baselineFindings = JSON.parse(baselineRaw);
+        const prevFindings = Array.isArray(baselineFindings)
+          ? baselineFindings
+          : (baselineFindings.findings ?? baselineFindings.issues ?? []);
+        const diff = diffReviews(prevFindings, result.findings ?? []);
+        const regSummary = formatRegressionSummary(diff);
+        console.log(regSummary);
+      } catch (err) {
+        console.error(`Warning: --baseline comparison failed: ${err.message}`);
+      }
+    }
 
     if (parsed.output === 'json') {
       console.log(JSON.stringify(formatJsonOutput(result, parsed.phase), null, 2));
