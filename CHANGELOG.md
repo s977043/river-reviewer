@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.17.0](https://github.com/s977043/river-reviewer/compare/v0.16.0...v0.17.0) (2026-04-25)
+
+
+### Features
+
+* **eval:** add Re-review / Regression Review with finding fingerprints ([#621](https://github.com/s977043/river-reviewer/issues/621)) ([#634](https://github.com/s977043/river-reviewer/issues/634)) ([515f51d](https://github.com/s977043/river-reviewer/commit/515f51d40f4528650301055080fe419a0ab8c2f3))
+* **eval:** add Review Result Store and Dashboard ([#620](https://github.com/s977043/river-reviewer/issues/620)) ([#635](https://github.com/s977043/river-reviewer/issues/635)) ([6abd0ae](https://github.com/s977043/river-reviewer/commit/6abd0aeeb5239079609da89eeb8db9f61cf0fe9f))
+* **review:** add parallel Reviewer Orchestration layer ([#622](https://github.com/s977043/river-reviewer/issues/622)) ([#633](https://github.com/s977043/river-reviewer/issues/633)) ([a7cdd33](https://github.com/s977043/river-reviewer/commit/a7cdd33a927e98dfc0f47f3da5b312a61881015c))
+
+
+### Bug Fixes
+
+* **finding-classifier:** apply ruleId=unknown guard to deduplicateWithinFile ([#631](https://github.com/s977043/river-reviewer/issues/631)) ([06ea25e](https://github.com/s977043/river-reviewer/commit/06ea25eaa0eb47405568a81a4c652b6a8532f374))
+
 ## [0.16.0](https://github.com/s977043/river-reviewer/compare/v0.15.0...v0.16.0) (2026-04-25)
 
 
