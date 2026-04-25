@@ -65,6 +65,7 @@ Options:
   --output <mode>   Output format: text|markdown|json|yaml. Default: text
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
+  --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap)
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
   --verbose         (eval) Print detailed per-case results
   -h, --help        Show this help message
@@ -88,6 +89,7 @@ function parseArgs(argv) {
     output: 'text',
     availableContexts: null,
     availableDependencies: null,
+    reviewers: null,
     // skills subcommand fields
     skillsSubcommand: null,
     fromPath: null,
@@ -194,6 +196,18 @@ function parseArgs(argv) {
     }
     if (arg === '--dependency') {
       parsed.availableDependencies = parseList(args.shift());
+      continue;
+    }
+    if (arg === '--reviewers') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error(
+          'Error: --reviewers option requires a value (e.g. bug-hunter,security-scanner).'
+        );
+        parsed.command = 'help';
+        break;
+      }
+      parsed.reviewers = parseList(value);
       continue;
     }
     // Skills subcommand options
@@ -768,6 +782,7 @@ Dependencies: ${
       availableContexts: parsed.availableContexts,
       availableDependencies: parsed.availableDependencies,
       plannerMode: parsed.plannerMode,
+      reviewers: parsed.reviewers,
     });
 
     if (parsed.output === 'json') {

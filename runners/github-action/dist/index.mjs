@@ -34760,6 +34760,115 @@ async function collectRepoDiff(repoRoot, baseRef, { contextLines = 3 } = {}) {
 
 /***/ }),
 
+/***/ 7440:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   Z: () => (/* binding */ classifyFindings)
+/* harmony export */ });
+/* unused harmony export SUPPRESS_REASONS */
+/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(9946);
+
+
+const SUPPRESS_REASONS = {
+  LOW_CONFIDENCE: 'low_confidence',
+  DUPLICATE: 'duplicate',
+  STYLE_ONLY: 'style_only',
+  INSUFFICIENT_EVIDENCE: 'insufficient_evidence',
+  COVERED_BY_HIGHER_LEVEL: 'covered_by_higher_level_finding',
+};
+
+function evidenceTotalChars(finding) {
+  const ev = finding.evidence;
+  if (!Array.isArray(ev) || ev.length === 0) return 0;
+  return ev.reduce((sum, e) => sum + String(e ?? '').length, 0);
+}
+
+function deduplicateWithinFile(findings) {
+  const seen = new Set();
+  return findings.filter((f) => {
+    const ruleId = String(f.ruleId ?? '');
+    if (ruleId === 'unknown') return true; // ruleId が未確定の finding は file-level dedup もスキップ
+    const key = `${f.file ?? ''}::${ruleId}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function deduplicateWithinPR(findings) {
+  const seen = new Set();
+  return findings.filter((f) => {
+    const key = String(f.ruleId ?? '');
+    if (key === 'unknown') return true; // ruleId が確定していない finding は PR-level dedup をスキップ
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/**
+ * @param {object[]} findings
+ * @param {{ reviewMode?: 'tiny'|'medium'|'large' }} [options]
+ * @returns {{ overview: object[], inlineCandidates: object[], suppressed: object[] }}
+ */
+function classifyFindings(findings, options = {}) {
+  const reviewMode = options.reviewMode ?? 'medium';
+  const maxOverview = reviewMode === 'tiny' ? 3 : reviewMode === 'large' ? 8 : 5;
+
+  const suppressed = [];
+  const active = [];
+
+  for (const finding of findings) {
+    if (finding.confidence === 'low' && finding.severity !== 'critical') {
+      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.LOW_CONFIDENCE });
+      continue;
+    }
+    if (evidenceTotalChars(finding) < 30 && finding.severity !== 'critical') {
+      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.INSUFFICIENT_EVIDENCE });
+      continue;
+    }
+    const ruleId = String(finding.ruleId ?? '');
+    if (finding.severity === 'minor' && /readability|style|format/i.test(ruleId)) {
+      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.STYLE_ONLY });
+      continue;
+    }
+    active.push(finding);
+  }
+
+  const deduped = deduplicateWithinPR(deduplicateWithinFile(active));
+  const dedupedSet = new Set(deduped.map((f) => f.id));
+  for (const f of active) {
+    if (!dedupedSet.has(f.id)) {
+      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.DUPLICATE });
+    }
+  }
+
+  const sorted = [...deduped].sort(
+    (a, b) => (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_0__/* .computeFindingBreakdown */ ._)(b).composite - (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_0__/* .computeFindingBreakdown */ ._)(a).composite
+  );
+
+  const overview = [];
+  const overviewRuleIds = new Set();
+  for (const f of sorted) {
+    const rid = String(f.ruleId ?? '');
+    const isUnknown = rid === 'unknown';
+    if (!isUnknown && overviewRuleIds.has(rid)) {
+      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
+    } else if (overview.length < maxOverview) {
+      overview.push(f);
+      if (!isUnknown) overviewRuleIds.add(rid);
+    } else {
+      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
+    }
+  }
+
+  return { overview, inlineCandidates: [], suppressed };
+}
+
+
+/***/ }),
+
 /***/ 340:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
@@ -35307,7 +35416,7 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
 
 /***/ }),
 
-/***/ 727:
+/***/ 5544:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -35322,105 +35431,8 @@ __nccwpck_require__.d(__webpack_exports__, {
 var loader = __nccwpck_require__(3833);
 // EXTERNAL MODULE: ./src/lib/scoring/breakdown.mjs
 var breakdown = __nccwpck_require__(9946);
-;// CONCATENATED MODULE: ./src/lib/finding-classifier.mjs
-
-
-const SUPPRESS_REASONS = {
-  LOW_CONFIDENCE: 'low_confidence',
-  DUPLICATE: 'duplicate',
-  STYLE_ONLY: 'style_only',
-  INSUFFICIENT_EVIDENCE: 'insufficient_evidence',
-  COVERED_BY_HIGHER_LEVEL: 'covered_by_higher_level_finding',
-};
-
-function evidenceTotalChars(finding) {
-  const ev = finding.evidence;
-  if (!Array.isArray(ev) || ev.length === 0) return 0;
-  return ev.reduce((sum, e) => sum + String(e ?? '').length, 0);
-}
-
-function deduplicateWithinFile(findings) {
-  const seen = new Set();
-  return findings.filter((f) => {
-    const ruleId = String(f.ruleId ?? '');
-    if (ruleId === 'unknown') return true; // ruleId が未確定の finding は file-level dedup もスキップ
-    const key = `${f.file ?? ''}::${ruleId}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-function deduplicateWithinPR(findings) {
-  const seen = new Set();
-  return findings.filter((f) => {
-    const key = String(f.ruleId ?? '');
-    if (key === 'unknown') return true; // ruleId が確定していない finding は PR-level dedup をスキップ
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-/**
- * @param {object[]} findings
- * @param {{ reviewMode?: 'tiny'|'medium'|'large' }} [options]
- * @returns {{ overview: object[], inlineCandidates: object[], suppressed: object[] }}
- */
-function classifyFindings(findings, options = {}) {
-  const reviewMode = options.reviewMode ?? 'medium';
-  const maxOverview = reviewMode === 'tiny' ? 3 : reviewMode === 'large' ? 8 : 5;
-
-  const suppressed = [];
-  const active = [];
-
-  for (const finding of findings) {
-    if (finding.confidence === 'low' && finding.severity !== 'critical') {
-      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.LOW_CONFIDENCE });
-      continue;
-    }
-    if (evidenceTotalChars(finding) < 30 && finding.severity !== 'critical') {
-      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.INSUFFICIENT_EVIDENCE });
-      continue;
-    }
-    const ruleId = String(finding.ruleId ?? '');
-    if (finding.severity === 'minor' && /readability|style|format/i.test(ruleId)) {
-      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.STYLE_ONLY });
-      continue;
-    }
-    active.push(finding);
-  }
-
-  const deduped = deduplicateWithinPR(deduplicateWithinFile(active));
-  const dedupedSet = new Set(deduped.map((f) => f.id));
-  for (const f of active) {
-    if (!dedupedSet.has(f.id)) {
-      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.DUPLICATE });
-    }
-  }
-
-  const sorted = [...deduped].sort(
-    (a, b) => (0,breakdown/* computeFindingBreakdown */._)(b).composite - (0,breakdown/* computeFindingBreakdown */._)(a).composite
-  );
-
-  const overview = [];
-  const overviewRuleIds = new Set();
-  for (const f of sorted) {
-    const rid = String(f.ruleId ?? '');
-    const isUnknown = rid === 'unknown';
-    if (!isUnknown && overviewRuleIds.has(rid)) {
-      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
-    } else if (overview.length < maxOverview) {
-      overview.push(f);
-      if (!isUnknown) overviewRuleIds.add(rid);
-    } else {
-      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
-    }
-  }
-
-  return { overview, inlineCandidates: [], suppressed };
-}
-
+// EXTERNAL MODULE: ./src/lib/finding-classifier.mjs
+var finding_classifier = __nccwpck_require__(7440);
 // EXTERNAL MODULE: ./src/config/default.mjs
 var config_default = __nccwpck_require__(4807);
 // EXTERNAL MODULE: ./runners/core/review-runner.mjs + 5 modules
@@ -36171,7 +36183,7 @@ async function generateReview({
     return bB.composite - bA.composite;
   });
 
-  const classified = classifyFindings(findings, { reviewMode: reviewMode ?? 'medium' });
+  const classified = (0,finding_classifier/* classifyFindings */.Z)(findings, { reviewMode: reviewMode ?? 'medium' });
 
   return {
     comments,
@@ -37019,8 +37031,146 @@ var loader = __nccwpck_require__(3833);
 var lib_diff = __nccwpck_require__(4382);
 // EXTERNAL MODULE: ./src/lib/diff-optimizer.mjs
 var diff_optimizer = __nccwpck_require__(1092);
-// EXTERNAL MODULE: ./src/lib/review-engine.mjs + 2 modules
-var review_engine = __nccwpck_require__(727);
+// EXTERNAL MODULE: ./src/lib/review-engine.mjs + 1 modules
+var review_engine = __nccwpck_require__(5544);
+// EXTERNAL MODULE: ./src/lib/finding-classifier.mjs
+var finding_classifier = __nccwpck_require__(7440);
+;// CONCATENATED MODULE: ./src/lib/reviewer-orchestrator.mjs
+
+
+
+const REVIEWER_ROLES = {
+  'bug-hunter': {
+    label: 'Bug Hunter',
+    focusInstructions: `You are the Bug Hunter reviewer. Focus exclusively on:
+- Logic errors, off-by-one mistakes, incorrect boolean conditions
+- Null/undefined dereference and missing guard clauses
+- Edge cases (empty collections, negative values, concurrent access)
+- Incorrect or swallowed error handling
+Report only issues in these categories. Do NOT report security vulnerabilities or style issues.`,
+  },
+  'security-scanner': {
+    label: 'Security Scanner',
+    focusInstructions: `You are the Security Scanner reviewer. Focus exclusively on:
+- Injection vulnerabilities (SQL, shell command, path traversal, template injection)
+- Authentication and authorization bypasses
+- Sensitive data exposure (hardcoded secrets, PII in logs, tokens in URLs)
+- Insecure defaults, missing input validation at trust boundaries
+Report only security issues. Do NOT report logic bugs or style concerns.`,
+  },
+  'test-gap': {
+    label: 'Test Gap Finder',
+    focusInstructions: `You are the Test Gap Finder reviewer. Focus exclusively on:
+- New or changed code paths that lack test coverage
+- Missing edge-case tests (boundary values, error paths, empty inputs)
+- Tests that are present but do not assert meaningful outcomes
+Report only test coverage gaps. Do NOT report implementation bugs or style issues.`,
+  },
+};
+
+const DEFAULT_REVIEWERS = ['bug-hunter', 'security-scanner'];
+
+function resolveReviewerRoles(reviewers) {
+  const names = reviewers ?? DEFAULT_REVIEWERS;
+  const valid = names.filter((n) => REVIEWER_ROLES[n]);
+  const invalid = names.filter((n) => !REVIEWER_ROLES[n]);
+  return { valid, invalid };
+}
+
+async function runReviewerOrchestration({
+  diff,
+  plan,
+  phase,
+  dryRun = false,
+  model,
+  apiKey,
+  projectRules,
+  riskAssessment,
+  memoryContext,
+  fileTypes,
+  relatedADRs,
+  reviewMode,
+  config,
+  reviewers,
+} = {}) {
+  const { valid: roles, invalid } = resolveReviewerRoles(reviewers);
+
+  if (!roles.length) {
+    throw new Error(
+      `No valid reviewer roles. Got: [${(reviewers ?? []).join(', ')}]. Valid: [${Object.keys(REVIEWER_ROLES).join(', ')}]`
+    );
+  }
+
+  const generateArgs = {
+    diff,
+    plan,
+    phase,
+    dryRun,
+    model,
+    apiKey,
+    riskAssessment,
+    memoryContext,
+    fileTypes,
+    relatedADRs,
+    reviewMode,
+    config,
+  };
+
+  // Run each role in parallel; partial failure is tolerated
+  const settled = await Promise.allSettled(
+    roles.map((roleName) => {
+      const role = REVIEWER_ROLES[roleName];
+      const roleRules = [role.focusInstructions, projectRules].filter(Boolean).join('\n\n');
+      return (0,review_engine/* generateReview */.G1)({ ...generateArgs, projectRules: roleRules }).then((result) => ({
+        ...result,
+        reviewerRole: roleName,
+      }));
+    })
+  );
+
+  const succeeded = settled
+    .filter((r) => r.status === 'fulfilled')
+    .map((r) => r.value);
+  const failed = settled.filter((r) => r.status === 'rejected');
+
+  // Merge findings with globally unique IDs and role tags
+  let nextId = 1;
+  const allFindings = succeeded.flatMap((r) =>
+    (r.findings ?? []).map((f) => ({
+      ...f,
+      id: `rr-${nextId++}`,
+      reviewerRole: r.reviewerRole,
+    }))
+  );
+
+  const allComments = succeeded.flatMap((r) => r.comments ?? []);
+  const classified = (0,finding_classifier/* classifyFindings */.Z)(allFindings, { reviewMode: reviewMode ?? 'medium' });
+
+  const reviewerResults = roles.map((name, i) => ({
+    role: name,
+    label: REVIEWER_ROLES[name].label,
+    status: settled[i].status,
+    findingsCount:
+      settled[i].status === 'fulfilled' ? (settled[i].value.findings?.length ?? 0) : 0,
+    error: settled[i].status === 'rejected' ? String(settled[i].reason?.message ?? 'unknown') : null,
+  }));
+
+  return {
+    comments: allComments,
+    findings: allFindings,
+    classified,
+    reviewerResults,
+    invalidRoles: invalid,
+    prompt: succeeded[0]?.prompt ?? null,
+    promptTruncated: succeeded.some((r) => r.promptTruncated),
+    llmModel: succeeded[0]?.llmModel ?? null,
+    debug: {
+      succeededReviewers: succeeded.length,
+      failedReviewers: failed.length,
+    },
+  };
+}
+
 ;// CONCATENATED MODULE: ./src/lib/openai-planner.mjs
 const DEFAULT_PLANNER_MODEL =
   process.env.RIVER_PLANNER_MODEL ||
@@ -37457,6 +37607,7 @@ function isLlmEnabled() {
 
 
 
+
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
   if (['upstream', 'midstream', 'downstream'].includes(normalized)) return normalized;
@@ -37741,6 +37892,7 @@ async function runLocalReview({
   availableContexts,
   availableDependencies,
   plannerMode,
+  reviewers,
 } = {}) {
   const context =
     providedContext ??
@@ -37789,7 +37941,7 @@ async function runLocalReview({
     changedFiles: context.changedFiles,
   });
 
-  const review = await (0,review_engine/* generateReview */.G1)({
+  const reviewArgs = {
     diff: context.diff,
     plan: context.plan,
     phase: normalizePhase(phase),
@@ -37803,7 +37955,11 @@ async function runLocalReview({
     relatedADRs: context.plan?.relatedADRs,
     reviewMode: context.plan?.reviewMode,
     config: context.config,
-  });
+  };
+
+  const review = reviewers?.length
+    ? await runReviewerOrchestration({ ...reviewArgs, reviewers })
+    : await (0,review_engine/* generateReview */.G1)(reviewArgs);
 
   return {
     status: 'ok',
@@ -37818,6 +37974,7 @@ async function runLocalReview({
     comments: review.comments,
     findings: review.findings,
     classified: review.classified,
+    reviewerResults: review.reviewerResults ?? null,
     tokenEstimate: context.diff.tokenEstimate,
     rawTokenEstimate: context.diff.rawTokenEstimate,
     reduction: context.diff.reduction,
@@ -48519,6 +48676,7 @@ Options:
   --output <mode>   Output format: text|markdown|json|yaml. Default: text
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
+  --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap)
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
   --verbose         (eval) Print detailed per-case results
   -h, --help        Show this help message
@@ -48542,6 +48700,7 @@ function parseArgs(argv) {
     output: 'text',
     availableContexts: null,
     availableDependencies: null,
+    reviewers: null,
     // skills subcommand fields
     skillsSubcommand: null,
     fromPath: null,
@@ -48648,6 +48807,18 @@ function parseArgs(argv) {
     }
     if (arg === '--dependency') {
       parsed.availableDependencies = parseList(args.shift());
+      continue;
+    }
+    if (arg === '--reviewers') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error(
+          'Error: --reviewers option requires a value (e.g. bug-hunter,security-scanner).'
+        );
+        parsed.command = 'help';
+        break;
+      }
+      parsed.reviewers = parseList(value);
       continue;
     }
     // Skills subcommand options
@@ -49222,6 +49393,7 @@ Dependencies: ${
       availableContexts: parsed.availableContexts,
       availableDependencies: parsed.availableDependencies,
       plannerMode: parsed.plannerMode,
+      reviewers: parsed.reviewers,
     });
 
     if (parsed.output === 'json') {
