@@ -93,7 +93,10 @@ async function saveRunRecord(runRecord, { storeDir } = {}) {
 async function listRunRecords(storeDir) {
   try {
     const entries = await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readdir(storeDir);
-    const jsonFiles = entries.filter((e) => e.endsWith('.json')).sort().reverse();
+    const jsonFiles = entries
+      .filter((e) => e.endsWith('.json'))
+      .sort()
+      .reverse();
     const metas = await Promise.allSettled(
       jsonFiles.map(async (name) => {
         const raw = await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readFile(node_path__WEBPACK_IMPORTED_MODULE_1__.join(storeDir, name), 'utf8');
@@ -118,10 +121,15 @@ async function listRunRecords(storeDir) {
 
 /**
  * Load a full run record by runId from the store directory.
+ * Validates that the resolved path stays within storeDir (path traversal guard).
  */
 async function loadRunRecord(storeDir, runId) {
-  const filePath = node_path__WEBPACK_IMPORTED_MODULE_1__.join(storeDir, `${runId}.json`);
-  const raw = await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readFile(filePath, 'utf8');
+  const base = node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(storeDir);
+  const resolved = node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(base, `${runId}.json`);
+  if (!resolved.startsWith(base + node_path__WEBPACK_IMPORTED_MODULE_1__.sep) && resolved !== base) {
+    throw new Error(`Invalid runId: path traversal detected`);
+  }
+  const raw = await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readFile(resolved, 'utf8');
   return JSON.parse(raw);
 }
 
@@ -189,9 +197,7 @@ function formatDashboard(dashboard) {
     dashboard.suppressRate !== null ? `${(dashboard.suppressRate * 100).toFixed(1)}%` : 'N/A';
   lines.push(`| Suppress rate | ${suppPct} |`);
   const avgF =
-    dashboard.avgFindingsPerRun !== null
-      ? dashboard.avgFindingsPerRun.toFixed(1)
-      : 'N/A';
+    dashboard.avgFindingsPerRun !== null ? dashboard.avgFindingsPerRun.toFixed(1) : 'N/A';
   lines.push(`| Avg findings/run | ${avgF} |`);
   lines.push('');
 
