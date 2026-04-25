@@ -35270,6 +35270,8 @@ __nccwpck_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
 var loader = __nccwpck_require__(3833);
+// EXTERNAL MODULE: ./src/lib/scoring/breakdown.mjs
+var breakdown = __nccwpck_require__(9946);
 // EXTERNAL MODULE: ./src/config/default.mjs
 var config_default = __nccwpck_require__(4807);
 // EXTERNAL MODULE: ./runners/core/review-runner.mjs + 4 modules
@@ -35396,6 +35398,7 @@ function validateFindingMessage(message) {
 }
 
 ;// CONCATENATED MODULE: ./src/lib/review-engine.mjs
+
 
 
 
@@ -36004,6 +36007,12 @@ async function generateReview({
     };
   });
 
+  findings.sort((a, b) => {
+    const bA = (0,breakdown/* computeFindingBreakdown */._)(a);
+    const bB = (0,breakdown/* computeFindingBreakdown */._)(b);
+    return bB.composite - bA.composite;
+  });
+
   return {
     comments,
     findings,
@@ -36200,6 +36209,92 @@ function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
 
 /***/ }),
 
+/***/ 9946:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   _: () => (/* binding */ computeFindingBreakdown)
+/* harmony export */ });
+function computeEvidenceStrength(finding) {
+  const evidence = finding.evidence;
+  if (!Array.isArray(evidence) || evidence.length === 0) return 0.0;
+  const totalChars = evidence.reduce((sum, e) => sum + String(e ?? '').length, 0);
+  if (totalChars === 0) return 0.0;
+  if (totalChars <= 50) return 0.3;
+  if (totalChars <= 150) return 0.6;
+  return 1.0;
+}
+
+function computeReproducibility(finding) {
+  const confidence = finding.confidence ?? 'medium';
+  const severity = finding.severity ?? 'info';
+
+  let base;
+  if (confidence === 'high') base = 1.0;
+  else if (confidence === 'medium') base = 0.5;
+  else base = 0.2;
+
+  if (severity === 'critical') base = Math.min(1.0, base + 0.2);
+  if (severity === 'minor') base = Math.max(0.0, base - 0.1);
+
+  return base;
+}
+
+function computeBlastRadius(finding) {
+  const severity = finding.severity ?? 'info';
+  const ruleId = String(finding.ruleId ?? '');
+
+  let base;
+  if (severity === 'critical') base = 1.0;
+  else if (severity === 'major') base = 0.7;
+  else if (severity === 'minor') base = 0.3;
+  else base = 0.1;
+
+  if (ruleId.includes('security')) base = Math.min(1.0, base * 1.2);
+
+  return base;
+}
+
+function computeReviewerAgreement(finding) {
+  const confidence = finding.confidence ?? 'medium';
+  if (confidence === 'high') return 0.9;
+  if (confidence === 'medium') return 0.7;
+  return 0.4;
+}
+
+/**
+ * Compute a 4-axis score breakdown for a single finding.
+ *
+ * @param {{
+ *   evidence?: string[],
+ *   confidence?: 'high' | 'medium' | 'low',
+ *   severity?: string,
+ *   ruleId?: string,
+ * }} finding
+ * @returns {{
+ *   evidenceStrength: number,
+ *   reproducibility: number,
+ *   blastRadius: number,
+ *   reviewerAgreement: number,
+ *   composite: number,
+ * }}
+ */
+function computeFindingBreakdown(finding) {
+  const evidenceStrength = computeEvidenceStrength(finding);
+  const reproducibility = computeReproducibility(finding);
+  const blastRadius = computeBlastRadius(finding);
+  const reviewerAgreement = computeReviewerAgreement(finding);
+  const composite =
+    evidenceStrength * 0.3 +
+    reproducibility * 0.25 +
+    blastRadius * 0.3 +
+    reviewerAgreement * 0.15;
+  return { evidenceStrength, reproducibility, blastRadius, reviewerAgreement, composite };
+}
+
+
+/***/ }),
+
 /***/ 9487:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
@@ -36209,6 +36304,7 @@ function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
 /* harmony export */ });
 /* unused harmony exports computeAxisScores, computeOverallScore, countBySeverity, deriveVerdict */
 /* harmony import */ var _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(5034);
+/* harmony import */ var _breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(9946);
 /**
  * Review scoring engine.
  *
@@ -36219,6 +36315,7 @@ function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
  * The output is always flagged `derived: true` to signal that this is a
  * heuristic indicator, not an authoritative quality metric.
  */
+
 
 
 
@@ -36329,6 +36426,7 @@ function deriveVerdict({ overall, axes, counts }) {
  *   axes: Record<typeof AXES[number], number>,
  *   verdict: string,
  *   counts: {critical: number, major: number, minor: number, info: number},
+ *   findingBreakdowns: Array<{id: string, evidenceStrength: number, reproducibility: number, blastRadius: number, reviewerAgreement: number, composite: number}>,
  *   derived: true,
  * }}
  */
@@ -36337,7 +36435,8 @@ function scoreReview(findings) {
   const overall = computeOverallScore(axes);
   const counts = countBySeverity(findings);
   const verdict = deriveVerdict({ overall, axes, counts });
-  return { overall, axes, verdict, counts, derived: true };
+  const findingBreakdowns = (findings ?? []).map((f) => ({ id: f.id, ...(0,_breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__/* .computeFindingBreakdown */ ._)(f) }));
+  return { overall, axes, verdict, counts, findingBreakdowns, derived: true };
 }
 
 /**
