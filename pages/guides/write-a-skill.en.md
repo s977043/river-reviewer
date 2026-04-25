@@ -107,7 +107,7 @@ Skill return `message` cannot be long. Ensure the following elements are readabl
 Note:
 
 - Do not write findings if Evidence cannot be written.
-- Confidence is a schema field (`confidence: high|medium|low`) included in JSON output. When instructing the LLM to emit it, include a `Confidence:` label in the message — it will be parsed automatically.
+- Confidence and Severity are schema fields (`confidence: high|medium|low`, `severity: critical|major|minor|info`) included in JSON output. When instructing the LLM to emit them, include `Confidence:` and `Severity:` labels in the message — they will be parsed automatically.
 
 ## Recommended: Finding Pattern (Short)
 
