@@ -170,7 +170,7 @@ ${buildLanguageInstruction(language)}
 - Use Severity: blocker|warning|nit and Confidence: high|medium|low.
 - Focus on correctness, safety, and maintainability risks in the changed code.
 - Prefer commenting on changed lines; if a point depends on context not visible in the diff, set Confidence: low.
-- Limit to 8 findings. If there are no issues worth mentioning, reply with "NO_ISSUES".
+- Limit to ${depthConfig.maxFindings} findings. If there are no issues worth mentioning, reply with "NO_ISSUES".
 - Keep messages brief (<=200 characters).
 - ${depthConfig.focusHint}
 ${buildSeverityInstruction(severity, language)}

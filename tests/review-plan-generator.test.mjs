@@ -73,8 +73,8 @@ test('getReviewDepthConfig: unknown mode falls back to medium', () => {
   assert.equal(cfg.maxFindings, 8);
 });
 
-test('getReviewDepthConfig: focusHint contains limit number for each mode', () => {
-  assert.ok(getReviewDepthConfig('tiny').focusHint.includes('3'));
-  assert.ok(getReviewDepthConfig('medium').focusHint.includes('8'));
-  assert.ok(getReviewDepthConfig('large').focusHint.includes('15'));
+test('getReviewDepthConfig: focusHint is non-empty for each mode', () => {
+  assert.ok(getReviewDepthConfig('tiny').focusHint.length > 0);
+  assert.ok(getReviewDepthConfig('medium').focusHint.length > 0);
+  assert.ok(getReviewDepthConfig('large').focusHint.length > 0);
 });

@@ -33,9 +33,9 @@ export function determineReviewMode(diffMeta, options = {}) {
  */
 export function getReviewDepthConfig(reviewMode) {
   const configs = {
-    tiny: { maxFindings: 3, focusHint: 'Focus on the most critical issues only. Limit findings to 3.' },
-    medium: { maxFindings: 8, focusHint: 'Provide a balanced review. Limit findings to 8.' },
-    large: { maxFindings: 15, focusHint: 'This is a large PR. Prioritize high-severity issues. Limit findings to 15.' },
+    tiny: { maxFindings: 3, focusHint: 'This is a small PR. Focus on the most critical issues only.' },
+    medium: { maxFindings: 8, focusHint: 'Provide a balanced review covering important issues.' },
+    large: { maxFindings: 15, focusHint: 'This is a large PR. Prioritize high-severity issues over minor style concerns.' },
   };
   return configs[reviewMode] ?? configs.medium;
 }
