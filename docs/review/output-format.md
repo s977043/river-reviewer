@@ -34,6 +34,27 @@
 | Minor    | 小さなバグ、可読性の問題、軽微な最適化の機会                 |
 | Info     | 提案、参考情報、追加の検討事項                               |
 
+## Finding フィールド
+
+各指摘（finding）が持つフィールドの一覧。`id`・`ruleId`・`title`・`message`・`severity`・`phase`・`file` は必須。
+
+| フィールド   | 型              | 必須 | 説明                                                           |
+| ------------ | --------------- | ---- | -------------------------------------------------------------- |
+| `id`         | `string`        | Yes  | ランスコープ内のユニークな識別子。                             |
+| `ruleId`     | `string`        | Yes  | 指摘を生成したルール / スキルの識別子。                        |
+| `title`      | `string`        | Yes  | 指摘の短いタイトル。                                           |
+| `message`    | `string`        | Yes  | 問題の詳細説明。                                               |
+| `severity`   | `string`        | Yes  | 重要度。`critical` / `major` / `minor` / `info`。              |
+| `phase`      | `string`        | Yes  | SDLC フェーズ。`upstream` / `midstream` / `downstream`。       |
+| `file`       | `string`        | Yes  | 対象ファイルパス。                                             |
+| `line`       | `integer`       | No   | 指摘に関連する開始行番号。                                     |
+| `lineEnd`    | `integer`       | No   | マルチライン指摘の終了行番号。                                 |
+| `confidence` | `string`        | No   | 指摘の信頼度。`high` / `medium` / `low`。                      |
+| `status`     | `string`        | No   | ライフサイクルステータス。`open` / `suppressed` / `verified`。 |
+| `evidence`   | `array<string>` | No   | 指摘を支持する証拠スニペットの配列。                           |
+| `reviewer`   | `string`        | No   | 指摘を生成したスキル / エージェントの識別子。                  |
+| `suggestion` | `string`        | No   | 修正や後続アクションのヒント。                                 |
+
 ## 禁止事項
 
 - 差分に存在しないコードへの推測に基づく指摘
