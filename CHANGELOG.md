@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.18.0](https://github.com/s977043/river-reviewer/compare/v0.17.2...v0.18.0) (2026-04-25)
+
+
+### Features
+
+* **eval:** enable skill eval CI gate (Phase 3) ([#646](https://github.com/s977043/river-reviewer/issues/646)) ([92c26ee](https://github.com/s977043/river-reviewer/commit/92c26eef3455fb4ee751c14fc8729fce923bf9c3))
+
 ## [0.17.2](https://github.com/s977043/river-reviewer/compare/v0.17.1...v0.17.2) (2026-04-25)
 
 
