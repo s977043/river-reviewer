@@ -34869,6 +34869,53 @@ function classifyFindings(findings, options = {}) {
 
 /***/ }),
 
+/***/ 3528:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  i: () => (/* binding */ annotateFingerprints)
+});
+
+// UNUSED EXPORTS: computeFingerprint
+
+;// CONCATENATED MODULE: external "node:crypto"
+const external_node_crypto_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
+;// CONCATENATED MODULE: ./src/lib/finding-fingerprint.mjs
+
+
+/**
+ * Stable fingerprint for a finding so that the same logical issue can be
+ * matched across review runs even when IDs regenerate.
+ *
+ * Strategy: hash(ruleId + file + first-60-chars-of-message).
+ * Intentionally omits lineStart/lineEnd because line numbers shift as code
+ * changes, but the same logical finding should still be considered persisting.
+ */
+function computeFingerprint(finding) {
+  const ruleId = String(finding.ruleId ?? 'unknown');
+  const file = String(finding.file ?? '');
+  // Normalize message: lowercase, collapse whitespace, take first 60 chars
+  const msgNorm = String(finding.message ?? finding.title ?? '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 60);
+  const raw = `${ruleId}::${file}::${msgNorm}`;
+  return (0,external_node_crypto_namespaceObject.createHash)('sha256').update(raw).digest('hex').slice(0, 16);
+}
+
+/**
+ * Annotate findings with their fingerprint (non-mutating).
+ */
+function annotateFingerprints(findings) {
+  return findings.map((f) => ({ ...f, fingerprint: computeFingerprint(f) }));
+}
+
+
+/***/ }),
+
 /***/ 340:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
@@ -36891,6 +36938,36 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /******/ __nccwpck_require__.m = __webpack_modules__;
 /******/ 
 /************************************************************************/
+/******/ /* webpack/runtime/create fake namespace object */
+/******/ (() => {
+/******/ 	var getProto = Object.getPrototypeOf ? (obj) => (Object.getPrototypeOf(obj)) : (obj) => (obj.__proto__);
+/******/ 	var leafPrototypes;
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 16: return value when it's Promise-like
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__nccwpck_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = this(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if(typeof value === 'object' && value) {
+/******/ 			if((mode & 4) && value.__esModule) return value;
+/******/ 			if((mode & 16) && typeof value.then === 'function') return value;
+/******/ 		}
+/******/ 		var ns = Object.create(null);
+/******/ 		__nccwpck_require__.r(ns);
+/******/ 		var def = {};
+/******/ 		leafPrototypes = leafPrototypes || [null, getProto({}), getProto([]), getProto(getProto)];
+/******/ 		for(var current = mode & 2 && value; typeof current == 'object' && !~leafPrototypes.indexOf(current); current = getProto(current)) {
+/******/ 			Object.getOwnPropertyNames(current).forEach((key) => (def[key] = () => (value[key])));
+/******/ 		}
+/******/ 		def['default'] = () => (value);
+/******/ 		__nccwpck_require__.d(ns, def);
+/******/ 		return ns;
+/******/ 	};
+/******/ })();
+/******/ 
 /******/ /* webpack/runtime/define property getters */
 /******/ (() => {
 /******/ 	// define getter functions for harmony exports
@@ -37589,7 +37666,10 @@ function isLlmEnabled() {
   );
 }
 
+// EXTERNAL MODULE: ./src/lib/finding-fingerprint.mjs + 1 modules
+var finding_fingerprint = __nccwpck_require__(3528);
 ;// CONCATENATED MODULE: ./src/lib/local-runner.mjs
+
 
 
 
@@ -37972,7 +38052,7 @@ async function runLocalReview({
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
     comments: review.comments,
-    findings: review.findings,
+    findings: (0,finding_fingerprint/* annotateFingerprints */.i)(review.findings ?? []),
     classified: review.classified,
     reviewerResults: review.reviewerResults ?? null,
     tokenEstimate: context.diff.tokenEstimate,
@@ -48677,6 +48757,7 @@ Options:
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
   --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap)
+  --baseline <path> Path to a previous review JSON (findings array) for regression comparison
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
   --verbose         (eval) Print detailed per-case results
   -h, --help        Show this help message
@@ -48701,6 +48782,7 @@ function parseArgs(argv) {
     availableContexts: null,
     availableDependencies: null,
     reviewers: null,
+    baseline: null,
     // skills subcommand fields
     skillsSubcommand: null,
     fromPath: null,
@@ -48819,6 +48901,16 @@ function parseArgs(argv) {
         break;
       }
       parsed.reviewers = parseList(value);
+      continue;
+    }
+    if (arg === '--baseline') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --baseline option requires a file path.');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.baseline = value;
       continue;
     }
     // Skills subcommand options
@@ -49395,6 +49487,25 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
       reviewers: parsed.reviewers,
     });
+
+    // Regression comparison when --baseline is provided
+    if (parsed.baseline && result.status === 'ok') {
+      try {
+        const { diffReviews, formatRegressionSummary } = await __nccwpck_require__.e(/* import() */ 744).then(__nccwpck_require__.bind(__nccwpck_require__, 3744));
+        const baselineRaw = await Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 1455, 19)).then((fs) =>
+          fs.readFile(parsed.baseline, 'utf8')
+        );
+        const baselineFindings = JSON.parse(baselineRaw);
+        const prevFindings = Array.isArray(baselineFindings)
+          ? baselineFindings
+          : (baselineFindings.findings ?? baselineFindings.issues ?? []);
+        const diff = diffReviews(prevFindings, result.findings ?? []);
+        const regSummary = formatRegressionSummary(diff);
+        console.log(regSummary);
+      } catch (err) {
+        console.error(`Warning: --baseline comparison failed: ${err.message}`);
+      }
+    }
 
     if (parsed.output === 'json') {
       console.log(JSON.stringify(formatJsonOutput(result, parsed.phase), null, 2));
