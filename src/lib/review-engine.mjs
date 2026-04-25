@@ -9,6 +9,7 @@ import {
   parseFindingMessage,
   normalizeSeverity,
 } from './finding-format.mjs';
+import { getReviewDepthConfig } from './review-plan-generator.mjs';
 
 const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
 const MAX_PROMPT_CHARS = 12000;
@@ -142,6 +143,7 @@ export function buildPrompt({
   riskAssessment,
   memoryContext,
   relatedADRs,
+  reviewMode,
   maxChars = MAX_PROMPT_CHARS,
   config = defaultConfig,
 }) {
@@ -151,6 +153,7 @@ export function buildPrompt({
   const severity = reviewConfig.severity ?? defaultConfig.review.severity;
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
+  const depthConfig = getReviewDepthConfig(reviewMode ?? 'medium');
   const prompt = `You are River Reviewer, an AI code review agent.
 Phase: ${phase}
 
@@ -167,8 +170,9 @@ ${buildLanguageInstruction(language)}
 - Use Severity: blocker|warning|nit and Confidence: high|medium|low.
 - Focus on correctness, safety, and maintainability risks in the changed code.
 - Prefer commenting on changed lines; if a point depends on context not visible in the diff, set Confidence: low.
-- Limit to 8 findings. If there are no issues worth mentioning, reply with "NO_ISSUES".
+- Limit to ${depthConfig.maxFindings} findings. If there are no issues worth mentioning, reply with "NO_ISSUES".
 - Keep messages brief (<=200 characters).
+- ${depthConfig.focusHint}
 ${buildSeverityInstruction(severity, language)}
 ${buildAdditionalSection(reviewConfig.additionalInstructions, language)}
 Diff:
@@ -453,6 +457,7 @@ export async function generateReview({
   fileTypes,
   relatedADRs,
   riskAssessment,
+  reviewMode,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -465,6 +470,7 @@ export async function generateReview({
     projectRules,
     relatedADRs,
     riskAssessment,
+    reviewMode,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });

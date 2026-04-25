@@ -139,6 +139,8 @@ export interface SkillSelectionResult {
   plannerFallback?: boolean;
   /** Planner error message (if fallback occurred) */
   plannerError?: string;
+  /** Review mode determined by diff size */
+  reviewMode?: 'tiny' | 'medium' | 'large';
 }
 
 /**

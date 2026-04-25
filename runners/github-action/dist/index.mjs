@@ -33049,7 +33049,7 @@ config(en());
 
 /***/ }),
 
-/***/ 8647:
+/***/ 4584:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -33416,7 +33416,52 @@ function extractTitle(markdown) {
   return match ? match[1].trim() : null;
 }
 
+;// CONCATENATED MODULE: ./src/lib/diff-meta.mjs
+
+
+/**
+ * Count changed lines from raw unified diff text.
+ *
+ * @param {string} diffText
+ * @returns {number}
+ */
+function countChangedLinesFromText(diffText) {
+  if (!diffText) return 0;
+  let lines = 0;
+  for (const line of diffText.split('\n')) {
+    if ((line.startsWith('+') && !line.startsWith('+++')) || (line.startsWith('-') && !line.startsWith('---'))) {
+      lines++;
+    }
+  }
+  return lines;
+}
+
+/**
+ * Extract metadata from a diff object for review depth control.
+ *
+ * @param {{ changedFiles?: string[], diffText?: string }} diff
+ * @returns {{ fileCount: number, changedLines: number, fileTypes: object, hasTests: boolean, hasMigrations: boolean, hasSchemas: boolean }}
+ */
+function extractDiffMeta(diff) {
+  const changedFiles = diff?.changedFiles ?? [];
+  const changedLines = countChangedLinesFromText(diff?.diffText);
+  const fileTypes = classifyChangedFiles(changedFiles);
+
+  return {
+    fileCount: changedFiles.length,
+    changedLines,
+    fileTypes,
+    hasTests: fileTypes.test.length > 0,
+    hasMigrations: fileTypes.migration.length > 0,
+    hasSchemas: fileTypes.schema.length > 0,
+  };
+}
+
+// EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs
+var review_plan_generator = __nccwpck_require__(8069);
 ;// CONCATENATED MODULE: ./runners/core/review-runner.mjs
+
+
 
 
 
@@ -33630,6 +33675,9 @@ async function buildExecutionPlan(options) {
   const riskAssessment = riskMap ? (0,risk_map/* evaluateRisk */.lm)(riskMap, changedFiles) : null;
   const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), { changedFiles, keywords: impactTags });
 
+  const diffMeta = extractDiffMeta({ changedFiles, diffText });
+  const reviewMode = (0,review_plan_generator/* determineReviewMode */.X)(diffMeta);
+
   // If planner is provided, try LLM-based planning, fallback to deterministic rank
   const effectivePlannerMode = planner
     ? (0,planner_utils/* normalizePlannerMode */.p)(plannerMode, { defaultMode: 'order' })
@@ -33661,6 +33709,7 @@ async function buildExecutionPlan(options) {
       impactTags,
       fileTypes,
       relatedADRs,
+      reviewMode,
     };
   }
 
@@ -33673,6 +33722,7 @@ async function buildExecutionPlan(options) {
     impactTags,
     fileTypes,
     relatedADRs,
+    reviewMode,
   };
 }
 
@@ -35274,8 +35324,8 @@ var loader = __nccwpck_require__(3833);
 var breakdown = __nccwpck_require__(9946);
 // EXTERNAL MODULE: ./src/config/default.mjs
 var config_default = __nccwpck_require__(4807);
-// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 4 modules
-var review_runner = __nccwpck_require__(8647);
+// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 5 modules
+var review_runner = __nccwpck_require__(4584);
 // EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
 var heuristic_review = __nccwpck_require__(2294);
 ;// CONCATENATED MODULE: ./src/lib/finding-format.mjs
@@ -35397,7 +35447,10 @@ function validateFindingMessage(message) {
   };
 }
 
+// EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs
+var review_plan_generator = __nccwpck_require__(8069);
 ;// CONCATENATED MODULE: ./src/lib/review-engine.mjs
+
 
 
 
@@ -35537,6 +35590,7 @@ function buildPrompt({
   riskAssessment,
   memoryContext,
   relatedADRs,
+  reviewMode,
   maxChars = MAX_PROMPT_CHARS,
   config = config_default/* defaultConfig */.s,
 }) {
@@ -35546,6 +35600,7 @@ function buildPrompt({
   const severity = reviewConfig.severity ?? config_default/* defaultConfig */.s.review.severity;
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
+  const depthConfig = (0,review_plan_generator/* getReviewDepthConfig */.i)(reviewMode ?? 'medium');
   const prompt = `You are River Reviewer, an AI code review agent.
 Phase: ${phase}
 
@@ -35562,8 +35617,9 @@ ${buildLanguageInstruction(language)}
 - Use Severity: blocker|warning|nit and Confidence: high|medium|low.
 - Focus on correctness, safety, and maintainability risks in the changed code.
 - Prefer commenting on changed lines; if a point depends on context not visible in the diff, set Confidence: low.
-- Limit to 8 findings. If there are no issues worth mentioning, reply with "NO_ISSUES".
+- Limit to ${depthConfig.maxFindings} findings. If there are no issues worth mentioning, reply with "NO_ISSUES".
 - Keep messages brief (<=200 characters).
+- ${depthConfig.focusHint}
 ${buildSeverityInstruction(severity, language)}
 ${buildAdditionalSection(reviewConfig.additionalInstructions, language)}
 Diff:
@@ -35848,6 +35904,7 @@ async function generateReview({
   fileTypes,
   relatedADRs,
   riskAssessment,
+  reviewMode,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -35860,6 +35917,7 @@ async function generateReview({
     projectRules,
     relatedADRs,
     riskAssessment,
+    reviewMode,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });
@@ -36021,6 +36079,58 @@ async function generateReview({
     llmModel: openAIConfig.model,
     debug,
   };
+}
+
+
+/***/ }),
+
+/***/ 8069:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   X: () => (/* binding */ determineReviewMode),
+/* harmony export */   i: () => (/* binding */ getReviewDepthConfig)
+/* harmony export */ });
+/**
+ * Determine review mode based on diff metadata.
+ *
+ * @param {{ fileCount: number, changedLines: number, hasMigrations: boolean, hasSchemas: boolean }} diffMeta
+ * @param {object} [options]
+ * @returns {'tiny' | 'medium' | 'large'}
+ */
+function determineReviewMode(diffMeta, options = {}) {
+  const { fileCount, changedLines, hasMigrations, hasSchemas } = diffMeta;
+
+  let mode;
+  if (fileCount <= 3 && changedLines <= 100) {
+    mode = 'tiny';
+  } else if (fileCount > 20 || changedLines > 800) {
+    mode = 'large';
+  } else {
+    mode = 'medium';
+  }
+
+  if (hasMigrations || hasSchemas) {
+    if (mode === 'tiny') mode = 'medium';
+    else if (mode === 'medium') mode = 'large';
+  }
+
+  return mode;
+}
+
+/**
+ * Get review depth configuration for the given mode.
+ *
+ * @param {'tiny' | 'medium' | 'large'} reviewMode
+ * @returns {{ maxFindings: number, focusHint: string }}
+ */
+function getReviewDepthConfig(reviewMode) {
+  const configs = {
+    tiny: { maxFindings: 3, focusHint: 'This is a small PR. Focus on the most critical issues only.' },
+    medium: { maxFindings: 8, focusHint: 'Provide a balanced review covering important issues.' },
+    large: { maxFindings: 15, focusHint: 'This is a large PR. Prioritize high-severity issues over minor style concerns.' },
+  };
+  return configs[reviewMode] ?? configs.medium;
 }
 
 
@@ -36954,8 +37064,8 @@ function createOpenAIPlanner(options = {}) {
 
 // EXTERNAL MODULE: ./src/lib/planner-utils.mjs
 var planner_utils = __nccwpck_require__(1013);
-// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 4 modules
-var review_runner = __nccwpck_require__(8647);
+// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 5 modules
+var review_runner = __nccwpck_require__(4584);
 ;// CONCATENATED MODULE: ./src/lib/rules.mjs
 
 
@@ -37588,6 +37698,7 @@ async function runLocalReview({
     memoryContext,
     fileTypes: context.plan?.fileTypes,
     relatedADRs: context.plan?.relatedADRs,
+    reviewMode: context.plan?.reviewMode,
     config: context.config,
   });
 
@@ -37598,6 +37709,7 @@ async function runLocalReview({
     mergeBase: context.mergeBase,
     changedFiles: context.changedFiles,
     plan: context.plan,
+    reviewMode: context.plan?.reviewMode ?? 'medium',
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
     comments: review.comments,
