@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.16.0](https://github.com/s977043/river-reviewer/compare/v0.15.0...v0.16.0) (2026-04-25)
+
+
+### Features
+
+* **finding-classifier:** add noise control layer with classify pipeline ([#617](https://github.com/s977043/river-reviewer/issues/617)) ([f7fc882](https://github.com/s977043/river-reviewer/commit/f7fc882e963e6b164d9e7a3d25b3f84e27dea997))
+* **review:** add review depth control based on PR size ([#619](https://github.com/s977043/river-reviewer/issues/619)) ([9129998](https://github.com/s977043/river-reviewer/commit/9129998663dd16b7608ef994f370ec54f483d597))
+* **scoring:** add finding score breakdown ([#618](https://github.com/s977043/river-reviewer/issues/618)) ([1d67c56](https://github.com/s977043/river-reviewer/commit/1d67c56b24ef5cd0181265efa56f40a0c4727249))
+
 ## [0.15.0](https://github.com/s977043/river-reviewer/compare/v0.14.2...v0.15.0) (2026-04-23)
 
 
