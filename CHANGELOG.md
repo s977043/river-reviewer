@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.2](https://github.com/s977043/river-reviewer/compare/v0.17.1...v0.17.2) (2026-04-25)
+
+
+### Bug Fixes
+
+* **eval:** redirect sub-eval progress to stderr to fix nightly CI ([#642](https://github.com/s977043/river-reviewer/issues/642)) ([495a76b](https://github.com/s977043/river-reviewer/commit/495a76b4e073fa72199959333aa348bdaa6be134))
+
 ## [0.17.1](https://github.com/s977043/river-reviewer/compare/v0.17.0...v0.17.1) (2026-04-25)
 
 
