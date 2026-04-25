@@ -1,4 +1,5 @@
 import { mergeConfig } from '../config/loader.mjs';
+import { computeFindingBreakdown } from './scoring/breakdown.mjs';
 import { defaultConfig } from '../config/default.mjs';
 import { summarizeSkill } from '../../runners/core/review-runner.mjs';
 import { buildHeuristicComments, HEURISTIC_SKILL_IDS } from './heuristic-review.mjs';
@@ -609,6 +610,12 @@ export async function generateReview({
       evidence: parsed.evidence,
       suggestion: parsed.suggestion || null,
     };
+  });
+
+  findings.sort((a, b) => {
+    const bA = computeFindingBreakdown(a);
+    const bB = computeFindingBreakdown(b);
+    return bB.composite - bA.composite;
   });
 
   return {
