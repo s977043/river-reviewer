@@ -11723,6 +11723,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fs");
 
 /***/ }),
 
+/***/ 7598:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
+
+/***/ }),
+
 /***/ 3024:
 /***/ ((module) => {
 
@@ -11734,6 +11741,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs");
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs/promises");
+
+/***/ }),
+
+/***/ 8161:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:os");
 
 /***/ }),
 
@@ -34869,6 +34883,47 @@ function classifyFindings(findings, options = {}) {
 
 /***/ }),
 
+/***/ 9597:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   i: () => (/* binding */ annotateFingerprints)
+/* harmony export */ });
+/* unused harmony export computeFingerprint */
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7598);
+
+
+/**
+ * Stable fingerprint for a finding so that the same logical issue can be
+ * matched across review runs even when IDs regenerate.
+ *
+ * Strategy: hash(ruleId + file + first-60-chars-of-message).
+ * Intentionally omits lineStart/lineEnd because line numbers shift as code
+ * changes, but the same logical finding should still be considered persisting.
+ */
+function computeFingerprint(finding) {
+  const ruleId = String(finding.ruleId ?? 'unknown');
+  const file = String(finding.file ?? '');
+  // Normalize message: lowercase, collapse whitespace, take first 60 chars
+  const msgNorm = String(finding.message ?? finding.title ?? '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 60);
+  const raw = `${ruleId}::${file}::${msgNorm}`;
+  return (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.createHash)('sha256').update(raw).digest('hex').slice(0, 16);
+}
+
+/**
+ * Annotate findings with their fingerprint (non-mutating).
+ */
+function annotateFingerprints(findings) {
+  return findings.map((f) => ({ ...f, fingerprint: computeFingerprint(f) }));
+}
+
+
+/***/ }),
+
 /***/ 340:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
@@ -36891,6 +36946,36 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /******/ __nccwpck_require__.m = __webpack_modules__;
 /******/ 
 /************************************************************************/
+/******/ /* webpack/runtime/create fake namespace object */
+/******/ (() => {
+/******/ 	var getProto = Object.getPrototypeOf ? (obj) => (Object.getPrototypeOf(obj)) : (obj) => (obj.__proto__);
+/******/ 	var leafPrototypes;
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 16: return value when it's Promise-like
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__nccwpck_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = this(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if(typeof value === 'object' && value) {
+/******/ 			if((mode & 4) && value.__esModule) return value;
+/******/ 			if((mode & 16) && typeof value.then === 'function') return value;
+/******/ 		}
+/******/ 		var ns = Object.create(null);
+/******/ 		__nccwpck_require__.r(ns);
+/******/ 		var def = {};
+/******/ 		leafPrototypes = leafPrototypes || [null, getProto({}), getProto([]), getProto(getProto)];
+/******/ 		for(var current = mode & 2 && value; typeof current == 'object' && !~leafPrototypes.indexOf(current); current = getProto(current)) {
+/******/ 			Object.getOwnPropertyNames(current).forEach((key) => (def[key] = () => (value[key])));
+/******/ 		}
+/******/ 		def['default'] = () => (value);
+/******/ 		__nccwpck_require__.d(ns, def);
+/******/ 		return ns;
+/******/ 	};
+/******/ })();
+/******/ 
 /******/ /* webpack/runtime/define property getters */
 /******/ (() => {
 /******/ 	// define getter functions for harmony exports
@@ -37589,7 +37674,10 @@ function isLlmEnabled() {
   );
 }
 
+// EXTERNAL MODULE: ./src/lib/finding-fingerprint.mjs
+var finding_fingerprint = __nccwpck_require__(9597);
 ;// CONCATENATED MODULE: ./src/lib/local-runner.mjs
+
 
 
 
@@ -37972,7 +38060,7 @@ async function runLocalReview({
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
     comments: review.comments,
-    findings: review.findings,
+    findings: (0,finding_fingerprint/* annotateFingerprints */.i)(review.findings ?? []),
     classified: review.classified,
     reviewerResults: review.reviewerResults ?? null,
     tokenEstimate: context.diff.tokenEstimate,
@@ -48677,6 +48765,13 @@ Options:
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
   --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap)
+  --baseline <path> Path to a previous review JSON (findings array) for regression comparison
+  --save            Persist the review run to the project result store (.river/runs/)
+
+Commands:
+  river runs list           List stored review runs
+  river runs diff <id> <id> Diff two stored review runs
+  river runs summary        Show aggregate dashboard metrics
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
   --verbose         (eval) Print detailed per-case results
   -h, --help        Show this help message
@@ -48701,6 +48796,12 @@ function parseArgs(argv) {
     availableContexts: null,
     availableDependencies: null,
     reviewers: null,
+    baseline: null,
+    save: false,
+    // runs subcommand fields
+    runsSubcommand: null,
+    runsId1: null,
+    runsId2: null,
     // skills subcommand fields
     skillsSubcommand: null,
     fromPath: null,
@@ -48712,12 +48813,22 @@ function parseArgs(argv) {
 
   while (args.length) {
     const arg = args.shift();
-    if (!parsed.command && (arg === 'run' || arg === 'doctor' || arg === 'skills')) {
+    if (
+      !parsed.command &&
+      (arg === 'run' || arg === 'doctor' || arg === 'skills' || arg === 'runs')
+    ) {
       parsed.command = arg;
       // Check for skills subcommands (import/export/list)
       if (arg === 'skills' && args[0] && SKILLS_SUBCOMMANDS.has(args[0])) {
         parsed.skillsSubcommand = args.shift();
-      } else if (args[0] && !args[0].startsWith('-')) {
+      } else if (arg === 'runs' && args[0] && !args[0].startsWith('-')) {
+        parsed.runsSubcommand = args.shift(); // list | diff | summary
+        // diff takes two positional run IDs
+        if (parsed.runsSubcommand === 'diff') {
+          parsed.runsId1 = args.shift() ?? null;
+          parsed.runsId2 = args.shift() ?? null;
+        }
+      } else if (arg !== 'runs' && args[0] && !args[0].startsWith('-')) {
         parsed.target = args.shift();
       }
       continue;
@@ -48819,6 +48930,20 @@ function parseArgs(argv) {
         break;
       }
       parsed.reviewers = parseList(value);
+      continue;
+    }
+    if (arg === '--baseline') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --baseline option requires a file path.');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.baseline = value;
+      continue;
+    }
+    if (arg === '--save') {
+      parsed.save = true;
       continue;
     }
     // Skills subcommand options
@@ -49252,6 +49377,63 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       return 0;
     }
 
+    if (parsed.command === 'runs') {
+      const { resolveStoreDir, listRunRecords, loadRunRecord, computeDashboard, formatDashboard } =
+        await __nccwpck_require__.e(/* import() */ 260).then(__nccwpck_require__.bind(__nccwpck_require__, 4260));
+      const storeDir = resolveStoreDir(targetPath);
+
+      if (!parsed.runsSubcommand || parsed.runsSubcommand === 'list') {
+        const runs = await listRunRecords(storeDir);
+        if (!runs.length) {
+          console.log('No stored runs found in ' + storeDir);
+          return 0;
+        }
+        console.log(`Stored runs (${storeDir}):\n`);
+        for (const r of runs) {
+          console.log(
+            `  ${r.runId}  phase=${r.phase}  findings=${r.findingsCount}  suppressed=${r.suppressedCount}  files=${r.changedFilesCount}  ${r.timestamp}`
+          );
+        }
+        return 0;
+      }
+
+      if (parsed.runsSubcommand === 'diff') {
+        if (!parsed.runsId1 || !parsed.runsId2) {
+          console.error('Error: river runs diff <run-id-1> <run-id-2>');
+          return 1;
+        }
+        const { diffReviews, formatRegressionSummary } = await __nccwpck_require__.e(/* import() */ 744).then(__nccwpck_require__.bind(__nccwpck_require__, 3744));
+        const [run1, run2] = await Promise.all([
+          loadRunRecord(storeDir, parsed.runsId1),
+          loadRunRecord(storeDir, parsed.runsId2),
+        ]);
+        const diff = diffReviews(run1.findings ?? [], run2.findings ?? []);
+        console.log(formatRegressionSummary(diff));
+        return 0;
+      }
+
+      if (parsed.runsSubcommand === 'summary') {
+        const runs = await listRunRecords(storeDir);
+        if (!runs.length) {
+          console.log('No stored runs found in ' + storeDir);
+          return 0;
+        }
+        // Load full records for dashboard computation
+        const fullRuns = await Promise.all(
+          runs.map((r) => loadRunRecord(storeDir, r.runId).catch(() => null))
+        );
+        const valid = fullRuns.filter(Boolean);
+        const db = computeDashboard(valid);
+        console.log(formatDashboard(db));
+        return 0;
+      }
+
+      console.error(
+        `Unknown runs subcommand: ${parsed.runsSubcommand}. Use: list | diff | summary`
+      );
+      return 1;
+    }
+
     if (parsed.command === 'eval') {
       const { evaluateReviewFixtures } = await __nccwpck_require__.e(/* import() */ 213).then(__nccwpck_require__.bind(__nccwpck_require__, 9213));
       const casesPath =
@@ -49395,6 +49577,39 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
       reviewers: parsed.reviewers,
     });
+
+    // Persist run to result store when --save is provided
+    if (parsed.save && result.status === 'ok') {
+      try {
+        const { buildRunRecord, saveRunRecord, resolveStoreDir } =
+          await __nccwpck_require__.e(/* import() */ 260).then(__nccwpck_require__.bind(__nccwpck_require__, 4260));
+        const record = buildRunRecord(result, { phase: parsed.phase });
+        // Use targetPath (not result.repoRoot) so --save and runs list resolve the same storeDir
+        const savedPath = await saveRunRecord(record, { storeDir: resolveStoreDir(targetPath) });
+        console.error(`Run saved: ${record.runId} → ${savedPath}`);
+      } catch (err) {
+        console.error(`Warning: --save failed: ${err.message}`);
+      }
+    }
+
+    // Regression comparison when --baseline is provided
+    if (parsed.baseline && result.status === 'ok') {
+      try {
+        const { diffReviews, formatRegressionSummary } = await __nccwpck_require__.e(/* import() */ 744).then(__nccwpck_require__.bind(__nccwpck_require__, 3744));
+        const baselineRaw = await Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 1455, 19)).then((fs) =>
+          fs.readFile(parsed.baseline, 'utf8')
+        );
+        const baselineFindings = JSON.parse(baselineRaw);
+        const prevFindings = Array.isArray(baselineFindings)
+          ? baselineFindings
+          : (baselineFindings.findings ?? baselineFindings.issues ?? []);
+        const diff = diffReviews(prevFindings, result.findings ?? []);
+        const regSummary = formatRegressionSummary(diff);
+        console.log(regSummary);
+      } catch (err) {
+        console.error(`Warning: --baseline comparison failed: ${err.message}`);
+      }
+    }
 
     if (parsed.output === 'json') {
       console.log(JSON.stringify(formatJsonOutput(result, parsed.phase), null, 2));
