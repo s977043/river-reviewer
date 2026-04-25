@@ -5,6 +5,7 @@ import { ConfigLoader } from '../config/loader.mjs';
 import { collectRepoDiff } from './diff.mjs';
 import { renderDiffText } from './diff-optimizer.mjs';
 import { generateReview } from './review-engine.mjs';
+import { runReviewerOrchestration } from './reviewer-orchestrator.mjs';
 import { detectDefaultBranch, ensureGitRepo, findMergeBase } from './git.mjs';
 import { createOpenAIPlanner } from './openai-planner.mjs';
 import { normalizePlannerMode } from './planner-utils.mjs';
@@ -305,6 +306,7 @@ export async function runLocalReview({
   availableContexts,
   availableDependencies,
   plannerMode,
+  reviewers,
 } = {}) {
   const context =
     providedContext ??
@@ -353,7 +355,7 @@ export async function runLocalReview({
     changedFiles: context.changedFiles,
   });
 
-  const review = await generateReview({
+  const reviewArgs = {
     diff: context.diff,
     plan: context.plan,
     phase: normalizePhase(phase),
@@ -367,7 +369,11 @@ export async function runLocalReview({
     relatedADRs: context.plan?.relatedADRs,
     reviewMode: context.plan?.reviewMode,
     config: context.config,
-  });
+  };
+
+  const review = reviewers?.length
+    ? await runReviewerOrchestration({ ...reviewArgs, reviewers })
+    : await generateReview(reviewArgs);
 
   return {
     status: 'ok',
@@ -382,6 +388,7 @@ export async function runLocalReview({
     comments: review.comments,
     findings: review.findings,
     classified: review.classified,
+    reviewerResults: review.reviewerResults ?? null,
     tokenEstimate: context.diff.tokenEstimate,
     rawTokenEstimate: context.diff.rawTokenEstimate,
     reduction: context.diff.reduction,
