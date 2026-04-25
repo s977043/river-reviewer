@@ -6,11 +6,15 @@ import { createHash } from 'node:crypto';
 const STORE_DIR_NAME = '.river/runs';
 const GLOBAL_STORE_DIR = path.join(os.homedir(), '.river', 'runs');
 
-/** Resolve the store directory for a project. Prefers project-local, falls back to global. */
-export function resolveStoreDir(repoRoot, { storeDir } = {}) {
-  if (storeDir) return storeDir;
+/** Compute the default store path from repoRoot (no override). */
+function defaultStoreDir(repoRoot) {
   if (repoRoot) return path.join(repoRoot, STORE_DIR_NAME);
   return GLOBAL_STORE_DIR;
+}
+
+/** Resolve the store directory for a project. Prefers project-local, falls back to global. */
+export function resolveStoreDir(repoRoot, { storeDir } = {}) {
+  return storeDir ?? defaultStoreDir(repoRoot);
 }
 
 /** Generate a unique run ID from timestamp + short hash. */
