@@ -31,6 +31,8 @@ exclude = [
   # Uncomment if needed:
   # 'github\.com/.*/tree/main/.*',
   # 'github\.com/.*/pull/\d+',
+  # Compare URLs exist only after tag creation (release-please chicken-and-egg)
+  'github\.com/.*/compare/',
 
 ]
 
