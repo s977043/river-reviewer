@@ -625,7 +625,7 @@ export async function generateReview({
     return bB.composite - bA.composite;
   });
 
-  const classified = classifyFindings(findings, { reviewMode: 'medium' });
+  const classified = classifyFindings(findings, { reviewMode: reviewMode ?? 'medium' });
 
   return {
     comments,
