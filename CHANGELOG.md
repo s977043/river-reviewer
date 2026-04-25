@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.1](https://github.com/s977043/river-reviewer/compare/v0.17.0...v0.17.1) (2026-04-25)
+
+
+### Bug Fixes
+
+* **lychee:** exclude GitHub compare URLs from link checking ([#640](https://github.com/s977043/river-reviewer/issues/640)) ([ec88a6a](https://github.com/s977043/river-reviewer/commit/ec88a6ae153ccb87fe17b530c8cdf2bba6ec712e))
+
 ## [0.17.0](https://github.com/s977043/river-reviewer/compare/v0.16.0...v0.17.0) (2026-04-25)
 
 
