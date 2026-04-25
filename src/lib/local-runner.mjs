@@ -380,6 +380,8 @@ export async function runLocalReview({
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
     comments: review.comments,
+    findings: review.findings,
+    classified: review.classified,
     tokenEstimate: context.diff.tokenEstimate,
     rawTokenEstimate: context.diff.rawTokenEstimate,
     reduction: context.diff.reduction,
