@@ -365,6 +365,7 @@ export async function runLocalReview({
     memoryContext,
     fileTypes: context.plan?.fileTypes,
     relatedADRs: context.plan?.relatedADRs,
+    reviewMode: context.plan?.reviewMode,
     config: context.config,
   });
 
@@ -375,6 +376,7 @@ export async function runLocalReview({
     mergeBase: context.mergeBase,
     changedFiles: context.changedFiles,
     plan: context.plan,
+    reviewMode: context.plan?.reviewMode ?? 'medium',
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
     comments: review.comments,

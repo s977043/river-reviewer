@@ -7,6 +7,8 @@ import { normalizePlannerMode } from '../../src/lib/planner-utils.mjs';
 import { HEURISTIC_SKILL_IDS } from '../../src/lib/heuristic-review.mjs';
 import { evaluateRisk } from '../../src/lib/risk-map.mjs';
 import { findRelatedADRs } from '../../src/lib/adr-linker.mjs';
+import { extractDiffMeta } from '../../src/lib/diff-meta.mjs';
+import { determineReviewMode } from '../../src/lib/review-plan-generator.mjs';
 
 const MODEL_PRIORITY = {
   cheap: 1,
@@ -211,6 +213,9 @@ export async function buildExecutionPlan(options) {
   const riskAssessment = riskMap ? evaluateRisk(riskMap, changedFiles) : null;
   const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), { changedFiles, keywords: impactTags });
 
+  const diffMeta = extractDiffMeta({ changedFiles, diffText });
+  const reviewMode = determineReviewMode(diffMeta);
+
   // If planner is provided, try LLM-based planning, fallback to deterministic rank
   const effectivePlannerMode = planner
     ? normalizePlannerMode(plannerMode, { defaultMode: 'order' })
@@ -242,6 +247,7 @@ export async function buildExecutionPlan(options) {
       impactTags,
       fileTypes,
       relatedADRs,
+      reviewMode,
     };
   }
 
@@ -254,6 +260,7 @@ export async function buildExecutionPlan(options) {
     impactTags,
     fileTypes,
     relatedADRs,
+    reviewMode,
   };
 }
 
