@@ -35353,6 +35353,7 @@ function deduplicateWithinPR(findings) {
   const seen = new Set();
   return findings.filter((f) => {
     const key = String(f.ruleId ?? '');
+    if (key === 'unknown') return true; // ruleId が確定していない finding は PR-level dedup をスキップ
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -35376,7 +35377,7 @@ function classifyFindings(findings, options = {}) {
       suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.LOW_CONFIDENCE });
       continue;
     }
-    if (evidenceTotalChars(finding) < 30) {
+    if (evidenceTotalChars(finding) < 30 && finding.severity !== 'critical') {
       suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.INSUFFICIENT_EVIDENCE });
       continue;
     }
@@ -35404,11 +35405,12 @@ function classifyFindings(findings, options = {}) {
   const overviewRuleIds = new Set();
   for (const f of sorted) {
     const rid = String(f.ruleId ?? '');
-    if (overviewRuleIds.has(rid)) {
+    const isUnknown = rid === 'unknown';
+    if (!isUnknown && overviewRuleIds.has(rid)) {
       suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
     } else if (overview.length < maxOverview) {
       overview.push(f);
-      overviewRuleIds.add(rid);
+      if (!isUnknown) overviewRuleIds.add(rid);
     } else {
       suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
     }

@@ -99,7 +99,11 @@ describe('classifyFindings', () => {
     );
     const { overview, suppressed } = classifyFindings(findings, { reviewMode: 'medium' });
     assert.equal(overview.length, 5);
-    assert.equal(suppressed.filter((f) => f.suppressReason === SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL).length, 3);
+    assert.equal(
+      suppressed.filter((f) => f.suppressReason === SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL)
+        .length,
+      3
+    );
   });
 
   it('caps overview by maxOverview (tiny=3)', () => {
@@ -144,5 +148,34 @@ describe('classifyFindings', () => {
     classifyFindings([f]);
     assert.equal(f.confidence, original.confidence);
     assert.ok(!('suppressReason' in f));
+  });
+
+  it('does not collapse multiple findings with ruleId=unknown (BUG-1)', () => {
+    const f1 = makeFinding({ ruleId: 'unknown', file: 'src/a.mjs' });
+    const f2 = makeFinding({ ruleId: 'unknown', file: 'src/b.mjs' });
+    const f3 = makeFinding({ ruleId: 'unknown', file: 'src/c.mjs' });
+    const { overview, suppressed } = classifyFindings([f1, f2, f3]);
+    assert.equal(
+      overview.length +
+        suppressed.filter((f) => f.suppressReason === SUPPRESS_REASONS.DUPLICATE).length,
+      3
+    );
+    assert.equal(
+      suppressed.filter((f) => f.suppressReason === SUPPRESS_REASONS.DUPLICATE).length,
+      0
+    );
+  });
+
+  it('does not suppress critical findings with short evidence (BUG-2)', () => {
+    const f = makeFinding({ severity: 'critical', evidence: ['short'] });
+    const { overview, suppressed } = classifyFindings([f]);
+    assert.equal(overview.length, 1);
+    assert.equal(suppressed.length, 0);
+  });
+
+  it('does not suppress critical findings with empty evidence (BUG-2)', () => {
+    const f = makeFinding({ severity: 'critical', evidence: [] });
+    const { overview } = classifyFindings([f]);
+    assert.equal(overview.length, 1);
   });
 });
