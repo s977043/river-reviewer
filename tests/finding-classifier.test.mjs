@@ -166,6 +166,16 @@ describe('classifyFindings', () => {
     );
   });
 
+  it('does not collapse same-file findings with ruleId=unknown (BUG-1 file-level)', () => {
+    const f1 = makeFinding({ ruleId: 'unknown', file: 'src/a.mjs' });
+    const f2 = makeFinding({ ruleId: 'unknown', file: 'src/a.mjs' });
+    const { suppressed } = classifyFindings([f1, f2]);
+    assert.equal(
+      suppressed.filter((f) => f.suppressReason === SUPPRESS_REASONS.DUPLICATE).length,
+      0
+    );
+  });
+
   it('does not suppress critical findings with short evidence (BUG-2)', () => {
     const f = makeFinding({ severity: 'critical', evidence: ['short'] });
     const { overview, suppressed } = classifyFindings([f]);

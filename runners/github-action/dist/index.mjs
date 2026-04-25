@@ -35342,7 +35342,9 @@ function evidenceTotalChars(finding) {
 function deduplicateWithinFile(findings) {
   const seen = new Set();
   return findings.filter((f) => {
-    const key = `${f.file ?? ''}::${f.ruleId ?? ''}`;
+    const ruleId = String(f.ruleId ?? '');
+    if (ruleId === 'unknown') return true; // ruleId が未確定の finding は file-level dedup もスキップ
+    const key = `${f.file ?? ''}::${ruleId}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
