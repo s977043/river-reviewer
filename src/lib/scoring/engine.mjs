@@ -10,6 +10,7 @@
  */
 
 import { AXES, AXIS_PATTERNS, DEFAULT_DEDUCTIONS, VERDICT_THRESHOLDS } from './rubric.mjs';
+import { computeFindingBreakdown } from './breakdown.mjs';
 
 /**
  * Classify a finding into one of the 5 axes based on its ruleId.
@@ -126,7 +127,8 @@ export function scoreReview(findings) {
   const overall = computeOverallScore(axes);
   const counts = countBySeverity(findings);
   const verdict = deriveVerdict({ overall, axes, counts });
-  return { overall, axes, verdict, counts, derived: true };
+  const findingBreakdowns = (findings ?? []).map((f) => ({ id: f.id, ...computeFindingBreakdown(f) }));
+  return { overall, axes, verdict, counts, findingBreakdowns, derived: true };
 }
 
 /**
