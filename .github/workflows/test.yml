@@ -89,9 +89,10 @@ jobs:
       - run: npm run build:action
       - name: Check dist is up to date
         run: |
-          if ! git diff --quiet runners/github-action/dist/; then
+          git add runners/github-action/dist/
+          if ! git diff --cached --quiet runners/github-action/dist/; then
             echo "::error::dist/ is out of date. Run 'npm run build:action' and commit."
-            git diff --stat runners/github-action/dist/
+            git diff --cached --stat runners/github-action/dist/
             exit 1
           fi
 
