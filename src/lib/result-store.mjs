@@ -72,6 +72,9 @@ export async function saveRunRecord(runRecord, { storeDir } = {}) {
 
 /**
  * List all stored runs in a store directory, sorted newest first.
+ * Sorting is lexicographic by filename — relies on runId having a timestamp prefix
+ * (e.g. `2026-01-01T12-00-00-abc123`) so that lexicographic order equals chronological order.
+ * Custom runIds without a timestamp prefix will sort unpredictably.
  * @returns {object[]} array of { runId, timestamp, phase, reviewedTarget, findingsCount }
  */
 export async function listRunRecords(storeDir) {
