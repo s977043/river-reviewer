@@ -1,6 +1,6 @@
 {
   "name": "river-reviewer",
-  "version": "0.14.2",
+  "version": "0.15.0",
   "private": true,
   "description": "River Reviewer docs, schemas, and validation utilities.",
   "license": "MIT",
@@ -66,7 +66,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "^0.211.0",
     "@opentelemetry/resources": "^2.6.1",
     "@opentelemetry/sdk-node": "^0.212.0",
-    "@opentelemetry/semantic-conventions": "^1.39.0",
+    "@opentelemetry/semantic-conventions": "^1.40.0",
     "commander": "^14.0.2",
     "date-fns": "^4.1.0",
     "gray-matter": "^4.0.3",
@@ -91,7 +91,7 @@
     "markdownlint-cli": "^0.48.0",
     "prettier": "^3.8.1",
     "prh": "^5.4.4",
-    "textlint": "^15.5.2",
+    "textlint": "^15.5.4",
     "textlint-rule-preset-ja-technical-writing": "^12.0.2",
     "textlint-rule-prh": "^6.1.0"
   }
