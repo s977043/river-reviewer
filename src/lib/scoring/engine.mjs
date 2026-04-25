@@ -119,6 +119,7 @@ export function deriveVerdict({ overall, axes, counts }) {
  *   axes: Record<typeof AXES[number], number>,
  *   verdict: string,
  *   counts: {critical: number, major: number, minor: number, info: number},
+ *   findingBreakdowns: Array<{id: string, evidenceStrength: number, reproducibility: number, blastRadius: number, reviewerAgreement: number, composite: number}>,
  *   derived: true,
  * }}
  */

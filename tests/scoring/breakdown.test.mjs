@@ -16,7 +16,7 @@ describe('computeFindingBreakdown', () => {
     const cases = [
       { evidence: [], confidence: 'low', severity: 'info', ruleId: 'foo' },
       { evidence: ['x'.repeat(200)], confidence: 'high', severity: 'critical', ruleId: 'security-check' },
-      { evidence: ['abc'], confidence: 'medium', severity: 'major', ruleId: 'heuristic-missing-tests', source: 'heuristic' },
+      { evidence: ['abc'], confidence: 'medium', severity: 'major', ruleId: 'rr-downstream-test-existence-001' },
     ];
     for (const finding of cases) {
       const { composite } = computeFindingBreakdown(finding);
@@ -87,7 +87,7 @@ describe('computeFindingBreakdown', () => {
       assert.equal(reproducibility, 0.4);
     });
 
-    it('minor severity clamps to 0.0 from low base', () => {
+    it('minor severity reduces low base to 0.1', () => {
       const { reproducibility } = computeFindingBreakdown({ confidence: 'low', severity: 'minor' });
       assert.equal(reproducibility, 0.1);
     });
@@ -126,29 +126,24 @@ describe('computeFindingBreakdown', () => {
   });
 
   describe('reviewerAgreement', () => {
-    it('source=heuristic → 1.0', () => {
-      const { reviewerAgreement } = computeFindingBreakdown({ source: 'heuristic', confidence: 'low' });
-      assert.equal(reviewerAgreement, 1.0);
-    });
-
-    it('ruleId starting with heuristic- → 1.0', () => {
-      const { reviewerAgreement } = computeFindingBreakdown({ ruleId: 'heuristic-missing-tests', confidence: 'low' });
-      assert.equal(reviewerAgreement, 1.0);
-    });
-
-    it('LLM with high confidence → 0.9', () => {
-      const { reviewerAgreement } = computeFindingBreakdown({ source: 'llm', confidence: 'high', ruleId: 'foo' });
+    it('high confidence → 0.9', () => {
+      const { reviewerAgreement } = computeFindingBreakdown({ confidence: 'high', ruleId: 'foo' });
       assert.equal(reviewerAgreement, 0.9);
     });
 
-    it('LLM with medium confidence → 0.7', () => {
-      const { reviewerAgreement } = computeFindingBreakdown({ source: 'llm', confidence: 'medium', ruleId: 'foo' });
+    it('medium confidence → 0.7', () => {
+      const { reviewerAgreement } = computeFindingBreakdown({ confidence: 'medium', ruleId: 'foo' });
       assert.equal(reviewerAgreement, 0.7);
     });
 
-    it('LLM with low confidence → 0.4', () => {
-      const { reviewerAgreement } = computeFindingBreakdown({ source: 'llm', confidence: 'low', ruleId: 'foo' });
+    it('low confidence → 0.4', () => {
+      const { reviewerAgreement } = computeFindingBreakdown({ confidence: 'low', ruleId: 'foo' });
       assert.equal(reviewerAgreement, 0.4);
+    });
+
+    it('missing confidence defaults to medium → 0.7', () => {
+      const { reviewerAgreement } = computeFindingBreakdown({ ruleId: 'foo' });
+      assert.equal(reviewerAgreement, 0.7);
     });
   });
 });

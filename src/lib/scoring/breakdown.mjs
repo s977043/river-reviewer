@@ -1,11 +1,3 @@
-export const AXIS_WEIGHTS = {
-  security: 1.5,
-  performance: 1.2,
-  maintainability: 1.0,
-  extensibility: 1.0,
-  readability: 0.8,
-};
-
 function computeEvidenceStrength(finding) {
   const evidence = finding.evidence;
   if (!Array.isArray(evidence) || evidence.length === 0) return 0.0;
@@ -47,11 +39,6 @@ function computeBlastRadius(finding) {
 }
 
 function computeReviewerAgreement(finding) {
-  const source = finding.source;
-  const ruleId = String(finding.ruleId ?? '');
-
-  if (source === 'heuristic' || ruleId.startsWith('heuristic-')) return 1.0;
-
   const confidence = finding.confidence ?? 'medium';
   if (confidence === 'high') return 0.9;
   if (confidence === 'medium') return 0.7;
@@ -66,7 +53,6 @@ function computeReviewerAgreement(finding) {
  *   confidence?: 'high' | 'medium' | 'low',
  *   severity?: string,
  *   ruleId?: string,
- *   source?: string,
  * }} finding
  * @returns {{
  *   evidenceStrength: number,
