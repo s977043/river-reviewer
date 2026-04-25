@@ -1,5 +1,6 @@
 import { mergeConfig } from '../config/loader.mjs';
 import { computeFindingBreakdown } from './scoring/breakdown.mjs';
+import { classifyFindings } from './finding-classifier.mjs';
 import { defaultConfig } from '../config/default.mjs';
 import { summarizeSkill } from '../../runners/core/review-runner.mjs';
 import { buildHeuristicComments, HEURISTIC_SKILL_IDS } from './heuristic-review.mjs';
@@ -624,9 +625,12 @@ export async function generateReview({
     return bB.composite - bA.composite;
   });
 
+  const classified = classifyFindings(findings, { reviewMode: reviewMode ?? 'medium' });
+
   return {
     comments,
     findings,
+    classified,
     prompt: promptInfo.prompt,
     promptTruncated: promptInfo.truncated,
     llmModel: openAIConfig.model,

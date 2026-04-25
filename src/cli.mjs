@@ -434,9 +434,26 @@ ${formatDebugSummaryMarkdown(result)}
   const riskSection = formatRiskSummaryMarkdown(result.plan);
   const scoreSection = formatScoreSectionMarkdown(result, phase);
   const findings = `### 指摘\n${formatCommentsMarkdown(result.comments)}\n`;
+  const suppressedSummary = formatSuppressedSummaryMarkdown(result.classified);
   console.log(
-    [header, planSection, riskSection, scoreSection, findings].filter(Boolean).join('\n')
+    [header, planSection, riskSection, scoreSection, findings, suppressedSummary]
+      .filter(Boolean)
+      .join('\n')
   );
+}
+
+function formatSuppressedSummaryMarkdown(classified) {
+  if (!classified?.suppressed?.length) return null;
+  const counts = {};
+  for (const f of classified.suppressed) {
+    counts[f.suppressReason] = (counts[f.suppressReason] ?? 0) + 1;
+  }
+  const top = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([r, n]) => `${r}(${n})`)
+    .join(', ');
+  return `> _${classified.suppressed.length} 件の指摘を抑制しました (主な理由: ${top})_\n`;
 }
 
 function formatScoreSectionMarkdown(result, phase) {

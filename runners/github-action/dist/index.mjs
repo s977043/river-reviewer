@@ -35307,7 +35307,7 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
 
 /***/ }),
 
-/***/ 5544:
+/***/ 727:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -35322,6 +35322,103 @@ __nccwpck_require__.d(__webpack_exports__, {
 var loader = __nccwpck_require__(3833);
 // EXTERNAL MODULE: ./src/lib/scoring/breakdown.mjs
 var breakdown = __nccwpck_require__(9946);
+;// CONCATENATED MODULE: ./src/lib/finding-classifier.mjs
+
+
+const SUPPRESS_REASONS = {
+  LOW_CONFIDENCE: 'low_confidence',
+  DUPLICATE: 'duplicate',
+  STYLE_ONLY: 'style_only',
+  INSUFFICIENT_EVIDENCE: 'insufficient_evidence',
+  COVERED_BY_HIGHER_LEVEL: 'covered_by_higher_level_finding',
+};
+
+function evidenceTotalChars(finding) {
+  const ev = finding.evidence;
+  if (!Array.isArray(ev) || ev.length === 0) return 0;
+  return ev.reduce((sum, e) => sum + String(e ?? '').length, 0);
+}
+
+function deduplicateWithinFile(findings) {
+  const seen = new Set();
+  return findings.filter((f) => {
+    const key = `${f.file ?? ''}::${f.ruleId ?? ''}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function deduplicateWithinPR(findings) {
+  const seen = new Set();
+  return findings.filter((f) => {
+    const key = String(f.ruleId ?? '');
+    if (key === 'unknown') return true; // ruleId が確定していない finding は PR-level dedup をスキップ
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/**
+ * @param {object[]} findings
+ * @param {{ reviewMode?: 'tiny'|'medium'|'large' }} [options]
+ * @returns {{ overview: object[], inlineCandidates: object[], suppressed: object[] }}
+ */
+function classifyFindings(findings, options = {}) {
+  const reviewMode = options.reviewMode ?? 'medium';
+  const maxOverview = reviewMode === 'tiny' ? 3 : reviewMode === 'large' ? 8 : 5;
+
+  const suppressed = [];
+  const active = [];
+
+  for (const finding of findings) {
+    if (finding.confidence === 'low' && finding.severity !== 'critical') {
+      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.LOW_CONFIDENCE });
+      continue;
+    }
+    if (evidenceTotalChars(finding) < 30 && finding.severity !== 'critical') {
+      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.INSUFFICIENT_EVIDENCE });
+      continue;
+    }
+    const ruleId = String(finding.ruleId ?? '');
+    if (finding.severity === 'minor' && /readability|style|format/i.test(ruleId)) {
+      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.STYLE_ONLY });
+      continue;
+    }
+    active.push(finding);
+  }
+
+  const deduped = deduplicateWithinPR(deduplicateWithinFile(active));
+  const dedupedSet = new Set(deduped.map((f) => f.id));
+  for (const f of active) {
+    if (!dedupedSet.has(f.id)) {
+      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.DUPLICATE });
+    }
+  }
+
+  const sorted = [...deduped].sort(
+    (a, b) => (0,breakdown/* computeFindingBreakdown */._)(b).composite - (0,breakdown/* computeFindingBreakdown */._)(a).composite
+  );
+
+  const overview = [];
+  const overviewRuleIds = new Set();
+  for (const f of sorted) {
+    const rid = String(f.ruleId ?? '');
+    const isUnknown = rid === 'unknown';
+    if (!isUnknown && overviewRuleIds.has(rid)) {
+      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
+    } else if (overview.length < maxOverview) {
+      overview.push(f);
+      if (!isUnknown) overviewRuleIds.add(rid);
+    } else {
+      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
+    }
+  }
+
+  return { overview, inlineCandidates: [], suppressed };
+}
+
 // EXTERNAL MODULE: ./src/config/default.mjs
 var config_default = __nccwpck_require__(4807);
 // EXTERNAL MODULE: ./runners/core/review-runner.mjs + 5 modules
@@ -35450,6 +35547,7 @@ function validateFindingMessage(message) {
 // EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs
 var review_plan_generator = __nccwpck_require__(8069);
 ;// CONCATENATED MODULE: ./src/lib/review-engine.mjs
+
 
 
 
@@ -36071,9 +36169,12 @@ async function generateReview({
     return bB.composite - bA.composite;
   });
 
+  const classified = classifyFindings(findings, { reviewMode: reviewMode ?? 'medium' });
+
   return {
     comments,
     findings,
+    classified,
     prompt: promptInfo.prompt,
     promptTruncated: promptInfo.truncated,
     llmModel: openAIConfig.model,
@@ -36916,8 +37017,8 @@ var loader = __nccwpck_require__(3833);
 var lib_diff = __nccwpck_require__(4382);
 // EXTERNAL MODULE: ./src/lib/diff-optimizer.mjs
 var diff_optimizer = __nccwpck_require__(1092);
-// EXTERNAL MODULE: ./src/lib/review-engine.mjs + 1 modules
-var review_engine = __nccwpck_require__(5544);
+// EXTERNAL MODULE: ./src/lib/review-engine.mjs + 2 modules
+var review_engine = __nccwpck_require__(727);
 ;// CONCATENATED MODULE: ./src/lib/openai-planner.mjs
 const DEFAULT_PLANNER_MODEL =
   process.env.RIVER_PLANNER_MODEL ||
@@ -37713,6 +37814,8 @@ async function runLocalReview({
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
     comments: review.comments,
+    findings: review.findings,
+    classified: review.classified,
     tokenEstimate: context.diff.tokenEstimate,
     rawTokenEstimate: context.diff.rawTokenEstimate,
     reduction: context.diff.reduction,
@@ -48783,9 +48886,26 @@ ${formatDebugSummaryMarkdown(result)}
   const riskSection = formatRiskSummaryMarkdown(result.plan);
   const scoreSection = formatScoreSectionMarkdown(result, phase);
   const findings = `### 指摘\n${formatCommentsMarkdown(result.comments)}\n`;
+  const suppressedSummary = formatSuppressedSummaryMarkdown(result.classified);
   console.log(
-    [header, planSection, riskSection, scoreSection, findings].filter(Boolean).join('\n')
+    [header, planSection, riskSection, scoreSection, findings, suppressedSummary]
+      .filter(Boolean)
+      .join('\n')
   );
+}
+
+function formatSuppressedSummaryMarkdown(classified) {
+  if (!classified?.suppressed?.length) return null;
+  const counts = {};
+  for (const f of classified.suppressed) {
+    counts[f.suppressReason] = (counts[f.suppressReason] ?? 0) + 1;
+  }
+  const top = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([r, n]) => `${r}(${n})`)
+    .join(', ');
+  return `> _${classified.suppressed.length} 件の指摘を抑制しました (主な理由: ${top})_\n`;
 }
 
 function formatScoreSectionMarkdown(result, phase) {
