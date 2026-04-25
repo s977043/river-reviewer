@@ -26,11 +26,15 @@ export const modules = {
 const STORE_DIR_NAME = '.river/runs';
 const GLOBAL_STORE_DIR = node_path__WEBPACK_IMPORTED_MODULE_1__.join(node_os__WEBPACK_IMPORTED_MODULE_2__.homedir(), '.river', 'runs');
 
-/** Resolve the store directory for a project. Prefers project-local, falls back to global. */
-function resolveStoreDir(repoRoot, { storeDir } = {}) {
-  if (storeDir) return storeDir;
+/** Compute the default store path from repoRoot (no override). */
+function defaultStoreDir(repoRoot) {
   if (repoRoot) return node_path__WEBPACK_IMPORTED_MODULE_1__.join(repoRoot, STORE_DIR_NAME);
   return GLOBAL_STORE_DIR;
+}
+
+/** Resolve the store directory for a project. Prefers project-local, falls back to global. */
+function resolveStoreDir(repoRoot, { storeDir } = {}) {
+  return storeDir ?? defaultStoreDir(repoRoot);
 }
 
 /** Generate a unique run ID from timestamp + short hash. */
@@ -88,6 +92,9 @@ async function saveRunRecord(runRecord, { storeDir } = {}) {
 
 /**
  * List all stored runs in a store directory, sorted newest first.
+ * Sorting is lexicographic by filename — relies on runId having a timestamp prefix
+ * (e.g. `2026-01-01T12-00-00-abc123`) so that lexicographic order equals chronological order.
+ * Custom runIds without a timestamp prefix will sort unpredictably.
  * @returns {object[]} array of { runId, timestamp, phase, reviewedTarget, findingsCount }
  */
 async function listRunRecords(storeDir) {
