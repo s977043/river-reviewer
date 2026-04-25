@@ -67,6 +67,12 @@ Options:
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
   --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap)
   --baseline <path> Path to a previous review JSON (findings array) for regression comparison
+  --save            Persist the review run to the project result store (.river/runs/)
+
+Commands:
+  river runs list           List stored review runs
+  river runs diff <id> <id> Diff two stored review runs
+  river runs summary        Show aggregate dashboard metrics
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
   --verbose         (eval) Print detailed per-case results
   -h, --help        Show this help message
@@ -92,6 +98,11 @@ function parseArgs(argv) {
     availableDependencies: null,
     reviewers: null,
     baseline: null,
+    save: false,
+    // runs subcommand fields
+    runsSubcommand: null,
+    runsId1: null,
+    runsId2: null,
     // skills subcommand fields
     skillsSubcommand: null,
     fromPath: null,
@@ -103,12 +114,22 @@ function parseArgs(argv) {
 
   while (args.length) {
     const arg = args.shift();
-    if (!parsed.command && (arg === 'run' || arg === 'doctor' || arg === 'skills')) {
+    if (
+      !parsed.command &&
+      (arg === 'run' || arg === 'doctor' || arg === 'skills' || arg === 'runs')
+    ) {
       parsed.command = arg;
       // Check for skills subcommands (import/export/list)
       if (arg === 'skills' && args[0] && SKILLS_SUBCOMMANDS.has(args[0])) {
         parsed.skillsSubcommand = args.shift();
-      } else if (args[0] && !args[0].startsWith('-')) {
+      } else if (arg === 'runs' && args[0] && !args[0].startsWith('-')) {
+        parsed.runsSubcommand = args.shift(); // list | diff | summary
+        // diff takes two positional run IDs
+        if (parsed.runsSubcommand === 'diff') {
+          parsed.runsId1 = args.shift() ?? null;
+          parsed.runsId2 = args.shift() ?? null;
+        }
+      } else if (arg !== 'runs' && args[0] && !args[0].startsWith('-')) {
         parsed.target = args.shift();
       }
       continue;
@@ -220,6 +241,10 @@ function parseArgs(argv) {
         break;
       }
       parsed.baseline = value;
+      continue;
+    }
+    if (arg === '--save') {
+      parsed.save = true;
       continue;
     }
     // Skills subcommand options
@@ -653,6 +678,63 @@ async function main(argv = process.argv.slice(2)) {
       return 0;
     }
 
+    if (parsed.command === 'runs') {
+      const { resolveStoreDir, listRunRecords, loadRunRecord, computeDashboard, formatDashboard } =
+        await import('./lib/result-store.mjs');
+      const storeDir = resolveStoreDir(targetPath);
+
+      if (!parsed.runsSubcommand || parsed.runsSubcommand === 'list') {
+        const runs = await listRunRecords(storeDir);
+        if (!runs.length) {
+          console.log('No stored runs found in ' + storeDir);
+          return 0;
+        }
+        console.log(`Stored runs (${storeDir}):\n`);
+        for (const r of runs) {
+          console.log(
+            `  ${r.runId}  phase=${r.phase}  findings=${r.findingsCount}  suppressed=${r.suppressedCount}  files=${r.changedFilesCount}  ${r.timestamp}`
+          );
+        }
+        return 0;
+      }
+
+      if (parsed.runsSubcommand === 'diff') {
+        if (!parsed.runsId1 || !parsed.runsId2) {
+          console.error('Error: river runs diff <run-id-1> <run-id-2>');
+          return 1;
+        }
+        const { diffReviews, formatRegressionSummary } = await import('./lib/review-differ.mjs');
+        const [run1, run2] = await Promise.all([
+          loadRunRecord(storeDir, parsed.runsId1),
+          loadRunRecord(storeDir, parsed.runsId2),
+        ]);
+        const diff = diffReviews(run1.findings ?? [], run2.findings ?? []);
+        console.log(formatRegressionSummary(diff));
+        return 0;
+      }
+
+      if (parsed.runsSubcommand === 'summary') {
+        const runs = await listRunRecords(storeDir);
+        if (!runs.length) {
+          console.log('No stored runs found in ' + storeDir);
+          return 0;
+        }
+        // Load full records for dashboard computation
+        const fullRuns = await Promise.all(
+          runs.map((r) => loadRunRecord(storeDir, r.runId).catch(() => null))
+        );
+        const valid = fullRuns.filter(Boolean);
+        const db = computeDashboard(valid);
+        console.log(formatDashboard(db));
+        return 0;
+      }
+
+      console.error(
+        `Unknown runs subcommand: ${parsed.runsSubcommand}. Use: list | diff | summary`
+      );
+      return 1;
+    }
+
     if (parsed.command === 'eval') {
       const { evaluateReviewFixtures } = await import('./lib/review-fixtures-eval.mjs');
       const casesPath =
@@ -796,6 +878,18 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
       reviewers: parsed.reviewers,
     });
+
+    // Persist run to result store when --save is provided
+    if (parsed.save && result.status === 'ok') {
+      try {
+        const { buildRunRecord, saveRunRecord } = await import('./lib/result-store.mjs');
+        const record = buildRunRecord(result, { phase: parsed.phase });
+        const savedPath = await saveRunRecord(record);
+        console.error(`Run saved: ${record.runId} → ${savedPath}`);
+      } catch (err) {
+        console.error(`Warning: --save failed: ${err.message}`);
+      }
+    }
 
     // Regression comparison when --baseline is provided
     if (parsed.baseline && result.status === 'ok') {
