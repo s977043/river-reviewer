@@ -86,8 +86,8 @@ jobs:
     name: Evaluate ${{ matrix.skill }}
     needs: discover-skills
     if: needs.discover-skills.outputs.has_skills == 'true'
-    # Continue on error - evaluations are informational and shouldn't block PRs
-    continue-on-error: true
+    # Eval failures block PRs — skills with promptfoo.yaml fixtures are gated
+    continue-on-error: false
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
