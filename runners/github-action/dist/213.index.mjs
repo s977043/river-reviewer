@@ -237,7 +237,7 @@ async function evaluateReviewFixtures({ casesPath, phase = null, verbose = false
         caseFailures.forEach((line) => console.log(`  ${line}`));
       }
     } else {
-      console.log(caseFailures.length ? formatFailure(name, caseFailures[0]) : formatSuccess(name));
+      console.error(caseFailures.length ? formatFailure(name, caseFailures[0]) : formatSuccess(name));
     }
   }
 
@@ -254,7 +254,7 @@ async function evaluateReviewFixtures({ casesPath, phase = null, verbose = false
   if (failures.length) {
     console.error(`\n${failures.length} fixture checks failed.`);
   } else {
-    console.log('\nAll review fixtures passed.');
+    console.error('\nAll review fixtures passed.');
   }
 
   return {
