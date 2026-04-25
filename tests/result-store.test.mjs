@@ -127,6 +127,10 @@ describe('result-store', () => {
     it('throws when loading non-existent run', async () => {
       await assert.rejects(() => loadRunRecord(tmpDir, 'nonexistent-run'));
     });
+
+    it('throws on path traversal attempt in runId', async () => {
+      await assert.rejects(() => loadRunRecord(tmpDir, '../../etc/passwd'), /path traversal/i);
+    });
   });
 
   describe('listRunRecords', () => {
@@ -168,7 +172,16 @@ describe('result-store', () => {
       const rec2 = buildRunRecord(
         makeResult({
           findings: [
-            { id: 'rr-2', ruleId: 'sql-injection', file: 'src/bar.mjs', severity: 'critical', confidence: 'high', reviewerRole: 'security-scanner', message: 'sql injection', evidence: [] },
+            {
+              id: 'rr-2',
+              ruleId: 'sql-injection',
+              file: 'src/bar.mjs',
+              severity: 'critical',
+              confidence: 'high',
+              reviewerRole: 'security-scanner',
+              message: 'sql injection',
+              evidence: [],
+            },
           ],
           classified: { overview: [{ id: 'rr-2' }], suppressed: [], inlineCandidates: [] },
         })

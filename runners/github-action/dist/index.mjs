@@ -49581,9 +49581,11 @@ Dependencies: ${
     // Persist run to result store when --save is provided
     if (parsed.save && result.status === 'ok') {
       try {
-        const { buildRunRecord, saveRunRecord } = await __nccwpck_require__.e(/* import() */ 260).then(__nccwpck_require__.bind(__nccwpck_require__, 4260));
+        const { buildRunRecord, saveRunRecord, resolveStoreDir } =
+          await __nccwpck_require__.e(/* import() */ 260).then(__nccwpck_require__.bind(__nccwpck_require__, 4260));
         const record = buildRunRecord(result, { phase: parsed.phase });
-        const savedPath = await saveRunRecord(record);
+        // Use targetPath (not result.repoRoot) so --save and runs list resolve the same storeDir
+        const savedPath = await saveRunRecord(record, { storeDir: resolveStoreDir(targetPath) });
         console.error(`Run saved: ${record.runId} → ${savedPath}`);
       } catch (err) {
         console.error(`Warning: --save failed: ${err.message}`);

@@ -73,7 +73,10 @@ export async function saveRunRecord(runRecord, { storeDir } = {}) {
 export async function listRunRecords(storeDir) {
   try {
     const entries = await fs.readdir(storeDir);
-    const jsonFiles = entries.filter((e) => e.endsWith('.json')).sort().reverse();
+    const jsonFiles = entries
+      .filter((e) => e.endsWith('.json'))
+      .sort()
+      .reverse();
     const metas = await Promise.allSettled(
       jsonFiles.map(async (name) => {
         const raw = await fs.readFile(path.join(storeDir, name), 'utf8');
@@ -98,10 +101,15 @@ export async function listRunRecords(storeDir) {
 
 /**
  * Load a full run record by runId from the store directory.
+ * Validates that the resolved path stays within storeDir (path traversal guard).
  */
 export async function loadRunRecord(storeDir, runId) {
-  const filePath = path.join(storeDir, `${runId}.json`);
-  const raw = await fs.readFile(filePath, 'utf8');
+  const base = path.resolve(storeDir);
+  const resolved = path.resolve(base, `${runId}.json`);
+  if (!resolved.startsWith(base + path.sep) && resolved !== base) {
+    throw new Error(`Invalid runId: path traversal detected`);
+  }
+  const raw = await fs.readFile(resolved, 'utf8');
   return JSON.parse(raw);
 }
 
@@ -169,9 +177,7 @@ export function formatDashboard(dashboard) {
     dashboard.suppressRate !== null ? `${(dashboard.suppressRate * 100).toFixed(1)}%` : 'N/A';
   lines.push(`| Suppress rate | ${suppPct} |`);
   const avgF =
-    dashboard.avgFindingsPerRun !== null
-      ? dashboard.avgFindingsPerRun.toFixed(1)
-      : 'N/A';
+    dashboard.avgFindingsPerRun !== null ? dashboard.avgFindingsPerRun.toFixed(1) : 'N/A';
   lines.push(`| Avg findings/run | ${avgF} |`);
   lines.push('');
 

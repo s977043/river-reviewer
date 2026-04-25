@@ -882,9 +882,11 @@ Dependencies: ${
     // Persist run to result store when --save is provided
     if (parsed.save && result.status === 'ok') {
       try {
-        const { buildRunRecord, saveRunRecord } = await import('./lib/result-store.mjs');
+        const { buildRunRecord, saveRunRecord, resolveStoreDir } =
+          await import('./lib/result-store.mjs');
         const record = buildRunRecord(result, { phase: parsed.phase });
-        const savedPath = await saveRunRecord(record);
+        // Use targetPath (not result.repoRoot) so --save and runs list resolve the same storeDir
+        const savedPath = await saveRunRecord(record, { storeDir: resolveStoreDir(targetPath) });
         console.error(`Run saved: ${record.runId} → ${savedPath}`);
       } catch (err) {
         console.error(`Warning: --save failed: ${err.message}`);
