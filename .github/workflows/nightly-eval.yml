@@ -33,7 +33,7 @@ jobs:
         env:
           DESC: ${{ github.event.inputs.description || format('nightly-{0}', github.run_id) }}
         run: |
-          npm run eval:all -- --json --append-ledger --description "$DESC" > eval-output.json
+          node scripts/evaluate-all.mjs --json --append-ledger --description "$DESC" > eval-output.json
           cat eval-output.json
 
       - name: Generate summary
