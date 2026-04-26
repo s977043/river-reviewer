@@ -133,7 +133,7 @@ severity の内部語彙（`blocker` / `warning` / `nit`）と JSON スキーマ
 ## CI / 後続システムとの接続
 
 - **Review Artifact**: `--output json --output-file <path>` を CI の artifact upload で永続化することを推奨する。
-- **GitHub Action**: `runners/github-action/action.yml` の inputs から本 CLI へのマッピングを提供する（詳細は後続 Issue #511）。
+- **GitHub Action**: `runners/github-action/action.yml` の inputs から本 CLI へのマッピングを提供する（未実装、別途対応予定）。
 - **Riverbed Memory**: 取り込み入力としては JSON 出力のみを正とする（参考: [Riverbed Storage](./riverbed-storage.md)）。
 - **PR コメント**: idempotent 更新（`<!-- river-reviewer -->` marker）の方針は [Stable Interfaces](./stable-interfaces.md) を継承する。
 

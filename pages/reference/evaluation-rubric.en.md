@@ -2,7 +2,7 @@
 
 River Reviewer's evaluation framework provides a rubric to quantify review quality across multiple dimensions. Each dimension has an independent score, and a weighted sum produces the overall score.
 
-> **Status**: This document is a specification. Runtime integration (wiring `dimensionScores` generation into `scripts/evaluate-review-fixtures.mjs` / `src/lib/review-fixtures-eval.mjs`) is tracked in a follow-up issue. At present only the schema, rubric definitions, and the consistency test (`tests/eval-rubric.test.mjs`) are implemented.
+> **Status**: This document is a specification. Runtime integration (wiring `dimensionScores` generation into `scripts/evaluate-review-fixtures.mjs` / `src/lib/review-fixtures-eval.mjs`) is tracked separately. At present only the schema, rubric definitions, and the consistency test (`tests/eval-rubric.test.mjs`) are implemented.
 
 ## Dimension List
 

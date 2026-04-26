@@ -22,6 +22,7 @@ import { parseList } from './lib/utils.mjs';
 import { PLANNER_MODES } from './lib/planner-utils.mjs';
 import { scoreReview } from './lib/scoring/engine.mjs';
 import { AXES, AXIS_LABELS_JA } from './lib/scoring/rubric.mjs';
+import { severityToPriority } from './lib/finding-format.mjs';
 
 const MAX_PROMPT_PREVIEW_LENGTH = 800;
 const MAX_DIFF_PREVIEW_LINES = 200;
@@ -483,11 +484,12 @@ ${formatDebugSummaryMarkdown(result)}
 `;
   const planSection = formatPlanMarkdown(result.plan);
   const riskSection = formatRiskSummaryMarkdown(result.plan);
+  const prioritySummary = formatPrioritySummaryMarkdown(result);
   const scoreSection = formatScoreSectionMarkdown(result, phase);
   const findings = `### 指摘\n${formatCommentsMarkdown(result.comments)}\n`;
   const suppressedSummary = formatSuppressedSummaryMarkdown(result.classified);
   console.log(
-    [header, planSection, riskSection, scoreSection, findings, suppressedSummary]
+    [header, planSection, riskSection, prioritySummary, scoreSection, findings, suppressedSummary]
       .filter(Boolean)
       .join('\n')
   );
@@ -505,6 +507,52 @@ function formatSuppressedSummaryMarkdown(classified) {
     .map(([r, n]) => `${r}(${n})`)
     .join(', ');
   return `> _${classified.suppressed.length} 件の指摘を抑制しました (主な理由: ${top})_\n`;
+}
+
+function formatPrioritySummaryMarkdown(result) {
+  const findings = result.findings ?? [];
+  const counts = { P1: 0, P2: 0, P3: 0, P4: 0 };
+  for (const f of findings) {
+    const p = severityToPriority(f.severity);
+    counts[p]++;
+  }
+
+  const lines = ['### 優先度サマリー\n'];
+
+  if (counts.P1 > 0) {
+    lines.push(`> **P1 (マージ前必須修正): ${counts.P1} 件**\n`);
+  }
+
+  lines.push(
+    `- P1 (must fix before merge): ${counts.P1} 件`,
+    `- P2 (should fix or waive): ${counts.P2} 件`,
+    `- P3 (recommended improvement): ${counts.P3} 件`,
+    `- P4 (informational): ${counts.P4} 件`,
+    ''
+  );
+
+  const suppressed = result.classified?.suppressed ?? [];
+  if (suppressed.length > 0) {
+    const reasonCounts = {};
+    for (const f of suppressed) {
+      reasonCounts[f.suppressReason] = (reasonCounts[f.suppressReason] ?? 0) + 1;
+    }
+    const topReasons = Object.entries(reasonCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([r, n]) => `${r}(${n})`)
+      .join(', ');
+    lines.push(`- 抑制済み: ${suppressed.length} 件 (主な理由: ${topReasons})`, '');
+  }
+
+  const humanReviewFiles = result.plan?.riskMap?.require_human_review ?? [];
+  if (humanReviewFiles.length > 0) {
+    lines.push('> **Human review required**');
+    for (const f of humanReviewFiles) lines.push(`> - ${sanitizeForMarkdown(f)}`);
+    lines.push('');
+  }
+
+  return lines.join('\n');
 }
 
 function formatScoreSectionMarkdown(result, phase) {
@@ -599,7 +647,17 @@ function formatJsonOutput(result, phase) {
     };
   });
 
-  const summary = { issueCountBySeverity, issueCountByPhase };
+  const priorityCounts = { P1: 0, P2: 0, P3: 0, P4: 0 };
+  for (const f of result.findings ?? []) {
+    const p = severityToPriority(f.severity);
+    priorityCounts[p]++;
+  }
+  const prioritySummary = {
+    counts: priorityCounts,
+    requiresImmediateAttention: priorityCounts.P1 > 0,
+  };
+
+  const summary = { issueCountBySeverity, issueCountByPhase, prioritySummary };
   const riskAssessment = result.plan?.riskAssessment;
   if (riskAssessment) {
     summary.riskSummary = {

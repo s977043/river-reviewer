@@ -54,7 +54,7 @@ Loaded as needed when the Runner executes a review.
 ## Why Three Stages?
 
 ```text
-All skills (111+)
+All skills (80+)
   │
   ├── Stage 1: Metadata → Filter → 10-15 skill candidates
   │

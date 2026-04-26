@@ -13,6 +13,7 @@ import { buildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { loadProjectRules } from './rules.mjs';
 import { loadRiskMap } from './risk-map.mjs';
 import { loadReviewMemory } from './memory-context.mjs';
+import { collectRepoContext } from './repo-context.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import { isLlmEnabled, parseList } from './utils.mjs';
 import { annotateFingerprints } from './finding-fingerprint.mjs';
@@ -356,6 +357,11 @@ export async function runLocalReview({
     changedFiles: context.changedFiles,
   });
 
+  const repoContext = await collectRepoContext({
+    changedFiles: context.changedFiles,
+    repoRoot: path.resolve(context.repoRoot),
+  }).catch(() => null);
+
   const reviewArgs = {
     diff: context.diff,
     plan: context.plan,
@@ -369,6 +375,7 @@ export async function runLocalReview({
     fileTypes: context.plan?.fileTypes,
     relatedADRs: context.plan?.relatedADRs,
     reviewMode: context.plan?.reviewMode,
+    repoContext,
     config: context.config,
   };
 

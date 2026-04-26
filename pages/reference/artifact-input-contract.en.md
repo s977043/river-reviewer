@@ -117,8 +117,8 @@ The input artifacts recognized by River Reviewer are listed below. See "Legend" 
 
 River Reviewer resolves artifacts in this order:
 
-1. **CLI / GitHub Action arguments** (planned). Example: `--artifact pbi-input=./path/to/pbi-input.md`
-2. **Configuration file** (planned). `artifacts` section in `river.config.*`.
+1. **CLI / GitHub Action arguments** (defined in `river review plan` / `river review exec` CLI spec). Example: `--artifact pbi-input=./path/to/pbi-input.md`
+2. **Configuration file** (defined in `river review plan` / `river review exec` CLI spec). `artifacts` section in `river.config.*`.
 3. **Current directory auto-detection** (fallback). Searches the workspace root for the default filenames above.
 
 Artifacts not resolved by any channel are treated as "absent" and follow the per-artifact absence behavior above.
@@ -132,12 +132,12 @@ Artifacts not resolved by any channel are treated as "absent" and follow the per
 
 ### Skills
 
-- Individual skills declare the artifact IDs they require (details deferred to skill-pack design in follow-up issue #510).
+- Individual skills declare the artifact IDs they require (implemented as part of the skill-pack design).
 - Skills requiring an unresolved artifact are auto-skipped and recorded in `plan.skippedSkills`.
 
 ### CI
 
-- GitHub Action inputs (see `runners/github-action/action.yml`) will expose artifact wiring (details deferred to follow-up issue #511).
+- GitHub Action inputs (see `runners/github-action/action.yml`) will expose artifact wiring (not yet implemented; tracked separately).
 - CI should decide failure from the Review Artifact `status` and the severity mix of `findings`.
 
 ## PlanGate Independence
