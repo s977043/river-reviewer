@@ -56,7 +56,7 @@
     "eval:regression": "node scripts/evaluate-regression.mjs"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.5.0",
+    "@docusaurus/core": "^3.10.0",
     "@docusaurus/preset-classic": "^3.5.0",
     "@docusaurus/theme-mermaid": "^3.9.2",
     "@google/generative-ai": "^0.24.1",
