@@ -86,6 +86,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node-deps
+        with:
+          node-version: '22.22.2'
       - run: npm run build:action
       - name: Check dist is up to date
         run: |
