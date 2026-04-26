@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.20.0](https://github.com/s977043/river-reviewer/compare/v0.19.0...v0.20.0) (2026-04-26)
+
+
+### Features
+
+* **github:** add inline_comments input for per-line review comments ([#675](https://github.com/s977043/river-reviewer/issues/675)) ([45c63d2](https://github.com/s977043/river-reviewer/commit/45c63d255efe79678fdd028c8a970f6e1c78fe91))
+* **node-api:** add concurrency limit to parallel skill execution ([#678](https://github.com/s977043/river-reviewer/issues/678)) ([dc238b8](https://github.com/s977043/river-reviewer/commit/dc238b88842f9849ad48ca31d243fd94fc015637))
+* **node-api:** implement AI provider execution in review() and evaluateSkill() ([#655](https://github.com/s977043/river-reviewer/issues/655)) ([ad9c295](https://github.com/s977043/river-reviewer/commit/ad9c2953bf8e4ef633fc190bcc93fb911870bff9))
+* **node-api:** improve per-file finding attribution in parseFindings ([#679](https://github.com/s977043/river-reviewer/issues/679)) ([1b46c64](https://github.com/s977043/river-reviewer/commit/1b46c64b06a91b066c406a6cbf8d2944edbf9992)), closes [#657](https://github.com/s977043/river-reviewer/issues/657)
+* **review:** add P1/P2/P3/P4 priority display to markdown output ([#677](https://github.com/s977043/river-reviewer/issues/677)) ([56eb93d](https://github.com/s977043/river-reviewer/commit/56eb93d1a589462101efd3cd70ed2b09a0b8cdfb))
+* **skills:** add Greptile-inspired cross-context core skills ([fb18e7f](https://github.com/s977043/river-reviewer/commit/fb18e7ff80e469e281879c6f53a9a1e5b9acdc77))
+* **skills:** add Greptile-inspired cross-context core skills ([#654](https://github.com/s977043/river-reviewer/issues/654)) ([3a36d5a](https://github.com/s977043/river-reviewer/commit/3a36d5a12cf2d1b58a2d6ad7296c206d4a48008a))
+* **skills:** add Greptile-inspired cross-context core skills ([#654](https://github.com/s977043/river-reviewer/issues/654)) ([d192cc9](https://github.com/s977043/river-reviewer/commit/d192cc9c2b8dd52f16732a97cc3b3c3321ec8b13))
+
 ## [0.19.0](https://github.com/s977043/river-reviewer/compare/v0.18.0...v0.19.0) (2026-04-26)
 
 
