@@ -11,6 +11,7 @@ import {
   normalizeSeverity,
 } from './finding-format.mjs';
 import { getReviewDepthConfig } from './review-plan-generator.mjs';
+import { buildRepoContextSection } from './repo-context.mjs';
 
 const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
 const MAX_PROMPT_CHARS = 12000;
@@ -145,6 +146,7 @@ export function buildPrompt({
   memoryContext,
   relatedADRs,
   reviewMode,
+  repoContext,
   maxChars = MAX_PROMPT_CHARS,
   config = defaultConfig,
 }) {
@@ -164,7 +166,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${buildRepoContextSection(repoContext)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -459,6 +461,7 @@ export async function generateReview({
   relatedADRs,
   riskAssessment,
   reviewMode,
+  repoContext,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -472,6 +475,7 @@ export async function generateReview({
     relatedADRs,
     riskAssessment,
     reviewMode,
+    repoContext,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });
@@ -486,6 +490,17 @@ export async function generateReview({
     llmProvider: openAIConfig.provider,
     reviewLanguage: language,
     reviewSeverity: promptInfo.severity,
+    repoContext: repoContext
+      ? {
+          sections: repoContext.sections.map((s) => ({
+            label: s.label,
+            chars: s.content.length,
+            file: s.file,
+          })),
+          totalChars: repoContext.totalChars,
+          truncated: repoContext.truncated,
+        }
+      : null,
   };
 
   const skipReason = dryRun
