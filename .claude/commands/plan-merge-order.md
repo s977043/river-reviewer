@@ -105,6 +105,34 @@ git log --format= --name-only --since=6.months | sort | uniq -c | sort -rn | hea
 - `runners/core/review-runner.mjs` — plan 構築
 - `schemas/output.schema.json` — 出力スキーマ
 
+## Branch Protection Strict Mode 対応
+
+マージ先ブランチが `strict: true`（ブランチが常に最新 main と同期している必要がある）の場合、PR を順番にマージするたびに残りの PR が stale になり、rebase → CI 待ち → merge → rebase... のループに陥る。N 本の PR があると CI 待ち時間が N 倍になる。
+
+**最初に確認する:**
+
+```bash
+gh api repos/OWNER/REPO/branches/main/protection --jq .required_status_checks.strict
+# true が返ったら以下の戦略を適用
+```
+
+**推奨戦略（N 本の独立 deps PR を一括処理する場合）:**
+
+1. **可能なら 1 つの PR に統合する** — `package.json` が重複する deps 系 PR は 1 ブランチにまとめると rebase ループが発生しない
+2. **統合できない場合: 同一 SHA ベース一括 rebase** — マージ開始前に全ての残ブランチを現在の `origin/main` SHA に同時 rebase して push する。これで各 PR が並列に CI を実行する。マージするたびに次ブランチを rebase する（1 回ずつで済む）
+3. **lock-file-only 衝突の解消** — `gh api .../pulls/N/update-branch` が 422 を返す場合: 新 PR を作らず、ブランチをローカルで checkout して `npm install --package-lock-only` → commit → force push する。新 PR 作成は CI 履歴・レビューコメントの消失を招く
+
+**同一 SHA 一括 rebase の例:**
+
+```bash
+# 残ブランチを一度に全部 rebase してから push
+for branch in feat/pr-a feat/pr-b feat/pr-c; do
+  git rebase origin/main origin/$branch --onto origin/main
+  git push origin HEAD:refs/heads/$branch --force-with-lease
+done
+# その後 CI が通ったものから順次 merge
+```
+
 ## 禁止事項
 
 - **Step 0 の Preflight 検証を省略して Step 1 以降に進んではならない**
@@ -112,3 +140,4 @@ git log --format= --name-only --since=6.months | sort | uniq -c | sort -rn | hea
 - Hot file の複数 PR 同時マージを推奨してはならない
 - 「順序は適当で大丈夫」と断定してはならない
 - `gh pr list` / `gh pr view` の GraphQL 結果のみで state を信頼してはならない (必ず `gh api repos/.../pulls/{N}` で裏取り)
+- strict mode 環境で N 本 PR を「1 本ずつ rebase して CI を待つ」ことで済ませない（N 倍の CI 待ちが発生する）
