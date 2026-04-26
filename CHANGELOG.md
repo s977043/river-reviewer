@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.1](https://github.com/s977043/river-reviewer/compare/v0.20.0...v0.20.1) (2026-04-26)
+
+
+### Bug Fixes
+
+* **guards:** correct rebase bash example and peerDeps check recommendation ([#684](https://github.com/s977043/river-reviewer/issues/684)) ([613f129](https://github.com/s977043/river-reviewer/commit/613f129fe512f2a614961011e713ccd93cf057fe))
+
 ## [0.20.0](https://github.com/s977043/river-reviewer/compare/v0.19.0...v0.20.0) (2026-04-26)
 
 
