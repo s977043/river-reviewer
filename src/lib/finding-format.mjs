@@ -89,6 +89,26 @@ export function normalizeSeverity(internalSeverity) {
 }
 
 /**
+ * Map output schema severity to P1/P2/P3/P4 priority label.
+ * @param {'critical'|'major'|'minor'|'info'|string|null|undefined} severity
+ * @returns {'P1'|'P2'|'P3'|'P4'}
+ */
+export function severityToPriority(severity) {
+  switch ((severity ?? '').toLowerCase().trim()) {
+    case 'critical':
+      return 'P1';
+    case 'major':
+      return 'P2';
+    case 'minor':
+      return 'P3';
+    case 'info':
+      return 'P4';
+    default:
+      return 'P2';
+  }
+}
+
+/**
  * Validate whether a finding message contains the required labeled fields.
  * @param {string} message
  */

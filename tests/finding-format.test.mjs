@@ -9,6 +9,7 @@ import {
   validateFindingMessage,
   parseFindingMessage,
   normalizeSeverity,
+  severityToPriority,
 } from '../src/lib/finding-format.mjs';
 
 test('formatFindingMessage produces a valid labeled message', () => {
@@ -55,6 +56,16 @@ test('normalizeSeverity maps internal vocabulary to schema vocabulary', () => {
   assert.equal(normalizeSeverity('major'), 'major');
   assert.equal(normalizeSeverity('unknown'), 'major');
   assert.equal(normalizeSeverity(null), 'major');
+});
+
+test('severityToPriority maps schema severity to priority label', () => {
+  assert.equal(severityToPriority('critical'), 'P1');
+  assert.equal(severityToPriority('major'), 'P2');
+  assert.equal(severityToPriority('minor'), 'P3');
+  assert.equal(severityToPriority('info'), 'P4');
+  assert.equal(severityToPriority('unknown'), 'P2');
+  assert.equal(severityToPriority(null), 'P2');
+  assert.equal(severityToPriority(undefined), 'P2');
 });
 
 test('generateReview returns structured findings[]', async () => {
