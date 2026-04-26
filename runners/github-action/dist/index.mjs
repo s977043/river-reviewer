@@ -2,7 +2,7 @@
 import './sourcemap-register.cjs';import { createRequire as __WEBPACK_EXTERNAL_createRequire } from "module";
 /******/ var __webpack_modules__ = ({
 
-/***/ 779:
+/***/ 4194:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -216,14 +216,14 @@ function regex(str) {
 
 /***/ }),
 
-/***/ 2815:
+/***/ 8613:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const formats_1 = __nccwpck_require__(779);
-const limit_1 = __nccwpck_require__(1284);
-const codegen_1 = __nccwpck_require__(1436);
+const formats_1 = __nccwpck_require__(4194);
+const limit_1 = __nccwpck_require__(8142);
+const codegen_1 = __nccwpck_require__(3626);
 const fullName = new codegen_1.Name("fullFormats");
 const fastName = new codegen_1.Name("fastFormats");
 const formatsPlugin = (ajv, opts = { keywords: true }) => {
@@ -259,14 +259,14 @@ exports["default"] = formatsPlugin;
 
 /***/ }),
 
-/***/ 1284:
+/***/ 8142:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.formatLimitDefinition = void 0;
-const ajv_1 = __nccwpck_require__(2463);
-const codegen_1 = __nccwpck_require__(1436);
+const ajv_1 = __nccwpck_require__(3457);
+const codegen_1 = __nccwpck_require__(3626);
 const ops = codegen_1.operators;
 const KWDs = {
     formatMaximum: { okStr: "<=", ok: ops.LTE, fail: ops.GT },
@@ -334,16 +334,16 @@ exports["default"] = formatLimitPlugin;
 
 /***/ }),
 
-/***/ 2210:
+/***/ 7720:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MissingRefError = exports.ValidationError = exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = exports.Ajv2020 = void 0;
-const core_1 = __nccwpck_require__(3893);
-const draft2020_1 = __nccwpck_require__(4298);
-const discriminator_1 = __nccwpck_require__(8886);
-const json_schema_2020_12_1 = __nccwpck_require__(3995);
+const core_1 = __nccwpck_require__(9927);
+const draft2020_1 = __nccwpck_require__(9815);
+const discriminator_1 = __nccwpck_require__(1448);
+const json_schema_2020_12_1 = __nccwpck_require__(6949);
 const META_SCHEMA_ID = "https://json-schema.org/draft/2020-12/schema";
 class Ajv2020 extends core_1.default {
     constructor(opts = {}) {
@@ -378,33 +378,33 @@ module.exports = exports = Ajv2020;
 module.exports.Ajv2020 = Ajv2020;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = Ajv2020;
-var validate_1 = __nccwpck_require__(7881);
+var validate_1 = __nccwpck_require__(7007);
 Object.defineProperty(exports, "KeywordCxt", ({ enumerable: true, get: function () { return validate_1.KeywordCxt; } }));
-var codegen_1 = __nccwpck_require__(1436);
+var codegen_1 = __nccwpck_require__(3626);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return codegen_1._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return codegen_1.str; } }));
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return codegen_1.stringify; } }));
 Object.defineProperty(exports, "nil", ({ enumerable: true, get: function () { return codegen_1.nil; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return codegen_1.Name; } }));
 Object.defineProperty(exports, "CodeGen", ({ enumerable: true, get: function () { return codegen_1.CodeGen; } }));
-var validation_error_1 = __nccwpck_require__(3021);
+var validation_error_1 = __nccwpck_require__(871);
 Object.defineProperty(exports, "ValidationError", ({ enumerable: true, get: function () { return validation_error_1.default; } }));
-var ref_error_1 = __nccwpck_require__(3162);
+var ref_error_1 = __nccwpck_require__(7524);
 Object.defineProperty(exports, "MissingRefError", ({ enumerable: true, get: function () { return ref_error_1.default; } }));
 //# sourceMappingURL=2020.js.map
 
 /***/ }),
 
-/***/ 2463:
+/***/ 3457:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MissingRefError = exports.ValidationError = exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = exports.Ajv = void 0;
-const core_1 = __nccwpck_require__(3893);
-const draft7_1 = __nccwpck_require__(9941);
-const discriminator_1 = __nccwpck_require__(8886);
-const draft7MetaSchema = __nccwpck_require__(2079);
+const core_1 = __nccwpck_require__(9927);
+const draft7_1 = __nccwpck_require__(1631);
+const discriminator_1 = __nccwpck_require__(1448);
+const draft7MetaSchema = __nccwpck_require__(8061);
 const META_SUPPORT_DATA = ["/properties"];
 const META_SCHEMA_ID = "http://json-schema.org/draft-07/schema";
 class Ajv extends core_1.default {
@@ -434,24 +434,24 @@ module.exports = exports = Ajv;
 module.exports.Ajv = Ajv;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = Ajv;
-var validate_1 = __nccwpck_require__(7881);
+var validate_1 = __nccwpck_require__(7007);
 Object.defineProperty(exports, "KeywordCxt", ({ enumerable: true, get: function () { return validate_1.KeywordCxt; } }));
-var codegen_1 = __nccwpck_require__(1436);
+var codegen_1 = __nccwpck_require__(3626);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return codegen_1._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return codegen_1.str; } }));
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return codegen_1.stringify; } }));
 Object.defineProperty(exports, "nil", ({ enumerable: true, get: function () { return codegen_1.nil; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return codegen_1.Name; } }));
 Object.defineProperty(exports, "CodeGen", ({ enumerable: true, get: function () { return codegen_1.CodeGen; } }));
-var validation_error_1 = __nccwpck_require__(3021);
+var validation_error_1 = __nccwpck_require__(871);
 Object.defineProperty(exports, "ValidationError", ({ enumerable: true, get: function () { return validation_error_1.default; } }));
-var ref_error_1 = __nccwpck_require__(3162);
+var ref_error_1 = __nccwpck_require__(7524);
 Object.defineProperty(exports, "MissingRefError", ({ enumerable: true, get: function () { return ref_error_1.default; } }));
 //# sourceMappingURL=ajv.js.map
 
 /***/ }),
 
-/***/ 567:
+/***/ 1101:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -613,15 +613,15 @@ exports.regexpCode = regexpCode;
 
 /***/ }),
 
-/***/ 1436:
+/***/ 3626:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.or = exports.and = exports.not = exports.CodeGen = exports.operators = exports.varKinds = exports.ValueScopeName = exports.ValueScope = exports.Scope = exports.Name = exports.regexpCode = exports.stringify = exports.getProperty = exports.nil = exports.strConcat = exports.str = exports._ = void 0;
-const code_1 = __nccwpck_require__(567);
-const scope_1 = __nccwpck_require__(7788);
-var code_2 = __nccwpck_require__(567);
+const code_1 = __nccwpck_require__(1101);
+const scope_1 = __nccwpck_require__(3874);
+var code_2 = __nccwpck_require__(1101);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return code_2._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return code_2.str; } }));
 Object.defineProperty(exports, "strConcat", ({ enumerable: true, get: function () { return code_2.strConcat; } }));
@@ -630,7 +630,7 @@ Object.defineProperty(exports, "getProperty", ({ enumerable: true, get: function
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return code_2.stringify; } }));
 Object.defineProperty(exports, "regexpCode", ({ enumerable: true, get: function () { return code_2.regexpCode; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return code_2.Name; } }));
-var scope_2 = __nccwpck_require__(7788);
+var scope_2 = __nccwpck_require__(3874);
 Object.defineProperty(exports, "Scope", ({ enumerable: true, get: function () { return scope_2.Scope; } }));
 Object.defineProperty(exports, "ValueScope", ({ enumerable: true, get: function () { return scope_2.ValueScope; } }));
 Object.defineProperty(exports, "ValueScopeName", ({ enumerable: true, get: function () { return scope_2.ValueScopeName; } }));
@@ -1316,13 +1316,13 @@ function par(x) {
 
 /***/ }),
 
-/***/ 7788:
+/***/ 3874:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ValueScope = exports.ValueScopeName = exports.Scope = exports.varKinds = exports.UsedValueState = void 0;
-const code_1 = __nccwpck_require__(567);
+const code_1 = __nccwpck_require__(1101);
 class ValueError extends Error {
     constructor(name) {
         super(`CodeGen: "code" for ${name} not defined`);
@@ -1465,15 +1465,15 @@ exports.ValueScope = ValueScope;
 
 /***/ }),
 
-/***/ 1283:
+/***/ 6865:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.extendErrors = exports.resetErrorsCount = exports.reportExtraError = exports.reportError = exports.keyword$DataError = exports.keywordError = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const names_1 = __nccwpck_require__(630);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const names_1 = __nccwpck_require__(1740);
 exports.keywordError = {
     message: ({ keyword }) => (0, codegen_1.str) `must pass "${keyword}" keyword validation`,
 };
@@ -1594,18 +1594,18 @@ function extraErrorProps(cxt, { params, message }, keyValues) {
 
 /***/ }),
 
-/***/ 2718:
+/***/ 4688:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resolveSchema = exports.getCompilingSchema = exports.resolveRef = exports.compileSchema = exports.SchemaEnv = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const validation_error_1 = __nccwpck_require__(3021);
-const names_1 = __nccwpck_require__(630);
-const resolve_1 = __nccwpck_require__(4090);
-const util_1 = __nccwpck_require__(4464);
-const validate_1 = __nccwpck_require__(7881);
+const codegen_1 = __nccwpck_require__(3626);
+const validation_error_1 = __nccwpck_require__(871);
+const names_1 = __nccwpck_require__(1740);
+const resolve_1 = __nccwpck_require__(3032);
+const util_1 = __nccwpck_require__(6362);
+const validate_1 = __nccwpck_require__(7007);
 class SchemaEnv {
     constructor(env) {
         var _a;
@@ -1842,12 +1842,12 @@ function getJsonPointer(parsedRef, { baseId, schema, root }) {
 
 /***/ }),
 
-/***/ 630:
+/***/ 1740:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(3626);
 const names = {
     // validation function arguments
     data: new codegen_1.Name("data"), // data passed to validation function
@@ -1876,12 +1876,12 @@ exports["default"] = names;
 
 /***/ }),
 
-/***/ 3162:
+/***/ 7524:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const resolve_1 = __nccwpck_require__(4090);
+const resolve_1 = __nccwpck_require__(3032);
 class MissingRefError extends Error {
     constructor(resolver, baseId, ref, msg) {
         super(msg || `can't resolve reference ${ref} from id ${baseId}`);
@@ -1894,15 +1894,15 @@ exports["default"] = MissingRefError;
 
 /***/ }),
 
-/***/ 4090:
+/***/ 3032:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getSchemaRefs = exports.resolveUrl = exports.normalizeId = exports._getFullPath = exports.getFullPath = exports.inlineRef = void 0;
-const util_1 = __nccwpck_require__(4464);
-const equal = __nccwpck_require__(3430);
-const traverse = __nccwpck_require__(1167);
+const util_1 = __nccwpck_require__(6362);
+const equal = __nccwpck_require__(7272);
+const traverse = __nccwpck_require__(3533);
 // TODO refactor to use keyword definitions
 const SIMPLE_INLINED = new Set([
     "type",
@@ -2055,7 +2055,7 @@ exports.getSchemaRefs = getSchemaRefs;
 
 /***/ }),
 
-/***/ 7353:
+/***/ 2399:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2087,14 +2087,14 @@ exports.getRules = getRules;
 
 /***/ }),
 
-/***/ 4464:
+/***/ 6362:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkStrictMode = exports.getErrorPath = exports.Type = exports.useFunc = exports.setEvaluated = exports.evaluatedPropsToName = exports.mergeEvaluated = exports.eachItem = exports.unescapeJsonPointer = exports.escapeJsonPointer = exports.escapeFragment = exports.unescapeFragment = exports.schemaRefOrVal = exports.schemaHasRulesButRef = exports.schemaHasRules = exports.checkUnknownRules = exports.alwaysValidSchema = exports.toHash = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const code_1 = __nccwpck_require__(567);
+const codegen_1 = __nccwpck_require__(3626);
+const code_1 = __nccwpck_require__(1101);
 // TODO refactor to use Set
 function toHash(arr) {
     const hash = {};
@@ -2271,7 +2271,7 @@ exports.checkStrictMode = checkStrictMode;
 
 /***/ }),
 
-/***/ 7692:
+/***/ 3078:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2296,15 +2296,15 @@ exports.shouldUseRule = shouldUseRule;
 
 /***/ }),
 
-/***/ 5346:
+/***/ 7164:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.boolOrEmptySchema = exports.topBoolOrEmptySchema = void 0;
-const errors_1 = __nccwpck_require__(1283);
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
+const errors_1 = __nccwpck_require__(6865);
+const codegen_1 = __nccwpck_require__(3626);
+const names_1 = __nccwpck_require__(1740);
 const boolError = {
     message: "boolean schema is false",
 };
@@ -2352,17 +2352,17 @@ function falseSchemaError(it, overrideAllErrors) {
 
 /***/ }),
 
-/***/ 6685:
+/***/ 7931:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.reportTypeError = exports.checkDataTypes = exports.checkDataType = exports.coerceAndCheckDataType = exports.getJSONTypes = exports.getSchemaTypes = exports.DataType = void 0;
-const rules_1 = __nccwpck_require__(7353);
-const applicability_1 = __nccwpck_require__(7692);
-const errors_1 = __nccwpck_require__(1283);
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const rules_1 = __nccwpck_require__(2399);
+const applicability_1 = __nccwpck_require__(3078);
+const errors_1 = __nccwpck_require__(6865);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 var DataType;
 (function (DataType) {
     DataType[DataType["Correct"] = 0] = "Correct";
@@ -2561,14 +2561,14 @@ function getTypeErrorContext(it) {
 
 /***/ }),
 
-/***/ 1699:
+/***/ 1497:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.assignDefaults = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 function assignDefaults(it, ty) {
     const { properties, items } = it.schema;
     if (ty === "object" && properties) {
@@ -2602,24 +2602,24 @@ function assignDefault(it, prop, defaultValue) {
 
 /***/ }),
 
-/***/ 7881:
+/***/ 7007:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getData = exports.KeywordCxt = exports.validateFunctionCode = void 0;
-const boolSchema_1 = __nccwpck_require__(5346);
-const dataType_1 = __nccwpck_require__(6685);
-const applicability_1 = __nccwpck_require__(7692);
-const dataType_2 = __nccwpck_require__(6685);
-const defaults_1 = __nccwpck_require__(1699);
-const keyword_1 = __nccwpck_require__(5202);
-const subschema_1 = __nccwpck_require__(6200);
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const resolve_1 = __nccwpck_require__(4090);
-const util_1 = __nccwpck_require__(4464);
-const errors_1 = __nccwpck_require__(1283);
+const boolSchema_1 = __nccwpck_require__(7164);
+const dataType_1 = __nccwpck_require__(7931);
+const applicability_1 = __nccwpck_require__(3078);
+const dataType_2 = __nccwpck_require__(7931);
+const defaults_1 = __nccwpck_require__(1497);
+const keyword_1 = __nccwpck_require__(4004);
+const subschema_1 = __nccwpck_require__(234);
+const codegen_1 = __nccwpck_require__(3626);
+const names_1 = __nccwpck_require__(1740);
+const resolve_1 = __nccwpck_require__(3032);
+const util_1 = __nccwpck_require__(6362);
+const errors_1 = __nccwpck_require__(6865);
 // schema compilation - generates validation function, subschemaCode (below) is used for subschemas
 function validateFunctionCode(it) {
     if (isSchemaObj(it)) {
@@ -3128,16 +3128,16 @@ exports.getData = getData;
 
 /***/ }),
 
-/***/ 5202:
+/***/ 4004:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateKeywordUsage = exports.validSchemaType = exports.funcKeywordCode = exports.macroKeywordCode = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const code_1 = __nccwpck_require__(8484);
-const errors_1 = __nccwpck_require__(1283);
+const codegen_1 = __nccwpck_require__(3626);
+const names_1 = __nccwpck_require__(1740);
+const code_1 = __nccwpck_require__(4434);
+const errors_1 = __nccwpck_require__(6865);
 function macroKeywordCode(cxt, def) {
     const { gen, keyword, schema, parentSchema, it } = cxt;
     const macroSchema = def.macro.call(it.self, schema, parentSchema, it);
@@ -3258,14 +3258,14 @@ exports.validateKeywordUsage = validateKeywordUsage;
 
 /***/ }),
 
-/***/ 6200:
+/***/ 234:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.extendSubschemaMode = exports.extendSubschemaData = exports.getSubschema = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 function getSubschema(it, { keyword, schemaProp, schema, schemaPath, errSchemaPath, topSchemaRef }) {
     if (keyword !== undefined && schema !== undefined) {
         throw new Error('both "keyword" and "schema" passed, only one allowed');
@@ -3345,31 +3345,31 @@ exports.extendSubschemaMode = extendSubschemaMode;
 
 /***/ }),
 
-/***/ 3893:
+/***/ 9927:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = void 0;
-var validate_1 = __nccwpck_require__(7881);
+var validate_1 = __nccwpck_require__(7007);
 Object.defineProperty(exports, "KeywordCxt", ({ enumerable: true, get: function () { return validate_1.KeywordCxt; } }));
-var codegen_1 = __nccwpck_require__(1436);
+var codegen_1 = __nccwpck_require__(3626);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return codegen_1._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return codegen_1.str; } }));
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return codegen_1.stringify; } }));
 Object.defineProperty(exports, "nil", ({ enumerable: true, get: function () { return codegen_1.nil; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return codegen_1.Name; } }));
 Object.defineProperty(exports, "CodeGen", ({ enumerable: true, get: function () { return codegen_1.CodeGen; } }));
-const validation_error_1 = __nccwpck_require__(3021);
-const ref_error_1 = __nccwpck_require__(3162);
-const rules_1 = __nccwpck_require__(7353);
-const compile_1 = __nccwpck_require__(2718);
-const codegen_2 = __nccwpck_require__(1436);
-const resolve_1 = __nccwpck_require__(4090);
-const dataType_1 = __nccwpck_require__(6685);
-const util_1 = __nccwpck_require__(4464);
-const $dataRefSchema = __nccwpck_require__(3837);
-const uri_1 = __nccwpck_require__(6285);
+const validation_error_1 = __nccwpck_require__(871);
+const ref_error_1 = __nccwpck_require__(7524);
+const rules_1 = __nccwpck_require__(2399);
+const compile_1 = __nccwpck_require__(4688);
+const codegen_2 = __nccwpck_require__(3626);
+const resolve_1 = __nccwpck_require__(3032);
+const dataType_1 = __nccwpck_require__(7931);
+const util_1 = __nccwpck_require__(6362);
+const $dataRefSchema = __nccwpck_require__(2783);
+const uri_1 = __nccwpck_require__(2703);
 const defaultRegExp = (str, flags) => new RegExp(str, flags);
 defaultRegExp.code = "new RegExp";
 const META_IGNORE_OPTIONS = ["removeAdditional", "useDefaults", "coerceTypes"];
@@ -3969,19 +3969,19 @@ function schemaOrData(schema) {
 
 /***/ }),
 
-/***/ 3995:
+/***/ 6949:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const metaSchema = __nccwpck_require__(1678);
-const applicator = __nccwpck_require__(7216);
-const unevaluated = __nccwpck_require__(9547);
-const content = __nccwpck_require__(8226);
-const core = __nccwpck_require__(518);
-const format = __nccwpck_require__(4588);
-const metadata = __nccwpck_require__(5707);
-const validation = __nccwpck_require__(7082);
+const metaSchema = __nccwpck_require__(1016);
+const applicator = __nccwpck_require__(6006);
+const unevaluated = __nccwpck_require__(9334);
+const content = __nccwpck_require__(5464);
+const core = __nccwpck_require__(3892);
+const format = __nccwpck_require__(7442);
+const metadata = __nccwpck_require__(2617);
+const validation = __nccwpck_require__(9064);
 const META_SUPPORT_DATA = ["/properties"];
 function addMetaSchema2020($data) {
     ;
@@ -4005,20 +4005,20 @@ exports["default"] = addMetaSchema2020;
 
 /***/ }),
 
-/***/ 4951:
+/***/ 1077:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 // https://github.com/ajv-validator/ajv/issues/889
-const equal = __nccwpck_require__(3430);
+const equal = __nccwpck_require__(7272);
 equal.code = 'require("ajv/dist/runtime/equal").default';
 exports["default"] = equal;
 //# sourceMappingURL=equal.js.map
 
 /***/ }),
 
-/***/ 6214:
+/***/ 9140:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -4048,19 +4048,19 @@ ucs2length.code = 'require("ajv/dist/runtime/ucs2length").default';
 
 /***/ }),
 
-/***/ 6285:
+/***/ 2703:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const uri = __nccwpck_require__(4352);
+const uri = __nccwpck_require__(7374);
 uri.code = 'require("ajv/dist/runtime/uri").default';
 exports["default"] = uri;
 //# sourceMappingURL=uri.js.map
 
 /***/ }),
 
-/***/ 3021:
+/***/ 871:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -4077,14 +4077,14 @@ exports["default"] = ValidationError;
 
 /***/ }),
 
-/***/ 3448:
+/***/ 2:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateAdditionalItems = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 const error = {
     message: ({ params: { len } }) => (0, codegen_1.str) `must NOT have more than ${len} items`,
     params: ({ params: { len } }) => (0, codegen_1._) `{limit: ${len}}`,
@@ -4132,15 +4132,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2431:
+/***/ 6953:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const util_1 = __nccwpck_require__(4464);
+const code_1 = __nccwpck_require__(4434);
+const codegen_1 = __nccwpck_require__(3626);
+const names_1 = __nccwpck_require__(1740);
+const util_1 = __nccwpck_require__(6362);
 const error = {
     message: "must NOT have additional properties",
     params: ({ params }) => (0, codegen_1._) `{additionalProperty: ${params.additionalProperty}}`,
@@ -4244,12 +4244,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 9205:
+/***/ 8843:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __nccwpck_require__(4464);
+const util_1 = __nccwpck_require__(6362);
 const def = {
     keyword: "allOf",
     schemaType: "array",
@@ -4273,12 +4273,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 9380:
+/***/ 9446:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
+const code_1 = __nccwpck_require__(4434);
 const def = {
     keyword: "anyOf",
     schemaType: "array",
@@ -4291,13 +4291,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6182:
+/***/ 3276:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 const error = {
     message: ({ params: { min, max } }) => max === undefined
         ? (0, codegen_1.str) `must contain at least ${min} valid item(s)`
@@ -4392,15 +4392,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 5826:
+/***/ 4588:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateSchemaDeps = exports.validatePropertyDeps = exports.error = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const code_1 = __nccwpck_require__(8484);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const code_1 = __nccwpck_require__(4434);
 exports.error = {
     message: ({ params: { property, depsCount, deps } }) => {
         const property_ies = depsCount === 1 ? "property" : "properties";
@@ -4483,12 +4483,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 3818:
+/***/ 9720:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dependencies_1 = __nccwpck_require__(5826);
+const dependencies_1 = __nccwpck_require__(4588);
 const def = {
     keyword: "dependentSchemas",
     type: "object",
@@ -4500,13 +4500,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8584:
+/***/ 9358:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 const error = {
     message: ({ params }) => (0, codegen_1.str) `must match "${params.ifClause}" schema`,
     params: ({ params }) => (0, codegen_1._) `{failingKeyword: ${params.ifClause}}`,
@@ -4572,27 +4572,27 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8775:
+/***/ 1345:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const additionalItems_1 = __nccwpck_require__(3448);
-const prefixItems_1 = __nccwpck_require__(6467);
-const items_1 = __nccwpck_require__(5791);
-const items2020_1 = __nccwpck_require__(2959);
-const contains_1 = __nccwpck_require__(6182);
-const dependencies_1 = __nccwpck_require__(5826);
-const propertyNames_1 = __nccwpck_require__(1372);
-const additionalProperties_1 = __nccwpck_require__(2431);
-const properties_1 = __nccwpck_require__(8778);
-const patternProperties_1 = __nccwpck_require__(664);
-const not_1 = __nccwpck_require__(8350);
-const anyOf_1 = __nccwpck_require__(9380);
-const oneOf_1 = __nccwpck_require__(2490);
-const allOf_1 = __nccwpck_require__(9205);
-const if_1 = __nccwpck_require__(8584);
-const thenElse_1 = __nccwpck_require__(6829);
+const additionalItems_1 = __nccwpck_require__(2);
+const prefixItems_1 = __nccwpck_require__(4805);
+const items_1 = __nccwpck_require__(9305);
+const items2020_1 = __nccwpck_require__(2921);
+const contains_1 = __nccwpck_require__(3276);
+const dependencies_1 = __nccwpck_require__(4588);
+const propertyNames_1 = __nccwpck_require__(5230);
+const additionalProperties_1 = __nccwpck_require__(6953);
+const properties_1 = __nccwpck_require__(8492);
+const patternProperties_1 = __nccwpck_require__(3014);
+const not_1 = __nccwpck_require__(3628);
+const anyOf_1 = __nccwpck_require__(9446);
+const oneOf_1 = __nccwpck_require__(3056);
+const allOf_1 = __nccwpck_require__(8843);
+const if_1 = __nccwpck_require__(9358);
+const thenElse_1 = __nccwpck_require__(9255);
 function getApplicator(draft2020 = false) {
     const applicator = [
         // any
@@ -4622,15 +4622,15 @@ exports["default"] = getApplicator;
 
 /***/ }),
 
-/***/ 5791:
+/***/ 9305:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateTuple = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const code_1 = __nccwpck_require__(8484);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const code_1 = __nccwpck_require__(4434);
 const def = {
     keyword: "items",
     type: "array",
@@ -4680,15 +4680,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2959:
+/***/ 2921:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const code_1 = __nccwpck_require__(8484);
-const additionalItems_1 = __nccwpck_require__(3448);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const code_1 = __nccwpck_require__(4434);
+const additionalItems_1 = __nccwpck_require__(2);
 const error = {
     message: ({ params: { len } }) => (0, codegen_1.str) `must NOT have more than ${len} items`,
     params: ({ params: { len } }) => (0, codegen_1._) `{limit: ${len}}`,
@@ -4716,12 +4716,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8350:
+/***/ 3628:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __nccwpck_require__(4464);
+const util_1 = __nccwpck_require__(6362);
 const def = {
     keyword: "not",
     schemaType: ["object", "boolean"],
@@ -4748,13 +4748,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2490:
+/***/ 3056:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 const error = {
     message: "must match exactly one schema in oneOf",
     params: ({ params }) => (0, codegen_1._) `{passingSchemas: ${params.passing}}`,
@@ -4814,15 +4814,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 664:
+/***/ 3014:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const util_2 = __nccwpck_require__(4464);
+const code_1 = __nccwpck_require__(4434);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const util_2 = __nccwpck_require__(6362);
 const def = {
     keyword: "patternProperties",
     type: "object",
@@ -4895,12 +4895,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6467:
+/***/ 4805:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const items_1 = __nccwpck_require__(5791);
+const items_1 = __nccwpck_require__(9305);
 const def = {
     keyword: "prefixItems",
     type: "array",
@@ -4913,15 +4913,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8778:
+/***/ 8492:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const validate_1 = __nccwpck_require__(7881);
-const code_1 = __nccwpck_require__(8484);
-const util_1 = __nccwpck_require__(4464);
-const additionalProperties_1 = __nccwpck_require__(2431);
+const validate_1 = __nccwpck_require__(7007);
+const code_1 = __nccwpck_require__(4434);
+const util_1 = __nccwpck_require__(6362);
+const additionalProperties_1 = __nccwpck_require__(6953);
 const def = {
     keyword: "properties",
     type: "object",
@@ -4973,13 +4973,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 1372:
+/***/ 5230:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 const error = {
     message: "property name must be valid",
     params: ({ params }) => (0, codegen_1._) `{propertyName: ${params.propertyName}}`,
@@ -5017,12 +5017,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6829:
+/***/ 9255:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __nccwpck_require__(4464);
+const util_1 = __nccwpck_require__(6362);
 const def = {
     keyword: ["then", "else"],
     schemaType: ["object", "boolean"],
@@ -5036,16 +5036,16 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8484:
+/***/ 4434:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateUnion = exports.validateArray = exports.usePattern = exports.callValidateCode = exports.schemaProperties = exports.allSchemaProperties = exports.noPropertyInData = exports.propertyInData = exports.isOwnProperty = exports.hasPropFunc = exports.reportMissingProp = exports.checkMissingProp = exports.checkReportMissingProp = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const names_1 = __nccwpck_require__(630);
-const util_2 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const names_1 = __nccwpck_require__(1740);
+const util_2 = __nccwpck_require__(6362);
 function checkReportMissingProp(cxt, prop) {
     const { gen, data, it } = cxt;
     gen.if(noPropertyInData(gen, data, prop, it.opts.ownProperties), () => {
@@ -5173,7 +5173,7 @@ exports.validateUnion = validateUnion;
 
 /***/ }),
 
-/***/ 9872:
+/***/ 9066:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5189,13 +5189,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 7397:
+/***/ 6751:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const id_1 = __nccwpck_require__(9872);
-const ref_1 = __nccwpck_require__(2996);
+const id_1 = __nccwpck_require__(9066);
+const ref_1 = __nccwpck_require__(6842);
 const core = [
     "$schema",
     "$id",
@@ -5211,18 +5211,18 @@ exports["default"] = core;
 
 /***/ }),
 
-/***/ 2996:
+/***/ 6842:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.callRef = exports.getValidate = void 0;
-const ref_error_1 = __nccwpck_require__(3162);
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const compile_1 = __nccwpck_require__(2718);
-const util_1 = __nccwpck_require__(4464);
+const ref_error_1 = __nccwpck_require__(7524);
+const code_1 = __nccwpck_require__(4434);
+const codegen_1 = __nccwpck_require__(3626);
+const names_1 = __nccwpck_require__(1740);
+const compile_1 = __nccwpck_require__(4688);
+const util_1 = __nccwpck_require__(6362);
 const def = {
     keyword: "$ref",
     schemaType: "string",
@@ -5339,16 +5339,16 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8886:
+/***/ 1448:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const types_1 = __nccwpck_require__(7115);
-const compile_1 = __nccwpck_require__(2718);
-const ref_error_1 = __nccwpck_require__(3162);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const types_1 = __nccwpck_require__(2189);
+const compile_1 = __nccwpck_require__(4688);
+const ref_error_1 = __nccwpck_require__(7524);
+const util_1 = __nccwpck_require__(6362);
 const error = {
     message: ({ params: { discrError, tagName } }) => discrError === types_1.DiscrError.Tag
         ? `tag "${tagName}" must be string`
@@ -5449,7 +5449,7 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 7115:
+/***/ 2189:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5464,19 +5464,19 @@ var DiscrError;
 
 /***/ }),
 
-/***/ 4298:
+/***/ 9815:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __nccwpck_require__(7397);
-const validation_1 = __nccwpck_require__(5481);
-const applicator_1 = __nccwpck_require__(8775);
-const dynamic_1 = __nccwpck_require__(9923);
-const next_1 = __nccwpck_require__(7844);
-const unevaluated_1 = __nccwpck_require__(2010);
-const format_1 = __nccwpck_require__(2601);
-const metadata_1 = __nccwpck_require__(6620);
+const core_1 = __nccwpck_require__(6751);
+const validation_1 = __nccwpck_require__(8251);
+const applicator_1 = __nccwpck_require__(1345);
+const dynamic_1 = __nccwpck_require__(2053);
+const next_1 = __nccwpck_require__(134);
+const unevaluated_1 = __nccwpck_require__(2372);
+const format_1 = __nccwpck_require__(3211);
+const metadata_1 = __nccwpck_require__(7234);
 const draft2020Vocabularies = [
     dynamic_1.default,
     core_1.default,
@@ -5493,16 +5493,16 @@ exports["default"] = draft2020Vocabularies;
 
 /***/ }),
 
-/***/ 9941:
+/***/ 1631:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __nccwpck_require__(7397);
-const validation_1 = __nccwpck_require__(5481);
-const applicator_1 = __nccwpck_require__(8775);
-const format_1 = __nccwpck_require__(2601);
-const metadata_1 = __nccwpck_require__(6620);
+const core_1 = __nccwpck_require__(6751);
+const validation_1 = __nccwpck_require__(8251);
+const applicator_1 = __nccwpck_require__(1345);
+const format_1 = __nccwpck_require__(3211);
+const metadata_1 = __nccwpck_require__(7234);
 const draft7Vocabularies = [
     core_1.default,
     validation_1.default,
@@ -5516,16 +5516,16 @@ exports["default"] = draft7Vocabularies;
 
 /***/ }),
 
-/***/ 8639:
+/***/ 2533:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.dynamicAnchor = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const compile_1 = __nccwpck_require__(2718);
-const ref_1 = __nccwpck_require__(2996);
+const codegen_1 = __nccwpck_require__(3626);
+const names_1 = __nccwpck_require__(1740);
+const compile_1 = __nccwpck_require__(4688);
+const ref_1 = __nccwpck_require__(6842);
 const def = {
     keyword: "$dynamicAnchor",
     schemaType: "string",
@@ -5552,15 +5552,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 5065:
+/***/ 4323:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.dynamicRef = void 0;
-const codegen_1 = __nccwpck_require__(1436);
-const names_1 = __nccwpck_require__(630);
-const ref_1 = __nccwpck_require__(2996);
+const codegen_1 = __nccwpck_require__(3626);
+const names_1 = __nccwpck_require__(1740);
+const ref_1 = __nccwpck_require__(6842);
 const def = {
     keyword: "$dynamicRef",
     schemaType: "string",
@@ -5609,28 +5609,28 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 9923:
+/***/ 2053:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dynamicAnchor_1 = __nccwpck_require__(8639);
-const dynamicRef_1 = __nccwpck_require__(5065);
-const recursiveAnchor_1 = __nccwpck_require__(9982);
-const recursiveRef_1 = __nccwpck_require__(1794);
+const dynamicAnchor_1 = __nccwpck_require__(2533);
+const dynamicRef_1 = __nccwpck_require__(4323);
+const recursiveAnchor_1 = __nccwpck_require__(968);
+const recursiveRef_1 = __nccwpck_require__(7656);
 const dynamic = [dynamicAnchor_1.default, dynamicRef_1.default, recursiveAnchor_1.default, recursiveRef_1.default];
 exports["default"] = dynamic;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 9982:
+/***/ 968:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dynamicAnchor_1 = __nccwpck_require__(8639);
-const util_1 = __nccwpck_require__(4464);
+const dynamicAnchor_1 = __nccwpck_require__(2533);
+const util_1 = __nccwpck_require__(6362);
 const def = {
     keyword: "$recursiveAnchor",
     schemaType: "boolean",
@@ -5646,12 +5646,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 1794:
+/***/ 7656:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dynamicRef_1 = __nccwpck_require__(5065);
+const dynamicRef_1 = __nccwpck_require__(4323);
 const def = {
     keyword: "$recursiveRef",
     schemaType: "string",
@@ -5662,12 +5662,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6402:
+/***/ 8128:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(3626);
 const error = {
     message: ({ schemaCode }) => (0, codegen_1.str) `must match format "${schemaCode}"`,
     params: ({ schemaCode }) => (0, codegen_1._) `{format: ${schemaCode}}`,
@@ -5760,19 +5760,19 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2601:
+/***/ 3211:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const format_1 = __nccwpck_require__(6402);
+const format_1 = __nccwpck_require__(8128);
 const format = [format_1.default];
 exports["default"] = format;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 6620:
+/***/ 7234:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5796,40 +5796,40 @@ exports.contentVocabulary = [
 
 /***/ }),
 
-/***/ 7844:
+/***/ 134:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dependentRequired_1 = __nccwpck_require__(643);
-const dependentSchemas_1 = __nccwpck_require__(3818);
-const limitContains_1 = __nccwpck_require__(3907);
+const dependentRequired_1 = __nccwpck_require__(25);
+const dependentSchemas_1 = __nccwpck_require__(9720);
+const limitContains_1 = __nccwpck_require__(6517);
 const next = [dependentRequired_1.default, dependentSchemas_1.default, limitContains_1.default];
 exports["default"] = next;
 //# sourceMappingURL=next.js.map
 
 /***/ }),
 
-/***/ 2010:
+/***/ 2372:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const unevaluatedProperties_1 = __nccwpck_require__(6855);
-const unevaluatedItems_1 = __nccwpck_require__(4144);
+const unevaluatedProperties_1 = __nccwpck_require__(509);
+const unevaluatedItems_1 = __nccwpck_require__(8710);
 const unevaluated = [unevaluatedProperties_1.default, unevaluatedItems_1.default];
 exports["default"] = unevaluated;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 4144:
+/***/ 8710:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 const error = {
     message: ({ params: { len } }) => (0, codegen_1.str) `must NOT have more than ${len} items`,
     params: ({ params: { len } }) => (0, codegen_1._) `{limit: ${len}}`,
@@ -5869,14 +5869,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6855:
+/***/ 509:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const names_1 = __nccwpck_require__(630);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const names_1 = __nccwpck_require__(1740);
 const error = {
     message: "must NOT have unevaluated properties",
     params: ({ params }) => (0, codegen_1._) `{unevaluatedProperty: ${params.unevaluatedProperty}}`,
@@ -5940,14 +5940,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8026:
+/***/ 8288:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const equal_1 = __nccwpck_require__(4951);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const equal_1 = __nccwpck_require__(1077);
 const error = {
     message: "must be equal to constant",
     params: ({ schemaCode }) => (0, codegen_1._) `{allowedValue: ${schemaCode}}`,
@@ -5971,12 +5971,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 643:
+/***/ 25:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dependencies_1 = __nccwpck_require__(5826);
+const dependencies_1 = __nccwpck_require__(4588);
 const def = {
     keyword: "dependentRequired",
     type: "object",
@@ -5989,14 +5989,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 3200:
+/***/ 1558:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const equal_1 = __nccwpck_require__(4951);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const equal_1 = __nccwpck_require__(1077);
 const error = {
     message: "must be equal to one of the allowed values",
     params: ({ schemaCode }) => (0, codegen_1._) `{allowedValues: ${schemaCode}}`,
@@ -6043,21 +6043,21 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 5481:
+/***/ 8251:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const limitNumber_1 = __nccwpck_require__(3723);
-const multipleOf_1 = __nccwpck_require__(8132);
-const limitLength_1 = __nccwpck_require__(6962);
-const pattern_1 = __nccwpck_require__(6023);
-const limitProperties_1 = __nccwpck_require__(895);
-const required_1 = __nccwpck_require__(2123);
-const limitItems_1 = __nccwpck_require__(6296);
-const uniqueItems_1 = __nccwpck_require__(5132);
-const const_1 = __nccwpck_require__(8026);
-const enum_1 = __nccwpck_require__(3200);
+const limitNumber_1 = __nccwpck_require__(3117);
+const multipleOf_1 = __nccwpck_require__(7934);
+const limitLength_1 = __nccwpck_require__(160);
+const pattern_1 = __nccwpck_require__(3037);
+const limitProperties_1 = __nccwpck_require__(1541);
+const required_1 = __nccwpck_require__(3034);
+const limitItems_1 = __nccwpck_require__(1966);
+const uniqueItems_1 = __nccwpck_require__(9018);
+const const_1 = __nccwpck_require__(8288);
+const enum_1 = __nccwpck_require__(1558);
 const validation = [
     // number
     limitNumber_1.default,
@@ -6082,12 +6082,12 @@ exports["default"] = validation;
 
 /***/ }),
 
-/***/ 3907:
+/***/ 6517:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __nccwpck_require__(4464);
+const util_1 = __nccwpck_require__(6362);
 const def = {
     keyword: ["maxContains", "minContains"],
     type: "array",
@@ -6103,12 +6103,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6296:
+/***/ 1966:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(3626);
 const error = {
     message({ keyword, schemaCode }) {
         const comp = keyword === "maxItems" ? "more" : "fewer";
@@ -6133,14 +6133,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6962:
+/***/ 160:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const ucs2length_1 = __nccwpck_require__(6214);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const ucs2length_1 = __nccwpck_require__(9140);
 const error = {
     message({ keyword, schemaCode }) {
         const comp = keyword === "maxLength" ? "more" : "fewer";
@@ -6166,12 +6166,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 3723:
+/***/ 3117:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(3626);
 const ops = codegen_1.operators;
 const KWDs = {
     maximum: { okStr: "<=", ok: ops.LTE, fail: ops.GT },
@@ -6199,12 +6199,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 895:
+/***/ 1541:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(3626);
 const error = {
     message({ keyword, schemaCode }) {
         const comp = keyword === "maxProperties" ? "more" : "fewer";
@@ -6229,12 +6229,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8132:
+/***/ 7934:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __nccwpck_require__(1436);
+const codegen_1 = __nccwpck_require__(3626);
 const error = {
     message: ({ schemaCode }) => (0, codegen_1.str) `must be multiple of ${schemaCode}`,
     params: ({ schemaCode }) => (0, codegen_1._) `{multipleOf: ${schemaCode}}`,
@@ -6261,13 +6261,13 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 6023:
+/***/ 3037:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
+const code_1 = __nccwpck_require__(4434);
+const codegen_1 = __nccwpck_require__(3626);
 const error = {
     message: ({ schemaCode }) => (0, codegen_1.str) `must match pattern "${schemaCode}"`,
     params: ({ schemaCode }) => (0, codegen_1._) `{pattern: ${schemaCode}}`,
@@ -6291,14 +6291,14 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 2123:
+/***/ 3034:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __nccwpck_require__(8484);
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
+const code_1 = __nccwpck_require__(4434);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
 const error = {
     message: ({ params: { missingProperty } }) => (0, codegen_1.str) `must have required property '${missingProperty}'`,
     params: ({ params: { missingProperty } }) => (0, codegen_1._) `{missingProperty: ${missingProperty}}`,
@@ -6376,15 +6376,15 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 5132:
+/***/ 9018:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dataType_1 = __nccwpck_require__(6685);
-const codegen_1 = __nccwpck_require__(1436);
-const util_1 = __nccwpck_require__(4464);
-const equal_1 = __nccwpck_require__(4951);
+const dataType_1 = __nccwpck_require__(7931);
+const codegen_1 = __nccwpck_require__(3626);
+const util_1 = __nccwpck_require__(6362);
+const equal_1 = __nccwpck_require__(1077);
 const error = {
     message: ({ params: { i, j } }) => (0, codegen_1.str) `must NOT have duplicate items (items ## ${j} and ${i} are identical)`,
     params: ({ params: { i, j } }) => (0, codegen_1._) `{i: ${i}, j: ${j}}`,
@@ -6446,12 +6446,12 @@ exports["default"] = def;
 
 /***/ }),
 
-/***/ 8905:
+/***/ 2815:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var isObject = __nccwpck_require__(6403);
+var isObject = __nccwpck_require__(2137);
 
 module.exports = function extend(o/*, objects*/) {
   if (!isObject(o)) { o = {}; }
@@ -6486,7 +6486,7 @@ function hasOwn(obj, key) {
 
 /***/ }),
 
-/***/ 3430:
+/***/ 7272:
 /***/ ((module) => {
 
 
@@ -6539,20 +6539,20 @@ module.exports = function equal(a, b) {
 
 /***/ }),
 
-/***/ 9599:
+/***/ 493:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 const fs = __nccwpck_require__(9896);
-const sections = __nccwpck_require__(9495);
-const defaults = __nccwpck_require__(7545);
-const stringify = __nccwpck_require__(4710);
-const excerpt = __nccwpck_require__(7894);
-const engines = __nccwpck_require__(4452);
-const toFile = __nccwpck_require__(8073);
-const parse = __nccwpck_require__(8120);
-const utils = __nccwpck_require__(8698);
+const sections = __nccwpck_require__(8945);
+const defaults = __nccwpck_require__(223);
+const stringify = __nccwpck_require__(7604);
+const excerpt = __nccwpck_require__(8432);
+const engines = __nccwpck_require__(8446);
+const toFile = __nccwpck_require__(395);
+const parse = __nccwpck_require__(6938);
+const utils = __nccwpck_require__(3472);
 
 /**
  * Takes a string or object with `content` property, extracts
@@ -6774,13 +6774,13 @@ module.exports = matter;
 
 /***/ }),
 
-/***/ 7545:
+/***/ 223:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const engines = __nccwpck_require__(4452);
-const utils = __nccwpck_require__(8698);
+const engines = __nccwpck_require__(8446);
+const utils = __nccwpck_require__(3472);
 
 module.exports = function(options) {
   const opts = Object.assign({}, options);
@@ -6799,7 +6799,7 @@ module.exports = function(options) {
 
 /***/ }),
 
-/***/ 5921:
+/***/ 3611:
 /***/ ((module) => {
 
 
@@ -6836,12 +6836,12 @@ function aliase(name) {
 
 /***/ }),
 
-/***/ 4452:
+/***/ 8446:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 
 
-const yaml = __nccwpck_require__(188);
+const yaml = __nccwpck_require__(9922);
 
 /**
  * Default engines
@@ -6897,12 +6897,12 @@ engines.javascript = {
 
 /***/ }),
 
-/***/ 7894:
+/***/ 8432:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const defaults = __nccwpck_require__(7545);
+const defaults = __nccwpck_require__(223);
 
 module.exports = function(file, options) {
   const opts = defaults(options);
@@ -6936,13 +6936,13 @@ module.exports = function(file, options) {
 
 /***/ }),
 
-/***/ 8120:
+/***/ 6938:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const getEngine = __nccwpck_require__(5921);
-const defaults = __nccwpck_require__(7545);
+const getEngine = __nccwpck_require__(3611);
+const defaults = __nccwpck_require__(223);
 
 module.exports = function(language, str, options) {
   const opts = defaults(options);
@@ -6956,14 +6956,14 @@ module.exports = function(language, str, options) {
 
 /***/ }),
 
-/***/ 4710:
+/***/ 7604:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const typeOf = __nccwpck_require__(5140);
-const getEngine = __nccwpck_require__(5921);
-const defaults = __nccwpck_require__(7545);
+const typeOf = __nccwpck_require__(5902);
+const getEngine = __nccwpck_require__(3611);
+const defaults = __nccwpck_require__(223);
 
 module.exports = function(file, data, options) {
   if (data == null && options == null) {
@@ -7019,14 +7019,14 @@ function newline(str) {
 
 /***/ }),
 
-/***/ 8073:
+/***/ 395:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const typeOf = __nccwpck_require__(5140);
-const stringify = __nccwpck_require__(4710);
-const utils = __nccwpck_require__(8698);
+const typeOf = __nccwpck_require__(5902);
+const stringify = __nccwpck_require__(7604);
+const utils = __nccwpck_require__(3472);
 
 /**
  * Normalize the given value to ensure an object is returned
@@ -7069,13 +7069,13 @@ module.exports = function(file) {
 
 /***/ }),
 
-/***/ 8698:
+/***/ 3472:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 
-const stripBom = __nccwpck_require__(1389);
-const typeOf = __nccwpck_require__(5140);
+const stripBom = __nccwpck_require__(291);
+const typeOf = __nccwpck_require__(5902);
 
 exports.define = function(obj, key, val) {
   Reflect.defineProperty(obj, key, {
@@ -7142,13 +7142,13 @@ exports.startsWith = function(str, substr, len) {
 
 /***/ }),
 
-/***/ 188:
+/***/ 9922:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 
-var yaml = __nccwpck_require__(993);
+var yaml = __nccwpck_require__(5043);
 
 
 module.exports = yaml;
@@ -7156,14 +7156,14 @@ module.exports = yaml;
 
 /***/ }),
 
-/***/ 993:
+/***/ 5043:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 
-var loader = __nccwpck_require__(9559);
-var dumper = __nccwpck_require__(9081);
+var loader = __nccwpck_require__(3969);
+var dumper = __nccwpck_require__(9855);
 
 
 function deprecated(name) {
@@ -7173,25 +7173,25 @@ function deprecated(name) {
 }
 
 
-module.exports.Type = __nccwpck_require__(7592);
-module.exports.Schema = __nccwpck_require__(995);
-module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(6587);
-module.exports.JSON_SCHEMA = __nccwpck_require__(5636);
-module.exports.CORE_SCHEMA = __nccwpck_require__(4773);
-module.exports.DEFAULT_SAFE_SCHEMA = __nccwpck_require__(8693);
-module.exports.DEFAULT_FULL_SCHEMA = __nccwpck_require__(1285);
+module.exports.Type = __nccwpck_require__(7850);
+module.exports.Schema = __nccwpck_require__(1261);
+module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(9185);
+module.exports.JSON_SCHEMA = __nccwpck_require__(1902);
+module.exports.CORE_SCHEMA = __nccwpck_require__(2011);
+module.exports.DEFAULT_SAFE_SCHEMA = __nccwpck_require__(3935);
+module.exports.DEFAULT_FULL_SCHEMA = __nccwpck_require__(203);
 module.exports.load                = loader.load;
 module.exports.loadAll             = loader.loadAll;
 module.exports.safeLoad            = loader.safeLoad;
 module.exports.safeLoadAll         = loader.safeLoadAll;
 module.exports.dump                = dumper.dump;
 module.exports.safeDump            = dumper.safeDump;
-module.exports.YAMLException = __nccwpck_require__(7627);
+module.exports.YAMLException = __nccwpck_require__(397);
 
 // Deprecated schema names from JS-YAML 2.0.x
-module.exports.MINIMAL_SCHEMA = __nccwpck_require__(6587);
-module.exports.SAFE_SCHEMA = __nccwpck_require__(8693);
-module.exports.DEFAULT_SCHEMA = __nccwpck_require__(1285);
+module.exports.MINIMAL_SCHEMA = __nccwpck_require__(9185);
+module.exports.SAFE_SCHEMA = __nccwpck_require__(3935);
+module.exports.DEFAULT_SCHEMA = __nccwpck_require__(203);
 
 // Deprecated functions from JS-YAML 1.x.x
 module.exports.scan           = deprecated('scan');
@@ -7202,7 +7202,7 @@ module.exports.addConstructor = deprecated('addConstructor');
 
 /***/ }),
 
-/***/ 3973:
+/***/ 5975:
 /***/ ((module) => {
 
 
@@ -7268,17 +7268,17 @@ module.exports.extend         = extend;
 
 /***/ }),
 
-/***/ 9081:
+/***/ 9855:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 /*eslint-disable no-use-before-define*/
 
-var common              = __nccwpck_require__(3973);
-var YAMLException       = __nccwpck_require__(7627);
-var DEFAULT_FULL_SCHEMA = __nccwpck_require__(1285);
-var DEFAULT_SAFE_SCHEMA = __nccwpck_require__(8693);
+var common              = __nccwpck_require__(5975);
+var YAMLException       = __nccwpck_require__(397);
+var DEFAULT_FULL_SCHEMA = __nccwpck_require__(203);
+var DEFAULT_SAFE_SCHEMA = __nccwpck_require__(3935);
 
 var _toString       = Object.prototype.toString;
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -8125,7 +8125,7 @@ module.exports.safeDump = safeDump;
 
 /***/ }),
 
-/***/ 7627:
+/***/ 397:
 /***/ ((module) => {
 
 // YAML error class. http://stackoverflow.com/questions/8458984
@@ -8175,18 +8175,18 @@ module.exports = YAMLException;
 
 /***/ }),
 
-/***/ 9559:
+/***/ 3969:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 /*eslint-disable max-len,no-use-before-define*/
 
-var common              = __nccwpck_require__(3973);
-var YAMLException       = __nccwpck_require__(7627);
-var Mark                = __nccwpck_require__(1233);
-var DEFAULT_SAFE_SCHEMA = __nccwpck_require__(8693);
-var DEFAULT_FULL_SCHEMA = __nccwpck_require__(1285);
+var common              = __nccwpck_require__(5975);
+var YAMLException       = __nccwpck_require__(397);
+var Mark                = __nccwpck_require__(4427);
+var DEFAULT_SAFE_SCHEMA = __nccwpck_require__(3935);
+var DEFAULT_FULL_SCHEMA = __nccwpck_require__(203);
 
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -9842,13 +9842,13 @@ module.exports.safeLoad    = safeLoad;
 
 /***/ }),
 
-/***/ 1233:
+/***/ 4427:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 
-var common = __nccwpck_require__(3973);
+var common = __nccwpck_require__(5975);
 
 
 function Mark(name, buffer, position, line, column) {
@@ -9925,16 +9925,16 @@ module.exports = Mark;
 
 /***/ }),
 
-/***/ 995:
+/***/ 1261:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
 /*eslint-disable max-len*/
 
-var common        = __nccwpck_require__(3973);
-var YAMLException = __nccwpck_require__(7627);
-var Type          = __nccwpck_require__(7592);
+var common        = __nccwpck_require__(5975);
+var YAMLException = __nccwpck_require__(397);
+var Type          = __nccwpck_require__(7850);
 
 
 function compileList(schema, name, result) {
@@ -10040,7 +10040,7 @@ module.exports = Schema;
 
 /***/ }),
 
-/***/ 4773:
+/***/ 2011:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // Standard YAML's Core schema.
@@ -10053,19 +10053,19 @@ module.exports = Schema;
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(1261);
 
 
 module.exports = new Schema({
   include: [
-    __nccwpck_require__(5636)
+    __nccwpck_require__(1902)
   ]
 });
 
 
 /***/ }),
 
-/***/ 1285:
+/***/ 203:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // JS-YAML's default schema for `load` function.
@@ -10080,24 +10080,24 @@ module.exports = new Schema({
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(1261);
 
 
 module.exports = Schema.DEFAULT = new Schema({
   include: [
-    __nccwpck_require__(8693)
+    __nccwpck_require__(3935)
   ],
   explicit: [
-    __nccwpck_require__(1775),
-    __nccwpck_require__(7394),
-    __nccwpck_require__(9531)
+    __nccwpck_require__(201),
+    __nccwpck_require__(7548),
+    __nccwpck_require__(2897)
   ]
 });
 
 
 /***/ }),
 
-/***/ 8693:
+/***/ 3935:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // JS-YAML's default schema for `safeLoad` function.
@@ -10110,29 +10110,29 @@ module.exports = Schema.DEFAULT = new Schema({
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(1261);
 
 
 module.exports = new Schema({
   include: [
-    __nccwpck_require__(4773)
+    __nccwpck_require__(2011)
   ],
   implicit: [
-    __nccwpck_require__(5339),
-    __nccwpck_require__(4543)
+    __nccwpck_require__(3365),
+    __nccwpck_require__(2317)
   ],
   explicit: [
-    __nccwpck_require__(2946),
-    __nccwpck_require__(7742),
-    __nccwpck_require__(770),
-    __nccwpck_require__(1723)
+    __nccwpck_require__(5752),
+    __nccwpck_require__(2172),
+    __nccwpck_require__(4568),
+    __nccwpck_require__(6277)
   ]
 });
 
 
 /***/ }),
 
-/***/ 6587:
+/***/ 9185:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // Standard YAML's Failsafe schema.
@@ -10142,21 +10142,21 @@ module.exports = new Schema({
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(1261);
 
 
 module.exports = new Schema({
   explicit: [
-    __nccwpck_require__(4504),
-    __nccwpck_require__(1848),
-    __nccwpck_require__(7021)
+    __nccwpck_require__(5550),
+    __nccwpck_require__(7786),
+    __nccwpck_require__(1547)
   ]
 });
 
 
 /***/ }),
 
-/***/ 5636:
+/***/ 1902:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 // Standard YAML's JSON schema.
@@ -10170,30 +10170,30 @@ module.exports = new Schema({
 
 
 
-var Schema = __nccwpck_require__(995);
+var Schema = __nccwpck_require__(1261);
 
 
 module.exports = new Schema({
   include: [
-    __nccwpck_require__(6587)
+    __nccwpck_require__(9185)
   ],
   implicit: [
-    __nccwpck_require__(7658),
-    __nccwpck_require__(6699),
-    __nccwpck_require__(9158),
-    __nccwpck_require__(1641)
+    __nccwpck_require__(6832),
+    __nccwpck_require__(9481),
+    __nccwpck_require__(5904),
+    __nccwpck_require__(7839)
   ]
 });
 
 
 /***/ }),
 
-/***/ 7592:
+/***/ 7850:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var YAMLException = __nccwpck_require__(7627);
+var YAMLException = __nccwpck_require__(397);
 
 var TYPE_CONSTRUCTOR_OPTIONS = [
   'kind',
@@ -10256,7 +10256,7 @@ module.exports = Type;
 
 /***/ }),
 
-/***/ 2946:
+/***/ 5752:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
@@ -10271,7 +10271,7 @@ try {
   NodeBuffer = _require('buffer').Buffer;
 } catch (__) {}
 
-var Type       = __nccwpck_require__(7592);
+var Type       = __nccwpck_require__(7850);
 
 
 // [ 64, 65, 66 ] -> [ padding, CR, LF ]
@@ -10401,12 +10401,12 @@ module.exports = new Type('tag:yaml.org,2002:binary', {
 
 /***/ }),
 
-/***/ 6699:
+/***/ 9481:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 function resolveYamlBoolean(data) {
   if (data === null) return false;
@@ -10443,13 +10443,13 @@ module.exports = new Type('tag:yaml.org,2002:bool', {
 
 /***/ }),
 
-/***/ 1641:
+/***/ 7839:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var common = __nccwpck_require__(3973);
-var Type   = __nccwpck_require__(7592);
+var common = __nccwpck_require__(5975);
+var Type   = __nccwpck_require__(7850);
 
 var YAML_FLOAT_PATTERN = new RegExp(
   // 2.5e4, 2.5 and integers
@@ -10566,13 +10566,13 @@ module.exports = new Type('tag:yaml.org,2002:float', {
 
 /***/ }),
 
-/***/ 9158:
+/***/ 5904:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var common = __nccwpck_require__(3973);
-var Type   = __nccwpck_require__(7592);
+var common = __nccwpck_require__(5975);
+var Type   = __nccwpck_require__(7850);
 
 function isHexCode(c) {
   return ((0x30/* 0 */ <= c) && (c <= 0x39/* 9 */)) ||
@@ -10746,7 +10746,7 @@ module.exports = new Type('tag:yaml.org,2002:int', {
 
 /***/ }),
 
-/***/ 9531:
+/***/ 2897:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
@@ -10770,7 +10770,7 @@ try {
   if (typeof window !== 'undefined') esprima = window.esprima;
 }
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 function resolveJavascriptFunction(data) {
   if (data === null) return false;
@@ -10846,12 +10846,12 @@ module.exports = new Type('tag:yaml.org,2002:js/function', {
 
 /***/ }),
 
-/***/ 7394:
+/***/ 7548:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 function resolveJavascriptRegExp(data) {
   if (data === null) return false;
@@ -10913,12 +10913,12 @@ module.exports = new Type('tag:yaml.org,2002:js/regexp', {
 
 /***/ }),
 
-/***/ 1775:
+/***/ 201:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 function resolveJavascriptUndefined() {
   return true;
@@ -10948,12 +10948,12 @@ module.exports = new Type('tag:yaml.org,2002:js/undefined', {
 
 /***/ }),
 
-/***/ 7021:
+/***/ 1547:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 module.exports = new Type('tag:yaml.org,2002:map', {
   kind: 'mapping',
@@ -10963,12 +10963,12 @@ module.exports = new Type('tag:yaml.org,2002:map', {
 
 /***/ }),
 
-/***/ 4543:
+/***/ 2317:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 function resolveYamlMerge(data) {
   return data === '<<' || data === null;
@@ -10982,12 +10982,12 @@ module.exports = new Type('tag:yaml.org,2002:merge', {
 
 /***/ }),
 
-/***/ 7658:
+/***/ 6832:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 function resolveYamlNull(data) {
   if (data === null) return true;
@@ -11023,12 +11023,12 @@ module.exports = new Type('tag:yaml.org,2002:null', {
 
 /***/ }),
 
-/***/ 7742:
+/***/ 2172:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 var _toString       = Object.prototype.toString;
@@ -11074,12 +11074,12 @@ module.exports = new Type('tag:yaml.org,2002:omap', {
 
 /***/ }),
 
-/***/ 770:
+/***/ 4568:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 var _toString = Object.prototype.toString;
 
@@ -11134,12 +11134,12 @@ module.exports = new Type('tag:yaml.org,2002:pairs', {
 
 /***/ }),
 
-/***/ 1848:
+/***/ 7786:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 module.exports = new Type('tag:yaml.org,2002:seq', {
   kind: 'sequence',
@@ -11149,12 +11149,12 @@ module.exports = new Type('tag:yaml.org,2002:seq', {
 
 /***/ }),
 
-/***/ 1723:
+/***/ 6277:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -11185,12 +11185,12 @@ module.exports = new Type('tag:yaml.org,2002:set', {
 
 /***/ }),
 
-/***/ 4504:
+/***/ 5550:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 module.exports = new Type('tag:yaml.org,2002:str', {
   kind: 'scalar',
@@ -11200,12 +11200,12 @@ module.exports = new Type('tag:yaml.org,2002:str', {
 
 /***/ }),
 
-/***/ 5339:
+/***/ 3365:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var Type = __nccwpck_require__(7592);
+var Type = __nccwpck_require__(7850);
 
 var YAML_DATE_REGEXP = new RegExp(
   '^([0-9][0-9][0-9][0-9])'          + // [1] year
@@ -11295,7 +11295,7 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
 
 /***/ }),
 
-/***/ 6403:
+/***/ 2137:
 /***/ ((module) => {
 
 /*!
@@ -11315,7 +11315,7 @@ module.exports = function isExtendable(val) {
 
 /***/ }),
 
-/***/ 1167:
+/***/ 3533:
 /***/ ((module) => {
 
 
@@ -11415,7 +11415,7 @@ function escapeJsonPtr(str) {
 
 /***/ }),
 
-/***/ 5140:
+/***/ 5902:
 /***/ ((module) => {
 
 var toString = Object.prototype.toString;
@@ -11551,13 +11551,13 @@ function isBuffer(val) {
 
 /***/ }),
 
-/***/ 9495:
+/***/ 8945:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-var typeOf = __nccwpck_require__(5140);
-var extend = __nccwpck_require__(8905);
+var typeOf = __nccwpck_require__(5902);
+var extend = __nccwpck_require__(2815);
 
 /**
  * Parse sections in `input` with the given `options`.
@@ -11694,7 +11694,7 @@ function isBuffer(val) {
 
 /***/ }),
 
-/***/ 1389:
+/***/ 291:
 /***/ ((module) => {
 
 /*!
@@ -11720,6 +11720,13 @@ module.exports = function(str) {
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fs");
+
+/***/ }),
+
+/***/ 1421:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
 
 /***/ }),
 
@@ -11765,13 +11772,20 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
 
 /***/ }),
 
-/***/ 4352:
+/***/ 7975:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:util");
+
+/***/ }),
+
+/***/ 7374:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizeComponentEncoding, isIPv4, nonSimpleDomain } = __nccwpck_require__(5077)
-const { SCHEMES, getSchemeHandler } = __nccwpck_require__(5300)
+const { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizeComponentEncoding, isIPv4, nonSimpleDomain } = __nccwpck_require__(2787)
+const { SCHEMES, getSchemeHandler } = __nccwpck_require__(426)
 
 /**
  * @template {import('./types/index').URIComponent|string} T
@@ -12112,12 +12126,12 @@ module.exports.fastUri = fastUri
 
 /***/ }),
 
-/***/ 5300:
+/***/ 426:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 
 
-const { isUUID } = __nccwpck_require__(5077)
+const { isUUID } = __nccwpck_require__(2787)
 const URN_REG = /([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-.:;=@]|%[\da-f]{2})+)/iu
 
 const supportedSchemeNames = /** @type {const} */ (['http', 'https', 'ws',
@@ -12386,7 +12400,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 5077:
+/***/ 2787:
 /***/ ((module) => {
 
 
@@ -12729,7 +12743,4267 @@ module.exports = {
 
 /***/ }),
 
-/***/ 3243:
+/***/ 2758:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  kN: () => (/* binding */ buildExecutionPlan),
+  Ay: () => (/* binding */ rankByModelHint),
+  P0: () => (/* reexport */ summarizeSkill)
+});
+
+// UNUSED EXPORTS: matchesPhase, selectSkills
+
+// EXTERNAL MODULE: ../../../node_modules/minimatch/dist/esm/index.js + 7 modules
+var esm = __nccwpck_require__(9061);
+// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
+var skill_loader = __nccwpck_require__(2957);
+;// CONCATENATED MODULE: ./src/lib/skill-planner.mjs
+
+
+/**
+ * Summarize a skill's metadata for LLM consumption.
+ * @param {import('../../runners/core/review-runner.mjs').SkillDefinition|import('../../runners/core/review-runner.mjs').SkillMetadata} skill
+ */
+function summarizeSkill(skill) {
+  const meta = skill?.metadata ?? skill;
+  return {
+    id: meta.id,
+    name: meta.name,
+    description: meta.description,
+    phase: meta.phase,
+    applyTo: meta.applyTo ?? [],
+    inputContext: meta.inputContext ?? [],
+    outputKind: meta.outputKind ?? ['findings'],
+    modelHint: meta.modelHint ?? null,
+    dependencies: meta.dependencies ?? [],
+    tags: meta.tags ?? [],
+    severity: meta.severity ?? null,
+  };
+}
+
+/**
+ * Plan skills using an LLM (or provided planner function). Falls back to deterministic ordering on error.
+ * @param {Object} options
+ * @param {Array} options.skills - candidate skills (already filtered)
+ * @param {Object} options.context - review context (e.g., changedFiles/diff summary/prompt)
+ * @param {Function} [options.llmPlan] - async function receiving {skills, context}, returning [{id, priority, reason}]
+ * @param {boolean} [options.appendRemaining=true] - whether to append unreferenced skills in deterministic order
+ * @returns {Promise<{planned: Array, reasons: Array, fallback: boolean}>}
+ */
+async function planSkills({ skills, context, llmPlan, appendRemaining = true }) {
+  const summaries = skills.map(summarizeSkill);
+
+  if (!llmPlan) {
+    return {
+      planned: rankByModelHint(skills),
+      reasons: [],
+      fallback: false,
+    };
+  }
+
+  try {
+    const plan = await llmPlan({ skills: summaries, context });
+    if (!Array.isArray(plan)) {
+      throw new Error('planner returned non-array response');
+    }
+    const order = plan;
+    const byId = new Map(summaries.map((summary, idx) => [summary.id, skills[idx]]));
+    const planned = [];
+    const reasons = [];
+    let matchedCount = 0;
+
+    for (const entry of order) {
+      if (!entry?.id) continue;
+      const candidate = byId.get(entry.id);
+      if (candidate) {
+        planned.push(candidate);
+        matchedCount += 1;
+        if (entry.reason) reasons.push({ id: entry.id, reason: entry.reason });
+        byId.delete(entry.id);
+      }
+    }
+
+    if (appendRemaining) {
+      // append any not referenced by LLM in deterministic order
+      const remaining = rankByModelHint(Array.from(byId.values()));
+      planned.push(...remaining);
+    } else if (matchedCount === 0 && order.length > 0) {
+      // In prune mode, a non-empty plan that matches nothing is almost certainly invalid output.
+      throw new Error('planner returned no known skill ids');
+    }
+
+    return { planned, reasons, fallback: false };
+  } catch (err) {
+    return {
+      planned: rankByModelHint(skills),
+      reasons: [{ id: 'fallback', reason: `planner error: ${err.message}` }],
+      fallback: true,
+    };
+  }
+}
+
+;// CONCATENATED MODULE: ./src/lib/impact-scope.mjs
+function ensureArray(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function extOf(file) {
+  const idx = file.lastIndexOf('.');
+  if (idx < 0) return '';
+  return file.slice(idx + 1).toLowerCase();
+}
+
+function containsSegment(file, segment) {
+  const normalized = file.replaceAll('\\', '/');
+  return normalized.split('/').includes(segment);
+}
+
+function matchesAny(file, needles) {
+  const normalized = file.toLowerCase();
+  return needles.some(n => normalized.includes(n));
+}
+
+/**
+ * Infer impact tags from changed file paths.
+ * Tags are intentionally small and map to existing `skills/**` tags.
+ * @param {string[]|string} changedFiles
+ * @param {{diffText?: string}} [options]
+ * @returns {string[]}
+ */
+function inferImpactTags(changedFiles, options = {}) {
+  const files = ensureArray(changedFiles);
+  const tags = new Set();
+
+  for (const file of files) {
+    const ext = extOf(file);
+
+    if (['ts', 'tsx', 'cts', 'mts'].includes(ext)) tags.add('typescript');
+    if (['js', 'jsx', 'cjs', 'mjs'].includes(ext)) tags.add('javascript');
+    if (['md', 'mdx', 'adr'].includes(ext) || matchesAny(file, ['/docs/', '/design/']) || containsSegment(file, 'docs')) {
+      tags.add('design');
+    }
+
+    if (
+      containsSegment(file, 'tests') ||
+      containsSegment(file, 'test') ||
+      containsSegment(file, '__tests__') ||
+      matchesAny(file, ['.test.', '.spec.'])
+    ) {
+      tags.add('tests');
+    }
+
+    if (containsSegment(file, 'api') || containsSegment(file, 'routes')) tags.add('api');
+    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/'])) tags.add('reliability');
+
+    if (
+      containsSegment(file, 'auth') ||
+      containsSegment(file, 'security') ||
+      matchesAny(file, ['/oauth', '/jwt', '/session', '/cookie', '/csrf'])
+    ) {
+      tags.add('security');
+    }
+
+    if (
+      tags.has('api') ||
+      containsSegment(file, 'config') ||
+      containsSegment(file, 'db') ||
+      matchesAny(file, ['/env', '/secrets', '/headers'])
+    ) {
+      tags.add('security');
+    }
+
+    if (containsSegment(file, 'logging') || matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])) {
+      tags.add('observability');
+      tags.add('reliability');
+    }
+  }
+
+  const diffText = options?.diffText;
+  if (typeof diffText === 'string' && diffText.length) {
+    const lower = diffText.toLowerCase();
+    const hasCatch = lower.includes('catch (') || lower.includes('catch(');
+    const addsSilentReturn =
+      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) || /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
+    const mentionsIgnore = lower.includes('ignore') || lower.includes('swallow');
+    if (hasCatch && (addsSilentReturn || mentionsIgnore)) {
+      tags.add('observability');
+      tags.add('reliability');
+    }
+  }
+
+  return [...tags].sort();
+}
+
+;// CONCATENATED MODULE: ./src/lib/file-classifier.mjs
+// Module-scope regexes to avoid re-creation per call
+const RE_TEST_EXT = /\.(?:test|spec)\.(?:[jt]sx?|mjs)$/;
+const RE_SCHEMA_EXT = /\.schema\.[jt]s$/;
+const RE_MIGRATION = /(?:^|\/)migrations?\//;
+const RE_MIGRATE = /(?:^|\/)migrate/;
+const RE_CONFIG_EXT = /\.config\.(?:[jt]sx?|mjs)$/;
+const RE_RC_FILE = /^\.[a-z]+rc(?:\.[a-z]+)?$/;
+const RE_TSCONFIG = /^tsconfig.*\.json$/;
+const RE_DOCKERFILE = /^Dockerfile/;
+const RE_DOCKER_COMPOSE = /^docker-compose/;
+
+const CONFIG_NAMES = new Set([
+  'package.json',
+  '.river-reviewer.json',
+  '.lychee.toml',
+  '.markdownlint.json',
+  '.markdownlint-cli2.yaml',
+  '.textlintrc.json',
+]);
+
+/**
+ * Classify changed files by type for routing and evidence collection.
+ * Complementary to impact-scope.mjs which classifies by quality domain.
+ *
+ * @param {string[]} files - Array of file paths (relative to repo root)
+ * @returns {{ config: string[], schema: string[], migration: string[], app: string[], test: string[], infra: string[], docs: string[], unknown: string[] }}
+ */
+function classifyChangedFiles(files) {
+  const result = {
+    config: [],
+    schema: [],
+    migration: [],
+    app: [],
+    test: [],
+    infra: [],
+    docs: [],
+    unknown: [],
+  };
+
+  for (const file of files) {
+    result[classifyFile(file)].push(file);
+  }
+
+  return result;
+}
+
+// Priority: test > schema > migration > config > infra > docs > app > unknown
+function classifyFile(file) {
+  const normalized = file.replaceAll('\\', '/');
+  const basename = normalized.split('/').pop() ?? '';
+
+  if (isTest(normalized, basename)) return 'test';
+  if (isSchema(normalized, basename)) return 'schema';
+  if (isMigration(normalized)) return 'migration';
+  if (isConfig(normalized, basename)) return 'config';
+  if (isInfra(normalized, basename)) return 'infra';
+  if (isDocs(normalized, basename)) return 'docs';
+  if (isApp(normalized)) return 'app';
+  return 'unknown';
+}
+
+function isTest(file, basename) {
+  return file.startsWith('tests/') || file.includes('/__tests__/') || RE_TEST_EXT.test(basename);
+}
+
+function isSchema(file, basename) {
+  return (
+    file.startsWith('schemas/') || RE_SCHEMA_EXT.test(basename) || basename.endsWith('.schema.json')
+  );
+}
+
+function isMigration(file) {
+  return RE_MIGRATION.test(file) || RE_MIGRATE.test(file) || file.startsWith('db/');
+}
+
+function isConfig(file, basename) {
+  if (RE_CONFIG_EXT.test(basename)) return true;
+  if (RE_RC_FILE.test(basename)) return true;
+  if (CONFIG_NAMES.has(basename) || basename.startsWith('.env')) return true;
+  if (RE_TSCONFIG.test(basename)) return true;
+  return false;
+}
+
+function isInfra(file, basename) {
+  return (
+    file.startsWith('.github/') ||
+    file.startsWith('.husky/') ||
+    file.startsWith('scripts/') ||
+    RE_DOCKERFILE.test(basename) ||
+    RE_DOCKER_COMPOSE.test(basename)
+  );
+}
+
+function isDocs(file, basename) {
+  if (basename.endsWith('.md') || basename.endsWith('.mdx')) return true;
+  if (file.startsWith('docs/') || file.startsWith('pages/')) return true;
+  return false;
+}
+
+function isApp(file) {
+  return file.startsWith('src/') || file.startsWith('runners/');
+}
+
+// EXTERNAL MODULE: ./src/lib/planner-utils.mjs
+var planner_utils = __nccwpck_require__(633);
+// EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
+var heuristic_review = __nccwpck_require__(418);
+// EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
+var risk_map = __nccwpck_require__(2374);
+// EXTERNAL MODULE: external "node:fs"
+var external_node_fs_ = __nccwpck_require__(3024);
+// EXTERNAL MODULE: external "node:path"
+var external_node_path_ = __nccwpck_require__(6760);
+;// CONCATENATED MODULE: ./src/lib/adr-linker.mjs
+
+
+
+/**
+ * Scan known ADR/spec directories and find documents relevant to changed files.
+ *
+ * @param {string} repoRoot - Repository root path
+ * @param {{ changedFiles?: string[], keywords?: string[] }} options
+ * @returns {{ path: string, title: string, matchReason: string }[]}
+ */
+function findRelatedADRs(repoRoot, { changedFiles = [], keywords = [] } = {}) {
+  const adrDirs = ['docs/adr', 'pages/explanation', 'specs'];
+  const results = [];
+
+  for (const dir of adrDirs) {
+    const fullDir = external_node_path_.join(repoRoot, dir);
+    if (!external_node_fs_.existsSync(fullDir)) continue;
+
+    const files = external_node_fs_.readdirSync(fullDir).filter((f) => f.endsWith('.md'));
+    for (const file of files) {
+      const filePath = external_node_path_.join(dir, file);
+      const content = external_node_fs_.readFileSync(external_node_path_.join(fullDir, file), 'utf-8');
+      const title = extractTitle(content) || file;
+
+      // Match by keyword in content
+      for (const kw of keywords) {
+        if (content.toLowerCase().includes(kw.toLowerCase())) {
+          results.push({ path: filePath, title, matchReason: `keyword: ${kw}` });
+          break; // one match per file is enough
+        }
+      }
+
+      // Match by changed file mention in content
+      for (const cf of changedFiles) {
+        const basename = cf.split('/').pop();
+        if (content.includes(cf) || content.includes(basename)) {
+          if (!results.some((r) => r.path === filePath)) {
+            results.push({
+              path: filePath,
+              title,
+              matchReason: `references: ${cf}`,
+            });
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
+function extractTitle(markdown) {
+  const match = /^#\s+(.+)/m.exec(markdown);
+  return match ? match[1].trim() : null;
+}
+
+;// CONCATENATED MODULE: ./src/lib/diff-meta.mjs
+
+
+/**
+ * Count changed lines from raw unified diff text.
+ *
+ * @param {string} diffText
+ * @returns {number}
+ */
+function countChangedLinesFromText(diffText) {
+  if (!diffText) return 0;
+  let lines = 0;
+  for (const line of diffText.split('\n')) {
+    if ((line.startsWith('+') && !line.startsWith('+++')) || (line.startsWith('-') && !line.startsWith('---'))) {
+      lines++;
+    }
+  }
+  return lines;
+}
+
+/**
+ * Extract metadata from a diff object for review depth control.
+ *
+ * @param {{ changedFiles?: string[], diffText?: string }} diff
+ * @returns {{ fileCount: number, changedLines: number, fileTypes: object, hasTests: boolean, hasMigrations: boolean, hasSchemas: boolean }}
+ */
+function extractDiffMeta(diff) {
+  const changedFiles = diff?.changedFiles ?? [];
+  const changedLines = countChangedLinesFromText(diff?.diffText);
+  const fileTypes = classifyChangedFiles(changedFiles);
+
+  return {
+    fileCount: changedFiles.length,
+    changedLines,
+    fileTypes,
+    hasTests: fileTypes.test.length > 0,
+    hasMigrations: fileTypes.migration.length > 0,
+    hasSchemas: fileTypes.schema.length > 0,
+  };
+}
+
+// EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs
+var review_plan_generator = __nccwpck_require__(7817);
+;// CONCATENATED MODULE: ./runners/core/review-runner.mjs
+
+
+
+
+
+
+
+
+
+
+
+
+const MODEL_PRIORITY = {
+  cheap: 1,
+  balanced: 2,
+  'high-accuracy': 3,
+};
+
+function getMeta(skill) {
+  return skill?.metadata ?? skill;
+}
+
+function review_runner_ensureArray(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function matchesPhase(skill, phase) {
+  const meta = getMeta(skill);
+  if (Array.isArray(meta.phase)) {
+    return meta.phase.includes(phase);
+  }
+  return meta.phase === phase;
+}
+
+function matchesApplyTo(skill, changedFiles) {
+  const meta = getMeta(skill);
+  const globs = review_runner_ensureArray(meta.applyTo);
+  if (!globs.length) return false;
+  return changedFiles.some((file) =>
+    globs.some((pattern) => (0,esm/* minimatch */.xF)(file, pattern, { dot: true }))
+  );
+}
+
+function missingInputContexts(skill, availableContexts) {
+  const meta = getMeta(skill);
+  if (!meta.inputContext || meta.inputContext.length === 0) return [];
+  const available = new Set(availableContexts);
+  return meta.inputContext.filter((ctx) => !available.has(ctx));
+}
+
+function missingDependencies(skill, availableDependencies) {
+  const meta = getMeta(skill);
+  const deps = review_runner_ensureArray(meta.dependencies);
+  if (!deps.length) return [];
+  if (availableDependencies == null) return [];
+  const available = new Set(review_runner_ensureArray(availableDependencies));
+  return deps.filter((dep) => !available.has(dep));
+}
+
+function evaluateSkill(skill, options) {
+  const reasons = [];
+  const meta = getMeta(skill);
+  if (!matchesPhase(meta, options.phase)) {
+    reasons.push(`phase mismatch: ${meta.phase} !== ${options.phase}`);
+  }
+  if (!matchesApplyTo(meta, options.changedFiles)) {
+    reasons.push('applyTo did not match any changed file');
+  }
+  const missingContexts = missingInputContexts(meta, options.availableContexts);
+  if (missingContexts.length) {
+    reasons.push(`missing inputContext: ${missingContexts.join(', ')}`);
+  }
+  const depsMissing = missingDependencies(meta, options.availableDependencies);
+  if (depsMissing.length) {
+    reasons.push(`missing dependencies: ${depsMissing.join(', ')}`);
+  }
+  return {
+    ok: reasons.length === 0,
+    reasons,
+  };
+}
+
+function selectSkills(skills, options) {
+  const changedFiles = review_runner_ensureArray(options.changedFiles);
+  const availableContexts = review_runner_ensureArray(options.availableContexts);
+  const availableDependencies = options.availableDependencies ?? null;
+  const dryRun = options.dryRun ?? false;
+  const llmEnabled = options.llmEnabled ?? true;
+  const selected = [];
+  const skipped = [];
+
+  for (const skill of skills) {
+    const meta = skill.metadata ?? skill;
+    const skillId = meta.id;
+
+    // ルーティングスキル（エントリポイント）は実行対象外
+    const tags = review_runner_ensureArray(meta.tags);
+    if (tags.includes('routing')) {
+      skipped.push({ skill, reasons: ['routing skill: not an executable review skill'] });
+      continue;
+    }
+
+    // dry-run または LLM 無効時はヒューリスティック対応スキルのみ選択
+    const isLlmRestricted = dryRun || !llmEnabled;
+    if (isLlmRestricted && !heuristic_review/* HEURISTIC_SKILL_IDS */.y2.includes(skillId)) {
+      const reason = dryRun
+        ? 'dry-run: LLM必須スキル（ヒューリスティック未対応）'
+        : 'LLM disabled: LLM必須スキル（APIキー未設定）';
+      skipped.push({ skill, reasons: [reason] });
+      continue;
+    }
+
+    const result = evaluateSkill(meta, {
+      phase: options.phase,
+      changedFiles,
+      availableContexts,
+      availableDependencies,
+    });
+    if (result.ok) {
+      selected.push(skill);
+    } else {
+      skipped.push({ skill, reasons: result.reasons });
+    }
+  }
+  return { selected, skipped };
+}
+
+function rankByModelHint(skills, preferredModelHint = 'balanced') {
+  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
+  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
+  return [...skills].sort((a, b) => {
+    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
+    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
+    if (wa !== wb) return wa - wb;
+    return getMeta(a).id.localeCompare(getMeta(b).id);
+  });
+}
+
+function computeTagScore(skill, impactTags) {
+  if (!impactTags?.length) return 0;
+  const tags = new Set(getMeta(skill).tags ?? []);
+  let score = 0;
+  for (const tag of impactTags) {
+    if (tags.has(tag)) score += 1;
+  }
+  return score;
+}
+
+function rankByImpactTags(skills, impactTags, preferredModelHint = 'balanced') {
+  const scores = new Map(skills.map((s) => [getMeta(s).id, computeTagScore(s, impactTags)]));
+  const anyMatched = Array.from(scores.values()).some((v) => v > 0);
+  if (!anyMatched) {
+    return rankByModelHint(skills, preferredModelHint);
+  }
+
+  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
+  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
+
+  return [...skills].sort((a, b) => {
+    const idA = getMeta(a).id;
+    const idB = getMeta(b).id;
+    const scoreA = scores.get(idA) ?? 0;
+    const scoreB = scores.get(idB) ?? 0;
+    if (scoreA !== scoreB) return scoreB - scoreA;
+
+    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
+    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
+    if (wa !== wb) return wa - wb;
+    return idA.localeCompare(idB);
+  });
+}
+
+/**
+ * Build an execution plan from skills and review context.
+ * - planner 未指定: メタデと modelHint に基づく決定論的な並び替え
+ * - planner 指定: LLM 等で優先度決定し、エラー時は決定論的順序にフォールバック
+ *   - plannerMode=order: 優先度づけ（未参照スキルは後ろに決定論で追加）
+ *   - plannerMode=prune: 絞り込み（LLM が選んだスキルのみを実行）
+ */
+async function buildExecutionPlan(options) {
+  const {
+    phase,
+    changedFiles = [],
+    availableContexts = [],
+    availableDependencies = null,
+    preferredModelHint = 'balanced',
+    skills: providedSkills,
+    planner,
+    plannerMode,
+    diffText,
+    dryRun = false,
+    llmEnabled = true,
+    repoRoot,
+    riskMap,
+  } = options;
+
+  const skills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
+  const selection = selectSkills(skills, {
+    phase,
+    changedFiles,
+    availableContexts,
+    availableDependencies,
+    dryRun,
+    llmEnabled,
+  });
+  if (selection.selected.length === 0) {
+    return { selected: [], skipped: selection.skipped };
+  }
+
+  const impactTags = inferImpactTags(changedFiles, { diffText });
+  const fileTypes = classifyChangedFiles(changedFiles);
+  const riskAssessment = riskMap ? (0,risk_map/* evaluateRisk */.lm)(riskMap, changedFiles) : null;
+  const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), { changedFiles, keywords: impactTags });
+
+  const diffMeta = extractDiffMeta({ changedFiles, diffText });
+  const reviewMode = (0,review_plan_generator/* determineReviewMode */.X)(diffMeta);
+
+  // If planner is provided, try LLM-based planning, fallback to deterministic rank
+  const effectivePlannerMode = planner
+    ? (0,planner_utils/* normalizePlannerMode */.p)(plannerMode, { defaultMode: 'order' })
+    : 'off';
+  if (planner && effectivePlannerMode !== 'off') {
+    const context = {
+      phase,
+      changedFiles,
+      availableContexts,
+      impactTags,
+      fileTypes,
+    };
+    const { planned, reasons, fallback } = await planSkills({
+      skills: selection.selected,
+      context,
+      llmPlan: planner.plan ?? planner,
+      appendRemaining: effectivePlannerMode !== 'prune',
+    });
+    const ranked = fallback
+      ? rankByImpactTags(selection.selected, impactTags, preferredModelHint)
+      : planned;
+    return {
+      selected: ranked,
+      skipped: selection.skipped,
+      plannerMode: effectivePlannerMode,
+      plannerReasons: reasons,
+      plannerFallback: fallback,
+      ...(fallback ? { plannerError: reasons?.[0]?.reason ?? 'planner fallback' } : {}),
+      impactTags,
+      fileTypes,
+      relatedADRs,
+      reviewMode,
+    };
+  }
+
+  // planner が無い場合（LLM未設定）は決定論的順位付けで実行
+  const ordered = rankByImpactTags(selection.selected, impactTags, preferredModelHint);
+
+  return {
+    selected: ordered,
+    skipped: selection.skipped,
+    impactTags,
+    fileTypes,
+    relatedADRs,
+    reviewMode,
+  };
+}
+
+// Re-export summarizeSkill for consumers that want the same view used by planner
+
+
+
+/***/ }),
+
+/***/ 2957:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  vN: () => (/* binding */ SkillLoaderError),
+  m: () => (/* binding */ createSkillValidator),
+  KJ: () => (/* binding */ defaultPaths),
+  e$: () => (/* binding */ loadSchema),
+  l1: () => (/* binding */ loadSkills),
+  eJ: () => (/* binding */ parseFrontMatter)
+});
+
+// UNUSED EXPORTS: listSkillFiles, loadAllSkillMetadata, loadSkillFile, loadSkillMetadata, parseSkillFile
+
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(9896);
+;// CONCATENATED MODULE: external "path"
+const external_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
+;// CONCATENATED MODULE: external "url"
+const external_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
+// EXTERNAL MODULE: ../../../node_modules/js-yaml/dist/js-yaml.mjs
+var js_yaml = __nccwpck_require__(1813);
+// EXTERNAL MODULE: ../../../node_modules/gray-matter/index.js
+var gray_matter = __nccwpck_require__(493);
+// EXTERNAL MODULE: ../../../node_modules/ajv/dist/2020.js
+var _2020 = __nccwpck_require__(7720);
+// EXTERNAL MODULE: ../../../node_modules/ajv-formats/dist/index.js
+var dist = __nccwpck_require__(8613);
+;// CONCATENATED MODULE: ./runners/core/skill-loader.mjs
+
+
+
+
+
+
+
+
+/**
+ * @typedef {'upstream' | 'midstream' | 'downstream'} PhaseEnum
+ * @typedef {PhaseEnum | PhaseEnum[]} Phase
+ * @typedef {'info' | 'minor' | 'major' | 'critical'} Severity
+ * @typedef {'diff' | 'fullFile' | 'tests' | 'adr' | 'commitMessage' | 'repoConfig'} InputContext
+ * @typedef {'findings' | 'summary' | 'actions' | 'tests' | 'metrics' | 'questions'} OutputKind
+ * @typedef {'cheap' | 'balanced' | 'high-accuracy'} ModelHint
+ * @typedef {'code_search' | 'test_runner' | 'adr_lookup' | 'repo_metadata' | 'coverage_report' | 'tracing' | `custom:${string}`} Dependency
+ *
+ * @typedef {Object} SkillMetadata
+ * @property {string} id
+ * @property {string} name
+ * @property {string} description
+ * @property {Phase} phase
+ * @property {string[]} applyTo
+ * @property {string[]=} files
+ * @property {string[]=} tags
+ * @property {Severity=} severity
+ * @property {InputContext[]=} inputContext
+ * @property {OutputKind[]=} outputKind
+ * @property {ModelHint=} modelHint
+ * @property {Dependency[]=} dependencies
+ * @property {{phase?: Phase, applyTo?: string[], files?: string[]}=} trigger
+ * @property {number=} priority
+ *
+ * @typedef {Object} SkillDefinition
+ * @property {SkillMetadata} metadata
+ * @property {string} body
+ * @property {string} path
+ */
+
+const skill_loader_filename = (0,external_url_namespaceObject.fileURLToPath)(import.meta.url);
+const skill_loader_dirname = external_path_namespaceObject.dirname(skill_loader_filename);
+const repoRoot = process.env.RIVER_REPO_ROOT
+  ? external_path_namespaceObject.resolve(process.env.RIVER_REPO_ROOT)
+  : external_path_namespaceObject.resolve(skill_loader_dirname, '..', '..');
+const defaultSkillsDir = external_path_namespaceObject.join(repoRoot, 'skills');
+const defaultSchemaPath = external_path_namespaceObject.join(repoRoot, 'schemas', 'skill.schema.json');
+const markdownExtensions = new Set(['.md', '.mdx']);
+const yamlExtensions = new Set(['.yaml', '.yml']);
+const allowedExtensions = new Set([...markdownExtensions, ...yamlExtensions]);
+const ignoredSkillDirNames = new Set([
+  'references',
+  'fixtures',
+  'golden',
+  'eval',
+  'prompt',
+  'prompts',
+]);
+const ignoredFileNames = new Set(['.gitkeep', 'README.md', 'registry.yaml', 'registry.yml', '_template.md']);
+const legacySkillFiles = new Set(['skill.yaml', 'skill.yml']);
+const streamCategories = new Set(['core', 'upstream', 'midstream', 'downstream']);
+const allPhases = ['upstream', 'midstream', 'downstream'];
+
+const defaultPaths = {
+  repoRoot,
+  skillsDir: defaultSkillsDir,
+  schemaPath: defaultSchemaPath,
+};
+
+class SkillLoaderError extends Error {
+  constructor(message, details = undefined) {
+    super(message);
+    this.name = 'SkillLoaderError';
+    this.details = details;
+  }
+}
+
+async function loadSchema(schemaPath = defaultSchemaPath) {
+  const raw = await external_fs_.promises.readFile(schemaPath, 'utf8');
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    throw new SkillLoaderError(`Failed to parse JSON schema at ${schemaPath}: ${err.message}`);
+  }
+}
+
+function createSkillValidator(schema) {
+  const ajv = new _2020({ allErrors: true, strict: false, useDefaults: true });
+  dist(ajv);
+  return ajv.compile(schema);
+}
+
+async function listSkillFiles(dir = defaultSkillsDir) {
+  const entries = await external_fs_.promises.readdir(dir, { withFileTypes: true });
+  const files = [];
+
+  const hasLegacySkillFile = entries.some(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+  if (hasLegacySkillFile) {
+    const legacyEntry = entries.find(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+    if (!legacyEntry) {
+      throw new Error(`skill.yaml detected but not found in ${dir}`);
+    }
+    files.push(external_path_namespaceObject.join(dir, legacyEntry.name));
+    return files.sort((a, b) => a.localeCompare(b));
+  }
+
+  for (const entry of entries) {
+    const entryPath = external_path_namespaceObject.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (ignoredSkillDirNames.has(entry.name) || entry.name.startsWith('.')) {
+        continue;
+      }
+      const nested = await listSkillFiles(entryPath);
+      files.push(...nested);
+      continue;
+    }
+
+    const ext = external_path_namespaceObject.extname(entry.name).toLowerCase();
+    if (!allowedExtensions.has(ext)) continue;
+    if (ignoredFileNames.has(entry.name)) continue;
+    if (entry.name.startsWith('_')) continue;
+    files.push(entryPath);
+  }
+
+  return files.sort((a, b) => a.localeCompare(b));
+}
+
+function normalizeStringArray(value) {
+  if (!value) return undefined;
+  const asArray = Array.isArray(value) ? value : [value];
+  const filtered = asArray
+    .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
+    .filter(Boolean);
+  return filtered.length ? filtered : undefined;
+}
+
+function normalizePhaseValue(value) {
+  if (!value) return undefined;
+  if (Array.isArray(value)) {
+    const phases = value.filter(Boolean);
+    if (phases.length === 1) return phases[0];
+    return phases.length ? phases : undefined;
+  }
+  return value;
+}
+
+function inferCategoryFromPhase(phase) {
+  if (!phase) return undefined;
+  if (Array.isArray(phase)) {
+    const unique = Array.from(new Set(phase));
+    if (unique.length === 1 && streamCategories.has(unique[0])) {
+      return unique[0];
+    }
+    if (unique.length > 1) {
+      return 'core';
+    }
+    return undefined;
+  }
+  return streamCategories.has(phase) ? phase : undefined;
+}
+
+function inferCategoryFromPath(filePath) {
+  if (!filePath) return undefined;
+  const segments = external_path_namespaceObject.normalize(filePath).split(external_path_namespaceObject.sep);
+  const skillsIndex = segments.lastIndexOf('skills');
+  const candidate = skillsIndex >= 0 ? segments[skillsIndex + 1] : undefined;
+  if (candidate && streamCategories.has(candidate)) {
+    return candidate;
+  }
+  return undefined;
+}
+
+function resolveCategory(metaCategory, { phase, filePath } = {}) {
+  if (typeof metaCategory === 'string' && streamCategories.has(metaCategory)) {
+    return metaCategory;
+  }
+  return inferCategoryFromPath(filePath) ?? inferCategoryFromPhase(phase);
+}
+
+function resolvePhase(metaPhase, category) {
+  if (category === 'core') {
+    return [...allPhases];
+  }
+  if (category && streamCategories.has(category)) {
+    return category;
+  }
+  return normalizePhaseValue(metaPhase);
+}
+
+function normalizeMetadata(metadata, { filePath } = {}) {
+  const meta = { ...metadata };
+
+  if (meta.priority !== undefined) {
+    const parsedPriority = typeof meta.priority === 'string' ? Number(meta.priority) : meta.priority;
+    if (Number.isFinite(parsedPriority)) {
+      meta.priority = parsedPriority;
+    } else {
+      delete meta.priority;
+    }
+  }
+
+  const topLevelApplyTo =
+    normalizeStringArray(meta.applyTo) ??
+    normalizeStringArray(meta.files) ??
+    normalizeStringArray(meta.path_patterns);
+  if (topLevelApplyTo) {
+    meta.applyTo = topLevelApplyTo;
+  }
+
+  const trigger =
+    meta.trigger && typeof meta.trigger === 'object' && !Array.isArray(meta.trigger)
+      ? meta.trigger
+      : null;
+  const triggerApplyTo =
+    normalizeStringArray(trigger?.applyTo) ??
+    normalizeStringArray(trigger?.files) ??
+    normalizeStringArray(trigger?.path_patterns);
+
+  if (!meta.phase && trigger?.phase) {
+    meta.phase = trigger.phase;
+  }
+  if (!meta.applyTo && triggerApplyTo) {
+    meta.applyTo = triggerApplyTo;
+  }
+
+  meta.category = resolveCategory(meta.category, { phase: meta.phase, filePath });
+  meta.phase = resolvePhase(meta.phase, meta.category);
+
+  // Trigger is consumed during normalization; avoid leaking nested state.
+  if (trigger) {
+    delete meta.trigger;
+  }
+  if ('path_patterns' in meta) {
+    delete meta.path_patterns;
+  }
+
+  return meta;
+}
+
+function parseFrontMatter(content, { filePath } = {}) {
+  const trimmed = content.trimStart();
+  if (!trimmed.startsWith('---')) {
+    throw new SkillLoaderError('Missing front matter block (---)');
+  }
+
+  let parsed;
+  try {
+    parsed = gray_matter(trimmed);
+  } catch (err) {
+    throw new SkillLoaderError(
+      `Front matter parse error${filePath ? ` (${filePath})` : ''}: ${err.message}`
+    );
+  }
+
+  const metadata = parsed.data ?? {};
+  if (typeof metadata !== 'object' || Array.isArray(metadata)) {
+    throw new SkillLoaderError('Front matter must be a mapping');
+  }
+  if (Object.keys(metadata).length === 0) {
+    throw new SkillLoaderError('Front matter is empty');
+  }
+  const normalized = normalizeMetadata(metadata, { filePath });
+  const body = (parsed.content ?? '').trim();
+  return { metadata: normalized, body };
+}
+
+async function parseSkillFile(filePath) {
+  const ext = external_path_namespaceObject.extname(filePath).toLowerCase();
+  if (!allowedExtensions.has(ext)) {
+    throw new SkillLoaderError(`Unsupported skill file extension: ${ext}`);
+  }
+  const raw = await external_fs_.promises.readFile(filePath, 'utf8');
+  if (markdownExtensions.has(ext)) {
+    return parseFrontMatter(raw, { filePath });
+  }
+
+  // YAML handling
+  let loaded = {};
+  try {
+    loaded = js_yaml/* default.load */.Ay.load(raw) ?? {};
+  } catch (err) {
+    throw new SkillLoaderError(`YAML parse error: ${err.message}`);
+  }
+  if (typeof loaded !== 'object' || Array.isArray(loaded)) {
+    throw new SkillLoaderError('Skill YAML must be a mapping');
+  }
+
+  let metadata = loaded;
+  let body = '';
+
+  // Support nested metadata block
+  if (loaded.metadata && typeof loaded.metadata === 'object' && !Array.isArray(loaded.metadata)) {
+    metadata = { ...loaded.metadata };
+    if (typeof metadata.instruction === 'string') {
+      body = metadata.instruction;
+      delete metadata.instruction;
+    } else if (typeof loaded.instruction === 'string') {
+      body = loaded.instruction;
+    }
+  } else if (typeof loaded.instruction === 'string') {
+    // Support flat structure with optional instruction field
+    body = loaded.instruction;
+    delete metadata.instruction;
+  }
+
+  metadata = normalizeMetadata(metadata, { filePath });
+  return { metadata, body };
+}
+
+function validateMetadata(metadata, validate) {
+  const metaCopy = JSON.parse(JSON.stringify(metadata ?? {}));
+  const ok = validate(metaCopy);
+  if (!ok) {
+    const details = (validate.errors ?? []).map(err => `${err.instancePath || '/'} ${err.message}`).join('; ');
+    throw new SkillLoaderError(`Validation failed: ${details}`, validate.errors);
+  }
+  return metaCopy;
+}
+
+function relativeToRepo(filePath) {
+  return filePath.startsWith(repoRoot) ? external_path_namespaceObject.relative(repoRoot, filePath) : filePath;
+}
+
+function logSkillLoadError(filePath, err) {
+  const location = relativeToRepo(filePath);
+  const reason = err instanceof Error ? err.message : String(err);
+  console.error(`⚠️  Failed to load skill ${location}: ${reason}`);
+  if (err?.details && Array.isArray(err.details)) {
+    for (const detail of err.details) {
+      const instance = detail.instancePath || '/';
+      console.error(`   - ${instance}: ${detail.message}`);
+    }
+  }
+}
+
+function logDuplicateSkill(id, filePath, originalPath) {
+  const location = relativeToRepo(filePath);
+  const first = relativeToRepo(originalPath);
+  console.warn(`⚠️  Duplicate skill id "${id}" in ${location}; already loaded from ${first}. Skipping.`);
+}
+
+function hasExcludedTag(metadata, excludedTags) {
+  if (!excludedTags?.length) return false;
+  const tags = metadata?.tags ?? [];
+  return tags.some(tag => excludedTags.includes(tag));
+}
+
+async function loadSkillFile(filePath, options = {}) {
+  const { validator, schemaPath = defaultSchemaPath } = options;
+  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
+  const parsed = await parseSkillFile(filePath);
+  const metadata = validateMetadata(parsed.metadata, compiledValidator);
+  return {
+    metadata,
+    body: parsed.body,
+    path: filePath,
+  };
+}
+
+/**
+ * Shared loader loop used by {@link loadSkills} and {@link loadAllSkillMetadata}.
+ * Differs only in the per-file loader function (`loaderFn`), so the skill-discovery
+ * semantics (schema validation, excluded tags, duplicate-id handling) stay in sync
+ * across the two public entry points.
+ *
+ * @param {(filePath: string, options: { validator: Function }) => Promise<{ metadata: SkillMetadata, path: string }>} loaderFn
+ * @param {object} options
+ */
+async function _loadFromDir(loaderFn, options = {}) {
+  const {
+    skillsDir = defaultSkillsDir,
+    schemaPath = defaultSchemaPath,
+    validator: providedValidator,
+    excludedTags = ['agent'],
+  } = options;
+  const schema = providedValidator ? null : await loadSchema(schemaPath);
+  const validator = providedValidator ?? createSkillValidator(schema);
+  const files = await listSkillFiles(skillsDir);
+  const skillsById = new Map();
+
+  for (const filePath of files) {
+    try {
+      const skill = await loaderFn(filePath, { validator });
+      const id = skill?.metadata?.id;
+      if (!id) {
+        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
+        continue;
+      }
+      if (hasExcludedTag(skill.metadata, excludedTags)) {
+        continue;
+      }
+      if (skillsById.has(id)) {
+        logDuplicateSkill(id, filePath, skillsById.get(id).path);
+        continue;
+      }
+      skillsById.set(id, skill);
+    } catch (err) {
+      logSkillLoadError(filePath, err);
+    }
+  }
+
+  return Array.from(skillsById.values());
+}
+
+async function loadSkills(options = {}) {
+  return _loadFromDir(loadSkillFile, options);
+}
+
+/**
+ * Load only skill metadata (Stage 1 of Progressive Disclosure).
+ * Returns metadata and path without the body, suitable for filtering
+ * and routing before full skill loading.
+ *
+ * @param {string} filePath
+ * @param {object} [options]
+ * @param {Function} [options.validator]
+ * @param {string} [options.schemaPath]
+ * @returns {Promise<{metadata: SkillMetadata, path: string}>}
+ */
+async function loadSkillMetadata(filePath, options = {}) {
+  const { validator, schemaPath = defaultSchemaPath } = options;
+  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
+  const parsed = await parseSkillFile(filePath);
+  const metadata = validateMetadata(parsed.metadata, compiledValidator);
+  return {
+    metadata,
+    path: filePath,
+  };
+}
+
+/**
+ * Load metadata for all skills (Stage 1 of Progressive Disclosure).
+ * Returns an array of {metadata, path} objects without skill bodies.
+ *
+ * @param {object} [options]
+ * @param {string} [options.skillsDir]
+ * @param {string} [options.schemaPath]
+ * @param {Function} [options.validator]
+ * @param {string[]} [options.excludedTags]
+ * @returns {Promise<Array<{metadata: SkillMetadata, path: string}>>}
+ */
+async function loadAllSkillMetadata(options = {}) {
+  return _loadFromDir(loadSkillMetadata, options);
+}
+
+
+/***/ }),
+
+/***/ 5163:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   s: () => (/* binding */ defaultConfig),
+/* harmony export */   z: () => (/* binding */ defaultSkillConfig)
+/* harmony export */ });
+// Unified default config supporting both legacy and skill-based flows
+const defaultConfig = Object.freeze({
+  version: '1.0',
+  model: {
+    provider: 'openai',
+    modelName: 'gpt-4o-mini',
+    temperature: 0,
+    maxTokens: 600,
+  },
+  review: {
+    language: 'ja',
+    severity: 'normal',
+    additionalInstructions: [],
+  },
+  exclude: {
+    files: [],
+    prLabelsToIgnore: [],
+  },
+  skills: [],
+});
+
+// Alias kept for compatibility with newer skill-only imports
+const defaultSkillConfig = defaultConfig;
+
+
+/***/ }),
+
+/***/ 759:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  UT: () => (/* binding */ ConfigLoader),
+  Z9: () => (/* binding */ loadConfig),
+  R2: () => (/* binding */ mergeConfig)
+});
+
+// UNUSED EXPORTS: ConfigLoaderError, ConfigMergeError
+
+// EXTERNAL MODULE: external "node:fs/promises"
+var promises_ = __nccwpck_require__(1455);
+// EXTERNAL MODULE: external "node:path"
+var external_node_path_ = __nccwpck_require__(6760);
+// EXTERNAL MODULE: ../../../node_modules/js-yaml/dist/js-yaml.mjs
+var js_yaml = __nccwpck_require__(1813);
+// EXTERNAL MODULE: ../../../node_modules/zod/v4/classic/external.js + 73 modules
+var external = __nccwpck_require__(8367);
+;// CONCATENATED MODULE: ./src/config/schema.mjs
+
+
+// --- Legacy Schema (for river run) ---
+const modelConfigSchema = external/* object */.Ikc({
+  provider: external/* enum */.k5n(['google', 'openai', 'anthropic']).optional(),
+  modelName: external/* string */.YjP().min(1).optional(),
+  temperature: external/* number */.aig().min(0).max(1).optional(),
+  maxTokens: external/* number */.aig().int().positive().optional(),
+});
+
+const reviewConfigSchema = external/* object */.Ikc({
+  language: external/* enum */.k5n(['ja', 'en']).optional(),
+  severity: external/* enum */.k5n(['strict', 'normal', 'relaxed']).optional(),
+  additionalInstructions: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
+});
+
+const excludeConfigSchema = external/* object */.Ikc({
+  files: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
+  prLabelsToIgnore: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
+});
+
+const riverReviewerConfigSchema = external/* object */.Ikc({
+  model: modelConfigSchema.optional(),
+  review: reviewConfigSchema.optional(),
+  exclude: excludeConfigSchema.optional(),
+});
+
+// --- New Skill-based Schema (for river skills) ---
+
+// Skill-based schemas
+const AIModelSchema = external/* enum */.k5n([
+  'gemini-2.0-flash', // Default: Fast & Smart
+  'gemini-2.0-flash-thinking', // Reasoning: For Security/Architecture
+  'gemini-2.0-pro', // High Spec
+  'gemini-1.5-pro', // Legacy Balanced
+  'gpt-4o', // OpenAI Option
+  'o1', // OpenAI Reasoning
+  'o1-mini', // OpenAI Fast Reasoning
+]);
+
+const RuleSchema = external/* object */.Ikc({
+  id: external/* string */.YjP().describe('Unique identifier for the rule'),
+  severity: external/* enum */.k5n(['info', 'warning', 'error', 'critical']),
+  description: external/* string */.YjP(),
+  context: external/* string */.YjP().describe('Why this matters (Understanding)'),
+  patterns: external/* array */.YOg(external/* string */.YjP()).describe('Keywords or patterns to look for'),
+  anti_patterns: external/* array */.YOg(external/* string */.YjP()).describe('Bad code examples'),
+  fix_guidance: external/* string */.YjP().describe('How to fix it (Expertise Transfer)'),
+});
+
+const SkillSchema = external/* object */.Ikc({
+  name: external/* string */.YjP(),
+  description: external/* string */.YjP().optional(),
+  files: external/* array */.YOg(external/* string */.YjP()).describe('Glob patterns for target files'),
+  exclude: external/* array */.YOg(external/* string */.YjP()).optional(),
+  model: AIModelSchema.default('gemini-2.0-flash'),
+  temperature: external/* number */.aig().min(0).max(1).default(0.2),
+  rules: external/* array */.YOg(RuleSchema),
+});
+
+const ConfigSchema = external/* object */.Ikc({
+    version: external/* string */.YjP().default('1.0'),
+    model: modelConfigSchema.optional(),
+    review: reviewConfigSchema.optional(),
+    exclude: excludeConfigSchema.optional(),
+    skills: external/* array */.YOg(SkillSchema).default([]),
+  })
+  // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
+  .catchall(external/* unknown */.L5J());
+
+// EXTERNAL MODULE: ./src/config/default.mjs
+var config_default = __nccwpck_require__(5163);
+;// CONCATENATED MODULE: ./src/config/loader.mjs
+
+
+
+
+
+
+class ConfigMergeError extends Error {
+  constructor(message, options = {}) {
+    super(message, options);
+    this.name = 'ConfigMergeError';
+    if (options.cause) this.cause = options.cause;
+  }
+}
+
+function mergeValue(base, override) {
+  if (Array.isArray(override)) return [...override];
+  if (override && typeof override === 'object') {
+    const baseIsPlainObject = base && typeof base === 'object' && !Array.isArray(base);
+    return mergeConfig(baseIsPlainObject ? base : {}, override);
+  }
+  return override ?? base;
+}
+
+function mergeConfig(base, override) {
+  const result = { ...base };
+  for (const [key, value] of Object.entries(override ?? {})) {
+    const baseValue = base?.[key];
+    result[key] = mergeValue(baseValue, value);
+  }
+  return result;
+}
+
+class ConfigLoaderError extends Error {
+  constructor(message, options = {}) {
+    super(message, options);
+    this.name = 'ConfigLoaderError';
+    if (options.path) this.path = options.path;
+  }
+}
+
+class ConfigLoader {
+  constructor({
+    baseConfig = config_default/* defaultConfig */.s,
+    fileNames = ['.river-reviewer.json', '.river-reviewer.yaml', '.river-reviewer.yml'],
+    fsImpl = promises_,
+  } = {}) {
+    this.baseConfig = baseConfig;
+    this.fileNames = Array.isArray(fileNames) ? [...fileNames] : [fileNames];
+    this.fs = fsImpl;
+  }
+
+  async findConfigPath(repoRoot) {
+    for (const candidate of this.fileNames) {
+      const fullPath = external_node_path_.join(repoRoot, candidate);
+      try {
+        await this.fs.access(fullPath);
+        return fullPath;
+      } catch (err) {
+        if (err?.code !== 'ENOENT') {
+          throw new ConfigLoaderError('設定ファイルの存在確認に失敗しました', { cause: err, path: fullPath });
+        }
+      }
+    }
+    return null;
+  }
+
+  parseConfig(raw, filePath) {
+    const ext = external_node_path_.extname(filePath).toLowerCase();
+    let parsed;
+    if (ext === '.yaml' || ext === '.yml') {
+      parsed = js_yaml/* default.load */.Ay.load(raw);
+    } else {
+      parsed = JSON.parse(raw);
+    }
+
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new ConfigLoaderError('設定ファイルのトップレベルはオブジェクトである必要があります', {
+        path: filePath,
+      });
+    }
+    return parsed;
+  }
+
+  async load(repoRoot = process.cwd()) {
+    const configPath = await this.findConfigPath(repoRoot);
+    if (!configPath) {
+      return { config: this.baseConfig, path: null, source: 'default' };
+    }
+
+    let parsedInput = {};
+
+    try {
+      const raw = await this.fs.readFile(configPath, 'utf8');
+      const parsed = this.parseConfig(raw, configPath);
+      
+      // Determine schema based on content
+      const isNewSchema = 'skills' in parsed || 'version' in parsed;
+      
+      if (isNewSchema) {
+        const validated = ConfigSchema.safeParse(parsed);
+        if (!validated.success) {
+          const detail = validated.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
+          throw new ConfigLoaderError(`設定ファイルの形式が正しくありません (Skill Schema): ${detail}`, { path: configPath });
+        }
+        parsedInput = validated.data;
+
+        const knownKeys = new Set(['version', 'model', 'review', 'exclude', 'skills']);
+        const unknownKeys = Object.keys(parsedInput).filter(key => !knownKeys.has(key));
+        if (unknownKeys.length) {
+          const message = `Unknown config keys ignored: ${unknownKeys.join(', ')}`;
+          if (process.env.RIVER_CONFIG_STRICT === '1') {
+            throw new ConfigLoaderError(message, { path: configPath });
+          }
+          // eslint-disable-next-line no-console
+          console.warn(message);
+        }
+      } else {
+        // Fallback to old schema
+        const validated = riverReviewerConfigSchema.safeParse(parsed);
+        if (!validated.success) {
+           const detail = validated.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
+           throw new ConfigLoaderError(`設定ファイルの形式が正しくありません (Legacy Schema): ${detail}`, { path: configPath });
+        }
+        parsedInput = validated.data;
+      }
+      
+    } catch (err) {
+      if (err instanceof ConfigLoaderError) throw err;
+      if (err instanceof SyntaxError || err?.name === 'YAMLException') {
+        throw new ConfigLoaderError('設定ファイルのパースに失敗しました', { cause: err, path: configPath });
+      }
+      throw new ConfigLoaderError('設定ファイルの読み込みに失敗しました', { cause: err, path: configPath });
+    }
+
+    try {
+      // Determine which base config to use
+      const baseToUse = ('skills' in parsedInput || 'version' in parsedInput) ? config_default/* defaultSkillConfig */.z : this.baseConfig;
+      const merged = mergeConfig(baseToUse, parsedInput);
+      return { config: merged, path: configPath, source: 'file' };
+    } catch (err) {
+      throw new ConfigMergeError('設定のマージに失敗しました', { cause: err });
+    }
+  }
+}
+
+// Export loadConfig helper for SkillDispatcher (always uses default loader for now)
+async function loadConfig(repoRoot) {
+  const loader = new ConfigLoader(); // Uses legacy default, but load() will switch base if new schema detected
+  const { config } = await loader.load(repoRoot);
+  return config;
+}
+
+
+/***/ }),
+
+/***/ 9232:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   J: () => (/* binding */ optimizeDiff),
+/* harmony export */   p: () => (/* binding */ renderDiffText)
+/* harmony export */ });
+const EXCLUDED_EXTENSIONS = new Set(['.md']);
+const EXCLUDED_FILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock']);
+const MAX_HUNK_LINES = 200;
+const MAX_HUNK_HEAD = 120;
+const MAX_HUNK_TAIL = 40;
+
+function extension(path) {
+  const idx = path.lastIndexOf('.');
+  return idx >= 0 ? path.slice(idx).toLowerCase() : '';
+}
+
+function baseName(path) {
+  const parts = path.split('/');
+  return parts[parts.length - 1];
+}
+
+function isExcludedFile(path) {
+  const ext = extension(path);
+  if (EXCLUDED_EXTENSIONS.has(ext)) return true;
+  if (EXCLUDED_FILES.has(baseName(path))) return true;
+  return false;
+}
+
+function normalizeWhitespace(line) {
+  return line.replace(/\s+/g, '');
+}
+
+function isWhitespaceOnlyChange(lines) {
+  const added = lines
+    .filter(line => line.startsWith('+') && !line.startsWith('+++'))
+    .map(line => line.slice(1));
+  const removed = lines
+    .filter(line => line.startsWith('-') && !line.startsWith('---'))
+    .map(line => line.slice(1));
+  if (added.length === 0 && removed.length === 0) return false;
+  return normalizeWhitespace(added.join('')) === normalizeWhitespace(removed.join(''));
+}
+
+const COMMENT_MARKERS = [/^\/\//, /^\/\*/, /^\*($|\s)/, /^\*\/$/, /^#/, /^<!--/, /^-->/];
+
+function isCommentOnlyChange(lines) {
+  const changed = lines.filter(line => line.startsWith('+') || line.startsWith('-'));
+  if (!changed.length) return false;
+  return changed.every(line => {
+    const content = line.slice(1).trim();
+    if (!content) return true;
+    return COMMENT_MARKERS.some(re => re.test(content));
+  });
+}
+
+function compressHunkLines(lines) {
+  if (lines.length <= MAX_HUNK_LINES) return lines;
+  const head = lines.slice(0, MAX_HUNK_HEAD);
+  const tail = lines.slice(-MAX_HUNK_TAIL);
+  return [...head, '... (hunk truncated) ...', ...tail];
+}
+
+/**
+ * Filter and compress parsed diff files.
+ * @param {{files: Array<{path: string, hunks: Array<{header: string, lines: string[]}>}>}} diff
+ * @returns {{files: Array, diffText: string, tokenEstimate: number, reduction: number, rawTokenEstimate: number}}
+ */
+function optimizeDiff(diff) {
+  const rawTokenEstimate = Math.ceil((diff.diffText ?? '').length / 4);
+  const optimizedFiles = [];
+
+  for (const file of diff.files ?? []) {
+    if (isExcludedFile(file.path)) continue;
+
+    const keptHunks = [];
+    for (const hunk of file.hunks ?? []) {
+      const lines = hunk.lines ?? [];
+      if (isWhitespaceOnlyChange(lines)) continue;
+      if (isCommentOnlyChange(lines)) continue;
+
+      const compressedLines = compressHunkLines(lines);
+      keptHunks.push({
+        ...hunk,
+        lines: compressedLines,
+      });
+    }
+
+    if (keptHunks.length) {
+      optimizedFiles.push({
+        ...file,
+        hunks: keptHunks,
+      });
+    }
+  }
+
+  const diffText = renderDiffText(optimizedFiles);
+  const tokenEstimate = Math.ceil(diffText.length / 4);
+  const reduction = rawTokenEstimate === 0 ? 0 : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
+
+  return {
+    files: optimizedFiles,
+    diffText,
+    tokenEstimate,
+    reduction,
+    rawTokenEstimate,
+  };
+}
+
+function renderDiffText(files) {
+  if (!files.length) return '';
+  const chunks = [];
+  for (const file of files) {
+    const isNewFile = !file.oldPath || file.oldPath === '/dev/null';
+    const isDeletedFile = !file.newPath || file.newPath === '/dev/null';
+    const oldPath = isNewFile ? '/dev/null' : file.oldPath ?? file.path;
+    const newPath = isDeletedFile ? '/dev/null' : file.newPath ?? file.path;
+    const oldDisplay = oldPath === '/dev/null' ? '/dev/null' : `a/${oldPath}`;
+    const newDisplay = newPath === '/dev/null' ? '/dev/null' : `b/${newPath}`;
+
+    chunks.push(`diff --git a/${oldPath} b/${newPath}`);
+    chunks.push(`--- ${oldDisplay}`);
+    chunks.push(`+++ ${newDisplay}`);
+    for (const hunk of file.hunks ?? []) {
+      chunks.push(hunk.header);
+      chunks.push(...(hunk.lines ?? []));
+    }
+  }
+  return chunks.join('\n');
+}
+
+
+/***/ }),
+
+/***/ 6066:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   K: () => (/* binding */ collectRepoDiff),
+/* harmony export */   r: () => (/* binding */ parseUnifiedDiff)
+/* harmony export */ });
+/* harmony import */ var _git_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(8937);
+/* harmony import */ var _diff_optimizer_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(9232);
+
+
+
+function stripPrefix(path) {
+  if (!path) return path;
+  if (path.startsWith('a/')) return path.slice(2);
+  if (path.startsWith('b/')) return path.slice(2);
+  return path;
+}
+
+/**
+ * Parse a unified diff into a structured representation.
+ * Returns files with hunks and added line hints so downstream consumers
+ * can locate where to attach review comments.
+ */
+function parseUnifiedDiff(diffText) {
+  const files = [];
+  let currentFile = null;
+  let currentHunk = null;
+  let newLineNumber = 0;
+  let pendingOldPath = null;
+
+  for (const line of diffText.split('\n')) {
+    if (line.startsWith('diff --git')) {
+      currentHunk = null;
+      continue;
+    }
+    if (line.startsWith('--- ')) {
+      pendingOldPath = stripPrefix(line.slice(4).trim());
+      continue;
+    }
+    if (line.startsWith('+++ ')) {
+      const newPathRaw = stripPrefix(line.slice(4).trim());
+      const isDeletion = newPathRaw === '/dev/null';
+      const oldPath = pendingOldPath ?? (isDeletion ? '/dev/null' : newPathRaw);
+      const newPath = isDeletion ? '/dev/null' : newPathRaw;
+      const path = isDeletion ? oldPath : newPath;
+
+      currentFile = { path, newPath, oldPath, hunks: [], addedLines: [] };
+      files.push(currentFile);
+      currentHunk = null;
+      newLineNumber = 0;
+      pendingOldPath = null;
+      continue;
+    }
+    if (!currentFile) continue;
+    if (line.startsWith('@@')) {
+      const match = /@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(line);
+      if (!match) continue;
+      const oldStart = Number.parseInt(match[1], 10);
+      const oldLines = match[2] ? Number.parseInt(match[2], 10) : 1;
+      const newStart = Number.parseInt(match[3], 10);
+      const newLines = match[4] ? Number.parseInt(match[4], 10) : 1;
+      currentHunk = {
+        header: line,
+        oldStart,
+        oldLines,
+        newStart,
+        newLines,
+        lines: [],
+        addedLines: [],
+      };
+      currentFile.hunks.push(currentHunk);
+      newLineNumber = newStart;
+      continue;
+    }
+    if (!currentHunk) continue;
+    currentHunk.lines.push(line);
+    if (line.startsWith('+') && !line.startsWith('+++')) {
+      currentFile.addedLines.push(newLineNumber);
+      currentHunk.addedLines.push(newLineNumber);
+      newLineNumber += 1;
+    } else if (line.startsWith('-') && !line.startsWith('---')) {
+      // deletion: do not advance new line number
+    } else {
+      newLineNumber += 1;
+    }
+  }
+  return { files };
+}
+
+async function collectRepoDiff(repoRoot, baseRef, { contextLines = 3 } = {}) {
+  const changedFiles = await (0,_git_mjs__WEBPACK_IMPORTED_MODULE_0__/* .listChangedFiles */ .AC)(repoRoot, baseRef);
+  if (!changedFiles.length) {
+    return {
+      changedFiles: [],
+      rawDiffText: '',
+      rawTokenEstimate: 0,
+      files: [],
+      diffText: '',
+      tokenEstimate: 0,
+      reduction: 0,
+    };
+  }
+
+  const rawDiffText = await (0,_git_mjs__WEBPACK_IMPORTED_MODULE_0__/* .diffWithContext */ .LL)(repoRoot, baseRef, { unified: contextLines });
+  const parsed = parseUnifiedDiff(rawDiffText);
+  const files = parsed.files.length
+    ? parsed.files
+    : changedFiles.map(file => ({
+        path: file,
+        hunks: [],
+        addedLines: [],
+      }));
+  const rawTokenEstimate = Math.ceil(rawDiffText.length / 4);
+  const optimized = (0,_diff_optimizer_mjs__WEBPACK_IMPORTED_MODULE_1__/* .optimizeDiff */ .J)({ files, diffText: rawDiffText });
+
+  return {
+    changedFiles,
+    files,
+    rawDiffText,
+    rawTokenEstimate,
+    diffText: optimized.diffText,
+    filesForReview: optimized.files,
+    tokenEstimate: optimized.tokenEstimate,
+    reduction: optimized.reduction,
+  };
+}
+
+
+/***/ }),
+
+/***/ 2196:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   Z: () => (/* binding */ classifyFindings)
+/* harmony export */ });
+/* unused harmony export SUPPRESS_REASONS */
+/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(3926);
+
+
+const SUPPRESS_REASONS = {
+  LOW_CONFIDENCE: 'low_confidence',
+  DUPLICATE: 'duplicate',
+  STYLE_ONLY: 'style_only',
+  INSUFFICIENT_EVIDENCE: 'insufficient_evidence',
+  COVERED_BY_HIGHER_LEVEL: 'covered_by_higher_level_finding',
+};
+
+function evidenceTotalChars(finding) {
+  const ev = finding.evidence;
+  if (!Array.isArray(ev) || ev.length === 0) return 0;
+  return ev.reduce((sum, e) => sum + String(e ?? '').length, 0);
+}
+
+function deduplicateWithinFile(findings) {
+  const seen = new Set();
+  return findings.filter((f) => {
+    const ruleId = String(f.ruleId ?? '');
+    if (ruleId === 'unknown') return true; // ruleId が未確定の finding は file-level dedup もスキップ
+    const key = `${f.file ?? ''}::${ruleId}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function deduplicateWithinPR(findings) {
+  const seen = new Set();
+  return findings.filter((f) => {
+    const key = String(f.ruleId ?? '');
+    if (key === 'unknown') return true; // ruleId が確定していない finding は PR-level dedup をスキップ
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/**
+ * @param {object[]} findings
+ * @param {{ reviewMode?: 'tiny'|'medium'|'large' }} [options]
+ * @returns {{ overview: object[], inlineCandidates: object[], suppressed: object[] }}
+ */
+function classifyFindings(findings, options = {}) {
+  const reviewMode = options.reviewMode ?? 'medium';
+  const maxOverview = reviewMode === 'tiny' ? 3 : reviewMode === 'large' ? 8 : 5;
+
+  const suppressed = [];
+  const active = [];
+
+  for (const finding of findings) {
+    if (finding.confidence === 'low' && finding.severity !== 'critical') {
+      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.LOW_CONFIDENCE });
+      continue;
+    }
+    if (evidenceTotalChars(finding) < 30 && finding.severity !== 'critical') {
+      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.INSUFFICIENT_EVIDENCE });
+      continue;
+    }
+    const ruleId = String(finding.ruleId ?? '');
+    if (finding.severity === 'minor' && /readability|style|format/i.test(ruleId)) {
+      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.STYLE_ONLY });
+      continue;
+    }
+    active.push(finding);
+  }
+
+  const deduped = deduplicateWithinPR(deduplicateWithinFile(active));
+  const dedupedSet = new Set(deduped.map((f) => f.id));
+  for (const f of active) {
+    if (!dedupedSet.has(f.id)) {
+      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.DUPLICATE });
+    }
+  }
+
+  const sorted = [...deduped].sort(
+    (a, b) => (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_0__/* .computeFindingBreakdown */ ._)(b).composite - (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_0__/* .computeFindingBreakdown */ ._)(a).composite
+  );
+
+  const overview = [];
+  const overviewRuleIds = new Set();
+  for (const f of sorted) {
+    const rid = String(f.ruleId ?? '');
+    const isUnknown = rid === 'unknown';
+    if (!isUnknown && overviewRuleIds.has(rid)) {
+      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
+    } else if (overview.length < maxOverview) {
+      overview.push(f);
+      if (!isUnknown) overviewRuleIds.add(rid);
+    } else {
+      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
+    }
+  }
+
+  return { overview, inlineCandidates: [], suppressed };
+}
+
+
+/***/ }),
+
+/***/ 9905:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   i: () => (/* binding */ annotateFingerprints)
+/* harmony export */ });
+/* unused harmony export computeFingerprint */
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7598);
+
+
+/**
+ * Stable fingerprint for a finding so that the same logical issue can be
+ * matched across review runs even when IDs regenerate.
+ *
+ * Strategy: hash(ruleId + file + first-60-chars-of-message).
+ * Intentionally omits lineStart/lineEnd because line numbers shift as code
+ * changes, but the same logical finding should still be considered persisting.
+ */
+function computeFingerprint(finding) {
+  const ruleId = String(finding.ruleId ?? 'unknown');
+  const file = String(finding.file ?? '');
+  // Normalize message: lowercase, collapse whitespace, take first 60 chars
+  const msgNorm = String(finding.message ?? finding.title ?? '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 60);
+  const raw = `${ruleId}::${file}::${msgNorm}`;
+  return (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.createHash)('sha256').update(raw).digest('hex').slice(0, 16);
+}
+
+/**
+ * Annotate findings with their fingerprint (non-mutating).
+ */
+function annotateFingerprints(findings) {
+  return findings.map((f) => ({ ...f, fingerprint: computeFingerprint(f) }));
+}
+
+
+/***/ }),
+
+/***/ 8937:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   AC: () => (/* binding */ listChangedFiles),
+/* harmony export */   LL: () => (/* binding */ diffWithContext),
+/* harmony export */   NC: () => (/* binding */ ensureGitRepo),
+/* harmony export */   Rd: () => (/* binding */ detectDefaultBranch),
+/* harmony export */   XS: () => (/* binding */ GitError),
+/* harmony export */   fe: () => (/* binding */ findMergeBase),
+/* harmony export */   kG: () => (/* binding */ GitRepoNotFoundError)
+/* harmony export */ });
+/* unused harmony export collectAddedLineHints */
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1421);
+/* harmony import */ var node_util__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7975);
+
+
+
+const exec = (0,node_util__WEBPACK_IMPORTED_MODULE_1__.promisify)(node_child_process__WEBPACK_IMPORTED_MODULE_0__.execFile);
+
+class GitError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'GitError';
+  }
+}
+
+class GitRepoNotFoundError extends GitError {
+  constructor(cwd) {
+    super(`Not a git repository: ${cwd}`);
+    this.name = 'GitRepoNotFoundError';
+  }
+}
+
+async function runGit(args, { cwd }) {
+  try {
+    // Use a large maxBuffer (200MB) to handle large diffs (e.g., pnpm-lock.yaml changes)
+    const { stdout } = await exec('git', args, { cwd, maxBuffer: 200 * 1024 * 1024 });
+    return stdout.trim();
+  } catch (error) {
+    const detail = error.stderr?.toString().trim() || error.message;
+    throw new GitError(detail);
+  }
+}
+
+async function ensureGitRepo(cwd) {
+  const insideWorkTree = await runGit(['rev-parse', '--is-inside-work-tree'], { cwd }).catch(() => null);
+  if (insideWorkTree !== 'true') {
+    throw new GitRepoNotFoundError(cwd);
+  }
+  return runGit(['rev-parse', '--show-toplevel'], { cwd });
+}
+
+async function detectDefaultBranch(cwd) {
+  const candidates = [];
+  const ref = await runGit(['symbolic-ref', '--quiet', 'refs/remotes/origin/HEAD'], { cwd }).catch(() => null);
+  if (ref) {
+    const parts = ref.split('/');
+    candidates.push(parts[parts.length - 1]);
+  }
+  candidates.push('main', 'master');
+
+  for (const branch of candidates) {
+    const exists = await runGit(['rev-parse', '--quiet', '--verify', branch], { cwd }).catch(() => null);
+    if (exists) return branch;
+    const remoteExists = await runGit(['rev-parse', '--quiet', '--verify', `origin/${branch}`], { cwd }).catch(
+      () => null,
+    );
+    if (remoteExists) return branch;
+  }
+  return 'HEAD';
+}
+
+async function findMergeBase(cwd, baseRef) {
+  const candidates = [`origin/${baseRef}`, baseRef];
+  for (const ref of candidates) {
+    const mergeBase = await runGit(['merge-base', 'HEAD', ref], { cwd }).catch(() => null);
+    if (mergeBase) return mergeBase;
+  }
+  // fallback to current HEAD to keep diff calculations deterministic
+  return runGit(['rev-parse', 'HEAD'], { cwd });
+}
+
+async function listChangedFiles(cwd, baseRef) {
+  const stdout = await runGit(['diff', '--name-only', baseRef], { cwd });
+  return stdout
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+async function diffWithContext(cwd, baseRef, { unified = 3 } = {}) {
+  return runGit(['diff', `--unified=${unified}`, '--no-color', baseRef], { cwd });
+}
+
+function collectAddedLineHints(diffText) {
+  const hints = new Map();
+  let currentFile = null;
+
+  for (const line of diffText.split('\n')) {
+    if (line.startsWith('+++ b/')) {
+      // We record the first hunk per file; this keeps output stable for the placeholder comments.
+      currentFile = line.replace('+++ b/', '').trim();
+      continue;
+    }
+    if (!line.startsWith('@@')) continue;
+    const match = /@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/.exec(line);
+    if (match && currentFile && !hints.has(currentFile)) {
+      const startLine = Number.parseInt(match[1], 10);
+      hints.set(currentFile, startLine);
+    }
+  }
+  return hints;
+}
+
+
+/***/ }),
+
+/***/ 418:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   y2: () => (/* binding */ HEURISTIC_SKILL_IDS),
+/* harmony export */   zq: () => (/* binding */ buildHeuristicComments)
+/* harmony export */ });
+/* unused harmony export SKILL_HEURISTIC_MAP */
+/**
+ * スキルIDとヒューリスティック関数のマッピング
+ * dry-run 時はこのマッピングに含まれるスキルのみ実行される
+ */
+const SKILL_HEURISTIC_MAP = {
+  'rr-midstream-security-basic-001': ['findHardcodedSecrets', 'findGitHubActionsIssues'],
+  'rr-midstream-logging-observability-001': ['findSilentCatch'],
+  'rr-downstream-test-existence-001': ['findMissingTests'],
+  'rr-downstream-coverage-gap-001': ['findMissingTests'],
+};
+
+/**
+ * ヒューリスティック対応スキルIDの一覧（dry-run 時のフィルタリング用）
+ */
+const HEURISTIC_SKILL_IDS = Object.keys(SKILL_HEURISTIC_MAP);
+
+function ensureArray(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function getSkillId(skill) {
+  return skill?.metadata?.id ?? skill?.id ?? null;
+}
+
+function hasSkill(plan, skillId) {
+  const selected = ensureArray(plan?.selected);
+  return selected.some((skill) => getSkillId(skill) === skillId);
+}
+
+function* iterateAddedLines(file) {
+  const hunks = ensureArray(file?.hunks);
+  for (const hunk of hunks) {
+    let newLineNumber = hunk.newStart ?? 0;
+    for (const rawLine of ensureArray(hunk.lines)) {
+      if (rawLine.startsWith('+') && !rawLine.startsWith('+++')) {
+        yield { line: newLineNumber, text: rawLine.slice(1) };
+        newLineNumber += 1;
+        continue;
+      }
+      if (rawLine.startsWith('-') && !rawLine.startsWith('---')) {
+        continue;
+      }
+      newLineNumber += 1;
+    }
+  }
+}
+
+function* iterateHunkLines(file) {
+  const hunks = ensureArray(file?.hunks);
+  for (const hunk of hunks) {
+    let newLineNumber = hunk.newStart ?? 0;
+    for (const rawLine of ensureArray(hunk.lines)) {
+      if (rawLine.startsWith('+') && !rawLine.startsWith('+++')) {
+        yield { type: 'add', line: newLineNumber, text: rawLine.slice(1) };
+        newLineNumber += 1;
+        continue;
+      }
+      if (rawLine.startsWith('-') && !rawLine.startsWith('---')) {
+        yield { type: 'del', line: null, text: rawLine.slice(1) };
+        continue;
+      }
+      // context line (usually starts with a space)
+      const text = rawLine.startsWith(' ') ? rawLine.slice(1) : rawLine;
+      yield { type: 'ctx', line: newLineNumber, text };
+      newLineNumber += 1;
+    }
+  }
+}
+
+function isEnvReference(code) {
+  return /\b(process\.env|import\.meta\.env)\b/.test(code);
+}
+
+function looksLikeLogging(code) {
+  return /\b(console\.(?:log|info|warn|error)|logger\.\w+|log\.\w+)\b/.test(code);
+}
+
+function matchesHardcodedSecretLine(code) {
+  if (isEnvReference(code)) return false;
+
+  // Typical high-signal tokens/keys
+  const explicitPatterns = [
+    /\bAKIA[0-9A-Z]{16}\b/, // AWS Access Key ID
+    /\bghp_[A-Za-z0-9]{36,}\b/, // GitHub token
+    /\bsk-(?:live|test)?_[A-Za-z0-9]{16,}\b/, // Stripe-like
+    /\bsk-[A-Za-z0-9]{16,}\b/, // OpenAI-like (generic)
+  ];
+  if (explicitPatterns.some((re) => re.test(code))) return true;
+
+  // Heuristic: suspicious identifier name + long-ish string literal
+  const assignMatch =
+    /\b(?:export\s+)?(?:const|let|var)\s+(?<name>[A-Za-z0-9_]+)\s*=\s*(?<quote>['"`])(?<value>[^'"`]+)\k<quote>/.exec(
+      code
+    ) ||
+    /['"](?<name>[A-Za-z0-9_]+)['"]\s*:\s*(?<quote>['"`])(?<value>[^'"`]+)\k<quote>/.exec(code) ||
+    /\b(?<name>[A-Za-z0-9_]+)\s*:\s*(?<quote>['"`])(?<value>[^'"`]+)\k<quote>/.exec(code);
+  if (!assignMatch) return false;
+
+  const name = assignMatch.groups?.name ?? '';
+  const value = assignMatch.groups?.value ?? '';
+  if (!/(token|secret|api[_-]?key|password|passwd|private[_-]?key)/i.test(name)) return false;
+  if (value.length < 10) return false;
+  if (/^https?:\/\//i.test(value)) return false;
+  return true;
+}
+
+function findHardcodedSecrets({ diff }) {
+  // Avoid noisy output when many hardcoded values are introduced at once.
+  const MAX_HARDCODED_SECRET_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (looksLikeTestFile(filePath)) continue;
+    const normalized = String(filePath).replaceAll('\\', '/');
+    if (normalized.includes('/fixtures/') || normalized.includes('/__fixtures__/')) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesHardcodedSecretLine(text)) continue;
+      comments.push({
+        file: filePath,
+        line,
+        kind: 'hardcoded-secret',
+      });
+      if (comments.length >= MAX_HARDCODED_SECRET_COMMENTS) return comments;
+    }
+  }
+
+  return comments;
+}
+
+function matchesSilentCatchLine(code) {
+  const lower = code.toLowerCase();
+  const hasCatch = lower.includes('catch (') || lower.includes('catch(') || /\bcatch\b/.test(lower);
+  if (!hasCatch) return false;
+  if (looksLikeLogging(code)) return false;
+  if (/\bthrow\b/.test(code)) return false;
+  if (/\breturn\s*;\s*(?:\/\/.*)?$/.test(code)) return true;
+  if (/\breturn\s+(null|undefined)\s*;\s*(?:\/\/.*)?$/.test(code)) return true;
+  if (/\bcatch\s*\([^)]*\)\s*\{\s*\}\s*$/.test(code)) return true;
+  return false;
+}
+
+function findSilentCatch({ diff }) {
+  const comments = [];
+  const files = ensureArray(diff?.files);
+
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    let catchAnchor = null;
+    let window = 0;
+    let sawLogOrThrow = false;
+
+    for (const entry of iterateHunkLines(file)) {
+      const text = entry.text ?? '';
+
+      // One-liner: catch (...) {}
+      if (matchesSilentCatchLine(text) && entry.line != null) {
+        comments.push({ file: filePath, line: entry.line, kind: 'silent-catch' });
+        if (comments.length >= 3) return comments;
+        catchAnchor = null;
+        window = 0;
+        sawLogOrThrow = false;
+        continue;
+      }
+
+      if (entry.line != null && /\bcatch\s*\(/.test(text)) {
+        catchAnchor = entry.line;
+        window = 8;
+        sawLogOrThrow = false;
+        continue;
+      }
+
+      if (window > 0) {
+        if (entry.type === 'add') {
+          if (looksLikeLogging(text) || /\bthrow\b/.test(text)) {
+            sawLogOrThrow = true;
+          }
+          if (
+            !sawLogOrThrow &&
+            (/\breturn\s*;\s*(?:\/\/.*)?$/.test(text) ||
+              /\breturn\s+(null|undefined)\s*;/.test(text))
+          ) {
+            comments.push({
+              file: filePath,
+              line: catchAnchor ?? entry.line ?? 1,
+              kind: 'silent-catch',
+            });
+            if (comments.length >= 3) return comments;
+            catchAnchor = null;
+            window = 0;
+            sawLogOrThrow = false;
+            continue;
+          }
+        }
+        window -= 1;
+      }
+    }
+  }
+
+  return comments;
+}
+
+function looksLikeTestFile(filePath) {
+  const normalized = String(filePath).replaceAll('\\', '/');
+  return (
+    normalized.includes('/tests/') ||
+    normalized.includes('/__tests__/') ||
+    /\.(test|spec)\./.test(normalized)
+  );
+}
+
+function looksLikeProductCodeFile(filePath) {
+  const normalized = String(filePath).replaceAll('\\', '/');
+  if (looksLikeTestFile(normalized)) return false;
+  if (!/\.(ts|tsx|js|jsx|mjs|cjs)$/.test(normalized)) return false;
+  return (
+    normalized.startsWith('src/') ||
+    normalized.startsWith('lib/') ||
+    normalized.includes('/src/') ||
+    normalized.includes('/lib/')
+  );
+}
+
+function hasBehaviorChangeSignal({ diff }) {
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    for (const { text } of iterateAddedLines(file)) {
+      if (/\bif\s*\(/.test(text) || /\bswitch\s*\(/.test(text) || /\bthrow\s+new\b/.test(text))
+        return true;
+    }
+  }
+  return false;
+}
+
+function findMissingTests({ diff }) {
+  const files = ensureArray(diff?.files);
+  const changedPaths = files
+    .map((f) => f?.path)
+    .filter(Boolean)
+    .filter((p) => p !== '/dev/null');
+  const touchesTests = changedPaths.some(looksLikeTestFile);
+  const touchesCode = changedPaths.some(looksLikeProductCodeFile);
+  if (!touchesCode || touchesTests) return [];
+  if (!hasBehaviorChangeSignal({ diff })) return [];
+
+  const firstCodeFile = files.find((f) => looksLikeProductCodeFile(f?.path));
+  const filePath = firstCodeFile?.path;
+  const line = firstCodeFile?.addedLines?.[0] || firstCodeFile?.hunks?.[0]?.newStart || 1;
+  return [
+    {
+      file: filePath,
+      line,
+      kind: 'missing-tests',
+    },
+  ];
+}
+
+/**
+ * Check if a file path is a GitHub Actions workflow file.
+ * @param {string} filePath - File path to check
+ * @returns {boolean} True if the file is a workflow YAML file in .github/workflows/
+ */
+function looksLikeGitHubWorkflowFile(filePath) {
+  const normalized = String(filePath).replaceAll('\\', '/');
+  return normalized.startsWith('.github/workflows/') && /\.(yml|yaml)$/.test(normalized);
+}
+
+/**
+ * Detect GitHub Actions security issues in workflow files.
+ * Checks for common security vulnerabilities including:
+ * - pull_request_target privilege escalation risks
+ * - Excessive permissions (write-all)
+ * - Secrets exposed in run blocks
+ * - Unsanitized user input in run blocks (command injection)
+ * @param {{diff: {files?: Array}}} options - Diff object containing file changes
+ * @returns {Array<{file: string, line: number, kind: string}>} Array of detected security issues
+ */
+function findGitHubActionsIssues({ diff }) {
+  const MAX_WORKFLOW_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || !looksLikeGitHubWorkflowFile(filePath)) continue;
+
+    for (const { line, text } of iterateAddedLines(file)) {
+      // Check for pull_request_target usage (privilege escalation risk)
+      if (
+        /^\s*(-\s+)?pull_request_target\s*:?\s*$/.test(text) ||
+        /\bon\s*:\s*\[[^\]]*\bpull_request_target\b[^\]]*\]/.test(text)
+      ) {
+        comments.push({
+          file: filePath,
+          line,
+          kind: 'gh-actions-pull-request-target',
+        });
+        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
+        continue;
+      }
+
+      // Check for excessive permissions
+      if (/permissions\s*:\s*(write-all|'write-all'|"write-all")/.test(text)) {
+        comments.push({
+          file: filePath,
+          line,
+          kind: 'gh-actions-excessive-permissions',
+        });
+        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
+        continue;
+      }
+
+      // Check for secrets in run blocks (potential exposure)
+      if (/\$\{\{\s*secrets\.\w+\s*\}\}/.test(text) && /run\s*:/.test(text)) {
+        comments.push({
+          file: filePath,
+          line,
+          kind: 'gh-actions-secret-in-run',
+        });
+        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
+        continue;
+      }
+
+      // Check for unsanitized user input in run blocks (command injection)
+      if (
+        /run\s*:/.test(text) &&
+        /\$\{\{\s*github\.event\.(issue|pull_request|comment)\.(title|body)\s*\}\}/.test(text) &&
+        !/\|\s*jq\b/.test(text) &&
+        !/toJSON/.test(text)
+      ) {
+        comments.push({
+          file: filePath,
+          line,
+          kind: 'gh-actions-unsanitized-input',
+        });
+        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
+        continue;
+      }
+    }
+  }
+
+  return comments;
+}
+
+/**
+ * Generate deterministic review comments from heuristics.
+ * These comments are used as a fallback when LLM is not available.
+ * @param {{diff: {files?: Array}, plan: {selected?: Array}}} options
+ */
+function buildHeuristicComments({ diff, plan }) {
+  const comments = [];
+
+  // セキュリティ基本チェック
+  if (hasSkill(plan, 'rr-midstream-security-basic-001')) {
+    const skillId = 'rr-midstream-security-basic-001';
+    for (const c of findHardcodedSecrets({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findGitHubActionsIssues({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+  }
+
+  // ロギング・可観測性チェック
+  if (hasSkill(plan, 'rr-midstream-logging-observability-001')) {
+    const skillId = 'rr-midstream-logging-observability-001';
+    for (const c of findSilentCatch({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+  }
+
+  // テスト存在チェック
+  if (hasSkill(plan, 'rr-downstream-test-existence-001')) {
+    const skillId = 'rr-downstream-test-existence-001';
+    for (const c of findMissingTests({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+  } else if (hasSkill(plan, 'rr-downstream-coverage-gap-001')) {
+    const skillId = 'rr-downstream-coverage-gap-001';
+    for (const c of findMissingTests({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+  }
+
+  return comments.slice(0, 8);
+}
+
+
+/***/ }),
+
+/***/ 633:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   E: () => (/* binding */ PLANNER_MODES),
+/* harmony export */   p: () => (/* binding */ normalizePlannerMode)
+/* harmony export */ });
+const PLANNER_MODES = /** @type {const} */ (['off', 'order', 'prune']);
+
+function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
+  const fallback = PLANNER_MODES.includes(defaultMode) ? defaultMode : 'off';
+  const normalized = (mode || '').toLowerCase();
+  if (PLANNER_MODES.includes(normalized)) return normalized;
+  return fallback;
+}
+
+
+
+/***/ }),
+
+/***/ 9557:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   n: () => (/* binding */ formatRepoContextPrompt),
+/* harmony export */   o: () => (/* binding */ collectRepoContext)
+/* harmony export */ });
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1455);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(6760);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(1421);
+/* harmony import */ var node_util__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(7975);
+
+
+
+
+
+const execFileAsync = (0,node_util__WEBPACK_IMPORTED_MODULE_3__.promisify)(node_child_process__WEBPACK_IMPORTED_MODULE_2__.execFile);
+
+/** Default token budget (max characters per section) */
+const DEFAULT_BUDGET = {
+  fullFile: 2000,
+  usages: 1000,
+  tests: 2000,
+  i18n: 1000,
+  config: 500,
+  docs: 1500,
+};
+
+const TOTAL_BUDGET = 8000;
+
+/** Config file basenames to look for */
+const CONFIG_BASENAMES = [
+  'package.json',
+  'tsconfig.json',
+  'tsconfig.base.json',
+  'tsconfig.build.json',
+  'next.config.js',
+  'next.config.mjs',
+  'next.config.ts',
+  '.eslintrc',
+  '.eslintrc.js',
+  '.eslintrc.cjs',
+  '.eslintrc.json',
+  '.eslintrc.yaml',
+  '.eslintrc.yml',
+  'eslint.config.js',
+  'eslint.config.mjs',
+  'vite.config.js',
+  'vite.config.ts',
+  'vitest.config.js',
+  'vitest.config.ts',
+];
+
+/**
+ * Read a file safely, returning null if not found.
+ * @param {string} filePath
+ * @returns {Promise<string|null>}
+ */
+async function safeReadFile(filePath) {
+  try {
+    return await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readFile(filePath, 'utf8');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Collect full text of changed files.
+ * @param {string[]} changedFiles
+ * @param {string} cwd
+ * @param {number} maxChars
+ * @returns {Promise<Array<{title: string, content: string}>>}
+ */
+async function collectFullTexts(changedFiles, cwd, maxChars) {
+  const sections = [];
+  for (const filePath of changedFiles) {
+    const absPath = node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(cwd, filePath);
+    const content = await safeReadFile(absPath);
+    if (content === null) continue;
+    const truncated =
+      content.length > maxChars ? content.slice(0, maxChars) + '\n...[truncated]' : content;
+    sections.push({ title: `File: ${filePath}`, content: truncated });
+  }
+  return sections;
+}
+
+/**
+ * Collect sibling files in the same directories as changed files (up to 5 per dir, excluding changed files).
+ * @param {string[]} changedFiles
+ * @param {string} cwd
+ * @returns {Promise<Array<{title: string, content: string}>>}
+ */
+async function collectSiblingFiles(changedFiles, cwd) {
+  const changedSet = new Set(changedFiles.map((f) => node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(cwd, f)));
+  const seenDirs = new Set();
+  const sections = [];
+
+  for (const filePath of changedFiles) {
+    const absPath = node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(cwd, filePath);
+    const dir = node_path__WEBPACK_IMPORTED_MODULE_1__.dirname(absPath);
+    if (seenDirs.has(dir)) continue;
+    seenDirs.add(dir);
+
+    let entries;
+    try {
+      entries = await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readdir(dir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    const siblings = entries
+      .filter((e) => e.isFile() && !changedSet.has(node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, e.name)))
+      .slice(0, 5)
+      .map((e) => node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, e.name));
+
+    if (siblings.length) {
+      const listing = siblings.map((s) => `- ${node_path__WEBPACK_IMPORTED_MODULE_1__.relative(cwd, s)}`).join('\n');
+      sections.push({ title: 'Sibling files', content: listing });
+    }
+  }
+  return sections;
+}
+
+/**
+ * Find corresponding test files for changed files.
+ * @param {string[]} changedFiles
+ * @param {string} cwd
+ * @param {number} maxChars
+ * @returns {Promise<Array<{title: string, content: string}>>}
+ */
+async function collectTestFiles(changedFiles, cwd, maxChars) {
+  const sections = [];
+  const seen = new Set();
+
+  for (const filePath of changedFiles) {
+    const absPath = node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(cwd, filePath);
+    const dir = node_path__WEBPACK_IMPORTED_MODULE_1__.dirname(absPath);
+    const ext = node_path__WEBPACK_IMPORTED_MODULE_1__.extname(filePath);
+    const base = node_path__WEBPACK_IMPORTED_MODULE_1__.basename(filePath, ext);
+
+    // Candidate patterns: *.test.*, *.spec.*
+    const candidates = [
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, `${base}.test${ext}`),
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, `${base}.spec${ext}`),
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, `${base}.test.js`),
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, `${base}.spec.js`),
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, `${base}.test.mjs`),
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, `${base}.spec.mjs`),
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, `${base}.test.ts`),
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, `${base}.spec.ts`),
+      // __tests__ directory
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, '__tests__', `${base}${ext}`),
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, '__tests__', `${base}.test${ext}`),
+      node_path__WEBPACK_IMPORTED_MODULE_1__.join(dir, '__tests__', `${base}.spec${ext}`),
+    ];
+
+    for (const candidate of candidates) {
+      if (seen.has(candidate)) continue;
+      const content = await safeReadFile(candidate);
+      if (content !== null) {
+        seen.add(candidate);
+        const relPath = node_path__WEBPACK_IMPORTED_MODULE_1__.relative(cwd, candidate);
+        const truncated =
+          content.length > maxChars ? content.slice(0, maxChars) + '\n...[truncated]' : content;
+        sections.push({ title: `Test: ${relPath}`, content: truncated });
+        break; // first match per file is enough
+      }
+    }
+  }
+  return sections;
+}
+
+/**
+ * Search for export symbol usages using ripgrep.
+ * @param {string[]} changedFiles
+ * @param {string} cwd
+ * @param {number} maxChars
+ * @param {string[]} debugMessages
+ * @returns {Promise<Array<{title: string, content: string}>>}
+ */
+async function collectSymbolUsages(changedFiles, cwd, maxChars, debugMessages) {
+  // Check if rg is available
+  try {
+    await execFileAsync('rg', ['--version'], { timeout: 5000 });
+  } catch {
+    debugMessages.push('symbol-search: ripgrep (rg) not available, skipping');
+    return [];
+  }
+
+  const sections = [];
+
+  for (const filePath of changedFiles) {
+    const absPath = node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(cwd, filePath);
+    const content = await safeReadFile(absPath);
+    if (!content) continue;
+
+    // Extract exported symbol names
+    const exportMatches = [
+      ...content.matchAll(/^export\s+(?:async\s+)?(?:function|class|const|let|var)\s+(\w+)/gm),
+      ...content.matchAll(/^export\s*\{\s*([^}]+)\}/gm),
+      ...content.matchAll(/^module\.exports\s*=\s*\{\s*([^}]+)\}/gm),
+    ];
+
+    const symbols = new Set();
+    for (const m of exportMatches) {
+      // For named exports like `export { foo, bar }`, split on commas
+      const names = m[1]
+        .split(',')
+        .map((s) => s.trim().split(/\s+/)[0])
+        .filter(Boolean);
+      for (const name of names) symbols.add(name);
+    }
+
+    if (!symbols.size) continue;
+
+    // Search for usages (limit to first 3 symbols to avoid excessive output)
+    const topSymbols = [...symbols].slice(0, 3);
+    for (const symbol of topSymbols) {
+      try {
+        const { stdout } = await execFileAsync(
+          'rg',
+          ['--with-filename', '--line-number', '--max-count=10', symbol, cwd],
+          { timeout: 10000 }
+        );
+        if (stdout.trim()) {
+          const truncated =
+            stdout.length > maxChars ? stdout.slice(0, maxChars) + '\n...[truncated]' : stdout;
+          sections.push({
+            title: `Symbol usages: ${symbol} (from ${filePath})`,
+            content: truncated,
+          });
+        }
+      } catch {
+        // rg exits non-zero when no matches found — that is fine
+      }
+    }
+  }
+
+  return sections;
+}
+
+/**
+ * Collect i18n files matching common patterns.
+ * @param {string} cwd
+ * @param {number} maxChars
+ * @returns {Promise<Array<{title: string, content: string}>>}
+ */
+async function collectI18nFiles(cwd, maxChars) {
+  const dirNames = ['i18n', 'locales'];
+  const sections = [];
+  const seen = new Set();
+
+  for (const dirName of dirNames) {
+    let entries;
+    try {
+      entries = await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readdir(cwd, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      if (!entry.isDirectory() || entry.name !== dirName) continue;
+
+      const dirPath = node_path__WEBPACK_IMPORTED_MODULE_1__.join(cwd, entry.name);
+      let files;
+      try {
+        files = await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readdir(dirPath, { withFileTypes: true });
+      } catch {
+        continue;
+      }
+
+      for (const file of files.slice(0, 3)) {
+        if (!file.isFile()) continue;
+        const filePath = node_path__WEBPACK_IMPORTED_MODULE_1__.join(dirPath, file.name);
+        if (seen.has(filePath)) continue;
+        seen.add(filePath);
+        const content = await safeReadFile(filePath);
+        if (content === null) continue;
+        const relPath = node_path__WEBPACK_IMPORTED_MODULE_1__.relative(cwd, filePath);
+        const truncated =
+          content.length > maxChars ? content.slice(0, maxChars) + '\n...[truncated]' : content;
+        sections.push({ title: `i18n: ${relPath}`, content: truncated });
+        if (sections.length >= 3) return sections;
+      }
+    }
+  }
+
+  return sections;
+}
+
+/**
+ * Collect relevant config files from cwd root.
+ * @param {string} cwd
+ * @param {number} maxChars
+ * @returns {Promise<Array<{title: string, content: string}>>}
+ */
+async function collectConfigFiles(cwd, maxChars) {
+  const sections = [];
+  for (const basename of CONFIG_BASENAMES) {
+    const filePath = node_path__WEBPACK_IMPORTED_MODULE_1__.join(cwd, basename);
+    const content = await safeReadFile(filePath);
+    if (content === null) continue;
+    const truncated =
+      content.length > maxChars ? content.slice(0, maxChars) + '\n...[truncated]' : content;
+    sections.push({ title: `Config: ${basename}`, content: truncated });
+  }
+  return sections;
+}
+
+/**
+ * Collect ADR / architecture docs by keyword matching.
+ * @param {string[]} changedFiles
+ * @param {string} cwd
+ * @param {number} maxChars
+ * @returns {Promise<Array<{title: string, content: string}>>}
+ */
+async function collectAdrDocs(changedFiles, cwd, maxChars) {
+  // Build keyword set from changed file paths
+  const keywords = new Set();
+  for (const f of changedFiles) {
+    const parts = f.split('/');
+    for (const part of parts) {
+      const base = node_path__WEBPACK_IMPORTED_MODULE_1__.basename(part, node_path__WEBPACK_IMPORTED_MODULE_1__.extname(part));
+      if (base.length >= 3) keywords.add(base.toLowerCase());
+    }
+  }
+
+  if (!keywords.size) return [];
+
+  // Find .md files under well-known doc dirs
+  const searchDirs = ['docs', 'adr', 'architecture', 'decisions', '.'];
+  const sections = [];
+  const seen = new Set();
+
+  for (const dir of searchDirs) {
+    const dirPath = node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(cwd, dir);
+    let entries;
+    try {
+      entries = await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readdir(dirPath, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+      const filePath = node_path__WEBPACK_IMPORTED_MODULE_1__.join(dirPath, entry.name);
+      if (seen.has(filePath)) continue;
+      seen.add(filePath);
+
+      const content = await safeReadFile(filePath);
+      if (!content) continue;
+
+      const contentLower = content.toLowerCase();
+      const matched = [...keywords].some((kw) => contentLower.includes(kw));
+      if (!matched) continue;
+
+      const relPath = node_path__WEBPACK_IMPORTED_MODULE_1__.relative(cwd, filePath);
+      const truncated =
+        content.length > maxChars ? content.slice(0, maxChars) + '\n...[truncated]' : content;
+      sections.push({ title: `Doc: ${relPath}`, content: truncated });
+      if (sections.length >= 3) return sections;
+    }
+  }
+  return sections;
+}
+
+/**
+ * Collect repo-wide context for the given changed files.
+ *
+ * @param {object} options
+ * @param {string[]} options.changedFiles - Changed file paths (relative to cwd)
+ * @param {string} options.cwd - Repository root path
+ * @param {object} [options.tokenBudget] - Per-section character limit overrides
+ * @returns {Promise<{sections: Array<{title: string, content: string}>, truncated: boolean, debugSummary: string}>}
+ */
+async function collectRepoContext({ changedFiles, cwd, tokenBudget = {} } = {}) {
+  const budget = { ...DEFAULT_BUDGET, ...tokenBudget };
+  const debugMessages = [];
+  const allSections = [];
+
+  if (!changedFiles?.length || !cwd) {
+    return {
+      sections: [],
+      truncated: false,
+      debugSummary: 'collectRepoContext: no changedFiles or cwd provided',
+    };
+  }
+
+  // 1. Changed file full text
+  const fullTexts = await collectFullTexts(changedFiles, cwd, budget.fullFile);
+  allSections.push(...fullTexts);
+  debugMessages.push(`full-text: ${fullTexts.length} file(s)`);
+
+  // 2. Sibling files (listing only — no content to save budget)
+  const siblings = await collectSiblingFiles(changedFiles, cwd);
+  allSections.push(...siblings);
+  debugMessages.push(`siblings: ${siblings.length} section(s)`);
+
+  // 3. Corresponding test files
+  const testFiles = await collectTestFiles(changedFiles, cwd, budget.tests);
+  allSections.push(...testFiles);
+  debugMessages.push(`tests: ${testFiles.length} file(s)`);
+
+  // 4. Symbol usage search via rg
+  const usages = await collectSymbolUsages(changedFiles, cwd, budget.usages, debugMessages);
+  allSections.push(...usages);
+
+  // 5. i18n files
+  const i18nFiles = await collectI18nFiles(cwd, budget.i18n);
+  allSections.push(...i18nFiles);
+  debugMessages.push(`i18n: ${i18nFiles.length} file(s)`);
+
+  // 6. Config files
+  const configFiles = await collectConfigFiles(cwd, budget.config);
+  allSections.push(...configFiles);
+  debugMessages.push(`config: ${configFiles.length} file(s)`);
+
+  // 7. ADR / architecture docs
+  const adrDocs = await collectAdrDocs(changedFiles, cwd, budget.docs);
+  allSections.push(...adrDocs);
+  debugMessages.push(`docs: ${adrDocs.length} file(s)`);
+
+  // Apply total budget
+  let totalChars = allSections.reduce((sum, s) => sum + s.title.length + s.content.length, 0);
+  let truncated = false;
+
+  if (totalChars > TOTAL_BUDGET) {
+    truncated = true;
+    debugMessages.push(
+      `total budget exceeded (${totalChars} > ${TOTAL_BUDGET}), truncating sections`
+    );
+    let remaining = TOTAL_BUDGET;
+    for (const section of allSections) {
+      const available = Math.max(0, remaining - section.title.length - 10);
+      if (section.content.length > available) {
+        section.content = section.content.slice(0, available) + '\n...[truncated]';
+      }
+      remaining -= section.title.length + section.content.length;
+      if (remaining <= 0) {
+        const idx = allSections.indexOf(section);
+        for (let i = idx + 1; i < allSections.length; i++) {
+          allSections[i].content = '...[omitted due to total budget]';
+        }
+        break;
+      }
+    }
+    totalChars = allSections.reduce((sum, s) => sum + s.title.length + s.content.length, 0);
+    debugMessages.push(`after truncation: ${totalChars} chars`);
+  }
+
+  return {
+    sections: allSections,
+    truncated,
+    debugSummary: debugMessages.join('; '),
+  };
+}
+
+/**
+ * Format collected context sections into a prompt string.
+ *
+ * @param {Array<{title: string, content: string}>} sections
+ * @returns {string}
+ */
+function formatRepoContextPrompt(sections) {
+  if (!sections?.length) return '';
+  const parts = ['### Repository Context\n'];
+  for (const section of sections) {
+    parts.push(`#### ${section.title}`);
+    if (section.content) {
+      parts.push('```');
+      parts.push(section.content);
+      parts.push('```');
+    }
+    parts.push('');
+  }
+  return parts.join('\n');
+}
+
+
+/***/ }),
+
+/***/ 8954:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  G1: () => (/* binding */ generateReview)
+});
+
+// UNUSED EXPORTS: buildPrompt, parseLineComments
+
+// EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
+var loader = __nccwpck_require__(759);
+// EXTERNAL MODULE: ./src/lib/scoring/breakdown.mjs
+var breakdown = __nccwpck_require__(3926);
+// EXTERNAL MODULE: ./src/lib/finding-classifier.mjs
+var finding_classifier = __nccwpck_require__(2196);
+// EXTERNAL MODULE: ./src/config/default.mjs
+var config_default = __nccwpck_require__(5163);
+// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 5 modules
+var review_runner = __nccwpck_require__(2758);
+// EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
+var heuristic_review = __nccwpck_require__(418);
+;// CONCATENATED MODULE: ./src/lib/finding-format.mjs
+const FINDING_SEVERITIES = /** @type {const} */ (['blocker', 'warning', 'nit']);
+const FINDING_CONFIDENCE = /** @type {const} */ (['high', 'medium', 'low']);
+
+function normalizeWhitespace(text) {
+  return String(text ?? '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function clamp(text, maxChars) {
+  const normalized = normalizeWhitespace(text);
+  if (normalized.length <= maxChars) return normalized;
+  return `${normalized.slice(0, Math.max(0, maxChars - 1))}…`;
+}
+
+/**
+ * Format a finding message for line-comments (`<file>:<line>: <message>`).
+ * Evidence is already anchored by `<file>:<line>`, so we keep the message compact.
+ * @param {{
+ *   finding: string,
+ *   evidence: string,
+ *   impact: string,
+ *   fix: string,
+ *   severity: typeof FINDING_SEVERITIES[number],
+ *   confidence: typeof FINDING_CONFIDENCE[number],
+ * }} finding
+ */
+function formatFindingMessage({ finding, evidence, impact, fix, severity, confidence }) {
+  const sev = FINDING_SEVERITIES.includes(severity) ? severity : 'warning';
+  const conf = FINDING_CONFIDENCE.includes(confidence) ? confidence : 'medium';
+
+  return [
+    `Finding: ${clamp(finding, 80)}`,
+    `Evidence: ${clamp(evidence, 60)}`,
+    `Impact: ${clamp(impact, 60)}`,
+    `Fix: ${clamp(fix, 80)}`,
+    `Severity: ${sev}`,
+    `Confidence: ${conf}`,
+  ].join(' ');
+}
+
+const LABEL_NAMES = ['Finding', 'Evidence', 'Impact', 'Fix', 'Severity', 'Confidence'];
+const LABEL_ALTERNATION = LABEL_NAMES.join('|');
+
+/**
+ * Parse a labeled finding message string into structured fields.
+ * @param {string} message
+ * @returns {{ title: string, evidence: string[], impact: string, suggestion: string, severity: string|null, confidence: string|null }}
+ */
+function parseFindingMessage(message) {
+  const text = String(message ?? '');
+  const get = (label) => {
+    const re = new RegExp(`${label}:\\s*([^]*?)(?=\\s+(?:${LABEL_ALTERNATION}):|$)`, 'm');
+    return (text.match(re)?.[1] ?? '').trim();
+  };
+  const evidenceText = get('Evidence');
+  return {
+    title: get('Finding'),
+    evidence: evidenceText ? [evidenceText] : [],
+    impact: get('Impact'),
+    suggestion: get('Fix'),
+    severity: get('Severity') || null,
+    confidence: get('Confidence') || null,
+  };
+}
+
+/**
+ * Map internal severity vocabulary (blocker/warning/nit) to output schema vocabulary.
+ * Accepts both vocabularies; unknown values default to 'major' (fail-safe).
+ * @param {string|null|undefined} internalSeverity
+ * @returns {'critical'|'major'|'minor'|'info'}
+ */
+function normalizeSeverity(internalSeverity) {
+  switch ((internalSeverity ?? '').toLowerCase().trim()) {
+    case 'blocker':
+    case 'critical':
+      return 'critical';
+    case 'warning':
+    case 'major':
+      return 'major';
+    case 'nit':
+    case 'minor':
+      return 'minor';
+    case 'info':
+      return 'info';
+    default:
+      return 'major';
+  }
+}
+
+/**
+ * Validate whether a finding message contains the required labeled fields.
+ * @param {string} message
+ */
+function validateFindingMessage(message) {
+  const text = String(message ?? '');
+  const missing = [];
+  for (const label of ['Finding:', 'Evidence:', 'Impact:', 'Fix:', 'Severity:', 'Confidence:']) {
+    if (!text.includes(label)) missing.push(label);
+  }
+
+  const sevMatch = /Severity:\s*(\w+)/.exec(text);
+  const confMatch = /Confidence:\s*(\w+)/.exec(text);
+  const severity = sevMatch?.[1] ?? null;
+  const confidence = confMatch?.[1] ?? null;
+
+  const invalid = [];
+  if (severity && !FINDING_SEVERITIES.includes(severity)) invalid.push(`Severity:${severity}`);
+  if (confidence && !FINDING_CONFIDENCE.includes(confidence))
+    invalid.push(`Confidence:${confidence}`);
+
+  return {
+    ok: missing.length === 0 && invalid.length === 0,
+    missing,
+    invalid,
+  };
+}
+
+// EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs
+var review_plan_generator = __nccwpck_require__(7817);
+// EXTERNAL MODULE: ./src/lib/repo-context.mjs
+var repo_context = __nccwpck_require__(9557);
+;// CONCATENATED MODULE: ./src/lib/review-engine.mjs
+
+
+
+
+
+
+
+
+
+
+const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
+const MAX_PROMPT_CHARS = 12000;
+const MAX_PROMPT_PREVIEW_CHARS = 2000;
+const NO_ISSUES_REGEX = /^NO_ISSUES/i;
+const LINE_COMMENT_REGEX = /^(.+?):(\d+):\s*(.+)$/;
+
+/**
+ * スキル名のサニタイズ: Markdown インジェクション対策
+ */
+function sanitizeSkillName(name) {
+  if (!name) return '';
+  return String(name).replace(/[\[\]`*_{}()#+\-.!|<>\n]/g, '');
+}
+
+function buildSystemMessage(language) {
+  return language === 'en'
+    ? 'You are River Reviewer, an expert code review assistant. Respond in English. You excel at spotting risky changes and explaining them briefly.'
+    : 'You are River Reviewer, an expert code review assistant. Respond in Japanese. You excel at spotting risky changes and explaining them briefly.';
+}
+
+function buildLanguageInstruction(language) {
+  return language === 'en'
+    ? '- Write the <message> in English.'
+    : '- <message>は日本語で記述すること。';
+}
+
+function buildSeverityInstruction(severity, language) {
+  const japanese = {
+    strict: '軽微な懸念も含めて網羅的に指摘する',
+    normal: '重要度と再現性のバランスを取り、主要なリスクを指摘する',
+    relaxed: '重大・致命的な問題に限定し、軽微な指摘は省く',
+  };
+  const english = {
+    strict: 'Capture even minor risks and style regressions',
+    normal: 'Balance breadth with impact; focus on notable risks',
+    relaxed: 'Limit findings to critical or high-impact issues; skip nits',
+  };
+  const map = language === 'en' ? english : japanese;
+  const label = language === 'en' ? 'Severity focus' : '厳格度';
+  return `- ${label} (${severity}): ${map[severity] ?? map.normal}`;
+}
+
+function buildAdditionalSection(instructions, language) {
+  if (!instructions?.length) return '';
+  const header = language === 'en' ? 'Additional instructions:' : '追加指示:';
+  const body = instructions.map((item) => `- ${item}`).join('\n');
+  return `\n${header}\n${body}\n`;
+}
+
+function resolveOpenAIConfig(options = {}, config = config_default/* defaultConfig */.s) {
+  const provider = config.model?.provider ?? 'openai';
+  const modelName = options.model || ENV_DEFAULT_MODEL || config.model?.modelName;
+  return {
+    provider,
+    apiKey: options.apiKey || process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
+    model: modelName,
+    endpoint:
+      options.endpoint ||
+      process.env.RIVER_OPENAI_BASE_URL ||
+      'https://api.openai.com/v1/chat/completions',
+    temperature: config.model?.temperature ?? 0,
+    maxTokens: config.model?.maxTokens ?? 600,
+  };
+}
+
+function buildSkillSummary(plan) {
+  if (!plan?.selected?.length) return 'No skills selected; provide general review notes.';
+  const summaries = plan.selected.map((skill) => (0,review_runner/* summarizeSkill */.P0)(skill));
+  const top = summaries.slice(0, 6);
+  const body = top
+    .map(
+      (s) =>
+        `- ${s.id}: ${s.name} [phase=${s.phase}, severity=${s.severity ?? 'unknown'}, modelHint=${s.modelHint}]`
+    )
+    .join('\n');
+  const truncated =
+    summaries.length > top.length ? `\n...and ${summaries.length - top.length} more skills.` : '';
+  return `${body}${truncated}`;
+}
+
+function buildFileSummary(files = []) {
+  if (!files.length) return 'No files changed';
+  return files.map((file) => `- ${file.path} (hunks: ${file.hunks.length || 1})`).join('\n');
+}
+
+function buildProjectRulesSection(rulesText) {
+  if (!rulesText) return '';
+  return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
+}
+
+function buildADRContextSection(relatedADRs) {
+  if (!relatedADRs?.length) return '';
+  const lines = ['\n### Related ADRs/Specs\n'];
+  for (const adr of relatedADRs.slice(0, 5)) {
+    lines.push(`- ${adr.title} (${adr.path}) — ${adr.matchReason}`);
+  }
+  lines.push('\nこれらの設計文書との整合性を考慮してレビューしてください。\n');
+  return lines.join('\n');
+}
+
+function sanitizePath(p) {
+  return String(p)
+    .replace(/[\n\r]/g, '')
+    .slice(0, 200);
+}
+
+function buildRiskAssessmentSection(riskAssessment) {
+  if (!riskAssessment) return '';
+  const { escalatedFiles, humanReviewFiles } = riskAssessment;
+  if (!escalatedFiles?.length && !humanReviewFiles?.length) return '';
+  const lines = ['\n### Risk Assessment\n'];
+  if (humanReviewFiles?.length) {
+    lines.push('以下のファイルは人間によるレビューが必須です:');
+    for (const f of humanReviewFiles) lines.push('- ' + sanitizePath(f) + ': require_human_review');
+  }
+  if (escalatedFiles?.length) {
+    lines.push('以下のファイルはエスカレーション対象です:');
+    for (const f of escalatedFiles) lines.push('- ' + sanitizePath(f) + ': escalate');
+  }
+  lines.push('これらのファイルには特に注意してレビューしてください。\n');
+  return lines.join('\n');
+}
+
+function buildPrompt({
+  diffText,
+  diffFiles,
+  plan,
+  phase,
+  projectRules,
+  riskAssessment,
+  memoryContext,
+  relatedADRs,
+  reviewMode,
+  repoContext,
+  maxChars = MAX_PROMPT_CHARS,
+  config = config_default/* defaultConfig */.s,
+}) {
+  const effectiveConfig = (0,loader/* mergeConfig */.R2)(config_default/* defaultConfig */.s, config ?? {});
+  const reviewConfig = effectiveConfig.review ?? config_default/* defaultConfig */.s.review;
+  const language = reviewConfig.language ?? config_default/* defaultConfig */.s.review.language;
+  const severity = reviewConfig.severity ?? config_default/* defaultConfig */.s.review.severity;
+  const truncated = diffText.length > maxChars;
+  const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
+  const depthConfig = (0,review_plan_generator/* getReviewDepthConfig */.i)(reviewMode ?? 'medium');
+  const repoContextSection = repoContext?.sections?.length
+    ? (0,repo_context/* formatRepoContextPrompt */.n)(repoContext.sections) + '\n'
+    : '';
+  const prompt = `You are River Reviewer, an AI code review agent.
+Phase: ${phase}
+
+Changed files:
+${buildFileSummary(diffFiles)}
+
+Relevant skills:
+${buildSkillSummary(plan)}
+
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${repoContextSection}Review the unified git diff below and produce concise findings.
+${buildLanguageInstruction(language)}
+- Output each finding on its own line using the format "<file>:<line>: <message>".
+- In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
+- Use Severity: blocker|warning|nit and Confidence: high|medium|low.
+- Focus on correctness, safety, and maintainability risks in the changed code.
+- Prefer commenting on changed lines; if a point depends on context not visible in the diff, set Confidence: low.
+- Limit to ${depthConfig.maxFindings} findings. If there are no issues worth mentioning, reply with "NO_ISSUES".
+- Keep messages brief (<=200 characters).
+- ${depthConfig.focusHint}
+${buildSeverityInstruction(severity, language)}
+${buildAdditionalSection(reviewConfig.additionalInstructions, language)}
+Diff:
+${diffBody}`;
+  return { prompt, truncated, language, severity };
+}
+
+function parseLineComments(outputText) {
+  if (!outputText) return null;
+  const comments = [];
+  for (const rawLine of outputText.split('\n')) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    if (NO_ISSUES_REGEX.test(line)) return [];
+    const match = LINE_COMMENT_REGEX.exec(line);
+    if (match) {
+      comments.push({
+        file: match[1].trim(),
+        line: Number.parseInt(match[2], 10),
+        message: match[3].trim(),
+      });
+    }
+  }
+  return comments.length ? comments : null;
+}
+
+async function callOpenAI({
+  prompt,
+  apiKey,
+  model,
+  endpoint,
+  temperature,
+  maxTokens,
+  systemMessage,
+}) {
+  const controller = AbortSignal.timeout(15000);
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    signal: controller,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      temperature,
+      max_tokens: maxTokens,
+      messages: [
+        {
+          role: 'system',
+          content: systemMessage ?? buildSystemMessage('ja'),
+        },
+        { role: 'user', content: prompt },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const detail = await res.text();
+    throw new Error(`OpenAI API error ${res.status}: ${detail}`);
+  }
+  const json = await res.json();
+  return json.choices?.[0]?.message?.content?.trim() ?? '';
+}
+
+function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
+  const allSkills = plan?.selected ?? [];
+  // ヒューリスティック対応スキルは除外（ヒューリスティックで処理済み）
+  const skills = allSkills.filter((skill) => {
+    const skillId = skill.metadata?.id ?? skill.id;
+    return !heuristic_review/* HEURISTIC_SKILL_IDS */.y2.includes(skillId);
+  });
+
+  const firstFile = diff.files?.find((f) => f?.path && f.path !== '/dev/null') ?? null;
+  if (!firstFile) {
+    return [
+      {
+        file: '(no-files)',
+        line: 1,
+        message: formatFindingMessage({
+          finding: 'レビュー対象ファイルが特定できない',
+          evidence: '差分ファイルが空',
+          impact: 'レビューの自動化ができない',
+          fix: '差分がある状態で再実行する',
+          severity: 'warning',
+          confidence: 'low',
+        }),
+      },
+    ];
+  }
+
+  const line =
+    firstFile.addedLines?.[0] ||
+    firstFile.hunks?.[0]?.newStart ||
+    1; /* default to first added line or hunk start to keep pointers stable */
+
+  // Build specific reason message
+  const evidenceBase = llmSkipReason
+    ? `LLM: ${llmSkipReason}`
+    : 'ヒューリスティック検出パターンに該当なし';
+
+  // スキルがない場合は1件のコメントを生成
+  if (skills.length === 0) {
+    return [
+      {
+        file: firstFile.path,
+        line,
+        message: formatFindingMessage({
+          finding: 'マッチするスキルがなく自動指摘を生成できなかった',
+          evidence: evidenceBase,
+          impact: '重要なリスクを見落とす可能性がある',
+          fix: 'このファイル種別に対応するスキルを追加するか、手動レビューを実施する',
+          severity: 'warning',
+          confidence: 'low',
+        }),
+      },
+    ];
+  }
+
+  // スキル単位でコメントを生成
+  return skills.map((skill) => {
+    const skillId = skill.metadata?.id ?? skill.id;
+    const rawSkillName = skill.metadata?.name ?? skillId;
+    const skillName = sanitizeSkillName(rawSkillName);
+    return {
+      file: firstFile.path,
+      line,
+      skillId,
+      message: formatFindingMessage({
+        finding: `スキル「${skillName}」の観点で自動指摘を生成できなかった`,
+        evidence: evidenceBase,
+        impact: 'このスキルが検出する問題を見落とす可能性がある',
+        fix: `「${skillName}」の観点で手動レビューを実施する`,
+        severity: 'warning',
+        confidence: 'low',
+      }),
+    };
+  });
+}
+
+function normalizeHeuristicComments(rawComments) {
+  return rawComments.map((c) => {
+    switch (c.kind) {
+      case 'silent-catch':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: 'catch で例外が握りつぶされる可能性がある',
+            evidence: 'catch 内で return（ログ/再throwなし）',
+            impact: '障害調査や失敗検知が困難になる',
+            fix: 'ログ+再throw / 上位へ返す / 無視するなら理由コメント+計測を検討する',
+            severity: 'nit',
+            confidence: 'high',
+          }),
+        };
+      case 'missing-tests':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: '挙動変更に対するテスト差分が見当たらない',
+            evidence: 'コード差分あり・テスト差分なし',
+            impact: '回帰の検知漏れや仕様逸脱が起きやすい',
+            fix: '新分岐/例外/境界の最小テストを1〜3件追加する',
+            severity: 'warning',
+            confidence: 'medium',
+          }),
+        };
+      case 'hardcoded-secret':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: '秘密情報（トークン/キー）の直書きの可能性がある',
+            evidence: 'トークン/キーらしい文字列が追加されている',
+            impact: '漏洩時に不正利用やインシデントにつながる',
+            fix: '環境変数（GitHub Secrets等）へ移し、漏洩時はローテーションも検討する',
+            severity: 'blocker',
+            confidence: 'high',
+          }),
+        };
+      case 'gh-actions-pull-request-target':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: 'pull_request_targetイベントは権限昇格のリスクがある',
+            evidence: 'pull_request_targetトリガーが追加されている',
+            impact: 'フォークからのPRで任意コードが本リポジトリの権限で実行される可能性',
+            fix: 'pull_requestイベントを使用するか、pull_request_targetの場合はチェックアウト前に入力を検証する',
+            severity: 'blocker',
+            confidence: 'high',
+          }),
+        };
+      case 'gh-actions-excessive-permissions':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: '過剰な権限設定（write-all）が検出された',
+            evidence: 'permissions: write-all が設定されている',
+            impact: 'ワークフローが侵害された場合の影響範囲が最大化される',
+            fix: '最小権限の原則に従い、必要な権限のみを個別に指定する（例: contents: read, pull-requests: write）',
+            severity: 'warning',
+            confidence: 'high',
+          }),
+        };
+      case 'gh-actions-secret-in-run':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: 'runブロック内でsecretsを直接使用している',
+            evidence: 'run: と secrets.* が同一行に存在',
+            impact: 'ログ出力やエラーメッセージでシークレットが漏洩する可能性',
+            fix: 'シークレットを環境変数として設定し、envブロック経由で参照する',
+            severity: 'warning',
+            confidence: 'medium',
+          }),
+        };
+      case 'gh-actions-unsanitized-input':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: 'ユーザー入力がサニタイズされずに使用されている',
+            evidence: 'github.event.*.title/body/name がrunブロックで直接使用',
+            impact: 'コマンドインジェクション攻撃のリスクがある',
+            fix: 'jqやtoJSONを使用して入力をサニタイズする、または環境変数経由で渡す',
+            severity: 'blocker',
+            confidence: 'high',
+          }),
+        };
+      default:
+        return {
+          file: c.file,
+          line: c.line,
+          message: formatFindingMessage({
+            finding: `想定外のヒューリスティック（kind=${String(c.kind ?? 'unknown')}）`,
+            evidence: 'ヒューリスティック kind が未知',
+            impact: 'レビュー結果が不安定になる可能性がある',
+            fix: 'ヒューリスティック定義と出力の対応を見直す',
+            severity: 'warning',
+            confidence: 'low',
+          }),
+        };
+    }
+  });
+}
+
+function redactSecrets(text) {
+  if (!text) return text;
+  return String(text)
+    .replace(/\bAKIA[0-9A-Z]{16}\b/g, 'AKIA****************')
+    .replace(/\bghp_[A-Za-z0-9]{20,}\b/g, 'ghp_***REDACTED***')
+    .replace(/\bsk_(?:live|test)_[A-Za-z0-9]{16,}\b/g, 'sk_***REDACTED***')
+    .replace(/\bsk-[A-Za-z0-9]{16,}\b/g, 'sk-***REDACTED***')
+    .replace(/-----BEGIN [^-]* PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----')
+    .replace(/-----END [^-]* PRIVATE KEY-----/g, '-----END PRIVATE KEY-----');
+}
+
+/**
+ * Generate review comments using LLM when configured, otherwise fall back to deterministic hints.
+ */
+async function generateReview({
+  diff,
+  plan,
+  phase,
+  dryRun = false,
+  includeFallback = true,
+  model,
+  apiKey,
+  projectRules,
+  fileTypes,
+  relatedADRs,
+  riskAssessment,
+  reviewMode,
+  repoContext,
+  maxPromptChars = MAX_PROMPT_CHARS,
+  config,
+}) {
+  const effectiveConfig = (0,loader/* mergeConfig */.R2)(config_default/* defaultConfig */.s, config ?? {});
+  const promptInfo = buildPrompt({
+    diffText: diff.diffText,
+    diffFiles: diff.files,
+    plan,
+    phase,
+    projectRules,
+    relatedADRs,
+    riskAssessment,
+    reviewMode,
+    repoContext,
+    maxChars: maxPromptChars,
+    config: effectiveConfig,
+  });
+  const openAIConfig = resolveOpenAIConfig({ model, apiKey }, effectiveConfig);
+  const language = promptInfo.language ?? effectiveConfig.review.language;
+
+  let comments = [];
+  const debug = {
+    promptTruncated: promptInfo.truncated,
+    promptPreview: promptInfo.prompt.slice(0, MAX_PROMPT_PREVIEW_CHARS),
+    llmModel: openAIConfig.model,
+    llmProvider: openAIConfig.provider,
+    reviewLanguage: language,
+    reviewSeverity: promptInfo.severity,
+  };
+
+  const skipReason = dryRun
+    ? 'dry-run enabled'
+    : openAIConfig.provider !== 'openai'
+      ? `provider ${openAIConfig.provider} is not supported yet`
+      : openAIConfig.apiKey
+        ? null
+        : 'OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set';
+
+  if (!skipReason) {
+    try {
+      const output = await callOpenAI({
+        prompt: promptInfo.prompt,
+        apiKey: openAIConfig.apiKey,
+        model: openAIConfig.model,
+        endpoint: openAIConfig.endpoint,
+        temperature: openAIConfig.temperature,
+        maxTokens: openAIConfig.maxTokens,
+        systemMessage: buildSystemMessage(language),
+      });
+      debug.rawLlmOutput = output;
+      const parsed = parseLineComments(output);
+      if (parsed !== null) {
+        const redacted = parsed.map((c) => ({ ...c, message: redactSecrets(c.message) }));
+        const checks = redacted.map((c) => validateFindingMessage(c.message));
+        const invalidCount = checks.filter((c) => !c.ok).length;
+        if (invalidCount === 0) {
+          comments = redacted;
+          debug.llmUsed = true;
+        } else {
+          debug.llmUsed = false;
+          debug.llmError = `LLM findings violate required format (invalidCount=${invalidCount}). Falling back.`;
+        }
+      } else {
+        debug.llmUsed = false;
+        debug.llmError = 'LLM output could not be parsed';
+      }
+    } catch (err) {
+      debug.llmUsed = false;
+      debug.llmError = err.message;
+    }
+  } else {
+    debug.llmUsed = false;
+    debug.llmSkipped = skipReason;
+  }
+
+  if (!comments.length) {
+    const heuristic = (0,heuristic_review/* buildHeuristicComments */.zq)({ diff, plan });
+    debug.heuristicsUsed = true;
+    if (heuristic.length) {
+      comments = normalizeHeuristicComments(heuristic);
+      debug.heuristicsCount = heuristic.length;
+    } else {
+      const llmSkipReason = debug.llmSkipped || debug.llmError || null;
+      // If skipped due to missing API key, do not generate fallback warnings (user request)
+      const isMissingKey = llmSkipReason && llmSkipReason.includes('not set');
+
+      if (isMissingKey) {
+        comments = [];
+      } else {
+        comments = includeFallback ? buildFallbackComments(diff, plan, { llmSkipReason }) : [];
+      }
+      debug.heuristicsCount = 0;
+      debug.fallbackIncluded = includeFallback;
+    }
+  }
+
+  const formatChecks = comments.map((c) => ({
+    file: c.file,
+    line: c.line,
+    ...validateFindingMessage(c.message),
+  }));
+  const invalidCount = formatChecks.filter((c) => !c.ok).length;
+  debug.findingFormat = invalidCount
+    ? { ok: false, invalidCount, samples: formatChecks.filter((c) => !c.ok).slice(0, 3) }
+    : { ok: true };
+
+  debug.fileClassification = fileTypes ?? null;
+
+  // Verifier pass: filter findings that fail quality checks
+  const { verifyFinding } = await __nccwpck_require__.e(/* import() */ 209).then(__nccwpck_require__.bind(__nccwpck_require__, 1209));
+  const verifierResults = comments.map((comment) => ({
+    comment,
+    verification: verifyFinding({
+      finding: comment,
+      diff: diff.diffText,
+      skill: plan?.selected?.[0] ?? {},
+      fileTypes,
+    }),
+  }));
+
+  const verified = verifierResults.filter((r) => r.verification.verified).map((r) => r.comment);
+  const rejected = verifierResults.filter((r) => !r.verification.verified);
+
+  debug.verifierRejected = rejected.map((r) => ({
+    file: r.comment.file,
+    line: r.comment.line,
+    reasons: r.verification.reasons,
+  }));
+  debug.verifierStats = {
+    total: comments.length,
+    verified: verified.length,
+    rejected: rejected.length,
+  };
+
+  // Replace comments with verified-only set
+  comments = verified;
+
+  // Build structured findings from verified comments
+  const findings = comments.map((c, i) => {
+    const parsed = parseFindingMessage(c.message);
+    const severity = normalizeSeverity(parsed.severity);
+    const confidence =
+      parsed.confidence && ['high', 'medium', 'low'].includes(parsed.confidence)
+        ? parsed.confidence
+        : 'medium';
+    return {
+      id: `rr-${i + 1}`,
+      ruleId: c.skillId || 'unknown',
+      file: c.file,
+      lineStart: c.line ?? null,
+      lineEnd: c.line ?? null,
+      title: parsed.title || c.message.slice(0, 80),
+      message: c.message,
+      severity,
+      confidence,
+      status: /** @type {'open'} */ ('open'),
+      evidence: parsed.evidence,
+      suggestion: parsed.suggestion || null,
+    };
+  });
+
+  findings.sort((a, b) => {
+    const bA = (0,breakdown/* computeFindingBreakdown */._)(a);
+    const bB = (0,breakdown/* computeFindingBreakdown */._)(b);
+    return bB.composite - bA.composite;
+  });
+
+  const classified = (0,finding_classifier/* classifyFindings */.Z)(findings, { reviewMode: reviewMode ?? 'medium' });
+
+  return {
+    comments,
+    findings,
+    classified,
+    prompt: promptInfo.prompt,
+    promptTruncated: promptInfo.truncated,
+    llmModel: openAIConfig.model,
+    debug,
+  };
+}
+
+
+/***/ }),
+
+/***/ 7817:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   X: () => (/* binding */ determineReviewMode),
+/* harmony export */   i: () => (/* binding */ getReviewDepthConfig)
+/* harmony export */ });
+/**
+ * Determine review mode based on diff metadata.
+ *
+ * @param {{ fileCount: number, changedLines: number, hasMigrations: boolean, hasSchemas: boolean }} diffMeta
+ * @param {object} [options]
+ * @returns {'tiny' | 'medium' | 'large'}
+ */
+function determineReviewMode(diffMeta, options = {}) {
+  const { fileCount, changedLines, hasMigrations, hasSchemas } = diffMeta;
+
+  let mode;
+  if (fileCount <= 3 && changedLines <= 100) {
+    mode = 'tiny';
+  } else if (fileCount > 20 || changedLines > 800) {
+    mode = 'large';
+  } else {
+    mode = 'medium';
+  }
+
+  if (hasMigrations || hasSchemas) {
+    if (mode === 'tiny') mode = 'medium';
+    else if (mode === 'medium') mode = 'large';
+  }
+
+  return mode;
+}
+
+/**
+ * Get review depth configuration for the given mode.
+ *
+ * @param {'tiny' | 'medium' | 'large'} reviewMode
+ * @returns {{ maxFindings: number, focusHint: string }}
+ */
+function getReviewDepthConfig(reviewMode) {
+  const configs = {
+    tiny: { maxFindings: 3, focusHint: 'This is a small PR. Focus on the most critical issues only.' },
+    medium: { maxFindings: 8, focusHint: 'Provide a balanced review covering important issues.' },
+    large: { maxFindings: 15, focusHint: 'This is a large PR. Prioritize high-severity issues over minor style concerns.' },
+  };
+  return configs[reviewMode] ?? configs.medium;
+}
+
+
+/***/ }),
+
+/***/ 2374:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  _Z: () => (/* binding */ RiskMapError),
+  lm: () => (/* binding */ evaluateRisk),
+  E$: () => (/* binding */ loadRiskMap)
+});
+
+// UNUSED EXPORTS: aggregateRiskLevel
+
+// EXTERNAL MODULE: external "node:fs/promises"
+var promises_ = __nccwpck_require__(1455);
+// EXTERNAL MODULE: external "node:path"
+var external_node_path_ = __nccwpck_require__(6760);
+// EXTERNAL MODULE: ../../../node_modules/js-yaml/dist/js-yaml.mjs
+var js_yaml = __nccwpck_require__(1813);
+// EXTERNAL MODULE: ../../../node_modules/minimatch/dist/esm/index.js + 7 modules
+var esm = __nccwpck_require__(9061);
+// EXTERNAL MODULE: ../../../node_modules/zod/v4/classic/external.js + 73 modules
+var external = __nccwpck_require__(8367);
+;// CONCATENATED MODULE: ./src/config/risk-map-schema.mjs
+
+
+const RiskActionSchema = external/* enum */.k5n(['comment_only', 'escalate', 'require_human_review']);
+
+const RiskRuleSchema = external/* object */.Ikc({
+  pattern: external/* string */.YjP().min(1),
+  action: RiskActionSchema,
+  reason: external/* string */.YjP().optional(),
+});
+
+const RiskMapSchema = external/* object */.Ikc({
+  version: external/* string */.YjP().default('1'),
+  rules: external/* array */.YOg(RiskRuleSchema).min(1),
+  defaults: external/* object */.Ikc({
+      action: RiskActionSchema.default('comment_only'),
+    })
+    .default({ action: 'comment_only' }),
+});
+
+;// CONCATENATED MODULE: ./src/lib/risk-map.mjs
+
+
+
+
+
+
+const DEFAULT_RISK_MAP_PATH = external_node_path_.join('.river', 'risk-map.yaml');
+
+class RiskMapError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'RiskMapError';
+  }
+}
+
+/**
+ * Load a risk map from .river/risk-map.yaml (or a custom path).
+ * Missing files are treated as "no risk map" without error.
+ * @param {string} repoRoot
+ * @param {{ riskMapPath?: string }} [options]
+ * @returns {Promise<import('../../schemas/risk-map.schema.json') | null>}
+ */
+async function loadRiskMap(repoRoot, options = {}) {
+  const repoRootAbs = external_node_path_.resolve(repoRoot);
+  const relativePath = options.riskMapPath ?? DEFAULT_RISK_MAP_PATH;
+  const fullPath = external_node_path_.resolve(repoRootAbs, relativePath);
+
+  if (!fullPath.startsWith(repoRootAbs + external_node_path_.sep) && fullPath !== repoRootAbs) {
+    throw new RiskMapError(`Risk map path is outside of the repository: ${relativePath}`);
+  }
+
+  let raw;
+  try {
+    raw = await promises_.readFile(fullPath, 'utf8');
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return null;
+    }
+    throw new RiskMapError(`Failed to read risk map at ${fullPath}: ${error.message}`);
+  }
+
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  let parsed;
+  try {
+    parsed = js_yaml/* default.load */.Ay.load(trimmed);
+  } catch (error) {
+    throw new RiskMapError(`Failed to parse risk map YAML: ${error.message}`);
+  }
+
+  const result = RiskMapSchema.safeParse(parsed);
+  if (!result.success) {
+    const issues = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
+    throw new RiskMapError(`Invalid risk map schema: ${issues}`);
+  }
+
+  return result.data;
+}
+
+const ACTION_PRIORITY = {
+  comment_only: 0,
+  escalate: 1,
+  require_human_review: 2,
+};
+
+/**
+ * Evaluate risk for a list of changed files against a risk map.
+ * First matching rule wins per file.
+ * @param {object} riskMap - Parsed risk map config
+ * @param {string[]} filePaths - List of changed file paths
+ * @returns {{ fileRisks: Array<{ file: string, action: string, rule?: object }>, aggregateAction: string, escalatedFiles: string[], humanReviewFiles: string[] }}
+ */
+function evaluateRisk(riskMap, filePaths) {
+  if (!riskMap || !filePaths?.length) {
+    return {
+      fileRisks: [],
+      aggregateAction: riskMap?.defaults?.action ?? 'comment_only',
+      escalatedFiles: [],
+      humanReviewFiles: [],
+    };
+  }
+
+  const defaultAction = riskMap.defaults?.action ?? 'comment_only';
+  const fileRisks = [];
+
+  for (const file of filePaths) {
+    let matched = false;
+    for (const rule of riskMap.rules) {
+      if ((0,esm/* minimatch */.xF)(file, rule.pattern, { dot: true })) {
+        fileRisks.push({
+          file,
+          action: rule.action,
+          rule: { pattern: rule.pattern, reason: rule.reason },
+        });
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      fileRisks.push({ file, action: defaultAction });
+    }
+  }
+
+  const escalatedFiles = fileRisks
+    .filter((r) => r.action === 'escalate')
+    .map((r) => r.file);
+  const humanReviewFiles = fileRisks
+    .filter((r) => r.action === 'require_human_review')
+    .map((r) => r.file);
+  const aggregateAction = aggregateRiskLevel(fileRisks, defaultAction);
+
+  return { fileRisks, aggregateAction, escalatedFiles, humanReviewFiles };
+}
+
+/**
+ * Aggregate to the highest risk action across all file risks.
+ * @param {Array<{ action: string }>} fileRisks
+ * @param {string} [fallback='comment_only']
+ * @returns {string}
+ */
+function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
+  if (!fileRisks?.length) return fallback;
+
+  let maxPriority = -1;
+  let maxAction = fallback;
+  for (const { action } of fileRisks) {
+    const priority = ACTION_PRIORITY[action] ?? 0;
+    if (priority > maxPriority) {
+      maxPriority = priority;
+      maxAction = action;
+    }
+  }
+  return maxAction;
+}
+
+
+/***/ }),
+
+/***/ 3926:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   _: () => (/* binding */ computeFindingBreakdown)
+/* harmony export */ });
+function computeEvidenceStrength(finding) {
+  const evidence = finding.evidence;
+  if (!Array.isArray(evidence) || evidence.length === 0) return 0.0;
+  const totalChars = evidence.reduce((sum, e) => sum + String(e ?? '').length, 0);
+  if (totalChars === 0) return 0.0;
+  if (totalChars <= 50) return 0.3;
+  if (totalChars <= 150) return 0.6;
+  return 1.0;
+}
+
+function computeReproducibility(finding) {
+  const confidence = finding.confidence ?? 'medium';
+  const severity = finding.severity ?? 'info';
+
+  let base;
+  if (confidence === 'high') base = 1.0;
+  else if (confidence === 'medium') base = 0.5;
+  else base = 0.2;
+
+  if (severity === 'critical') base = Math.min(1.0, base + 0.2);
+  if (severity === 'minor') base = Math.max(0.0, base - 0.1);
+
+  return base;
+}
+
+function computeBlastRadius(finding) {
+  const severity = finding.severity ?? 'info';
+  const ruleId = String(finding.ruleId ?? '');
+
+  let base;
+  if (severity === 'critical') base = 1.0;
+  else if (severity === 'major') base = 0.7;
+  else if (severity === 'minor') base = 0.3;
+  else base = 0.1;
+
+  if (ruleId.includes('security')) base = Math.min(1.0, base * 1.2);
+
+  return base;
+}
+
+function computeReviewerAgreement(finding) {
+  const confidence = finding.confidence ?? 'medium';
+  if (confidence === 'high') return 0.9;
+  if (confidence === 'medium') return 0.7;
+  return 0.4;
+}
+
+/**
+ * Compute a 4-axis score breakdown for a single finding.
+ *
+ * @param {{
+ *   evidence?: string[],
+ *   confidence?: 'high' | 'medium' | 'low',
+ *   severity?: string,
+ *   ruleId?: string,
+ * }} finding
+ * @returns {{
+ *   evidenceStrength: number,
+ *   reproducibility: number,
+ *   blastRadius: number,
+ *   reviewerAgreement: number,
+ *   composite: number,
+ * }}
+ */
+function computeFindingBreakdown(finding) {
+  const evidenceStrength = computeEvidenceStrength(finding);
+  const reproducibility = computeReproducibility(finding);
+  const blastRadius = computeBlastRadius(finding);
+  const reviewerAgreement = computeReviewerAgreement(finding);
+  const composite =
+    evidenceStrength * 0.3 +
+    reproducibility * 0.25 +
+    blastRadius * 0.3 +
+    reviewerAgreement * 0.15;
+  return { evidenceStrength, reproducibility, blastRadius, reviewerAgreement, composite };
+}
+
+
+/***/ }),
+
+/***/ 6899:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   lS: () => (/* binding */ scoreReview),
+/* harmony export */   w8: () => (/* binding */ classifyAxis)
+/* harmony export */ });
+/* unused harmony exports computeAxisScores, computeOverallScore, countBySeverity, deriveVerdict */
+/* harmony import */ var _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(5486);
+/* harmony import */ var _breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3926);
+/**
+ * Review scoring engine.
+ *
+ * Deterministic (no AI): derives axis scores, overall score, and verdict from
+ * structured findings. Inspired by unilabo/site-management-system's scoring
+ * rubric, adapted to river-reviewer's HITL-first posture.
+ *
+ * The output is always flagged `derived: true` to signal that this is a
+ * heuristic indicator, not an authoritative quality metric.
+ */
+
+
+
+
+/**
+ * Classify a finding into one of the 5 axes based on its ruleId.
+ * Falls back to `maintainability` when no pattern matches.
+ *
+ * @param {{ ruleId?: string, category?: string }} finding
+ * @returns {typeof AXES[number]}
+ */
+function classifyAxis(finding) {
+  if (finding?.category && _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXES */ .gR.includes(finding.category)) {
+    return finding.category;
+  }
+  const ruleId = finding?.ruleId ?? '';
+  for (const { axis, pattern } of _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXIS_PATTERNS */ .SZ) {
+    if (pattern.test(ruleId)) return axis;
+  }
+  return 'maintainability';
+}
+
+/**
+ * Compute axis scores from findings.
+ *
+ * @param {Array<{severity: string, ruleId?: string, category?: string}>} findings
+ * @param {object} [options]
+ * @param {object} [options.deductions] - Override default deduction table.
+ * @returns {Record<typeof AXES[number], number>}
+ */
+function computeAxisScores(findings, options = {}) {
+  const deductions = options.deductions ?? _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .DEFAULT_DEDUCTIONS */ .Fh;
+  const scores = Object.fromEntries(_rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXES */ .gR.map((a) => [a, 100]));
+
+  for (const finding of findings ?? []) {
+    const axis = classifyAxis(finding);
+    const severity = normalizeSeverity(finding.severity);
+    const deduction = deductions[axis]?.[severity] ?? 0;
+    scores[axis] = Math.max(0, scores[axis] - deduction);
+  }
+
+  return scores;
+}
+
+/**
+ * Compute overall score as the mean of axis scores.
+ *
+ * @param {Record<typeof AXES[number], number>} axisScores
+ * @returns {number}
+ */
+function computeOverallScore(axisScores) {
+  const values = _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXES */ .gR.map((a) => axisScores[a] ?? 100);
+  const sum = values.reduce((a, b) => a + b, 0);
+  return Math.round(sum / values.length);
+}
+
+/**
+ * Count findings per severity.
+ *
+ * @param {Array<{severity: string}>} findings
+ * @returns {{critical: number, major: number, minor: number, info: number}}
+ */
+function countBySeverity(findings) {
+  const counts = { critical: 0, major: 0, minor: 0, info: 0 };
+  for (const f of findings ?? []) {
+    const s = normalizeSeverity(f.severity);
+    counts[s]++;
+  }
+  return counts;
+}
+
+/**
+ * Derive verdict from overall score, axis scores, and severity counts.
+ *
+ * Return values:
+ * - `auto-approve`: Recommendation only; does NOT bypass HITL policy.
+ * - `human-review-recommended`: Notable findings but not blocking.
+ * - `human-review-required`: Critical findings or very low score.
+ *
+ * @param {{overall: number, axes: Record<string, number>, counts: object}} args
+ * @returns {'auto-approve' | 'human-review-recommended' | 'human-review-required'}
+ */
+function deriveVerdict({ overall, axes, counts }) {
+  const t = _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .VERDICT_THRESHOLDS */ .n;
+
+  if (counts.critical > t.humanReviewRecommended.maxCritical) {
+    return 'human-review-required';
+  }
+  if (overall < t.humanReviewRecommended.minOverall) {
+    return 'human-review-required';
+  }
+  if (
+    overall >= t.autoApprove.minOverall &&
+    (axes.security ?? 100) >= t.autoApprove.minSecurity &&
+    counts.critical <= t.autoApprove.maxCritical &&
+    counts.major <= t.autoApprove.maxMajor
+  ) {
+    return 'auto-approve';
+  }
+  return 'human-review-recommended';
+}
+
+/**
+ * Complete scoring entry point.
+ *
+ * @param {Array<object>} findings - Findings with at least `severity` and `ruleId`.
+ * @returns {{
+ *   overall: number,
+ *   axes: Record<typeof AXES[number], number>,
+ *   verdict: string,
+ *   counts: {critical: number, major: number, minor: number, info: number},
+ *   findingBreakdowns: Array<{id: string, evidenceStrength: number, reproducibility: number, blastRadius: number, reviewerAgreement: number, composite: number}>,
+ *   derived: true,
+ * }}
+ */
+function scoreReview(findings) {
+  const axes = computeAxisScores(findings);
+  const overall = computeOverallScore(axes);
+  const counts = countBySeverity(findings);
+  const verdict = deriveVerdict({ overall, axes, counts });
+  const findingBreakdowns = (findings ?? []).map((f) => ({ id: f.id, ...(0,_breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__/* .computeFindingBreakdown */ ._)(f) }));
+  return { overall, axes, verdict, counts, findingBreakdowns, derived: true };
+}
+
+/**
+ * Normalize severity to the canonical vocabulary used by the scoring engine.
+ * Accepts both the output schema values (critical/major/minor/info) and
+ * internal values (blocker/warning/nit) via fall-through.
+ *
+ * @param {string} severity
+ * @returns {'critical' | 'major' | 'minor' | 'info'}
+ */
+function normalizeSeverity(severity) {
+  const s = String(severity ?? '')
+    .toLowerCase()
+    .trim();
+  if (s === 'critical' || s === 'blocker') return 'critical';
+  if (s === 'major' || s === 'warning') return 'major';
+  if (s === 'minor' || s === 'nit') return 'minor';
+  return 'info';
+}
+
+
+/***/ }),
+
+/***/ 5486:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   Fh: () => (/* binding */ DEFAULT_DEDUCTIONS),
+/* harmony export */   SZ: () => (/* binding */ AXIS_PATTERNS),
+/* harmony export */   Sf: () => (/* binding */ AXIS_LABELS_JA),
+/* harmony export */   gR: () => (/* binding */ AXES),
+/* harmony export */   n: () => (/* binding */ VERDICT_THRESHOLDS)
+/* harmony export */ });
+/**
+ * Default scoring rubric for deterministic review scoring.
+ *
+ * Derived from unilabo/site-management-system's review-prompt.md, adapted to
+ * river-reviewer's skill taxonomy. Scores are **derived from finding severity
+ * and axis**, not AI-generated. See docs/review/scoring-model.md for rationale.
+ */
+
+const AXES = /** @type {const} */ ([
+  'readability',
+  'extensibility',
+  'performance',
+  'security',
+  'maintainability',
+]);
+
+const AXIS_LABELS_JA = {
+  readability: '可読性',
+  extensibility: '拡張性',
+  performance: 'パフォーマンス',
+  security: 'セキュリティ',
+  maintainability: '保守性',
+};
+
+/**
+ * Regex patterns mapping ruleId to axis. First match wins.
+ * Falls back to `maintainability` when no pattern matches.
+ *
+ * Patterns use a leading `\b` to anchor at word boundary, but intentionally
+ * omit a trailing `\b` so that keyword prefixes match extended identifiers
+ * (e.g. `depend` matches `dependency`, `read` matches `readability`).
+ */
+const AXIS_PATTERNS = [
+  {
+    axis: 'security',
+    pattern: /\b(sec|security|auth|authz|authn|injection|xss|csrf|crypto)/i,
+  },
+  {
+    axis: 'performance',
+    pattern: /\b(perf|performance|n-?plus-?one|n1\b|slow|query|memory)/i,
+  },
+  {
+    axis: 'extensibility',
+    pattern: /\b(arch|architecture|depend|layer|fat|coupling|boundary)/i,
+  },
+  {
+    axis: 'readability',
+    pattern: /\b(read|readability|naming|complexity|style|clarity)/i,
+  },
+  {
+    axis: 'maintainability',
+    pattern: /\b(test|coverage|maint|maintainability|doc|comment)/i,
+  },
+];
+
+/**
+ * Default deduction table.
+ * Per-severity deductions per axis. Security is penalized more heavily.
+ */
+const DEFAULT_DEDUCTIONS = {
+  security: { critical: 50, major: 30, minor: 15, info: 5 },
+  readability: { critical: 30, major: 20, minor: 10, info: 3 },
+  extensibility: { critical: 30, major: 20, minor: 10, info: 3 },
+  performance: { critical: 30, major: 20, minor: 10, info: 3 },
+  maintainability: { critical: 30, major: 20, minor: 10, info: 3 },
+};
+
+/**
+ * Verdict thresholds (display only; HITL-respecting).
+ *
+ * `auto-approve` is a recommendation for automation (e.g. CI bot), NOT a policy
+ * to merge without human review. river-reviewer remains HITL-first.
+ */
+const VERDICT_THRESHOLDS = {
+  autoApprove: {
+    minOverall: 90,
+    minSecurity: 95,
+    maxCritical: 0,
+    maxMajor: 0,
+  },
+  humanReviewRecommended: {
+    minOverall: 70,
+    maxCritical: 0,
+  },
+  // below humanReviewRecommended threshold -> humanReviewRequired
+};
+
+
+/***/ }),
+
+/***/ 1813:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
@@ -16596,7 +20870,7 @@ var jsYaml = {
 
 /***/ }),
 
-/***/ 9519:
+/***/ 9061:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -16607,7 +20881,7 @@ __nccwpck_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: AST, GLOBSTAR, Minimatch, braceExpand, defaults, escape, filter, makeRe, match, sep, unescape
 
-;// CONCATENATED MODULE: ./node_modules/minimatch/node_modules/balanced-match/dist/esm/index.js
+;// CONCATENATED MODULE: ../../../node_modules/minimatch/node_modules/balanced-match/dist/esm/index.js
 const balanced = (a, b, str) => {
     const ma = a instanceof RegExp ? maybeMatch(a, str) : a;
     const mb = b instanceof RegExp ? maybeMatch(b, str) : b;
@@ -16662,7 +20936,7 @@ const range = (a, b, str) => {
     return result;
 };
 //# sourceMappingURL=index.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/node_modules/brace-expansion/dist/esm/index.js
+;// CONCATENATED MODULE: ../../../node_modules/minimatch/node_modules/brace-expansion/dist/esm/index.js
 
 const escSlash = '\0SLASH' + Math.random() + '\0';
 const escOpen = '\0OPEN' + Math.random() + '\0';
@@ -16860,7 +21134,7 @@ function expand_(str, max, isTop) {
     return expansions;
 }
 //# sourceMappingURL=index.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/assert-valid-pattern.js
+;// CONCATENATED MODULE: ../../../node_modules/minimatch/dist/esm/assert-valid-pattern.js
 const MAX_PATTERN_LENGTH = 1024 * 64;
 const assertValidPattern = (pattern) => {
     if (typeof pattern !== 'string') {
@@ -16871,7 +21145,7 @@ const assertValidPattern = (pattern) => {
     }
 };
 //# sourceMappingURL=assert-valid-pattern.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/brace-expressions.js
+;// CONCATENATED MODULE: ../../../node_modules/minimatch/dist/esm/brace-expressions.js
 // translate the various posix character classes into unicode properties
 // this works across all unicode locales
 // { <posix class>: [<translation>, /u flag required, negated]
@@ -17018,7 +21292,7 @@ const parseClass = (glob, position) => {
     return [comb, uflag, endPos - pos, true];
 };
 //# sourceMappingURL=brace-expressions.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/unescape.js
+;// CONCATENATED MODULE: ../../../node_modules/minimatch/dist/esm/unescape.js
 /**
  * Un-escape a string that has been escaped with {@link escape}.
  *
@@ -17053,7 +21327,7 @@ const unescape_unescape = (s, { windowsPathsNoEscape = false, magicalBraces = tr
             .replace(/\\([^/{}])/g, '$1');
 };
 //# sourceMappingURL=unescape.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/ast.js
+;// CONCATENATED MODULE: ../../../node_modules/minimatch/dist/esm/ast.js
 // parse a single path portion
 var _a;
 
@@ -17895,7 +22169,7 @@ class AST {
 }
 _a = AST;
 //# sourceMappingURL=ast.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/escape.js
+;// CONCATENATED MODULE: ../../../node_modules/minimatch/dist/esm/escape.js
 /**
  * Escape all magic characters in a glob pattern.
  *
@@ -17922,7 +22196,7 @@ const escape_escape = (s, { windowsPathsNoEscape = false, magicalBraces = false,
         : s.replace(/[?*()[\]\\]/g, '\\$&');
 };
 //# sourceMappingURL=escape.js.map
-;// CONCATENATED MODULE: ./node_modules/minimatch/dist/esm/index.js
+;// CONCATENATED MODULE: ../../../node_modules/minimatch/dist/esm/index.js
 
 
 
@@ -19040,7 +23314,7 @@ minimatch.unescape = unescape_unescape;
 
 /***/ }),
 
-/***/ 3905:
+/***/ 8367:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -19056,7 +23330,7 @@ __nccwpck_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: $brand, $input, $output, NEVER, TimePrecision, ZodAny, ZodArray, ZodBase64, ZodBase64URL, ZodBigInt, ZodBigIntFormat, ZodBoolean, ZodCIDRv4, ZodCIDRv6, ZodCUID, ZodCUID2, ZodCatch, ZodCodec, ZodCustom, ZodCustomStringFormat, ZodDate, ZodDefault, ZodDiscriminatedUnion, ZodE164, ZodEmail, ZodEmoji, ZodEnum, ZodError, ZodExactOptional, ZodFile, ZodFirstPartyTypeKind, ZodFunction, ZodGUID, ZodIPv4, ZodIPv6, ZodISODate, ZodISODateTime, ZodISODuration, ZodISOTime, ZodIntersection, ZodIssueCode, ZodJWT, ZodKSUID, ZodLazy, ZodLiteral, ZodMAC, ZodMap, ZodNaN, ZodNanoID, ZodNever, ZodNonOptional, ZodNull, ZodNullable, ZodNumber, ZodNumberFormat, ZodObject, ZodOptional, ZodPipe, ZodPrefault, ZodPromise, ZodReadonly, ZodRealError, ZodRecord, ZodSet, ZodString, ZodStringFormat, ZodSuccess, ZodSymbol, ZodTemplateLiteral, ZodTransform, ZodTuple, ZodType, ZodULID, ZodURL, ZodUUID, ZodUndefined, ZodUnion, ZodUnknown, ZodVoid, ZodXID, ZodXor, _ZodString, _default, _function, any, base64, base64url, bigint, boolean, catch, check, cidrv4, cidrv6, clone, codec, coerce, config, core, cuid, cuid2, custom, date, decode, decodeAsync, describe, discriminatedUnion, e164, email, emoji, encode, encodeAsync, endsWith, exactOptional, file, flattenError, float32, float64, formatError, fromJSONSchema, function, getErrorMap, globalRegistry, gt, gte, guid, hash, hex, hostname, httpUrl, includes, instanceof, int, int32, int64, intersection, ipv4, ipv6, iso, json, jwt, keyof, ksuid, lazy, length, literal, locales, looseObject, looseRecord, lowercase, lt, lte, mac, map, maxLength, maxSize, meta, mime, minLength, minSize, multipleOf, nan, nanoid, nativeEnum, negative, never, nonnegative, nonoptional, nonpositive, normalize, null, nullable, nullish, optional, overwrite, parse, parseAsync, partialRecord, pipe, positive, prefault, preprocess, prettifyError, promise, property, readonly, record, refine, regex, regexes, registry, safeDecode, safeDecodeAsync, safeEncode, safeEncodeAsync, safeParse, safeParseAsync, set, setErrorMap, size, slugify, startsWith, strictObject, stringFormat, stringbool, success, superRefine, symbol, templateLiteral, toJSONSchema, toLowerCase, toUpperCase, transform, treeifyError, trim, tuple, uint32, uint64, ulid, undefined, union, uppercase, url, util, uuid, uuidv4, uuidv6, uuidv7, void, xid, xor
 
-// NAMESPACE OBJECT: ./node_modules/zod/v4/core/regexes.js
+// NAMESPACE OBJECT: ../../../node_modules/zod/v4/core/regexes.js
 var regexes_namespaceObject = {};
 __nccwpck_require__.r(regexes_namespaceObject);
 __nccwpck_require__.d(regexes_namespaceObject, {
@@ -19120,7 +23394,7 @@ __nccwpck_require__.d(regexes_namespaceObject, {
   xid: () => (xid)
 });
 
-// NAMESPACE OBJECT: ./node_modules/zod/v4/classic/checks.js
+// NAMESPACE OBJECT: ../../../node_modules/zod/v4/classic/checks.js
 var classic_checks_namespaceObject = {};
 __nccwpck_require__.r(classic_checks_namespaceObject);
 __nccwpck_require__.d(classic_checks_namespaceObject, {
@@ -19155,7 +23429,7 @@ __nccwpck_require__.d(classic_checks_namespaceObject, {
   uppercase: () => (_uppercase)
 });
 
-// NAMESPACE OBJECT: ./node_modules/zod/v4/classic/iso.js
+// NAMESPACE OBJECT: ../../../node_modules/zod/v4/classic/iso.js
 var iso_namespaceObject = {};
 __nccwpck_require__.r(iso_namespaceObject);
 __nccwpck_require__.d(iso_namespaceObject, {
@@ -19169,7 +23443,7 @@ __nccwpck_require__.d(iso_namespaceObject, {
   time: () => (iso_time)
 });
 
-// NAMESPACE OBJECT: ./node_modules/zod/v4/classic/schemas.js
+// NAMESPACE OBJECT: ../../../node_modules/zod/v4/classic/schemas.js
 var classic_schemas_namespaceObject = {};
 __nccwpck_require__.r(classic_schemas_namespaceObject);
 __nccwpck_require__.d(classic_schemas_namespaceObject, {
@@ -19339,7 +23613,7 @@ __nccwpck_require__.d(classic_schemas_namespaceObject, {
   xor: () => (xor)
 });
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/core.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/core.js
 /** A special constant with type `never` */
 const NEVER = Object.freeze({
     status: "aborted",
@@ -19417,7 +23691,7 @@ function config(newConfig) {
     return globalConfig;
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/util.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/util.js
 // functions
 function assertEqual(val) {
     return val;
@@ -20070,7 +24344,7 @@ class Class {
     constructor(..._args) { }
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/errors.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/errors.js
 
 
 const initializer = (inst, def) => {
@@ -20254,7 +24528,7 @@ function prettifyError(error) {
     return lines.join("\n");
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/parse.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/parse.js
 
 
 
@@ -20349,7 +24623,7 @@ const _safeDecodeAsync = (_Err) => async (schema, value, _ctx) => {
 };
 const safeDecodeAsync = /* @__PURE__*/ _safeDecodeAsync($ZodRealError);
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/regexes.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/regexes.js
 
 const cuid = /^[cC][^\s-]{8,}$/;
 const cuid2 = /^[0-9a-z]+$/;
@@ -20484,7 +24758,7 @@ const sha512_hex = /^[0-9a-fA-F]{128}$/;
 const sha512_base64 = /*@__PURE__*/ fixedBase64(86, "==");
 const sha512_base64url = /*@__PURE__*/ fixedBase64url(86);
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/checks.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/checks.js
 // import { $ZodType } from "./schemas.js";
 
 
@@ -21061,7 +25335,7 @@ const $ZodCheckOverwrite = /*@__PURE__*/ $constructor("$ZodCheckOverwrite", (ins
     };
 });
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/doc.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/doc.js
 class Doc {
     constructor(args = []) {
         this.content = [];
@@ -21098,14 +25372,14 @@ class Doc {
     }
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/versions.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/versions.js
 const version = {
     major: 4,
     minor: 3,
     patch: 6,
 };
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/schemas.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/schemas.js
 
 
 
@@ -23200,7 +27474,7 @@ function handleRefineResult(result, payload, input, inst) {
     }
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ar.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ar.js
 
 const error = () => {
     const Sizable = {
@@ -23308,7 +27582,7 @@ const error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/az.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/az.js
 
 const az_error = () => {
     const Sizable = {
@@ -23415,7 +27689,7 @@ const az_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/be.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/be.js
 
 function getBelarusianPlural(count, one, few, many) {
     const absCount = Math.abs(count);
@@ -23573,7 +27847,7 @@ const be_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/bg.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/bg.js
 
 const bg_error = () => {
     const Sizable = {
@@ -23695,7 +27969,7 @@ const bg_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ca.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ca.js
 
 const ca_error = () => {
     const Sizable = {
@@ -23804,7 +28078,7 @@ const ca_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/cs.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/cs.js
 
 const cs_error = () => {
     const Sizable = {
@@ -23917,7 +28191,7 @@ const cs_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/da.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/da.js
 
 const da_error = () => {
     const Sizable = {
@@ -24034,7 +28308,7 @@ const da_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/de.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/de.js
 
 const de_error = () => {
     const Sizable = {
@@ -24144,7 +28418,7 @@ const de_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/en.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/en.js
 
 const en_error = () => {
     const Sizable = {
@@ -24255,7 +28529,7 @@ const en_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/eo.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/eo.js
 
 const eo_error = () => {
     const Sizable = {
@@ -24366,7 +28640,7 @@ const eo_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/es.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/es.js
 
 const es_error = () => {
     const Sizable = {
@@ -24500,7 +28774,7 @@ const es_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/fa.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/fa.js
 
 const fa_error = () => {
     const Sizable = {
@@ -24616,7 +28890,7 @@ const fa_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/fi.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/fi.js
 
 const fi_error = () => {
     const Sizable = {
@@ -24730,7 +29004,7 @@ const fi_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/fr.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/fr.js
 
 const fr_error = () => {
     const Sizable = {
@@ -24840,7 +29114,7 @@ const fr_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/fr-CA.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/fr-CA.js
 
 const fr_CA_error = () => {
     const Sizable = {
@@ -24949,7 +29223,7 @@ const fr_CA_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/he.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/he.js
 
 const he_error = () => {
     // Hebrew labels + grammatical gender
@@ -25165,7 +29439,7 @@ const he_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/hu.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/hu.js
 
 const hu_error = () => {
     const Sizable = {
@@ -25275,7 +29549,7 @@ const hu_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/hy.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/hy.js
 
 function getArmenianPlural(count, one, many) {
     return Math.abs(count) === 1 ? one : many;
@@ -25424,7 +29698,7 @@ const hy_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/id.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/id.js
 
 const id_error = () => {
     const Sizable = {
@@ -25532,7 +29806,7 @@ const id_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/is.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/is.js
 
 const is_error = () => {
     const Sizable = {
@@ -25643,7 +29917,7 @@ const is_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/it.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/it.js
 
 const it_error = () => {
     const Sizable = {
@@ -25753,7 +30027,7 @@ const it_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ja.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ja.js
 
 const ja_error = () => {
     const Sizable = {
@@ -25862,7 +30136,7 @@ const ja_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ka.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ka.js
 
 const ka_error = () => {
     const Sizable = {
@@ -25976,7 +30250,7 @@ const ka_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/km.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/km.js
 
 const km_error = () => {
     const Sizable = {
@@ -26088,14 +30362,14 @@ const km_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/kh.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/kh.js
 
 /** @deprecated Use `km` instead. */
 /* harmony default export */ function kh() {
     return km();
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ko.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ko.js
 
 const ko_error = () => {
     const Sizable = {
@@ -26208,7 +30482,7 @@ const ko_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/lt.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/lt.js
 
 const capitalizeFirstCharacter = (text) => {
     return text.charAt(0).toUpperCase() + text.slice(1);
@@ -26413,7 +30687,7 @@ const lt_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/mk.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/mk.js
 
 const mk_error = () => {
     const Sizable = {
@@ -26524,7 +30798,7 @@ const mk_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ms.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ms.js
 
 const ms_error = () => {
     const Sizable = {
@@ -26633,7 +30907,7 @@ const ms_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/nl.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/nl.js
 
 const nl_error = () => {
     const Sizable = {
@@ -26745,7 +31019,7 @@ const nl_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/no.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/no.js
 
 const no_error = () => {
     const Sizable = {
@@ -26855,7 +31129,7 @@ const no_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ota.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ota.js
 
 const ota_error = () => {
     const Sizable = {
@@ -26966,7 +31240,7 @@ const ota_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ps.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ps.js
 
 const ps_error = () => {
     const Sizable = {
@@ -27082,7 +31356,7 @@ const ps_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/pl.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/pl.js
 
 const pl_error = () => {
     const Sizable = {
@@ -27193,7 +31467,7 @@ const pl_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/pt.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/pt.js
 
 const pt_error = () => {
     const Sizable = {
@@ -27303,7 +31577,7 @@ const pt_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ru.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ru.js
 
 function getRussianPlural(count, one, few, many) {
     const absCount = Math.abs(count);
@@ -27461,7 +31735,7 @@ const ru_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/sl.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/sl.js
 
 const sl_error = () => {
     const Sizable = {
@@ -27572,7 +31846,7 @@ const sl_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/sv.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/sv.js
 
 const sv_error = () => {
     const Sizable = {
@@ -27684,7 +31958,7 @@ const sv_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ta.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ta.js
 
 const ta_error = () => {
     const Sizable = {
@@ -27796,7 +32070,7 @@ const ta_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/th.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/th.js
 
 const th_error = () => {
     const Sizable = {
@@ -27908,7 +32182,7 @@ const th_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/tr.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/tr.js
 
 const tr_error = () => {
     const Sizable = {
@@ -28015,7 +32289,7 @@ const tr_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/uk.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/uk.js
 
 const uk_error = () => {
     const Sizable = {
@@ -28125,14 +32399,14 @@ const uk_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ua.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ua.js
 
 /** @deprecated Use `uk` instead. */
 /* harmony default export */ function ua() {
     return uk();
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/ur.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/ur.js
 
 const ur_error = () => {
     const Sizable = {
@@ -28244,7 +32518,7 @@ const ur_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/uz.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/uz.js
 
 const uz_error = () => {
     const Sizable = {
@@ -28355,7 +32629,7 @@ const uz_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/vi.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/vi.js
 
 const vi_error = () => {
     const Sizable = {
@@ -28465,7 +32739,7 @@ const vi_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/zh-CN.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/zh-CN.js
 
 const zh_CN_error = () => {
     const Sizable = {
@@ -28576,7 +32850,7 @@ const zh_CN_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/zh-TW.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/zh-TW.js
 
 const zh_TW_error = () => {
     const Sizable = {
@@ -28685,7 +32959,7 @@ const zh_TW_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/yo.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/yo.js
 
 const yo_error = () => {
     const Sizable = {
@@ -28794,7 +33068,7 @@ const yo_error = () => {
     };
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/locales/index.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/locales/index.js
 
 
 
@@ -28845,7 +33119,7 @@ const yo_error = () => {
 
 
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/registries.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/registries.js
 var _a;
 const $output = Symbol("ZodOutput");
 const $input = Symbol("ZodInput");
@@ -28898,7 +33172,7 @@ function registry() {
 (_a = globalThis).__zod_globalRegistry ?? (_a.__zod_globalRegistry = registry());
 const registries_globalRegistry = globalThis.__zod_globalRegistry;
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/api.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/api.js
 
 
 
@@ -29978,7 +34252,7 @@ function _stringFormat(Class, format, fnOrRegex, _params = {}) {
     return inst;
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/to-json-schema.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/to-json-schema.js
 
 // function initializeContext<T extends schemas.$ZodType>(inputs: JSONSchemaGeneratorParams<T>): ToJSONSchemaContext<T> {
 //   return {
@@ -30417,7 +34691,7 @@ const createStandardJSONSchemaMethod = (schema, io, processors = {}) => (params)
     return to_json_schema_finalize(ctx, schema);
 };
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/json-schema-processors.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/json-schema-processors.js
 
 
 const formatMap = {
@@ -31024,7 +35298,7 @@ function toJSONSchema(input, params) {
     return finalize(ctx, input);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/json-schema-generator.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/json-schema-generator.js
 
 
 /**
@@ -31121,7 +35395,7 @@ class JSONSchemaGenerator {
     }
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/core/index.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/core/index.js
 
 
 
@@ -31139,10 +35413,10 @@ class JSONSchemaGenerator {
 
 
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/checks.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/classic/checks.js
 
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/iso.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/classic/iso.js
 
 
 const ZodISODateTime = /*@__PURE__*/ $constructor("ZodISODateTime", (inst, def) => {
@@ -31174,7 +35448,7 @@ function iso_duration(params) {
     return _isoDuration(ZodISODuration, params);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/errors.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/classic/errors.js
 
 
 
@@ -31224,7 +35498,7 @@ const ZodRealError = $constructor("ZodError", errors_initializer, {
 // /** @deprecated Use `z.core.$ZodErrorMapCtx` instead. */
 // export type ErrorMapCtx = core.$ZodErrorMapCtx;
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/parse.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/classic/parse.js
 
 
 const parse_parse = /* @__PURE__ */ _parse(ZodRealError);
@@ -31241,7 +35515,7 @@ const parse_safeDecode = /* @__PURE__ */ _safeDecode(ZodRealError);
 const parse_safeEncodeAsync = /* @__PURE__ */ _safeEncodeAsync(ZodRealError);
 const parse_safeDecodeAsync = /* @__PURE__ */ _safeDecodeAsync(ZodRealError);
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/schemas.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/classic/schemas.js
 
 
 
@@ -32400,7 +36674,7 @@ function preprocess(fn, schema) {
     return pipe(transform(fn), schema);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/compat.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/classic/compat.js
 // Zod 3 compat layer
 
 /** @deprecated Use the raw string literal codes instead, e.g. "invalid_type". */
@@ -32433,7 +36707,7 @@ var ZodFirstPartyTypeKind;
 (function (ZodFirstPartyTypeKind) {
 })(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/from-json-schema.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/classic/from-json-schema.js
 
 
 
@@ -33019,7 +37293,7 @@ function fromJSONSchema(schema, params) {
     return convertSchema(schema, ctx);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/coerce.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/classic/coerce.js
 
 
 function coerce_string(params) {
@@ -33038,7 +37312,7 @@ function coerce_date(params) {
     return core._coercedDate(schemas.ZodDate, params);
 }
 
-;// CONCATENATED MODULE: ./node_modules/zod/v4/classic/external.js
+;// CONCATENATED MODULE: ../../../node_modules/zod/v4/classic/external.js
 
 
 
@@ -33063,3847 +37337,70 @@ config(en());
 
 /***/ }),
 
-/***/ 4584:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  kN: () => (/* binding */ buildExecutionPlan),
-  Ay: () => (/* binding */ rankByModelHint),
-  P0: () => (/* reexport */ summarizeSkill)
-});
-
-// UNUSED EXPORTS: matchesPhase, selectSkills
-
-// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
-var esm = __nccwpck_require__(9519);
-// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
-var skill_loader = __nccwpck_require__(5541);
-;// CONCATENATED MODULE: ./src/lib/skill-planner.mjs
-
-
-/**
- * Summarize a skill's metadata for LLM consumption.
- * @param {import('../../runners/core/review-runner.mjs').SkillDefinition|import('../../runners/core/review-runner.mjs').SkillMetadata} skill
- */
-function summarizeSkill(skill) {
-  const meta = skill?.metadata ?? skill;
-  return {
-    id: meta.id,
-    name: meta.name,
-    description: meta.description,
-    phase: meta.phase,
-    applyTo: meta.applyTo ?? [],
-    inputContext: meta.inputContext ?? [],
-    outputKind: meta.outputKind ?? ['findings'],
-    modelHint: meta.modelHint ?? null,
-    dependencies: meta.dependencies ?? [],
-    tags: meta.tags ?? [],
-    severity: meta.severity ?? null,
-  };
-}
-
-/**
- * Plan skills using an LLM (or provided planner function). Falls back to deterministic ordering on error.
- * @param {Object} options
- * @param {Array} options.skills - candidate skills (already filtered)
- * @param {Object} options.context - review context (e.g., changedFiles/diff summary/prompt)
- * @param {Function} [options.llmPlan] - async function receiving {skills, context}, returning [{id, priority, reason}]
- * @param {boolean} [options.appendRemaining=true] - whether to append unreferenced skills in deterministic order
- * @returns {Promise<{planned: Array, reasons: Array, fallback: boolean}>}
- */
-async function planSkills({ skills, context, llmPlan, appendRemaining = true }) {
-  const summaries = skills.map(summarizeSkill);
-
-  if (!llmPlan) {
-    return {
-      planned: rankByModelHint(skills),
-      reasons: [],
-      fallback: false,
-    };
-  }
-
-  try {
-    const plan = await llmPlan({ skills: summaries, context });
-    if (!Array.isArray(plan)) {
-      throw new Error('planner returned non-array response');
-    }
-    const order = plan;
-    const byId = new Map(summaries.map((summary, idx) => [summary.id, skills[idx]]));
-    const planned = [];
-    const reasons = [];
-    let matchedCount = 0;
-
-    for (const entry of order) {
-      if (!entry?.id) continue;
-      const candidate = byId.get(entry.id);
-      if (candidate) {
-        planned.push(candidate);
-        matchedCount += 1;
-        if (entry.reason) reasons.push({ id: entry.id, reason: entry.reason });
-        byId.delete(entry.id);
-      }
-    }
-
-    if (appendRemaining) {
-      // append any not referenced by LLM in deterministic order
-      const remaining = rankByModelHint(Array.from(byId.values()));
-      planned.push(...remaining);
-    } else if (matchedCount === 0 && order.length > 0) {
-      // In prune mode, a non-empty plan that matches nothing is almost certainly invalid output.
-      throw new Error('planner returned no known skill ids');
-    }
-
-    return { planned, reasons, fallback: false };
-  } catch (err) {
-    return {
-      planned: rankByModelHint(skills),
-      reasons: [{ id: 'fallback', reason: `planner error: ${err.message}` }],
-      fallback: true,
-    };
-  }
-}
-
-;// CONCATENATED MODULE: ./src/lib/impact-scope.mjs
-function ensureArray(value) {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function extOf(file) {
-  const idx = file.lastIndexOf('.');
-  if (idx < 0) return '';
-  return file.slice(idx + 1).toLowerCase();
-}
-
-function containsSegment(file, segment) {
-  const normalized = file.replaceAll('\\', '/');
-  return normalized.split('/').includes(segment);
-}
-
-function matchesAny(file, needles) {
-  const normalized = file.toLowerCase();
-  return needles.some(n => normalized.includes(n));
-}
-
-/**
- * Infer impact tags from changed file paths.
- * Tags are intentionally small and map to existing `skills/**` tags.
- * @param {string[]|string} changedFiles
- * @param {{diffText?: string}} [options]
- * @returns {string[]}
- */
-function inferImpactTags(changedFiles, options = {}) {
-  const files = ensureArray(changedFiles);
-  const tags = new Set();
-
-  for (const file of files) {
-    const ext = extOf(file);
-
-    if (['ts', 'tsx', 'cts', 'mts'].includes(ext)) tags.add('typescript');
-    if (['js', 'jsx', 'cjs', 'mjs'].includes(ext)) tags.add('javascript');
-    if (['md', 'mdx', 'adr'].includes(ext) || matchesAny(file, ['/docs/', '/design/']) || containsSegment(file, 'docs')) {
-      tags.add('design');
-    }
-
-    if (
-      containsSegment(file, 'tests') ||
-      containsSegment(file, 'test') ||
-      containsSegment(file, '__tests__') ||
-      matchesAny(file, ['.test.', '.spec.'])
-    ) {
-      tags.add('tests');
-    }
-
-    if (containsSegment(file, 'api') || containsSegment(file, 'routes')) tags.add('api');
-    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/'])) tags.add('reliability');
-
-    if (
-      containsSegment(file, 'auth') ||
-      containsSegment(file, 'security') ||
-      matchesAny(file, ['/oauth', '/jwt', '/session', '/cookie', '/csrf'])
-    ) {
-      tags.add('security');
-    }
-
-    if (
-      tags.has('api') ||
-      containsSegment(file, 'config') ||
-      containsSegment(file, 'db') ||
-      matchesAny(file, ['/env', '/secrets', '/headers'])
-    ) {
-      tags.add('security');
-    }
-
-    if (containsSegment(file, 'logging') || matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])) {
-      tags.add('observability');
-      tags.add('reliability');
-    }
-  }
-
-  const diffText = options?.diffText;
-  if (typeof diffText === 'string' && diffText.length) {
-    const lower = diffText.toLowerCase();
-    const hasCatch = lower.includes('catch (') || lower.includes('catch(');
-    const addsSilentReturn =
-      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) || /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
-    const mentionsIgnore = lower.includes('ignore') || lower.includes('swallow');
-    if (hasCatch && (addsSilentReturn || mentionsIgnore)) {
-      tags.add('observability');
-      tags.add('reliability');
-    }
-  }
-
-  return [...tags].sort();
-}
-
-;// CONCATENATED MODULE: ./src/lib/file-classifier.mjs
-// Module-scope regexes to avoid re-creation per call
-const RE_TEST_EXT = /\.(?:test|spec)\.(?:[jt]sx?|mjs)$/;
-const RE_SCHEMA_EXT = /\.schema\.[jt]s$/;
-const RE_MIGRATION = /(?:^|\/)migrations?\//;
-const RE_MIGRATE = /(?:^|\/)migrate/;
-const RE_CONFIG_EXT = /\.config\.(?:[jt]sx?|mjs)$/;
-const RE_RC_FILE = /^\.[a-z]+rc(?:\.[a-z]+)?$/;
-const RE_TSCONFIG = /^tsconfig.*\.json$/;
-const RE_DOCKERFILE = /^Dockerfile/;
-const RE_DOCKER_COMPOSE = /^docker-compose/;
-
-const CONFIG_NAMES = new Set([
-  'package.json',
-  '.river-reviewer.json',
-  '.lychee.toml',
-  '.markdownlint.json',
-  '.markdownlint-cli2.yaml',
-  '.textlintrc.json',
-]);
-
-/**
- * Classify changed files by type for routing and evidence collection.
- * Complementary to impact-scope.mjs which classifies by quality domain.
- *
- * @param {string[]} files - Array of file paths (relative to repo root)
- * @returns {{ config: string[], schema: string[], migration: string[], app: string[], test: string[], infra: string[], docs: string[], unknown: string[] }}
- */
-function classifyChangedFiles(files) {
-  const result = {
-    config: [],
-    schema: [],
-    migration: [],
-    app: [],
-    test: [],
-    infra: [],
-    docs: [],
-    unknown: [],
-  };
-
-  for (const file of files) {
-    result[classifyFile(file)].push(file);
-  }
-
-  return result;
-}
-
-// Priority: test > schema > migration > config > infra > docs > app > unknown
-function classifyFile(file) {
-  const normalized = file.replaceAll('\\', '/');
-  const basename = normalized.split('/').pop() ?? '';
-
-  if (isTest(normalized, basename)) return 'test';
-  if (isSchema(normalized, basename)) return 'schema';
-  if (isMigration(normalized)) return 'migration';
-  if (isConfig(normalized, basename)) return 'config';
-  if (isInfra(normalized, basename)) return 'infra';
-  if (isDocs(normalized, basename)) return 'docs';
-  if (isApp(normalized)) return 'app';
-  return 'unknown';
-}
-
-function isTest(file, basename) {
-  return file.startsWith('tests/') || file.includes('/__tests__/') || RE_TEST_EXT.test(basename);
-}
-
-function isSchema(file, basename) {
-  return (
-    file.startsWith('schemas/') || RE_SCHEMA_EXT.test(basename) || basename.endsWith('.schema.json')
-  );
-}
-
-function isMigration(file) {
-  return RE_MIGRATION.test(file) || RE_MIGRATE.test(file) || file.startsWith('db/');
-}
-
-function isConfig(file, basename) {
-  if (RE_CONFIG_EXT.test(basename)) return true;
-  if (RE_RC_FILE.test(basename)) return true;
-  if (CONFIG_NAMES.has(basename) || basename.startsWith('.env')) return true;
-  if (RE_TSCONFIG.test(basename)) return true;
-  return false;
-}
-
-function isInfra(file, basename) {
-  return (
-    file.startsWith('.github/') ||
-    file.startsWith('.husky/') ||
-    file.startsWith('scripts/') ||
-    RE_DOCKERFILE.test(basename) ||
-    RE_DOCKER_COMPOSE.test(basename)
-  );
-}
-
-function isDocs(file, basename) {
-  if (basename.endsWith('.md') || basename.endsWith('.mdx')) return true;
-  if (file.startsWith('docs/') || file.startsWith('pages/')) return true;
-  return false;
-}
-
-function isApp(file) {
-  return file.startsWith('src/') || file.startsWith('runners/');
-}
-
-// EXTERNAL MODULE: ./src/lib/planner-utils.mjs
-var planner_utils = __nccwpck_require__(1013);
-// EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
-var heuristic_review = __nccwpck_require__(2294);
-// EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
-var risk_map = __nccwpck_require__(572);
-// EXTERNAL MODULE: external "node:fs"
-var external_node_fs_ = __nccwpck_require__(3024);
-// EXTERNAL MODULE: external "node:path"
-var external_node_path_ = __nccwpck_require__(6760);
-;// CONCATENATED MODULE: ./src/lib/adr-linker.mjs
-
-
-
-/**
- * Scan known ADR/spec directories and find documents relevant to changed files.
- *
- * @param {string} repoRoot - Repository root path
- * @param {{ changedFiles?: string[], keywords?: string[] }} options
- * @returns {{ path: string, title: string, matchReason: string }[]}
- */
-function findRelatedADRs(repoRoot, { changedFiles = [], keywords = [] } = {}) {
-  const adrDirs = ['docs/adr', 'pages/explanation', 'specs'];
-  const results = [];
-
-  for (const dir of adrDirs) {
-    const fullDir = external_node_path_.join(repoRoot, dir);
-    if (!external_node_fs_.existsSync(fullDir)) continue;
-
-    const files = external_node_fs_.readdirSync(fullDir).filter((f) => f.endsWith('.md'));
-    for (const file of files) {
-      const filePath = external_node_path_.join(dir, file);
-      const content = external_node_fs_.readFileSync(external_node_path_.join(fullDir, file), 'utf-8');
-      const title = extractTitle(content) || file;
-
-      // Match by keyword in content
-      for (const kw of keywords) {
-        if (content.toLowerCase().includes(kw.toLowerCase())) {
-          results.push({ path: filePath, title, matchReason: `keyword: ${kw}` });
-          break; // one match per file is enough
-        }
-      }
-
-      // Match by changed file mention in content
-      for (const cf of changedFiles) {
-        const basename = cf.split('/').pop();
-        if (content.includes(cf) || content.includes(basename)) {
-          if (!results.some((r) => r.path === filePath)) {
-            results.push({
-              path: filePath,
-              title,
-              matchReason: `references: ${cf}`,
-            });
-          }
-          break;
-        }
-      }
-    }
-  }
-
-  return results;
-}
-
-function extractTitle(markdown) {
-  const match = /^#\s+(.+)/m.exec(markdown);
-  return match ? match[1].trim() : null;
-}
-
-;// CONCATENATED MODULE: ./src/lib/diff-meta.mjs
-
-
-/**
- * Count changed lines from raw unified diff text.
- *
- * @param {string} diffText
- * @returns {number}
- */
-function countChangedLinesFromText(diffText) {
-  if (!diffText) return 0;
-  let lines = 0;
-  for (const line of diffText.split('\n')) {
-    if ((line.startsWith('+') && !line.startsWith('+++')) || (line.startsWith('-') && !line.startsWith('---'))) {
-      lines++;
-    }
-  }
-  return lines;
-}
-
-/**
- * Extract metadata from a diff object for review depth control.
- *
- * @param {{ changedFiles?: string[], diffText?: string }} diff
- * @returns {{ fileCount: number, changedLines: number, fileTypes: object, hasTests: boolean, hasMigrations: boolean, hasSchemas: boolean }}
- */
-function extractDiffMeta(diff) {
-  const changedFiles = diff?.changedFiles ?? [];
-  const changedLines = countChangedLinesFromText(diff?.diffText);
-  const fileTypes = classifyChangedFiles(changedFiles);
-
-  return {
-    fileCount: changedFiles.length,
-    changedLines,
-    fileTypes,
-    hasTests: fileTypes.test.length > 0,
-    hasMigrations: fileTypes.migration.length > 0,
-    hasSchemas: fileTypes.schema.length > 0,
-  };
-}
-
-// EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs
-var review_plan_generator = __nccwpck_require__(8069);
-;// CONCATENATED MODULE: ./runners/core/review-runner.mjs
-
-
-
-
-
-
-
-
-
-
-
-
-const MODEL_PRIORITY = {
-  cheap: 1,
-  balanced: 2,
-  'high-accuracy': 3,
-};
-
-function getMeta(skill) {
-  return skill?.metadata ?? skill;
-}
-
-function review_runner_ensureArray(value) {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function matchesPhase(skill, phase) {
-  const meta = getMeta(skill);
-  if (Array.isArray(meta.phase)) {
-    return meta.phase.includes(phase);
-  }
-  return meta.phase === phase;
-}
-
-function matchesApplyTo(skill, changedFiles) {
-  const meta = getMeta(skill);
-  const globs = review_runner_ensureArray(meta.applyTo);
-  if (!globs.length) return false;
-  return changedFiles.some((file) =>
-    globs.some((pattern) => (0,esm/* minimatch */.xF)(file, pattern, { dot: true }))
-  );
-}
-
-function missingInputContexts(skill, availableContexts) {
-  const meta = getMeta(skill);
-  if (!meta.inputContext || meta.inputContext.length === 0) return [];
-  const available = new Set(availableContexts);
-  return meta.inputContext.filter((ctx) => !available.has(ctx));
-}
-
-function missingDependencies(skill, availableDependencies) {
-  const meta = getMeta(skill);
-  const deps = review_runner_ensureArray(meta.dependencies);
-  if (!deps.length) return [];
-  if (availableDependencies == null) return [];
-  const available = new Set(review_runner_ensureArray(availableDependencies));
-  return deps.filter((dep) => !available.has(dep));
-}
-
-function evaluateSkill(skill, options) {
-  const reasons = [];
-  const meta = getMeta(skill);
-  if (!matchesPhase(meta, options.phase)) {
-    reasons.push(`phase mismatch: ${meta.phase} !== ${options.phase}`);
-  }
-  if (!matchesApplyTo(meta, options.changedFiles)) {
-    reasons.push('applyTo did not match any changed file');
-  }
-  const missingContexts = missingInputContexts(meta, options.availableContexts);
-  if (missingContexts.length) {
-    reasons.push(`missing inputContext: ${missingContexts.join(', ')}`);
-  }
-  const depsMissing = missingDependencies(meta, options.availableDependencies);
-  if (depsMissing.length) {
-    reasons.push(`missing dependencies: ${depsMissing.join(', ')}`);
-  }
-  return {
-    ok: reasons.length === 0,
-    reasons,
-  };
-}
-
-function selectSkills(skills, options) {
-  const changedFiles = review_runner_ensureArray(options.changedFiles);
-  const availableContexts = review_runner_ensureArray(options.availableContexts);
-  const availableDependencies = options.availableDependencies ?? null;
-  const dryRun = options.dryRun ?? false;
-  const llmEnabled = options.llmEnabled ?? true;
-  const selected = [];
-  const skipped = [];
-
-  for (const skill of skills) {
-    const meta = skill.metadata ?? skill;
-    const skillId = meta.id;
-
-    // ルーティングスキル（エントリポイント）は実行対象外
-    const tags = review_runner_ensureArray(meta.tags);
-    if (tags.includes('routing')) {
-      skipped.push({ skill, reasons: ['routing skill: not an executable review skill'] });
-      continue;
-    }
-
-    // dry-run または LLM 無効時はヒューリスティック対応スキルのみ選択
-    const isLlmRestricted = dryRun || !llmEnabled;
-    if (isLlmRestricted && !heuristic_review/* HEURISTIC_SKILL_IDS */.y2.includes(skillId)) {
-      const reason = dryRun
-        ? 'dry-run: LLM必須スキル（ヒューリスティック未対応）'
-        : 'LLM disabled: LLM必須スキル（APIキー未設定）';
-      skipped.push({ skill, reasons: [reason] });
-      continue;
-    }
-
-    const result = evaluateSkill(meta, {
-      phase: options.phase,
-      changedFiles,
-      availableContexts,
-      availableDependencies,
-    });
-    if (result.ok) {
-      selected.push(skill);
-    } else {
-      skipped.push({ skill, reasons: result.reasons });
-    }
-  }
-  return { selected, skipped };
-}
-
-function rankByModelHint(skills, preferredModelHint = 'balanced') {
-  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
-  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
-  return [...skills].sort((a, b) => {
-    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
-    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
-    if (wa !== wb) return wa - wb;
-    return getMeta(a).id.localeCompare(getMeta(b).id);
-  });
-}
-
-function computeTagScore(skill, impactTags) {
-  if (!impactTags?.length) return 0;
-  const tags = new Set(getMeta(skill).tags ?? []);
-  let score = 0;
-  for (const tag of impactTags) {
-    if (tags.has(tag)) score += 1;
-  }
-  return score;
-}
-
-function rankByImpactTags(skills, impactTags, preferredModelHint = 'balanced') {
-  const scores = new Map(skills.map((s) => [getMeta(s).id, computeTagScore(s, impactTags)]));
-  const anyMatched = Array.from(scores.values()).some((v) => v > 0);
-  if (!anyMatched) {
-    return rankByModelHint(skills, preferredModelHint);
-  }
-
-  const preferredWeight = MODEL_PRIORITY[preferredModelHint] ?? MODEL_PRIORITY.balanced;
-  const weight = (hint) => MODEL_PRIORITY[hint] ?? MODEL_PRIORITY.balanced;
-
-  return [...skills].sort((a, b) => {
-    const idA = getMeta(a).id;
-    const idB = getMeta(b).id;
-    const scoreA = scores.get(idA) ?? 0;
-    const scoreB = scores.get(idB) ?? 0;
-    if (scoreA !== scoreB) return scoreB - scoreA;
-
-    const wa = Math.abs(weight(getMeta(a).modelHint) - preferredWeight);
-    const wb = Math.abs(weight(getMeta(b).modelHint) - preferredWeight);
-    if (wa !== wb) return wa - wb;
-    return idA.localeCompare(idB);
-  });
-}
-
-/**
- * Build an execution plan from skills and review context.
- * - planner 未指定: メタデと modelHint に基づく決定論的な並び替え
- * - planner 指定: LLM 等で優先度決定し、エラー時は決定論的順序にフォールバック
- *   - plannerMode=order: 優先度づけ（未参照スキルは後ろに決定論で追加）
- *   - plannerMode=prune: 絞り込み（LLM が選んだスキルのみを実行）
- */
-async function buildExecutionPlan(options) {
-  const {
-    phase,
-    changedFiles = [],
-    availableContexts = [],
-    availableDependencies = null,
-    preferredModelHint = 'balanced',
-    skills: providedSkills,
-    planner,
-    plannerMode,
-    diffText,
-    dryRun = false,
-    llmEnabled = true,
-    repoRoot,
-    riskMap,
-  } = options;
-
-  const skills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
-  const selection = selectSkills(skills, {
-    phase,
-    changedFiles,
-    availableContexts,
-    availableDependencies,
-    dryRun,
-    llmEnabled,
-  });
-  if (selection.selected.length === 0) {
-    return { selected: [], skipped: selection.skipped };
-  }
-
-  const impactTags = inferImpactTags(changedFiles, { diffText });
-  const fileTypes = classifyChangedFiles(changedFiles);
-  const riskAssessment = riskMap ? (0,risk_map/* evaluateRisk */.lm)(riskMap, changedFiles) : null;
-  const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), { changedFiles, keywords: impactTags });
-
-  const diffMeta = extractDiffMeta({ changedFiles, diffText });
-  const reviewMode = (0,review_plan_generator/* determineReviewMode */.X)(diffMeta);
-
-  // If planner is provided, try LLM-based planning, fallback to deterministic rank
-  const effectivePlannerMode = planner
-    ? (0,planner_utils/* normalizePlannerMode */.p)(plannerMode, { defaultMode: 'order' })
-    : 'off';
-  if (planner && effectivePlannerMode !== 'off') {
-    const context = {
-      phase,
-      changedFiles,
-      availableContexts,
-      impactTags,
-      fileTypes,
-    };
-    const { planned, reasons, fallback } = await planSkills({
-      skills: selection.selected,
-      context,
-      llmPlan: planner.plan ?? planner,
-      appendRemaining: effectivePlannerMode !== 'prune',
-    });
-    const ranked = fallback
-      ? rankByImpactTags(selection.selected, impactTags, preferredModelHint)
-      : planned;
-    return {
-      selected: ranked,
-      skipped: selection.skipped,
-      plannerMode: effectivePlannerMode,
-      plannerReasons: reasons,
-      plannerFallback: fallback,
-      ...(fallback ? { plannerError: reasons?.[0]?.reason ?? 'planner fallback' } : {}),
-      impactTags,
-      fileTypes,
-      relatedADRs,
-      reviewMode,
-    };
-  }
-
-  // planner が無い場合（LLM未設定）は決定論的順位付けで実行
-  const ordered = rankByImpactTags(selection.selected, impactTags, preferredModelHint);
-
-  return {
-    selected: ordered,
-    skipped: selection.skipped,
-    impactTags,
-    fileTypes,
-    relatedADRs,
-    reviewMode,
-  };
-}
-
-// Re-export summarizeSkill for consumers that want the same view used by planner
-
-
-
-/***/ }),
-
-/***/ 5541:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  vN: () => (/* binding */ SkillLoaderError),
-  m: () => (/* binding */ createSkillValidator),
-  KJ: () => (/* binding */ defaultPaths),
-  e$: () => (/* binding */ loadSchema),
-  l1: () => (/* binding */ loadSkills),
-  eJ: () => (/* binding */ parseFrontMatter)
-});
-
-// UNUSED EXPORTS: listSkillFiles, loadAllSkillMetadata, loadSkillFile, loadSkillMetadata, parseSkillFile
-
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(9896);
-;// CONCATENATED MODULE: external "path"
-const external_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
-;// CONCATENATED MODULE: external "url"
-const external_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
-// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-var js_yaml = __nccwpck_require__(3243);
-// EXTERNAL MODULE: ./node_modules/gray-matter/index.js
-var gray_matter = __nccwpck_require__(9599);
-// EXTERNAL MODULE: ./node_modules/ajv/dist/2020.js
-var _2020 = __nccwpck_require__(2210);
-// EXTERNAL MODULE: ./node_modules/ajv-formats/dist/index.js
-var dist = __nccwpck_require__(2815);
-;// CONCATENATED MODULE: ./runners/core/skill-loader.mjs
-
-
-
-
-
-
-
-
-/**
- * @typedef {'upstream' | 'midstream' | 'downstream'} PhaseEnum
- * @typedef {PhaseEnum | PhaseEnum[]} Phase
- * @typedef {'info' | 'minor' | 'major' | 'critical'} Severity
- * @typedef {'diff' | 'fullFile' | 'tests' | 'adr' | 'commitMessage' | 'repoConfig'} InputContext
- * @typedef {'findings' | 'summary' | 'actions' | 'tests' | 'metrics' | 'questions'} OutputKind
- * @typedef {'cheap' | 'balanced' | 'high-accuracy'} ModelHint
- * @typedef {'code_search' | 'test_runner' | 'adr_lookup' | 'repo_metadata' | 'coverage_report' | 'tracing' | `custom:${string}`} Dependency
- *
- * @typedef {Object} SkillMetadata
- * @property {string} id
- * @property {string} name
- * @property {string} description
- * @property {Phase} phase
- * @property {string[]} applyTo
- * @property {string[]=} files
- * @property {string[]=} tags
- * @property {Severity=} severity
- * @property {InputContext[]=} inputContext
- * @property {OutputKind[]=} outputKind
- * @property {ModelHint=} modelHint
- * @property {Dependency[]=} dependencies
- * @property {{phase?: Phase, applyTo?: string[], files?: string[]}=} trigger
- * @property {number=} priority
- *
- * @typedef {Object} SkillDefinition
- * @property {SkillMetadata} metadata
- * @property {string} body
- * @property {string} path
- */
-
-const skill_loader_filename = (0,external_url_namespaceObject.fileURLToPath)(import.meta.url);
-const skill_loader_dirname = external_path_namespaceObject.dirname(skill_loader_filename);
-const repoRoot = process.env.RIVER_REPO_ROOT
-  ? external_path_namespaceObject.resolve(process.env.RIVER_REPO_ROOT)
-  : external_path_namespaceObject.resolve(skill_loader_dirname, '..', '..');
-const defaultSkillsDir = external_path_namespaceObject.join(repoRoot, 'skills');
-const defaultSchemaPath = external_path_namespaceObject.join(repoRoot, 'schemas', 'skill.schema.json');
-const markdownExtensions = new Set(['.md', '.mdx']);
-const yamlExtensions = new Set(['.yaml', '.yml']);
-const allowedExtensions = new Set([...markdownExtensions, ...yamlExtensions]);
-const ignoredSkillDirNames = new Set([
-  'references',
-  'fixtures',
-  'golden',
-  'eval',
-  'prompt',
-  'prompts',
-]);
-const ignoredFileNames = new Set(['.gitkeep', 'README.md', 'registry.yaml', 'registry.yml', '_template.md']);
-const legacySkillFiles = new Set(['skill.yaml', 'skill.yml']);
-const streamCategories = new Set(['core', 'upstream', 'midstream', 'downstream']);
-const allPhases = ['upstream', 'midstream', 'downstream'];
-
-const defaultPaths = {
-  repoRoot,
-  skillsDir: defaultSkillsDir,
-  schemaPath: defaultSchemaPath,
-};
-
-class SkillLoaderError extends Error {
-  constructor(message, details = undefined) {
-    super(message);
-    this.name = 'SkillLoaderError';
-    this.details = details;
-  }
-}
-
-async function loadSchema(schemaPath = defaultSchemaPath) {
-  const raw = await external_fs_.promises.readFile(schemaPath, 'utf8');
-  try {
-    return JSON.parse(raw);
-  } catch (err) {
-    throw new SkillLoaderError(`Failed to parse JSON schema at ${schemaPath}: ${err.message}`);
-  }
-}
-
-function createSkillValidator(schema) {
-  const ajv = new _2020({ allErrors: true, strict: false, useDefaults: true });
-  dist(ajv);
-  return ajv.compile(schema);
-}
-
-async function listSkillFiles(dir = defaultSkillsDir) {
-  const entries = await external_fs_.promises.readdir(dir, { withFileTypes: true });
-  const files = [];
-
-  const hasLegacySkillFile = entries.some(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
-  if (hasLegacySkillFile) {
-    const legacyEntry = entries.find(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
-    if (!legacyEntry) {
-      throw new Error(`skill.yaml detected but not found in ${dir}`);
-    }
-    files.push(external_path_namespaceObject.join(dir, legacyEntry.name));
-    return files.sort((a, b) => a.localeCompare(b));
-  }
-
-  for (const entry of entries) {
-    const entryPath = external_path_namespaceObject.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (ignoredSkillDirNames.has(entry.name) || entry.name.startsWith('.')) {
-        continue;
-      }
-      const nested = await listSkillFiles(entryPath);
-      files.push(...nested);
-      continue;
-    }
-
-    const ext = external_path_namespaceObject.extname(entry.name).toLowerCase();
-    if (!allowedExtensions.has(ext)) continue;
-    if (ignoredFileNames.has(entry.name)) continue;
-    if (entry.name.startsWith('_')) continue;
-    files.push(entryPath);
-  }
-
-  return files.sort((a, b) => a.localeCompare(b));
-}
-
-function normalizeStringArray(value) {
-  if (!value) return undefined;
-  const asArray = Array.isArray(value) ? value : [value];
-  const filtered = asArray
-    .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
-    .filter(Boolean);
-  return filtered.length ? filtered : undefined;
-}
-
-function normalizePhaseValue(value) {
-  if (!value) return undefined;
-  if (Array.isArray(value)) {
-    const phases = value.filter(Boolean);
-    if (phases.length === 1) return phases[0];
-    return phases.length ? phases : undefined;
-  }
-  return value;
-}
-
-function inferCategoryFromPhase(phase) {
-  if (!phase) return undefined;
-  if (Array.isArray(phase)) {
-    const unique = Array.from(new Set(phase));
-    if (unique.length === 1 && streamCategories.has(unique[0])) {
-      return unique[0];
-    }
-    if (unique.length > 1) {
-      return 'core';
-    }
-    return undefined;
-  }
-  return streamCategories.has(phase) ? phase : undefined;
-}
-
-function inferCategoryFromPath(filePath) {
-  if (!filePath) return undefined;
-  const segments = external_path_namespaceObject.normalize(filePath).split(external_path_namespaceObject.sep);
-  const skillsIndex = segments.lastIndexOf('skills');
-  const candidate = skillsIndex >= 0 ? segments[skillsIndex + 1] : undefined;
-  if (candidate && streamCategories.has(candidate)) {
-    return candidate;
-  }
-  return undefined;
-}
-
-function resolveCategory(metaCategory, { phase, filePath } = {}) {
-  if (typeof metaCategory === 'string' && streamCategories.has(metaCategory)) {
-    return metaCategory;
-  }
-  return inferCategoryFromPath(filePath) ?? inferCategoryFromPhase(phase);
-}
-
-function resolvePhase(metaPhase, category) {
-  if (category === 'core') {
-    return [...allPhases];
-  }
-  if (category && streamCategories.has(category)) {
-    return category;
-  }
-  return normalizePhaseValue(metaPhase);
-}
-
-function normalizeMetadata(metadata, { filePath } = {}) {
-  const meta = { ...metadata };
-
-  if (meta.priority !== undefined) {
-    const parsedPriority = typeof meta.priority === 'string' ? Number(meta.priority) : meta.priority;
-    if (Number.isFinite(parsedPriority)) {
-      meta.priority = parsedPriority;
-    } else {
-      delete meta.priority;
-    }
-  }
-
-  const topLevelApplyTo =
-    normalizeStringArray(meta.applyTo) ??
-    normalizeStringArray(meta.files) ??
-    normalizeStringArray(meta.path_patterns);
-  if (topLevelApplyTo) {
-    meta.applyTo = topLevelApplyTo;
-  }
-
-  const trigger =
-    meta.trigger && typeof meta.trigger === 'object' && !Array.isArray(meta.trigger)
-      ? meta.trigger
-      : null;
-  const triggerApplyTo =
-    normalizeStringArray(trigger?.applyTo) ??
-    normalizeStringArray(trigger?.files) ??
-    normalizeStringArray(trigger?.path_patterns);
-
-  if (!meta.phase && trigger?.phase) {
-    meta.phase = trigger.phase;
-  }
-  if (!meta.applyTo && triggerApplyTo) {
-    meta.applyTo = triggerApplyTo;
-  }
-
-  meta.category = resolveCategory(meta.category, { phase: meta.phase, filePath });
-  meta.phase = resolvePhase(meta.phase, meta.category);
-
-  // Trigger is consumed during normalization; avoid leaking nested state.
-  if (trigger) {
-    delete meta.trigger;
-  }
-  if ('path_patterns' in meta) {
-    delete meta.path_patterns;
-  }
-
-  return meta;
-}
-
-function parseFrontMatter(content, { filePath } = {}) {
-  const trimmed = content.trimStart();
-  if (!trimmed.startsWith('---')) {
-    throw new SkillLoaderError('Missing front matter block (---)');
-  }
-
-  let parsed;
-  try {
-    parsed = gray_matter(trimmed);
-  } catch (err) {
-    throw new SkillLoaderError(
-      `Front matter parse error${filePath ? ` (${filePath})` : ''}: ${err.message}`
-    );
-  }
-
-  const metadata = parsed.data ?? {};
-  if (typeof metadata !== 'object' || Array.isArray(metadata)) {
-    throw new SkillLoaderError('Front matter must be a mapping');
-  }
-  if (Object.keys(metadata).length === 0) {
-    throw new SkillLoaderError('Front matter is empty');
-  }
-  const normalized = normalizeMetadata(metadata, { filePath });
-  const body = (parsed.content ?? '').trim();
-  return { metadata: normalized, body };
-}
-
-async function parseSkillFile(filePath) {
-  const ext = external_path_namespaceObject.extname(filePath).toLowerCase();
-  if (!allowedExtensions.has(ext)) {
-    throw new SkillLoaderError(`Unsupported skill file extension: ${ext}`);
-  }
-  const raw = await external_fs_.promises.readFile(filePath, 'utf8');
-  if (markdownExtensions.has(ext)) {
-    return parseFrontMatter(raw, { filePath });
-  }
-
-  // YAML handling
-  let loaded = {};
-  try {
-    loaded = js_yaml/* default.load */.Ay.load(raw) ?? {};
-  } catch (err) {
-    throw new SkillLoaderError(`YAML parse error: ${err.message}`);
-  }
-  if (typeof loaded !== 'object' || Array.isArray(loaded)) {
-    throw new SkillLoaderError('Skill YAML must be a mapping');
-  }
-
-  let metadata = loaded;
-  let body = '';
-
-  // Support nested metadata block
-  if (loaded.metadata && typeof loaded.metadata === 'object' && !Array.isArray(loaded.metadata)) {
-    metadata = { ...loaded.metadata };
-    if (typeof metadata.instruction === 'string') {
-      body = metadata.instruction;
-      delete metadata.instruction;
-    } else if (typeof loaded.instruction === 'string') {
-      body = loaded.instruction;
-    }
-  } else if (typeof loaded.instruction === 'string') {
-    // Support flat structure with optional instruction field
-    body = loaded.instruction;
-    delete metadata.instruction;
-  }
-
-  metadata = normalizeMetadata(metadata, { filePath });
-  return { metadata, body };
-}
-
-function validateMetadata(metadata, validate) {
-  const metaCopy = JSON.parse(JSON.stringify(metadata ?? {}));
-  const ok = validate(metaCopy);
-  if (!ok) {
-    const details = (validate.errors ?? []).map(err => `${err.instancePath || '/'} ${err.message}`).join('; ');
-    throw new SkillLoaderError(`Validation failed: ${details}`, validate.errors);
-  }
-  return metaCopy;
-}
-
-function relativeToRepo(filePath) {
-  return filePath.startsWith(repoRoot) ? external_path_namespaceObject.relative(repoRoot, filePath) : filePath;
-}
-
-function logSkillLoadError(filePath, err) {
-  const location = relativeToRepo(filePath);
-  const reason = err instanceof Error ? err.message : String(err);
-  console.error(`⚠️  Failed to load skill ${location}: ${reason}`);
-  if (err?.details && Array.isArray(err.details)) {
-    for (const detail of err.details) {
-      const instance = detail.instancePath || '/';
-      console.error(`   - ${instance}: ${detail.message}`);
-    }
-  }
-}
-
-function logDuplicateSkill(id, filePath, originalPath) {
-  const location = relativeToRepo(filePath);
-  const first = relativeToRepo(originalPath);
-  console.warn(`⚠️  Duplicate skill id "${id}" in ${location}; already loaded from ${first}. Skipping.`);
-}
-
-function hasExcludedTag(metadata, excludedTags) {
-  if (!excludedTags?.length) return false;
-  const tags = metadata?.tags ?? [];
-  return tags.some(tag => excludedTags.includes(tag));
-}
-
-async function loadSkillFile(filePath, options = {}) {
-  const { validator, schemaPath = defaultSchemaPath } = options;
-  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
-  const parsed = await parseSkillFile(filePath);
-  const metadata = validateMetadata(parsed.metadata, compiledValidator);
-  return {
-    metadata,
-    body: parsed.body,
-    path: filePath,
-  };
-}
-
-/**
- * Shared loader loop used by {@link loadSkills} and {@link loadAllSkillMetadata}.
- * Differs only in the per-file loader function (`loaderFn`), so the skill-discovery
- * semantics (schema validation, excluded tags, duplicate-id handling) stay in sync
- * across the two public entry points.
- *
- * @param {(filePath: string, options: { validator: Function }) => Promise<{ metadata: SkillMetadata, path: string }>} loaderFn
- * @param {object} options
- */
-async function _loadFromDir(loaderFn, options = {}) {
-  const {
-    skillsDir = defaultSkillsDir,
-    schemaPath = defaultSchemaPath,
-    validator: providedValidator,
-    excludedTags = ['agent'],
-  } = options;
-  const schema = providedValidator ? null : await loadSchema(schemaPath);
-  const validator = providedValidator ?? createSkillValidator(schema);
-  const files = await listSkillFiles(skillsDir);
-  const skillsById = new Map();
-
-  for (const filePath of files) {
-    try {
-      const skill = await loaderFn(filePath, { validator });
-      const id = skill?.metadata?.id;
-      if (!id) {
-        logSkillLoadError(filePath, new SkillLoaderError('Missing id in skill metadata'));
-        continue;
-      }
-      if (hasExcludedTag(skill.metadata, excludedTags)) {
-        continue;
-      }
-      if (skillsById.has(id)) {
-        logDuplicateSkill(id, filePath, skillsById.get(id).path);
-        continue;
-      }
-      skillsById.set(id, skill);
-    } catch (err) {
-      logSkillLoadError(filePath, err);
-    }
-  }
-
-  return Array.from(skillsById.values());
-}
-
-async function loadSkills(options = {}) {
-  return _loadFromDir(loadSkillFile, options);
-}
-
-/**
- * Load only skill metadata (Stage 1 of Progressive Disclosure).
- * Returns metadata and path without the body, suitable for filtering
- * and routing before full skill loading.
- *
- * @param {string} filePath
- * @param {object} [options]
- * @param {Function} [options.validator]
- * @param {string} [options.schemaPath]
- * @returns {Promise<{metadata: SkillMetadata, path: string}>}
- */
-async function loadSkillMetadata(filePath, options = {}) {
-  const { validator, schemaPath = defaultSchemaPath } = options;
-  const compiledValidator = validator ?? createSkillValidator(await loadSchema(schemaPath));
-  const parsed = await parseSkillFile(filePath);
-  const metadata = validateMetadata(parsed.metadata, compiledValidator);
-  return {
-    metadata,
-    path: filePath,
-  };
-}
-
-/**
- * Load metadata for all skills (Stage 1 of Progressive Disclosure).
- * Returns an array of {metadata, path} objects without skill bodies.
- *
- * @param {object} [options]
- * @param {string} [options.skillsDir]
- * @param {string} [options.schemaPath]
- * @param {Function} [options.validator]
- * @param {string[]} [options.excludedTags]
- * @returns {Promise<Array<{metadata: SkillMetadata, path: string}>>}
- */
-async function loadAllSkillMetadata(options = {}) {
-  return _loadFromDir(loadSkillMetadata, options);
-}
-
-
-/***/ }),
-
-/***/ 4807:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   s: () => (/* binding */ defaultConfig),
-/* harmony export */   z: () => (/* binding */ defaultSkillConfig)
-/* harmony export */ });
-// Unified default config supporting both legacy and skill-based flows
-const defaultConfig = Object.freeze({
-  version: '1.0',
-  model: {
-    provider: 'openai',
-    modelName: 'gpt-4o-mini',
-    temperature: 0,
-    maxTokens: 600,
-  },
-  review: {
-    language: 'ja',
-    severity: 'normal',
-    additionalInstructions: [],
-  },
-  exclude: {
-    files: [],
-    prLabelsToIgnore: [],
-  },
-  skills: [],
-});
-
-// Alias kept for compatibility with newer skill-only imports
-const defaultSkillConfig = defaultConfig;
-
-
-/***/ }),
-
-/***/ 3833:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  UT: () => (/* binding */ ConfigLoader),
-  Z9: () => (/* binding */ loadConfig),
-  R2: () => (/* binding */ mergeConfig)
-});
-
-// UNUSED EXPORTS: ConfigLoaderError, ConfigMergeError
-
-// EXTERNAL MODULE: external "node:fs/promises"
-var promises_ = __nccwpck_require__(1455);
-// EXTERNAL MODULE: external "node:path"
-var external_node_path_ = __nccwpck_require__(6760);
-// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-var js_yaml = __nccwpck_require__(3243);
-// EXTERNAL MODULE: ./node_modules/zod/v4/classic/external.js + 73 modules
-var external = __nccwpck_require__(3905);
-;// CONCATENATED MODULE: ./src/config/schema.mjs
-
-
-// --- Legacy Schema (for river run) ---
-const modelConfigSchema = external/* object */.Ikc({
-  provider: external/* enum */.k5n(['google', 'openai', 'anthropic']).optional(),
-  modelName: external/* string */.YjP().min(1).optional(),
-  temperature: external/* number */.aig().min(0).max(1).optional(),
-  maxTokens: external/* number */.aig().int().positive().optional(),
-});
-
-const reviewConfigSchema = external/* object */.Ikc({
-  language: external/* enum */.k5n(['ja', 'en']).optional(),
-  severity: external/* enum */.k5n(['strict', 'normal', 'relaxed']).optional(),
-  additionalInstructions: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
-});
-
-const excludeConfigSchema = external/* object */.Ikc({
-  files: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
-  prLabelsToIgnore: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
-});
-
-const riverReviewerConfigSchema = external/* object */.Ikc({
-  model: modelConfigSchema.optional(),
-  review: reviewConfigSchema.optional(),
-  exclude: excludeConfigSchema.optional(),
-});
-
-// --- New Skill-based Schema (for river skills) ---
-
-// Skill-based schemas
-const AIModelSchema = external/* enum */.k5n([
-  'gemini-2.0-flash', // Default: Fast & Smart
-  'gemini-2.0-flash-thinking', // Reasoning: For Security/Architecture
-  'gemini-2.0-pro', // High Spec
-  'gemini-1.5-pro', // Legacy Balanced
-  'gpt-4o', // OpenAI Option
-  'o1', // OpenAI Reasoning
-  'o1-mini', // OpenAI Fast Reasoning
-]);
-
-const RuleSchema = external/* object */.Ikc({
-  id: external/* string */.YjP().describe('Unique identifier for the rule'),
-  severity: external/* enum */.k5n(['info', 'warning', 'error', 'critical']),
-  description: external/* string */.YjP(),
-  context: external/* string */.YjP().describe('Why this matters (Understanding)'),
-  patterns: external/* array */.YOg(external/* string */.YjP()).describe('Keywords or patterns to look for'),
-  anti_patterns: external/* array */.YOg(external/* string */.YjP()).describe('Bad code examples'),
-  fix_guidance: external/* string */.YjP().describe('How to fix it (Expertise Transfer)'),
-});
-
-const SkillSchema = external/* object */.Ikc({
-  name: external/* string */.YjP(),
-  description: external/* string */.YjP().optional(),
-  files: external/* array */.YOg(external/* string */.YjP()).describe('Glob patterns for target files'),
-  exclude: external/* array */.YOg(external/* string */.YjP()).optional(),
-  model: AIModelSchema.default('gemini-2.0-flash'),
-  temperature: external/* number */.aig().min(0).max(1).default(0.2),
-  rules: external/* array */.YOg(RuleSchema),
-});
-
-const ConfigSchema = external/* object */.Ikc({
-    version: external/* string */.YjP().default('1.0'),
-    model: modelConfigSchema.optional(),
-    review: reviewConfigSchema.optional(),
-    exclude: excludeConfigSchema.optional(),
-    skills: external/* array */.YOg(SkillSchema).default([]),
-  })
-  // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
-  .catchall(external/* unknown */.L5J());
-
-// EXTERNAL MODULE: ./src/config/default.mjs
-var config_default = __nccwpck_require__(4807);
-;// CONCATENATED MODULE: ./src/config/loader.mjs
-
-
-
-
-
-
-class ConfigMergeError extends Error {
-  constructor(message, options = {}) {
-    super(message, options);
-    this.name = 'ConfigMergeError';
-    if (options.cause) this.cause = options.cause;
-  }
-}
-
-function mergeValue(base, override) {
-  if (Array.isArray(override)) return [...override];
-  if (override && typeof override === 'object') {
-    const baseIsPlainObject = base && typeof base === 'object' && !Array.isArray(base);
-    return mergeConfig(baseIsPlainObject ? base : {}, override);
-  }
-  return override ?? base;
-}
-
-function mergeConfig(base, override) {
-  const result = { ...base };
-  for (const [key, value] of Object.entries(override ?? {})) {
-    const baseValue = base?.[key];
-    result[key] = mergeValue(baseValue, value);
-  }
-  return result;
-}
-
-class ConfigLoaderError extends Error {
-  constructor(message, options = {}) {
-    super(message, options);
-    this.name = 'ConfigLoaderError';
-    if (options.path) this.path = options.path;
-  }
-}
-
-class ConfigLoader {
-  constructor({
-    baseConfig = config_default/* defaultConfig */.s,
-    fileNames = ['.river-reviewer.json', '.river-reviewer.yaml', '.river-reviewer.yml'],
-    fsImpl = promises_,
-  } = {}) {
-    this.baseConfig = baseConfig;
-    this.fileNames = Array.isArray(fileNames) ? [...fileNames] : [fileNames];
-    this.fs = fsImpl;
-  }
-
-  async findConfigPath(repoRoot) {
-    for (const candidate of this.fileNames) {
-      const fullPath = external_node_path_.join(repoRoot, candidate);
-      try {
-        await this.fs.access(fullPath);
-        return fullPath;
-      } catch (err) {
-        if (err?.code !== 'ENOENT') {
-          throw new ConfigLoaderError('設定ファイルの存在確認に失敗しました', { cause: err, path: fullPath });
-        }
-      }
-    }
-    return null;
-  }
-
-  parseConfig(raw, filePath) {
-    const ext = external_node_path_.extname(filePath).toLowerCase();
-    let parsed;
-    if (ext === '.yaml' || ext === '.yml') {
-      parsed = js_yaml/* default.load */.Ay.load(raw);
-    } else {
-      parsed = JSON.parse(raw);
-    }
-
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      throw new ConfigLoaderError('設定ファイルのトップレベルはオブジェクトである必要があります', {
-        path: filePath,
-      });
-    }
-    return parsed;
-  }
-
-  async load(repoRoot = process.cwd()) {
-    const configPath = await this.findConfigPath(repoRoot);
-    if (!configPath) {
-      return { config: this.baseConfig, path: null, source: 'default' };
-    }
-
-    let parsedInput = {};
-
-    try {
-      const raw = await this.fs.readFile(configPath, 'utf8');
-      const parsed = this.parseConfig(raw, configPath);
-      
-      // Determine schema based on content
-      const isNewSchema = 'skills' in parsed || 'version' in parsed;
-      
-      if (isNewSchema) {
-        const validated = ConfigSchema.safeParse(parsed);
-        if (!validated.success) {
-          const detail = validated.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
-          throw new ConfigLoaderError(`設定ファイルの形式が正しくありません (Skill Schema): ${detail}`, { path: configPath });
-        }
-        parsedInput = validated.data;
-
-        const knownKeys = new Set(['version', 'model', 'review', 'exclude', 'skills']);
-        const unknownKeys = Object.keys(parsedInput).filter(key => !knownKeys.has(key));
-        if (unknownKeys.length) {
-          const message = `Unknown config keys ignored: ${unknownKeys.join(', ')}`;
-          if (process.env.RIVER_CONFIG_STRICT === '1') {
-            throw new ConfigLoaderError(message, { path: configPath });
-          }
-          // eslint-disable-next-line no-console
-          console.warn(message);
-        }
-      } else {
-        // Fallback to old schema
-        const validated = riverReviewerConfigSchema.safeParse(parsed);
-        if (!validated.success) {
-           const detail = validated.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
-           throw new ConfigLoaderError(`設定ファイルの形式が正しくありません (Legacy Schema): ${detail}`, { path: configPath });
-        }
-        parsedInput = validated.data;
-      }
-      
-    } catch (err) {
-      if (err instanceof ConfigLoaderError) throw err;
-      if (err instanceof SyntaxError || err?.name === 'YAMLException') {
-        throw new ConfigLoaderError('設定ファイルのパースに失敗しました', { cause: err, path: configPath });
-      }
-      throw new ConfigLoaderError('設定ファイルの読み込みに失敗しました', { cause: err, path: configPath });
-    }
-
-    try {
-      // Determine which base config to use
-      const baseToUse = ('skills' in parsedInput || 'version' in parsedInput) ? config_default/* defaultSkillConfig */.z : this.baseConfig;
-      const merged = mergeConfig(baseToUse, parsedInput);
-      return { config: merged, path: configPath, source: 'file' };
-    } catch (err) {
-      throw new ConfigMergeError('設定のマージに失敗しました', { cause: err });
-    }
-  }
-}
-
-// Export loadConfig helper for SkillDispatcher (always uses default loader for now)
-async function loadConfig(repoRoot) {
-  const loader = new ConfigLoader(); // Uses legacy default, but load() will switch base if new schema detected
-  const { config } = await loader.load(repoRoot);
-  return config;
-}
-
-
-/***/ }),
-
-/***/ 1092:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   J: () => (/* binding */ optimizeDiff),
-/* harmony export */   p: () => (/* binding */ renderDiffText)
-/* harmony export */ });
-const EXCLUDED_EXTENSIONS = new Set(['.md']);
-const EXCLUDED_FILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock']);
-const MAX_HUNK_LINES = 200;
-const MAX_HUNK_HEAD = 120;
-const MAX_HUNK_TAIL = 40;
-
-function extension(path) {
-  const idx = path.lastIndexOf('.');
-  return idx >= 0 ? path.slice(idx).toLowerCase() : '';
-}
-
-function baseName(path) {
-  const parts = path.split('/');
-  return parts[parts.length - 1];
-}
-
-function isExcludedFile(path) {
-  const ext = extension(path);
-  if (EXCLUDED_EXTENSIONS.has(ext)) return true;
-  if (EXCLUDED_FILES.has(baseName(path))) return true;
-  return false;
-}
-
-function normalizeWhitespace(line) {
-  return line.replace(/\s+/g, '');
-}
-
-function isWhitespaceOnlyChange(lines) {
-  const added = lines
-    .filter(line => line.startsWith('+') && !line.startsWith('+++'))
-    .map(line => line.slice(1));
-  const removed = lines
-    .filter(line => line.startsWith('-') && !line.startsWith('---'))
-    .map(line => line.slice(1));
-  if (added.length === 0 && removed.length === 0) return false;
-  return normalizeWhitespace(added.join('')) === normalizeWhitespace(removed.join(''));
-}
-
-const COMMENT_MARKERS = [/^\/\//, /^\/\*/, /^\*($|\s)/, /^\*\/$/, /^#/, /^<!--/, /^-->/];
-
-function isCommentOnlyChange(lines) {
-  const changed = lines.filter(line => line.startsWith('+') || line.startsWith('-'));
-  if (!changed.length) return false;
-  return changed.every(line => {
-    const content = line.slice(1).trim();
-    if (!content) return true;
-    return COMMENT_MARKERS.some(re => re.test(content));
-  });
-}
-
-function compressHunkLines(lines) {
-  if (lines.length <= MAX_HUNK_LINES) return lines;
-  const head = lines.slice(0, MAX_HUNK_HEAD);
-  const tail = lines.slice(-MAX_HUNK_TAIL);
-  return [...head, '... (hunk truncated) ...', ...tail];
-}
-
-/**
- * Filter and compress parsed diff files.
- * @param {{files: Array<{path: string, hunks: Array<{header: string, lines: string[]}>}>}} diff
- * @returns {{files: Array, diffText: string, tokenEstimate: number, reduction: number, rawTokenEstimate: number}}
- */
-function optimizeDiff(diff) {
-  const rawTokenEstimate = Math.ceil((diff.diffText ?? '').length / 4);
-  const optimizedFiles = [];
-
-  for (const file of diff.files ?? []) {
-    if (isExcludedFile(file.path)) continue;
-
-    const keptHunks = [];
-    for (const hunk of file.hunks ?? []) {
-      const lines = hunk.lines ?? [];
-      if (isWhitespaceOnlyChange(lines)) continue;
-      if (isCommentOnlyChange(lines)) continue;
-
-      const compressedLines = compressHunkLines(lines);
-      keptHunks.push({
-        ...hunk,
-        lines: compressedLines,
-      });
-    }
-
-    if (keptHunks.length) {
-      optimizedFiles.push({
-        ...file,
-        hunks: keptHunks,
-      });
-    }
-  }
-
-  const diffText = renderDiffText(optimizedFiles);
-  const tokenEstimate = Math.ceil(diffText.length / 4);
-  const reduction = rawTokenEstimate === 0 ? 0 : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
-
-  return {
-    files: optimizedFiles,
-    diffText,
-    tokenEstimate,
-    reduction,
-    rawTokenEstimate,
-  };
-}
-
-function renderDiffText(files) {
-  if (!files.length) return '';
-  const chunks = [];
-  for (const file of files) {
-    const isNewFile = !file.oldPath || file.oldPath === '/dev/null';
-    const isDeletedFile = !file.newPath || file.newPath === '/dev/null';
-    const oldPath = isNewFile ? '/dev/null' : file.oldPath ?? file.path;
-    const newPath = isDeletedFile ? '/dev/null' : file.newPath ?? file.path;
-    const oldDisplay = oldPath === '/dev/null' ? '/dev/null' : `a/${oldPath}`;
-    const newDisplay = newPath === '/dev/null' ? '/dev/null' : `b/${newPath}`;
-
-    chunks.push(`diff --git a/${oldPath} b/${newPath}`);
-    chunks.push(`--- ${oldDisplay}`);
-    chunks.push(`+++ ${newDisplay}`);
-    for (const hunk of file.hunks ?? []) {
-      chunks.push(hunk.header);
-      chunks.push(...(hunk.lines ?? []));
-    }
-  }
-  return chunks.join('\n');
-}
-
-
-/***/ }),
-
-/***/ 4382:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   K: () => (/* binding */ collectRepoDiff),
-/* harmony export */   r: () => (/* binding */ parseUnifiedDiff)
-/* harmony export */ });
-/* harmony import */ var _git_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(340);
-/* harmony import */ var _diff_optimizer_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1092);
-
-
-
-function stripPrefix(path) {
-  if (!path) return path;
-  if (path.startsWith('a/')) return path.slice(2);
-  if (path.startsWith('b/')) return path.slice(2);
-  return path;
-}
-
-/**
- * Parse a unified diff into a structured representation.
- * Returns files with hunks and added line hints so downstream consumers
- * can locate where to attach review comments.
- */
-function parseUnifiedDiff(diffText) {
-  const files = [];
-  let currentFile = null;
-  let currentHunk = null;
-  let newLineNumber = 0;
-  let pendingOldPath = null;
-
-  for (const line of diffText.split('\n')) {
-    if (line.startsWith('diff --git')) {
-      currentHunk = null;
-      continue;
-    }
-    if (line.startsWith('--- ')) {
-      pendingOldPath = stripPrefix(line.slice(4).trim());
-      continue;
-    }
-    if (line.startsWith('+++ ')) {
-      const newPathRaw = stripPrefix(line.slice(4).trim());
-      const isDeletion = newPathRaw === '/dev/null';
-      const oldPath = pendingOldPath ?? (isDeletion ? '/dev/null' : newPathRaw);
-      const newPath = isDeletion ? '/dev/null' : newPathRaw;
-      const path = isDeletion ? oldPath : newPath;
-
-      currentFile = { path, newPath, oldPath, hunks: [], addedLines: [] };
-      files.push(currentFile);
-      currentHunk = null;
-      newLineNumber = 0;
-      pendingOldPath = null;
-      continue;
-    }
-    if (!currentFile) continue;
-    if (line.startsWith('@@')) {
-      const match = /@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(line);
-      if (!match) continue;
-      const oldStart = Number.parseInt(match[1], 10);
-      const oldLines = match[2] ? Number.parseInt(match[2], 10) : 1;
-      const newStart = Number.parseInt(match[3], 10);
-      const newLines = match[4] ? Number.parseInt(match[4], 10) : 1;
-      currentHunk = {
-        header: line,
-        oldStart,
-        oldLines,
-        newStart,
-        newLines,
-        lines: [],
-        addedLines: [],
-      };
-      currentFile.hunks.push(currentHunk);
-      newLineNumber = newStart;
-      continue;
-    }
-    if (!currentHunk) continue;
-    currentHunk.lines.push(line);
-    if (line.startsWith('+') && !line.startsWith('+++')) {
-      currentFile.addedLines.push(newLineNumber);
-      currentHunk.addedLines.push(newLineNumber);
-      newLineNumber += 1;
-    } else if (line.startsWith('-') && !line.startsWith('---')) {
-      // deletion: do not advance new line number
-    } else {
-      newLineNumber += 1;
-    }
-  }
-  return { files };
-}
-
-async function collectRepoDiff(repoRoot, baseRef, { contextLines = 3 } = {}) {
-  const changedFiles = await (0,_git_mjs__WEBPACK_IMPORTED_MODULE_0__/* .listChangedFiles */ .AC)(repoRoot, baseRef);
-  if (!changedFiles.length) {
-    return {
-      changedFiles: [],
-      rawDiffText: '',
-      rawTokenEstimate: 0,
-      files: [],
-      diffText: '',
-      tokenEstimate: 0,
-      reduction: 0,
-    };
-  }
-
-  const rawDiffText = await (0,_git_mjs__WEBPACK_IMPORTED_MODULE_0__/* .diffWithContext */ .LL)(repoRoot, baseRef, { unified: contextLines });
-  const parsed = parseUnifiedDiff(rawDiffText);
-  const files = parsed.files.length
-    ? parsed.files
-    : changedFiles.map(file => ({
-        path: file,
-        hunks: [],
-        addedLines: [],
-      }));
-  const rawTokenEstimate = Math.ceil(rawDiffText.length / 4);
-  const optimized = (0,_diff_optimizer_mjs__WEBPACK_IMPORTED_MODULE_1__/* .optimizeDiff */ .J)({ files, diffText: rawDiffText });
-
-  return {
-    changedFiles,
-    files,
-    rawDiffText,
-    rawTokenEstimate,
-    diffText: optimized.diffText,
-    filesForReview: optimized.files,
-    tokenEstimate: optimized.tokenEstimate,
-    reduction: optimized.reduction,
-  };
-}
-
-
-/***/ }),
-
-/***/ 7440:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   Z: () => (/* binding */ classifyFindings)
-/* harmony export */ });
-/* unused harmony export SUPPRESS_REASONS */
-/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(9946);
-
-
-const SUPPRESS_REASONS = {
-  LOW_CONFIDENCE: 'low_confidence',
-  DUPLICATE: 'duplicate',
-  STYLE_ONLY: 'style_only',
-  INSUFFICIENT_EVIDENCE: 'insufficient_evidence',
-  COVERED_BY_HIGHER_LEVEL: 'covered_by_higher_level_finding',
-};
-
-function evidenceTotalChars(finding) {
-  const ev = finding.evidence;
-  if (!Array.isArray(ev) || ev.length === 0) return 0;
-  return ev.reduce((sum, e) => sum + String(e ?? '').length, 0);
-}
-
-function deduplicateWithinFile(findings) {
-  const seen = new Set();
-  return findings.filter((f) => {
-    const ruleId = String(f.ruleId ?? '');
-    if (ruleId === 'unknown') return true; // ruleId が未確定の finding は file-level dedup もスキップ
-    const key = `${f.file ?? ''}::${ruleId}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-function deduplicateWithinPR(findings) {
-  const seen = new Set();
-  return findings.filter((f) => {
-    const key = String(f.ruleId ?? '');
-    if (key === 'unknown') return true; // ruleId が確定していない finding は PR-level dedup をスキップ
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-/**
- * @param {object[]} findings
- * @param {{ reviewMode?: 'tiny'|'medium'|'large' }} [options]
- * @returns {{ overview: object[], inlineCandidates: object[], suppressed: object[] }}
- */
-function classifyFindings(findings, options = {}) {
-  const reviewMode = options.reviewMode ?? 'medium';
-  const maxOverview = reviewMode === 'tiny' ? 3 : reviewMode === 'large' ? 8 : 5;
-
-  const suppressed = [];
-  const active = [];
-
-  for (const finding of findings) {
-    if (finding.confidence === 'low' && finding.severity !== 'critical') {
-      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.LOW_CONFIDENCE });
-      continue;
-    }
-    if (evidenceTotalChars(finding) < 30 && finding.severity !== 'critical') {
-      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.INSUFFICIENT_EVIDENCE });
-      continue;
-    }
-    const ruleId = String(finding.ruleId ?? '');
-    if (finding.severity === 'minor' && /readability|style|format/i.test(ruleId)) {
-      suppressed.push({ ...finding, suppressReason: SUPPRESS_REASONS.STYLE_ONLY });
-      continue;
-    }
-    active.push(finding);
-  }
-
-  const deduped = deduplicateWithinPR(deduplicateWithinFile(active));
-  const dedupedSet = new Set(deduped.map((f) => f.id));
-  for (const f of active) {
-    if (!dedupedSet.has(f.id)) {
-      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.DUPLICATE });
-    }
-  }
-
-  const sorted = [...deduped].sort(
-    (a, b) => (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_0__/* .computeFindingBreakdown */ ._)(b).composite - (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_0__/* .computeFindingBreakdown */ ._)(a).composite
-  );
-
-  const overview = [];
-  const overviewRuleIds = new Set();
-  for (const f of sorted) {
-    const rid = String(f.ruleId ?? '');
-    const isUnknown = rid === 'unknown';
-    if (!isUnknown && overviewRuleIds.has(rid)) {
-      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
-    } else if (overview.length < maxOverview) {
-      overview.push(f);
-      if (!isUnknown) overviewRuleIds.add(rid);
-    } else {
-      suppressed.push({ ...f, suppressReason: SUPPRESS_REASONS.COVERED_BY_HIGHER_LEVEL });
-    }
-  }
-
-  return { overview, inlineCandidates: [], suppressed };
-}
-
-
-/***/ }),
-
-/***/ 9597:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   i: () => (/* binding */ annotateFingerprints)
-/* harmony export */ });
-/* unused harmony export computeFingerprint */
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7598);
-
-
-/**
- * Stable fingerprint for a finding so that the same logical issue can be
- * matched across review runs even when IDs regenerate.
- *
- * Strategy: hash(ruleId + file + first-60-chars-of-message).
- * Intentionally omits lineStart/lineEnd because line numbers shift as code
- * changes, but the same logical finding should still be considered persisting.
- */
-function computeFingerprint(finding) {
-  const ruleId = String(finding.ruleId ?? 'unknown');
-  const file = String(finding.file ?? '');
-  // Normalize message: lowercase, collapse whitespace, take first 60 chars
-  const msgNorm = String(finding.message ?? finding.title ?? '')
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 60);
-  const raw = `${ruleId}::${file}::${msgNorm}`;
-  return (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.createHash)('sha256').update(raw).digest('hex').slice(0, 16);
-}
-
-/**
- * Annotate findings with their fingerprint (non-mutating).
- */
-function annotateFingerprints(findings) {
-  return findings.map((f) => ({ ...f, fingerprint: computeFingerprint(f) }));
-}
-
-
-/***/ }),
-
-/***/ 340:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  XS: () => (/* binding */ GitError),
-  kG: () => (/* binding */ GitRepoNotFoundError),
-  Rd: () => (/* binding */ detectDefaultBranch),
-  LL: () => (/* binding */ diffWithContext),
-  NC: () => (/* binding */ ensureGitRepo),
-  fe: () => (/* binding */ findMergeBase),
-  AC: () => (/* binding */ listChangedFiles)
-});
-
-// UNUSED EXPORTS: collectAddedLineHints
-
-;// CONCATENATED MODULE: external "node:child_process"
-const external_node_child_process_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
-;// CONCATENATED MODULE: external "node:util"
-const external_node_util_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:util");
-;// CONCATENATED MODULE: ./src/lib/git.mjs
-
-
-
-const exec = (0,external_node_util_namespaceObject.promisify)(external_node_child_process_namespaceObject.execFile);
-
-class GitError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = 'GitError';
-  }
-}
-
-class GitRepoNotFoundError extends GitError {
-  constructor(cwd) {
-    super(`Not a git repository: ${cwd}`);
-    this.name = 'GitRepoNotFoundError';
-  }
-}
-
-async function runGit(args, { cwd }) {
-  try {
-    // Use a large maxBuffer (200MB) to handle large diffs (e.g., pnpm-lock.yaml changes)
-    const { stdout } = await exec('git', args, { cwd, maxBuffer: 200 * 1024 * 1024 });
-    return stdout.trim();
-  } catch (error) {
-    const detail = error.stderr?.toString().trim() || error.message;
-    throw new GitError(detail);
-  }
-}
-
-async function ensureGitRepo(cwd) {
-  const insideWorkTree = await runGit(['rev-parse', '--is-inside-work-tree'], { cwd }).catch(() => null);
-  if (insideWorkTree !== 'true') {
-    throw new GitRepoNotFoundError(cwd);
-  }
-  return runGit(['rev-parse', '--show-toplevel'], { cwd });
-}
-
-async function detectDefaultBranch(cwd) {
-  const candidates = [];
-  const ref = await runGit(['symbolic-ref', '--quiet', 'refs/remotes/origin/HEAD'], { cwd }).catch(() => null);
-  if (ref) {
-    const parts = ref.split('/');
-    candidates.push(parts[parts.length - 1]);
-  }
-  candidates.push('main', 'master');
-
-  for (const branch of candidates) {
-    const exists = await runGit(['rev-parse', '--quiet', '--verify', branch], { cwd }).catch(() => null);
-    if (exists) return branch;
-    const remoteExists = await runGit(['rev-parse', '--quiet', '--verify', `origin/${branch}`], { cwd }).catch(
-      () => null,
-    );
-    if (remoteExists) return branch;
-  }
-  return 'HEAD';
-}
-
-async function findMergeBase(cwd, baseRef) {
-  const candidates = [`origin/${baseRef}`, baseRef];
-  for (const ref of candidates) {
-    const mergeBase = await runGit(['merge-base', 'HEAD', ref], { cwd }).catch(() => null);
-    if (mergeBase) return mergeBase;
-  }
-  // fallback to current HEAD to keep diff calculations deterministic
-  return runGit(['rev-parse', 'HEAD'], { cwd });
-}
-
-async function listChangedFiles(cwd, baseRef) {
-  const stdout = await runGit(['diff', '--name-only', baseRef], { cwd });
-  return stdout
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
-}
-
-async function diffWithContext(cwd, baseRef, { unified = 3 } = {}) {
-  return runGit(['diff', `--unified=${unified}`, '--no-color', baseRef], { cwd });
-}
-
-function collectAddedLineHints(diffText) {
-  const hints = new Map();
-  let currentFile = null;
-
-  for (const line of diffText.split('\n')) {
-    if (line.startsWith('+++ b/')) {
-      // We record the first hunk per file; this keeps output stable for the placeholder comments.
-      currentFile = line.replace('+++ b/', '').trim();
-      continue;
-    }
-    if (!line.startsWith('@@')) continue;
-    const match = /@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/.exec(line);
-    if (match && currentFile && !hints.has(currentFile)) {
-      const startLine = Number.parseInt(match[1], 10);
-      hints.set(currentFile, startLine);
-    }
-  }
-  return hints;
-}
-
-
-/***/ }),
-
-/***/ 2294:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   y2: () => (/* binding */ HEURISTIC_SKILL_IDS),
-/* harmony export */   zq: () => (/* binding */ buildHeuristicComments)
-/* harmony export */ });
-/* unused harmony export SKILL_HEURISTIC_MAP */
-/**
- * スキルIDとヒューリスティック関数のマッピング
- * dry-run 時はこのマッピングに含まれるスキルのみ実行される
- */
-const SKILL_HEURISTIC_MAP = {
-  'rr-midstream-security-basic-001': ['findHardcodedSecrets', 'findGitHubActionsIssues'],
-  'rr-midstream-logging-observability-001': ['findSilentCatch'],
-  'rr-downstream-test-existence-001': ['findMissingTests'],
-  'rr-downstream-coverage-gap-001': ['findMissingTests'],
-};
-
-/**
- * ヒューリスティック対応スキルIDの一覧（dry-run 時のフィルタリング用）
- */
-const HEURISTIC_SKILL_IDS = Object.keys(SKILL_HEURISTIC_MAP);
-
-function ensureArray(value) {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function getSkillId(skill) {
-  return skill?.metadata?.id ?? skill?.id ?? null;
-}
-
-function hasSkill(plan, skillId) {
-  const selected = ensureArray(plan?.selected);
-  return selected.some((skill) => getSkillId(skill) === skillId);
-}
-
-function* iterateAddedLines(file) {
-  const hunks = ensureArray(file?.hunks);
-  for (const hunk of hunks) {
-    let newLineNumber = hunk.newStart ?? 0;
-    for (const rawLine of ensureArray(hunk.lines)) {
-      if (rawLine.startsWith('+') && !rawLine.startsWith('+++')) {
-        yield { line: newLineNumber, text: rawLine.slice(1) };
-        newLineNumber += 1;
-        continue;
-      }
-      if (rawLine.startsWith('-') && !rawLine.startsWith('---')) {
-        continue;
-      }
-      newLineNumber += 1;
-    }
-  }
-}
-
-function* iterateHunkLines(file) {
-  const hunks = ensureArray(file?.hunks);
-  for (const hunk of hunks) {
-    let newLineNumber = hunk.newStart ?? 0;
-    for (const rawLine of ensureArray(hunk.lines)) {
-      if (rawLine.startsWith('+') && !rawLine.startsWith('+++')) {
-        yield { type: 'add', line: newLineNumber, text: rawLine.slice(1) };
-        newLineNumber += 1;
-        continue;
-      }
-      if (rawLine.startsWith('-') && !rawLine.startsWith('---')) {
-        yield { type: 'del', line: null, text: rawLine.slice(1) };
-        continue;
-      }
-      // context line (usually starts with a space)
-      const text = rawLine.startsWith(' ') ? rawLine.slice(1) : rawLine;
-      yield { type: 'ctx', line: newLineNumber, text };
-      newLineNumber += 1;
-    }
-  }
-}
-
-function isEnvReference(code) {
-  return /\b(process\.env|import\.meta\.env)\b/.test(code);
-}
-
-function looksLikeLogging(code) {
-  return /\b(console\.(?:log|info|warn|error)|logger\.\w+|log\.\w+)\b/.test(code);
-}
-
-function matchesHardcodedSecretLine(code) {
-  if (isEnvReference(code)) return false;
-
-  // Typical high-signal tokens/keys
-  const explicitPatterns = [
-    /\bAKIA[0-9A-Z]{16}\b/, // AWS Access Key ID
-    /\bghp_[A-Za-z0-9]{36,}\b/, // GitHub token
-    /\bsk-(?:live|test)?_[A-Za-z0-9]{16,}\b/, // Stripe-like
-    /\bsk-[A-Za-z0-9]{16,}\b/, // OpenAI-like (generic)
-  ];
-  if (explicitPatterns.some((re) => re.test(code))) return true;
-
-  // Heuristic: suspicious identifier name + long-ish string literal
-  const assignMatch =
-    /\b(?:export\s+)?(?:const|let|var)\s+(?<name>[A-Za-z0-9_]+)\s*=\s*(?<quote>['"`])(?<value>[^'"`]+)\k<quote>/.exec(
-      code
-    ) ||
-    /['"](?<name>[A-Za-z0-9_]+)['"]\s*:\s*(?<quote>['"`])(?<value>[^'"`]+)\k<quote>/.exec(code) ||
-    /\b(?<name>[A-Za-z0-9_]+)\s*:\s*(?<quote>['"`])(?<value>[^'"`]+)\k<quote>/.exec(code);
-  if (!assignMatch) return false;
-
-  const name = assignMatch.groups?.name ?? '';
-  const value = assignMatch.groups?.value ?? '';
-  if (!/(token|secret|api[_-]?key|password|passwd|private[_-]?key)/i.test(name)) return false;
-  if (value.length < 10) return false;
-  if (/^https?:\/\//i.test(value)) return false;
-  return true;
-}
-
-function findHardcodedSecrets({ diff }) {
-  // Avoid noisy output when many hardcoded values are introduced at once.
-  const MAX_HARDCODED_SECRET_COMMENTS = 3;
-  const comments = [];
-  const files = ensureArray(diff?.files);
-
-  for (const file of files) {
-    const filePath = file?.path;
-    if (!filePath || filePath === '/dev/null') continue;
-    if (looksLikeTestFile(filePath)) continue;
-    const normalized = String(filePath).replaceAll('\\', '/');
-    if (normalized.includes('/fixtures/') || normalized.includes('/__fixtures__/')) continue;
-    for (const { line, text } of iterateAddedLines(file)) {
-      if (!matchesHardcodedSecretLine(text)) continue;
-      comments.push({
-        file: filePath,
-        line,
-        kind: 'hardcoded-secret',
-      });
-      if (comments.length >= MAX_HARDCODED_SECRET_COMMENTS) return comments;
-    }
-  }
-
-  return comments;
-}
-
-function matchesSilentCatchLine(code) {
-  const lower = code.toLowerCase();
-  const hasCatch = lower.includes('catch (') || lower.includes('catch(') || /\bcatch\b/.test(lower);
-  if (!hasCatch) return false;
-  if (looksLikeLogging(code)) return false;
-  if (/\bthrow\b/.test(code)) return false;
-  if (/\breturn\s*;\s*(?:\/\/.*)?$/.test(code)) return true;
-  if (/\breturn\s+(null|undefined)\s*;\s*(?:\/\/.*)?$/.test(code)) return true;
-  if (/\bcatch\s*\([^)]*\)\s*\{\s*\}\s*$/.test(code)) return true;
-  return false;
-}
-
-function findSilentCatch({ diff }) {
-  const comments = [];
-  const files = ensureArray(diff?.files);
-
-  for (const file of files) {
-    const filePath = file?.path;
-    if (!filePath || filePath === '/dev/null') continue;
-    let catchAnchor = null;
-    let window = 0;
-    let sawLogOrThrow = false;
-
-    for (const entry of iterateHunkLines(file)) {
-      const text = entry.text ?? '';
-
-      // One-liner: catch (...) {}
-      if (matchesSilentCatchLine(text) && entry.line != null) {
-        comments.push({ file: filePath, line: entry.line, kind: 'silent-catch' });
-        if (comments.length >= 3) return comments;
-        catchAnchor = null;
-        window = 0;
-        sawLogOrThrow = false;
-        continue;
-      }
-
-      if (entry.line != null && /\bcatch\s*\(/.test(text)) {
-        catchAnchor = entry.line;
-        window = 8;
-        sawLogOrThrow = false;
-        continue;
-      }
-
-      if (window > 0) {
-        if (entry.type === 'add') {
-          if (looksLikeLogging(text) || /\bthrow\b/.test(text)) {
-            sawLogOrThrow = true;
-          }
-          if (
-            !sawLogOrThrow &&
-            (/\breturn\s*;\s*(?:\/\/.*)?$/.test(text) ||
-              /\breturn\s+(null|undefined)\s*;/.test(text))
-          ) {
-            comments.push({
-              file: filePath,
-              line: catchAnchor ?? entry.line ?? 1,
-              kind: 'silent-catch',
-            });
-            if (comments.length >= 3) return comments;
-            catchAnchor = null;
-            window = 0;
-            sawLogOrThrow = false;
-            continue;
-          }
-        }
-        window -= 1;
-      }
-    }
-  }
-
-  return comments;
-}
-
-function looksLikeTestFile(filePath) {
-  const normalized = String(filePath).replaceAll('\\', '/');
-  return (
-    normalized.includes('/tests/') ||
-    normalized.includes('/__tests__/') ||
-    /\.(test|spec)\./.test(normalized)
-  );
-}
-
-function looksLikeProductCodeFile(filePath) {
-  const normalized = String(filePath).replaceAll('\\', '/');
-  if (looksLikeTestFile(normalized)) return false;
-  if (!/\.(ts|tsx|js|jsx|mjs|cjs)$/.test(normalized)) return false;
-  return (
-    normalized.startsWith('src/') ||
-    normalized.startsWith('lib/') ||
-    normalized.includes('/src/') ||
-    normalized.includes('/lib/')
-  );
-}
-
-function hasBehaviorChangeSignal({ diff }) {
-  const files = ensureArray(diff?.files);
-  for (const file of files) {
-    for (const { text } of iterateAddedLines(file)) {
-      if (/\bif\s*\(/.test(text) || /\bswitch\s*\(/.test(text) || /\bthrow\s+new\b/.test(text))
-        return true;
-    }
-  }
-  return false;
-}
-
-function findMissingTests({ diff }) {
-  const files = ensureArray(diff?.files);
-  const changedPaths = files
-    .map((f) => f?.path)
-    .filter(Boolean)
-    .filter((p) => p !== '/dev/null');
-  const touchesTests = changedPaths.some(looksLikeTestFile);
-  const touchesCode = changedPaths.some(looksLikeProductCodeFile);
-  if (!touchesCode || touchesTests) return [];
-  if (!hasBehaviorChangeSignal({ diff })) return [];
-
-  const firstCodeFile = files.find((f) => looksLikeProductCodeFile(f?.path));
-  const filePath = firstCodeFile?.path;
-  const line = firstCodeFile?.addedLines?.[0] || firstCodeFile?.hunks?.[0]?.newStart || 1;
-  return [
-    {
-      file: filePath,
-      line,
-      kind: 'missing-tests',
-    },
-  ];
-}
-
-/**
- * Check if a file path is a GitHub Actions workflow file.
- * @param {string} filePath - File path to check
- * @returns {boolean} True if the file is a workflow YAML file in .github/workflows/
- */
-function looksLikeGitHubWorkflowFile(filePath) {
-  const normalized = String(filePath).replaceAll('\\', '/');
-  return normalized.startsWith('.github/workflows/') && /\.(yml|yaml)$/.test(normalized);
-}
-
-/**
- * Detect GitHub Actions security issues in workflow files.
- * Checks for common security vulnerabilities including:
- * - pull_request_target privilege escalation risks
- * - Excessive permissions (write-all)
- * - Secrets exposed in run blocks
- * - Unsanitized user input in run blocks (command injection)
- * @param {{diff: {files?: Array}}} options - Diff object containing file changes
- * @returns {Array<{file: string, line: number, kind: string}>} Array of detected security issues
- */
-function findGitHubActionsIssues({ diff }) {
-  const MAX_WORKFLOW_COMMENTS = 3;
-  const comments = [];
-  const files = ensureArray(diff?.files);
-
-  for (const file of files) {
-    const filePath = file?.path;
-    if (!filePath || !looksLikeGitHubWorkflowFile(filePath)) continue;
-
-    for (const { line, text } of iterateAddedLines(file)) {
-      // Check for pull_request_target usage (privilege escalation risk)
-      if (
-        /^\s*(-\s+)?pull_request_target\s*:?\s*$/.test(text) ||
-        /\bon\s*:\s*\[[^\]]*\bpull_request_target\b[^\]]*\]/.test(text)
-      ) {
-        comments.push({
-          file: filePath,
-          line,
-          kind: 'gh-actions-pull-request-target',
-        });
-        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
-        continue;
-      }
-
-      // Check for excessive permissions
-      if (/permissions\s*:\s*(write-all|'write-all'|"write-all")/.test(text)) {
-        comments.push({
-          file: filePath,
-          line,
-          kind: 'gh-actions-excessive-permissions',
-        });
-        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
-        continue;
-      }
-
-      // Check for secrets in run blocks (potential exposure)
-      if (/\$\{\{\s*secrets\.\w+\s*\}\}/.test(text) && /run\s*:/.test(text)) {
-        comments.push({
-          file: filePath,
-          line,
-          kind: 'gh-actions-secret-in-run',
-        });
-        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
-        continue;
-      }
-
-      // Check for unsanitized user input in run blocks (command injection)
-      if (
-        /run\s*:/.test(text) &&
-        /\$\{\{\s*github\.event\.(issue|pull_request|comment)\.(title|body)\s*\}\}/.test(text) &&
-        !/\|\s*jq\b/.test(text) &&
-        !/toJSON/.test(text)
-      ) {
-        comments.push({
-          file: filePath,
-          line,
-          kind: 'gh-actions-unsanitized-input',
-        });
-        if (comments.length >= MAX_WORKFLOW_COMMENTS) return comments;
-        continue;
-      }
-    }
-  }
-
-  return comments;
-}
-
-/**
- * Generate deterministic review comments from heuristics.
- * These comments are used as a fallback when LLM is not available.
- * @param {{diff: {files?: Array}, plan: {selected?: Array}}} options
- */
-function buildHeuristicComments({ diff, plan }) {
-  const comments = [];
-
-  // セキュリティ基本チェック
-  if (hasSkill(plan, 'rr-midstream-security-basic-001')) {
-    const skillId = 'rr-midstream-security-basic-001';
-    for (const c of findHardcodedSecrets({ diff })) {
-      comments.push({ ...c, skillId });
-    }
-    for (const c of findGitHubActionsIssues({ diff })) {
-      comments.push({ ...c, skillId });
-    }
-  }
-
-  // ロギング・可観測性チェック
-  if (hasSkill(plan, 'rr-midstream-logging-observability-001')) {
-    const skillId = 'rr-midstream-logging-observability-001';
-    for (const c of findSilentCatch({ diff })) {
-      comments.push({ ...c, skillId });
-    }
-  }
-
-  // テスト存在チェック
-  if (hasSkill(plan, 'rr-downstream-test-existence-001')) {
-    const skillId = 'rr-downstream-test-existence-001';
-    for (const c of findMissingTests({ diff })) {
-      comments.push({ ...c, skillId });
-    }
-  } else if (hasSkill(plan, 'rr-downstream-coverage-gap-001')) {
-    const skillId = 'rr-downstream-coverage-gap-001';
-    for (const c of findMissingTests({ diff })) {
-      comments.push({ ...c, skillId });
-    }
-  }
-
-  return comments.slice(0, 8);
-}
-
-
-/***/ }),
-
-/***/ 1013:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   E: () => (/* binding */ PLANNER_MODES),
-/* harmony export */   p: () => (/* binding */ normalizePlannerMode)
-/* harmony export */ });
-const PLANNER_MODES = /** @type {const} */ (['off', 'order', 'prune']);
-
-function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
-  const fallback = PLANNER_MODES.includes(defaultMode) ? defaultMode : 'off';
-  const normalized = (mode || '').toLowerCase();
-  if (PLANNER_MODES.includes(normalized)) return normalized;
-  return fallback;
-}
-
-
-
-/***/ }),
-
-/***/ 5544:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  G1: () => (/* binding */ generateReview)
-});
-
-// UNUSED EXPORTS: buildPrompt, parseLineComments
-
-// EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
-var loader = __nccwpck_require__(3833);
-// EXTERNAL MODULE: ./src/lib/scoring/breakdown.mjs
-var breakdown = __nccwpck_require__(9946);
-// EXTERNAL MODULE: ./src/lib/finding-classifier.mjs
-var finding_classifier = __nccwpck_require__(7440);
-// EXTERNAL MODULE: ./src/config/default.mjs
-var config_default = __nccwpck_require__(4807);
-// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 5 modules
-var review_runner = __nccwpck_require__(4584);
-// EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
-var heuristic_review = __nccwpck_require__(2294);
-;// CONCATENATED MODULE: ./src/lib/finding-format.mjs
-const FINDING_SEVERITIES = /** @type {const} */ (['blocker', 'warning', 'nit']);
-const FINDING_CONFIDENCE = /** @type {const} */ (['high', 'medium', 'low']);
-
-function normalizeWhitespace(text) {
-  return String(text ?? '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function clamp(text, maxChars) {
-  const normalized = normalizeWhitespace(text);
-  if (normalized.length <= maxChars) return normalized;
-  return `${normalized.slice(0, Math.max(0, maxChars - 1))}…`;
-}
-
-/**
- * Format a finding message for line-comments (`<file>:<line>: <message>`).
- * Evidence is already anchored by `<file>:<line>`, so we keep the message compact.
- * @param {{
- *   finding: string,
- *   evidence: string,
- *   impact: string,
- *   fix: string,
- *   severity: typeof FINDING_SEVERITIES[number],
- *   confidence: typeof FINDING_CONFIDENCE[number],
- * }} finding
- */
-function formatFindingMessage({ finding, evidence, impact, fix, severity, confidence }) {
-  const sev = FINDING_SEVERITIES.includes(severity) ? severity : 'warning';
-  const conf = FINDING_CONFIDENCE.includes(confidence) ? confidence : 'medium';
-
-  return [
-    `Finding: ${clamp(finding, 80)}`,
-    `Evidence: ${clamp(evidence, 60)}`,
-    `Impact: ${clamp(impact, 60)}`,
-    `Fix: ${clamp(fix, 80)}`,
-    `Severity: ${sev}`,
-    `Confidence: ${conf}`,
-  ].join(' ');
-}
-
-const LABEL_NAMES = ['Finding', 'Evidence', 'Impact', 'Fix', 'Severity', 'Confidence'];
-const LABEL_ALTERNATION = LABEL_NAMES.join('|');
-
-/**
- * Parse a labeled finding message string into structured fields.
- * @param {string} message
- * @returns {{ title: string, evidence: string[], impact: string, suggestion: string, severity: string|null, confidence: string|null }}
- */
-function parseFindingMessage(message) {
-  const text = String(message ?? '');
-  const get = (label) => {
-    const re = new RegExp(`${label}:\\s*([^]*?)(?=\\s+(?:${LABEL_ALTERNATION}):|$)`, 'm');
-    return (text.match(re)?.[1] ?? '').trim();
-  };
-  const evidenceText = get('Evidence');
-  return {
-    title: get('Finding'),
-    evidence: evidenceText ? [evidenceText] : [],
-    impact: get('Impact'),
-    suggestion: get('Fix'),
-    severity: get('Severity') || null,
-    confidence: get('Confidence') || null,
-  };
-}
-
-/**
- * Map internal severity vocabulary (blocker/warning/nit) to output schema vocabulary.
- * Accepts both vocabularies; unknown values default to 'major' (fail-safe).
- * @param {string|null|undefined} internalSeverity
- * @returns {'critical'|'major'|'minor'|'info'}
- */
-function normalizeSeverity(internalSeverity) {
-  switch ((internalSeverity ?? '').toLowerCase().trim()) {
-    case 'blocker':
-    case 'critical':
-      return 'critical';
-    case 'warning':
-    case 'major':
-      return 'major';
-    case 'nit':
-    case 'minor':
-      return 'minor';
-    case 'info':
-      return 'info';
-    default:
-      return 'major';
-  }
-}
-
-/**
- * Validate whether a finding message contains the required labeled fields.
- * @param {string} message
- */
-function validateFindingMessage(message) {
-  const text = String(message ?? '');
-  const missing = [];
-  for (const label of ['Finding:', 'Evidence:', 'Impact:', 'Fix:', 'Severity:', 'Confidence:']) {
-    if (!text.includes(label)) missing.push(label);
-  }
-
-  const sevMatch = /Severity:\s*(\w+)/.exec(text);
-  const confMatch = /Confidence:\s*(\w+)/.exec(text);
-  const severity = sevMatch?.[1] ?? null;
-  const confidence = confMatch?.[1] ?? null;
-
-  const invalid = [];
-  if (severity && !FINDING_SEVERITIES.includes(severity)) invalid.push(`Severity:${severity}`);
-  if (confidence && !FINDING_CONFIDENCE.includes(confidence))
-    invalid.push(`Confidence:${confidence}`);
-
-  return {
-    ok: missing.length === 0 && invalid.length === 0,
-    missing,
-    invalid,
-  };
-}
-
-// EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs
-var review_plan_generator = __nccwpck_require__(8069);
-;// CONCATENATED MODULE: ./src/lib/review-engine.mjs
-
-
-
-
-
-
-
-
-
-const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
-const MAX_PROMPT_CHARS = 12000;
-const MAX_PROMPT_PREVIEW_CHARS = 2000;
-const NO_ISSUES_REGEX = /^NO_ISSUES/i;
-const LINE_COMMENT_REGEX = /^(.+?):(\d+):\s*(.+)$/;
-
-/**
- * スキル名のサニタイズ: Markdown インジェクション対策
- */
-function sanitizeSkillName(name) {
-  if (!name) return '';
-  return String(name).replace(/[\[\]`*_{}()#+\-.!|<>\n]/g, '');
-}
-
-function buildSystemMessage(language) {
-  return language === 'en'
-    ? 'You are River Reviewer, an expert code review assistant. Respond in English. You excel at spotting risky changes and explaining them briefly.'
-    : 'You are River Reviewer, an expert code review assistant. Respond in Japanese. You excel at spotting risky changes and explaining them briefly.';
-}
-
-function buildLanguageInstruction(language) {
-  return language === 'en'
-    ? '- Write the <message> in English.'
-    : '- <message>は日本語で記述すること。';
-}
-
-function buildSeverityInstruction(severity, language) {
-  const japanese = {
-    strict: '軽微な懸念も含めて網羅的に指摘する',
-    normal: '重要度と再現性のバランスを取り、主要なリスクを指摘する',
-    relaxed: '重大・致命的な問題に限定し、軽微な指摘は省く',
-  };
-  const english = {
-    strict: 'Capture even minor risks and style regressions',
-    normal: 'Balance breadth with impact; focus on notable risks',
-    relaxed: 'Limit findings to critical or high-impact issues; skip nits',
-  };
-  const map = language === 'en' ? english : japanese;
-  const label = language === 'en' ? 'Severity focus' : '厳格度';
-  return `- ${label} (${severity}): ${map[severity] ?? map.normal}`;
-}
-
-function buildAdditionalSection(instructions, language) {
-  if (!instructions?.length) return '';
-  const header = language === 'en' ? 'Additional instructions:' : '追加指示:';
-  const body = instructions.map((item) => `- ${item}`).join('\n');
-  return `\n${header}\n${body}\n`;
-}
-
-function resolveOpenAIConfig(options = {}, config = config_default/* defaultConfig */.s) {
-  const provider = config.model?.provider ?? 'openai';
-  const modelName = options.model || ENV_DEFAULT_MODEL || config.model?.modelName;
-  return {
-    provider,
-    apiKey: options.apiKey || process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
-    model: modelName,
-    endpoint:
-      options.endpoint ||
-      process.env.RIVER_OPENAI_BASE_URL ||
-      'https://api.openai.com/v1/chat/completions',
-    temperature: config.model?.temperature ?? 0,
-    maxTokens: config.model?.maxTokens ?? 600,
-  };
-}
-
-function buildSkillSummary(plan) {
-  if (!plan?.selected?.length) return 'No skills selected; provide general review notes.';
-  const summaries = plan.selected.map((skill) => (0,review_runner/* summarizeSkill */.P0)(skill));
-  const top = summaries.slice(0, 6);
-  const body = top
-    .map(
-      (s) =>
-        `- ${s.id}: ${s.name} [phase=${s.phase}, severity=${s.severity ?? 'unknown'}, modelHint=${s.modelHint}]`
-    )
-    .join('\n');
-  const truncated =
-    summaries.length > top.length ? `\n...and ${summaries.length - top.length} more skills.` : '';
-  return `${body}${truncated}`;
-}
-
-function buildFileSummary(files = []) {
-  if (!files.length) return 'No files changed';
-  return files.map((file) => `- ${file.path} (hunks: ${file.hunks.length || 1})`).join('\n');
-}
-
-function buildProjectRulesSection(rulesText) {
-  if (!rulesText) return '';
-  return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
-}
-
-function buildADRContextSection(relatedADRs) {
-  if (!relatedADRs?.length) return '';
-  const lines = ['\n### Related ADRs/Specs\n'];
-  for (const adr of relatedADRs.slice(0, 5)) {
-    lines.push(`- ${adr.title} (${adr.path}) — ${adr.matchReason}`);
-  }
-  lines.push('\nこれらの設計文書との整合性を考慮してレビューしてください。\n');
-  return lines.join('\n');
-}
-
-function sanitizePath(p) {
-  return String(p)
-    .replace(/[\n\r]/g, '')
-    .slice(0, 200);
-}
-
-function buildRiskAssessmentSection(riskAssessment) {
-  if (!riskAssessment) return '';
-  const { escalatedFiles, humanReviewFiles } = riskAssessment;
-  if (!escalatedFiles?.length && !humanReviewFiles?.length) return '';
-  const lines = ['\n### Risk Assessment\n'];
-  if (humanReviewFiles?.length) {
-    lines.push('以下のファイルは人間によるレビューが必須です:');
-    for (const f of humanReviewFiles) lines.push('- ' + sanitizePath(f) + ': require_human_review');
-  }
-  if (escalatedFiles?.length) {
-    lines.push('以下のファイルはエスカレーション対象です:');
-    for (const f of escalatedFiles) lines.push('- ' + sanitizePath(f) + ': escalate');
-  }
-  lines.push('これらのファイルには特に注意してレビューしてください。\n');
-  return lines.join('\n');
-}
-
-function buildPrompt({
-  diffText,
-  diffFiles,
-  plan,
-  phase,
-  projectRules,
-  riskAssessment,
-  memoryContext,
-  relatedADRs,
-  reviewMode,
-  maxChars = MAX_PROMPT_CHARS,
-  config = config_default/* defaultConfig */.s,
-}) {
-  const effectiveConfig = (0,loader/* mergeConfig */.R2)(config_default/* defaultConfig */.s, config ?? {});
-  const reviewConfig = effectiveConfig.review ?? config_default/* defaultConfig */.s.review;
-  const language = reviewConfig.language ?? config_default/* defaultConfig */.s.review.language;
-  const severity = reviewConfig.severity ?? config_default/* defaultConfig */.s.review.severity;
-  const truncated = diffText.length > maxChars;
-  const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
-  const depthConfig = (0,review_plan_generator/* getReviewDepthConfig */.i)(reviewMode ?? 'medium');
-  const prompt = `You are River Reviewer, an AI code review agent.
-Phase: ${phase}
-
-Changed files:
-${buildFileSummary(diffFiles)}
-
-Relevant skills:
-${buildSkillSummary(plan)}
-
-${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}Review the unified git diff below and produce concise findings.
-${buildLanguageInstruction(language)}
-- Output each finding on its own line using the format "<file>:<line>: <message>".
-- In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
-- Use Severity: blocker|warning|nit and Confidence: high|medium|low.
-- Focus on correctness, safety, and maintainability risks in the changed code.
-- Prefer commenting on changed lines; if a point depends on context not visible in the diff, set Confidence: low.
-- Limit to ${depthConfig.maxFindings} findings. If there are no issues worth mentioning, reply with "NO_ISSUES".
-- Keep messages brief (<=200 characters).
-- ${depthConfig.focusHint}
-${buildSeverityInstruction(severity, language)}
-${buildAdditionalSection(reviewConfig.additionalInstructions, language)}
-Diff:
-${diffBody}`;
-  return { prompt, truncated, language, severity };
-}
-
-function parseLineComments(outputText) {
-  if (!outputText) return null;
-  const comments = [];
-  for (const rawLine of outputText.split('\n')) {
-    const line = rawLine.trim();
-    if (!line) continue;
-    if (NO_ISSUES_REGEX.test(line)) return [];
-    const match = LINE_COMMENT_REGEX.exec(line);
-    if (match) {
-      comments.push({
-        file: match[1].trim(),
-        line: Number.parseInt(match[2], 10),
-        message: match[3].trim(),
-      });
-    }
-  }
-  return comments.length ? comments : null;
-}
-
-async function callOpenAI({
-  prompt,
-  apiKey,
-  model,
-  endpoint,
-  temperature,
-  maxTokens,
-  systemMessage,
-}) {
-  const controller = AbortSignal.timeout(15000);
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    signal: controller,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      temperature,
-      max_tokens: maxTokens,
-      messages: [
-        {
-          role: 'system',
-          content: systemMessage ?? buildSystemMessage('ja'),
-        },
-        { role: 'user', content: prompt },
-      ],
-    }),
-  });
-
-  if (!res.ok) {
-    const detail = await res.text();
-    throw new Error(`OpenAI API error ${res.status}: ${detail}`);
-  }
-  const json = await res.json();
-  return json.choices?.[0]?.message?.content?.trim() ?? '';
-}
-
-function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
-  const allSkills = plan?.selected ?? [];
-  // ヒューリスティック対応スキルは除外（ヒューリスティックで処理済み）
-  const skills = allSkills.filter((skill) => {
-    const skillId = skill.metadata?.id ?? skill.id;
-    return !heuristic_review/* HEURISTIC_SKILL_IDS */.y2.includes(skillId);
-  });
-
-  const firstFile = diff.files?.find((f) => f?.path && f.path !== '/dev/null') ?? null;
-  if (!firstFile) {
-    return [
-      {
-        file: '(no-files)',
-        line: 1,
-        message: formatFindingMessage({
-          finding: 'レビュー対象ファイルが特定できない',
-          evidence: '差分ファイルが空',
-          impact: 'レビューの自動化ができない',
-          fix: '差分がある状態で再実行する',
-          severity: 'warning',
-          confidence: 'low',
-        }),
-      },
-    ];
-  }
-
-  const line =
-    firstFile.addedLines?.[0] ||
-    firstFile.hunks?.[0]?.newStart ||
-    1; /* default to first added line or hunk start to keep pointers stable */
-
-  // Build specific reason message
-  const evidenceBase = llmSkipReason
-    ? `LLM: ${llmSkipReason}`
-    : 'ヒューリスティック検出パターンに該当なし';
-
-  // スキルがない場合は1件のコメントを生成
-  if (skills.length === 0) {
-    return [
-      {
-        file: firstFile.path,
-        line,
-        message: formatFindingMessage({
-          finding: 'マッチするスキルがなく自動指摘を生成できなかった',
-          evidence: evidenceBase,
-          impact: '重要なリスクを見落とす可能性がある',
-          fix: 'このファイル種別に対応するスキルを追加するか、手動レビューを実施する',
-          severity: 'warning',
-          confidence: 'low',
-        }),
-      },
-    ];
-  }
-
-  // スキル単位でコメントを生成
-  return skills.map((skill) => {
-    const skillId = skill.metadata?.id ?? skill.id;
-    const rawSkillName = skill.metadata?.name ?? skillId;
-    const skillName = sanitizeSkillName(rawSkillName);
-    return {
-      file: firstFile.path,
-      line,
-      skillId,
-      message: formatFindingMessage({
-        finding: `スキル「${skillName}」の観点で自動指摘を生成できなかった`,
-        evidence: evidenceBase,
-        impact: 'このスキルが検出する問題を見落とす可能性がある',
-        fix: `「${skillName}」の観点で手動レビューを実施する`,
-        severity: 'warning',
-        confidence: 'low',
-      }),
-    };
-  });
-}
-
-function normalizeHeuristicComments(rawComments) {
-  return rawComments.map((c) => {
-    switch (c.kind) {
-      case 'silent-catch':
-        return {
-          file: c.file,
-          line: c.line,
-          skillId: c.skillId,
-          message: formatFindingMessage({
-            finding: 'catch で例外が握りつぶされる可能性がある',
-            evidence: 'catch 内で return（ログ/再throwなし）',
-            impact: '障害調査や失敗検知が困難になる',
-            fix: 'ログ+再throw / 上位へ返す / 無視するなら理由コメント+計測を検討する',
-            severity: 'nit',
-            confidence: 'high',
-          }),
-        };
-      case 'missing-tests':
-        return {
-          file: c.file,
-          line: c.line,
-          skillId: c.skillId,
-          message: formatFindingMessage({
-            finding: '挙動変更に対するテスト差分が見当たらない',
-            evidence: 'コード差分あり・テスト差分なし',
-            impact: '回帰の検知漏れや仕様逸脱が起きやすい',
-            fix: '新分岐/例外/境界の最小テストを1〜3件追加する',
-            severity: 'warning',
-            confidence: 'medium',
-          }),
-        };
-      case 'hardcoded-secret':
-        return {
-          file: c.file,
-          line: c.line,
-          skillId: c.skillId,
-          message: formatFindingMessage({
-            finding: '秘密情報（トークン/キー）の直書きの可能性がある',
-            evidence: 'トークン/キーらしい文字列が追加されている',
-            impact: '漏洩時に不正利用やインシデントにつながる',
-            fix: '環境変数（GitHub Secrets等）へ移し、漏洩時はローテーションも検討する',
-            severity: 'blocker',
-            confidence: 'high',
-          }),
-        };
-      case 'gh-actions-pull-request-target':
-        return {
-          file: c.file,
-          line: c.line,
-          skillId: c.skillId,
-          message: formatFindingMessage({
-            finding: 'pull_request_targetイベントは権限昇格のリスクがある',
-            evidence: 'pull_request_targetトリガーが追加されている',
-            impact: 'フォークからのPRで任意コードが本リポジトリの権限で実行される可能性',
-            fix: 'pull_requestイベントを使用するか、pull_request_targetの場合はチェックアウト前に入力を検証する',
-            severity: 'blocker',
-            confidence: 'high',
-          }),
-        };
-      case 'gh-actions-excessive-permissions':
-        return {
-          file: c.file,
-          line: c.line,
-          skillId: c.skillId,
-          message: formatFindingMessage({
-            finding: '過剰な権限設定（write-all）が検出された',
-            evidence: 'permissions: write-all が設定されている',
-            impact: 'ワークフローが侵害された場合の影響範囲が最大化される',
-            fix: '最小権限の原則に従い、必要な権限のみを個別に指定する（例: contents: read, pull-requests: write）',
-            severity: 'warning',
-            confidence: 'high',
-          }),
-        };
-      case 'gh-actions-secret-in-run':
-        return {
-          file: c.file,
-          line: c.line,
-          skillId: c.skillId,
-          message: formatFindingMessage({
-            finding: 'runブロック内でsecretsを直接使用している',
-            evidence: 'run: と secrets.* が同一行に存在',
-            impact: 'ログ出力やエラーメッセージでシークレットが漏洩する可能性',
-            fix: 'シークレットを環境変数として設定し、envブロック経由で参照する',
-            severity: 'warning',
-            confidence: 'medium',
-          }),
-        };
-      case 'gh-actions-unsanitized-input':
-        return {
-          file: c.file,
-          line: c.line,
-          skillId: c.skillId,
-          message: formatFindingMessage({
-            finding: 'ユーザー入力がサニタイズされずに使用されている',
-            evidence: 'github.event.*.title/body/name がrunブロックで直接使用',
-            impact: 'コマンドインジェクション攻撃のリスクがある',
-            fix: 'jqやtoJSONを使用して入力をサニタイズする、または環境変数経由で渡す',
-            severity: 'blocker',
-            confidence: 'high',
-          }),
-        };
-      default:
-        return {
-          file: c.file,
-          line: c.line,
-          message: formatFindingMessage({
-            finding: `想定外のヒューリスティック（kind=${String(c.kind ?? 'unknown')}）`,
-            evidence: 'ヒューリスティック kind が未知',
-            impact: 'レビュー結果が不安定になる可能性がある',
-            fix: 'ヒューリスティック定義と出力の対応を見直す',
-            severity: 'warning',
-            confidence: 'low',
-          }),
-        };
-    }
-  });
-}
-
-function redactSecrets(text) {
-  if (!text) return text;
-  return String(text)
-    .replace(/\bAKIA[0-9A-Z]{16}\b/g, 'AKIA****************')
-    .replace(/\bghp_[A-Za-z0-9]{20,}\b/g, 'ghp_***REDACTED***')
-    .replace(/\bsk_(?:live|test)_[A-Za-z0-9]{16,}\b/g, 'sk_***REDACTED***')
-    .replace(/\bsk-[A-Za-z0-9]{16,}\b/g, 'sk-***REDACTED***')
-    .replace(/-----BEGIN [^-]* PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----')
-    .replace(/-----END [^-]* PRIVATE KEY-----/g, '-----END PRIVATE KEY-----');
-}
-
-/**
- * Generate review comments using LLM when configured, otherwise fall back to deterministic hints.
- */
-async function generateReview({
-  diff,
-  plan,
-  phase,
-  dryRun = false,
-  includeFallback = true,
-  model,
-  apiKey,
-  projectRules,
-  fileTypes,
-  relatedADRs,
-  riskAssessment,
-  reviewMode,
-  maxPromptChars = MAX_PROMPT_CHARS,
-  config,
-}) {
-  const effectiveConfig = (0,loader/* mergeConfig */.R2)(config_default/* defaultConfig */.s, config ?? {});
-  const promptInfo = buildPrompt({
-    diffText: diff.diffText,
-    diffFiles: diff.files,
-    plan,
-    phase,
-    projectRules,
-    relatedADRs,
-    riskAssessment,
-    reviewMode,
-    maxChars: maxPromptChars,
-    config: effectiveConfig,
-  });
-  const openAIConfig = resolveOpenAIConfig({ model, apiKey }, effectiveConfig);
-  const language = promptInfo.language ?? effectiveConfig.review.language;
-
-  let comments = [];
-  const debug = {
-    promptTruncated: promptInfo.truncated,
-    promptPreview: promptInfo.prompt.slice(0, MAX_PROMPT_PREVIEW_CHARS),
-    llmModel: openAIConfig.model,
-    llmProvider: openAIConfig.provider,
-    reviewLanguage: language,
-    reviewSeverity: promptInfo.severity,
-  };
-
-  const skipReason = dryRun
-    ? 'dry-run enabled'
-    : openAIConfig.provider !== 'openai'
-      ? `provider ${openAIConfig.provider} is not supported yet`
-      : openAIConfig.apiKey
-        ? null
-        : 'OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set';
-
-  if (!skipReason) {
-    try {
-      const output = await callOpenAI({
-        prompt: promptInfo.prompt,
-        apiKey: openAIConfig.apiKey,
-        model: openAIConfig.model,
-        endpoint: openAIConfig.endpoint,
-        temperature: openAIConfig.temperature,
-        maxTokens: openAIConfig.maxTokens,
-        systemMessage: buildSystemMessage(language),
-      });
-      debug.rawLlmOutput = output;
-      const parsed = parseLineComments(output);
-      if (parsed !== null) {
-        const redacted = parsed.map((c) => ({ ...c, message: redactSecrets(c.message) }));
-        const checks = redacted.map((c) => validateFindingMessage(c.message));
-        const invalidCount = checks.filter((c) => !c.ok).length;
-        if (invalidCount === 0) {
-          comments = redacted;
-          debug.llmUsed = true;
-        } else {
-          debug.llmUsed = false;
-          debug.llmError = `LLM findings violate required format (invalidCount=${invalidCount}). Falling back.`;
-        }
-      } else {
-        debug.llmUsed = false;
-        debug.llmError = 'LLM output could not be parsed';
-      }
-    } catch (err) {
-      debug.llmUsed = false;
-      debug.llmError = err.message;
-    }
-  } else {
-    debug.llmUsed = false;
-    debug.llmSkipped = skipReason;
-  }
-
-  if (!comments.length) {
-    const heuristic = (0,heuristic_review/* buildHeuristicComments */.zq)({ diff, plan });
-    debug.heuristicsUsed = true;
-    if (heuristic.length) {
-      comments = normalizeHeuristicComments(heuristic);
-      debug.heuristicsCount = heuristic.length;
-    } else {
-      const llmSkipReason = debug.llmSkipped || debug.llmError || null;
-      // If skipped due to missing API key, do not generate fallback warnings (user request)
-      const isMissingKey = llmSkipReason && llmSkipReason.includes('not set');
-
-      if (isMissingKey) {
-        comments = [];
-      } else {
-        comments = includeFallback ? buildFallbackComments(diff, plan, { llmSkipReason }) : [];
-      }
-      debug.heuristicsCount = 0;
-      debug.fallbackIncluded = includeFallback;
-    }
-  }
-
-  const formatChecks = comments.map((c) => ({
-    file: c.file,
-    line: c.line,
-    ...validateFindingMessage(c.message),
-  }));
-  const invalidCount = formatChecks.filter((c) => !c.ok).length;
-  debug.findingFormat = invalidCount
-    ? { ok: false, invalidCount, samples: formatChecks.filter((c) => !c.ok).slice(0, 3) }
-    : { ok: true };
-
-  debug.fileClassification = fileTypes ?? null;
-
-  // Verifier pass: filter findings that fail quality checks
-  const { verifyFinding } = await __nccwpck_require__.e(/* import() */ 341).then(__nccwpck_require__.bind(__nccwpck_require__, 9341));
-  const verifierResults = comments.map((comment) => ({
-    comment,
-    verification: verifyFinding({
-      finding: comment,
-      diff: diff.diffText,
-      skill: plan?.selected?.[0] ?? {},
-      fileTypes,
-    }),
-  }));
-
-  const verified = verifierResults.filter((r) => r.verification.verified).map((r) => r.comment);
-  const rejected = verifierResults.filter((r) => !r.verification.verified);
-
-  debug.verifierRejected = rejected.map((r) => ({
-    file: r.comment.file,
-    line: r.comment.line,
-    reasons: r.verification.reasons,
-  }));
-  debug.verifierStats = {
-    total: comments.length,
-    verified: verified.length,
-    rejected: rejected.length,
-  };
-
-  // Replace comments with verified-only set
-  comments = verified;
-
-  // Build structured findings from verified comments
-  const findings = comments.map((c, i) => {
-    const parsed = parseFindingMessage(c.message);
-    const severity = normalizeSeverity(parsed.severity);
-    const confidence =
-      parsed.confidence && ['high', 'medium', 'low'].includes(parsed.confidence)
-        ? parsed.confidence
-        : 'medium';
-    return {
-      id: `rr-${i + 1}`,
-      ruleId: c.skillId || 'unknown',
-      file: c.file,
-      lineStart: c.line ?? null,
-      lineEnd: c.line ?? null,
-      title: parsed.title || c.message.slice(0, 80),
-      message: c.message,
-      severity,
-      confidence,
-      status: /** @type {'open'} */ ('open'),
-      evidence: parsed.evidence,
-      suggestion: parsed.suggestion || null,
-    };
-  });
-
-  findings.sort((a, b) => {
-    const bA = (0,breakdown/* computeFindingBreakdown */._)(a);
-    const bB = (0,breakdown/* computeFindingBreakdown */._)(b);
-    return bB.composite - bA.composite;
-  });
-
-  const classified = (0,finding_classifier/* classifyFindings */.Z)(findings, { reviewMode: reviewMode ?? 'medium' });
-
-  return {
-    comments,
-    findings,
-    classified,
-    prompt: promptInfo.prompt,
-    promptTruncated: promptInfo.truncated,
-    llmModel: openAIConfig.model,
-    debug,
-  };
-}
-
-
-/***/ }),
-
-/***/ 8069:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   X: () => (/* binding */ determineReviewMode),
-/* harmony export */   i: () => (/* binding */ getReviewDepthConfig)
-/* harmony export */ });
-/**
- * Determine review mode based on diff metadata.
- *
- * @param {{ fileCount: number, changedLines: number, hasMigrations: boolean, hasSchemas: boolean }} diffMeta
- * @param {object} [options]
- * @returns {'tiny' | 'medium' | 'large'}
- */
-function determineReviewMode(diffMeta, options = {}) {
-  const { fileCount, changedLines, hasMigrations, hasSchemas } = diffMeta;
-
-  let mode;
-  if (fileCount <= 3 && changedLines <= 100) {
-    mode = 'tiny';
-  } else if (fileCount > 20 || changedLines > 800) {
-    mode = 'large';
-  } else {
-    mode = 'medium';
-  }
-
-  if (hasMigrations || hasSchemas) {
-    if (mode === 'tiny') mode = 'medium';
-    else if (mode === 'medium') mode = 'large';
-  }
-
-  return mode;
-}
-
-/**
- * Get review depth configuration for the given mode.
- *
- * @param {'tiny' | 'medium' | 'large'} reviewMode
- * @returns {{ maxFindings: number, focusHint: string }}
- */
-function getReviewDepthConfig(reviewMode) {
-  const configs = {
-    tiny: { maxFindings: 3, focusHint: 'This is a small PR. Focus on the most critical issues only.' },
-    medium: { maxFindings: 8, focusHint: 'Provide a balanced review covering important issues.' },
-    large: { maxFindings: 15, focusHint: 'This is a large PR. Prioritize high-severity issues over minor style concerns.' },
-  };
-  return configs[reviewMode] ?? configs.medium;
-}
-
-
-/***/ }),
-
-/***/ 572:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  _Z: () => (/* binding */ RiskMapError),
-  lm: () => (/* binding */ evaluateRisk),
-  E$: () => (/* binding */ loadRiskMap)
-});
-
-// UNUSED EXPORTS: aggregateRiskLevel
-
-// EXTERNAL MODULE: external "node:fs/promises"
-var promises_ = __nccwpck_require__(1455);
-// EXTERNAL MODULE: external "node:path"
-var external_node_path_ = __nccwpck_require__(6760);
-// EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-var js_yaml = __nccwpck_require__(3243);
-// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
-var esm = __nccwpck_require__(9519);
-// EXTERNAL MODULE: ./node_modules/zod/v4/classic/external.js + 73 modules
-var external = __nccwpck_require__(3905);
-;// CONCATENATED MODULE: ./src/config/risk-map-schema.mjs
-
-
-const RiskActionSchema = external/* enum */.k5n(['comment_only', 'escalate', 'require_human_review']);
-
-const RiskRuleSchema = external/* object */.Ikc({
-  pattern: external/* string */.YjP().min(1),
-  action: RiskActionSchema,
-  reason: external/* string */.YjP().optional(),
-});
-
-const RiskMapSchema = external/* object */.Ikc({
-  version: external/* string */.YjP().default('1'),
-  rules: external/* array */.YOg(RiskRuleSchema).min(1),
-  defaults: external/* object */.Ikc({
-      action: RiskActionSchema.default('comment_only'),
-    })
-    .default({ action: 'comment_only' }),
-});
-
-;// CONCATENATED MODULE: ./src/lib/risk-map.mjs
-
-
-
-
-
-
-const DEFAULT_RISK_MAP_PATH = external_node_path_.join('.river', 'risk-map.yaml');
-
-class RiskMapError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = 'RiskMapError';
-  }
-}
-
-/**
- * Load a risk map from .river/risk-map.yaml (or a custom path).
- * Missing files are treated as "no risk map" without error.
- * @param {string} repoRoot
- * @param {{ riskMapPath?: string }} [options]
- * @returns {Promise<import('../../schemas/risk-map.schema.json') | null>}
- */
-async function loadRiskMap(repoRoot, options = {}) {
-  const repoRootAbs = external_node_path_.resolve(repoRoot);
-  const relativePath = options.riskMapPath ?? DEFAULT_RISK_MAP_PATH;
-  const fullPath = external_node_path_.resolve(repoRootAbs, relativePath);
-
-  if (!fullPath.startsWith(repoRootAbs + external_node_path_.sep) && fullPath !== repoRootAbs) {
-    throw new RiskMapError(`Risk map path is outside of the repository: ${relativePath}`);
-  }
-
-  let raw;
-  try {
-    raw = await promises_.readFile(fullPath, 'utf8');
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return null;
-    }
-    throw new RiskMapError(`Failed to read risk map at ${fullPath}: ${error.message}`);
-  }
-
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
-
-  let parsed;
-  try {
-    parsed = js_yaml/* default.load */.Ay.load(trimmed);
-  } catch (error) {
-    throw new RiskMapError(`Failed to parse risk map YAML: ${error.message}`);
-  }
-
-  const result = RiskMapSchema.safeParse(parsed);
-  if (!result.success) {
-    const issues = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
-    throw new RiskMapError(`Invalid risk map schema: ${issues}`);
-  }
-
-  return result.data;
-}
-
-const ACTION_PRIORITY = {
-  comment_only: 0,
-  escalate: 1,
-  require_human_review: 2,
-};
-
-/**
- * Evaluate risk for a list of changed files against a risk map.
- * First matching rule wins per file.
- * @param {object} riskMap - Parsed risk map config
- * @param {string[]} filePaths - List of changed file paths
- * @returns {{ fileRisks: Array<{ file: string, action: string, rule?: object }>, aggregateAction: string, escalatedFiles: string[], humanReviewFiles: string[] }}
- */
-function evaluateRisk(riskMap, filePaths) {
-  if (!riskMap || !filePaths?.length) {
-    return {
-      fileRisks: [],
-      aggregateAction: riskMap?.defaults?.action ?? 'comment_only',
-      escalatedFiles: [],
-      humanReviewFiles: [],
-    };
-  }
-
-  const defaultAction = riskMap.defaults?.action ?? 'comment_only';
-  const fileRisks = [];
-
-  for (const file of filePaths) {
-    let matched = false;
-    for (const rule of riskMap.rules) {
-      if ((0,esm/* minimatch */.xF)(file, rule.pattern, { dot: true })) {
-        fileRisks.push({
-          file,
-          action: rule.action,
-          rule: { pattern: rule.pattern, reason: rule.reason },
-        });
-        matched = true;
-        break;
-      }
-    }
-    if (!matched) {
-      fileRisks.push({ file, action: defaultAction });
-    }
-  }
-
-  const escalatedFiles = fileRisks
-    .filter((r) => r.action === 'escalate')
-    .map((r) => r.file);
-  const humanReviewFiles = fileRisks
-    .filter((r) => r.action === 'require_human_review')
-    .map((r) => r.file);
-  const aggregateAction = aggregateRiskLevel(fileRisks, defaultAction);
-
-  return { fileRisks, aggregateAction, escalatedFiles, humanReviewFiles };
-}
-
-/**
- * Aggregate to the highest risk action across all file risks.
- * @param {Array<{ action: string }>} fileRisks
- * @param {string} [fallback='comment_only']
- * @returns {string}
- */
-function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
-  if (!fileRisks?.length) return fallback;
-
-  let maxPriority = -1;
-  let maxAction = fallback;
-  for (const { action } of fileRisks) {
-    const priority = ACTION_PRIORITY[action] ?? 0;
-    if (priority > maxPriority) {
-      maxPriority = priority;
-      maxAction = action;
-    }
-  }
-  return maxAction;
-}
-
-
-/***/ }),
-
-/***/ 9946:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   _: () => (/* binding */ computeFindingBreakdown)
-/* harmony export */ });
-function computeEvidenceStrength(finding) {
-  const evidence = finding.evidence;
-  if (!Array.isArray(evidence) || evidence.length === 0) return 0.0;
-  const totalChars = evidence.reduce((sum, e) => sum + String(e ?? '').length, 0);
-  if (totalChars === 0) return 0.0;
-  if (totalChars <= 50) return 0.3;
-  if (totalChars <= 150) return 0.6;
-  return 1.0;
-}
-
-function computeReproducibility(finding) {
-  const confidence = finding.confidence ?? 'medium';
-  const severity = finding.severity ?? 'info';
-
-  let base;
-  if (confidence === 'high') base = 1.0;
-  else if (confidence === 'medium') base = 0.5;
-  else base = 0.2;
-
-  if (severity === 'critical') base = Math.min(1.0, base + 0.2);
-  if (severity === 'minor') base = Math.max(0.0, base - 0.1);
-
-  return base;
-}
-
-function computeBlastRadius(finding) {
-  const severity = finding.severity ?? 'info';
-  const ruleId = String(finding.ruleId ?? '');
-
-  let base;
-  if (severity === 'critical') base = 1.0;
-  else if (severity === 'major') base = 0.7;
-  else if (severity === 'minor') base = 0.3;
-  else base = 0.1;
-
-  if (ruleId.includes('security')) base = Math.min(1.0, base * 1.2);
-
-  return base;
-}
-
-function computeReviewerAgreement(finding) {
-  const confidence = finding.confidence ?? 'medium';
-  if (confidence === 'high') return 0.9;
-  if (confidence === 'medium') return 0.7;
-  return 0.4;
-}
-
-/**
- * Compute a 4-axis score breakdown for a single finding.
- *
- * @param {{
- *   evidence?: string[],
- *   confidence?: 'high' | 'medium' | 'low',
- *   severity?: string,
- *   ruleId?: string,
- * }} finding
- * @returns {{
- *   evidenceStrength: number,
- *   reproducibility: number,
- *   blastRadius: number,
- *   reviewerAgreement: number,
- *   composite: number,
- * }}
- */
-function computeFindingBreakdown(finding) {
-  const evidenceStrength = computeEvidenceStrength(finding);
-  const reproducibility = computeReproducibility(finding);
-  const blastRadius = computeBlastRadius(finding);
-  const reviewerAgreement = computeReviewerAgreement(finding);
-  const composite =
-    evidenceStrength * 0.3 +
-    reproducibility * 0.25 +
-    blastRadius * 0.3 +
-    reviewerAgreement * 0.15;
-  return { evidenceStrength, reproducibility, blastRadius, reviewerAgreement, composite };
-}
-
-
-/***/ }),
-
-/***/ 9487:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   lS: () => (/* binding */ scoreReview),
-/* harmony export */   w8: () => (/* binding */ classifyAxis)
-/* harmony export */ });
-/* unused harmony exports computeAxisScores, computeOverallScore, countBySeverity, deriveVerdict */
-/* harmony import */ var _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(5034);
-/* harmony import */ var _breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(9946);
-/**
- * Review scoring engine.
- *
- * Deterministic (no AI): derives axis scores, overall score, and verdict from
- * structured findings. Inspired by unilabo/site-management-system's scoring
- * rubric, adapted to river-reviewer's HITL-first posture.
- *
- * The output is always flagged `derived: true` to signal that this is a
- * heuristic indicator, not an authoritative quality metric.
- */
-
-
-
-
-/**
- * Classify a finding into one of the 5 axes based on its ruleId.
- * Falls back to `maintainability` when no pattern matches.
- *
- * @param {{ ruleId?: string, category?: string }} finding
- * @returns {typeof AXES[number]}
- */
-function classifyAxis(finding) {
-  if (finding?.category && _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXES */ .gR.includes(finding.category)) {
-    return finding.category;
-  }
-  const ruleId = finding?.ruleId ?? '';
-  for (const { axis, pattern } of _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXIS_PATTERNS */ .SZ) {
-    if (pattern.test(ruleId)) return axis;
-  }
-  return 'maintainability';
-}
-
-/**
- * Compute axis scores from findings.
- *
- * @param {Array<{severity: string, ruleId?: string, category?: string}>} findings
- * @param {object} [options]
- * @param {object} [options.deductions] - Override default deduction table.
- * @returns {Record<typeof AXES[number], number>}
- */
-function computeAxisScores(findings, options = {}) {
-  const deductions = options.deductions ?? _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .DEFAULT_DEDUCTIONS */ .Fh;
-  const scores = Object.fromEntries(_rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXES */ .gR.map((a) => [a, 100]));
-
-  for (const finding of findings ?? []) {
-    const axis = classifyAxis(finding);
-    const severity = normalizeSeverity(finding.severity);
-    const deduction = deductions[axis]?.[severity] ?? 0;
-    scores[axis] = Math.max(0, scores[axis] - deduction);
-  }
-
-  return scores;
-}
-
-/**
- * Compute overall score as the mean of axis scores.
- *
- * @param {Record<typeof AXES[number], number>} axisScores
- * @returns {number}
- */
-function computeOverallScore(axisScores) {
-  const values = _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .AXES */ .gR.map((a) => axisScores[a] ?? 100);
-  const sum = values.reduce((a, b) => a + b, 0);
-  return Math.round(sum / values.length);
-}
-
-/**
- * Count findings per severity.
- *
- * @param {Array<{severity: string}>} findings
- * @returns {{critical: number, major: number, minor: number, info: number}}
- */
-function countBySeverity(findings) {
-  const counts = { critical: 0, major: 0, minor: 0, info: 0 };
-  for (const f of findings ?? []) {
-    const s = normalizeSeverity(f.severity);
-    counts[s]++;
-  }
-  return counts;
-}
-
-/**
- * Derive verdict from overall score, axis scores, and severity counts.
- *
- * Return values:
- * - `auto-approve`: Recommendation only; does NOT bypass HITL policy.
- * - `human-review-recommended`: Notable findings but not blocking.
- * - `human-review-required`: Critical findings or very low score.
- *
- * @param {{overall: number, axes: Record<string, number>, counts: object}} args
- * @returns {'auto-approve' | 'human-review-recommended' | 'human-review-required'}
- */
-function deriveVerdict({ overall, axes, counts }) {
-  const t = _rubric_mjs__WEBPACK_IMPORTED_MODULE_0__/* .VERDICT_THRESHOLDS */ .n;
-
-  if (counts.critical > t.humanReviewRecommended.maxCritical) {
-    return 'human-review-required';
-  }
-  if (overall < t.humanReviewRecommended.minOverall) {
-    return 'human-review-required';
-  }
-  if (
-    overall >= t.autoApprove.minOverall &&
-    (axes.security ?? 100) >= t.autoApprove.minSecurity &&
-    counts.critical <= t.autoApprove.maxCritical &&
-    counts.major <= t.autoApprove.maxMajor
-  ) {
-    return 'auto-approve';
-  }
-  return 'human-review-recommended';
-}
-
-/**
- * Complete scoring entry point.
- *
- * @param {Array<object>} findings - Findings with at least `severity` and `ruleId`.
- * @returns {{
- *   overall: number,
- *   axes: Record<typeof AXES[number], number>,
- *   verdict: string,
- *   counts: {critical: number, major: number, minor: number, info: number},
- *   findingBreakdowns: Array<{id: string, evidenceStrength: number, reproducibility: number, blastRadius: number, reviewerAgreement: number, composite: number}>,
- *   derived: true,
- * }}
- */
-function scoreReview(findings) {
-  const axes = computeAxisScores(findings);
-  const overall = computeOverallScore(axes);
-  const counts = countBySeverity(findings);
-  const verdict = deriveVerdict({ overall, axes, counts });
-  const findingBreakdowns = (findings ?? []).map((f) => ({ id: f.id, ...(0,_breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__/* .computeFindingBreakdown */ ._)(f) }));
-  return { overall, axes, verdict, counts, findingBreakdowns, derived: true };
-}
-
-/**
- * Normalize severity to the canonical vocabulary used by the scoring engine.
- * Accepts both the output schema values (critical/major/minor/info) and
- * internal values (blocker/warning/nit) via fall-through.
- *
- * @param {string} severity
- * @returns {'critical' | 'major' | 'minor' | 'info'}
- */
-function normalizeSeverity(severity) {
-  const s = String(severity ?? '')
-    .toLowerCase()
-    .trim();
-  if (s === 'critical' || s === 'blocker') return 'critical';
-  if (s === 'major' || s === 'warning') return 'major';
-  if (s === 'minor' || s === 'nit') return 'minor';
-  return 'info';
-}
-
-
-/***/ }),
-
-/***/ 5034:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   Fh: () => (/* binding */ DEFAULT_DEDUCTIONS),
-/* harmony export */   SZ: () => (/* binding */ AXIS_PATTERNS),
-/* harmony export */   Sf: () => (/* binding */ AXIS_LABELS_JA),
-/* harmony export */   gR: () => (/* binding */ AXES),
-/* harmony export */   n: () => (/* binding */ VERDICT_THRESHOLDS)
-/* harmony export */ });
-/**
- * Default scoring rubric for deterministic review scoring.
- *
- * Derived from unilabo/site-management-system's review-prompt.md, adapted to
- * river-reviewer's skill taxonomy. Scores are **derived from finding severity
- * and axis**, not AI-generated. See docs/review/scoring-model.md for rationale.
- */
-
-const AXES = /** @type {const} */ ([
-  'readability',
-  'extensibility',
-  'performance',
-  'security',
-  'maintainability',
-]);
-
-const AXIS_LABELS_JA = {
-  readability: '可読性',
-  extensibility: '拡張性',
-  performance: 'パフォーマンス',
-  security: 'セキュリティ',
-  maintainability: '保守性',
-};
-
-/**
- * Regex patterns mapping ruleId to axis. First match wins.
- * Falls back to `maintainability` when no pattern matches.
- *
- * Patterns use a leading `\b` to anchor at word boundary, but intentionally
- * omit a trailing `\b` so that keyword prefixes match extended identifiers
- * (e.g. `depend` matches `dependency`, `read` matches `readability`).
- */
-const AXIS_PATTERNS = [
-  {
-    axis: 'security',
-    pattern: /\b(sec|security|auth|authz|authn|injection|xss|csrf|crypto)/i,
-  },
-  {
-    axis: 'performance',
-    pattern: /\b(perf|performance|n-?plus-?one|n1\b|slow|query|memory)/i,
-  },
-  {
-    axis: 'extensibility',
-    pattern: /\b(arch|architecture|depend|layer|fat|coupling|boundary)/i,
-  },
-  {
-    axis: 'readability',
-    pattern: /\b(read|readability|naming|complexity|style|clarity)/i,
-  },
-  {
-    axis: 'maintainability',
-    pattern: /\b(test|coverage|maint|maintainability|doc|comment)/i,
-  },
-];
-
-/**
- * Default deduction table.
- * Per-severity deductions per axis. Security is penalized more heavily.
- */
-const DEFAULT_DEDUCTIONS = {
-  security: { critical: 50, major: 30, minor: 15, info: 5 },
-  readability: { critical: 30, major: 20, minor: 10, info: 3 },
-  extensibility: { critical: 30, major: 20, minor: 10, info: 3 },
-  performance: { critical: 30, major: 20, minor: 10, info: 3 },
-  maintainability: { critical: 30, major: 20, minor: 10, info: 3 },
-};
-
-/**
- * Verdict thresholds (display only; HITL-respecting).
- *
- * `auto-approve` is a recommendation for automation (e.g. CI bot), NOT a policy
- * to merge without human review. river-reviewer remains HITL-first.
- */
-const VERDICT_THRESHOLDS = {
-  autoApprove: {
-    minOverall: 90,
-    minSecurity: 95,
-    maxCritical: 0,
-    maxMajor: 0,
-  },
-  humanReviewRecommended: {
-    minOverall: 70,
-    maxCritical: 0,
-  },
-  // below humanReviewRecommended threshold -> humanReviewRequired
-};
-
-
-/***/ }),
-
-/***/ 3837:
+/***/ 2783:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$id":"https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#","description":"Meta-schema for $data reference (JSON AnySchema extension proposal)","type":"object","required":["$data"],"properties":{"$data":{"type":"string","anyOf":[{"format":"relative-json-pointer"},{"format":"json-pointer"}]}},"additionalProperties":false}');
 
 /***/ }),
 
-/***/ 7216:
+/***/ 6006:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/applicator","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/applicator":true},"$dynamicAnchor":"meta","title":"Applicator vocabulary meta-schema","type":["object","boolean"],"properties":{"prefixItems":{"$ref":"#/$defs/schemaArray"},"items":{"$dynamicRef":"#meta"},"contains":{"$dynamicRef":"#meta"},"additionalProperties":{"$dynamicRef":"#meta"},"properties":{"type":"object","additionalProperties":{"$dynamicRef":"#meta"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$dynamicRef":"#meta"},"propertyNames":{"format":"regex"},"default":{}},"dependentSchemas":{"type":"object","additionalProperties":{"$dynamicRef":"#meta"},"default":{}},"propertyNames":{"$dynamicRef":"#meta"},"if":{"$dynamicRef":"#meta"},"then":{"$dynamicRef":"#meta"},"else":{"$dynamicRef":"#meta"},"allOf":{"$ref":"#/$defs/schemaArray"},"anyOf":{"$ref":"#/$defs/schemaArray"},"oneOf":{"$ref":"#/$defs/schemaArray"},"not":{"$dynamicRef":"#meta"}},"$defs":{"schemaArray":{"type":"array","minItems":1,"items":{"$dynamicRef":"#meta"}}}}');
 
 /***/ }),
 
-/***/ 8226:
+/***/ 5464:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/content","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/content":true},"$dynamicAnchor":"meta","title":"Content vocabulary meta-schema","type":["object","boolean"],"properties":{"contentEncoding":{"type":"string"},"contentMediaType":{"type":"string"},"contentSchema":{"$dynamicRef":"#meta"}}}');
 
 /***/ }),
 
-/***/ 518:
+/***/ 3892:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/core","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/core":true},"$dynamicAnchor":"meta","title":"Core vocabulary meta-schema","type":["object","boolean"],"properties":{"$id":{"$ref":"#/$defs/uriReferenceString","$comment":"Non-empty fragments not allowed.","pattern":"^[^#]*#?$"},"$schema":{"$ref":"#/$defs/uriString"},"$ref":{"$ref":"#/$defs/uriReferenceString"},"$anchor":{"$ref":"#/$defs/anchorString"},"$dynamicRef":{"$ref":"#/$defs/uriReferenceString"},"$dynamicAnchor":{"$ref":"#/$defs/anchorString"},"$vocabulary":{"type":"object","propertyNames":{"$ref":"#/$defs/uriString"},"additionalProperties":{"type":"boolean"}},"$comment":{"type":"string"},"$defs":{"type":"object","additionalProperties":{"$dynamicRef":"#meta"}}},"$defs":{"anchorString":{"type":"string","pattern":"^[A-Za-z_][-A-Za-z0-9._]*$"},"uriString":{"type":"string","format":"uri"},"uriReferenceString":{"type":"string","format":"uri-reference"}}}');
 
 /***/ }),
 
-/***/ 4588:
+/***/ 7442:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/format-annotation","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/format-annotation":true},"$dynamicAnchor":"meta","title":"Format vocabulary meta-schema for annotation results","type":["object","boolean"],"properties":{"format":{"type":"string"}}}');
 
 /***/ }),
 
-/***/ 5707:
+/***/ 2617:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/meta-data","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/meta-data":true},"$dynamicAnchor":"meta","title":"Meta-data vocabulary meta-schema","type":["object","boolean"],"properties":{"title":{"type":"string"},"description":{"type":"string"},"default":true,"deprecated":{"type":"boolean","default":false},"readOnly":{"type":"boolean","default":false},"writeOnly":{"type":"boolean","default":false},"examples":{"type":"array","items":true}}}');
 
 /***/ }),
 
-/***/ 9547:
+/***/ 9334:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/unevaluated","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/unevaluated":true},"$dynamicAnchor":"meta","title":"Unevaluated applicator vocabulary meta-schema","type":["object","boolean"],"properties":{"unevaluatedItems":{"$dynamicRef":"#meta"},"unevaluatedProperties":{"$dynamicRef":"#meta"}}}');
 
 /***/ }),
 
-/***/ 7082:
+/***/ 9064:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/meta/validation","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/validation":true},"$dynamicAnchor":"meta","title":"Validation vocabulary meta-schema","type":["object","boolean"],"properties":{"type":{"anyOf":[{"$ref":"#/$defs/simpleTypes"},{"type":"array","items":{"$ref":"#/$defs/simpleTypes"},"minItems":1,"uniqueItems":true}]},"const":true,"enum":{"type":"array","items":true},"multipleOf":{"type":"number","exclusiveMinimum":0},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"number"},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"number"},"maxLength":{"$ref":"#/$defs/nonNegativeInteger"},"minLength":{"$ref":"#/$defs/nonNegativeIntegerDefault0"},"pattern":{"type":"string","format":"regex"},"maxItems":{"$ref":"#/$defs/nonNegativeInteger"},"minItems":{"$ref":"#/$defs/nonNegativeIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"maxContains":{"$ref":"#/$defs/nonNegativeInteger"},"minContains":{"$ref":"#/$defs/nonNegativeInteger","default":1},"maxProperties":{"$ref":"#/$defs/nonNegativeInteger"},"minProperties":{"$ref":"#/$defs/nonNegativeIntegerDefault0"},"required":{"$ref":"#/$defs/stringArray"},"dependentRequired":{"type":"object","additionalProperties":{"$ref":"#/$defs/stringArray"}}},"$defs":{"nonNegativeInteger":{"type":"integer","minimum":0},"nonNegativeIntegerDefault0":{"$ref":"#/$defs/nonNegativeInteger","default":0},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"uniqueItems":true,"default":[]}}}');
 
 /***/ }),
 
-/***/ 1678:
+/***/ 1016:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://json-schema.org/draft/2020-12/schema","$vocabulary":{"https://json-schema.org/draft/2020-12/vocab/core":true,"https://json-schema.org/draft/2020-12/vocab/applicator":true,"https://json-schema.org/draft/2020-12/vocab/unevaluated":true,"https://json-schema.org/draft/2020-12/vocab/validation":true,"https://json-schema.org/draft/2020-12/vocab/meta-data":true,"https://json-schema.org/draft/2020-12/vocab/format-annotation":true,"https://json-schema.org/draft/2020-12/vocab/content":true},"$dynamicAnchor":"meta","title":"Core and Validation specifications meta-schema","allOf":[{"$ref":"meta/core"},{"$ref":"meta/applicator"},{"$ref":"meta/unevaluated"},{"$ref":"meta/validation"},{"$ref":"meta/meta-data"},{"$ref":"meta/format-annotation"},{"$ref":"meta/content"}],"type":["object","boolean"],"$comment":"This meta-schema also defines keywords that have appeared in previous drafts in order to prevent incompatible extensions as they remain in common use.","properties":{"definitions":{"$comment":"\\"definitions\\" has been replaced by \\"$defs\\".","type":"object","additionalProperties":{"$dynamicRef":"#meta"},"deprecated":true,"default":{}},"dependencies":{"$comment":"\\"dependencies\\" has been split and replaced by \\"dependentSchemas\\" and \\"dependentRequired\\" in order to serve their differing semantics.","type":"object","additionalProperties":{"anyOf":[{"$dynamicRef":"#meta"},{"$ref":"meta/validation#/$defs/stringArray"}]},"deprecated":true,"default":{}},"$recursiveAnchor":{"$comment":"\\"$recursiveAnchor\\" has been replaced by \\"$dynamicAnchor\\".","$ref":"meta/core#/$defs/anchorString","deprecated":true},"$recursiveRef":{"$comment":"\\"$recursiveRef\\" has been replaced by \\"$dynamicRef\\".","$ref":"meta/core#/$defs/uriReferenceString","deprecated":true}}}');
 
 /***/ }),
 
-/***/ 2079:
+/***/ 8061:
 /***/ ((module) => {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/draft-07/schema#","$id":"http://json-schema.org/draft-07/schema#","title":"Core schema meta-schema","definitions":{"schemaArray":{"type":"array","minItems":1,"items":{"$ref":"#"}},"nonNegativeInteger":{"type":"integer","minimum":0},"nonNegativeIntegerDefault0":{"allOf":[{"$ref":"#/definitions/nonNegativeInteger"},{"default":0}]},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"uniqueItems":true,"default":[]}},"type":["object","boolean"],"properties":{"$id":{"type":"string","format":"uri-reference"},"$schema":{"type":"string","format":"uri"},"$ref":{"type":"string","format":"uri-reference"},"$comment":{"type":"string"},"title":{"type":"string"},"description":{"type":"string"},"default":true,"readOnly":{"type":"boolean","default":false},"examples":{"type":"array","items":true},"multipleOf":{"type":"number","exclusiveMinimum":0},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"number"},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"number"},"maxLength":{"$ref":"#/definitions/nonNegativeInteger"},"minLength":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"pattern":{"type":"string","format":"regex"},"additionalItems":{"$ref":"#"},"items":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/schemaArray"}],"default":true},"maxItems":{"$ref":"#/definitions/nonNegativeInteger"},"minItems":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"contains":{"$ref":"#"},"maxProperties":{"$ref":"#/definitions/nonNegativeInteger"},"minProperties":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"required":{"$ref":"#/definitions/stringArray"},"additionalProperties":{"$ref":"#"},"definitions":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"properties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$ref":"#"},"propertyNames":{"format":"regex"},"default":{}},"dependencies":{"type":"object","additionalProperties":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/stringArray"}]}},"propertyNames":{"$ref":"#"},"const":true,"enum":{"type":"array","items":true,"minItems":1,"uniqueItems":true},"type":{"anyOf":[{"$ref":"#/definitions/simpleTypes"},{"type":"array","items":{"$ref":"#/definitions/simpleTypes"},"minItems":1,"uniqueItems":true}]},"format":{"type":"string"},"contentMediaType":{"type":"string"},"contentEncoding":{"type":"string"},"if":{"$ref":"#"},"then":{"$ref":"#"},"else":{"$ref":"#"},"allOf":{"$ref":"#/definitions/schemaArray"},"anyOf":{"$ref":"#/definitions/schemaArray"},"oneOf":{"$ref":"#/definitions/schemaArray"},"not":{"$ref":"#"}},"default":true}');
@@ -37104,22 +37601,22 @@ var external_node_path_ = __nccwpck_require__(6760);
 const external_node_process_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:process");
 // EXTERNAL MODULE: external "node:url"
 var external_node_url_ = __nccwpck_require__(3136);
-// EXTERNAL MODULE: ./src/lib/git.mjs + 2 modules
-var git = __nccwpck_require__(340);
+// EXTERNAL MODULE: ./src/lib/git.mjs
+var git = __nccwpck_require__(8937);
 // EXTERNAL MODULE: external "node:fs/promises"
 var promises_ = __nccwpck_require__(1455);
-// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
-var esm = __nccwpck_require__(9519);
+// EXTERNAL MODULE: ../../../node_modules/minimatch/dist/esm/index.js + 7 modules
+var esm = __nccwpck_require__(9061);
 // EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
-var loader = __nccwpck_require__(3833);
+var loader = __nccwpck_require__(759);
 // EXTERNAL MODULE: ./src/lib/diff.mjs
-var lib_diff = __nccwpck_require__(4382);
+var lib_diff = __nccwpck_require__(6066);
 // EXTERNAL MODULE: ./src/lib/diff-optimizer.mjs
-var diff_optimizer = __nccwpck_require__(1092);
+var diff_optimizer = __nccwpck_require__(9232);
 // EXTERNAL MODULE: ./src/lib/review-engine.mjs + 1 modules
-var review_engine = __nccwpck_require__(5544);
+var review_engine = __nccwpck_require__(8954);
 // EXTERNAL MODULE: ./src/lib/finding-classifier.mjs
-var finding_classifier = __nccwpck_require__(7440);
+var finding_classifier = __nccwpck_require__(2196);
 ;// CONCATENATED MODULE: ./src/lib/reviewer-orchestrator.mjs
 
 
@@ -37401,9 +37898,9 @@ function createOpenAIPlanner(options = {}) {
 }
 
 // EXTERNAL MODULE: ./src/lib/planner-utils.mjs
-var planner_utils = __nccwpck_require__(1013);
+var planner_utils = __nccwpck_require__(633);
 // EXTERNAL MODULE: ./runners/core/review-runner.mjs + 5 modules
-var review_runner = __nccwpck_require__(4584);
+var review_runner = __nccwpck_require__(2758);
 ;// CONCATENATED MODULE: ./src/lib/rules.mjs
 
 
@@ -37446,7 +37943,7 @@ async function loadProjectRules(repoRoot, options = {}) {
 }
 
 // EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
-var risk_map = __nccwpck_require__(572);
+var risk_map = __nccwpck_require__(2374);
 ;// CONCATENATED MODULE: ./src/lib/riverbed-memory.mjs
 
 
@@ -37648,7 +38145,7 @@ function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
 }
 
 // EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
-var skill_loader = __nccwpck_require__(5541);
+var skill_loader = __nccwpck_require__(2957);
 ;// CONCATENATED MODULE: ./src/lib/utils.mjs
 /**
  * Parse a comma-separated list string into a trimmed array.
@@ -37675,8 +38172,11 @@ function isLlmEnabled() {
 }
 
 // EXTERNAL MODULE: ./src/lib/finding-fingerprint.mjs
-var finding_fingerprint = __nccwpck_require__(9597);
+var finding_fingerprint = __nccwpck_require__(9905);
+// EXTERNAL MODULE: ./src/lib/repo-context.mjs
+var repo_context = __nccwpck_require__(9557);
 ;// CONCATENATED MODULE: ./src/lib/local-runner.mjs
+
 
 
 
@@ -38029,6 +38529,15 @@ async function runLocalReview({
     changedFiles: context.changedFiles,
   });
 
+  const repoContextResult = await (0,repo_context/* collectRepoContext */.o)({
+    changedFiles: context.changedFiles,
+    cwd: context.repoRoot,
+  });
+
+  if (debug && repoContextResult.debugSummary) {
+    process.stderr.write(`[repo-context] ${repoContextResult.debugSummary}\n`);
+  }
+
   const reviewArgs = {
     diff: context.diff,
     plan: context.plan,
@@ -38042,6 +38551,7 @@ async function runLocalReview({
     fileTypes: context.plan?.fileTypes,
     relatedADRs: context.plan?.relatedADRs,
     reviewMode: context.plan?.reviewMode,
+    repoContext: repoContextResult,
     config: context.config,
   };
 
@@ -38215,7 +38725,7 @@ Pricing last updated: ${this.lastUpdated}`;
 
 /* harmony default export */ const cost_estimator = (CostEstimator);
 
-;// CONCATENATED MODULE: ./node_modules/@google/generative-ai/dist/index.mjs
+;// CONCATENATED MODULE: ../../../node_modules/@google/generative-ai/dist/index.mjs
 /**
  * Contains the list of OpenAPI data types
  * as defined by https://swagger.io/docs/specification/data-models/data-types/
@@ -39737,7 +40247,7 @@ class GoogleGenerativeAI {
 
 //# sourceMappingURL=index.mjs.map
 
-;// CONCATENATED MODULE: ./node_modules/openai/internal/tslib.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/tslib.mjs
 function __classPrivateFieldSet(receiver, state, value, kind, f) {
     if (kind === "m")
         throw new TypeError("Private method is not writable");
@@ -39756,7 +40266,7 @@ function __classPrivateFieldGet(receiver, state, kind, f) {
 }
 
 
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/uuid.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils/uuid.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 /**
  * https://stackoverflow.com/a/2117523
@@ -39772,7 +40282,7 @@ let uuid4 = function () {
     return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) => (+c ^ (randomByte() & (15 >> (+c / 4)))).toString(16));
 };
 //# sourceMappingURL=uuid.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/errors.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/errors.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 function isAbortError(err) {
     return (typeof err === 'object' &&
@@ -39809,7 +40319,7 @@ const castToError = (err) => {
     return new Error(err);
 };
 //# sourceMappingURL=errors.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/error.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/core/error.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class error_OpenAIError extends Error {
@@ -39958,7 +40468,7 @@ class SubjectTokenProviderError extends error_OpenAIError {
     }
 }
 //# sourceMappingURL=error.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/values.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils/values.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 // https://url.spec.whatwg.org/#url-scheme-string
@@ -40053,14 +40563,14 @@ const safeJSON = (text) => {
     }
 };
 //# sourceMappingURL=values.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/sleep.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils/sleep.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 //# sourceMappingURL=sleep.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/version.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/version.mjs
 const VERSION = '6.34.0'; // x-release-please-version
 //# sourceMappingURL=version.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/detect-platform.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/detect-platform.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 const isRunningInBrowser = () => {
@@ -40218,7 +40728,7 @@ const getPlatformHeaders = () => {
     return (_platformHeaders ?? (_platformHeaders = getPlatformProperties()));
 };
 //# sourceMappingURL=detect-platform.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/shims.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/shims.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 function getDefaultFetch() {
     if (typeof fetch !== 'undefined') {
@@ -40304,7 +40814,7 @@ async function CancelReadableStream(stream) {
     await cancelPromise;
 }
 //# sourceMappingURL=shims.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/request-options.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/request-options.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 const FallbackEncoder = ({ headers, body }) => {
     return {
@@ -40315,7 +40825,7 @@ const FallbackEncoder = ({ headers, body }) => {
     };
 };
 //# sourceMappingURL=request-options.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/qs/formats.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/qs/formats.mjs
 const default_format = 'RFC3986';
 const default_formatter = (v) => String(v);
 const formatters = {
@@ -40325,7 +40835,7 @@ const formatters = {
 const RFC1738 = 'RFC1738';
 const RFC3986 = 'RFC3986';
 //# sourceMappingURL=formats.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/qs/utils.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/qs/utils.mjs
 
 
 let has = (obj, key) => ((has = Object.hasOwn ?? Function.prototype.call.bind(Object.prototype.hasOwnProperty)),
@@ -40543,7 +41053,7 @@ function maybe_map(val, fn) {
     return fn(val);
 }
 //# sourceMappingURL=utils.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/qs/stringify.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/qs/stringify.mjs
 
 
 
@@ -40818,14 +41328,14 @@ function stringify(object, opts = {}) {
     return joined.length > 0 ? prefix + joined : '';
 }
 //# sourceMappingURL=stringify.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/query.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils/query.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 function stringifyQuery(query) {
     return stringify(query, { arrayFormat: 'brackets' });
 }
 //# sourceMappingURL=query.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/bytes.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils/bytes.mjs
 function concatBytes(buffers) {
     let length = 0;
     for (const buffer of buffers) {
@@ -40852,7 +41362,7 @@ function decodeUTF8(bytes) {
         ((decoder = new globalThis.TextDecoder()), (decodeUTF8_ = decoder.decode.bind(decoder))))(bytes);
 }
 //# sourceMappingURL=bytes.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/decoders/line.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/decoders/line.mjs
 var _LineDecoder_buffer, _LineDecoder_carriageReturnIndex;
 
 
@@ -40961,7 +41471,7 @@ function findDoubleNewlineIndex(buffer) {
     return -1;
 }
 //# sourceMappingURL=line.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/log.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils/log.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 const levelNumbers = {
@@ -41041,7 +41551,7 @@ const formatRequestDetails = (details) => {
     return details;
 };
 //# sourceMappingURL=log.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/streaming.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/core/streaming.mjs
 var _Stream_client;
 
 
@@ -41330,7 +41840,7 @@ function partition(str, delimiter) {
     return [str, '', ''];
 }
 //# sourceMappingURL=streaming.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/parse.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/parse.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -41387,7 +41897,7 @@ function addRequestID(value, response) {
     });
 }
 //# sourceMappingURL=parse.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/api-promise.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/core/api-promise.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var _APIPromise_client;
 
@@ -41460,7 +41970,7 @@ class APIPromise extends Promise {
 }
 _APIPromise_client = new WeakMap();
 //# sourceMappingURL=api-promise.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/pagination.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/core/pagination.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var _AbstractPage_client;
 
@@ -41609,7 +42119,7 @@ class ConversationCursorPage extends AbstractPage {
     }
 }
 //# sourceMappingURL=pagination.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/auth/workload-identity-auth.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/auth/workload-identity-auth.mjs
 
 
 const SUBJECT_TOKEN_TYPES = {
@@ -41697,7 +42207,7 @@ class WorkloadIdentityAuth {
     }
 }
 //# sourceMappingURL=workload-identity-auth.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/uploads.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/uploads.mjs
 
 const checkFileSupport = () => {
     if (typeof File === 'undefined') {
@@ -41829,7 +42339,7 @@ const addFormValue = async (form, key, value) => {
     }
 };
 //# sourceMappingURL=uploads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/to-file.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/to-file.mjs
 
 
 /**
@@ -41918,10 +42428,10 @@ function propsForError(value) {
     return `; props: [${props.map((p) => `"${p}"`).join(', ')}]`;
 }
 //# sourceMappingURL=to-file.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/uploads.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/core/uploads.mjs
 
 //# sourceMappingURL=uploads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/core/resource.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/core/resource.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 class APIResource {
     constructor(client) {
@@ -41929,7 +42439,7 @@ class APIResource {
     }
 }
 //# sourceMappingURL=resource.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/path.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils/path.mjs
 
 /**
  * Percent-encode everything that isn't safe to have in a path without encoding safe chars.
@@ -42004,7 +42514,7 @@ const createPathTagFunction = (pathEncoder = encodeURIPath) => function path(sta
  */
 const path_path = /* @__PURE__ */ createPathTagFunction(encodeURIPath);
 //# sourceMappingURL=path.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/completions/messages.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/chat/completions/messages.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -42032,10 +42542,10 @@ class Messages extends APIResource {
     }
 }
 //# sourceMappingURL=messages.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/error.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/error.mjs
 
 //# sourceMappingURL=error.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/parser.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/parser.mjs
 
 function isChatCompletionFunctionTool(tool) {
     return tool !== undefined && 'function' in tool && tool.function !== undefined;
@@ -42198,7 +42708,7 @@ function validateInputTools(tools) {
     }
 }
 //# sourceMappingURL=parser.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/chatCompletionUtils.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/chatCompletionUtils.mjs
 const isAssistantMessage = (message) => {
     return message?.role === 'assistant';
 };
@@ -42209,7 +42719,7 @@ function isPresent(obj) {
     return obj != null;
 }
 //# sourceMappingURL=chatCompletionUtils.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/EventStream.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/EventStream.mjs
 var _EventStream_instances, _EventStream_connectedPromise, _EventStream_resolveConnectedPromise, _EventStream_rejectConnectedPromise, _EventStream_endPromise, _EventStream_resolveEndPromise, _EventStream_rejectEndPromise, _EventStream_listeners, _EventStream_ended, _EventStream_errored, _EventStream_aborted, _EventStream_catchingPromiseCreated, _EventStream_handleError;
 
 
@@ -42396,7 +42906,7 @@ _EventStream_connectedPromise = new WeakMap(), _EventStream_resolveConnectedProm
     return this._emit('error', new error_OpenAIError(String(error)));
 };
 //# sourceMappingURL=EventStream.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/RunnableFunction.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/RunnableFunction.mjs
 function isRunnableFunctionWithParse(fn) {
     return typeof fn.parse === 'function';
 }
@@ -42411,7 +42921,7 @@ class ParsingToolFunction {
     }
 }
 //# sourceMappingURL=RunnableFunction.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/AbstractChatCompletionRunner.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/AbstractChatCompletionRunner.mjs
 var _AbstractChatCompletionRunner_instances, _AbstractChatCompletionRunner_getFinalContent, _AbstractChatCompletionRunner_getFinalMessage, _AbstractChatCompletionRunner_getFinalFunctionToolCall, _AbstractChatCompletionRunner_getFinalFunctionToolCallResult, _AbstractChatCompletionRunner_calculateTotalUsage, _AbstractChatCompletionRunner_validateParams, _AbstractChatCompletionRunner_stringifyFunctionCallResult;
 
 
@@ -42699,7 +43209,7 @@ _AbstractChatCompletionRunner_instances = new WeakSet(), _AbstractChatCompletion
             : JSON.stringify(rawContent));
 };
 //# sourceMappingURL=AbstractChatCompletionRunner.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/ChatCompletionRunner.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/ChatCompletionRunner.mjs
 
 
 class ChatCompletionRunner extends AbstractChatCompletionRunner {
@@ -42720,7 +43230,7 @@ class ChatCompletionRunner extends AbstractChatCompletionRunner {
     }
 }
 //# sourceMappingURL=ChatCompletionRunner.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/_vendor/partial-json-parser/parser.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/_vendor/partial-json-parser/parser.mjs
 const STR = 0b000000001;
 const NUM = 0b000000010;
 const ARR = 0b000000100;
@@ -42962,10 +43472,10 @@ const _parseJSON = (jsonString, allow) => {
 const partialParse = (input) => parseJSON(input, Allow.ALL ^ Allow.NUM);
 
 //# sourceMappingURL=parser.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/streaming.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/streaming.mjs
 
 //# sourceMappingURL=streaming.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/ChatCompletionStream.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/ChatCompletionStream.mjs
 var _ChatCompletionStream_instances, _ChatCompletionStream_params, _ChatCompletionStream_choiceEventStates, _ChatCompletionStream_currentChatCompletionSnapshot, _ChatCompletionStream_beginRequest, _ChatCompletionStream_getChoiceEventState, _ChatCompletionStream_addChunk, _ChatCompletionStream_emitToolCallDoneEvent, _ChatCompletionStream_emitContentDoneEvents, _ChatCompletionStream_endRequest, _ChatCompletionStream_getAutoParseableResponseFormat, _ChatCompletionStream_accumulateChatCompletion;
 
 
@@ -43455,7 +43965,7 @@ function assertIsEmpty(obj) {
 }
 function assertNever(_x) { }
 //# sourceMappingURL=ChatCompletionStream.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/ChatCompletionStreamingRunner.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/ChatCompletionStreamingRunner.mjs
 
 class ChatCompletionStreamingRunner extends ChatCompletionStream {
     static fromReadableStream(stream) {
@@ -43476,7 +43986,7 @@ class ChatCompletionStreamingRunner extends ChatCompletionStream {
     }
 }
 //# sourceMappingURL=ChatCompletionStreamingRunner.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/completions/completions.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/chat/completions/completions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43586,7 +44096,7 @@ class Completions extends APIResource {
 
 Completions.Messages = Messages;
 //# sourceMappingURL=completions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/chat.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/chat/chat.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43599,18 +44109,18 @@ class Chat extends APIResource {
 }
 Chat.Completions = Completions;
 //# sourceMappingURL=chat.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/completions/index.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/chat/completions/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
 
 //# sourceMappingURL=index.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/index.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/chat/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
 //# sourceMappingURL=index.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/headers.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/headers.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 const brand_privateNullableHeaders = /* @__PURE__ */ Symbol('brand.privateNullableHeaders');
@@ -43685,7 +44195,7 @@ const isEmptyHeaders = (headers) => {
     return true;
 };
 //# sourceMappingURL=headers.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/audio/speech.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/audio/speech.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43720,7 +44230,7 @@ class Speech extends APIResource {
     }
 }
 //# sourceMappingURL=speech.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/audio/transcriptions.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/audio/transcriptions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43738,7 +44248,7 @@ class Transcriptions extends APIResource {
     }
 }
 //# sourceMappingURL=transcriptions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/audio/translations.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/audio/translations.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43751,7 +44261,7 @@ class Translations extends APIResource {
     }
 }
 //# sourceMappingURL=translations.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/audio/audio.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/audio/audio.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43772,7 +44282,7 @@ Audio.Transcriptions = Transcriptions;
 Audio.Translations = Translations;
 Audio.Speech = Speech;
 //# sourceMappingURL=audio.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/batches.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/batches.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43809,7 +44319,7 @@ class Batches extends APIResource {
     }
 }
 //# sourceMappingURL=batches.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/assistants.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/assistants.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43879,7 +44389,7 @@ class Assistants extends APIResource {
     }
 }
 //# sourceMappingURL=assistants.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/realtime/sessions.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/realtime/sessions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43908,7 +44418,7 @@ class Sessions extends APIResource {
     }
 }
 //# sourceMappingURL=sessions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/realtime/transcription-sessions.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/realtime/transcription-sessions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43937,7 +44447,7 @@ class TranscriptionSessions extends APIResource {
     }
 }
 //# sourceMappingURL=transcription-sessions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/realtime/realtime.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/realtime/realtime.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -43957,7 +44467,7 @@ class Realtime extends APIResource {
 Realtime.Sessions = Sessions;
 Realtime.TranscriptionSessions = TranscriptionSessions;
 //# sourceMappingURL=realtime.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/chatkit/sessions.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/chatkit/sessions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44001,7 +44511,7 @@ class sessions_Sessions extends APIResource {
     }
 }
 //# sourceMappingURL=sessions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/chatkit/threads.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/chatkit/threads.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44075,7 +44585,7 @@ class Threads extends APIResource {
     }
 }
 //# sourceMappingURL=threads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/chatkit/chatkit.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/chatkit/chatkit.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44092,7 +44602,7 @@ class ChatKit extends APIResource {
 ChatKit.Sessions = sessions_Sessions;
 ChatKit.Threads = Threads;
 //# sourceMappingURL=chatkit.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/threads/messages.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/threads/messages.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44167,7 +44677,7 @@ class messages_Messages extends APIResource {
     }
 }
 //# sourceMappingURL=messages.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/threads/runs/steps.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/threads/runs/steps.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44207,7 +44717,7 @@ class Steps extends APIResource {
     }
 }
 //# sourceMappingURL=steps.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/base64.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils/base64.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44263,7 +44773,7 @@ const toFloat32Array = (base64Str) => {
     }
 };
 //# sourceMappingURL=base64.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils/env.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils/env.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 /**
  * Read an environment variable.
@@ -44282,7 +44792,7 @@ const readEnv = (env) => {
     return undefined;
 };
 //# sourceMappingURL=env.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/internal/utils.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/internal/utils.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -44292,7 +44802,7 @@ const readEnv = (env) => {
 
 
 //# sourceMappingURL=utils.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/AssistantStream.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/AssistantStream.mjs
 var _AssistantStream_instances, _a, _AssistantStream_events, _AssistantStream_runStepSnapshots, _AssistantStream_messageSnapshots, _AssistantStream_messageSnapshot, _AssistantStream_finalRun, _AssistantStream_currentContentIndex, _AssistantStream_currentContent, _AssistantStream_currentToolCallIndex, _AssistantStream_currentToolCall, _AssistantStream_currentEvent, _AssistantStream_currentRunSnapshot, _AssistantStream_currentRunStepSnapshot, _AssistantStream_addEvent, _AssistantStream_endRequest, _AssistantStream_handleMessage, _AssistantStream_handleRunStep, _AssistantStream_handleEvent, _AssistantStream_accumulateRunStep, _AssistantStream_accumulateMessage, _AssistantStream_accumulateContent, _AssistantStream_handleRun;
 
 
@@ -44842,7 +45352,7 @@ _a = AssistantStream, _AssistantStream_addEvent = function _AssistantStream_addE
 };
 function AssistantStream_assertNever(_x) { }
 //# sourceMappingURL=AssistantStream.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/threads/runs/runs.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/threads/runs/runs.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45024,7 +45534,7 @@ class Runs extends APIResource {
 }
 Runs.Steps = Steps;
 //# sourceMappingURL=runs.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/threads/threads.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/threads/threads.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45119,7 +45629,7 @@ class threads_Threads extends APIResource {
 threads_Threads.Runs = Runs;
 threads_Threads.Messages = messages_Messages;
 //# sourceMappingURL=threads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/beta/beta.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/beta/beta.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45144,7 +45654,7 @@ Beta.ChatKit = ChatKit;
 Beta.Assistants = Assistants;
 Beta.Threads = threads_Threads;
 //# sourceMappingURL=beta.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/completions.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/completions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 /**
@@ -45156,7 +45666,7 @@ class completions_Completions extends APIResource {
     }
 }
 //# sourceMappingURL=completions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/containers/files/content.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/containers/files/content.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45175,7 +45685,7 @@ class Content extends APIResource {
     }
 }
 //# sourceMappingURL=content.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/containers/files/files.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/containers/files/files.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45227,7 +45737,7 @@ class Files extends APIResource {
 }
 Files.Content = Content;
 //# sourceMappingURL=files.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/containers/containers.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/containers/containers.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45270,7 +45780,7 @@ class Containers extends APIResource {
 }
 Containers.Files = Files;
 //# sourceMappingURL=containers.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/conversations/items.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/conversations/items.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45312,7 +45822,7 @@ class Items extends APIResource {
     }
 }
 //# sourceMappingURL=items.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/conversations/conversations.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/conversations/conversations.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45353,7 +45863,7 @@ class Conversations extends APIResource {
 }
 Conversations.Items = Items;
 //# sourceMappingURL=conversations.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/embeddings.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/embeddings.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45409,7 +45919,7 @@ class Embeddings extends APIResource {
     }
 }
 //# sourceMappingURL=embeddings.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/evals/runs/output-items.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/evals/runs/output-items.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45434,7 +45944,7 @@ class OutputItems extends APIResource {
     }
 }
 //# sourceMappingURL=output-items.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/evals/runs/runs.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/evals/runs/runs.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45490,7 +46000,7 @@ class runs_Runs extends APIResource {
 }
 runs_Runs.OutputItems = OutputItems;
 //# sourceMappingURL=runs.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/evals/evals.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/evals/evals.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45543,7 +46053,7 @@ class Evals extends APIResource {
 }
 Evals.Runs = runs_Runs;
 //# sourceMappingURL=evals.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/files.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/files.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45629,13 +46139,13 @@ class files_Files extends APIResource {
     }
 }
 //# sourceMappingURL=files.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/methods.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/fine-tuning/methods.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class Methods extends APIResource {
 }
 //# sourceMappingURL=methods.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/alpha/graders.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/fine-tuning/alpha/graders.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 /**
@@ -45684,7 +46194,7 @@ class Graders extends APIResource {
     }
 }
 //# sourceMappingURL=graders.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/alpha/alpha.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/fine-tuning/alpha/alpha.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45697,7 +46207,7 @@ class Alpha extends APIResource {
 }
 Alpha.Graders = Graders;
 //# sourceMappingURL=alpha.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/checkpoints/permissions.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/fine-tuning/checkpoints/permissions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45783,7 +46293,7 @@ class Permissions extends APIResource {
     }
 }
 //# sourceMappingURL=permissions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/checkpoints/checkpoints.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/fine-tuning/checkpoints/checkpoints.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45796,7 +46306,7 @@ class Checkpoints extends APIResource {
 }
 Checkpoints.Permissions = Permissions;
 //# sourceMappingURL=checkpoints.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/jobs/checkpoints.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/fine-tuning/jobs/checkpoints.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45823,7 +46333,7 @@ class checkpoints_Checkpoints extends APIResource {
     }
 }
 //# sourceMappingURL=checkpoints.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/jobs/jobs.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/fine-tuning/jobs/jobs.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45945,7 +46455,7 @@ class Jobs extends APIResource {
 }
 Jobs.Checkpoints = checkpoints_Checkpoints;
 //# sourceMappingURL=jobs.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/fine-tuning/fine-tuning.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/fine-tuning/fine-tuning.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45970,13 +46480,13 @@ FineTuning.Jobs = Jobs;
 FineTuning.Checkpoints = Checkpoints;
 FineTuning.Alpha = Alpha;
 //# sourceMappingURL=fine-tuning.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/graders/grader-models.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/graders/grader-models.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class GraderModels extends APIResource {
 }
 //# sourceMappingURL=grader-models.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/graders/graders.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/graders/graders.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -45989,7 +46499,7 @@ class graders_Graders extends APIResource {
 }
 graders_Graders.GraderModels = GraderModels;
 //# sourceMappingURL=graders.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/images.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/images.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46018,7 +46528,7 @@ class Images extends APIResource {
     }
 }
 //# sourceMappingURL=images.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/models.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/models.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46050,7 +46560,7 @@ class Models extends APIResource {
     }
 }
 //# sourceMappingURL=models.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/moderations.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/moderations.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 /**
@@ -46066,7 +46576,7 @@ class Moderations extends APIResource {
     }
 }
 //# sourceMappingURL=moderations.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/realtime/calls.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/realtime/calls.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46138,7 +46648,7 @@ class Calls extends APIResource {
     }
 }
 //# sourceMappingURL=calls.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/realtime/client-secrets.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/realtime/client-secrets.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class ClientSecrets extends APIResource {
@@ -46170,7 +46680,7 @@ class ClientSecrets extends APIResource {
     }
 }
 //# sourceMappingURL=client-secrets.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/realtime/realtime.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/realtime/realtime.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46187,7 +46697,7 @@ class realtime_Realtime extends APIResource {
 realtime_Realtime.ClientSecrets = ClientSecrets;
 realtime_Realtime.Calls = Calls;
 //# sourceMappingURL=realtime.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/ResponsesParser.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/ResponsesParser.mjs
 
 
 function maybeParseResponse(response, params) {
@@ -46348,7 +46858,7 @@ function addOutputText(rsp) {
     rsp.output_text = texts.join('');
 }
 //# sourceMappingURL=ResponsesParser.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/responses/ResponseStream.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/responses/ResponseStream.mjs
 var _ResponseStream_instances, _ResponseStream_params, _ResponseStream_currentResponseSnapshot, _ResponseStream_finalResponse, _ResponseStream_beginRequest, _ResponseStream_addEvent, _ResponseStream_endRequest, _ResponseStream_accumulateResponse;
 
 
@@ -46610,7 +47120,7 @@ function finalizeResponse(snapshot, params) {
     return maybeParseResponse(snapshot, params);
 }
 //# sourceMappingURL=ResponseStream.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/responses/input-items.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/responses/input-items.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46634,7 +47144,7 @@ class InputItems extends APIResource {
     }
 }
 //# sourceMappingURL=input-items.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/responses/input-tokens.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/responses/input-tokens.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 class InputTokens extends APIResource {
@@ -46654,7 +47164,7 @@ class InputTokens extends APIResource {
     }
 }
 //# sourceMappingURL=input-tokens.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/responses/responses.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/responses/responses.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46755,7 +47265,7 @@ class Responses extends APIResource {
 Responses.InputItems = InputItems;
 Responses.InputTokens = InputTokens;
 //# sourceMappingURL=responses.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/skills/content.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/skills/content.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46773,7 +47283,7 @@ class content_Content extends APIResource {
     }
 }
 //# sourceMappingURL=content.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/skills/versions/content.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/skills/versions/content.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46792,7 +47302,7 @@ class versions_content_Content extends APIResource {
     }
 }
 //# sourceMappingURL=content.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/skills/versions/versions.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/skills/versions/versions.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46837,7 +47347,7 @@ class Versions extends APIResource {
 }
 Versions.Content = versions_content_Content;
 //# sourceMappingURL=versions.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/skills/skills.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/skills/skills.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46887,7 +47397,7 @@ class Skills extends APIResource {
 Skills.Content = content_Content;
 Skills.Versions = Versions;
 //# sourceMappingURL=skills.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/uploads/parts.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/uploads/parts.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46914,7 +47424,7 @@ class Parts extends APIResource {
     }
 }
 //# sourceMappingURL=parts.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/uploads/uploads.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/uploads/uploads.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -46985,7 +47495,7 @@ class Uploads extends APIResource {
 }
 Uploads.Parts = Parts;
 //# sourceMappingURL=uploads.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/lib/Util.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/lib/Util.mjs
 /**
  * Like `Promise.allSettled()` but throws an error if any promises are rejected.
  */
@@ -47008,7 +47518,7 @@ const allSettledWithThrow = async (promises) => {
     return values;
 };
 //# sourceMappingURL=Util.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/vector-stores/file-batches.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/vector-stores/file-batches.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -47138,7 +47648,7 @@ class FileBatches extends APIResource {
     }
 }
 //# sourceMappingURL=file-batches.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/vector-stores/files.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/vector-stores/files.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -47277,7 +47787,7 @@ class vector_stores_files_Files extends APIResource {
     }
 }
 //# sourceMappingURL=files.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/vector-stores/vector-stores.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/vector-stores/vector-stores.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -47357,7 +47867,7 @@ class VectorStores extends APIResource {
 VectorStores.Files = vector_stores_files_Files;
 VectorStores.FileBatches = FileBatches;
 //# sourceMappingURL=vector-stores.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/videos.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/videos.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -47435,7 +47945,7 @@ class Videos extends APIResource {
     }
 }
 //# sourceMappingURL=videos.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/webhooks/webhooks.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/webhooks/webhooks.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var _Webhooks_instances, _Webhooks_validateSecret, _Webhooks_getRequiredHeader;
 
@@ -47533,15 +48043,15 @@ _Webhooks_instances = new WeakSet(), _Webhooks_validateSecret = function _Webhoo
     return value;
 };
 //# sourceMappingURL=webhooks.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/webhooks/index.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/webhooks/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 //# sourceMappingURL=index.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/webhooks.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/webhooks.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 //# sourceMappingURL=webhooks.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/resources/index.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/resources/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -47567,7 +48077,7 @@ _Webhooks_instances = new WeakSet(), _Webhooks_validateSecret = function _Webhoo
 
 
 //# sourceMappingURL=index.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/client.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/client.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 var _OpenAI_instances, client_a, _OpenAI_encoder, _OpenAI_baseURLOverridden;
 
@@ -48239,7 +48749,7 @@ OpenAI.Containers = Containers;
 OpenAI.Skills = Skills;
 OpenAI.Videos = Videos;
 //# sourceMappingURL=client.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/azure.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/azure.mjs
 
 
 
@@ -48332,7 +48842,7 @@ const _deployments_endpoints = new Set([
     '/images/edits',
 ]);
 //# sourceMappingURL=azure.mjs.map
-;// CONCATENATED MODULE: ./node_modules/openai/index.mjs
+;// CONCATENATED MODULE: ../../../node_modules/openai/index.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 
@@ -48700,9 +49210,9 @@ class SkillDispatcher {
 }
 
 // EXTERNAL MODULE: ./src/lib/scoring/engine.mjs
-var engine = __nccwpck_require__(9487);
+var engine = __nccwpck_require__(6899);
 // EXTERNAL MODULE: ./src/lib/scoring/rubric.mjs
-var rubric = __nccwpck_require__(5034);
+var rubric = __nccwpck_require__(5486);
 ;// CONCATENATED MODULE: ./src/cli.mjs
 
 
@@ -49337,7 +49847,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
   try {
     // Skills subcommands (import/export/list) – no git repo required
     if (parsed.command === 'skills' && parsed.skillsSubcommand) {
-      const { runSkillsSubcommand } = await __nccwpck_require__.e(/* import() */ 488).then(__nccwpck_require__.bind(__nccwpck_require__, 6488));
+      const { runSkillsSubcommand } = await __nccwpck_require__.e(/* import() */ 684).then(__nccwpck_require__.bind(__nccwpck_require__, 8684));
       return runSkillsSubcommand(parsed);
     }
 
@@ -49379,7 +49889,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
 
     if (parsed.command === 'runs') {
       const { resolveStoreDir, listRunRecords, loadRunRecord, computeDashboard, formatDashboard } =
-        await __nccwpck_require__.e(/* import() */ 260).then(__nccwpck_require__.bind(__nccwpck_require__, 4260));
+        await __nccwpck_require__.e(/* import() */ 560).then(__nccwpck_require__.bind(__nccwpck_require__, 4560));
       const storeDir = resolveStoreDir(targetPath);
 
       if (!parsed.runsSubcommand || parsed.runsSubcommand === 'list') {
@@ -49402,7 +49912,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
           console.error('Error: river runs diff <run-id-1> <run-id-2>');
           return 1;
         }
-        const { diffReviews, formatRegressionSummary } = await __nccwpck_require__.e(/* import() */ 744).then(__nccwpck_require__.bind(__nccwpck_require__, 3744));
+        const { diffReviews, formatRegressionSummary } = await __nccwpck_require__.e(/* import() */ 4).then(__nccwpck_require__.bind(__nccwpck_require__, 1004));
         const [run1, run2] = await Promise.all([
           loadRunRecord(storeDir, parsed.runsId1),
           loadRunRecord(storeDir, parsed.runsId2),
@@ -49435,7 +49945,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
     }
 
     if (parsed.command === 'eval') {
-      const { evaluateReviewFixtures } = await __nccwpck_require__.e(/* import() */ 213).then(__nccwpck_require__.bind(__nccwpck_require__, 9213));
+      const { evaluateReviewFixtures } = await __nccwpck_require__.e(/* import() */ 145).then(__nccwpck_require__.bind(__nccwpck_require__, 4145));
       const casesPath =
         parsed.fixturesCasesPath ||
         external_node_path_.join(external_node_process_namespaceObject.cwd(), 'tests', 'fixtures', 'review-eval', 'cases.json');
@@ -49582,7 +50092,7 @@ Dependencies: ${
     if (parsed.save && result.status === 'ok') {
       try {
         const { buildRunRecord, saveRunRecord, resolveStoreDir } =
-          await __nccwpck_require__.e(/* import() */ 260).then(__nccwpck_require__.bind(__nccwpck_require__, 4260));
+          await __nccwpck_require__.e(/* import() */ 560).then(__nccwpck_require__.bind(__nccwpck_require__, 4560));
         const record = buildRunRecord(result, { phase: parsed.phase });
         // Use targetPath (not result.repoRoot) so --save and runs list resolve the same storeDir
         const savedPath = await saveRunRecord(record, { storeDir: resolveStoreDir(targetPath) });
@@ -49595,7 +50105,7 @@ Dependencies: ${
     // Regression comparison when --baseline is provided
     if (parsed.baseline && result.status === 'ok') {
       try {
-        const { diffReviews, formatRegressionSummary } = await __nccwpck_require__.e(/* import() */ 744).then(__nccwpck_require__.bind(__nccwpck_require__, 3744));
+        const { diffReviews, formatRegressionSummary } = await __nccwpck_require__.e(/* import() */ 4).then(__nccwpck_require__.bind(__nccwpck_require__, 1004));
         const baselineRaw = await Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 1455, 19)).then((fs) =>
           fs.readFile(parsed.baseline, 'utf8')
         );
@@ -49616,7 +50126,7 @@ Dependencies: ${
     } else if (parsed.output === 'markdown') {
       printMarkdownReport(result, parsed.phase);
     } else if (parsed.output === 'yaml') {
-      const { formatYamlOutput } = await __nccwpck_require__.e(/* import() */ 610).then(__nccwpck_require__.bind(__nccwpck_require__, 4610));
+      const { formatYamlOutput } = await __nccwpck_require__.e(/* import() */ 830).then(__nccwpck_require__.bind(__nccwpck_require__, 3830));
       const artifact = {
         phase: parsed.phase,
         timestamp: new Date().toISOString(),
