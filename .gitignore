@@ -50,4 +50,5 @@ reports/
 **/eval/results.json
 dist/
 !runners/github-action/dist/
+!runners/node-api/dist/
 run_log.txt

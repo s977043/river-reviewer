@@ -116,6 +116,12 @@ export interface ReviewOptions {
   preferredModelHint?: ModelHint;
   /** Diff text for impact analysis */
   diffText?: string;
+  /**
+   * AI provider string for executing skills (e.g. "openai:gpt-4o").
+   * When omitted, review() returns an execution plan with zero findings.
+   * Supported formats: "openai:<model>" uses OPENAI_API_KEY env var.
+   */
+  provider?: string;
 }
 
 /**
