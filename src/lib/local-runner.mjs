@@ -16,6 +16,7 @@ import { loadReviewMemory } from './memory-context.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import { isLlmEnabled, parseList } from './utils.mjs';
 import { annotateFingerprints } from './finding-fingerprint.mjs';
+import { collectRepoContext } from './repo-context.mjs';
 
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
@@ -356,6 +357,15 @@ export async function runLocalReview({
     changedFiles: context.changedFiles,
   });
 
+  const repoContextResult = await collectRepoContext({
+    changedFiles: context.changedFiles,
+    cwd: context.repoRoot,
+  });
+
+  if (debug && repoContextResult.debugSummary) {
+    process.stderr.write(`[repo-context] ${repoContextResult.debugSummary}\n`);
+  }
+
   const reviewArgs = {
     diff: context.diff,
     plan: context.plan,
@@ -369,6 +379,7 @@ export async function runLocalReview({
     fileTypes: context.plan?.fileTypes,
     relatedADRs: context.plan?.relatedADRs,
     reviewMode: context.plan?.reviewMode,
+    repoContext: repoContextResult,
     config: context.config,
   };
 

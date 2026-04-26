@@ -11,6 +11,7 @@ import {
   normalizeSeverity,
 } from './finding-format.mjs';
 import { getReviewDepthConfig } from './review-plan-generator.mjs';
+import { formatRepoContextPrompt } from './repo-context.mjs';
 
 const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
 const MAX_PROMPT_CHARS = 12000;
@@ -145,6 +146,7 @@ export function buildPrompt({
   memoryContext,
   relatedADRs,
   reviewMode,
+  repoContext,
   maxChars = MAX_PROMPT_CHARS,
   config = defaultConfig,
 }) {
@@ -155,6 +157,9 @@ export function buildPrompt({
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
   const depthConfig = getReviewDepthConfig(reviewMode ?? 'medium');
+  const repoContextSection = repoContext?.sections?.length
+    ? formatRepoContextPrompt(repoContext.sections) + '\n'
+    : '';
   const prompt = `You are River Reviewer, an AI code review agent.
 Phase: ${phase}
 
@@ -164,7 +169,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${repoContextSection}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -459,6 +464,7 @@ export async function generateReview({
   relatedADRs,
   riskAssessment,
   reviewMode,
+  repoContext,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -472,6 +478,7 @@ export async function generateReview({
     relatedADRs,
     riskAssessment,
     reviewMode,
+    repoContext,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });
