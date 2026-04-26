@@ -388,6 +388,7 @@ export async function review(options: ReviewOptions): Promise<ReviewResult> {
     preferredModelHint = 'balanced',
     diffText,
     provider,
+    concurrency = 3,
   } = options;
 
   // Load skills
@@ -404,15 +405,28 @@ export async function review(options: ReviewOptions): Promise<ReviewResult> {
     diffText,
   });
 
-  // Execute selected skills in parallel; individual failures are non-fatal
+  // Execute selected skills with configurable concurrency; individual failures are non-fatal
   const allFindings: Finding[] = [];
   if (provider) {
-    const results = await Promise.allSettled(
-      plan.selected.map((skill) => executeSkillWithAI(skill, provider, files, diffText))
-    );
-    for (const result of results) {
-      if (result.status === 'fulfilled') {
-        allFindings.push(...result.value);
+    const skills = plan.selected;
+    if (concurrency <= 0) {
+      // unlimited: original behavior
+      const results = await Promise.allSettled(
+        skills.map((skill) => executeSkillWithAI(skill, provider, files, diffText))
+      );
+      for (const result of results) {
+        if (result.status === 'fulfilled') allFindings.push(...result.value);
+      }
+    } else {
+      // chunk-based concurrency
+      for (let i = 0; i < skills.length; i += concurrency) {
+        const chunk = skills.slice(i, i + concurrency);
+        const results = await Promise.allSettled(
+          chunk.map((skill) => executeSkillWithAI(skill, provider, files, diffText))
+        );
+        for (const result of results) {
+          if (result.status === 'fulfilled') allFindings.push(...result.value);
+        }
       }
     }
   }
