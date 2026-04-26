@@ -5,19 +5,19 @@ on:
     branches:
       - main
     paths:
-      - 'skills/*/eval/**'
-      - 'skills/*/prompt/**'
-      - 'skills/*/fixtures/**'
-      - 'skills/*/golden/**'
+      - 'skills/*/*/eval/**'
+      - 'skills/*/*/prompt/**'
+      - 'skills/*/*/fixtures/**'
+      - 'skills/*/*/golden/**'
       - '.github/workflows/skill-eval.yml'
   pull_request:
     branches:
       - main
     paths:
-      - 'skills/*/eval/**'
-      - 'skills/*/prompt/**'
-      - 'skills/*/fixtures/**'
-      - 'skills/*/golden/**'
+      - 'skills/*/*/eval/**'
+      - 'skills/*/*/prompt/**'
+      - 'skills/*/*/fixtures/**'
+      - 'skills/*/*/golden/**'
       - '.github/workflows/skill-eval.yml'
   schedule:
     # Run weekly on Mondays at 9:00 AM JST (00:00 UTC)
