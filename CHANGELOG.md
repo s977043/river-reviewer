@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.19.0](https://github.com/s977043/river-reviewer/compare/v0.18.0...v0.19.0) (2026-04-26)
+
+
+### Features
+
+* **eval:** add Phase 3 skill fixtures for typescript-nullcheck and typescript-strict ([#648](https://github.com/s977043/river-reviewer/issues/648)) ([bbc0b61](https://github.com/s977043/river-reviewer/commit/bbc0b612e148127eb9a3fd332e608b496f6ad82a))
+
 ## [0.18.0](https://github.com/s977043/river-reviewer/compare/v0.17.2...v0.18.0) (2026-04-25)
 
 
