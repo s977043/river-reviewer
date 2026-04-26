@@ -29,9 +29,11 @@ function formatInlineBody(issue) {
 
 /**
  * Format a markdown summary from JSON findings for the top-level PR comment.
+ * @param {object} data - original full JSON output (used for summary.issueCountBySeverity)
+ * @param {number} inlinePostedCount - number of findings successfully posted as inline comments
+ * @param {object[]} remainingIssues - issues to list in the summary (unlocated + inline-failed)
  */
-function formatSummaryFromJson(data) {
-  const issues = data.issues ?? [];
+function formatSummaryFromJson(data, inlinePostedCount, remainingIssues) {
   const summary = data.summary ?? {};
   const counts = summary.issueCountBySeverity ?? {};
 
@@ -41,7 +43,7 @@ function formatSummaryFromJson(data) {
     '',
   ];
 
-  const total = issues.length;
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
   if (total === 0) {
     lines.push('✅ No issues found.');
     return lines.join('\n');
@@ -55,17 +57,14 @@ function formatSummaryFromJson(data) {
   lines.push(`**${total} finding${total === 1 ? '' : 's'}** — ${countParts.join(', ')}`);
   lines.push('');
 
-  const inlineIssues = issues.filter((i) => i.file && i.line);
-  const noLocationIssues = issues.filter((i) => !i.file || !i.line);
-
-  if (inlineIssues.length > 0) {
-    lines.push(`_Inline comments posted for ${inlineIssues.length} finding${inlineIssues.length === 1 ? '' : 's'} with line info._`);
+  if (inlinePostedCount > 0) {
+    lines.push(`_Successfully posted ${inlinePostedCount} inline review comment${inlinePostedCount === 1 ? '' : 's'}._`);
     lines.push('');
   }
 
-  if (noLocationIssues.length > 0) {
-    lines.push('### Findings without line info', '');
-    for (const issue of noLocationIssues) {
+  if (remainingIssues.length > 0) {
+    lines.push('### Findings not posted inline', '');
+    for (const issue of remainingIssues) {
       const emoji = SEVERITY_EMOJI[issue.severity] || '🔵';
       lines.push(`- ${emoji} **${issue.title}**${issue.file ? ` (${issue.file})` : ''}`);
       if (issue.message && issue.message !== issue.title) {
@@ -148,8 +147,8 @@ module.exports = async function postInlineComments({ github, context, core }) {
   core.info(`Inline comments: ${inlinePosted} posted, ${inlineFailed} failed (will appear in summary)`);
 
   // Build summary: findings without location + inline failures
-  const summaryIssues = { ...data, issues: [...unlocatedIssues, ...inlineFailedIssues] };
-  const summaryBody = formatSummaryFromJson(summaryIssues);
+  const remainingIssues = [...unlocatedIssues, ...inlineFailedIssues];
+  const summaryBody = formatSummaryFromJson(data, inlinePosted, remainingIssues);
 
   // Post or update top-level summary comment
   const comments = await github.paginate(github.rest.issues.listComments, {
