@@ -133,3 +133,82 @@ river-review-<domain>
 - [ ] `skills/agent-skills/` ディレクトリを作成
 - [ ] 入口スキル `river-review` を作成
 - [ ] テンプレート（#311）を使用して専門スキルを追加
+
+---
+
+## Per-Skill Eval Fixture Convention
+
+スキルごとの回帰テスト用フィクスチャの配置ルール。
+
+### ディレクトリ構造
+
+```text
+skills/<phase>/<skillId>/
+├── eval/
+│   └── promptfoo.yaml    # promptfoo 設定（テスト定義）
+├── fixtures/
+│   ├── 01-<name>-happy.md      # 検出すべき diff（happy path）
+│   └── 02-<name>-false-positive.md  # 誤検知すべきでない diff（guard）
+└── golden/
+    └── 01-<name>-happy.md      # 期待する出力（similarity チェック用）
+```
+
+### 最小フィクスチャ要件
+
+各スキルに最低 2 つのテストケースが必要:
+
+1. **Happy path** (`01-*-happy.md`): スキルが問題を検出すべき diff
+2. **False-positive guard** (`02-*-false-positive.md`): スキルが誤検知してはならない diff
+
+### フィクスチャファイル形式
+
+```markdown
+# Test Case: <タイトル>
+
+## Description
+
+テストの目的
+
+## Input Diff
+
+\`\`\`diff
+(実際の git diff 形式)
+\`\`\`
+
+## Expected Behavior
+
+- 検出 / 非検出の期待値を箇条書きで記述
+```
+
+### Golden ファイル形式
+
+```markdown
+# Expected Output: <タイトル>
+
+**Finding:** <問題の概要>
+**Evidence:** <証拠コード>
+**Impact:** <影響>
+**Fix:** <修正案>
+**Severity:** major|minor|critical|info
+**Confidence:** high|medium|low
+```
+
+### promptfoo.yaml のアサーション型
+
+| アサーション型 | 用途                                                     |
+| -------------- | -------------------------------------------------------- |
+| `llm-rubric`   | LLM による意味的な合否判定（主観的な基準）               |
+| `contains`     | 必須文字列が含まれるか                                   |
+| `not-contains` | false-positive guard（誤検知がないか）                   |
+| `similar`      | golden ファイルとのコサイン類似度（threshold: 0.7 推奨） |
+
+### ローカル実行
+
+```bash
+cd skills/<phase>/<skillId>/eval
+promptfoo eval
+```
+
+### CI ゲート
+
+`.github/workflows/skill-eval.yml` が `eval/promptfoo.yaml` を持つ全スキルを自動検出し、PR ごとに実行する。`continue-on-error: false` のため、失敗はマージをブロックする。
