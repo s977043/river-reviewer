@@ -69,11 +69,93 @@ import type {
   EvaluateSkillOptions,
   EvaluationResult,
   SkillDefinition,
+  Finding,
   Phase,
   InputContext,
   Dependency,
   ModelHint,
 } from './types.js';
+
+export { parseProvider, parseFindings } from './ai-helpers.js';
+import { parseProvider, parseFindings } from './ai-helpers.js';
+
+/** Resolve API key from environment for known provider types. */
+function resolveApiKey(providerType: string): string | undefined {
+  if (providerType === 'openai') return process.env.OPENAI_API_KEY;
+  if (providerType === 'anthropic') return process.env.ANTHROPIC_API_KEY;
+  return undefined;
+}
+
+/** Call an OpenAI-compatible chat completions endpoint via fetch. */
+async function callOpenAICompatible(params: {
+  model: string;
+  apiKey: string;
+  systemMessage: string;
+  userMessage: string;
+  endpoint?: string;
+}): Promise<string> {
+  const endpoint = params.endpoint ?? 'https://api.openai.com/v1/chat/completions';
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${params.apiKey}`,
+    },
+    body: JSON.stringify({
+      model: params.model,
+      temperature: 0.1,
+      max_tokens: 2000,
+      messages: [
+        { role: 'system', content: params.systemMessage },
+        { role: 'user', content: params.userMessage },
+      ],
+    }),
+  });
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`AI API error ${response.status}: ${detail}`);
+  }
+  const json = (await response.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  return json.choices?.[0]?.message?.content?.trim() ?? '';
+}
+
+/** Execute a skill against diff/file content using an AI provider. */
+async function executeSkillWithAI(
+  skill: SkillDefinition,
+  providerStr: string,
+  files: string[],
+  diffText?: string
+): Promise<Finding[]> {
+  const { type: providerType, model } = parseProvider(providerStr);
+  const apiKey = resolveApiKey(providerType);
+
+  if (!apiKey) {
+    throw new Error(
+      `No API key found for provider "${providerType}". ` +
+        `Set the ${providerType === 'openai' ? 'OPENAI_API_KEY' : `${providerType.toUpperCase()}_API_KEY`} environment variable.`
+    );
+  }
+
+  if (providerType !== 'openai') {
+    throw new Error(
+      `Provider "${providerType}" is not yet supported. Only "openai" is currently supported.`
+    );
+  }
+
+  const systemMessage = skill.body;
+  const userParts: string[] = [];
+  if (diffText) userParts.push(`## Code Diff\n\n\`\`\`diff\n${diffText}\n\`\`\``);
+  if (files.length > 0) userParts.push(`## Files Under Review\n\n${files.join('\n')}`);
+  userParts.push(
+    '## Task\n\nReview the code diff above and identify issues according to your skill instructions.'
+  );
+  const userMessage = userParts.join('\n\n');
+
+  const output = await callOpenAICompatible({ model, apiKey, systemMessage, userMessage });
+  return parseFindings(output, skill.metadata.id, files);
+}
 
 /**
  * Load all skills from the skills directory.
@@ -110,7 +192,7 @@ export async function loadSkills(options: LoadSkillsOptions = {}): Promise<Skill
 
   // Filter by phase if specified
   if (phase) {
-    return skills.filter((skill) => coreMatchesPhase(skill, phase));
+    return (skills as SkillDefinition[]).filter((skill) => coreMatchesPhase(skill, phase));
   }
 
   return skills;
@@ -307,6 +389,7 @@ export async function review(options: ReviewOptions): Promise<ReviewResult> {
     availableDependencies,
     preferredModelHint = 'balanced',
     diffText,
+    provider,
   } = options;
 
   // Load skills
@@ -323,19 +406,29 @@ export async function review(options: ReviewOptions): Promise<ReviewResult> {
     diffText,
   });
 
-  // TODO: Actual skill execution would happen here with AI provider integration
-  // For now, return a structured result with the execution plan
+  // Execute each selected skill with the AI provider (when provided)
+  const allFindings: Finding[] = [];
+  if (provider) {
+    for (const skill of plan.selected) {
+      try {
+        const skillFindings = await executeSkillWithAI(skill, provider, files, diffText);
+        allFindings.push(...skillFindings);
+      } catch {
+        // Individual skill failures are non-fatal; continue with remaining skills
+      }
+    }
+  }
+
+  const bySeverity = { critical: 0, major: 0, minor: 0, info: 0 };
+  for (const f of allFindings) {
+    bySeverity[f.severity] = (bySeverity[f.severity] ?? 0) + 1;
+  }
 
   const result: ReviewResult = {
-    findings: [],
+    findings: allFindings,
     summary: {
-      totalFindings: 0,
-      bySeverity: {
-        critical: 0,
-        major: 0,
-        minor: 0,
-        info: 0,
-      },
+      totalFindings: allFindings.length,
+      bySeverity,
       filesReviewed: files.length,
       skillsExecuted: plan.selected.length,
     },
@@ -374,13 +467,7 @@ export async function review(options: ReviewOptions): Promise<ReviewResult> {
  * ```
  */
 export async function evaluateSkill(options: EvaluateSkillOptions): Promise<EvaluationResult> {
-  const {
-    skillId,
-    provider: _provider,
-    files: _files = [],
-    inputContexts: _inputContexts = [],
-    skillsDir,
-  } = options;
+  const { skillId, provider, files = [], inputContexts: _inputContexts = [], skillsDir } = options;
 
   const startTime = Date.now();
 
@@ -393,19 +480,13 @@ export async function evaluateSkill(options: EvaluateSkillOptions): Promise<Eval
       throw new Error(`Skill not found: ${skillId}`);
     }
 
-    // TODO: Implement actual AI provider integration
-    // This would involve:
-    // 1. Initializing the AI provider client based on the provider string
-    // 2. Preparing the context (files, diff, etc.)
-    // 3. Executing the skill with the AI provider
-    // 4. Parsing the results into findings
-
+    const findings = await executeSkillWithAI(skill, provider, files);
     const executionTime = Date.now() - startTime;
 
     return {
       skill,
-      success: false,
-      error: 'AI provider integration not yet implemented',
+      success: true,
+      findings,
       executionTime,
     };
   } catch (error) {
