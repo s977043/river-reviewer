@@ -4,8 +4,14 @@
   "description": "Core skill execution components for River Reviewer",
   "type": "module",
   "exports": {
-    "./skill-loader": "./skill-loader.mjs",
-    "./review-runner": "./review-runner.mjs"
+    "./skill-loader": {
+      "types": "./skill-loader.d.ts",
+      "default": "./skill-loader.mjs"
+    },
+    "./review-runner": {
+      "types": "./review-runner.d.ts",
+      "default": "./review-runner.mjs"
+    }
   },
   "dependencies": {
     "js-yaml": "^4.1.1",
