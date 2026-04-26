@@ -404,15 +404,15 @@ export async function review(options: ReviewOptions): Promise<ReviewResult> {
     diffText,
   });
 
-  // Execute each selected skill with the AI provider (when provided)
+  // Execute selected skills in parallel; individual failures are non-fatal
   const allFindings: Finding[] = [];
   if (provider) {
-    for (const skill of plan.selected) {
-      try {
-        const skillFindings = await executeSkillWithAI(skill, provider, files, diffText);
-        allFindings.push(...skillFindings);
-      } catch {
-        // Individual skill failures are non-fatal; continue with remaining skills
+    const results = await Promise.allSettled(
+      plan.selected.map((skill) => executeSkillWithAI(skill, provider, files, diffText))
+    );
+    for (const result of results) {
+      if (result.status === 'fulfilled') {
+        allFindings.push(...result.value);
       }
     }
   }
