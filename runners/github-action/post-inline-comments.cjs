@@ -116,31 +116,65 @@ module.exports = async function postInlineComments({ github, context, core }) {
   let inlineFailed = 0;
   const inlineFailedIssues = [];
 
+  // Filter out oversized comments up front
+  const fittingIssues = [];
   for (const issue of locatedIssues) {
     const body = formatInlineBody(issue);
     if (body.length > MAX_INLINE_BODY) {
       core.warning(`Skipping inline comment for ${issue.file}:${issue.line} — body too long`);
       inlineFailedIssues.push(issue);
       inlineFailed++;
-      continue;
+    } else {
+      fittingIssues.push({ issue, body });
     }
+  }
+
+  // Attempt a single batched review (1 API call instead of N)
+  let batchSucceeded = false;
+  if (fittingIssues.length > 0) {
     try {
-      await github.rest.pulls.createReviewComment({
+      await github.rest.pulls.createReview({
         owner,
         repo,
         pull_number: prNumber,
         commit_id: commitId,
-        path: issue.file,
-        line: issue.line,
-        side: 'RIGHT',
-        body,
+        event: 'COMMENT',
+        comments: fittingIssues.map(({ issue, body }) => ({
+          path: issue.file,
+          line: issue.line,
+          side: 'RIGHT',
+          body,
+        })),
       });
-      inlinePosted++;
+      inlinePosted = fittingIssues.length;
+      batchSucceeded = true;
+      core.info(`Batch review posted ${inlinePosted} inline comment(s) in 1 API call.`);
     } catch (err) {
-      // Line may not be in the diff — gracefully degrade to summary
-      core.warning(`Could not post inline comment for ${issue.file}:${issue.line}: ${err.message}`);
-      inlineFailedIssues.push(issue);
-      inlineFailed++;
+      // Batch failed (e.g. a line is outside the diff) — fall back to per-comment posting
+      core.warning(`Batch review failed (${err.message}); falling back to per-comment posting.`);
+    }
+  }
+
+  // Fallback: post comments individually so we can skip invalid lines
+  if (!batchSucceeded) {
+    for (const { issue, body } of fittingIssues) {
+      try {
+        await github.rest.pulls.createReviewComment({
+          owner,
+          repo,
+          pull_number: prNumber,
+          commit_id: commitId,
+          path: issue.file,
+          line: issue.line,
+          side: 'RIGHT',
+          body,
+        });
+        inlinePosted++;
+      } catch (err) {
+        core.warning(`Could not post inline comment for ${issue.file}:${issue.line}: ${err.message}`);
+        inlineFailedIssues.push(issue);
+        inlineFailed++;
+      }
     }
   }
 
