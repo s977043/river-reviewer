@@ -57,18 +57,20 @@ We define team-specific judgment criteria and review procedures as reusable **Ag
 
 ## Positioning: artifact-driven review agent
 
-River Reviewer is a **PlanGate-independent, artifact-driven review agent**. It does not require a special integration with PlanGate v6 or any other upstream workflow. Instead, it consumes externally supplied artifacts (`plan` / `diff` / `test-cases` / `junit`, etc.) and produces review results that include `findings`. The input contract is defined in the [Artifact Input Contract](pages/reference/artifact-input-contract.en.md), and the output schema in the [Review Artifact](pages/reference/review-artifact.en.md) reference.
+River Reviewer is an **artifact-driven review agent**. It consumes externally supplied artifacts (`plan` / `diff` / `test-cases` / `junit`, etc.) and produces review results that include `findings`. The input contract is defined in the [Artifact Input Contract](pages/reference/artifact-input-contract.en.md), and the output schema in the [Review Artifact](pages/reference/review-artifact.en.md) reference.
+
+The primary integration today is with **PlanGate v6**: River Reviewer receives `plan` / `pbi-input` artifacts produced by PlanGate and inspects them for design integrity and implementation conformance using dedicated skills.
 
 ### Four use cases
 
-The same CLI (`river review plan` / `river review exec`) switches use cases based on which artifacts you supply.
+> **Note**: The `river review plan` / `river review exec` / `river review verify` CLI commands are under development (tracked in Issue #509). Until the implementation is complete, the workflow steps run as placeholders.
 
 - **Design review**: pass `pbi-input` / `plan` to check plan integrity and completeness with upstream skills (e.g. `skills/upstream/rr-upstream-plangate-plan-integrity-001/`).
 - **Implementation review**: pass `plan` + `diff` to check that the code change matches the plan (e.g. `skills/upstream/rr-upstream-plangate-exec-conformance-001/`).
 - **QA review**: pass `test-cases` / `junit` / `coverage` so downstream skills can surface coverage gaps and failure paths.
 - **Double-check (W-check)**: pass existing AI or human review output as `review-self` / `review-external` to review the review itself.
 
-### CLI examples
+### CLI examples (under development)
 
 See [`river review plan` CLI spec](pages/reference/cli-review-plan-spec.en.md) and [`river review exec` CLI spec](pages/reference/cli-review-exec-spec.en.md) for full details.
 

@@ -133,7 +133,7 @@ When `--advisory-only` is set, fail/warn judgement is disabled and only internal
 ## CI / Downstream Integration
 
 - **Review Artifact**: persist `--output json --output-file <path>` via the CI artifact upload step.
-- **GitHub Action**: `runners/github-action/action.yml` will map inputs onto this CLI (deferred to follow-up issue #511).
+- **GitHub Action**: `runners/github-action/action.yml` will map inputs onto this CLI (not yet implemented; tracked separately).
 - **Riverbed Memory**: only the JSON output is canonical for ingestion (see [Riverbed Storage](./riverbed-storage.en.md)).
 - **PR comments**: idempotent updates via the `<!-- river-reviewer -->` marker follow [Stable Interfaces](./stable-interfaces.en.md).
 
