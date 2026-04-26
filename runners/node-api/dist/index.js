@@ -27,12 +27,10 @@ import { loadSkills as coreLoadSkills, loadSkillFile as coreLoadSkillFile, loadS
 import { buildExecutionPlan as coreBuildExecutionPlan, selectSkills as coreSelectSkills, matchesPhase as coreMatchesPhase, rankByModelHint as coreRankByModelHint, summarizeSkill as coreSummarizeSkill, } from '@river-reviewer/core-runner/review-runner';
 export { parseProvider, parseFindings } from './ai-helpers.js';
 import { parseProvider, parseFindings } from './ai-helpers.js';
-/** Resolve API key from environment for known provider types. */
+/** Resolve API key from environment. Currently only openai is supported. */
 function resolveApiKey(providerType) {
     if (providerType === 'openai')
         return process.env.OPENAI_API_KEY;
-    if (providerType === 'anthropic')
-        return process.env.ANTHROPIC_API_KEY;
     return undefined;
 }
 /** Call an OpenAI-compatible chat completions endpoint via fetch. */
@@ -64,13 +62,12 @@ async function callOpenAICompatible(params) {
 /** Execute a skill against diff/file content using an AI provider. */
 async function executeSkillWithAI(skill, providerStr, files, diffText) {
     const { type: providerType, model } = parseProvider(providerStr);
-    const apiKey = resolveApiKey(providerType);
-    if (!apiKey) {
-        throw new Error(`No API key found for provider "${providerType}". ` +
-            `Set the ${providerType === 'openai' ? 'OPENAI_API_KEY' : `${providerType.toUpperCase()}_API_KEY`} environment variable.`);
-    }
     if (providerType !== 'openai') {
         throw new Error(`Provider "${providerType}" is not yet supported. Only "openai" is currently supported.`);
+    }
+    const apiKey = resolveApiKey(providerType);
+    if (!apiKey) {
+        throw new Error(`No API key found for provider "${providerType}". Set the OPENAI_API_KEY environment variable.`);
     }
     const systemMessage = skill.body;
     const userParts = [];

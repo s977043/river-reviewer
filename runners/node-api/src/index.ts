@@ -79,10 +79,9 @@ import type {
 export { parseProvider, parseFindings } from './ai-helpers.js';
 import { parseProvider, parseFindings } from './ai-helpers.js';
 
-/** Resolve API key from environment for known provider types. */
+/** Resolve API key from environment. Currently only openai is supported. */
 function resolveApiKey(providerType: string): string | undefined {
   if (providerType === 'openai') return process.env.OPENAI_API_KEY;
-  if (providerType === 'anthropic') return process.env.ANTHROPIC_API_KEY;
   return undefined;
 }
 
@@ -129,18 +128,17 @@ async function executeSkillWithAI(
   diffText?: string
 ): Promise<Finding[]> {
   const { type: providerType, model } = parseProvider(providerStr);
-  const apiKey = resolveApiKey(providerType);
-
-  if (!apiKey) {
-    throw new Error(
-      `No API key found for provider "${providerType}". ` +
-        `Set the ${providerType === 'openai' ? 'OPENAI_API_KEY' : `${providerType.toUpperCase()}_API_KEY`} environment variable.`
-    );
-  }
 
   if (providerType !== 'openai') {
     throw new Error(
       `Provider "${providerType}" is not yet supported. Only "openai" is currently supported.`
+    );
+  }
+
+  const apiKey = resolveApiKey(providerType);
+  if (!apiKey) {
+    throw new Error(
+      `No API key found for provider "${providerType}". Set the OPENAI_API_KEY environment variable.`
     );
   }
 
