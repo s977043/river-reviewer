@@ -531,27 +531,6 @@ function formatPrioritySummaryMarkdown(result) {
     ''
   );
 
-  const suppressed = result.classified?.suppressed ?? [];
-  if (suppressed.length > 0) {
-    const reasonCounts = {};
-    for (const f of suppressed) {
-      reasonCounts[f.suppressReason] = (reasonCounts[f.suppressReason] ?? 0) + 1;
-    }
-    const topReasons = Object.entries(reasonCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([r, n]) => `${r}(${n})`)
-      .join(', ');
-    lines.push(`- 抑制済み: ${suppressed.length} 件 (主な理由: ${topReasons})`, '');
-  }
-
-  const humanReviewFiles = result.plan?.riskMap?.require_human_review ?? [];
-  if (humanReviewFiles.length > 0) {
-    lines.push('> **Human review required**');
-    for (const f of humanReviewFiles) lines.push(`> - ${sanitizeForMarkdown(f)}`);
-    lines.push('');
-  }
-
   return lines.join('\n');
 }
 
@@ -647,14 +626,14 @@ function formatJsonOutput(result, phase) {
     };
   });
 
-  const priorityCounts = { P1: 0, P2: 0, P3: 0, P4: 0 };
-  for (const f of result.findings ?? []) {
-    const p = severityToPriority(f.severity);
-    priorityCounts[p]++;
-  }
   const prioritySummary = {
-    counts: priorityCounts,
-    requiresImmediateAttention: priorityCounts.P1 > 0,
+    counts: {
+      P1: issueCountBySeverity.critical,
+      P2: issueCountBySeverity.major,
+      P3: issueCountBySeverity.minor,
+      P4: issueCountBySeverity.info,
+    },
+    requiresImmediateAttention: issueCountBySeverity.critical > 0,
   };
 
   const summary = { issueCountBySeverity, issueCountByPhase, prioritySummary };
