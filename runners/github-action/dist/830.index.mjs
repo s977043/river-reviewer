@@ -1,15 +1,15 @@
-export const id = 610;
-export const ids = [610];
+export const id = 830;
+export const ids = [830];
 export const modules = {
 
-/***/ 4610:
+/***/ 3830:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   formatYamlOutput: () => (/* binding */ formatYamlOutput)
 /* harmony export */ });
-/* harmony import */ var _scoring_engine_mjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9487);
-/* harmony import */ var _scoring_rubric_mjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5034);
+/* harmony import */ var _scoring_engine_mjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6899);
+/* harmony import */ var _scoring_rubric_mjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5486);
 /**
  * YAML output formatter for river-reviewer.
  *
@@ -175,4 +175,4 @@ function escapeYamlString(value) {
 
 };
 
-//# sourceMappingURL=610.index.mjs.map
+//# sourceMappingURL=830.index.mjs.map

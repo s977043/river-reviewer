@@ -1,8 +1,8 @@
-export const id = 260;
-export const ids = [260];
+export const id = 560;
+export const ids = [560];
 export const modules = {
 
-/***/ 4260:
+/***/ 4560:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -252,4 +252,4 @@ function formatDashboard(dashboard) {
 
 };
 
-//# sourceMappingURL=260.index.mjs.map
+//# sourceMappingURL=560.index.mjs.map
