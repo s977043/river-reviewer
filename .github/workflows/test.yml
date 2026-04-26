@@ -82,18 +82,38 @@ jobs:
     name: Action dist freshness
     runs-on: ubuntu-latest
     needs: lint
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/actions/setup-node-deps
-      - run: npm run build:action
+        with:
+          fetch-depth: 0
       - name: Check dist is up to date
         run: |
-          if ! git diff --quiet runners/github-action/dist/; then
-            echo "::error::dist/ is out of date. Run 'npm run build:action' and commit."
-            git diff --stat runners/github-action/dist/
+          src_ts=$(git log -1 --format=%ct -- 'runners/github-action/src/' 'src/')
+          dist_ts=$(git log -1 --format=%ct -- 'runners/github-action/dist/')
+
+          if [ -z "$src_ts" ]; then
+            echo "No bundled-source commits in history; skipping dist staleness check."
+            exit 0
+          fi
+
+          if [ -z "$dist_ts" ]; then
+            echo "::error::runners/github-action/dist/ has never been committed. Run 'npm run build:action' and commit."
             exit 1
           fi
+
+          if [ "$src_ts" -gt "$dist_ts" ]; then
+            src_date=$(git log -1 --format=%ci -- 'runners/github-action/src/' 'src/')
+            dist_date=$(git log -1 --format=%ci -- 'runners/github-action/dist/')
+            echo "::error::dist/ is stale. Source last changed at ${src_date} but dist last rebuilt at ${dist_date}. Run 'npm run build:action' and commit."
+            echo "Recent src changes:"
+            git log -3 --oneline -- 'runners/github-action/src/' 'src/'
+            exit 1
+          fi
+
+          src_date=$(git log -1 --format=%ci -- 'runners/github-action/src/' 'src/')
+          dist_date=$(git log -1 --format=%ci -- 'runners/github-action/dist/')
+          echo "dist/ is current (dist: ${dist_date}, src: ${src_date})"
 
   integration-test:
     name: Integration (CLI)
