@@ -122,14 +122,17 @@ gh api repos/OWNER/REPO/branches/main/protection --jq .required_status_checks.st
 2. **統合できない場合: 同一 SHA ベース一括 rebase** — マージ開始前に全ての残ブランチを現在の `origin/main` SHA に同時 rebase して push する。これで各 PR が並列に CI を実行する。マージするたびに次ブランチを rebase する（1 回ずつで済む）
 3. **lock-file-only 衝突の解消** — `gh api .../pulls/N/update-branch` が 422 を返す場合: 新 PR を作らず、ブランチをローカルで checkout して `npm install --package-lock-only` → commit → force push する。新 PR 作成は CI 履歴・レビューコメントの消失を招く
 
-**同一 SHA 一括 rebase の例:**
+**同一 SHA 一括 rebase の例（独立 PR のみ — ファイル共有・スタック無し）:**
 
 ```bash
-# 残ブランチを一度に全部 rebase してから push
+# 残ブランチを一度に全部 rebase してから push（コンフリクト時は即中断）
+set -e
 for branch in feat/pr-a feat/pr-b feat/pr-c; do
-  git rebase origin/main origin/$branch --onto origin/main
-  git push origin HEAD:refs/heads/$branch --force-with-lease
+  git checkout "$branch"
+  git rebase origin/main || { git rebase --abort; exit 1; }
+  git push origin "$branch" --force-with-lease --force-if-includes
 done
+git checkout main
 # その後 CI が通ったものから順次 merge
 ```
 
