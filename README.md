@@ -67,18 +67,20 @@ River Reviewer は、単にコードをAIに読ませるツールではありま
 
 ## ポジション: artifact-driven review agent
 
-River Reviewer は **PlanGate 非依存の artifact-driven review agent** です。PlanGate v6 などの上流ワークフローに特別な統合を前提とせず、外部から渡されるアーティファクト（`plan` / `diff` / `test-cases` / `junit` ほか）を入力として読み取り、`findings` を含むレビュー結果を出力します。入力の契約は [Artifact Input Contract](pages/reference/artifact-input-contract.md) で、出力スキーマは [Review Artifact](pages/reference/review-artifact.md) で定義されています。
+River Reviewer は **artifact-driven review agent** です。外部から渡されるアーティファクト（`plan` / `diff` / `test-cases` / `junit` ほか）を入力として読み取り、`findings` を含むレビュー結果を出力します。入力の契約は [Artifact Input Contract](pages/reference/artifact-input-contract.md) で、出力スキーマは [Review Artifact](pages/reference/review-artifact.md) で定義されています。
+
+現在の主な統合例は **PlanGate v6** との連携です。PlanGate が生成した `plan` / `pbi-input` アーティファクトを受け取り、設計整合性・実装適合性を専用スキルで検査します。
 
 ### 4 つのユースケース
 
-同じ CLI（`river review plan` / `river review exec`）が、入力として渡すアーティファクトの組み合わせでユースケースを切り替えます。
+> **注意**: `river review plan` / `river review exec` / `river review verify` の CLI は Issue #509 で開発中です。実装が完了するまで、ワークフロー内ではプレースホルダとして動作します。
 
 - **設計レビュー**: `pbi-input` / `plan` を入力に、計画の整合性・網羅性を上流 skill で検査します（例: `skills/upstream/rr-upstream-plangate-plan-integrity-001/`）。
 - **実装レビュー**: `plan` と `diff` を入力に、実装差分が計画と一致しているかを検査します（例: `skills/upstream/rr-upstream-plangate-exec-conformance-001/`）。
 - **QA レビュー**: `test-cases` / `junit` / `coverage` を入力に、テストカバレッジや失敗パスの抜けを下流 skill で浮かび上がらせます。
 - **W チェック（二重レビュー）**: 既存の AI / 人間レビュー結果を `review-self` / `review-external` として渡し、レビューそのものを再点検します。
 
-### CLI 利用例
+### CLI 利用例（開発中）
 
 詳細な仕様は [`river review plan` CLI 仕様](pages/reference/cli-review-plan-spec.md) / [`river review exec` CLI 仕様](pages/reference/cli-review-exec-spec.md) を参照してください。
 
