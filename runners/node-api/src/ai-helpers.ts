@@ -48,8 +48,11 @@ export function parseFindings(output: string, skillId: string, files: string[]):
     const lineMatch = evidenceMatch?.[1]?.match(/[Ll]ine\s+(\d+)/);
     const line = lineMatch ? parseInt(lineMatch[1], 10) : undefined;
 
+    const fileNameMatch = evidenceMatch?.[1]?.match(/\b([\w./\-]+\.[a-z]+)\b/);
+    const matchedFile = fileNameMatch ? files.find((f) => f.endsWith(fileNameMatch[1])) : undefined;
+
     findings.push({
-      file: files[0] ?? 'unknown',
+      file: matchedFile ?? files[0] ?? 'unknown',
       line,
       message,
       severity,
