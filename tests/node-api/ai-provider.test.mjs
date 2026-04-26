@@ -59,7 +59,7 @@ I found the following issues:
     assert.ok(findings.every((f) => f.skillId === 'test-skill-001'));
   });
 
-  it('assigns file from files array', () => {
+  it('assigns file from files array when evidence has no filename', () => {
     const findings = parseFindings(sampleOutput, 'test-skill-001', ['src/api.ts']);
     assert.ok(findings.every((f) => f.file === 'src/api.ts'));
   });
@@ -67,6 +67,46 @@ I found the following issues:
   it('uses "unknown" when no files provided', () => {
     const findings = parseFindings(sampleOutput, 'test-skill-001', []);
     assert.ok(findings.every((f) => f.file === 'unknown'));
+  });
+
+  it('attributes finding to matching file when evidence mentions a filename', () => {
+    const output = `
+**Finding:** SQL injection in user lookup
+**Evidence:** src/db.ts Line 13: db.query(\`SELECT * FROM users WHERE id = \${id}\`)
+**Impact:** Attacker could execute arbitrary SQL
+**Fix:** Use parameterized queries
+**Severity:** major
+`;
+    const files = ['src/api.ts', 'src/db.ts', 'src/utils.ts'];
+    const findings = parseFindings(output, 'test-skill-001', files);
+    assert.equal(findings[0].file, 'src/db.ts');
+  });
+
+  it('falls back to files[0] when evidence filename does not match any file', () => {
+    const output = `
+**Finding:** Issue in unknown location
+**Evidence:** notafile.ts Line 5: foo()
+**Impact:** Bad
+**Fix:** Fix it
+**Severity:** minor
+`;
+    const files = ['src/api.ts', 'src/db.ts'];
+    const findings = parseFindings(output, 'test-skill-001', files);
+    assert.equal(findings[0].file, 'src/api.ts');
+  });
+
+  it('matches file by suffix when evidence mentions only the basename', () => {
+    const output = `
+**Finding:** Type error in utils
+**Evidence:** utils.ts Line 22: const x: string = 42
+**Impact:** Runtime type mismatch
+**Fix:** Add proper type annotation
+**Severity:** minor
+`;
+    const files = ['packages/core/src/utils.ts', 'packages/api/src/utils.ts'];
+    const findings = parseFindings(output, 'test-skill-001', files);
+    // matches first file whose path ends with 'utils.ts'
+    assert.equal(findings[0].file, 'packages/core/src/utils.ts');
   });
 
   it('parses severity correctly', () => {
