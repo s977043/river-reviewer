@@ -59,6 +59,7 @@
     "@docusaurus/core": "^3.10.0",
     "@docusaurus/preset-classic": "^3.10.0",
     "@docusaurus/theme-mermaid": "^3.10.0",
+    "@mermaid-js/layout-elk": "^0.1.9",
     "@google/generative-ai": "^0.24.1",
     "@inquirer/prompts": "^8.4.1",
     "@opentelemetry/api": "^1.9.0",
