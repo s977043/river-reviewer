@@ -17,6 +17,10 @@ inputs:
     description: 'Post a PR comment with results (only on pull_request events).'
     required: false
     default: 'true'
+  inline_comments:
+    description: 'Post inline review comments on changed lines (requires output_format=json or forces json internally).'
+    required: false
+    default: 'false'
   dry_run:
     description: 'Run in dry-run mode (no external calls, print to stdout).'
     required: false
@@ -69,6 +73,11 @@ runs:
           exit 1
         fi
 
+        # When inline_comments=true, force json output for structured findings data
+        if [ "${{ inputs.inline_comments }}" = "true" ]; then
+          output_fmt="json"
+        fi
+
         cmd=(node "${GITHUB_ACTION_PATH}/dist/index.mjs" run "${repo_path}" --phase "${{ inputs.phase }}" --planner "${{ inputs.planner }}" --output "${output_fmt}")
         if [ "${{ inputs.dry_run }}" = "true" ]; then
           cmd+=("--dry-run")
@@ -96,7 +105,7 @@ runs:
         fi
 
     - name: Post PR comment
-      if: ${{ github.event_name == 'pull_request' && inputs.comment == 'true' && inputs.estimate != 'true' && inputs.output_format != 'json' }}
+      if: ${{ github.event_name == 'pull_request' && inputs.comment == 'true' && inputs.estimate != 'true' && inputs.output_format != 'json' && inputs.inline_comments != 'true' }}
       uses: actions/github-script@v8
       env:
         RIVER_REVIEWER_COMMENT_PATH: ${{ steps.river.outputs.comment_path }}
@@ -104,6 +113,16 @@ runs:
         script: |
           const postComment = require(`${process.env.GITHUB_ACTION_PATH}/post-comment.cjs`);
           await postComment({ github, context, core });
+
+    - name: Post inline review comments
+      if: ${{ github.event_name == 'pull_request' && inputs.comment == 'true' && inputs.inline_comments == 'true' && inputs.estimate != 'true' }}
+      uses: actions/github-script@v8
+      env:
+        RIVER_REVIEWER_JSON_PATH: ${{ steps.river.outputs.json_path }}
+      with:
+        script: |
+          const postInline = require(`${process.env.GITHUB_ACTION_PATH}/post-inline-comments.cjs`);
+          await postInline({ github, context, core });
 branding:
   icon: 'play-circle'
   color: 'blue'

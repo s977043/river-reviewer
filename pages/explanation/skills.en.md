@@ -531,7 +531,7 @@ Run evaluations regularly:
 
 ```bash
 # Before commit
-npm run eval:skills
+npm run eval:fixtures
 
 # In CI (optional - requires API keys)
 # See .github/workflows/skills-and-tests.yml

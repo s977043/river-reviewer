@@ -105,6 +105,10 @@ export interface ReviewOptions {
      * Supported formats: "openai:<model>" uses OPENAI_API_KEY env var.
      */
     provider?: string;
+    /**
+     * Maximum number of skills to execute concurrently (default: 3, 0 = unlimited).
+     */
+    concurrency?: number;
 }
 /**
  * Skill selection result with selected and skipped skills

@@ -9,6 +9,7 @@ import {
   validateFindingMessage,
   parseFindingMessage,
   normalizeSeverity,
+  severityToPriority,
 } from '../src/lib/finding-format.mjs';
 
 test('formatFindingMessage produces a valid labeled message', () => {
@@ -22,6 +23,25 @@ test('formatFindingMessage produces a valid labeled message', () => {
   });
   const validated = validateFindingMessage(msg);
   assert.equal(validated.ok, true);
+});
+
+test('severityToPriority maps all four severity levels correctly', () => {
+  assert.equal(severityToPriority('critical'), 'P1');
+  assert.equal(severityToPriority('major'), 'P2');
+  assert.equal(severityToPriority('minor'), 'P3');
+  assert.equal(severityToPriority('info'), 'P4');
+});
+
+test('severityToPriority falls back to P2 for unknown values', () => {
+  assert.equal(severityToPriority('unknown'), 'P2');
+  assert.equal(severityToPriority(''), 'P2');
+  assert.equal(severityToPriority(null), 'P2');
+  assert.equal(severityToPriority(undefined), 'P2');
+});
+
+test('severityToPriority is case-insensitive', () => {
+  assert.equal(severityToPriority('CRITICAL'), 'P1');
+  assert.equal(severityToPriority('Major'), 'P2');
 });
 
 test('parseFindingMessage extracts all labeled fields', () => {

@@ -267,7 +267,7 @@ export async function buildExecutionPlan(options) {
  * ```
  */
 export async function review(options) {
-    const { phase = 'midstream', files = [], skillsDir, availableContexts = ['diff', 'fullFile'], availableDependencies, preferredModelHint = 'balanced', diffText, provider, } = options;
+    const { phase = 'midstream', files = [], skillsDir, availableContexts = ['diff', 'fullFile'], availableDependencies, preferredModelHint = 'balanced', diffText, provider, concurrency = 3, } = options;
     // Load skills
     const skills = await loadSkills({ skillsDir, phase });
     // Build execution plan
@@ -280,16 +280,27 @@ export async function review(options) {
         skills,
         diffText,
     });
-    // Execute each selected skill with the AI provider (when provided)
+    // Execute selected skills with configurable concurrency; individual failures are non-fatal
     const allFindings = [];
     if (provider) {
-        for (const skill of plan.selected) {
-            try {
-                const skillFindings = await executeSkillWithAI(skill, provider, files, diffText);
-                allFindings.push(...skillFindings);
+        const skills = plan.selected;
+        if (concurrency <= 0) {
+            // unlimited: original behavior
+            const results = await Promise.allSettled(skills.map((skill) => executeSkillWithAI(skill, provider, files, diffText)));
+            for (const result of results) {
+                if (result.status === 'fulfilled')
+                    allFindings.push(...result.value);
             }
-            catch {
-                // Individual skill failures are non-fatal; continue with remaining skills
+        }
+        else {
+            // chunk-based concurrency
+            for (let i = 0; i < skills.length; i += concurrency) {
+                const chunk = skills.slice(i, i + concurrency);
+                const results = await Promise.allSettled(chunk.map((skill) => executeSkillWithAI(skill, provider, files, diffText)));
+                for (const result of results) {
+                    if (result.status === 'fulfilled')
+                        allFindings.push(...result.value);
+                }
             }
         }
     }
