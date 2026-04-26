@@ -11723,6 +11723,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fs");
 
 /***/ }),
 
+/***/ 1421:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
+
+/***/ }),
+
 /***/ 7598:
 /***/ ((module) => {
 
@@ -11762,6 +11769,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
+
+/***/ }),
+
+/***/ 7975:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:util");
 
 /***/ }),
 
@@ -34650,7 +34664,7 @@ function renderDiffText(files) {
 /* harmony export */   K: () => (/* binding */ collectRepoDiff),
 /* harmony export */   r: () => (/* binding */ parseUnifiedDiff)
 /* harmony export */ });
-/* harmony import */ var _git_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(340);
+/* harmony import */ var _git_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(8613);
 /* harmony import */ var _diff_optimizer_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1092);
 
 
@@ -35076,32 +35090,25 @@ function validateFindingMessage(message) {
 
 /***/ }),
 
-/***/ 340:
+/***/ 8613:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  XS: () => (/* binding */ GitError),
-  kG: () => (/* binding */ GitRepoNotFoundError),
-  Rd: () => (/* binding */ detectDefaultBranch),
-  LL: () => (/* binding */ diffWithContext),
-  NC: () => (/* binding */ ensureGitRepo),
-  fe: () => (/* binding */ findMergeBase),
-  AC: () => (/* binding */ listChangedFiles)
-});
-
-// UNUSED EXPORTS: collectAddedLineHints
-
-;// CONCATENATED MODULE: external "node:child_process"
-const external_node_child_process_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
-;// CONCATENATED MODULE: external "node:util"
-const external_node_util_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:util");
-;// CONCATENATED MODULE: ./src/lib/git.mjs
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   AC: () => (/* binding */ listChangedFiles),
+/* harmony export */   LL: () => (/* binding */ diffWithContext),
+/* harmony export */   NC: () => (/* binding */ ensureGitRepo),
+/* harmony export */   Rd: () => (/* binding */ detectDefaultBranch),
+/* harmony export */   XS: () => (/* binding */ GitError),
+/* harmony export */   fe: () => (/* binding */ findMergeBase),
+/* harmony export */   kG: () => (/* binding */ GitRepoNotFoundError)
+/* harmony export */ });
+/* unused harmony export collectAddedLineHints */
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1421);
+/* harmony import */ var node_util__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7975);
 
 
 
-const exec = (0,external_node_util_namespaceObject.promisify)(external_node_child_process_namespaceObject.execFile);
+const exec = (0,node_util__WEBPACK_IMPORTED_MODULE_1__.promisify)(node_child_process__WEBPACK_IMPORTED_MODULE_0__.execFile);
 
 class GitError extends Error {
   constructor(message) {
@@ -35623,6 +35630,241 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
 
 /***/ }),
 
+/***/ 9865:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   l: () => (/* binding */ buildRepoContextSection),
+/* harmony export */   o: () => (/* binding */ collectRepoContext)
+/* harmony export */ });
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1421);
+/* harmony import */ var node_util__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7975);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(3024);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6760);
+/**
+ * Repo-wide context collector for River Reviewer.
+ * Gathers full file text, corresponding tests, symbol usages, and config
+ * snippets relevant to the changed files, within a configurable token budget.
+ */
+
+
+
+
+
+
+const execFileAsync = (0,node_util__WEBPACK_IMPORTED_MODULE_1__.promisify)(node_child_process__WEBPACK_IMPORTED_MODULE_0__.execFile);
+
+/** Maximum total characters of repo context injected into the prompt. */
+const DEFAULT_MAX_CHARS = 8000;
+
+/** Per-section character caps (applied before the global budget). */
+const SECTION_CAPS = {
+  fullFile: 3000,
+  tests: 2000,
+  usages: 1500,
+  config: 500,
+};
+
+/** Test file path heuristics. */
+const TEST_SUFFIXES = [
+  (f) => f.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.test.$1'),
+  (f) => f.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.spec.$1'),
+  (f) => f.replace(/src\//, 'tests/').replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.test.$1'),
+  (f) => {
+    const base = node_path__WEBPACK_IMPORTED_MODULE_3__.basename(f);
+    const dir = node_path__WEBPACK_IMPORTED_MODULE_3__.dirname(f);
+    return node_path__WEBPACK_IMPORTED_MODULE_3__.join(dir, '__tests__', base.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.test.$1'));
+  },
+];
+
+/** Config files to include a snippet of. */
+const CONFIG_GLOBS = ['tsconfig.json', 'package.json', 'next.config.*', '.eslintrc*', 'vite.config.*'];
+
+/**
+ * Collect repo-wide context relevant to the changed files.
+ *
+ * @param {object} opts
+ * @param {string[]} opts.changedFiles - Relative paths of changed files
+ * @param {string} opts.repoRoot - Absolute path to the repository root
+ * @param {number} [opts.maxChars] - Total character budget (default 8000)
+ * @returns {Promise<RepoContext>}
+ */
+async function collectRepoContext({ changedFiles, repoRoot, maxChars = DEFAULT_MAX_CHARS }) {
+  const sections = [];
+  let budget = maxChars;
+
+  // 1. Full text of changed source files
+  for (const rel of changedFiles.slice(0, 5)) {
+    if (budget <= 0) break;
+    const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, rel);
+    if (!isSourceFile(rel) || !fileExists(abs)) continue;
+    const raw = readFileCapped(abs, Math.min(SECTION_CAPS.fullFile, budget));
+    if (raw) {
+      sections.push({ label: `Full file: ${rel}`, content: raw, file: rel });
+      budget -= raw.length;
+    }
+  }
+
+  // 2. Corresponding test files
+  const testContents = [];
+  for (const rel of changedFiles.slice(0, 5)) {
+    if (budget <= 0) break;
+    for (const toTest of TEST_SUFFIXES) {
+      const candidate = toTest(rel);
+      const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, candidate);
+      if (fileExists(abs)) {
+        const raw = readFileCapped(abs, Math.min(SECTION_CAPS.tests, budget));
+        if (raw) {
+          testContents.push(`// ${candidate}\n${raw}`);
+          budget -= raw.length;
+        }
+        break;
+      }
+    }
+  }
+  if (testContents.length) {
+    sections.push({ label: 'Corresponding test files', content: testContents.join('\n\n'), file: null });
+  }
+
+  // 3. Symbol usage search via ripgrep
+  if (budget > 0) {
+    const exportedSymbols = extractExportedSymbols({ changedFiles, repoRoot });
+    if (exportedSymbols.length) {
+      const usages = await searchSymbolUsages({
+        symbols: exportedSymbols.slice(0, 5),
+        repoRoot,
+        excludeFiles: changedFiles,
+        maxChars: Math.min(SECTION_CAPS.usages, budget),
+      });
+      if (usages) {
+        sections.push({ label: 'Symbol usage references', content: usages, file: null });
+        budget -= usages.length;
+      }
+    }
+  }
+
+  // 4. Config snippets
+  if (budget > 0) {
+    const configSnippets = [];
+    for (const glob of CONFIG_GLOBS) {
+      const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, glob);
+      if (fileExists(abs)) {
+        const snippet = readFileCapped(abs, Math.min(SECTION_CAPS.config, budget - configSnippets.reduce((s, c) => s + c.length, 0)));
+        if (snippet) configSnippets.push(`// ${glob}\n${snippet}`);
+      }
+    }
+    if (configSnippets.length) {
+      const content = configSnippets.join('\n\n');
+      sections.push({ label: 'Config files', content, file: null });
+      budget -= content.length;
+    }
+  }
+
+  return {
+    sections,
+    totalChars: maxChars - budget,
+    truncated: budget <= 0,
+  };
+}
+
+/**
+ * Build the "Repository Context" section string for prompt injection.
+ * Returns empty string when no context is available.
+ *
+ * @param {RepoContext|null|undefined} repoContext
+ * @returns {string}
+ */
+function buildRepoContextSection(repoContext) {
+  if (!repoContext?.sections?.length) return '';
+  const parts = ['\n### Repository Context\n'];
+  parts.push('差分の外側にある関連コードです。cross-file の影響分析に使用してください。\n');
+  for (const sec of repoContext.sections) {
+    parts.push(`#### ${sec.label}\n\`\`\`\n${sec.content}\n\`\`\`\n`);
+  }
+  if (repoContext.truncated) {
+    parts.push('> _Repository context was truncated to fit the prompt budget._\n');
+  }
+  return parts.join('\n');
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function isSourceFile(rel) {
+  return /\.(ts|tsx|js|jsx|mjs|cjs|vue|svelte|py|rb|go|java|kt|swift)$/.test(rel);
+}
+
+function fileExists(abs) {
+  try {
+    return node_fs__WEBPACK_IMPORTED_MODULE_2__.statSync(abs).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function readFileCapped(abs, cap) {
+  try {
+    const raw = node_fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync(abs, 'utf8');
+    if (!raw.trim()) return null;
+    return raw.length > cap ? raw.slice(0, cap) + '\n// ...[truncated]' : raw;
+  } catch {
+    return null;
+  }
+}
+
+function extractExportedSymbols({ changedFiles, repoRoot }) {
+  const symbols = [];
+  const exportRe = /^export\s+(?:(?:async\s+)?function|class|const|let|var)\s+(\w+)/gm;
+  for (const rel of changedFiles.slice(0, 5)) {
+    const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, rel);
+    if (!isSourceFile(rel) || !fileExists(abs)) continue;
+    try {
+      const text = node_fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync(abs, 'utf8');
+      for (const m of text.matchAll(exportRe)) {
+        if (m[1] && !symbols.includes(m[1])) symbols.push(m[1]);
+      }
+    } catch {
+      // skip
+    }
+  }
+  return symbols;
+}
+
+async function searchSymbolUsages({ symbols, repoRoot, excludeFiles, maxChars }) {
+  if (!symbols.length) return null;
+  const pattern = symbols.map((s) => `\\b${s}\\b`).join('|');
+  const excludeArgs = excludeFiles.flatMap((f) => ['--iglob', `!${f}`]);
+  try {
+    const { stdout } = await execFileAsync(
+      'rg',
+      [
+        '--no-heading',
+        '--line-number',
+        '--max-count', '3',
+        '--max-filesize', '200K',
+        '--glob', '*.{ts,tsx,js,jsx,mjs,cjs}',
+        ...excludeArgs,
+        '-e', pattern,
+        '.',
+      ],
+      { cwd: repoRoot, timeout: 5000 }
+    );
+    const trimmed = stdout.slice(0, maxChars);
+    return trimmed || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * @typedef {object} RepoContext
+ * @property {Array<{label: string, content: string, file: string|null}>} sections
+ * @property {number} totalChars
+ * @property {boolean} truncated
+ */
+
+
+/***/ }),
+
 /***/ 2022:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
@@ -35631,13 +35873,15 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
 /* harmony export */ });
 /* unused harmony exports buildPrompt, parseLineComments */
 /* harmony import */ var _config_loader_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(3833);
-/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(9946);
+/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(9946);
 /* harmony import */ var _finding_classifier_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7440);
 /* harmony import */ var _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(4807);
 /* harmony import */ var _runners_core_review_runner_mjs__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(4584);
 /* harmony import */ var _heuristic_review_mjs__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(2294);
 /* harmony import */ var _finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(5942);
-/* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(8069);
+/* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(8069);
+/* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(9865);
+
 
 
 
@@ -35780,6 +36024,7 @@ function buildPrompt({
   memoryContext,
   relatedADRs,
   reviewMode,
+  repoContext,
   maxChars = MAX_PROMPT_CHARS,
   config = _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s,
 }) {
@@ -35789,7 +36034,7 @@ function buildPrompt({
   const severity = reviewConfig.severity ?? _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s.review.severity;
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
-  const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_6__/* .getReviewDepthConfig */ .i)(reviewMode ?? 'medium');
+  const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_7__/* .getReviewDepthConfig */ .i)(reviewMode ?? 'medium');
   const prompt = `You are River Reviewer, an AI code review agent.
 Phase: ${phase}
 
@@ -35799,7 +36044,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${(0,_repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__/* .buildRepoContextSection */ .l)(repoContext)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -36094,6 +36339,7 @@ async function generateReview({
   relatedADRs,
   riskAssessment,
   reviewMode,
+  repoContext,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -36107,6 +36353,7 @@ async function generateReview({
     relatedADRs,
     riskAssessment,
     reviewMode,
+    repoContext,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });
@@ -36121,6 +36368,17 @@ async function generateReview({
     llmProvider: openAIConfig.provider,
     reviewLanguage: language,
     reviewSeverity: promptInfo.severity,
+    repoContext: repoContext
+      ? {
+          sections: repoContext.sections.map((s) => ({
+            label: s.label,
+            chars: s.content.length,
+            file: s.file,
+          })),
+          totalChars: repoContext.totalChars,
+          truncated: repoContext.truncated,
+        }
+      : null,
   };
 
   const skipReason = dryRun
@@ -36255,8 +36513,8 @@ async function generateReview({
   });
 
   findings.sort((a, b) => {
-    const bA = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_7__/* .computeFindingBreakdown */ ._)(a);
-    const bB = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_7__/* .computeFindingBreakdown */ ._)(b);
+    const bA = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_8__/* .computeFindingBreakdown */ ._)(a);
+    const bB = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_8__/* .computeFindingBreakdown */ ._)(b);
     return bB.composite - bA.composite;
   });
 
@@ -37126,8 +37384,8 @@ var external_node_path_ = __nccwpck_require__(6760);
 const external_node_process_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:process");
 // EXTERNAL MODULE: external "node:url"
 var external_node_url_ = __nccwpck_require__(3136);
-// EXTERNAL MODULE: ./src/lib/git.mjs + 2 modules
-var git = __nccwpck_require__(340);
+// EXTERNAL MODULE: ./src/lib/git.mjs
+var git = __nccwpck_require__(8613);
 // EXTERNAL MODULE: external "node:fs/promises"
 var promises_ = __nccwpck_require__(1455);
 // EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
@@ -37669,6 +37927,8 @@ function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
   };
 }
 
+// EXTERNAL MODULE: ./src/lib/repo-context.mjs
+var repo_context = __nccwpck_require__(9865);
 // EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
 var skill_loader = __nccwpck_require__(5541);
 ;// CONCATENATED MODULE: ./src/lib/utils.mjs
@@ -37699,6 +37959,7 @@ function isLlmEnabled() {
 // EXTERNAL MODULE: ./src/lib/finding-fingerprint.mjs
 var finding_fingerprint = __nccwpck_require__(9597);
 ;// CONCATENATED MODULE: ./src/lib/local-runner.mjs
+
 
 
 
@@ -38051,6 +38312,11 @@ async function runLocalReview({
     changedFiles: context.changedFiles,
   });
 
+  const repoContext = await (0,repo_context/* collectRepoContext */.o)({
+    changedFiles: context.changedFiles,
+    repoRoot: external_node_path_.resolve(context.repoRoot),
+  }).catch(() => null);
+
   const reviewArgs = {
     diff: context.diff,
     plan: context.plan,
@@ -38064,6 +38330,7 @@ async function runLocalReview({
     fileTypes: context.plan?.fileTypes,
     relatedADRs: context.plan?.relatedADRs,
     reviewMode: context.plan?.reviewMode,
+    repoContext,
     config: context.config,
   };
 
