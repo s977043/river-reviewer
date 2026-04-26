@@ -34924,6 +34924,158 @@ function annotateFingerprints(findings) {
 
 /***/ }),
 
+/***/ 5942:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   UB: () => (/* binding */ parseFindingMessage),
+/* harmony export */   lv: () => (/* binding */ normalizeSeverity),
+/* harmony export */   nG: () => (/* binding */ severityToPriority),
+/* harmony export */   xv: () => (/* binding */ validateFindingMessage),
+/* harmony export */   yv: () => (/* binding */ formatFindingMessage)
+/* harmony export */ });
+/* unused harmony exports FINDING_SEVERITIES, FINDING_CONFIDENCE */
+const FINDING_SEVERITIES = /** @type {const} */ (['blocker', 'warning', 'nit']);
+const FINDING_CONFIDENCE = /** @type {const} */ (['high', 'medium', 'low']);
+
+function normalizeWhitespace(text) {
+  return String(text ?? '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function clamp(text, maxChars) {
+  const normalized = normalizeWhitespace(text);
+  if (normalized.length <= maxChars) return normalized;
+  return `${normalized.slice(0, Math.max(0, maxChars - 1))}…`;
+}
+
+/**
+ * Format a finding message for line-comments (`<file>:<line>: <message>`).
+ * Evidence is already anchored by `<file>:<line>`, so we keep the message compact.
+ * @param {{
+ *   finding: string,
+ *   evidence: string,
+ *   impact: string,
+ *   fix: string,
+ *   severity: typeof FINDING_SEVERITIES[number],
+ *   confidence: typeof FINDING_CONFIDENCE[number],
+ * }} finding
+ */
+function formatFindingMessage({ finding, evidence, impact, fix, severity, confidence }) {
+  const sev = FINDING_SEVERITIES.includes(severity) ? severity : 'warning';
+  const conf = FINDING_CONFIDENCE.includes(confidence) ? confidence : 'medium';
+
+  return [
+    `Finding: ${clamp(finding, 80)}`,
+    `Evidence: ${clamp(evidence, 60)}`,
+    `Impact: ${clamp(impact, 60)}`,
+    `Fix: ${clamp(fix, 80)}`,
+    `Severity: ${sev}`,
+    `Confidence: ${conf}`,
+  ].join(' ');
+}
+
+const LABEL_NAMES = ['Finding', 'Evidence', 'Impact', 'Fix', 'Severity', 'Confidence'];
+const LABEL_ALTERNATION = LABEL_NAMES.join('|');
+
+/**
+ * Parse a labeled finding message string into structured fields.
+ * @param {string} message
+ * @returns {{ title: string, evidence: string[], impact: string, suggestion: string, severity: string|null, confidence: string|null }}
+ */
+function parseFindingMessage(message) {
+  const text = String(message ?? '');
+  const get = (label) => {
+    const re = new RegExp(`${label}:\\s*([^]*?)(?=\\s+(?:${LABEL_ALTERNATION}):|$)`, 'm');
+    return (text.match(re)?.[1] ?? '').trim();
+  };
+  const evidenceText = get('Evidence');
+  return {
+    title: get('Finding'),
+    evidence: evidenceText ? [evidenceText] : [],
+    impact: get('Impact'),
+    suggestion: get('Fix'),
+    severity: get('Severity') || null,
+    confidence: get('Confidence') || null,
+  };
+}
+
+/**
+ * Map internal severity vocabulary (blocker/warning/nit) to output schema vocabulary.
+ * Accepts both vocabularies; unknown values default to 'major' (fail-safe).
+ * @param {string|null|undefined} internalSeverity
+ * @returns {'critical'|'major'|'minor'|'info'}
+ */
+function normalizeSeverity(internalSeverity) {
+  switch ((internalSeverity ?? '').toLowerCase().trim()) {
+    case 'blocker':
+    case 'critical':
+      return 'critical';
+    case 'warning':
+    case 'major':
+      return 'major';
+    case 'nit':
+    case 'minor':
+      return 'minor';
+    case 'info':
+      return 'info';
+    default:
+      return 'major';
+  }
+}
+
+/**
+ * Map output schema severity to P1/P2/P3/P4 priority label.
+ * @param {'critical'|'major'|'minor'|'info'|string|null|undefined} severity
+ * @returns {'P1'|'P2'|'P3'|'P4'}
+ */
+function severityToPriority(severity) {
+  switch ((severity ?? '').toLowerCase().trim()) {
+    case 'critical':
+      return 'P1';
+    case 'major':
+      return 'P2';
+    case 'minor':
+      return 'P3';
+    case 'info':
+      return 'P4';
+    default:
+      return 'P2';
+  }
+}
+
+/**
+ * Validate whether a finding message contains the required labeled fields.
+ * @param {string} message
+ */
+function validateFindingMessage(message) {
+  const text = String(message ?? '');
+  const missing = [];
+  for (const label of ['Finding:', 'Evidence:', 'Impact:', 'Fix:', 'Severity:', 'Confidence:']) {
+    if (!text.includes(label)) missing.push(label);
+  }
+
+  const sevMatch = /Severity:\s*(\w+)/.exec(text);
+  const confMatch = /Confidence:\s*(\w+)/.exec(text);
+  const severity = sevMatch?.[1] ?? null;
+  const confidence = confMatch?.[1] ?? null;
+
+  const invalid = [];
+  if (severity && !FINDING_SEVERITIES.includes(severity)) invalid.push(`Severity:${severity}`);
+  if (confidence && !FINDING_CONFIDENCE.includes(confidence))
+    invalid.push(`Confidence:${confidence}`);
+
+  return {
+    ok: missing.length === 0 && invalid.length === 0,
+    missing,
+    invalid,
+  };
+}
+
+
+/***/ }),
+
 /***/ 340:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
@@ -35471,151 +35623,21 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
 
 /***/ }),
 
-/***/ 5544:
+/***/ 2022:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  G1: () => (/* binding */ generateReview)
-});
-
-// UNUSED EXPORTS: buildPrompt, parseLineComments
-
-// EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
-var loader = __nccwpck_require__(3833);
-// EXTERNAL MODULE: ./src/lib/scoring/breakdown.mjs
-var breakdown = __nccwpck_require__(9946);
-// EXTERNAL MODULE: ./src/lib/finding-classifier.mjs
-var finding_classifier = __nccwpck_require__(7440);
-// EXTERNAL MODULE: ./src/config/default.mjs
-var config_default = __nccwpck_require__(4807);
-// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 5 modules
-var review_runner = __nccwpck_require__(4584);
-// EXTERNAL MODULE: ./src/lib/heuristic-review.mjs
-var heuristic_review = __nccwpck_require__(2294);
-;// CONCATENATED MODULE: ./src/lib/finding-format.mjs
-const FINDING_SEVERITIES = /** @type {const} */ (['blocker', 'warning', 'nit']);
-const FINDING_CONFIDENCE = /** @type {const} */ (['high', 'medium', 'low']);
-
-function normalizeWhitespace(text) {
-  return String(text ?? '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function clamp(text, maxChars) {
-  const normalized = normalizeWhitespace(text);
-  if (normalized.length <= maxChars) return normalized;
-  return `${normalized.slice(0, Math.max(0, maxChars - 1))}…`;
-}
-
-/**
- * Format a finding message for line-comments (`<file>:<line>: <message>`).
- * Evidence is already anchored by `<file>:<line>`, so we keep the message compact.
- * @param {{
- *   finding: string,
- *   evidence: string,
- *   impact: string,
- *   fix: string,
- *   severity: typeof FINDING_SEVERITIES[number],
- *   confidence: typeof FINDING_CONFIDENCE[number],
- * }} finding
- */
-function formatFindingMessage({ finding, evidence, impact, fix, severity, confidence }) {
-  const sev = FINDING_SEVERITIES.includes(severity) ? severity : 'warning';
-  const conf = FINDING_CONFIDENCE.includes(confidence) ? confidence : 'medium';
-
-  return [
-    `Finding: ${clamp(finding, 80)}`,
-    `Evidence: ${clamp(evidence, 60)}`,
-    `Impact: ${clamp(impact, 60)}`,
-    `Fix: ${clamp(fix, 80)}`,
-    `Severity: ${sev}`,
-    `Confidence: ${conf}`,
-  ].join(' ');
-}
-
-const LABEL_NAMES = ['Finding', 'Evidence', 'Impact', 'Fix', 'Severity', 'Confidence'];
-const LABEL_ALTERNATION = LABEL_NAMES.join('|');
-
-/**
- * Parse a labeled finding message string into structured fields.
- * @param {string} message
- * @returns {{ title: string, evidence: string[], impact: string, suggestion: string, severity: string|null, confidence: string|null }}
- */
-function parseFindingMessage(message) {
-  const text = String(message ?? '');
-  const get = (label) => {
-    const re = new RegExp(`${label}:\\s*([^]*?)(?=\\s+(?:${LABEL_ALTERNATION}):|$)`, 'm');
-    return (text.match(re)?.[1] ?? '').trim();
-  };
-  const evidenceText = get('Evidence');
-  return {
-    title: get('Finding'),
-    evidence: evidenceText ? [evidenceText] : [],
-    impact: get('Impact'),
-    suggestion: get('Fix'),
-    severity: get('Severity') || null,
-    confidence: get('Confidence') || null,
-  };
-}
-
-/**
- * Map internal severity vocabulary (blocker/warning/nit) to output schema vocabulary.
- * Accepts both vocabularies; unknown values default to 'major' (fail-safe).
- * @param {string|null|undefined} internalSeverity
- * @returns {'critical'|'major'|'minor'|'info'}
- */
-function normalizeSeverity(internalSeverity) {
-  switch ((internalSeverity ?? '').toLowerCase().trim()) {
-    case 'blocker':
-    case 'critical':
-      return 'critical';
-    case 'warning':
-    case 'major':
-      return 'major';
-    case 'nit':
-    case 'minor':
-      return 'minor';
-    case 'info':
-      return 'info';
-    default:
-      return 'major';
-  }
-}
-
-/**
- * Validate whether a finding message contains the required labeled fields.
- * @param {string} message
- */
-function validateFindingMessage(message) {
-  const text = String(message ?? '');
-  const missing = [];
-  for (const label of ['Finding:', 'Evidence:', 'Impact:', 'Fix:', 'Severity:', 'Confidence:']) {
-    if (!text.includes(label)) missing.push(label);
-  }
-
-  const sevMatch = /Severity:\s*(\w+)/.exec(text);
-  const confMatch = /Confidence:\s*(\w+)/.exec(text);
-  const severity = sevMatch?.[1] ?? null;
-  const confidence = confMatch?.[1] ?? null;
-
-  const invalid = [];
-  if (severity && !FINDING_SEVERITIES.includes(severity)) invalid.push(`Severity:${severity}`);
-  if (confidence && !FINDING_CONFIDENCE.includes(confidence))
-    invalid.push(`Confidence:${confidence}`);
-
-  return {
-    ok: missing.length === 0 && invalid.length === 0,
-    missing,
-    invalid,
-  };
-}
-
-// EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs
-var review_plan_generator = __nccwpck_require__(8069);
-;// CONCATENATED MODULE: ./src/lib/review-engine.mjs
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   G1: () => (/* binding */ generateReview)
+/* harmony export */ });
+/* unused harmony exports buildPrompt, parseLineComments */
+/* harmony import */ var _config_loader_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(3833);
+/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(9946);
+/* harmony import */ var _finding_classifier_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7440);
+/* harmony import */ var _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(4807);
+/* harmony import */ var _runners_core_review_runner_mjs__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(4584);
+/* harmony import */ var _heuristic_review_mjs__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(2294);
+/* harmony import */ var _finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(5942);
+/* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(8069);
 
 
 
@@ -35674,7 +35696,7 @@ function buildAdditionalSection(instructions, language) {
   return `\n${header}\n${body}\n`;
 }
 
-function resolveOpenAIConfig(options = {}, config = config_default/* defaultConfig */.s) {
+function resolveOpenAIConfig(options = {}, config = _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s) {
   const provider = config.model?.provider ?? 'openai';
   const modelName = options.model || ENV_DEFAULT_MODEL || config.model?.modelName;
   return {
@@ -35692,7 +35714,7 @@ function resolveOpenAIConfig(options = {}, config = config_default/* defaultConf
 
 function buildSkillSummary(plan) {
   if (!plan?.selected?.length) return 'No skills selected; provide general review notes.';
-  const summaries = plan.selected.map((skill) => (0,review_runner/* summarizeSkill */.P0)(skill));
+  const summaries = plan.selected.map((skill) => (0,_runners_core_review_runner_mjs__WEBPACK_IMPORTED_MODULE_3__/* .summarizeSkill */ .P0)(skill));
   const top = summaries.slice(0, 6);
   const body = top
     .map(
@@ -35759,15 +35781,15 @@ function buildPrompt({
   relatedADRs,
   reviewMode,
   maxChars = MAX_PROMPT_CHARS,
-  config = config_default/* defaultConfig */.s,
+  config = _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s,
 }) {
-  const effectiveConfig = (0,loader/* mergeConfig */.R2)(config_default/* defaultConfig */.s, config ?? {});
-  const reviewConfig = effectiveConfig.review ?? config_default/* defaultConfig */.s.review;
-  const language = reviewConfig.language ?? config_default/* defaultConfig */.s.review.language;
-  const severity = reviewConfig.severity ?? config_default/* defaultConfig */.s.review.severity;
+  const effectiveConfig = (0,_config_loader_mjs__WEBPACK_IMPORTED_MODULE_0__/* .mergeConfig */ .R2)(_config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s, config ?? {});
+  const reviewConfig = effectiveConfig.review ?? _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s.review;
+  const language = reviewConfig.language ?? _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s.review.language;
+  const severity = reviewConfig.severity ?? _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s.review.severity;
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
-  const depthConfig = (0,review_plan_generator/* getReviewDepthConfig */.i)(reviewMode ?? 'medium');
+  const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_6__/* .getReviewDepthConfig */ .i)(reviewMode ?? 'medium');
   const prompt = `You are River Reviewer, an AI code review agent.
 Phase: ${phase}
 
@@ -35857,7 +35879,7 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
   // ヒューリスティック対応スキルは除外（ヒューリスティックで処理済み）
   const skills = allSkills.filter((skill) => {
     const skillId = skill.metadata?.id ?? skill.id;
-    return !heuristic_review/* HEURISTIC_SKILL_IDS */.y2.includes(skillId);
+    return !_heuristic_review_mjs__WEBPACK_IMPORTED_MODULE_4__/* .HEURISTIC_SKILL_IDS */ .y2.includes(skillId);
   });
 
   const firstFile = diff.files?.find((f) => f?.path && f.path !== '/dev/null') ?? null;
@@ -35866,7 +35888,7 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
       {
         file: '(no-files)',
         line: 1,
-        message: formatFindingMessage({
+        message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
           finding: 'レビュー対象ファイルが特定できない',
           evidence: '差分ファイルが空',
           impact: 'レビューの自動化ができない',
@@ -35894,7 +35916,7 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
       {
         file: firstFile.path,
         line,
-        message: formatFindingMessage({
+        message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
           finding: 'マッチするスキルがなく自動指摘を生成できなかった',
           evidence: evidenceBase,
           impact: '重要なリスクを見落とす可能性がある',
@@ -35915,7 +35937,7 @@ function buildFallbackComments(diff, plan, { llmSkipReason = null } = {}) {
       file: firstFile.path,
       line,
       skillId,
-      message: formatFindingMessage({
+      message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
         finding: `スキル「${skillName}」の観点で自動指摘を生成できなかった`,
         evidence: evidenceBase,
         impact: 'このスキルが検出する問題を見落とす可能性がある',
@@ -35935,7 +35957,7 @@ function normalizeHeuristicComments(rawComments) {
           file: c.file,
           line: c.line,
           skillId: c.skillId,
-          message: formatFindingMessage({
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: 'catch で例外が握りつぶされる可能性がある',
             evidence: 'catch 内で return（ログ/再throwなし）',
             impact: '障害調査や失敗検知が困難になる',
@@ -35949,7 +35971,7 @@ function normalizeHeuristicComments(rawComments) {
           file: c.file,
           line: c.line,
           skillId: c.skillId,
-          message: formatFindingMessage({
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: '挙動変更に対するテスト差分が見当たらない',
             evidence: 'コード差分あり・テスト差分なし',
             impact: '回帰の検知漏れや仕様逸脱が起きやすい',
@@ -35963,7 +35985,7 @@ function normalizeHeuristicComments(rawComments) {
           file: c.file,
           line: c.line,
           skillId: c.skillId,
-          message: formatFindingMessage({
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: '秘密情報（トークン/キー）の直書きの可能性がある',
             evidence: 'トークン/キーらしい文字列が追加されている',
             impact: '漏洩時に不正利用やインシデントにつながる',
@@ -35977,7 +35999,7 @@ function normalizeHeuristicComments(rawComments) {
           file: c.file,
           line: c.line,
           skillId: c.skillId,
-          message: formatFindingMessage({
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: 'pull_request_targetイベントは権限昇格のリスクがある',
             evidence: 'pull_request_targetトリガーが追加されている',
             impact: 'フォークからのPRで任意コードが本リポジトリの権限で実行される可能性',
@@ -35991,7 +36013,7 @@ function normalizeHeuristicComments(rawComments) {
           file: c.file,
           line: c.line,
           skillId: c.skillId,
-          message: formatFindingMessage({
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: '過剰な権限設定（write-all）が検出された',
             evidence: 'permissions: write-all が設定されている',
             impact: 'ワークフローが侵害された場合の影響範囲が最大化される',
@@ -36005,7 +36027,7 @@ function normalizeHeuristicComments(rawComments) {
           file: c.file,
           line: c.line,
           skillId: c.skillId,
-          message: formatFindingMessage({
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: 'runブロック内でsecretsを直接使用している',
             evidence: 'run: と secrets.* が同一行に存在',
             impact: 'ログ出力やエラーメッセージでシークレットが漏洩する可能性',
@@ -36019,7 +36041,7 @@ function normalizeHeuristicComments(rawComments) {
           file: c.file,
           line: c.line,
           skillId: c.skillId,
-          message: formatFindingMessage({
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: 'ユーザー入力がサニタイズされずに使用されている',
             evidence: 'github.event.*.title/body/name がrunブロックで直接使用',
             impact: 'コマンドインジェクション攻撃のリスクがある',
@@ -36032,7 +36054,7 @@ function normalizeHeuristicComments(rawComments) {
         return {
           file: c.file,
           line: c.line,
-          message: formatFindingMessage({
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: `想定外のヒューリスティック（kind=${String(c.kind ?? 'unknown')}）`,
             evidence: 'ヒューリスティック kind が未知',
             impact: 'レビュー結果が不安定になる可能性がある',
@@ -36075,7 +36097,7 @@ async function generateReview({
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
-  const effectiveConfig = (0,loader/* mergeConfig */.R2)(config_default/* defaultConfig */.s, config ?? {});
+  const effectiveConfig = (0,_config_loader_mjs__WEBPACK_IMPORTED_MODULE_0__/* .mergeConfig */ .R2)(_config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s, config ?? {});
   const promptInfo = buildPrompt({
     diffText: diff.diffText,
     diffFiles: diff.files,
@@ -36124,7 +36146,7 @@ async function generateReview({
       const parsed = parseLineComments(output);
       if (parsed !== null) {
         const redacted = parsed.map((c) => ({ ...c, message: redactSecrets(c.message) }));
-        const checks = redacted.map((c) => validateFindingMessage(c.message));
+        const checks = redacted.map((c) => (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .validateFindingMessage */ .xv)(c.message));
         const invalidCount = checks.filter((c) => !c.ok).length;
         if (invalidCount === 0) {
           comments = redacted;
@@ -36147,7 +36169,7 @@ async function generateReview({
   }
 
   if (!comments.length) {
-    const heuristic = (0,heuristic_review/* buildHeuristicComments */.zq)({ diff, plan });
+    const heuristic = (0,_heuristic_review_mjs__WEBPACK_IMPORTED_MODULE_4__/* .buildHeuristicComments */ .zq)({ diff, plan });
     debug.heuristicsUsed = true;
     if (heuristic.length) {
       comments = normalizeHeuristicComments(heuristic);
@@ -36170,7 +36192,7 @@ async function generateReview({
   const formatChecks = comments.map((c) => ({
     file: c.file,
     line: c.line,
-    ...validateFindingMessage(c.message),
+    ...(0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .validateFindingMessage */ .xv)(c.message),
   }));
   const invalidCount = formatChecks.filter((c) => !c.ok).length;
   debug.findingFormat = invalidCount
@@ -36210,8 +36232,8 @@ async function generateReview({
 
   // Build structured findings from verified comments
   const findings = comments.map((c, i) => {
-    const parsed = parseFindingMessage(c.message);
-    const severity = normalizeSeverity(parsed.severity);
+    const parsed = (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .parseFindingMessage */ .UB)(c.message);
+    const severity = (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .normalizeSeverity */ .lv)(parsed.severity);
     const confidence =
       parsed.confidence && ['high', 'medium', 'low'].includes(parsed.confidence)
         ? parsed.confidence
@@ -36233,12 +36255,12 @@ async function generateReview({
   });
 
   findings.sort((a, b) => {
-    const bA = (0,breakdown/* computeFindingBreakdown */._)(a);
-    const bB = (0,breakdown/* computeFindingBreakdown */._)(b);
+    const bA = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_7__/* .computeFindingBreakdown */ ._)(a);
+    const bB = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_7__/* .computeFindingBreakdown */ ._)(b);
     return bB.composite - bA.composite;
   });
 
-  const classified = (0,finding_classifier/* classifyFindings */.Z)(findings, { reviewMode: reviewMode ?? 'medium' });
+  const classified = (0,_finding_classifier_mjs__WEBPACK_IMPORTED_MODULE_1__/* .classifyFindings */ .Z)(findings, { reviewMode: reviewMode ?? 'medium' });
 
   return {
     comments,
@@ -37116,8 +37138,8 @@ var loader = __nccwpck_require__(3833);
 var lib_diff = __nccwpck_require__(4382);
 // EXTERNAL MODULE: ./src/lib/diff-optimizer.mjs
 var diff_optimizer = __nccwpck_require__(1092);
-// EXTERNAL MODULE: ./src/lib/review-engine.mjs + 1 modules
-var review_engine = __nccwpck_require__(5544);
+// EXTERNAL MODULE: ./src/lib/review-engine.mjs
+var review_engine = __nccwpck_require__(2022);
 // EXTERNAL MODULE: ./src/lib/finding-classifier.mjs
 var finding_classifier = __nccwpck_require__(7440);
 ;// CONCATENATED MODULE: ./src/lib/reviewer-orchestrator.mjs
@@ -48703,7 +48725,10 @@ class SkillDispatcher {
 var engine = __nccwpck_require__(9487);
 // EXTERNAL MODULE: ./src/lib/scoring/rubric.mjs
 var rubric = __nccwpck_require__(5034);
+// EXTERNAL MODULE: ./src/lib/finding-format.mjs
+var finding_format = __nccwpck_require__(5942);
 ;// CONCATENATED MODULE: ./src/cli.mjs
+
 
 
 
@@ -49182,11 +49207,12 @@ ${formatDebugSummaryMarkdown(result)}
 `;
   const planSection = formatPlanMarkdown(result.plan);
   const riskSection = formatRiskSummaryMarkdown(result.plan);
+  const prioritySummary = formatPrioritySummaryMarkdown(result);
   const scoreSection = formatScoreSectionMarkdown(result, phase);
   const findings = `### 指摘\n${formatCommentsMarkdown(result.comments)}\n`;
   const suppressedSummary = formatSuppressedSummaryMarkdown(result.classified);
   console.log(
-    [header, planSection, riskSection, scoreSection, findings, suppressedSummary]
+    [header, planSection, riskSection, prioritySummary, scoreSection, findings, suppressedSummary]
       .filter(Boolean)
       .join('\n')
   );
@@ -49204,6 +49230,52 @@ function formatSuppressedSummaryMarkdown(classified) {
     .map(([r, n]) => `${r}(${n})`)
     .join(', ');
   return `> _${classified.suppressed.length} 件の指摘を抑制しました (主な理由: ${top})_\n`;
+}
+
+function formatPrioritySummaryMarkdown(result) {
+  const findings = result.findings ?? [];
+  const counts = { P1: 0, P2: 0, P3: 0, P4: 0 };
+  for (const f of findings) {
+    const p = (0,finding_format/* severityToPriority */.nG)(f.severity);
+    counts[p]++;
+  }
+
+  const lines = ['### 優先度サマリー\n'];
+
+  if (counts.P1 > 0) {
+    lines.push(`> **P1 (マージ前必須修正): ${counts.P1} 件**\n`);
+  }
+
+  lines.push(
+    `- P1 (must fix before merge): ${counts.P1} 件`,
+    `- P2 (should fix or waive): ${counts.P2} 件`,
+    `- P3 (recommended improvement): ${counts.P3} 件`,
+    `- P4 (informational): ${counts.P4} 件`,
+    ''
+  );
+
+  const suppressed = result.classified?.suppressed ?? [];
+  if (suppressed.length > 0) {
+    const reasonCounts = {};
+    for (const f of suppressed) {
+      reasonCounts[f.suppressReason] = (reasonCounts[f.suppressReason] ?? 0) + 1;
+    }
+    const topReasons = Object.entries(reasonCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([r, n]) => `${r}(${n})`)
+      .join(', ');
+    lines.push(`- 抑制済み: ${suppressed.length} 件 (主な理由: ${topReasons})`, '');
+  }
+
+  const humanReviewFiles = result.plan?.riskMap?.require_human_review ?? [];
+  if (humanReviewFiles.length > 0) {
+    lines.push('> **Human review required**');
+    for (const f of humanReviewFiles) lines.push(`> - ${sanitizeForMarkdown(f)}`);
+    lines.push('');
+  }
+
+  return lines.join('\n');
 }
 
 function formatScoreSectionMarkdown(result, phase) {
@@ -49298,7 +49370,17 @@ function formatJsonOutput(result, phase) {
     };
   });
 
-  const summary = { issueCountBySeverity, issueCountByPhase };
+  const priorityCounts = { P1: 0, P2: 0, P3: 0, P4: 0 };
+  for (const f of result.findings ?? []) {
+    const p = (0,finding_format/* severityToPriority */.nG)(f.severity);
+    priorityCounts[p]++;
+  }
+  const prioritySummary = {
+    counts: priorityCounts,
+    requiresImmediateAttention: priorityCounts.P1 > 0,
+  };
+
+  const summary = { issueCountBySeverity, issueCountByPhase, prioritySummary };
   const riskAssessment = result.plan?.riskAssessment;
   if (riskAssessment) {
     summary.riskSummary = {
