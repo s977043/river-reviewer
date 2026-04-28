@@ -1,5 +1,12 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
+
+import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
+
 import {
   hashFinding,
   inferSubsystem,
@@ -9,6 +16,20 @@ import {
 } from '../src/lib/suppression.mjs';
 import { loadMemory } from '../src/lib/riverbed-memory.mjs';
 import { createTempMemory } from './helpers/memory.mjs';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const suppressionContextSchemaPath = resolve(
+  __dirname,
+  '..',
+  'schemas',
+  'suppression-context.schema.json'
+);
+const suppressionContextSchema = JSON.parse(readFileSync(suppressionContextSchemaPath, 'utf8'));
+const validateSuppressionContext = (() => {
+  const ajv = new Ajv2020({ allErrors: true });
+  addFormats(ajv);
+  return ajv.compile(suppressionContextSchema);
+})();
 
 const tmpIndex = () => createTempMemory({ layout: 'nested', prefix: 'river-supp-' });
 
@@ -172,4 +193,178 @@ test('findActiveSuppressions matches subsystem scope', () => {
   };
   const result = findActiveSuppressions(index, ['src/auth/oauth.ts']);
   assert.equal(result.length, 1);
+});
+
+// --- #687 PR-A: feedbackType / fingerprint / severity ---
+
+test('createSuppression preserves backward compat when no new fields are passed', () => {
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const entry = createSuppression({
+      indexPath,
+      findingId: 'f1',
+      findingHash: 'abc1234567890def',
+      filePaths: ['src/auth.ts'],
+      rationale: 'Accepted for now',
+    });
+    assert.equal(entry.context.scope, 'file');
+    assert.equal(entry.context.active, true);
+    assert.equal(entry.context.findingHash, 'abc1234567890def');
+    // None of the new fields should leak into the entry when not passed.
+    assert.equal('feedbackType' in entry.context, false);
+    assert.equal('fingerprint' in entry.context, false);
+    assert.equal('severity' in entry.context, false);
+  } finally {
+    cleanup();
+  }
+});
+
+test('createSuppression stores feedbackType / fingerprint / severity when provided', () => {
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const fingerprint = 'a'.repeat(16);
+    const entry = createSuppression({
+      indexPath,
+      findingId: 'f1',
+      filePaths: ['src/auth.ts'],
+      rationale: 'False positive on dynamic key lookup',
+      fingerprint,
+      feedbackType: 'false_positive',
+      severity: 'minor',
+      sourceCommentId: 12345,
+      prNumber: 678,
+    });
+    assert.equal(entry.context.fingerprint, fingerprint);
+    assert.equal(entry.context.fingerprintAlgo, 'v1');
+    assert.equal(entry.context.feedbackType, 'false_positive');
+    assert.equal(entry.context.severity, 'minor');
+    assert.equal(entry.context.sourceCommentId, 12345);
+    assert.equal(entry.context.sourcePR, 678);
+    // Entry id should now seed from the canonical fingerprint, not findingHash.
+    assert.ok(entry.id.startsWith('suppression-' + fingerprint + '-'));
+  } finally {
+    cleanup();
+  }
+});
+
+test('createSuppression accepts minSeverityToAutoSuppress and duplicateOfFingerprint', () => {
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const fp = 'b'.repeat(16);
+    const dupOf = 'c'.repeat(16);
+    const entry = createSuppression({
+      indexPath,
+      filePaths: ['src/payment.ts'],
+      rationale: 'duplicate of #f0',
+      fingerprint: fp,
+      feedbackType: 'duplicate',
+      severity: 'major',
+      minSeverityToAutoSuppress: 'critical',
+      duplicateOfFingerprint: dupOf,
+    });
+    assert.equal(entry.context.minSeverityToAutoSuppress, 'critical');
+    assert.equal(entry.context.duplicateOfFingerprint, dupOf);
+  } finally {
+    cleanup();
+  }
+});
+
+test('createSuppression context payload validates against suppression-context.schema.json', () => {
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const entry = createSuppression({
+      indexPath,
+      filePaths: ['src/auth.ts'],
+      rationale: 'r',
+      fingerprint: 'd'.repeat(16),
+      feedbackType: 'accepted_risk',
+      severity: 'critical',
+      sourceCommentId: 1,
+      prNumber: 2,
+      expiresAt: '2099-01-01T00:00:00Z',
+    });
+    const ok = validateSuppressionContext(entry.context);
+    assert.ok(ok, JSON.stringify(validateSuppressionContext.errors));
+  } finally {
+    cleanup();
+  }
+});
+
+test('suppression-context schema rejects an invalid feedbackType', () => {
+  const ok = validateSuppressionContext({
+    scope: 'file',
+    active: true,
+    feedbackType: 'totally-bogus',
+  });
+  assert.equal(ok, false);
+});
+
+test('suppression-context schema rejects a fingerprint that is not 16 lowercase hex', () => {
+  const tooShort = validateSuppressionContext({
+    scope: 'file',
+    active: true,
+    fingerprint: 'abc',
+  });
+  assert.equal(tooShort, false);
+  const upper = validateSuppressionContext({
+    scope: 'file',
+    active: true,
+    fingerprint: 'A'.repeat(16),
+  });
+  assert.equal(upper, false);
+});
+
+test('createSuppression drops invalid prNumber / sourceCommentId (NaN, float, non-positive)', () => {
+  // Use distinct fingerprints so the two appendEntry calls cannot collide on
+  // hashFinding(filePaths[0]) + Date.now() under fast CI runners. The
+  // fingerprint feeds the entry id seed (see createSuppression in
+  // src/lib/suppression.mjs).
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const entry = createSuppression({
+      indexPath,
+      filePaths: ['src/auth.ts'],
+      rationale: 'r',
+      fingerprint: 'a'.repeat(16),
+      prNumber: NaN,
+      sourceCommentId: 1.5,
+    });
+    assert.equal('sourcePR' in entry.context, false);
+    assert.equal('sourceCommentId' in entry.context, false);
+
+    const entry2 = createSuppression({
+      indexPath,
+      filePaths: ['src/auth.ts'],
+      rationale: 'r',
+      fingerprint: 'b'.repeat(16),
+      prNumber: 0,
+      sourceCommentId: -3,
+    });
+    assert.equal('sourcePR' in entry2.context, false);
+    assert.equal('sourceCommentId' in entry2.context, false);
+  } finally {
+    cleanup();
+  }
+});
+
+test('suppression-context schema rejects non-positive sourceCommentId', () => {
+  const ok = validateSuppressionContext({
+    scope: 'file',
+    active: true,
+    sourceCommentId: 0,
+  });
+  assert.equal(ok, false);
+});
+
+test('suppression-context schema accepts a backward-compatible legacy entry', () => {
+  // Pre-#687 entries only had {scope, active, findingId, findingHash}. The
+  // schema must not reject them so existing memory indexes stay valid.
+  const legacy = {
+    scope: 'file',
+    active: true,
+    findingId: 'f1',
+    findingHash: 'legacyhash',
+  };
+  const ok = validateSuppressionContext(legacy);
+  assert.ok(ok, JSON.stringify(validateSuppressionContext.errors));
 });

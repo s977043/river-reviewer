@@ -14,9 +14,9 @@ export const modules = {
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3136);
 /* harmony import */ var js_yaml__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3243);
 /* harmony import */ var gray_matter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9599);
-/* harmony import */ var ajv_dist_2020_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(2210);
-/* harmony import */ var ajv_formats__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(2815);
-/* harmony import */ var _runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(5541);
+/* harmony import */ var ajv_dist_2020_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(2210);
+/* harmony import */ var ajv_formats__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(2815);
+/* harmony import */ var _runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(5541);
 
 
 
@@ -152,7 +152,7 @@ async function listAssets(dirPath) {
 
 async function parseAgentSkill(skillMdPath) {
   const raw = await node_fs__WEBPACK_IMPORTED_MODULE_0__.promises.readFile(skillMdPath, 'utf8');
-  const { metadata, body } = (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_7__/* .parseFrontMatter */ .eJ)(raw, { filePath: skillMdPath });
+  const { metadata, body } = (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__/* .parseFrontMatter */ .eJ)(raw, { filePath: skillMdPath });
   const dirPath = node_path__WEBPACK_IMPORTED_MODULE_1__.dirname(skillMdPath);
   const assets = await listAssets(dirPath);
   return { metadata, body, dirPath, assets };
@@ -237,12 +237,12 @@ function convertAgentSkillToRR(parsed, existingIds = new Set(), projectRoot) {
 
 async function loadLooseSchema() {
   const schemaPath = node_path__WEBPACK_IMPORTED_MODULE_1__.join(repoRoot, 'schemas', 'agent-skill-loose.schema.json');
-  return (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_7__/* .loadSchema */ .e$)(schemaPath);
+  return (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__/* .loadSchema */ .e$)(schemaPath);
 }
 
 function createLooseValidator(schema) {
-  const ajv = new ajv_dist_2020_js__WEBPACK_IMPORTED_MODULE_5__({ allErrors: true, strict: false });
-  ajv_formats__WEBPACK_IMPORTED_MODULE_6__(ajv);
+  const ajv = new ajv_dist_2020_js__WEBPACK_IMPORTED_MODULE_7__({ allErrors: true, strict: false });
+  ajv_formats__WEBPACK_IMPORTED_MODULE_5__(ajv);
   return ajv.compile(schema);
 }
 
@@ -274,8 +274,8 @@ async function importAgentSkills(projectRoot, options = {}) {
   }
 
   // Load validators
-  const strictSchema = await (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_7__/* .loadSchema */ .e$)(_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_7__/* .defaultPaths */ .KJ.schemaPath);
-  const strictValidator = (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_7__/* .createSkillValidator */ .m)(strictSchema);
+  const strictSchema = await (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__/* .loadSchema */ .e$)(_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__/* .defaultPaths */ .KJ.schemaPath);
+  const strictValidator = (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__/* .createSkillValidator */ .m)(strictSchema);
   const looseSchema = await loadLooseSchema();
   const looseValidator = createLooseValidator(looseSchema);
 
@@ -450,7 +450,7 @@ async function exportSkillToAgentFormat(skill, outputDir, options = {}) {
 async function exportAllSkills(projectRoot, options = {}) {
   const { outputDir, includeAssets = false } = options;
   const dest = outputDir ?? node_path__WEBPACK_IMPORTED_MODULE_1__.join(projectRoot, '.agents', 'skills');
-  const skills = await (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_7__/* .loadSkills */ .l1)({ skillsDir: node_path__WEBPACK_IMPORTED_MODULE_1__.join(projectRoot, 'skills'), excludedTags: [] });
+  const skills = await (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__/* .loadSkills */ .l1)({ skillsDir: node_path__WEBPACK_IMPORTED_MODULE_1__.join(projectRoot, 'skills'), excludedTags: [] });
 
   const exported = [];
   const errors = [];
@@ -480,7 +480,7 @@ async function listAllSkills(projectRoot, options = {}) {
   const seenIds = new Set();
 
   if (source === 'rr' || source === 'all') {
-    const rrSkills = await (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_7__/* .loadSkills */ .l1)({ skillsDir: node_path__WEBPACK_IMPORTED_MODULE_1__.join(projectRoot, 'skills'), excludedTags: [] });
+    const rrSkills = await (0,_runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__/* .loadSkills */ .l1)({ skillsDir: node_path__WEBPACK_IMPORTED_MODULE_1__.join(projectRoot, 'skills'), excludedTags: [] });
     for (const s of rrSkills) {
       seenIds.add(s.metadata.id);
       skills.push({

@@ -26,6 +26,13 @@ export function inferSubsystem(filePath) {
 
 /**
  * Create a suppression record in Riverbed Memory.
+ *
+ * `feedbackType`, `fingerprint`, `severity`, `minSeverityToAutoSuppress`,
+ * `duplicateOfFingerprint`, `sourceCommentId` are introduced in #687 PR-A as
+ * the data model for auto-suppression; they default to undefined so existing
+ * call sites remain compatible. The shape of the resulting `context` is
+ * validated by `schemas/suppression-context.schema.json`.
+ *
  * @param {object} options
  * @returns {object} The created suppression entry
  */
@@ -33,17 +40,48 @@ export function createSuppression({
   indexPath,
   findingId,
   findingHash,
+  fingerprint,
+  fingerprintAlgo = 'v1',
+  feedbackType,
+  severity,
+  minSeverityToAutoSuppress,
+  duplicateOfFingerprint,
   filePaths,
   rationale,
   scope = 'file',
   expiresAt,
   prNumber,
+  sourceCommentId,
   author = 'river-reviewer',
 }) {
   if (!rationale) throw new Error('Suppression requires a rationale');
 
+  const idSeed = fingerprint || findingHash || hashFinding({ file: filePaths?.[0] });
+
+  const context = {
+    findingId: findingId || null,
+    findingHash: findingHash || null,
+    scope,
+    active: true,
+  };
+  if (fingerprint) {
+    context.fingerprint = fingerprint;
+    context.fingerprintAlgo = fingerprintAlgo;
+  }
+  if (feedbackType) context.feedbackType = feedbackType;
+  if (severity) context.severity = severity;
+  if (minSeverityToAutoSuppress) context.minSeverityToAutoSuppress = minSeverityToAutoSuppress;
+  if (duplicateOfFingerprint) context.duplicateOfFingerprint = duplicateOfFingerprint;
+  if (expiresAt) context.expiresAt = expiresAt;
+  // Reject NaN / non-integer / non-positive values so the entry stays consistent
+  // with suppression-context.schema.json (`integer`, `minimum: 1`).
+  if (Number.isInteger(prNumber) && prNumber > 0) context.sourcePR = prNumber;
+  if (Number.isInteger(sourceCommentId) && sourceCommentId > 0) {
+    context.sourceCommentId = sourceCommentId;
+  }
+
   const entry = {
-    id: 'suppression-' + (findingHash || hashFinding({ file: filePaths?.[0] })) + '-' + Date.now(),
+    id: 'suppression-' + idSeed + '-' + Date.now(),
     type: 'suppression',
     title: 'Suppress: ' + (findingId || 'finding'),
     content: rationale,
@@ -54,13 +92,7 @@ export function createSuppression({
       relatedFiles: filePaths ?? [],
       ...(prNumber ? { links: ['PR#' + prNumber] } : {}),
     },
-    context: {
-      findingId: findingId || null,
-      findingHash: findingHash || null,
-      scope,
-      active: true,
-      ...(expiresAt ? { expiresAt } : {}),
-    },
+    context,
   };
 
   appendEntry(indexPath, entry);
