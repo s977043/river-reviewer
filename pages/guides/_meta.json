@@ -1,6 +1,7 @@
 {
   "quickstart": "クイックスタート (River Reviewer)",
   "github-actions": "GitHub Actions で River Reviewer をセットアップする",
+  "repo-wide-review": "リポジトリ全体を踏まえたレビューの導入とチューニング",
   "run-phase-specific-review": "フェーズ固有のレビューを実行する",
   "troubleshooting": "トラブルシューティング",
   "faq": "FAQ（よくある失敗）",
