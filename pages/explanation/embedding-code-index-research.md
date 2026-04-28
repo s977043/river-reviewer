@@ -12,14 +12,14 @@ id: embedding-code-index-research
 
 ## 1. なぜ検討するか（解こうとしている問題）
 
-現在の context collector（[`src/lib/repo-context.mjs`](https://github.com/s977043/river-reviewer/blob/main/src/lib/repo-context.mjs)）は、変更ファイル → path heuristic + symbol grep + sibling 探索でコンテキストを集めます。これで十分なケースが多い一方、リポジトリが大きくなると次の限界が出る可能性があります。
+現在の context collector（[`src/lib/repo-context.mjs`](https://github.com/s977043/river-reviewer/blob/main/src/lib/repo-context.mjs)）は、変更ファイル → path heuristic + symbol grep + sibling 探索でコンテキストを集めます。多くのケースではこれで十分ですが、大規模リポジトリでは次の限界が見えてきます。
 
 - 同じ概念が異なる命名で実装されているとき（例: `formatUserId` と `normaliseAccountIdentifier`）、文字列検索では辿りにくい
 - ADR / 仕様書（自然文）と実装の意味的関連を拾えない
 - cross-file な設計パターン（例: Repository 抽象が複数ファイルに散らばる）を抽出しにくい
 - 大規模 monorepo で symbol grep 結果が多すぎ、ranking ができない
 
-これを「semantic retrieval」（意味的近傍検索）で補えるか、というのが本検討の出発点です。
+これを「semantic retrieval」（意味に基づく近傍検索）で補えるかが本検討の出発点です。
 
 ## 2. ripgrep / heuristic で十分な範囲
 
@@ -86,7 +86,7 @@ id: embedding-code-index-research
 案 A 採用時:
 
 - `actions/cache@v4` で `.river/index/` をキャッシュ。key は `${{ hashFiles('**/*.{ts,tsx,js,mjs,md}') }}-${{ env.MODEL_VERSION }}`。
-- restore-keys で部分一致再利用 → 差分 chunk のみ再 embed。
+- restore-keys で部分一致のキャッシュを再利用 → 差分 chunk のみ再 embed。
 - monorepo の場合は workspace 単位で分割キャッシュ。
 - secret は `OPENAI_API_KEY` のみで済む（vector DB を使わない場合）。
 
@@ -113,7 +113,7 @@ id: embedding-code-index-research
 実装する場合でも、**embedding は補助情報のみ** に留め、retrieval が空でも heuristic 経路でレビューが完走することを保証します。具体的には:
 
 1. embedding retrieval → top-k chunk 取得
-2. 取得した chunk のうち **既存 ripgrep 結果に含まれないもの** を最大 N 件に絞り context に追加
+2. 取得した chunk のうち **既存 ripgrep 結果に含まれないもの** から最大 N 件に絞って context へ追加
 3. embedding が無効化（`config.context.embedding.enabled=false`）/ index 不在 / API 失敗時は heuristic のみで動作
 
 これにより既存の review 出力は **下位互換** を保てます。
@@ -143,14 +143,14 @@ id: embedding-code-index-research
 将来 embedding を入れると判断した際の Issue 分割案:
 
 1. **secret detect + index exclude policy** — `.river/index.gitignore` 仕様、entropy 検出
-2. **chunking strategy** — TS/JS の AST chunk vs naive line-window、md の heading chunk
+2. **chunking strategy** — TS/JavaScript の AST chunk vs naive line-window、md の heading chunk
 3. **local embedder backend (案 A)** — ONNX runtime + BGE-small、CLI: `river index build`
 4. **review-time retrieval integration** — `repo-context.mjs` への embedding ranker 追加
 5. **CI cache strategy** — `.river/index/` の actions/cache 仕様、incremental update
 6. **eval drift guards** — [#688](https://github.com/s977043/river-reviewer/issues/688) に embedding on/off 軸を追加
 7. **docs-only first step (案 C)** — 段階導入したい場合の最小着地点
 
-各 Issue は独立した PR で完結する単位を想定し、Epic として grouping するかは導入意思決定時に再判断します。
+各 Issue は独立した PR で完結する単位を想定し、Epic として grouping するかは導入を決める時点で再判断します。
 
 ## 結論（要約）
 
