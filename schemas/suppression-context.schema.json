@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/s977043/river-reviewer/schemas/suppression-context.schema.json",
+  "title": "Suppression Entry Context Schema",
+  "description": "JSON Schema for the `context` payload of a Riverbed Memory entry whose `type` is `suppression`. The parent entry is validated by riverbed-entry.schema.json (which permits additional context properties); this schema constrains the suppression-specific shape so that auto-suppression and feedback typing remain consistent. See Issue #687 (Epic #650).",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["scope", "active"],
+  "$defs": {
+    "feedbackType": {
+      "type": "string",
+      "enum": ["false_positive", "accepted_risk", "wont_fix", "not_relevant", "duplicate"],
+      "description": "Why this suppression was added. Used by applySuppressions to decide whether auto-suppression is allowed for the finding's severity."
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["global", "subsystem", "file"],
+      "description": "Spatial scope at which the suppression should match future findings."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "minor", "major", "critical"],
+      "description": "Severity of the finding being suppressed at the time of suppression."
+    },
+    "fingerprintAlgo": {
+      "type": "string",
+      "enum": ["v1"],
+      "description": "Version tag for the fingerprint algorithm. Allows future migration without breaking older entries."
+    }
+  },
+  "properties": {
+    "scope": { "$ref": "#/$defs/scope" },
+    "active": {
+      "type": "boolean",
+      "description": "Whether the suppression is currently in effect. Revocations are recorded as separate `resurface` entries; this flag must remain true for the suppression to be considered active by findActiveSuppressions."
+    },
+    "feedbackType": {
+      "$ref": "#/$defs/feedbackType"
+    },
+    "fingerprint": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 16,
+      "pattern": "^[0-9a-f]{16}$",
+      "description": "16-hex sha256-derived fingerprint produced by computeFingerprint(finding) in src/lib/finding-fingerprint.mjs. Required for auto-suppression matching introduced in #687 PR-B."
+    },
+    "fingerprintAlgo": {
+      "$ref": "#/$defs/fingerprintAlgo"
+    },
+    "severity": {
+      "$ref": "#/$defs/severity"
+    },
+    "minSeverityToAutoSuppress": {
+      "$ref": "#/$defs/severity",
+      "description": "Optional override. When set, only findings whose severity is at or below this rank may be auto-suppressed by this entry. Default policy (#687 PR-B): findings of severity major/critical require feedbackType=accepted_risk."
+    },
+    "duplicateOfFingerprint": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 16,
+      "pattern": "^[0-9a-f]{16}$",
+      "description": "Set when feedbackType=duplicate. Points at the canonical fingerprint that this finding duplicates."
+    },
+    "findingId": {
+      "type": ["string", "null"],
+      "description": "Original transient finding ID at the time of suppression (regenerated each run; do not rely on for matching)."
+    },
+    "findingHash": {
+      "type": ["string", "null"],
+      "description": "Legacy hash from src/lib/suppression.mjs:hashFinding. Kept for backward compatibility; new entries should populate `fingerprint` instead."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional expiry; matches riverbed-entry.expiresAt semantics."
+    },
+    "sourcePR": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "PR number where the suppression was created."
+    },
+    "sourceCommentId": {
+      "type": "integer",
+      "description": "GitHub review comment ID that recorded the feedback."
+    }
+  }
+}
