@@ -315,12 +315,17 @@ test('suppression-context schema rejects a fingerprint that is not 16 lowercase 
 });
 
 test('createSuppression drops invalid prNumber / sourceCommentId (NaN, float, non-positive)', () => {
+  // Use distinct fingerprints so the two appendEntry calls cannot collide on
+  // hashFinding(filePaths[0]) + Date.now() under fast CI runners. The
+  // fingerprint feeds the entry id seed (see createSuppression in
+  // src/lib/suppression.mjs).
   const { cleanup, indexPath } = tmpIndex();
   try {
     const entry = createSuppression({
       indexPath,
       filePaths: ['src/auth.ts'],
       rationale: 'r',
+      fingerprint: 'a'.repeat(16),
       prNumber: NaN,
       sourceCommentId: 1.5,
     });
@@ -331,6 +336,7 @@ test('createSuppression drops invalid prNumber / sourceCommentId (NaN, float, no
       indexPath,
       filePaths: ['src/auth.ts'],
       rationale: 'r',
+      fingerprint: 'b'.repeat(16),
       prNumber: 0,
       sourceCommentId: -3,
     });
