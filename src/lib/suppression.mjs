@@ -73,8 +73,12 @@ export function createSuppression({
   if (minSeverityToAutoSuppress) context.minSeverityToAutoSuppress = minSeverityToAutoSuppress;
   if (duplicateOfFingerprint) context.duplicateOfFingerprint = duplicateOfFingerprint;
   if (expiresAt) context.expiresAt = expiresAt;
-  if (typeof prNumber === 'number') context.sourcePR = prNumber;
-  if (typeof sourceCommentId === 'number') context.sourceCommentId = sourceCommentId;
+  // Reject NaN / non-integer / non-positive values so the entry stays consistent
+  // with suppression-context.schema.json (`integer`, `minimum: 1`).
+  if (Number.isInteger(prNumber) && prNumber > 0) context.sourcePR = prNumber;
+  if (Number.isInteger(sourceCommentId) && sourceCommentId > 0) {
+    context.sourceCommentId = sourceCommentId;
+  }
 
   const entry = {
     id: 'suppression-' + idSeed + '-' + Date.now(),

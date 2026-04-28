@@ -314,6 +314,42 @@ test('suppression-context schema rejects a fingerprint that is not 16 lowercase 
   assert.equal(upper, false);
 });
 
+test('createSuppression drops invalid prNumber / sourceCommentId (NaN, float, non-positive)', () => {
+  const { cleanup, indexPath } = tmpIndex();
+  try {
+    const entry = createSuppression({
+      indexPath,
+      filePaths: ['src/auth.ts'],
+      rationale: 'r',
+      prNumber: NaN,
+      sourceCommentId: 1.5,
+    });
+    assert.equal('sourcePR' in entry.context, false);
+    assert.equal('sourceCommentId' in entry.context, false);
+
+    const entry2 = createSuppression({
+      indexPath,
+      filePaths: ['src/auth.ts'],
+      rationale: 'r',
+      prNumber: 0,
+      sourceCommentId: -3,
+    });
+    assert.equal('sourcePR' in entry2.context, false);
+    assert.equal('sourceCommentId' in entry2.context, false);
+  } finally {
+    cleanup();
+  }
+});
+
+test('suppression-context schema rejects non-positive sourceCommentId', () => {
+  const ok = validateSuppressionContext({
+    scope: 'file',
+    active: true,
+    sourceCommentId: 0,
+  });
+  assert.equal(ok, false);
+});
+
 test('suppression-context schema accepts a backward-compatible legacy entry', () => {
   // Pre-#687 entries only had {scope, active, findingId, findingHash}. The
   // schema must not reject them so existing memory indexes stay valid.

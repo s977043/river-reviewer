@@ -81,6 +81,7 @@
     },
     "sourceCommentId": {
       "type": "integer",
+      "minimum": 1,
       "description": "GitHub review comment ID that recorded the feedback."
     }
   }
