@@ -12,7 +12,7 @@ id: embedding-code-index-research
 
 ## 1. なぜ検討するか（解こうとしている問題）
 
-現在の context collector（[`src/lib/repo-context.mjs`](https://github.com/s977043/river-reviewer/blob/main/src/lib/repo-context.mjs)）は、変更ファイル → path heuristic + symbol grep + sibling 探索でコンテキストを集めます。多くのケースではこれで十分ですが、大規模リポジトリでは次の限界が見えてきます。
+現在の context collector（`src/lib/repo-context.mjs`）は、変更ファイル → path heuristic + symbol grep + sibling 探索でコンテキストを集めます。多くのケースではこれで十分ですが、大規模リポジトリでは次の限界が見えてきます。
 
 - 同じ概念が異なる命名で実装されているとき（例: `formatUserId` と `normaliseAccountIdentifier`）、文字列検索では辿りにくい
 - ADR / 仕様書（自然文）と実装の意味的関連を拾えない
@@ -98,15 +98,16 @@ id: embedding-code-index-research
 
 ## 7. cost / latency 試算（案 A）
 
-| 項目                       | 中規模 repo (5k files / 25k chunks) | 大規模 monorepo (50k files / 250k chunks) |
-| -------------------------- | ----------------------------------- | ----------------------------------------- |
-| 初回 embed コスト          | 約 \$0.25                           | 約 \$2.5                                  |
-| 1 PR あたり差分 embed      | < \$0.001                           | < \$0.01                                  |
-| index ファイルサイズ       | 約 30 MB                            | 約 300 MB                                 |
-| retrieval latency (in-mem) | 1〜3 ms                             | 50〜100 ms                                |
-| CI cache restore           | 数秒                                | 30 秒〜                                   |
+| 項目                          | 中規模 repo (5k files / 25k chunks) | 大規模 monorepo (50k files / 250k chunks) |
+| ----------------------------- | ----------------------------------- | ----------------------------------------- |
+| 初回 embed コスト             | 約 \$0.25                           | 約 \$2.5                                  |
+| 1 PR あたり差分 embed         | < \$0.001                           | < \$0.01                                  |
+| index サイズ (binary float32) | 約 150 MB                           | 約 1.5 GB                                 |
+| index サイズ (JSONL text)     | 約 450 MB                           | 約 4.5 GB                                 |
+| retrieval latency (in-mem)    | 1〜3 ms                             | 50〜100 ms                                |
+| CI cache restore (binary)     | 数秒                                | 1 分〜                                    |
 
-> 試算は `text-embedding-3-small`（1536 次元 / 約 \$0.02 per 1M tokens）想定。
+> 試算は `text-embedding-3-small`（1536 次元 / 約 \$0.02 per 1M tokens）想定。サイズは `chunks × 1536 × 4 bytes` を float32 binary、JSONL text 表現は約 3 倍で計算。実装は **binary 形式（例: numpy `.npy`、msgpack、または独自の typed array dump）** を前提とする。JSONL を本番運用に使うと大規模で破綻する。
 
 ## 8. deterministic fallback
 
