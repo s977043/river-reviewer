@@ -87,6 +87,11 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
       - name: Check dist is up to date
         run: |
           src_ts=$(git log -1 --format=%ct -- 'runners/github-action/src/' 'src/')
@@ -102,18 +107,36 @@ jobs:
             exit 1
           fi
 
-          if [ "$src_ts" -gt "$dist_ts" ]; then
+          if [ "$src_ts" -le "$dist_ts" ]; then
             src_date=$(git log -1 --format=%ci -- 'runners/github-action/src/' 'src/')
             dist_date=$(git log -1 --format=%ci -- 'runners/github-action/dist/')
-            echo "::error::dist/ is stale. Source last changed at ${src_date} but dist last rebuilt at ${dist_date}. Run 'npm run build:action' and commit."
-            echo "Recent src changes:"
-            git log -3 --oneline -- 'runners/github-action/src/' 'src/'
-            exit 1
+            echo "dist/ is current (dist: ${dist_date}, src: ${src_date})"
+            exit 0
+          fi
+
+          # Timestamp says dist is stale, but the src change might not be
+          # transitively imported by the bundle (e.g., a sibling helper that
+          # the action runner does not load). Rebuild and compare bytes
+          # before failing — only fail if the rebuild actually produces a
+          # diff. This avoids false positives that block PRs whose src/
+          # change is genuinely not part of the shipped bundle.
+          echo "Timestamp suggests dist is stale; rebuilding to verify..."
+          npm run build:action
+          if git diff --quiet -- runners/github-action/dist/; then
+            src_date=$(git log -1 --format=%ci -- 'runners/github-action/src/' 'src/')
+            dist_date=$(git log -1 --format=%ci -- 'runners/github-action/dist/')
+            echo "dist/ rebuild produced no changes; bundle is genuinely fresh (dist commit: ${dist_date}, src commit: ${src_date})."
+            exit 0
           fi
 
           src_date=$(git log -1 --format=%ci -- 'runners/github-action/src/' 'src/')
           dist_date=$(git log -1 --format=%ci -- 'runners/github-action/dist/')
-          echo "dist/ is current (dist: ${dist_date}, src: ${src_date})"
+          echo "::error::dist/ is stale. Source last changed at ${src_date} but dist last rebuilt at ${dist_date}, and rebuild produced byte-level changes. Run 'npm run build:action' and commit."
+          echo "Recent src changes:"
+          git log -3 --oneline -- 'runners/github-action/src/' 'src/'
+          echo "Rebuild diff (file list):"
+          git diff --name-only -- runners/github-action/dist/
+          exit 1
 
   integration-test:
     name: Integration (CLI)

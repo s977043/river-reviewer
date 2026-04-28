@@ -65,6 +65,8 @@ git commit -m "chore(action): rebuild github-action dist"
 - `runners/github-action/src/index.mjs` から import される `src/**` のモジュール
 - `package.json` / `package-lock.json` の ncc 依存 (`@vercel/ncc` 自体の bump、または bundle 対象に入る dependency の bump)
 
+> CI の `Action dist freshness` job は src commit timestamp が dist より新しい場合に **追加で `npm run build:action` を実行して byte 差分を確認**する。再 build しても dist に diff が出ないなら、その src 変更は bundle に含まれていない sibling と判断され、ローカル commit なしでも pass する（false positive 回避）。逆に diff が出た場合は依然として rebuild commit が必要。
+
 ## トラブルシューティング
 
 | 症状                                                                            | 原因                             | 対応                                             |
