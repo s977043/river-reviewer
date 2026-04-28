@@ -166,7 +166,7 @@ defaults:
 | `usages`   | `rg` で grep した export symbol の使用箇所  | 約 1500 文字 |
 | `config`   | sibling な設定ファイル（`.json` / `.yaml`） | 約 500 文字  |
 
-合計上限は既定 8000 文字（`maxChars` で上書き可）。各セクションは末尾から `// ...[truncated]` で切り詰めます。
+合計上限は既定 8000 文字です（`collectRepoContext` の `maxChars` 引数で上書き可能。現状は設定ファイルからは変更できず、プログラム経由でのみ調整できます。設定ファイルからの調整は [Issue #689](https://github.com/s977043/river-reviewer/issues/689) で計画中）。各セクションは末尾から `// ...[truncated]` で切り詰めます。
 
 `rg`（ripgrep）が利用できない環境では `usages` セクションが best-effort で空になります。CI ランナー側にあらかじめ ripgrep を入れておいてください（GitHub Actions の標準 Ubuntu イメージには同梱）。
 
