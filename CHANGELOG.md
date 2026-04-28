@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.0](https://github.com/s977043/river-reviewer/compare/v0.20.1...v0.21.0) (2026-04-28)
+
+
+### Features
+
+* **memory:** add suppression context schema and feedback fields ([#687](https://github.com/s977043/river-reviewer/issues/687) PR-A) ([#695](https://github.com/s977043/river-reviewer/issues/695)) ([6f27a6b](https://github.com/s977043/river-reviewer/commit/6f27a6b2353396923a074911943abac3a623bb44))
+
 ## [0.20.1](https://github.com/s977043/river-reviewer/compare/v0.20.0...v0.20.1) (2026-04-26)
 
 
