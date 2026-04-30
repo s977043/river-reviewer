@@ -88,5 +88,62 @@
         "note": "Diff alone shows an interface bump; the missing test update only surfaces with the test file in context."
       }
     }
+  },
+  {
+    "name": "guard: stale TODO replaced with precise rationale (no risk)",
+    "phase": "midstream",
+    "category": "guard",
+    "guard": true,
+    "seedRepo": "seeds/guard-future-use-comment/",
+    "diffFile": "diffs/guard-future-use-comment.diff",
+    "planSkills": ["rr-midstream-i18n-unused-key-001"],
+    "expected": {
+      "withRepoContext": {
+        "minFindings": 0,
+        "note": "Guard: the diff only improves a comment's rationale; a finding here would be a false positive."
+      },
+      "withoutRepoContext": {
+        "minFindings": 0,
+        "note": "Same: pure-comment edits should not generate findings."
+      }
+    }
+  },
+  {
+    "name": "guard: header update on a clearly-generated file",
+    "phase": "midstream",
+    "category": "guard",
+    "guard": true,
+    "seedRepo": "seeds/guard-generated-file/",
+    "diffFile": "diffs/guard-generated-file.diff",
+    "planSkills": ["rr-midstream-api-compatibility-001"],
+    "expected": {
+      "withRepoContext": {
+        "minFindings": 0,
+        "note": "Guard: the file is auto-generated (DO NOT EDIT MANUALLY header); review should not generate findings on the generator's bookkeeping comment."
+      },
+      "withoutRepoContext": {
+        "minFindings": 0,
+        "note": "Same."
+      }
+    }
+  },
+  {
+    "name": "guard: source change with companion test updated in the same diff",
+    "phase": "midstream",
+    "category": "guard",
+    "guard": true,
+    "seedRepo": "seeds/guard-related-test-updated/",
+    "diffFile": "diffs/guard-related-test-updated.diff",
+    "planSkills": ["rr-midstream-api-compatibility-001"],
+    "expected": {
+      "withRepoContext": {
+        "minFindings": 0,
+        "note": "Guard: sum.ts and sum.test.ts both move together. A 'missing test update' finding would be a false positive."
+      },
+      "withoutRepoContext": {
+        "minFindings": 0,
+        "note": "Same: the test update is visible directly in the diff."
+      }
+    }
   }
 ]

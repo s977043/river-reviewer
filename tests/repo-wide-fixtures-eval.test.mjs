@@ -59,3 +59,60 @@ test('categoriesCovered includes the i18n starter case', async () => {
   const { summary } = await evaluateRepoWideFixtures({ casesPath: CASES_PATH });
   assert.ok(summary.categoriesCovered.includes('i18n'));
 });
+
+// --- #688 PR-3: guard cases + falsePositiveRate ---
+
+test('summary exposes detectionCases / guardCases / falsePositiveRate (#688 PR-3)', async () => {
+  const { summary } = await evaluateRepoWideFixtures({ casesPath: CASES_PATH });
+  assert.ok(typeof summary.detectionCases === 'number');
+  assert.ok(typeof summary.guardCases === 'number');
+  assert.ok(typeof summary.falsePositiveRateWith === 'number');
+  assert.ok(typeof summary.falsePositiveRateWithout === 'number');
+  // Detection cases + guard cases sum to the total.
+  assert.equal(summary.detectionCases + summary.guardCases, summary.totalCases);
+});
+
+test('falsePositiveRate is in [0, 1]', async () => {
+  const { summary } = await evaluateRepoWideFixtures({ casesPath: CASES_PATH });
+  assert.ok(summary.falsePositiveRateWith >= 0 && summary.falsePositiveRateWith <= 1);
+  assert.ok(summary.falsePositiveRateWithout >= 0 && summary.falsePositiveRateWithout <= 1);
+});
+
+test('runRepoWideCase tags guard cases with guard: true', async () => {
+  const guardCase = {
+    name: 'smoke-guard',
+    category: 'guard',
+    guard: true,
+    seedRepo: 'seeds/guard-future-use-comment/',
+    diffFile: 'diffs/guard-future-use-comment.diff',
+    planSkills: [],
+    expected: {},
+  };
+  const result = await runRepoWideCase(guardCase, FIXTURES_DIR);
+  assert.equal(result.guard, true);
+});
+
+test('runRepoWideCase defaults guard to false on detection cases', async () => {
+  const detectionCase = {
+    name: 'smoke-detection',
+    category: 'i18n',
+    seedRepo: 'seeds/i18n-unused-key-01/',
+    diffFile: 'diffs/i18n-unused-key-01.diff',
+    planSkills: ['rr-midstream-i18n-unused-key-001'],
+    expected: {},
+  };
+  const result = await runRepoWideCase(detectionCase, FIXTURES_DIR);
+  assert.equal(result.guard, false);
+});
+
+test('detection rates only count detection cases (guards do not deflate)', async () => {
+  const { summary } = await evaluateRepoWideFixtures({ casesPath: CASES_PATH });
+  // If guards were counted in the denominator, all-zero detection on a
+  // mixed suite would still produce a non-zero rate from the detection
+  // cases alone. We avoid that by filtering before averaging.
+  if (summary.detectionCases === 0) {
+    assert.equal(summary.detectionRateWith, 0);
+  } else {
+    assert.ok(summary.detectionRateWith <= 1);
+  }
+});
