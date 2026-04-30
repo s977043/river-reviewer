@@ -12,6 +12,7 @@ import path from 'node:path';
 import { redactText, shouldExcludeForContext } from './secret-redactor.mjs';
 import { charsToTokens, estimateTokens } from './token-estimator.mjs';
 import { DEFAULT_WEIGHTS, pathProximity, scoreContextCandidate } from './context-ranker.mjs';
+import { resolveContextBudget } from './context-presets.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -75,7 +76,10 @@ export async function collectRepoContext({
   // satisfied for a candidate to land. estimateTokens is approximate
   // (ASCII chars/4, CJK chars/2 in #689 PR-A) so callers should treat
   // the result as best-effort, not a hard ceiling.
-  const budgetCfg = contextConfig?.budget;
+  // PR-D (#689): if the user picks a reviewMode without an explicit
+  // budget, resolve the preset; the explicit `budget: { ... }` always
+  // wins. resolveContextBudget returns null when both are absent.
+  const budgetCfg = resolveContextBudget(contextConfig);
   const maxTokensCfg = Number.isFinite(budgetCfg?.maxTokens) ? budgetCfg.maxTokens : null;
   let tokenBudget = maxTokensCfg;
   const billTokens = (text) => {
