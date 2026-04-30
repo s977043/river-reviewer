@@ -121,7 +121,7 @@ id: embedding-code-index-research
 
 ## 9. ripgrep / heuristic との併用方針
 
-- **ranking signal** として embedding score を [#689 token budget](https://github.com/s977043/river-reviewer/issues/689) の `pathProximity` / `symbolOverlap` 等と並列に追加（重み 0.10〜0.15）
+- **ranking signal** として embedding score を [#689 token budget](https://github.com/s977043/river-reviewer/issues/689) の `pathProximity` / `symbolUsage` 等と並列に追加（重み 0.10〜0.15）
 - 候補集合の **生成** は引き続き heuristic（embedding を生成器に使うと幻覚が増える）
 - 同一ファイルの heuristic 結果と embedding 結果が衝突したら heuristic 優先（ファイル単位 dedupe）
 
