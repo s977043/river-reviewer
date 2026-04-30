@@ -86,12 +86,61 @@ export const memoryConfigSchema = z
   })
   .strict();
 
+// --- #689 PR-A: context.budget config surface ---
+//
+// Companion to src/lib/token-estimator.mjs. PR-A teaches the loader to
+// accept and validate the new keys; pipeline integration (collectRepoContext
+// reading these and adjusting per-section caps) lands in #689 PR-C.
+//
+// Defaults are documented at runtime in repo-context.mjs (DEFAULT_MAX_CHARS,
+// SECTION_CAPS) and preserved when this block is omitted entirely.
+
+export const contextBudgetSchema = z
+  .object({
+    maxTokens: z.number().int().min(256).max(64000).optional(),
+    maxChars: z.number().int().min(1024).max(200000).optional(),
+    perSectionCaps: z
+      .object({
+        fullFile: z.number().int().min(0).optional(),
+        tests: z.number().int().min(0).optional(),
+        usages: z.number().int().min(0).optional(),
+        config: z.number().int().min(0).optional(),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+
+export const contextRankingSchema = z
+  .object({
+    enabled: z.boolean().optional(),
+    weights: z
+      .object({
+        pathProximity: z.number().min(0).max(1).optional(),
+        symbolUsage: z.number().min(0).max(1).optional(),
+        siblingTest: z.number().min(0).max(1).optional(),
+        commitRecency: z.number().min(0).max(1).optional(),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+
+export const contextConfigSchema = z
+  .object({
+    budget: contextBudgetSchema.optional(),
+    ranking: contextRankingSchema.optional(),
+    tokenizer: z.enum(['heuristic']).optional(),
+  })
+  .strict();
+
 export const riverReviewerConfigSchema = z.object({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
   exclude: excludeConfigSchema.optional(),
   security: securityConfigSchema.optional(),
   memory: memoryConfigSchema.optional(),
+  context: contextConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -135,6 +184,7 @@ export const ConfigSchema = z
     exclude: excludeConfigSchema.optional(),
     security: securityConfigSchema.optional(),
     memory: memoryConfigSchema.optional(),
+    context: contextConfigSchema.optional(),
     skills: z.array(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings

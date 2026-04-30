@@ -126,6 +126,42 @@ describe('riverReviewerConfigSchema', () => {
     });
     assert.ok(result.success, JSON.stringify(result.error?.format()));
   });
+
+  test('accepts context.budget / context.ranking blocks (#689 PR-A)', () => {
+    const result = riverReviewerConfigSchema.safeParse({
+      context: {
+        budget: {
+          maxTokens: 4000,
+          maxChars: 16000,
+          perSectionCaps: { fullFile: 3000, tests: 2000, usages: 1500, config: 500 },
+        },
+        ranking: {
+          enabled: true,
+          weights: { pathProximity: 0.4, symbolUsage: 0.3, siblingTest: 0.2, commitRecency: 0.1 },
+        },
+        tokenizer: 'heuristic',
+      },
+    });
+    assert.ok(result.success, JSON.stringify(result.error?.format()));
+  });
+
+  test('rejects out-of-range context.budget.maxTokens', () => {
+    assert.equal(
+      riverReviewerConfigSchema.safeParse({ context: { budget: { maxTokens: 100 } } }).success,
+      false
+    );
+    assert.equal(
+      riverReviewerConfigSchema.safeParse({ context: { budget: { maxTokens: 999_999 } } }).success,
+      false
+    );
+  });
+
+  test('rejects unknown context.tokenizer values', () => {
+    assert.equal(
+      riverReviewerConfigSchema.safeParse({ context: { tokenizer: 'tiktoken' } }).success,
+      false
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------
