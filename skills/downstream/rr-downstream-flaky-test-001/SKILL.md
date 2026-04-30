@@ -14,7 +14,7 @@ applyTo:
   - 'tests/**/*.js'
 tags: [tests, reliability, flakiness, downstream]
 severity: major
-inputContext: [diff, tests]
+inputContext: [diff]
 outputKind: [findings, actions, summary]
 modelHint: balanced
 dependencies: [test_runner]
