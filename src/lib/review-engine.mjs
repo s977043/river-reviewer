@@ -12,6 +12,7 @@ import {
 } from './finding-format.mjs';
 import { getReviewDepthConfig } from './review-plan-generator.mjs';
 import { buildRepoContextSection } from './repo-context.mjs';
+import { redactText } from './secret-redactor.mjs';
 
 const ENV_DEFAULT_MODEL = process.env.RIVER_OPENAI_MODEL || process.env.OPENAI_MODEL || null;
 const MAX_PROMPT_CHARS = 12000;
@@ -482,10 +483,28 @@ export async function generateReview({
   const openAIConfig = resolveOpenAIConfig({ model, apiKey }, effectiveConfig);
   const language = promptInfo.language ?? effectiveConfig.review.language;
 
+  // #692 PR-D: defense-in-depth redaction at the artifact boundary.
+  // PR-C already redacts repo context before it reaches the prompt, but
+  // any other path (project rules with a pasted token, additional
+  // instructions, etc.) could still slip a secret in. Build a single
+  // redacted view of the prompt and use it everywhere the prompt would
+  // otherwise leave process memory (debug.promptPreview, returned
+  // `prompt`, downstream artifact writes). The LLM call still uses the
+  // original `promptInfo.prompt` because it must.
+  const safePrompt = redactText(promptInfo.prompt, {
+    allowlist: effectiveConfig.security?.redact?.allowlist ?? [],
+    ...(effectiveConfig.security?.redact?.entropyThreshold != null
+      ? { entropyThreshold: effectiveConfig.security.redact.entropyThreshold }
+      : {}),
+    ...(effectiveConfig.security?.redact?.categories?.highEntropy === false
+      ? { highEntropy: false }
+      : {}),
+  }).text;
+
   let comments = [];
   const debug = {
     promptTruncated: promptInfo.truncated,
-    promptPreview: promptInfo.prompt.slice(0, MAX_PROMPT_PREVIEW_CHARS),
+    promptPreview: safePrompt.slice(0, MAX_PROMPT_PREVIEW_CHARS),
     llmModel: openAIConfig.model,
     llmProvider: openAIConfig.provider,
     reviewLanguage: language,
@@ -646,7 +665,11 @@ export async function generateReview({
     comments,
     findings,
     classified,
-    prompt: promptInfo.prompt,
+    // The returned prompt flows into local-runner result, artifacts, and
+    // dashboards. Use the redacted view so a leaked secret never leaves
+    // process memory through these paths. The LLM call above used the
+    // original promptInfo.prompt and is unaffected.
+    prompt: safePrompt,
     promptTruncated: promptInfo.truncated,
     llmModel: openAIConfig.model,
     debug,

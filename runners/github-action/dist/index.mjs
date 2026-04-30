@@ -35693,308 +35693,18 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
 
 /***/ }),
 
-/***/ 7685:
+/***/ 9865:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  l: () => (/* binding */ buildRepoContextSection),
-  o: () => (/* binding */ collectRepoContext)
-});
-
-// EXTERNAL MODULE: external "node:child_process"
-var external_node_child_process_ = __nccwpck_require__(1421);
-// EXTERNAL MODULE: external "node:util"
-var external_node_util_ = __nccwpck_require__(7975);
-// EXTERNAL MODULE: external "node:fs"
-var external_node_fs_ = __nccwpck_require__(3024);
-// EXTERNAL MODULE: external "node:path"
-var external_node_path_ = __nccwpck_require__(6760);
-// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
-var esm = __nccwpck_require__(9519);
-;// CONCATENATED MODULE: ./src/lib/secret-redactor.mjs
-// Secret redaction for repo-wide review context (#692 PR-A).
-//
-// This module is **additive** and not yet wired into the review pipeline.
-// PR-C of #692 will hook it into src/lib/repo-context.mjs and
-// src/lib/local-runner.mjs so that prompt input and debug artifacts are
-// redacted before they leave process memory.
-//
-// Design notes (see Issue #692 plan):
-// - Replacements are *length-independent* (`<REDACTED:category>`) so that
-//   suppression fingerprints stay stable when redaction is toggled on/off
-//   (interaction with #687 PR-B applySuppressions).
-// - High-entropy detection is opt-in by config and runs LAST so that named
-//   categories take priority and avoid double-counting.
-// - Allowlist substrings (example, dummy, placeholder, missing, xxxxx)
-//   suppress redaction on the surrounding token to protect documentation
-//   examples and obvious test fixtures from being mangled.
-// - DEFAULT_DENY_GLOBS is exported separately so that path-level exclusion
-//   can run BEFORE redaction (avoids reading .env / *.pem files at all).
-
-
-
-/**
- * Path globs that must be excluded from repo-wide context regardless of
- * user config. Lock files and build artifacts are also denied because they
- * carry no review value but inflate the budget.
- */
-const DEFAULT_DENY_GLOBS = Object.freeze([
-  '**/.env',
-  '**/.env.*',
-  '**/.envrc',
-  '**/secrets.*',
-  '**/credentials.*',
-  '**/credentials/**',
-  '**/*.pem',
-  '**/*.key',
-  '**/*.p12',
-  '**/*.pfx',
-  '**/*.jks',
-  '**/*.keystore',
-  '**/id_rsa',
-  '**/id_dsa',
-  '**/id_ecdsa',
-  '**/id_ed25519',
-  '**/*.lock',
-  '**/package-lock.json',
-  '**/pnpm-lock.yaml',
-  '**/yarn.lock',
-  '**/composer.lock',
-  '**/Cargo.lock',
-  '**/poetry.lock',
-  '**/Gemfile.lock',
-  '**/dist/**',
-  '**/build/**',
-  '**/out/**',
-  '**/.next/**',
-  '**/coverage/**',
-  '**/*.min.js',
-  '**/*.min.css',
-  '**/*.map',
-]);
-
-/**
- * Substrings that, when found near a candidate match, mark the match as a
- * documentation example or test placeholder rather than a real secret.
- *
- * `xxxxx` was rejected as too aggressive: legitimate hex / base64 tokens
- * frequently contain runs of repeated characters and would be incorrectly
- * skipped. The high-entropy fallback already protects monotonic strings
- * (entropy below threshold) so the placeholder list is intentionally short.
- */
-const ALLOWLIST_TOKENS = Object.freeze(['example', 'dummy', 'placeholder', '<missing>']);
-
-const ALLOWLIST_RE = new RegExp(
-  ALLOWLIST_TOKENS.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
-  'i'
-);
-
-const REPLACEMENT = (category) => `<REDACTED:${category}>`;
-
-/**
- * Pattern categories. Order matters — more specific / longer alternatives
- * come first so they win over weaker patterns and don't get partly eaten by
- * the high-entropy fallback.
- *
- * Each entry: { id, regex, replacement?, requireValueShape? }.
- */
-const PATTERNS = [
-  // GitHub
-  { id: 'githubToken', regex: /\b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}\b/g },
-  { id: 'githubToken', regex: /\bgithub_pat_[A-Za-z0-9_]{82}\b/g },
-  // OpenAI / Anthropic / Google
-  { id: 'openaiKey', regex: /\bsk-proj-[A-Za-z0-9_-]{40,}\b/g },
-  { id: 'anthropicKey', regex: /\bsk-ant-[A-Za-z0-9_-]{40,}\b/g },
-  { id: 'openaiKey', regex: /\bsk-[A-Za-z0-9]{20,}\b/g },
-  { id: 'googleApiKey', regex: /\bAIza[0-9A-Za-z_-]{35}\b/g },
-  // AWS
-  { id: 'awsAccessKey', regex: /\b(AKIA|ASIA)[0-9A-Z]{16}\b/g },
-  // Long-form private keys (multi-line block)
-  {
-    id: 'privateKey',
-    regex:
-      /-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP |)PRIVATE KEY-----[\s\S]*?-----END[^-]*PRIVATE KEY-----/g,
-  },
-  // Bearer tokens — capture the surrounding "Bearer " keyword to limit FP
-  { id: 'bearerToken', regex: /\b[Bb]earer\s+[A-Za-z0-9._~+/=-]{20,}\b/g },
-  // Database connection strings
-  {
-    id: 'databaseUrl',
-    regex: /\b(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?|redis|amqp|mssql):\/\/[^\s'"`<>]+/g,
-  },
-  // Webhook URLs (Slack / Discord)
-  { id: 'webhookUrl', regex: /https:\/\/hooks\.slack\.com\/[A-Z0-9/]+/g },
-  {
-    id: 'webhookUrl',
-    regex: /https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+/g,
-  },
-];
-
-/**
- * Patterns that are case-insensitive *value-shape* patterns and require an
- * explicit assignment context (key=value). These run after the explicit
- * patterns above so a literal `aws_secret_access_key=...` does not get
- * partially consumed.
- */
-const ASSIGNMENT_PATTERNS = [
-  // aws_secret_access_key = "..."
-  {
-    id: 'awsSecretKey',
-    regex: /\baws[_-]?secret[_-]?access[_-]?key\s*[:=]\s*['"]?[A-Za-z0-9/+=]{40}['"]?/gi,
-  },
-  // client_secret = "...", consumer_secret = "..."
-  {
-    id: 'oauthSecret',
-    regex: /\b(?:client|consumer)[_-]?secret\s*[:=]\s*['"][^'"]{16,}['"]/gi,
-  },
-];
-
-/**
- * Variable-name based assignment redaction. Only redacts values when the
- * name itself implies a secret, so plain dotenv lines like `PORT=3000` or
- * `LOG_LEVEL=info` are left alone.
- */
-// Two-step approach so the regex can capture short and unprefixed names
-// (`TOKEN=`, `MY_TOKEN=`, `export TOKEN=`) without exploding the alternation.
-// The captured name is then sanity-checked with SENSITIVE_NAME_RE before
-// the value is masked, which keeps `PORT=3000` and `LOG_LEVEL=info`
-// untouched.
-const ENV_VAR_RE = /^[ \t]*(?:export[ \t]+)?([A-Z][A-Z0-9_]*)\s*=\s*(.+)$/gm;
-const SENSITIVE_NAME_RE =
-  /(?:^|_)(?:TOKEN|SECRET|KEY|PASSWORD|PASSWD|CREDENTIAL|CREDENTIALS|API_KEY|ACCESS_KEY|PRIVATE_KEY)$/;
-
-const MIN_HIGH_ENTROPY_LENGTH = 24;
-const DEFAULT_HIGH_ENTROPY_THRESHOLD = 4.5;
-const HIGH_ENTROPY_TOKEN_RE = /[A-Za-z0-9+/=_-]{24,}/g;
-
-/**
- * Shannon entropy in bits per character. Higher = more random.
- * @param {string} s
- */
-function shannonEntropy(s) {
-  if (!s) return 0;
-  const counts = new Map();
-  for (const ch of s) counts.set(ch, (counts.get(ch) || 0) + 1);
-  const len = s.length;
-  let h = 0;
-  for (const c of counts.values()) {
-    const p = c / len;
-    h -= p * Math.log2(p);
-  }
-  return h;
-}
-
-function isAllowlisted(snippet) {
-  return ALLOWLIST_RE.test(snippet);
-}
-
-/**
- * Redact secrets in a text string.
- *
- * @param {string} text
- * @param {object} [opts]
- * @param {boolean} [opts.highEntropy] enable Shannon-entropy fallback (default true)
- * @param {number} [opts.entropyThreshold] entropy bits/char threshold (default 4.5)
- * @param {string[]} [opts.allowlist] additional substrings that suppress redaction
- * @returns {{ text: string, hits: Array<{ category: string, count: number }> }}
- */
-function redactText(text, opts = {}) {
-  if (text == null || text === '') return { text: text ?? '', hits: [] };
-  const {
-    highEntropy = true,
-    entropyThreshold = DEFAULT_HIGH_ENTROPY_THRESHOLD,
-    allowlist = [],
-  } = opts;
-  const extraAllow = allowlist.length
-    ? new RegExp(allowlist.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i')
-    : null;
-
-  const hits = new Map();
-  const bump = (category, n = 1) => hits.set(category, (hits.get(category) || 0) + n);
-  const skipMatch = (full) => isAllowlisted(full) || (extraAllow ? extraAllow.test(full) : false);
-
-  let out = String(text);
-
-  for (const { id, regex } of PATTERNS) {
-    out = out.replace(regex, (m) => {
-      if (skipMatch(m)) return m;
-      bump(id);
-      return REPLACEMENT(id);
-    });
-  }
-
-  for (const { id, regex } of ASSIGNMENT_PATTERNS) {
-    out = out.replace(regex, (m) => {
-      if (skipMatch(m)) return m;
-      bump(id);
-      return REPLACEMENT(id);
-    });
-  }
-
-  out = out.replace(ENV_VAR_RE, (full, name, value) => {
-    if (skipMatch(full)) return full;
-    if (!SENSITIVE_NAME_RE.test(name)) return full;
-    if (!value || value.trim().length < 8) return full;
-    bump('envAssignment');
-    // Reconstruct so we keep the (optional) `export ` prefix and the exact
-    // whitespace around `=`. Slicing `full` up to the start of `value` is
-    // safer than rebuilding the line by hand.
-    const valueStart = full.length - value.length;
-    return full.slice(0, valueStart) + REPLACEMENT('envAssignment');
-  });
-
-  if (highEntropy) {
-    out = out.replace(HIGH_ENTROPY_TOKEN_RE, (m) => {
-      if (m.length < MIN_HIGH_ENTROPY_LENGTH) return m;
-      if (skipMatch(m)) return m;
-      // Skip tokens that are still mid-replacement (we already redacted nearby).
-      if (m.includes('REDACTED')) return m;
-      const h = shannonEntropy(m);
-      if (h < entropyThreshold) return m;
-      bump('highEntropy');
-      return REPLACEMENT('highEntropy');
-    });
-  }
-
-  return {
-    text: out,
-    hits: [...hits.entries()].map(([category, count]) => ({ category, count })),
-  };
-}
-
-/**
- * True when `relPath` should be excluded from repo-wide context.
- * Combines the built-in deny list with caller-supplied additions, then
- * applies an allowlist of explicit "force-include" globs.
- *
- * @param {string} relPath
- * @param {object} [opts]
- * @param {string[]} [opts.extraDenyGlobs]
- * @param {string[]} [opts.allowlist] globs that override deny matches
- * @returns {boolean}
- */
-function shouldExcludeForContext(relPath, opts = {}) {
-  if (!relPath) return false;
-  const { extraDenyGlobs = [], allowlist = [] } = opts;
-  const deny = [...DEFAULT_DENY_GLOBS, ...extraDenyGlobs];
-
-  // nocase: case-insensitive so `.ENV`, `Package-Lock.json`, `ID_RSA` etc.
-  // are still excluded on case-preserving filesystems.
-  const matchOpts = { dot: true, nocase: true, matchBase: false };
-  // Allowlist beats deny so users can opt back into specific paths if they
-  // truly need them (e.g., a sample .env they want reviewed).
-  for (const g of allowlist) {
-    if ((0,esm/* minimatch */.xF)(relPath, g, matchOpts)) return false;
-  }
-  for (const g of deny) {
-    if ((0,esm/* minimatch */.xF)(relPath, g, matchOpts)) return true;
-  }
-  return false;
-}
-
-;// CONCATENATED MODULE: ./src/lib/repo-context.mjs
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   l: () => (/* binding */ buildRepoContextSection),
+/* harmony export */   o: () => (/* binding */ collectRepoContext)
+/* harmony export */ });
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1421);
+/* harmony import */ var node_util__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7975);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(3024);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6760);
+/* harmony import */ var _secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(12);
 /**
  * Repo-wide context collector for River Reviewer.
  * Gathers full file text, corresponding tests, symbol usages, and config
@@ -36008,7 +35718,7 @@ function shouldExcludeForContext(relPath, opts = {}) {
 
 
 
-const execFileAsync = (0,external_node_util_.promisify)(external_node_child_process_.execFile);
+const execFileAsync = (0,node_util__WEBPACK_IMPORTED_MODULE_1__.promisify)(node_child_process__WEBPACK_IMPORTED_MODULE_0__.execFile);
 
 /** Maximum total characters of repo context injected into the prompt. */
 const DEFAULT_MAX_CHARS = 8000;
@@ -36027,9 +35737,9 @@ const TEST_SUFFIXES = [
   (f) => f.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.spec.$1'),
   (f) => f.replace(/src\//, 'tests/').replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.test.$1'),
   (f) => {
-    const base = external_node_path_.basename(f);
-    const dir = external_node_path_.dirname(f);
-    return external_node_path_.join(dir, '__tests__', base.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.test.$1'));
+    const base = node_path__WEBPACK_IMPORTED_MODULE_3__.basename(f);
+    const dir = node_path__WEBPACK_IMPORTED_MODULE_3__.dirname(f);
+    return node_path__WEBPACK_IMPORTED_MODULE_3__.join(dir, '__tests__', base.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.test.$1'));
   },
 ];
 
@@ -36091,10 +35801,10 @@ async function collectRepoContext({
     }
   };
   const isPathExcluded = (rel) =>
-    shouldExcludeForContext(rel, { extraDenyGlobs: denyExtra, allowlist: allowExtra });
+    (0,_secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_4__/* .shouldExcludeForContext */ .g)(rel, { extraDenyGlobs: denyExtra, allowlist: allowExtra });
   const maybeRedact = (text) => {
     if (!redactionEnabled || !text) return text;
-    const { text: redacted, hits } = redactText(text, redactOpts);
+    const { text: redacted, hits } = (0,_secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_4__/* .redactText */ .Rd)(text, redactOpts);
     if (hits.length) bumpHits(hits);
     return redacted;
   };
@@ -36106,7 +35816,7 @@ async function collectRepoContext({
       excludedPaths.push({ path: rel, section: 'fullFile' });
       continue;
     }
-    const abs = external_node_path_.join(repoRoot, rel);
+    const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, rel);
     if (!isSourceFile(rel) || !fileExists(abs)) continue;
     const raw = readFileCapped(abs, Math.min(SECTION_CAPS.fullFile, budget));
     if (raw) {
@@ -36126,7 +35836,7 @@ async function collectRepoContext({
         excludedPaths.push({ path: candidate, section: 'tests' });
         break;
       }
-      const abs = external_node_path_.join(repoRoot, candidate);
+      const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, candidate);
       if (fileExists(abs)) {
         const raw = readFileCapped(abs, Math.min(SECTION_CAPS.tests, budget));
         if (raw) {
@@ -36176,7 +35886,7 @@ async function collectRepoContext({
         excludedPaths.push({ path: glob, section: 'config' });
         continue;
       }
-      const abs = external_node_path_.join(repoRoot, glob);
+      const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, glob);
       if (fileExists(abs)) {
         const snippet = readFileCapped(
           abs,
@@ -36231,7 +35941,7 @@ function isSourceFile(rel) {
 
 function fileExists(abs) {
   try {
-    return external_node_fs_.statSync(abs).isFile();
+    return node_fs__WEBPACK_IMPORTED_MODULE_2__.statSync(abs).isFile();
   } catch {
     return false;
   }
@@ -36239,7 +35949,7 @@ function fileExists(abs) {
 
 function readFileCapped(abs, cap) {
   try {
-    const raw = external_node_fs_.readFileSync(abs, 'utf8');
+    const raw = node_fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync(abs, 'utf8');
     if (!raw.trim()) return null;
     return raw.length > cap ? raw.slice(0, cap) + '\n// ...[truncated]' : raw;
   } catch {
@@ -36251,10 +35961,10 @@ function extractExportedSymbols({ changedFiles, repoRoot }) {
   const symbols = [];
   const exportRe = /^export\s+(?:(?:async\s+)?function|class|const|let|var)\s+(\w+)/gm;
   for (const rel of changedFiles.slice(0, 5)) {
-    const abs = external_node_path_.join(repoRoot, rel);
+    const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, rel);
     if (!isSourceFile(rel) || !fileExists(abs)) continue;
     try {
-      const text = external_node_fs_.readFileSync(abs, 'utf8');
+      const text = node_fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync(abs, 'utf8');
       for (const m of text.matchAll(exportRe)) {
         if (m[1] && !symbols.includes(m[1])) symbols.push(m[1]);
       }
@@ -36313,14 +36023,16 @@ async function searchSymbolUsages({ symbols, repoRoot, excludeFiles, maxChars })
 /* harmony export */ });
 /* unused harmony exports buildPrompt, parseLineComments */
 /* harmony import */ var _config_loader_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(3833);
-/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(9946);
+/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_9__ = __nccwpck_require__(9946);
 /* harmony import */ var _finding_classifier_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7440);
 /* harmony import */ var _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(4807);
 /* harmony import */ var _runners_core_review_runner_mjs__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(4584);
 /* harmony import */ var _heuristic_review_mjs__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(2294);
 /* harmony import */ var _finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(5942);
-/* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(8069);
-/* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(7685);
+/* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(8069);
+/* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(9865);
+/* harmony import */ var _secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(12);
+
 
 
 
@@ -36474,7 +36186,7 @@ function buildPrompt({
   const severity = reviewConfig.severity ?? _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s.review.severity;
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
-  const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_7__/* .getReviewDepthConfig */ .i)(reviewMode ?? 'medium');
+  const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_8__/* .getReviewDepthConfig */ .i)(reviewMode ?? 'medium');
   const prompt = `You are River Reviewer, an AI code review agent.
 Phase: ${phase}
 
@@ -36800,10 +36512,28 @@ async function generateReview({
   const openAIConfig = resolveOpenAIConfig({ model, apiKey }, effectiveConfig);
   const language = promptInfo.language ?? effectiveConfig.review.language;
 
+  // #692 PR-D: defense-in-depth redaction at the artifact boundary.
+  // PR-C already redacts repo context before it reaches the prompt, but
+  // any other path (project rules with a pasted token, additional
+  // instructions, etc.) could still slip a secret in. Build a single
+  // redacted view of the prompt and use it everywhere the prompt would
+  // otherwise leave process memory (debug.promptPreview, returned
+  // `prompt`, downstream artifact writes). The LLM call still uses the
+  // original `promptInfo.prompt` because it must.
+  const safePrompt = (0,_secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_7__/* .redactText */ .Rd)(promptInfo.prompt, {
+    allowlist: effectiveConfig.security?.redact?.allowlist ?? [],
+    ...(effectiveConfig.security?.redact?.entropyThreshold != null
+      ? { entropyThreshold: effectiveConfig.security.redact.entropyThreshold }
+      : {}),
+    ...(effectiveConfig.security?.redact?.categories?.highEntropy === false
+      ? { highEntropy: false }
+      : {}),
+  }).text;
+
   let comments = [];
   const debug = {
     promptTruncated: promptInfo.truncated,
-    promptPreview: promptInfo.prompt.slice(0, MAX_PROMPT_PREVIEW_CHARS),
+    promptPreview: safePrompt.slice(0, MAX_PROMPT_PREVIEW_CHARS),
     llmModel: openAIConfig.model,
     llmProvider: openAIConfig.provider,
     reviewLanguage: language,
@@ -36953,8 +36683,8 @@ async function generateReview({
   });
 
   findings.sort((a, b) => {
-    const bA = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_8__/* .computeFindingBreakdown */ ._)(a);
-    const bB = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_8__/* .computeFindingBreakdown */ ._)(b);
+    const bA = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_9__/* .computeFindingBreakdown */ ._)(a);
+    const bB = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_9__/* .computeFindingBreakdown */ ._)(b);
     return bB.composite - bA.composite;
   });
 
@@ -36964,7 +36694,11 @@ async function generateReview({
     comments,
     findings,
     classified,
-    prompt: promptInfo.prompt,
+    // The returned prompt flows into local-runner result, artifacts, and
+    // dashboards. Use the redacted view so a leaked secret never leaves
+    // process memory through these paths. The LLM call above used the
+    // original promptInfo.prompt and is unaffected.
+    prompt: safePrompt,
     promptTruncated: promptInfo.truncated,
     llmModel: openAIConfig.model,
     debug,
@@ -37556,6 +37290,298 @@ const VERDICT_THRESHOLDS = {
   },
   // below humanReviewRecommended threshold -> humanReviewRequired
 };
+
+
+/***/ }),
+
+/***/ 12:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   Rd: () => (/* binding */ redactText),
+/* harmony export */   g: () => (/* binding */ shouldExcludeForContext)
+/* harmony export */ });
+/* unused harmony exports DEFAULT_DENY_GLOBS, shannonEntropy */
+/* harmony import */ var minimatch__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(9519);
+// Secret redaction for repo-wide review context (#692 PR-A).
+//
+// This module is **additive** and not yet wired into the review pipeline.
+// PR-C of #692 will hook it into src/lib/repo-context.mjs and
+// src/lib/local-runner.mjs so that prompt input and debug artifacts are
+// redacted before they leave process memory.
+//
+// Design notes (see Issue #692 plan):
+// - Replacements are *length-independent* (`<REDACTED:category>`) so that
+//   suppression fingerprints stay stable when redaction is toggled on/off
+//   (interaction with #687 PR-B applySuppressions).
+// - High-entropy detection is opt-in by config and runs LAST so that named
+//   categories take priority and avoid double-counting.
+// - Allowlist substrings (example, dummy, placeholder, missing, xxxxx)
+//   suppress redaction on the surrounding token to protect documentation
+//   examples and obvious test fixtures from being mangled.
+// - DEFAULT_DENY_GLOBS is exported separately so that path-level exclusion
+//   can run BEFORE redaction (avoids reading .env / *.pem files at all).
+
+
+
+/**
+ * Path globs that must be excluded from repo-wide context regardless of
+ * user config. Lock files and build artifacts are also denied because they
+ * carry no review value but inflate the budget.
+ */
+const DEFAULT_DENY_GLOBS = Object.freeze([
+  '**/.env',
+  '**/.env.*',
+  '**/.envrc',
+  '**/secrets.*',
+  '**/credentials.*',
+  '**/credentials/**',
+  '**/*.pem',
+  '**/*.key',
+  '**/*.p12',
+  '**/*.pfx',
+  '**/*.jks',
+  '**/*.keystore',
+  '**/id_rsa',
+  '**/id_dsa',
+  '**/id_ecdsa',
+  '**/id_ed25519',
+  '**/*.lock',
+  '**/package-lock.json',
+  '**/pnpm-lock.yaml',
+  '**/yarn.lock',
+  '**/composer.lock',
+  '**/Cargo.lock',
+  '**/poetry.lock',
+  '**/Gemfile.lock',
+  '**/dist/**',
+  '**/build/**',
+  '**/out/**',
+  '**/.next/**',
+  '**/coverage/**',
+  '**/*.min.js',
+  '**/*.min.css',
+  '**/*.map',
+]);
+
+/**
+ * Substrings that, when found near a candidate match, mark the match as a
+ * documentation example or test placeholder rather than a real secret.
+ *
+ * `xxxxx` was rejected as too aggressive: legitimate hex / base64 tokens
+ * frequently contain runs of repeated characters and would be incorrectly
+ * skipped. The high-entropy fallback already protects monotonic strings
+ * (entropy below threshold) so the placeholder list is intentionally short.
+ */
+const ALLOWLIST_TOKENS = Object.freeze(['example', 'dummy', 'placeholder', '<missing>']);
+
+const ALLOWLIST_RE = new RegExp(
+  ALLOWLIST_TOKENS.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
+  'i'
+);
+
+const REPLACEMENT = (category) => `<REDACTED:${category}>`;
+
+/**
+ * Pattern categories. Order matters — more specific / longer alternatives
+ * come first so they win over weaker patterns and don't get partly eaten by
+ * the high-entropy fallback.
+ *
+ * Each entry: { id, regex, replacement?, requireValueShape? }.
+ */
+const PATTERNS = [
+  // GitHub
+  { id: 'githubToken', regex: /\b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}\b/g },
+  { id: 'githubToken', regex: /\bgithub_pat_[A-Za-z0-9_]{82}\b/g },
+  // OpenAI / Anthropic / Google
+  { id: 'openaiKey', regex: /\bsk-proj-[A-Za-z0-9_-]{40,}\b/g },
+  { id: 'anthropicKey', regex: /\bsk-ant-[A-Za-z0-9_-]{40,}\b/g },
+  { id: 'openaiKey', regex: /\bsk-[A-Za-z0-9]{20,}\b/g },
+  { id: 'googleApiKey', regex: /\bAIza[0-9A-Za-z_-]{35}\b/g },
+  // AWS
+  { id: 'awsAccessKey', regex: /\b(AKIA|ASIA)[0-9A-Z]{16}\b/g },
+  // Long-form private keys (multi-line block)
+  {
+    id: 'privateKey',
+    regex:
+      /-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP |)PRIVATE KEY-----[\s\S]*?-----END[^-]*PRIVATE KEY-----/g,
+  },
+  // Bearer tokens — capture the surrounding "Bearer " keyword to limit FP
+  { id: 'bearerToken', regex: /\b[Bb]earer\s+[A-Za-z0-9._~+/=-]{20,}\b/g },
+  // Database connection strings
+  {
+    id: 'databaseUrl',
+    regex: /\b(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?|redis|amqp|mssql):\/\/[^\s'"`<>]+/g,
+  },
+  // Webhook URLs (Slack / Discord)
+  { id: 'webhookUrl', regex: /https:\/\/hooks\.slack\.com\/[A-Z0-9/]+/g },
+  {
+    id: 'webhookUrl',
+    regex: /https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+/g,
+  },
+];
+
+/**
+ * Patterns that are case-insensitive *value-shape* patterns and require an
+ * explicit assignment context (key=value). These run after the explicit
+ * patterns above so a literal `aws_secret_access_key=...` does not get
+ * partially consumed.
+ */
+const ASSIGNMENT_PATTERNS = [
+  // aws_secret_access_key = "..."
+  {
+    id: 'awsSecretKey',
+    regex: /\baws[_-]?secret[_-]?access[_-]?key\s*[:=]\s*['"]?[A-Za-z0-9/+=]{40}['"]?/gi,
+  },
+  // client_secret = "...", consumer_secret = "..."
+  {
+    id: 'oauthSecret',
+    regex: /\b(?:client|consumer)[_-]?secret\s*[:=]\s*['"][^'"]{16,}['"]/gi,
+  },
+];
+
+/**
+ * Variable-name based assignment redaction. Only redacts values when the
+ * name itself implies a secret, so plain dotenv lines like `PORT=3000` or
+ * `LOG_LEVEL=info` are left alone.
+ */
+// Two-step approach so the regex can capture short and unprefixed names
+// (`TOKEN=`, `MY_TOKEN=`, `export TOKEN=`) without exploding the alternation.
+// The captured name is then sanity-checked with SENSITIVE_NAME_RE before
+// the value is masked, which keeps `PORT=3000` and `LOG_LEVEL=info`
+// untouched.
+const ENV_VAR_RE = /^[ \t]*(?:export[ \t]+)?([A-Z][A-Z0-9_]*)\s*=\s*(.+)$/gm;
+const SENSITIVE_NAME_RE =
+  /(?:^|_)(?:TOKEN|SECRET|KEY|PASSWORD|PASSWD|CREDENTIAL|CREDENTIALS|API_KEY|ACCESS_KEY|PRIVATE_KEY)$/;
+
+const MIN_HIGH_ENTROPY_LENGTH = 24;
+const DEFAULT_HIGH_ENTROPY_THRESHOLD = 4.5;
+const HIGH_ENTROPY_TOKEN_RE = /[A-Za-z0-9+/=_-]{24,}/g;
+
+/**
+ * Shannon entropy in bits per character. Higher = more random.
+ * @param {string} s
+ */
+function shannonEntropy(s) {
+  if (!s) return 0;
+  const counts = new Map();
+  for (const ch of s) counts.set(ch, (counts.get(ch) || 0) + 1);
+  const len = s.length;
+  let h = 0;
+  for (const c of counts.values()) {
+    const p = c / len;
+    h -= p * Math.log2(p);
+  }
+  return h;
+}
+
+function isAllowlisted(snippet) {
+  return ALLOWLIST_RE.test(snippet);
+}
+
+/**
+ * Redact secrets in a text string.
+ *
+ * @param {string} text
+ * @param {object} [opts]
+ * @param {boolean} [opts.highEntropy] enable Shannon-entropy fallback (default true)
+ * @param {number} [opts.entropyThreshold] entropy bits/char threshold (default 4.5)
+ * @param {string[]} [opts.allowlist] additional substrings that suppress redaction
+ * @returns {{ text: string, hits: Array<{ category: string, count: number }> }}
+ */
+function redactText(text, opts = {}) {
+  if (text == null || text === '') return { text: text ?? '', hits: [] };
+  const {
+    highEntropy = true,
+    entropyThreshold = DEFAULT_HIGH_ENTROPY_THRESHOLD,
+    allowlist = [],
+  } = opts;
+  const extraAllow = allowlist.length
+    ? new RegExp(allowlist.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i')
+    : null;
+
+  const hits = new Map();
+  const bump = (category, n = 1) => hits.set(category, (hits.get(category) || 0) + n);
+  const skipMatch = (full) => isAllowlisted(full) || (extraAllow ? extraAllow.test(full) : false);
+
+  let out = String(text);
+
+  for (const { id, regex } of PATTERNS) {
+    out = out.replace(regex, (m) => {
+      if (skipMatch(m)) return m;
+      bump(id);
+      return REPLACEMENT(id);
+    });
+  }
+
+  for (const { id, regex } of ASSIGNMENT_PATTERNS) {
+    out = out.replace(regex, (m) => {
+      if (skipMatch(m)) return m;
+      bump(id);
+      return REPLACEMENT(id);
+    });
+  }
+
+  out = out.replace(ENV_VAR_RE, (full, name, value) => {
+    if (skipMatch(full)) return full;
+    if (!SENSITIVE_NAME_RE.test(name)) return full;
+    if (!value || value.trim().length < 8) return full;
+    bump('envAssignment');
+    // Reconstruct so we keep the (optional) `export ` prefix and the exact
+    // whitespace around `=`. Slicing `full` up to the start of `value` is
+    // safer than rebuilding the line by hand.
+    const valueStart = full.length - value.length;
+    return full.slice(0, valueStart) + REPLACEMENT('envAssignment');
+  });
+
+  if (highEntropy) {
+    out = out.replace(HIGH_ENTROPY_TOKEN_RE, (m) => {
+      if (m.length < MIN_HIGH_ENTROPY_LENGTH) return m;
+      if (skipMatch(m)) return m;
+      // Skip tokens that are still mid-replacement (we already redacted nearby).
+      if (m.includes('REDACTED')) return m;
+      const h = shannonEntropy(m);
+      if (h < entropyThreshold) return m;
+      bump('highEntropy');
+      return REPLACEMENT('highEntropy');
+    });
+  }
+
+  return {
+    text: out,
+    hits: [...hits.entries()].map(([category, count]) => ({ category, count })),
+  };
+}
+
+/**
+ * True when `relPath` should be excluded from repo-wide context.
+ * Combines the built-in deny list with caller-supplied additions, then
+ * applies an allowlist of explicit "force-include" globs.
+ *
+ * @param {string} relPath
+ * @param {object} [opts]
+ * @param {string[]} [opts.extraDenyGlobs]
+ * @param {string[]} [opts.allowlist] globs that override deny matches
+ * @returns {boolean}
+ */
+function shouldExcludeForContext(relPath, opts = {}) {
+  if (!relPath) return false;
+  const { extraDenyGlobs = [], allowlist = [] } = opts;
+  const deny = [...DEFAULT_DENY_GLOBS, ...extraDenyGlobs];
+
+  // nocase: case-insensitive so `.ENV`, `Package-Lock.json`, `ID_RSA` etc.
+  // are still excluded on case-preserving filesystems.
+  const matchOpts = { dot: true, nocase: true, matchBase: false };
+  // Allowlist beats deny so users can opt back into specific paths if they
+  // truly need them (e.g., a sample .env they want reviewed).
+  for (const g of allowlist) {
+    if ((0,minimatch__WEBPACK_IMPORTED_MODULE_0__/* .minimatch */ .xF)(relPath, g, matchOpts)) return false;
+  }
+  for (const g of deny) {
+    if ((0,minimatch__WEBPACK_IMPORTED_MODULE_0__/* .minimatch */ .xF)(relPath, g, matchOpts)) return true;
+  }
+  return false;
+}
 
 
 /***/ }),
@@ -38367,8 +38393,8 @@ function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
   };
 }
 
-// EXTERNAL MODULE: ./src/lib/repo-context.mjs + 1 modules
-var repo_context = __nccwpck_require__(7685);
+// EXTERNAL MODULE: ./src/lib/repo-context.mjs
+var repo_context = __nccwpck_require__(9865);
 // EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
 var skill_loader = __nccwpck_require__(5541);
 ;// CONCATENATED MODULE: ./src/lib/utils.mjs
