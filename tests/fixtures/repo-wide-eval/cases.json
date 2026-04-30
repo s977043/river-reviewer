@@ -1,0 +1,20 @@
+[
+  {
+    "name": "i18n: deleted source reference leaves unused locale entry",
+    "phase": "midstream",
+    "category": "i18n",
+    "seedRepo": "seeds/i18n-unused-key-01/",
+    "diffFile": "diffs/i18n-unused-key-01.diff",
+    "planSkills": ["rr-midstream-i18n-unused-key-001"],
+    "expected": {
+      "withRepoContext": {
+        "minFindings": 0,
+        "note": "PR-1 starter: assertions are loose; subsequent PRs (#688 PR-2..) tighten detection bands as cross-context skills mature."
+      },
+      "withoutRepoContext": {
+        "minFindings": 0,
+        "note": "Without repo context the locale JSON is invisible; the diff alone cannot reveal an unused entry."
+      }
+    }
+  }
+]
