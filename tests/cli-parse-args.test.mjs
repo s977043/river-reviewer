@@ -243,3 +243,68 @@ test('parseArgs: explicit --phase overrides RIVER_PHASE env', () => {
     else process.env.RIVER_PHASE = backup;
   }
 });
+
+// -----------------------------------------------------------------------------
+// suppression subcommand (#687 PR-D)
+// -----------------------------------------------------------------------------
+
+test('parseArgs: suppression add captures all flags', () => {
+  const parsed = parseArgs([
+    'suppression',
+    'add',
+    '--fingerprint',
+    'a'.repeat(16),
+    '--feedback',
+    'false_positive',
+    '--rationale',
+    'flagged but acceptable in this codebase',
+    '--scope',
+    'subsystem',
+    '--severity',
+    'minor',
+    '--files',
+    'src/auth.ts,src/login.ts',
+    '--pr',
+    '123',
+  ]);
+  assert.equal(parsed.command, 'suppression');
+  assert.equal(parsed.suppressionSubcommand, 'add');
+  assert.equal(parsed.suppressionFingerprint, 'a'.repeat(16));
+  assert.equal(parsed.suppressionFeedbackType, 'false_positive');
+  assert.equal(parsed.suppressionRationale, 'flagged but acceptable in this codebase');
+  assert.equal(parsed.suppressionScope, 'subsystem');
+  assert.equal(parsed.suppressionSeverity, 'minor');
+  assert.deepEqual(parsed.suppressionFiles, ['src/auth.ts', 'src/login.ts']);
+  assert.equal(parsed.suppressionPrNumber, 123);
+});
+
+test('parseArgs: suppression add defaults scope to file', () => {
+  const parsed = parseArgs([
+    'suppression',
+    'add',
+    '--fingerprint',
+    'b'.repeat(16),
+    '--feedback',
+    'accepted_risk',
+    '--rationale',
+    'accepted',
+  ]);
+  assert.equal(parsed.suppressionScope, 'file');
+});
+
+test('parseArgs: suppression add silently drops non-positive --pr', () => {
+  // Non-positive values are silently dropped (suppressionPrNumber stays null).
+  const parsed = parseArgs([
+    'suppression',
+    'add',
+    '--fingerprint',
+    'c'.repeat(16),
+    '--feedback',
+    'false_positive',
+    '--rationale',
+    'r',
+    '--pr',
+    '0',
+  ]);
+  assert.equal(parsed.suppressionPrNumber, null);
+});
