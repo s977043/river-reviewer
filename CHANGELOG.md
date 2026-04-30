@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.28.1](https://github.com/s977043/river-reviewer/compare/v0.28.0...v0.28.1) (2026-04-30)
+
+
+### Bug Fixes
+
+* **ranker:** align DEFAULT_WEIGHTS keys + signal function names with schema ([#728](https://github.com/s977043/river-reviewer/issues/728)) ([e7e463e](https://github.com/s977043/river-reviewer/commit/e7e463e61e2e1fad6821de001389dcf65f22d5ac))
+
 ## [0.28.0](https://github.com/s977043/river-reviewer/compare/v0.27.0...v0.28.0) (2026-04-30)
 
 
