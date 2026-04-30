@@ -52,6 +52,34 @@ test('local-runner.mjs runLocalReview return surfaces suppressedFindings + suppr
   );
 });
 
+test('local-runner.mjs filters review.comments alongside findings (no leak)', () => {
+  // Regression guard for the gemini-code-assist[bot] high-priority finding on
+  // PR #701: if the suppression filter only applied to `findings` and left
+  // `comments` as the raw `review.comments`, suppressed findings still
+  // surfaced verbatim in the PR review thread.
+  assert.match(
+    localRunnerSource,
+    /comments:\s*keptComments,/,
+    'comments must use the suppression-filtered keptComments, not review.comments'
+  );
+  assert.match(localRunnerSource, /const keptComments\s*=/, 'keptComments derivation missing');
+});
+
+test('comment filtering by fingerprint matches finding fingerprint algo', () => {
+  // The filter computes a fingerprint from the comment's fields and rejects
+  // comments whose fingerprint matches a suppressed finding. If the algo
+  // ever drifts between the two paths, comments and findings desync.
+  const finding = { ruleId: 'rule-x', file: 'src/x.ts', message: 'msg', severity: 'minor' };
+  const comment = { skillId: 'rule-x', file: 'src/x.ts', message: 'msg', line: 42 };
+  const fpFinding = computeFingerprint(finding);
+  const fpComment = computeFingerprint({
+    ruleId: comment.skillId || 'unknown',
+    file: comment.file,
+    message: comment.message,
+  });
+  assert.equal(fpFinding, fpComment, 'comment-derived fingerprint must equal finding fingerprint');
+});
+
 test('applySuppressions+annotateFingerprints integration: matched finding moves to suppressedFindings', () => {
   // Reproduce the exact composition runLocalReview uses. If applySuppressions
   // ever stops accepting findings annotated by annotateFingerprints, this

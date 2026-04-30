@@ -34910,9 +34910,9 @@ function classifyFindings(findings, options = {}) {
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   Y: () => (/* binding */ computeFingerprint),
 /* harmony export */   i: () => (/* binding */ annotateFingerprints)
 /* harmony export */ });
-/* unused harmony export computeFingerprint */
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7598);
 
 
@@ -38490,6 +38490,29 @@ async function runLocalReview({
     applied: suppressionsApplied,
   } = applySuppressions(annotatedFindings, memoryContext, { config: context.config });
 
+  // Comments and findings are 1:1 in review-engine.mjs (`findings =
+  // comments.map(...)`). When a finding is suppressed, the corresponding
+  // PR comment must also be filtered — otherwise the suppressed finding
+  // still surfaces verbatim in the review thread, defeating the entire
+  // point of the suppression. Match by fingerprint computed from the
+  // comment's own fields so this stays robust if the 1:1 ordering ever
+  // drifts.
+  const suppressedFingerprints = new Set(
+    suppressedFindings.map((f) => f.fingerprint).filter(Boolean)
+  );
+  const reviewComments = review.comments ?? [];
+  const keptComments =
+    suppressedFingerprints.size === 0
+      ? reviewComments
+      : reviewComments.filter((c) => {
+          const fp = (0,finding_fingerprint/* computeFingerprint */.Y)({
+            ruleId: c.skillId || 'unknown',
+            file: c.file,
+            message: c.message,
+          });
+          return !suppressedFingerprints.has(fp);
+        });
+
   return {
     status: 'ok',
     repoRoot: external_node_path_.resolve(context.repoRoot),
@@ -38500,7 +38523,7 @@ async function runLocalReview({
     reviewMode: context.plan?.reviewMode ?? 'medium',
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
-    comments: review.comments,
+    comments: keptComments,
     findings: keptFindings,
     suppressedFindings,
     classified: review.classified,
