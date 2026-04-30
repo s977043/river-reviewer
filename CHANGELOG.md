@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.23.0](https://github.com/s977043/river-reviewer/compare/v0.22.0...v0.23.0) (2026-04-30)
+
+
+### Features
+
+* **memory:** wire applySuppressions into runLocalReview ([#687](https://github.com/s977043/river-reviewer/issues/687) PR-C) ([#701](https://github.com/s977043/river-reviewer/issues/701)) ([610d810](https://github.com/s977043/river-reviewer/commit/610d81046315dfb1f64521c08f3f80e0c69d9d22))
+* **security:** add security.redact zod schema and JSON Schema ([#692](https://github.com/s977043/river-reviewer/issues/692) PR-B) ([#702](https://github.com/s977043/river-reviewer/issues/702)) ([2839029](https://github.com/s977043/river-reviewer/commit/2839029cb81df868f354d8fae9523c47f262c1c9))
+* **security:** integrate redactText into collectRepoContext ([#692](https://github.com/s977043/river-reviewer/issues/692) PR-C) ([#704](https://github.com/s977043/river-reviewer/issues/704)) ([5a57f53](https://github.com/s977043/river-reviewer/commit/5a57f5341b9b2a95e667b244aa06acaa24118907))
+
 ## [0.22.0](https://github.com/s977043/river-reviewer/compare/v0.21.0...v0.22.0) (2026-04-30)
 
 
