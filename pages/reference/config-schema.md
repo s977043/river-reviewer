@@ -18,6 +18,27 @@
 - `exclude`
   - `files`: 変更差分から除外する glob パターン。
   - `prLabelsToIgnore`: Pull Request ラベル名に対象キーワードが含まれていればスキップする設定。`RIVER_PR_LABELS`（カンマ区切り）または GitHub Actions の `GITHUB_EVENT_PATH` から取得したラベルと照合し、大文字小文字を無視した部分一致で判定する。
+- `security`（[#692](https://github.com/s977043/river-reviewer/issues/692)）
+  - `redact.enabled`: `true`（デフォルト）。LLM へ送る前段で repo-wide context とプロンプトの secret を伏字化する。
+  - `redact.categories`: カテゴリ単位で個別 ON/OFF。キーは以下。
+    - 鍵類: `githubToken` / `openaiKey` / `anthropicKey` / `googleApiKey` / `awsAccessKey` / `awsSecretKey` / `privateKey`
+    - 認証: `bearerToken` / `databaseUrl` / `webhookUrl` / `oauthSecret` / `envAssignment`
+    - フォールバック: `highEntropy`
+  - `redact.extraPatterns`: 追加正規表現（`{ id, pattern, replacement? }`）。プロジェクト固有の鍵フォーマットに使う。
+  - `redact.allowlist`: 一致するトークンは redact しない（テスト固定値などの保護）。
+  - `redact.denyFiles`: コンテキスト収集の前段で読み飛ばす glob 追加分（既定の `.env*` / `*.pem` / `*.key` / `secrets.*` 等に上乗せ）。
+  - `redact.entropyThreshold`: `3.0`〜`6.0`（既定 `4.5`）。Shannon entropy を使った fallback 検出の閾値。
+  - `redact.entropyMinLength`: 既定 `24`。fallback 検出の対象とする最小文字数。
+- `memory`（[#687](https://github.com/s977043/river-reviewer/issues/687)）
+  - `suppressionEnabled`: `true`（デフォルト）。Riverbed Memory に登録された suppression entry を反映する。`false` で gate を完全バイパス（緊急対応用）。
+- `context`（[#689](https://github.com/s977043/river-reviewer/issues/689)）
+  - `reviewMode`: `tiny` / `medium` / `large`。budget を省略すると `src/lib/context-presets.mjs` のプリセットを適用する。`budget` を明示するとプリセットより優先される。
+  - `budget.maxTokens`: `256`〜`64000`。
+  - `budget.maxChars`: `1024`〜`200000`。char 上限と token 上限の両方が同時に効く。
+  - `budget.perSectionCaps`: `fullFile` / `tests` / `usages` / `config` ごとの char 上限を個別指定する。
+  - `ranking.enabled`: `true` で変更ファイルへの近接度に基づいた候補並び替えを有効化する。
+  - `ranking.weights`: `pathProximity` / `symbolUsage` / `siblingTest` / `commitRecency` を `0.0`〜`1.0` で指定する。省略時は等重みを使用する。
+  - `tokenizer`: `heuristic` のみ受理する（将来拡張用）。
 
 ### 設定例
 

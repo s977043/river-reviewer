@@ -257,7 +257,17 @@ exclude:
 5. テスト: `npm test`
 6. Planner 評価（任意）: `npm run planner:eval`
 7. Review fixtures 評価（任意）: `npm run eval:fixtures`（must_include 方式）
-8. ドキュメント開発（任意）: `npm run dev`（Docusaurus）
+8. リポ全体評価（任意）: `npm run eval:repo-context`（[#688](https://github.com/s977043/river-reviewer/issues/688) の repo-wide fixtures に対し detection / context lift / false positive を測定する）
+9. ドキュメント開発（任意）: `npm run dev`（Docusaurus）
+
+### v0.21〜v0.28 で追加された主な機能
+
+- **Riverbed Memory による suppression**（[#687](https://github.com/s977043/river-reviewer/issues/687)）: `river suppression add --fingerprint <fp> --feedback accepted_risk` で確定済み指摘の再表示を抑止する。`memory.suppressionEnabled: false` で gate を一時バイパス可能。
+- **Secret redaction**（[#692](https://github.com/s977043/river-reviewer/issues/692)）: repo-wide context と LLM プロンプトに対する多段階 redaction。`security.redact.*` でカテゴリ／allowlist／denyFiles を制御する。
+- **Context budget / ranking / reviewMode**（[#689](https://github.com/s977043/river-reviewer/issues/689)）: `context.budget` で token／char 上限を制御。`context.ranking.enabled` で近接度ベースの並び替えを有効化。`context.reviewMode: tiny | medium | large` でプリセット budget を切替。
+- **Repo-wide eval suite**（[#688](https://github.com/s977043/river-reviewer/issues/688)）: `npm run eval:repo-context` が detection / context lift / false positive の 3 指標を出力する。
+
+詳細は [`pages/guides/repo-wide-review.md`](pages/guides/repo-wide-review.md) および [`pages/reference/config-schema.md`](pages/reference/config-schema.md) を参照。
 
 ## AI エージェント運用
 
