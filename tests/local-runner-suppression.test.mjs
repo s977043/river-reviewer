@@ -45,9 +45,11 @@ test('local-runner.mjs runLocalReview return surfaces suppressedFindings + suppr
   // Likewise grep for the contract keys. Future readers can rely on the
   // names below being part of the public return shape.
   assert.match(localRunnerSource, /\bsuppressedFindings\b/, 'suppressedFindings key missing');
+  // reviewDebug spreads review.debug and always includes suppressionsApplied;
+  // #692 PR-C may layer repoContextSecurity in alongside it.
   assert.match(
     localRunnerSource,
-    /reviewDebug:\s*\{\s*\.\.\.\(review\.debug \?\? \{\}\),\s*suppressionsApplied\s*\}/,
+    /reviewDebug:\s*\{[\s\S]*\.\.\.\(review\.debug \?\? \{\}\)[\s\S]*suppressionsApplied/,
     'reviewDebug.suppressionsApplied wiring missing'
   );
 });
