@@ -1,0 +1,16 @@
+diff --git a/src/api/payment.ts b/src/api/payment.ts
+index 1111111..2222222 100644
+--- a/src/api/payment.ts
++++ b/src/api/payment.ts
+@@ -3,8 +3,12 @@ import { httpPost } from '../http/client';
+ export interface PaymentRequest {
+   amount: number;
+   currency: string;
++  /** New required field — server now rejects requests without it. */
++  idempotencyKey: string;
+ }
+
+ export async function createPayment(req: PaymentRequest) {
+-  return httpPost('/api/payments', { amount: req.amount, currency: req.currency });
++  return httpPost('/api/payments', req);
+ }

@@ -1,0 +1,15 @@
+diff --git a/src/pages/NewPage.tsx b/src/pages/NewPage.tsx
+index 1111111..2222222 100644
+--- a/src/pages/NewPage.tsx
++++ b/src/pages/NewPage.tsx
+@@ -0,0 +1,12 @@
++import { fetchAccount } from '../api/account';
++
++export async function NewPage({ accountId }: { accountId: string }) {
++  // Bug: this code passes accountId straight through, but the existing
++  // codebase always normalises IDs through formatId before hitting the
++  // API. Without seeing src/utils/formatId.ts a diff-only review cannot
++  // catch this drift.
++  const account = await fetchAccount(accountId);
++  return <div>{account.name}</div>;
++}

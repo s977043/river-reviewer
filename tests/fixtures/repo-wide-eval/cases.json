@@ -16,5 +16,77 @@
         "note": "Without repo context the locale JSON is invisible; the diff alone cannot reveal an unused entry."
       }
     }
+  },
+  {
+    "name": "normalization: new caller bypasses formatId helper",
+    "phase": "midstream",
+    "category": "normalization",
+    "seedRepo": "seeds/normalization-id-format-01/",
+    "diffFile": "diffs/normalization-id-format-01.diff",
+    "planSkills": ["rr-midstream-normalization-consistency-001"],
+    "expected": {
+      "withRepoContext": {
+        "minFindings": 0,
+        "note": "Should-detect: the seed exposes formatId.ts and an existing fetchAccount caller; with repo context the new direct call site looks suspicious."
+      },
+      "withoutRepoContext": {
+        "minFindings": 0,
+        "note": "Diff alone shows a fresh component file with no obvious red flag; expect lower detection without context."
+      }
+    }
+  },
+  {
+    "name": "loading: removed loading guard leaves null deref on initial render",
+    "phase": "midstream",
+    "category": "loading",
+    "seedRepo": "seeds/loading-state-early-return-01/",
+    "diffFile": "diffs/loading-state-early-return-01.diff",
+    "planSkills": ["rr-midstream-loading-state-001"],
+    "expected": {
+      "withRepoContext": {
+        "minFindings": 0,
+        "note": "Should-detect: useUser hook returns user=null while loading; removing the guard introduces a runtime null deref."
+      },
+      "withoutRepoContext": {
+        "minFindings": 0,
+        "note": "Without the hook contract visible the guard removal looks like a refactor."
+      }
+    }
+  },
+  {
+    "name": "nullability: dereferences nullable discount field",
+    "phase": "midstream",
+    "category": "nullability",
+    "seedRepo": "seeds/nullability-api-response-01/",
+    "diffFile": "diffs/nullability-api-response-01.diff",
+    "planSkills": ["rr-midstream-nullability-contract-001"],
+    "expected": {
+      "withRepoContext": {
+        "minFindings": 0,
+        "note": "Should-detect: Invoice.discount is `{ amount, reason } | null` per the API contract; the new component reads .amount unconditionally."
+      },
+      "withoutRepoContext": {
+        "minFindings": 0,
+        "note": "Diff alone shows a property access without the type definition to compare against."
+      }
+    }
+  },
+  {
+    "name": "api-compat: new required field, existing test not updated",
+    "phase": "midstream",
+    "category": "api-compat",
+    "seedRepo": "seeds/api-contract-no-test-01/",
+    "diffFile": "diffs/api-contract-no-test-01.diff",
+    "planSkills": ["rr-midstream-api-compatibility-001"],
+    "expected": {
+      "withRepoContext": {
+        "minFindings": 0,
+        "note": "Should-detect: tests/api/payment.test.ts still uses the old shape; the change makes idempotencyKey required without updating tests."
+      },
+      "withoutRepoContext": {
+        "minFindings": 0,
+        "note": "Diff alone shows an interface bump; the missing test update only surfaces with the test file in context."
+      }
+    }
   }
 ]
