@@ -68,12 +68,7 @@ export const DEFAULT_DENY_GLOBS = Object.freeze([
  * skipped. The high-entropy fallback already protects monotonic strings
  * (entropy below threshold) so the placeholder list is intentionally short.
  */
-const ALLOWLIST_TOKENS = Object.freeze([
-  'example',
-  'dummy',
-  'placeholder',
-  '<missing>',
-]);
+const ALLOWLIST_TOKENS = Object.freeze(['example', 'dummy', 'placeholder', '<missing>']);
 
 const ALLOWLIST_RE = new RegExp(
   ALLOWLIST_TOKENS.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
@@ -103,7 +98,8 @@ const PATTERNS = [
   // Long-form private keys (multi-line block)
   {
     id: 'privateKey',
-    regex: /-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP |)PRIVATE KEY-----[\s\S]*?-----END[^-]*PRIVATE KEY-----/g,
+    regex:
+      /-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP |)PRIVATE KEY-----[\s\S]*?-----END[^-]*PRIVATE KEY-----/g,
   },
   // Bearer tokens — capture the surrounding "Bearer " keyword to limit FP
   { id: 'bearerToken', regex: /\b[Bb]earer\s+[A-Za-z0-9._~+/=-]{20,}\b/g },
@@ -114,7 +110,10 @@ const PATTERNS = [
   },
   // Webhook URLs (Slack / Discord)
   { id: 'webhookUrl', regex: /https:\/\/hooks\.slack\.com\/[A-Z0-9/]+/g },
-  { id: 'webhookUrl', regex: /https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+/g },
+  {
+    id: 'webhookUrl',
+    regex: /https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+/g,
+  },
 ];
 
 /**
@@ -141,8 +140,14 @@ const ASSIGNMENT_PATTERNS = [
  * name itself implies a secret, so plain dotenv lines like `PORT=3000` or
  * `LOG_LEVEL=info` are left alone.
  */
-const ENV_VAR_RE =
-  /^([ \t]*[A-Z][A-Z0-9_]{2,}_(?:TOKEN|SECRET|KEY|PASSWORD|PASSWD|CREDENTIAL|CREDENTIALS|API_KEY|ACCESS_KEY|PRIVATE_KEY))\s*=\s*(.+)$/gm;
+// Two-step approach so the regex can capture short and unprefixed names
+// (`TOKEN=`, `MY_TOKEN=`, `export TOKEN=`) without exploding the alternation.
+// The captured name is then sanity-checked with SENSITIVE_NAME_RE before
+// the value is masked, which keeps `PORT=3000` and `LOG_LEVEL=info`
+// untouched.
+const ENV_VAR_RE = /^[ \t]*(?:export[ \t]+)?([A-Z][A-Z0-9_]*)\s*=\s*(.+)$/gm;
+const SENSITIVE_NAME_RE =
+  /(?:^|_)(?:TOKEN|SECRET|KEY|PASSWORD|PASSWD|CREDENTIAL|CREDENTIALS|API_KEY|ACCESS_KEY|PRIVATE_KEY)$/;
 
 const MIN_HIGH_ENTROPY_LENGTH = 24;
 const DEFAULT_HIGH_ENTROPY_THRESHOLD = 4.5;
@@ -192,8 +197,7 @@ export function redactText(text, opts = {}) {
 
   const hits = new Map();
   const bump = (category, n = 1) => hits.set(category, (hits.get(category) || 0) + n);
-  const skipMatch = (full) =>
-    isAllowlisted(full) || (extraAllow ? extraAllow.test(full) : false);
+  const skipMatch = (full) => isAllowlisted(full) || (extraAllow ? extraAllow.test(full) : false);
 
   let out = String(text);
 
@@ -215,9 +219,14 @@ export function redactText(text, opts = {}) {
 
   out = out.replace(ENV_VAR_RE, (full, name, value) => {
     if (skipMatch(full)) return full;
+    if (!SENSITIVE_NAME_RE.test(name)) return full;
     if (!value || value.trim().length < 8) return full;
     bump('envAssignment');
-    return `${name}=${REPLACEMENT('envAssignment')}`;
+    // Reconstruct so we keep the (optional) `export ` prefix and the exact
+    // whitespace around `=`. Slicing `full` up to the start of `value` is
+    // safer than rebuilding the line by hand.
+    const valueStart = full.length - value.length;
+    return full.slice(0, valueStart) + REPLACEMENT('envAssignment');
   });
 
   if (highEntropy) {
@@ -255,7 +264,9 @@ export function shouldExcludeForContext(relPath, opts = {}) {
   const { extraDenyGlobs = [], allowlist = [] } = opts;
   const deny = [...DEFAULT_DENY_GLOBS, ...extraDenyGlobs];
 
-  const matchOpts = { dot: true, nocase: false, matchBase: false };
+  // nocase: case-insensitive so `.ENV`, `Package-Lock.json`, `ID_RSA` etc.
+  // are still excluded on case-preserving filesystems.
+  const matchOpts = { dot: true, nocase: true, matchBase: false };
   // Allowlist beats deny so users can opt back into specific paths if they
   // truly need them (e.g., a sample .env they want reviewed).
   for (const g of allowlist) {

@@ -147,6 +147,32 @@ test('redactText catches dotenv-style secret assignments by variable name', () =
   assert.equal(hits.find((h) => h.category === 'envAssignment')?.count, 2);
 });
 
+test('redactText catches short and unprefixed secret-named variables', () => {
+  // Cases the original ENV_VAR_RE (which required `_KIND` suffix on a 3+
+  // char prefix) missed: bare `TOKEN=`, two-char-prefix `MY_TOKEN`, and
+  // the `export TOKEN=` shell shape.
+  const sample = [
+    'TOKEN=secrettoken12345',
+    'MY_TOKEN=anothersecret9999',
+    'export DATABASE_URL=postgres://u:p@h/db',
+    'export API_KEY=secret_key_value_here',
+  ].join('\n');
+  const { text, hits } = redactText(sample, { highEntropy: false });
+  // databaseUrl wins for the postgres:// row; envAssignment catches the rest.
+  assert.match(text, /^TOKEN=<REDACTED:envAssignment>/m);
+  assert.match(text, /^MY_TOKEN=<REDACTED:envAssignment>/m);
+  assert.match(text, /^export API_KEY=<REDACTED:envAssignment>/m);
+  // The export DATABASE_URL line is captured by databaseUrl (more specific).
+  assert.match(text, /<REDACTED:databaseUrl>/);
+  // Never expose any of the original secret values.
+  for (const sv of ['secrettoken12345', 'anothersecret9999', 'secret_key_value_here']) {
+    assert.equal(text.includes(sv), false, 'leaked: ' + sv);
+  }
+  // At least one envAssignment hit, plus one databaseUrl.
+  assert.ok((hits.find((h) => h.category === 'envAssignment')?.count ?? 0) >= 3);
+  assert.ok(hits.some((h) => h.category === 'databaseUrl'));
+});
+
 // --- false positives / allowlist ---
 
 test('redactText skips example / placeholder strings', () => {
@@ -229,6 +255,15 @@ test('shouldExcludeForContext denies .env and key files by default', () => {
   assert.equal(shouldExcludeForContext('id_rsa'), true);
   assert.equal(shouldExcludeForContext('certs/server.pem'), true);
   assert.equal(shouldExcludeForContext('app/keystore.jks'), true);
+});
+
+test('shouldExcludeForContext is case-insensitive on case-preserving filesystems', () => {
+  // macOS and Windows ship case-preserving but case-insensitive defaults;
+  // a contributor on either platform might commit `.ENV` or `Package-Lock.json`.
+  assert.equal(shouldExcludeForContext('.ENV'), true);
+  assert.equal(shouldExcludeForContext('Package-Lock.json'), true);
+  assert.equal(shouldExcludeForContext('ID_RSA'), true);
+  assert.equal(shouldExcludeForContext('CERTS/SERVER.PEM'), true);
 });
 
 test('shouldExcludeForContext denies lock and build artifacts', () => {
