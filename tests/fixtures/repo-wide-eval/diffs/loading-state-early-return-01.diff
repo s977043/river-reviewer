@@ -1,0 +1,16 @@
+diff --git a/src/components/Profile.tsx b/src/components/Profile.tsx
+index 1111111..2222222 100644
+--- a/src/components/Profile.tsx
++++ b/src/components/Profile.tsx
+@@ -1,12 +1,15 @@
+ import { useUser } from '../hooks/useUser';
+
+ export function Profile() {
+-  const { user, loading, error } = useUser();
+-  if (loading) return <p>Loading...</p>;
++  const { user, loading: _loading, error } = useUser();
++  // Removed loading guard. Now the component renders user.name even
++  // while user is still null during the initial fetch -> runtime crash.
+   if (error) return <p>Error: {error.message}</p>;
+   return <div>{user.name}</div>;
+ }

@@ -1,0 +1,13 @@
+diff --git a/src/components/InvoiceTotal.tsx b/src/components/InvoiceTotal.tsx
+index 1111111..2222222 100644
+--- a/src/components/InvoiceTotal.tsx
++++ b/src/components/InvoiceTotal.tsx
+@@ -0,0 +1,8 @@
++import { fetchInvoice } from '../api/invoice';
++
++export async function InvoiceTotal({ id }: { id: string }) {
++  const invoice = await fetchInvoice(id);
++  // Bug: `invoice.discount` is typed as `number | null` in the API
++  // contract but this component dereferences it directly.
++  return <div>{invoice.total - invoice.discount.amount}</div>;
++}
