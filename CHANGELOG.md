@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.24.0](https://github.com/s977043/river-reviewer/compare/v0.23.0...v0.24.0) (2026-04-30)
+
+
+### Features
+
+* **memory:** add `river suppression add` CLI + memory.suppressionEnabled ([#687](https://github.com/s977043/river-reviewer/issues/687) PR-D) ([#708](https://github.com/s977043/river-reviewer/issues/708)) ([9e30fc2](https://github.com/s977043/river-reviewer/commit/9e30fc25cc30a87c3470317c2df712601dcf6be7))
+* **security:** redact prompt at the artifact boundary ([#692](https://github.com/s977043/river-reviewer/issues/692) PR-D) ([#707](https://github.com/s977043/river-reviewer/issues/707)) ([9f7c1bd](https://github.com/s977043/river-reviewer/commit/9f7c1bdf6e6a6069ac87f698f03fbd0b2ce8b8ea))
+
 ## [0.23.0](https://github.com/s977043/river-reviewer/compare/v0.22.0...v0.23.0) (2026-04-30)
 
 
