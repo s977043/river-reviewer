@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.27.0](https://github.com/s977043/river-reviewer/compare/v0.26.0...v0.27.0) (2026-04-30)
+
+
+### Features
+
+* **context:** integrate ranker + token budget into collectRepoContext ([#689](https://github.com/s977043/river-reviewer/issues/689) PR-C) ([#719](https://github.com/s977043/river-reviewer/issues/719)) ([c3356d7](https://github.com/s977043/river-reviewer/commit/c3356d7acf800d99221906a3bb2ea7cdefa02667))
+* **eval:** add 3 guard fixtures and falsePositiveRate metric ([#688](https://github.com/s977043/river-reviewer/issues/688) PR-3) ([#718](https://github.com/s977043/river-reviewer/issues/718)) ([bb0ddd9](https://github.com/s977043/river-reviewer/commit/bb0ddd9504c87a26ef7f9ea3e45684bad91adf39))
+
 ## [0.26.0](https://github.com/s977043/river-reviewer/compare/v0.25.0...v0.26.0) (2026-04-30)
 
 
