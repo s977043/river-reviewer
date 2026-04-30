@@ -15,6 +15,7 @@
 - [ ] `src/lib/review-engine.mjs`—関数シグネチャと内部ロジック
 - [ ] `src/lib/local-runner.mjs`—`runLocalReview` 内の `generateReview` 呼び出し
 - [ ] `src/lib/review-fixtures-eval.mjs`—eval 呼び出し
+- [ ] `src/lib/repo-wide-fixtures-eval.mjs`—repo-wide eval 呼び出し（#688）
 - [ ] `tests/review-engine.test.mjs`—新パラメータ有無のテスト最低2件
 - [ ] `tests/review-eval.test.mjs`—既存の eval テスト
 - [ ] `tests/finding-format.test.mjs`—フォーマット検証テスト
