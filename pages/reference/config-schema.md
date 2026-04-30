@@ -32,11 +32,11 @@
 - `memory`（[#687](https://github.com/s977043/river-reviewer/issues/687)）
   - `suppressionEnabled`: `true`（デフォルト）。Riverbed Memory に登録された suppression entry を反映する。`false` で gate を完全バイパス（緊急対応用）。
   - **suppression entry の `feedbackType`** (`schemas/suppression-context.schema.json`):
-    - `false_positive`: 誤検知。severity 問わず自動抑止する。
-    - `accepted_risk`: リスクを認識した上で残すと決めた指摘。`major` / `critical` の自動抑止には **この値が必須**（HIGH_SEVERITY P1 guard）。
-    - `wont_fix`: 修正しないと決めた指摘。`accepted_risk` と同様に severity gate あり。
-    - `not_relevant`: 当該 PR / ファイルの文脈で関連が薄い指摘。
-    - `duplicate`: 別エントリの fingerprint への参照（`duplicateOfFingerprint` 必須）。
+    - `accepted_risk`: リスクを認識した上で残すと決めた指摘。**HIGH_SEVERITY guard を通過できる唯一の値**で、`major` / `critical` の自動抑止にはこの値が必須（`src/lib/suppression-apply.mjs` の HIGH_SEVERITY guard）。
+    - `false_positive`: 誤検知。`major` / `critical` は guard でブロックされ自動抑止されない（manual-handle 扱い）。`minor` / `info` は自動抑止する。
+    - `wont_fix`: 修正しないと決めた指摘。`false_positive` と同じく `major` / `critical` は guard でブロックされる。
+    - `not_relevant`: 当該 PR / ファイルの文脈で関連が薄い指摘。`major` / `critical` は guard でブロックされる。
+    - `duplicate`: 別エントリの fingerprint への参照。`duplicateOfFingerprint` フィールドで参照先を示せる（schema 上は任意だが運用上は記録推奨）。`major` / `critical` は guard でブロックされる。
   - CLI: `river suppression add` で対話的に登録できる。
     - 必須フラグ: `--fingerprint <fp>` / `--feedback <type>` / `--rationale <text>`
     - 任意フラグ: `--scope <pattern>` / `--severity <level>` / `--files <glob>` / `--expires <date>` / `--pr <num>`
