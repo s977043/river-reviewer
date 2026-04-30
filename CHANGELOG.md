@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.29.0](https://github.com/s977043/river-reviewer/compare/v0.28.1...v0.29.0) (2026-04-30)
+
+
+### Features
+
+* **skills:** add suppression-feedback workflow guidance skill ([#735](https://github.com/s977043/river-reviewer/issues/735)) ([d1ecab4](https://github.com/s977043/river-reviewer/commit/d1ecab4c9d05da7649c86e28856aa2484ec8b89f))
+
 ## [0.28.1](https://github.com/s977043/river-reviewer/compare/v0.28.0...v0.28.1) (2026-04-30)
 
 
