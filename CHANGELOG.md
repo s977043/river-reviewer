@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.28.0](https://github.com/s977043/river-reviewer/compare/v0.27.0...v0.28.0) (2026-04-30)
+
+
+### Features
+
+* **context:** add reviewMode preset budgets ([#689](https://github.com/s977043/river-reviewer/issues/689) PR-D) ([#721](https://github.com/s977043/river-reviewer/issues/721)) ([1be3880](https://github.com/s977043/river-reviewer/commit/1be3880606d4ee4a8a15fa9be9a6b5c43e461f57))
+
 ## [0.27.0](https://github.com/s977043/river-reviewer/compare/v0.26.0...v0.27.0) (2026-04-30)
 
 
