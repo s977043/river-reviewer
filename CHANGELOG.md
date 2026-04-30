@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.26.0](https://github.com/s977043/river-reviewer/compare/v0.25.0...v0.26.0) (2026-04-30)
+
+
+### Features
+
+* **context:** add context-ranker pure functions ([#689](https://github.com/s977043/river-reviewer/issues/689) PR-B) ([#714](https://github.com/s977043/river-reviewer/issues/714)) ([92d9eea](https://github.com/s977043/river-reviewer/commit/92d9eea084c7e1e53f16ce8394054978473b7b21))
+* **eval:** add 4 should-detect fixtures across cross-context categories ([#688](https://github.com/s977043/river-reviewer/issues/688) PR-2) ([#715](https://github.com/s977043/river-reviewer/issues/715)) ([63f6a3f](https://github.com/s977043/river-reviewer/commit/63f6a3fced032c91e6d60243955560f4671477b9))
+
 ## [0.25.0](https://github.com/s977043/river-reviewer/compare/v0.24.0...v0.25.0) (2026-04-30)
 
 
