@@ -43,11 +43,14 @@ async function main(argv = process.argv.slice(2)) {
     }
   }
   console.log(`\n## Summary`);
-  console.log(`  totalCases:           ${summary.totalCases}`);
-  console.log(`  detectionRateWith:    ${summary.detectionRateWith.toFixed(2)}`);
-  console.log(`  detectionRateWithout: ${summary.detectionRateWithout.toFixed(2)}`);
-  console.log(`  contextLiftRate:      ${summary.contextLiftRate.toFixed(2)}`);
-  console.log(`  categoriesCovered:    ${summary.categoriesCovered.join(', ') || '-'}`);
+  console.log(`  totalCases:               ${summary.totalCases}`);
+  console.log(`  detectionCases / guards:  ${summary.detectionCases} / ${summary.guardCases}`);
+  console.log(`  detectionRateWith:        ${summary.detectionRateWith.toFixed(2)}`);
+  console.log(`  detectionRateWithout:     ${summary.detectionRateWithout.toFixed(2)}`);
+  console.log(`  contextLiftRate:          ${summary.contextLiftRate.toFixed(2)}`);
+  console.log(`  falsePositiveRateWith:    ${summary.falsePositiveRateWith.toFixed(2)}`);
+  console.log(`  falsePositiveRateWithout: ${summary.falsePositiveRateWithout.toFixed(2)}`);
+  console.log(`  categoriesCovered:        ${summary.categoriesCovered.join(', ') || '-'}`);
   return 0;
 }
 

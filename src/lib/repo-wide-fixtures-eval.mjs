@@ -72,6 +72,11 @@ export async function runRepoWideCase(caseDef, fixturesDir) {
   return {
     name: caseDef.name ?? '(unnamed)',
     category: caseDef.category ?? 'unknown',
+    // PR-3 (#688): explicit guard flag promotes "no finding" from
+    // "below detection threshold" to "expected outcome". Used by the
+    // aggregate falsePositiveRate metric below. Backward-compatible:
+    // omitted on should-detect cases.
+    guard: caseDef.guard === true,
     withCtx: {
       findingsCount: withCtx.comments.length,
       mergedMessages: withCtx.comments.map((c) => c.message).join('\n'),
@@ -103,19 +108,36 @@ export async function evaluateRepoWideFixtures({ casesPath }) {
 
   // Metric aggregates per #688 plan §5.
   const totalCases = results.length;
-  const detectedWith = results.filter((r) => r.withCtx.findingsCount > 0).length;
-  const detectedWithout = results.filter((r) => r.withoutCtx.findingsCount > 0).length;
-  const totalLift = results.reduce((sum, r) => sum + Math.max(0, r.contextLift), 0);
+  const detectionCases = results.filter((r) => !r.guard);
+  const guardCases = results.filter((r) => r.guard);
+  const detectedWith = detectionCases.filter((r) => r.withCtx.findingsCount > 0).length;
+  const detectedWithout = detectionCases.filter((r) => r.withoutCtx.findingsCount > 0).length;
+  const totalLift = detectionCases.reduce((sum, r) => sum + Math.max(0, r.contextLift), 0);
+  // PR-3: false positives are guard cases that produced any finding.
+  // We track separately for "with context" (the configuration that
+  // matters in production) and "without context" so a regression that
+  // only fires in one mode is visible.
+  const fpWith = guardCases.filter((r) => r.withCtx.findingsCount > 0).length;
+  const fpWithout = guardCases.filter((r) => r.withoutCtx.findingsCount > 0).length;
   // categories present (coverage check is binary across canonical categories)
   const categories = [...new Set(results.map((r) => r.category))];
 
   return {
     summary: {
       totalCases,
-      detectionRateWith: totalCases ? detectedWith / totalCases : 0,
-      detectionRateWithout: totalCases ? detectedWithout / totalCases : 0,
+      detectionCases: detectionCases.length,
+      guardCases: guardCases.length,
+      // Detection rates only count should-detect cases so guard cases
+      // do not artificially deflate the rate.
+      detectionRateWith: detectionCases.length ? detectedWith / detectionCases.length : 0,
+      detectionRateWithout: detectionCases.length ? detectedWithout / detectionCases.length : 0,
       // Positive when context helped detect more.
-      contextLiftRate: totalCases ? totalLift / totalCases : 0,
+      contextLiftRate: detectionCases.length ? totalLift / detectionCases.length : 0,
+      // False positive rates count guard cases that produced any finding.
+      // 0 is the only acceptable steady-state value; any positive number
+      // is a regression worth investigating.
+      falsePositiveRateWith: guardCases.length ? fpWith / guardCases.length : 0,
+      falsePositiveRateWithout: guardCases.length ? fpWithout / guardCases.length : 0,
       categoriesCovered: categories,
     },
     results,

@@ -1,0 +1,16 @@
+diff --git a/src/utils/legacy.ts b/src/utils/legacy.ts
+index 1111111..2222222 100644
+--- a/src/utils/legacy.ts
++++ b/src/utils/legacy.ts
+@@ -3,8 +3,11 @@ export interface LegacyConfig {
+   token: string;
+ }
+
+-// TODO(2025-Q4): remove once the new config rolls out.
++// Kept intentionally during the v2 migration (see ADR-007). Removal is
++// blocked on the legacy ingestion job migrating to the new config —
++// tracked in https://example.com/issues/legacy-config and slated for
++// the next release after that lands.
+ export function loadLegacyConfig(): LegacyConfig {
+   return { token: process.env.LEGACY_TOKEN ?? '' };
+ }
