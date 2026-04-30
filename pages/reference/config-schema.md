@@ -31,6 +31,15 @@
   - `redact.entropyMinLength`: 既定 `24`。fallback 検出の対象とする最小文字数。
 - `memory`（[#687](https://github.com/s977043/river-reviewer/issues/687)）
   - `suppressionEnabled`: `true`（デフォルト）。Riverbed Memory に登録された suppression entry を反映する。`false` で gate を完全バイパス（緊急対応用）。
+  - **suppression entry の `feedbackType`** (`schemas/suppression-context.schema.json`):
+    - `false_positive`: 誤検知。severity 問わず自動抑止する。
+    - `accepted_risk`: リスクを認識した上で残すと決めた指摘。`major` / `critical` の自動抑止には **この値が必須**（HIGH_SEVERITY P1 guard）。
+    - `wont_fix`: 修正しないと決めた指摘。`accepted_risk` と同様に severity gate あり。
+    - `not_relevant`: 当該 PR / ファイルの文脈で関連が薄い指摘。
+    - `duplicate`: 別エントリの fingerprint への参照（`duplicateOfFingerprint` 必須）。
+  - CLI: `river suppression add` で対話的に登録できる。
+    - 必須フラグ: `--fingerprint <fp>` / `--feedback <type>` / `--rationale <text>`
+    - 任意フラグ: `--scope <pattern>` / `--severity <level>` / `--files <glob>` / `--expires <date>` / `--pr <num>`
 - `context`（[#689](https://github.com/s977043/river-reviewer/issues/689)）
   - `reviewMode`: `tiny` / `medium` / `large`。budget を省略すると `src/lib/context-presets.mjs` のプリセットを適用する。`budget` を明示するとプリセットより優先される。
   - `budget.maxTokens`: `256`〜`64000`。
