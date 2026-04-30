@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@v0.14.1
+      - uses: s977043/river-reviewer/runners/github-action@v0.28.0
         with:
           phase: midstream
           dry_run: true # 外部 API を呼び出す場合は false に設定
@@ -32,7 +32,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-> 安定性のために `@v0.14.1` のようなリリースタグを指定してください。
+> 安定性のために `@v0.28.0` のようなリリースタグを指定してください。
 
 ## 2. レビューの実行
 

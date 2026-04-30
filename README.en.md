@@ -111,14 +111,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.14.1
+        uses: s977043/river-reviewer/runners/github-action@v0.28.0
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-Pin to a release tag such as `@v0.14.1` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
+Pin to a release tag such as `@v0.28.0` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
 
 <!-- x-release-please-start-version -->
 
@@ -135,7 +135,17 @@ Latest release: [v0.28.0](https://github.com/s977043/river-reviewer/releases/lat
 3. Validate skills: `npm run skills:validate`
 4. Tests: `npm test`
 5. Planner evaluation (optional): `npm run planner:eval`
-6. Docs development (optional): `npm run dev`
+6. Repo-wide evaluation (optional): `npm run eval:repo-context` (measures detection / context lift / false positive against the [#688](https://github.com/s977043/river-reviewer/issues/688) repo-wide fixtures)
+7. Docs development (optional): `npm run dev`
+
+### Major features added in v0.21–v0.28
+
+- **Suppression memory** ([#687](https://github.com/s977043/river-reviewer/issues/687)): use `river suppression add --fingerprint <fp> --feedback accepted_risk` to stop re-surfacing accepted-risk findings. Set `memory.suppressionEnabled: false` to bypass the gate temporarily.
+- **Secret redaction** ([#692](https://github.com/s977043/river-reviewer/issues/692)): multi-stage redaction across repo-wide context and LLM prompts. Tune categories, allowlist, and denyFiles via `security.redact.*`.
+- **Context budget / ranking / reviewMode** ([#689](https://github.com/s977043/river-reviewer/issues/689)): `context.budget` for token / char caps, `context.ranking.enabled` for proximity-based reordering, `context.reviewMode: tiny | medium | large` for preset budgets.
+- **Repo-wide eval suite** ([#688](https://github.com/s977043/river-reviewer/issues/688)): `npm run eval:repo-context` reports detection rate, context lift, and false positive rate.
+
+See [`pages/guides/repo-wide-review.md`](pages/guides/repo-wide-review.md) and [`pages/reference/config-schema.md`](pages/reference/config-schema.md) for details.
 
 ### Local review run (river run .)
 

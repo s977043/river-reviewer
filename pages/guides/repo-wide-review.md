@@ -53,7 +53,7 @@ jobs:
         with:
           fetch-depth: 0 # repo-wide context collector が周辺コミット履歴を読むため必須
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.14.1
+        uses: s977043/river-reviewer/runners/github-action@v0.28.0
         with:
           phase: midstream
           dry_run: false
@@ -61,7 +61,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-> 例では `@v0.14.1` に固定しています。最新リリースが出た場合はそのタグへ置き換えてください。
+> 例では `@v0.28.0` に固定しています。最新リリースが出た場合はそのタグへ置き換えてください。
 >
 > `fetch-depth: 0` は repo-wide context collector が変更ファイル周辺のコミット履歴・関連ファイルを参照するために必要です。shallow clone のままだと collector が劣化します。
 
@@ -166,19 +166,46 @@ defaults:
 | `usages`   | `rg` で grep した export symbol の使用箇所  | 約 1500 文字 |
 | `config`   | sibling な設定ファイル（`.json` / `.yaml`） | 約 500 文字  |
 
-合計上限は既定 8000 文字です（`collectRepoContext` の `maxChars` 引数で上書き可能。現状は設定ファイルからは変更できず、プログラム経由でのみ調整できます。設定ファイルからの調整は [Issue #689](https://github.com/s977043/river-reviewer/issues/689) で計画中）。各セクションは末尾から `// ...[truncated]` で切り詰めます。
+合計上限は既定 8000 文字です（`.river-reviewer.yaml` の `context.budget` キー、または `collectRepoContext` の `maxChars` 引数で上書きできます）。各セクションは末尾から `// ...[truncated]` で切り詰めます。
 
 `rg`（ripgrep）が利用できない環境では `usages` セクションが best-effort で空になります。CI ランナー側にあらかじめ ripgrep を入れておいてください（GitHub Actions の標準 Ubuntu イメージには同梱）。
 
 ### context budget / ranking の調整方針
 
-> このセクションは **計画中** です。token 単位の budget、`reviewMode`（tiny / medium / large）連動、ranking score（path proximity、symbol overlap、commit recency など）は [Issue #689](https://github.com/s977043/river-reviewer/issues/689) で追跡しています。実装後は本ガイドに具体的な YAML キーを追記します。
+`#689` で導入された設定キーで、token 単位の budget・`reviewMode` プリセット・ranking スコアを `.river-reviewer.yaml` から調整できます。スキーマ詳細は `src/config/schema.mjs` を参照してください。
 
-現状取れる調整は次の通りです。
+```yaml
+# .river-reviewer.yaml
+context:
+  reviewMode: medium # tiny | medium | large。budget を省略するとプリセットを適用
+  budget:
+    maxTokens: 4000 # 256〜64000。明示指定があれば reviewMode より優先
+    maxChars: 8000 # 1024〜200000。char 上限と token 上限の両方が効きます
+    perSectionCaps:
+      fullFile: 3000
+      tests: 2000
+      usages: 1500
+      config: 500
+  ranking:
+    enabled: true # 変更ファイルとの近接度スコアで候補を並べ替え
+    weights: # 0.0〜1.0。省略時は等重み
+      pathProximity: 0.4
+      symbolUsage: 0.3
+      siblingTest: 0.2
+      commitRecency: 0.1
+```
 
-- `.river-reviewer.yaml` の `model.maxTokens` を引き上げる（応答上限）
-- ノイズが多いと感じたら `.river-reviewer.yaml` の `exclude.files` を強化する（例: 自動生成物、lock file、snapshot）
-- `risk-map.yaml` の `action: comment_only` を docs に当てて gating だけ外す
+`reviewMode` プリセット（`src/lib/context-presets.mjs`）の `maxTokens` 既定値:
+
+| reviewMode | maxTokens | 想定用途                                              |
+| ---------- | --------- | ----------------------------------------------------- |
+| `tiny`     | 1024      | 短いプロンプト、CI 回帰、コンテキスト窓の小さいモデル |
+| `medium`   | 4000      | gpt-4o-mini / sonnet 級モデルでの通常 PR              |
+| `large`    | 16000     | 大型モデルでの深掘りレビュー                          |
+
+ranking のスコアリングは `src/lib/context-ranker.mjs` の `pathProximity` / `symbolUsage` / `siblingTest` / `commitRecency` で構成され、変更ファイルから「近い」順に候補を絞ります。スコア内訳は `reviewDebug.repoContextRanking` で確認できます。
+
+その他、ノイズが多いと感じたら `.river-reviewer.yaml` の `exclude.files` を強化したり、`risk-map.yaml` の `action: comment_only` を docs に当てて gating だけ外すといった既存運用も引き続き有効です。
 
 ## secret redaction と safe defaults
 
