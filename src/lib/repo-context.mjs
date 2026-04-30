@@ -10,6 +10,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { redactText, shouldExcludeForContext } from './secret-redactor.mjs';
+import { charsToTokens, estimateTokens } from './token-estimator.mjs';
+import { DEFAULT_WEIGHTS, pathProximity, scoreContextCandidate } from './context-ranker.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -62,8 +64,55 @@ export async function collectRepoContext({
   repoRoot,
   maxChars = DEFAULT_MAX_CHARS,
   security,
+  context: contextConfig,
 }) {
   const sections = [];
+
+  // #689 PR-C: optional token budget on top of the legacy char budget.
+  // When `config.context.budget.maxTokens` is set, we also gate by an
+  // estimated token cost so callers can think in tokens. The char
+  // budget remains authoritative for backward compat — both must be
+  // satisfied for a candidate to land. estimateTokens is approximate
+  // (ASCII chars/4, CJK chars/2 in #689 PR-A) so callers should treat
+  // the result as best-effort, not a hard ceiling.
+  const budgetCfg = contextConfig?.budget;
+  const maxTokensCfg = Number.isFinite(budgetCfg?.maxTokens) ? budgetCfg.maxTokens : null;
+  let tokenBudget = maxTokensCfg;
+  const billTokens = (text) => {
+    if (tokenBudget == null || !text) return;
+    tokenBudget -= estimateTokens(text);
+  };
+  const tokenBudgetExhausted = () => tokenBudget != null && tokenBudget <= 0;
+
+  // #689 PR-C: optional ranking. When `config.context.ranking.enabled`
+  // is true (and changedFiles has more than one entry), score each
+  // candidate against the rest of the change set and process the most
+  // relevant ones first. PR-B (#714) shipped the pure scoring
+  // primitives; here we wire the simplest signal — pathProximity — and
+  // PR-D will layer in commit recency / risk-map weights.
+  const rankingCfg = contextConfig?.ranking;
+  const rankingEnabled = rankingCfg?.enabled === true;
+  const weights = rankingCfg?.weights ?? DEFAULT_WEIGHTS;
+  const rankCandidates = (paths) => {
+    if (!rankingEnabled || paths.length <= 1)
+      return paths.map((p, i) => ({ path: p, score: 1, originalIndex: i }));
+    return paths
+      .map((p, i) => {
+        // Proximity to the most recently-changed file in the set is a
+        // useful first-order signal. The collector picks the highest
+        // score across the rest of the change set so the head of the
+        // list always has at least one strong neighbor.
+        const proximities = paths.filter((_, j) => j !== i).map((other) => pathProximity(p, other));
+        const proximity = proximities.length ? Math.max(...proximities) : 0;
+        const score = scoreContextCandidate({
+          signals: { pathProximity: proximity },
+          weights,
+        });
+        return { path: p, score, originalIndex: i };
+      })
+      .sort((a, b) => b.score - a.score || a.originalIndex - b.originalIndex);
+  };
+
   let budget = maxChars;
 
   // #692 PR-C: redaction & path-level deny.
@@ -102,27 +151,42 @@ export async function collectRepoContext({
     return redacted;
   };
 
-  // 1. Full text of changed source files
-  for (const rel of changedFiles.slice(0, 5)) {
-    if (budget <= 0) break;
+  // 1. Full text of changed source files.
+  // PR-C (#689): rankCandidates orders the change set so the most
+  // relevant files (highest pathProximity to the rest of the change
+  // set) get processed first under the budget. Without ranking the
+  // legacy first-N-files behavior is preserved by handing back the
+  // candidates in their original order.
+  const rankedFullFile = rankCandidates(changedFiles.slice(0, 5));
+  const rankedScores = [];
+  for (const { path: rel, score } of rankedFullFile) {
+    if (budget <= 0 || tokenBudgetExhausted()) break;
     if (isPathExcluded(rel)) {
       excludedPaths.push({ path: rel, section: 'fullFile' });
       continue;
     }
     const abs = path.join(repoRoot, rel);
     if (!isSourceFile(rel) || !fileExists(abs)) continue;
-    const raw = readFileCapped(abs, Math.min(SECTION_CAPS.fullFile, budget));
+    // Use the tighter of the char-budget cap and the token-budget cap
+    // (translated to chars) so we never read more than either budget
+    // allows. PR-A (#712) charsToTokens is the safe upper bound.
+    const tokenChars = tokenBudget != null ? Math.max(0, charsToTokens(tokenBudget)) : Infinity;
+    const cap = Math.min(SECTION_CAPS.fullFile, budget, tokenChars);
+    if (cap <= 0) break;
+    const raw = readFileCapped(abs, cap);
     if (raw) {
       const content = maybeRedact(raw);
       sections.push({ label: `Full file: ${rel}`, content, file: rel });
       budget -= content.length;
+      billTokens(content);
+      rankedScores.push({ path: rel, score });
     }
   }
 
   // 2. Corresponding test files
   const testContents = [];
   for (const rel of changedFiles.slice(0, 5)) {
-    if (budget <= 0) break;
+    if (budget <= 0 || tokenBudgetExhausted()) break;
     for (const toTest of TEST_SUFFIXES) {
       const candidate = toTest(rel);
       if (isPathExcluded(candidate)) {
@@ -131,7 +195,10 @@ export async function collectRepoContext({
       }
       const abs = path.join(repoRoot, candidate);
       if (fileExists(abs)) {
-        const raw = readFileCapped(abs, Math.min(SECTION_CAPS.tests, budget));
+        const tokenChars = tokenBudget != null ? Math.max(0, charsToTokens(tokenBudget)) : Infinity;
+        const cap = Math.min(SECTION_CAPS.tests, budget, tokenChars);
+        if (cap <= 0) break;
+        const raw = readFileCapped(abs, cap);
         if (raw) {
           const content = maybeRedact(raw);
           // The pushed entry includes a `// candidate\n` header; bill the
@@ -140,6 +207,7 @@ export async function collectRepoContext({
           const entry = `// ${candidate}\n${content}`;
           testContents.push(entry);
           budget -= entry.length;
+          billTokens(entry);
         }
         break;
       }
@@ -154,25 +222,30 @@ export async function collectRepoContext({
   }
 
   // 3. Symbol usage search via ripgrep
-  if (budget > 0) {
+  if (budget > 0 && !tokenBudgetExhausted()) {
     const exportedSymbols = extractExportedSymbols({ changedFiles, repoRoot });
     if (exportedSymbols.length) {
-      const usages = await searchSymbolUsages({
-        symbols: exportedSymbols.slice(0, 5),
-        repoRoot,
-        excludeFiles: changedFiles,
-        maxChars: Math.min(SECTION_CAPS.usages, budget),
-      });
-      if (usages) {
-        const content = maybeRedact(usages);
-        sections.push({ label: 'Symbol usage references', content, file: null });
-        budget -= content.length;
+      const tokenChars = tokenBudget != null ? Math.max(0, charsToTokens(tokenBudget)) : Infinity;
+      const usagesCap = Math.min(SECTION_CAPS.usages, budget, tokenChars);
+      if (usagesCap > 0) {
+        const usages = await searchSymbolUsages({
+          symbols: exportedSymbols.slice(0, 5),
+          repoRoot,
+          excludeFiles: changedFiles,
+          maxChars: usagesCap,
+        });
+        if (usages) {
+          const content = maybeRedact(usages);
+          sections.push({ label: 'Symbol usage references', content, file: null });
+          budget -= content.length;
+          billTokens(content);
+        }
       }
     }
   }
 
   // 4. Config snippets
-  if (budget > 0) {
+  if (budget > 0 && !tokenBudgetExhausted()) {
     const configSnippets = [];
     for (const glob of CONFIG_GLOBS) {
       if (isPathExcluded(glob)) {
@@ -192,6 +265,7 @@ export async function collectRepoContext({
       const content = configSnippets.join('\n\n');
       sections.push({ label: 'Config files', content, file: null });
       budget -= content.length;
+      billTokens(content);
     }
   }
 
@@ -200,9 +274,26 @@ export async function collectRepoContext({
   return {
     sections,
     totalChars: maxChars - budget,
-    truncated: budget <= 0,
+    truncated: budget <= 0 || tokenBudgetExhausted(),
     redactionHits,
     excludedPaths,
+    // PR-C (#689): expose ranking + budget telemetry on the result so
+    // callers can surface it via reviewDebug. Raw context never appears
+    // here — only counts and per-path scores.
+    ranking: rankingEnabled
+      ? {
+          enabled: true,
+          scores: rankedScores,
+        }
+      : null,
+    tokenBudget:
+      maxTokensCfg != null
+        ? {
+            max: maxTokensCfg,
+            remaining: Math.max(0, tokenBudget),
+            exhausted: tokenBudgetExhausted(),
+          }
+        : null,
   };
 }
 

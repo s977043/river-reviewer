@@ -362,6 +362,7 @@ export async function runLocalReview({
     changedFiles: context.changedFiles,
     repoRoot: path.resolve(context.repoRoot),
     security: context.config?.security,
+    context: context.config?.context,
   }).catch(() => null);
 
   const reviewArgs = {
@@ -450,6 +451,14 @@ export async function runLocalReview({
               redactionHits: repoContext?.redactionHits ?? [],
               excludedPaths: repoContext?.excludedPaths ?? [],
             },
+          }
+        : {}),
+      // #689 PR-C: ranking + budget telemetry. Only emitted when the
+      // collector actually used these signals so no-op runs stay clean.
+      ...(repoContext?.ranking || repoContext?.tokenBudget
+        ? {
+            repoContextRanking: repoContext?.ranking ?? null,
+            repoContextTokenBudget: repoContext?.tokenBudget ?? null,
           }
         : {}),
     },
