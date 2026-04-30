@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.22.0](https://github.com/s977043/river-reviewer/compare/v0.21.0...v0.22.0) (2026-04-30)
+
+
+### Features
+
+* **memory:** add applySuppressions pure function ([#687](https://github.com/s977043/river-reviewer/issues/687) PR-B) ([#699](https://github.com/s977043/river-reviewer/issues/699)) ([396f584](https://github.com/s977043/river-reviewer/commit/396f5841944afa04b522c80ef5f2e622d57786cc))
+* **security:** add secret-redactor library and deny-glob defaults ([#692](https://github.com/s977043/river-reviewer/issues/692) PR-A) ([#698](https://github.com/s977043/river-reviewer/issues/698)) ([d20e1e3](https://github.com/s977043/river-reviewer/commit/d20e1e3ff4b9563520fc9618fc4c0a79dad01666))
+
 ## [0.21.0](https://github.com/s977043/river-reviewer/compare/v0.20.1...v0.21.0) (2026-04-28)
 
 
