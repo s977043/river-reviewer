@@ -1,11 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import {
-  estimateTokens,
-  charsToTokens,
-  tokensToChars,
-} from '../src/lib/token-estimator.mjs';
+import { estimateTokens, charsToTokens, tokensToChars } from '../src/lib/token-estimator.mjs';
 
 test('estimateTokens returns 0 for empty / null / undefined input', () => {
   assert.equal(estimateTokens(''), 0);
@@ -43,14 +39,15 @@ test('estimateTokens is deterministic across calls', () => {
   assert.equal(a, b);
 });
 
-test('estimateTokens accepts but ignores future tokenizer values', () => {
-  // PR-A only ships heuristic. Future "tiktoken" must not crash; it
-  // falls through to heuristic until PR-E wires the real tokenizer.
+test('estimateTokens currently ignores opts (reserved for PR-E)', () => {
+  // PR-A only implements heuristic. `opts.tokenizer` and `opts.model`
+  // are reserved for PR-E's `tiktoken` work and are documented as such
+  // in the JSDoc; the schema (contextConfigSchema.tokenizer) keeps
+  // unknown values out at config-load time. Direct programmatic callers
+  // that pass any opts get the heuristic regardless.
   const sample = 'a'.repeat(40);
-  assert.equal(
-    estimateTokens(sample, { tokenizer: 'tiktoken' }),
-    estimateTokens(sample, { tokenizer: 'heuristic' })
-  );
+  assert.equal(estimateTokens(sample, { tokenizer: 'tiktoken' }), estimateTokens(sample));
+  assert.equal(estimateTokens(sample, { model: 'gpt-4o' }), estimateTokens(sample));
 });
 
 test('estimateTokens counts code points, not UTF-16 code units', () => {
@@ -60,10 +57,31 @@ test('estimateTokens counts code points, not UTF-16 code units', () => {
   assert.equal(estimateTokens('🌊'), 1);
 });
 
-test('charsToTokens / tokensToChars round-trip approximately', () => {
-  assert.equal(charsToTokens(8000), 2000);
-  assert.equal(tokensToChars(2000), 8000);
+test('charsToTokens returns the safe (CJK-worst-case) upper bound on tokens', () => {
+  // 8000 chars at chars/2 worst case -> 4000 tokens.
+  assert.equal(charsToTokens(8000), 4000);
   assert.equal(charsToTokens(0), 0);
   assert.equal(charsToTokens(-1), 0);
+  assert.equal(charsToTokens(NaN), 0);
+});
+
+test('tokensToChars returns the safe (CJK-worst-case) upper bound on chars', () => {
+  // 4000 tokens at 2 chars/token CJK worst case -> 8000 chars.
+  assert.equal(tokensToChars(4000), 8000);
+  assert.equal(tokensToChars(0), 0);
+  assert.equal(tokensToChars(-1), 0);
   assert.equal(tokensToChars(NaN), 0);
+});
+
+test('estimateTokens never exceeds charsToTokens upper bound for any input', () => {
+  // Safety invariant: charsToTokens is supposed to be a worst-case upper
+  // bound, so the actual heuristic estimate must always fit underneath
+  // it. If this ever fires, charsToTokens is no longer safe to gate on.
+  const samples = ['a'.repeat(100), 'あ'.repeat(100), 'a'.repeat(50) + 'あ'.repeat(50)];
+  for (const s of samples) {
+    assert.ok(
+      estimateTokens(s) <= charsToTokens(s.length),
+      `estimateTokens(${JSON.stringify(s.slice(0, 10))}…) must not exceed charsToTokens upper bound`
+    );
+  }
 });

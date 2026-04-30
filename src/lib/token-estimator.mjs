@@ -38,34 +38,37 @@ function codePointLength(text) {
 }
 
 function cjkCount(text) {
-  const matches = text.match(CJK_RE);
-  return matches ? matches.length : 0;
+  // matchAll + counter avoids materializing the full match array, which
+  // matters once callers feed in 200k-char prompts (config.context.budget
+  // upper bound). Counting the iterator stays O(matches) on memory.
+  let n = 0;
+  for (const _ of text.matchAll(CJK_RE)) n += 1;
+  return n;
 }
 
 /**
  * Estimate the number of tokens an LLM tokenizer would assign to `text`.
  *
+ * PR-A only implements the `heuristic` tokenizer. The schema
+ * (`contextConfigSchema.tokenizer` enum: `heuristic`) is intentionally
+ * strict — it rejects unknown values at config-load time so typos
+ * surface immediately rather than silently degrading to heuristic. PR-E
+ * will add `tiktoken` to both the schema enum and the dispatch below.
+ *
+ * `opts.model` is reserved for the same PR-E work.
+ *
  * @param {string} text
  * @param {object} [opts]
  * @param {string} [opts.model] reserved for future tokenizer plugins
- * @param {('heuristic'|'tiktoken')} [opts.tokenizer] only `heuristic` is
- *   implemented in PR-A; PR-E will wire in `tiktoken`. Anything other
- *   than `heuristic` falls back to heuristic so callers cannot crash on
- *   future config that isn't yet supported.
  * @returns {number} non-negative integer
  */
 export function estimateTokens(text, opts = {}) {
   if (text == null) return 0;
   const s = String(text);
   if (s.length === 0) return 0;
-
-  // Future tokenizer hook (no-op for PR-A).
-  // eslint-disable-next-line no-unused-vars
-  const _model = opts.model;
-  const _tokenizer = opts.tokenizer ?? 'heuristic';
-  if (_tokenizer !== 'heuristic') {
-    // Unknown tokenizer: fall back so callers don't crash on future opts.
-  }
+  // opts is currently unused at runtime; kept for the API contract
+  // documented above so PR-E can extend without a breaking change.
+  void opts;
 
   const cjk = cjkCount(s);
   const total = codePointLength(s);
@@ -80,23 +83,29 @@ export function estimateTokens(text, opts = {}) {
 }
 
 /**
- * Convenience: char budget -> approximate token budget.
- * Used by repo-context.mjs callers that still talk in `maxChars` while
- * the rest of the pipeline migrates to tokens (#689 PR-C).
+ * Char budget -> safe upper bound on tokens.
+ *
+ * Returns the worst-case token count for a budget of `maxChars`: assumes
+ * the entire input is CJK (chars/2). Callers using this to gate "will
+ * the prompt fit" stay under the real LLM tokenizer limit even when the
+ * input shifts toward Japanese. Use estimateTokens() for the actual
+ * per-string estimate when accuracy matters more than safety.
  */
-export function charsToTokens(maxChars, opts = {}) {
+export function charsToTokens(maxChars, _opts = {}) {
   if (!Number.isFinite(maxChars) || maxChars <= 0) return 0;
-  // Treat the budget as ASCII-equivalent so callers see a conservative
-  // upper bound. Real call sites pair this with an actual estimate of
-  // the assembled prompt to verify they fit.
-  return Math.floor(maxChars / ASCII_DIVISOR);
+  return Math.floor(maxChars / CJK_DIVISOR);
 }
 
 /**
- * Inverse: rough token budget -> char budget. Used to gate per-section
- * `maxChars` from a higher-level token cap in PR-C.
+ * Token budget -> safe upper bound on chars.
+ *
+ * Returns the maximum chars that cannot exceed `maxTokens` even for
+ * fully-CJK input (where every char counts as 1/2 token). Callers using
+ * this to gate per-section maxChars stay under the prompt budget even
+ * when the section ends up CJK-heavy. Use estimateTokens() to verify
+ * a specific assembled prompt fits.
  */
-export function tokensToChars(maxTokens, opts = {}) {
+export function tokensToChars(maxTokens, _opts = {}) {
   if (!Number.isFinite(maxTokens) || maxTokens <= 0) return 0;
-  return Math.floor(maxTokens * ASCII_DIVISOR);
+  return Math.floor(maxTokens * CJK_DIVISOR);
 }
