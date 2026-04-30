@@ -74,11 +74,24 @@ export const securityConfigSchema = z
   })
   .strict();
 
+// --- #687 PR-D: memory.suppressionEnabled ---
+//
+// Companion to applySuppressions in src/lib/suppression-apply.mjs. When
+// `false`, the suppression gate is bypassed entirely (debugging /
+// emergency disable). Defaults to true at runtime; the schema only needs
+// to know the field exists.
+export const memoryConfigSchema = z
+  .object({
+    suppressionEnabled: z.boolean().optional(),
+  })
+  .strict();
+
 export const riverReviewerConfigSchema = z.object({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
   exclude: excludeConfigSchema.optional(),
   security: securityConfigSchema.optional(),
+  memory: memoryConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -121,6 +134,7 @@ export const ConfigSchema = z
     review: reviewConfigSchema.optional(),
     exclude: excludeConfigSchema.optional(),
     security: securityConfigSchema.optional(),
+    memory: memoryConfigSchema.optional(),
     skills: z.array(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
