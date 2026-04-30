@@ -17,6 +17,7 @@ import { collectRepoContext } from './repo-context.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import { isLlmEnabled, parseList } from './utils.mjs';
 import { annotateFingerprints } from './finding-fingerprint.mjs';
+import { applySuppressions } from './suppression-apply.mjs';
 
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
@@ -383,6 +384,17 @@ export async function runLocalReview({
     ? await runReviewerOrchestration({ ...reviewArgs, reviewers })
     : await generateReview(reviewArgs);
 
+  // #687 PR-C: gate findings by Riverbed Memory suppressions.
+  // Run AFTER fingerprint annotation so applySuppressions sees the canonical
+  // 16-hex fingerprint produced by computeFingerprint(). Bypassed when
+  // config.memory.suppressionEnabled === false (see suppression-apply.mjs).
+  const annotatedFindings = annotateFingerprints(review.findings ?? []);
+  const {
+    keptFindings,
+    suppressedFindings,
+    applied: suppressionsApplied,
+  } = applySuppressions(annotatedFindings, memoryContext, { config: context.config });
+
   return {
     status: 'ok',
     repoRoot: path.resolve(context.repoRoot),
@@ -394,14 +406,15 @@ export async function runLocalReview({
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
     comments: review.comments,
-    findings: annotateFingerprints(review.findings ?? []),
+    findings: keptFindings,
+    suppressedFindings,
     classified: review.classified,
     reviewerResults: review.reviewerResults ?? null,
     tokenEstimate: context.diff.tokenEstimate,
     rawTokenEstimate: context.diff.rawTokenEstimate,
     reduction: context.diff.reduction,
     prompt: review.prompt,
-    reviewDebug: review.debug,
+    reviewDebug: { ...(review.debug ?? {}), suppressionsApplied },
     projectRules: context.projectRules,
     availableContexts: context.availableContexts,
     availableDependencies: context.availableDependencies,
