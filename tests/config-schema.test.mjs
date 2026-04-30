@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import test, { describe } from 'node:test';
 
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
+
 import {
   modelConfigSchema,
   reviewConfigSchema,
@@ -10,6 +17,9 @@ import {
   RuleSchema,
   SkillSchema,
   ConfigSchema,
+  redactCategoriesSchema,
+  redactConfigSchema,
+  securityConfigSchema,
 } from '../src/config/schema.mjs';
 
 import { RiskActionSchema, RiskRuleSchema, RiskMapSchema } from '../src/config/risk-map-schema.mjs';
@@ -98,6 +108,122 @@ describe('riverReviewerConfigSchema', () => {
 
   test('accepts empty object', () => {
     assert.ok(riverReviewerConfigSchema.safeParse({}).success);
+  });
+
+  test('accepts security.redact block (#692 PR-B)', () => {
+    const result = riverReviewerConfigSchema.safeParse({
+      security: {
+        redact: {
+          enabled: true,
+          categories: { githubToken: true, highEntropy: false },
+          extraPatterns: [{ id: 'custom', pattern: '\\bsecret-\\w+\\b' }],
+          allowlist: ['TESTFIXTURE'],
+          denyFiles: ['vendor/**'],
+          entropyThreshold: 4.5,
+          entropyMinLength: 24,
+        },
+      },
+    });
+    assert.ok(result.success, JSON.stringify(result.error?.format()));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// #692 PR-B: security.redact.* zod and JSON Schema
+// ---------------------------------------------------------------------------
+
+describe('redactCategoriesSchema', () => {
+  test('accepts a partial object with only some categories', () => {
+    const r = redactCategoriesSchema.safeParse({ githubToken: true, highEntropy: false });
+    assert.ok(r.success);
+  });
+
+  test('rejects unknown category keys (strict)', () => {
+    const r = redactCategoriesSchema.safeParse({ unknownThing: true });
+    assert.equal(r.success, false);
+  });
+
+  test('rejects non-boolean values', () => {
+    const r = redactCategoriesSchema.safeParse({ githubToken: 'yes' });
+    assert.equal(r.success, false);
+  });
+});
+
+describe('redactConfigSchema', () => {
+  test('accepts an empty object (everything optional)', () => {
+    assert.ok(redactConfigSchema.safeParse({}).success);
+  });
+
+  test('rejects entropyThreshold outside [3.0, 6.0]', () => {
+    assert.equal(redactConfigSchema.safeParse({ entropyThreshold: 2.9 }).success, false);
+    assert.equal(redactConfigSchema.safeParse({ entropyThreshold: 6.1 }).success, false);
+    assert.ok(redactConfigSchema.safeParse({ entropyThreshold: 4.5 }).success);
+  });
+
+  test('rejects non-integer entropyMinLength', () => {
+    assert.equal(redactConfigSchema.safeParse({ entropyMinLength: 24.5 }).success, false);
+    assert.equal(redactConfigSchema.safeParse({ entropyMinLength: 7 }).success, false);
+    assert.ok(redactConfigSchema.safeParse({ entropyMinLength: 24 }).success);
+  });
+
+  test('rejects extra properties (strict)', () => {
+    const r = redactConfigSchema.safeParse({ enabled: true, somethingElse: 1 });
+    assert.equal(r.success, false);
+  });
+
+  test('rejects extraPatterns entries that omit id or pattern', () => {
+    assert.equal(
+      redactConfigSchema.safeParse({ extraPatterns: [{ pattern: 'x' }] }).success,
+      false
+    );
+    assert.equal(redactConfigSchema.safeParse({ extraPatterns: [{ id: 'x' }] }).success, false);
+  });
+});
+
+describe('securityConfigSchema', () => {
+  test('accepts only `redact`', () => {
+    assert.ok(securityConfigSchema.safeParse({ redact: { enabled: false } }).success);
+  });
+
+  test('rejects unknown top-level keys (strict)', () => {
+    assert.equal(securityConfigSchema.safeParse({ network: {} }).success, false);
+  });
+});
+
+describe('redaction-config.schema.json (#692 PR-B)', () => {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const schemaPath = resolve(__dirname, '..', 'schemas', 'redaction-config.schema.json');
+  const schema = JSON.parse(readFileSync(schemaPath, 'utf8'));
+  const ajv = new Ajv2020({ allErrors: true });
+  addFormats(ajv);
+  const validate = ajv.compile(schema);
+
+  test('accepts an example matching all properties', () => {
+    const ok = validate({
+      enabled: true,
+      categories: { githubToken: true },
+      extraPatterns: [{ id: 'custom', pattern: '\\bX\\b', replacement: '<X>' }],
+      allowlist: ['TESTFIXTURE'],
+      denyFiles: ['vendor/**'],
+      entropyThreshold: 4.5,
+      entropyMinLength: 24,
+    });
+    assert.ok(ok, JSON.stringify(validate.errors));
+  });
+
+  test('rejects unknown root-level properties', () => {
+    const ok = validate({ enabled: true, somethingElse: 1 });
+    assert.equal(ok, false);
+  });
+
+  test('rejects extraPatterns entries missing required fields', () => {
+    assert.equal(validate({ extraPatterns: [{ pattern: 'x' }] }), false);
+    assert.equal(validate({ extraPatterns: [{ id: 'x' }] }), false);
+  });
+
+  test('rejects out-of-range entropyThreshold', () => {
+    assert.equal(validate({ entropyThreshold: 2.5 }), false);
+    assert.equal(validate({ entropyThreshold: 6.5 }), false);
   });
 });
 
