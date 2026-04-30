@@ -41,11 +41,23 @@ export async function runRepoWideCase(caseDef, fixturesDir) {
     changedFiles: parsedDiff.files.map((f) => f.path).filter(Boolean),
   };
 
-  // Pass A: with repo context collected from seedRoot
-  const repoContext = await collectRepoContext({
-    changedFiles: diff.changedFiles,
-    repoRoot: seedRoot,
-  }).catch(() => null);
+  // Pass A: with repo context collected from seedRoot.
+  // Swallowing collectRepoContext errors here would mask environment
+  // problems (missing seedRepo, broken rg, etc.) as "no findings" — which
+  // is a wrong conclusion for an eval harness. Re-throw with context so
+  // the failing case is obvious.
+  let repoContext;
+  try {
+    repoContext = await collectRepoContext({
+      changedFiles: diff.changedFiles,
+      repoRoot: seedRoot,
+    });
+  } catch (err) {
+    throw new Error(
+      `collectRepoContext failed for case "${caseDef.name ?? '(unnamed)'}" ` +
+        `(seedRoot=${seedRoot}): ${err?.message ?? err}`
+    );
+  }
 
   const reviewArgs = {
     diff,

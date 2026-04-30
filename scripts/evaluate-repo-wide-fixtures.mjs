@@ -21,9 +21,7 @@ function parseArgs(argv) {
     if (a === '--cases') out.casesPath = args.shift() ?? DEFAULT_CASES;
     else if (a === '--verbose') out.verbose = true;
     else if (a === '-h' || a === '--help') {
-      console.log(
-        'Usage: evaluate-repo-wide-fixtures.mjs [--cases <path>] [--verbose]'
-      );
+      console.log('Usage: evaluate-repo-wide-fixtures.mjs [--cases <path>] [--verbose]');
       return null;
     }
   }
@@ -53,4 +51,11 @@ async function main(argv = process.argv.slice(2)) {
   return 0;
 }
 
-main(process.argv.slice(2)).then((code) => process.exit(code ?? 0));
+main(process.argv.slice(2))
+  .then((code) => process.exit(code ?? 0))
+  .catch((err) => {
+    // Surface failure with stderr + non-zero exit so CI and humans notice.
+    // Without this, an unhandled rejection would print no useful trace.
+    console.error('eval:repo-context failed:', err?.stack ?? err);
+    process.exit(1);
+  });
