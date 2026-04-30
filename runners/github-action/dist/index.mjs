@@ -19070,6 +19070,7 @@ minimatch.unescape = unescape_unescape;
 // EXPORTS
 __nccwpck_require__.d(__webpack_exports__, {
   YOg: () => (/* reexport */ array),
+  zMY: () => (/* reexport */ schemas_boolean),
   k5n: () => (/* reexport */ schemas_enum),
   aig: () => (/* reexport */ schemas_number),
   Ikc: () => (/* reexport */ object),
@@ -19077,7 +19078,7 @@ __nccwpck_require__.d(__webpack_exports__, {
   L5J: () => (/* reexport */ unknown)
 });
 
-// UNUSED EXPORTS: $brand, $input, $output, NEVER, TimePrecision, ZodAny, ZodArray, ZodBase64, ZodBase64URL, ZodBigInt, ZodBigIntFormat, ZodBoolean, ZodCIDRv4, ZodCIDRv6, ZodCUID, ZodCUID2, ZodCatch, ZodCodec, ZodCustom, ZodCustomStringFormat, ZodDate, ZodDefault, ZodDiscriminatedUnion, ZodE164, ZodEmail, ZodEmoji, ZodEnum, ZodError, ZodExactOptional, ZodFile, ZodFirstPartyTypeKind, ZodFunction, ZodGUID, ZodIPv4, ZodIPv6, ZodISODate, ZodISODateTime, ZodISODuration, ZodISOTime, ZodIntersection, ZodIssueCode, ZodJWT, ZodKSUID, ZodLazy, ZodLiteral, ZodMAC, ZodMap, ZodNaN, ZodNanoID, ZodNever, ZodNonOptional, ZodNull, ZodNullable, ZodNumber, ZodNumberFormat, ZodObject, ZodOptional, ZodPipe, ZodPrefault, ZodPromise, ZodReadonly, ZodRealError, ZodRecord, ZodSet, ZodString, ZodStringFormat, ZodSuccess, ZodSymbol, ZodTemplateLiteral, ZodTransform, ZodTuple, ZodType, ZodULID, ZodURL, ZodUUID, ZodUndefined, ZodUnion, ZodUnknown, ZodVoid, ZodXID, ZodXor, _ZodString, _default, _function, any, base64, base64url, bigint, boolean, catch, check, cidrv4, cidrv6, clone, codec, coerce, config, core, cuid, cuid2, custom, date, decode, decodeAsync, describe, discriminatedUnion, e164, email, emoji, encode, encodeAsync, endsWith, exactOptional, file, flattenError, float32, float64, formatError, fromJSONSchema, function, getErrorMap, globalRegistry, gt, gte, guid, hash, hex, hostname, httpUrl, includes, instanceof, int, int32, int64, intersection, ipv4, ipv6, iso, json, jwt, keyof, ksuid, lazy, length, literal, locales, looseObject, looseRecord, lowercase, lt, lte, mac, map, maxLength, maxSize, meta, mime, minLength, minSize, multipleOf, nan, nanoid, nativeEnum, negative, never, nonnegative, nonoptional, nonpositive, normalize, null, nullable, nullish, optional, overwrite, parse, parseAsync, partialRecord, pipe, positive, prefault, preprocess, prettifyError, promise, property, readonly, record, refine, regex, regexes, registry, safeDecode, safeDecodeAsync, safeEncode, safeEncodeAsync, safeParse, safeParseAsync, set, setErrorMap, size, slugify, startsWith, strictObject, stringFormat, stringbool, success, superRefine, symbol, templateLiteral, toJSONSchema, toLowerCase, toUpperCase, transform, treeifyError, trim, tuple, uint32, uint64, ulid, undefined, union, uppercase, url, util, uuid, uuidv4, uuidv6, uuidv7, void, xid, xor
+// UNUSED EXPORTS: $brand, $input, $output, NEVER, TimePrecision, ZodAny, ZodArray, ZodBase64, ZodBase64URL, ZodBigInt, ZodBigIntFormat, ZodBoolean, ZodCIDRv4, ZodCIDRv6, ZodCUID, ZodCUID2, ZodCatch, ZodCodec, ZodCustom, ZodCustomStringFormat, ZodDate, ZodDefault, ZodDiscriminatedUnion, ZodE164, ZodEmail, ZodEmoji, ZodEnum, ZodError, ZodExactOptional, ZodFile, ZodFirstPartyTypeKind, ZodFunction, ZodGUID, ZodIPv4, ZodIPv6, ZodISODate, ZodISODateTime, ZodISODuration, ZodISOTime, ZodIntersection, ZodIssueCode, ZodJWT, ZodKSUID, ZodLazy, ZodLiteral, ZodMAC, ZodMap, ZodNaN, ZodNanoID, ZodNever, ZodNonOptional, ZodNull, ZodNullable, ZodNumber, ZodNumberFormat, ZodObject, ZodOptional, ZodPipe, ZodPrefault, ZodPromise, ZodReadonly, ZodRealError, ZodRecord, ZodSet, ZodString, ZodStringFormat, ZodSuccess, ZodSymbol, ZodTemplateLiteral, ZodTransform, ZodTuple, ZodType, ZodULID, ZodURL, ZodUUID, ZodUndefined, ZodUnion, ZodUnknown, ZodVoid, ZodXID, ZodXor, _ZodString, _default, _function, any, base64, base64url, bigint, catch, check, cidrv4, cidrv6, clone, codec, coerce, config, core, cuid, cuid2, custom, date, decode, decodeAsync, describe, discriminatedUnion, e164, email, emoji, encode, encodeAsync, endsWith, exactOptional, file, flattenError, float32, float64, formatError, fromJSONSchema, function, getErrorMap, globalRegistry, gt, gte, guid, hash, hex, hostname, httpUrl, includes, instanceof, int, int32, int64, intersection, ipv4, ipv6, iso, json, jwt, keyof, ksuid, lazy, length, literal, locales, looseObject, looseRecord, lowercase, lt, lte, mac, map, maxLength, maxSize, meta, mime, minLength, minSize, multipleOf, nan, nanoid, nativeEnum, negative, never, nonnegative, nonoptional, nonpositive, normalize, null, nullable, nullish, optional, overwrite, parse, parseAsync, partialRecord, pipe, positive, prefault, preprocess, prettifyError, promise, property, readonly, record, refine, regex, regexes, registry, safeDecode, safeDecodeAsync, safeEncode, safeEncodeAsync, safeParse, safeParseAsync, set, setErrorMap, size, slugify, startsWith, strictObject, stringFormat, stringbool, success, superRefine, symbol, templateLiteral, toJSONSchema, toLowerCase, toUpperCase, transform, treeifyError, trim, tuple, uint32, uint64, ulid, undefined, union, uppercase, url, util, uuid, uuidv4, uuidv6, uuidv7, void, xid, xor
 
 // NAMESPACE OBJECT: ./node_modules/zod/v4/core/regexes.js
 var regexes_namespaceObject = {};
@@ -34324,10 +34325,62 @@ const excludeConfigSchema = external/* object */.Ikc({
   prLabelsToIgnore: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
 });
 
+// --- #692 PR-B: security.redact.* schema ---
+//
+// Pure schema addition: this PR only teaches the loader to accept and
+// validate `security.redact.*`. The keys are not yet read by the review
+// pipeline; PR-C of #692 will plumb `config.security` into
+// src/lib/repo-context.mjs and src/lib/local-runner.mjs.
+//
+// Default policy: redaction enabled; every named category on; entropy
+// fallback at 4.5 bits/char with a 24-char minimum length. Users tighten
+// or loosen via `extraPatterns`, `allowlist`, and `denyFiles`.
+
+const redactCategoriesSchema = external/* object */.Ikc({
+    githubToken: external/* boolean */.zMY().optional(),
+    openaiKey: external/* boolean */.zMY().optional(),
+    anthropicKey: external/* boolean */.zMY().optional(),
+    googleApiKey: external/* boolean */.zMY().optional(),
+    awsAccessKey: external/* boolean */.zMY().optional(),
+    awsSecretKey: external/* boolean */.zMY().optional(),
+    privateKey: external/* boolean */.zMY().optional(),
+    bearerToken: external/* boolean */.zMY().optional(),
+    databaseUrl: external/* boolean */.zMY().optional(),
+    webhookUrl: external/* boolean */.zMY().optional(),
+    oauthSecret: external/* boolean */.zMY().optional(),
+    envAssignment: external/* boolean */.zMY().optional(),
+    highEntropy: external/* boolean */.zMY().optional(),
+  })
+  .strict();
+
+const redactExtraPatternSchema = external/* object */.Ikc({
+    id: external/* string */.YjP().min(1),
+    pattern: external/* string */.YjP().min(1),
+    replacement: external/* string */.YjP().min(1).optional(),
+  })
+  .strict();
+
+const redactConfigSchema = external/* object */.Ikc({
+    enabled: external/* boolean */.zMY().optional(),
+    categories: redactCategoriesSchema.optional(),
+    extraPatterns: external/* array */.YOg(redactExtraPatternSchema).optional(),
+    allowlist: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
+    denyFiles: external/* array */.YOg(external/* string */.YjP().min(1)).optional(),
+    entropyThreshold: external/* number */.aig().min(3.0).max(6.0).optional(),
+    entropyMinLength: external/* number */.aig().int().min(8).optional(),
+  })
+  .strict();
+
+const securityConfigSchema = external/* object */.Ikc({
+    redact: redactConfigSchema.optional(),
+  })
+  .strict();
+
 const riverReviewerConfigSchema = external/* object */.Ikc({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
   exclude: excludeConfigSchema.optional(),
+  security: securityConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -34368,6 +34421,7 @@ const ConfigSchema = external/* object */.Ikc({
     model: modelConfigSchema.optional(),
     review: reviewConfigSchema.optional(),
     exclude: excludeConfigSchema.optional(),
+    security: securityConfigSchema.optional(),
     skills: external/* array */.YOg(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings

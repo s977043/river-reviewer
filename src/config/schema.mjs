@@ -19,10 +19,66 @@ export const excludeConfigSchema = z.object({
   prLabelsToIgnore: z.array(z.string().min(1)).optional(),
 });
 
+// --- #692 PR-B: security.redact.* schema ---
+//
+// Pure schema addition: this PR only teaches the loader to accept and
+// validate `security.redact.*`. The keys are not yet read by the review
+// pipeline; PR-C of #692 will plumb `config.security` into
+// src/lib/repo-context.mjs and src/lib/local-runner.mjs.
+//
+// Default policy: redaction enabled; every named category on; entropy
+// fallback at 4.5 bits/char with a 24-char minimum length. Users tighten
+// or loosen via `extraPatterns`, `allowlist`, and `denyFiles`.
+
+export const redactCategoriesSchema = z
+  .object({
+    githubToken: z.boolean().optional(),
+    openaiKey: z.boolean().optional(),
+    anthropicKey: z.boolean().optional(),
+    googleApiKey: z.boolean().optional(),
+    awsAccessKey: z.boolean().optional(),
+    awsSecretKey: z.boolean().optional(),
+    privateKey: z.boolean().optional(),
+    bearerToken: z.boolean().optional(),
+    databaseUrl: z.boolean().optional(),
+    webhookUrl: z.boolean().optional(),
+    oauthSecret: z.boolean().optional(),
+    envAssignment: z.boolean().optional(),
+    highEntropy: z.boolean().optional(),
+  })
+  .strict();
+
+export const redactExtraPatternSchema = z
+  .object({
+    id: z.string().min(1),
+    pattern: z.string().min(1),
+    replacement: z.string().min(1).optional(),
+  })
+  .strict();
+
+export const redactConfigSchema = z
+  .object({
+    enabled: z.boolean().optional(),
+    categories: redactCategoriesSchema.optional(),
+    extraPatterns: z.array(redactExtraPatternSchema).optional(),
+    allowlist: z.array(z.string().min(1)).optional(),
+    denyFiles: z.array(z.string().min(1)).optional(),
+    entropyThreshold: z.number().min(3.0).max(6.0).optional(),
+    entropyMinLength: z.number().int().min(8).optional(),
+  })
+  .strict();
+
+export const securityConfigSchema = z
+  .object({
+    redact: redactConfigSchema.optional(),
+  })
+  .strict();
+
 export const riverReviewerConfigSchema = z.object({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
   exclude: excludeConfigSchema.optional(),
+  security: securityConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -64,6 +120,7 @@ export const ConfigSchema = z
     model: modelConfigSchema.optional(),
     review: reviewConfigSchema.optional(),
     exclude: excludeConfigSchema.optional(),
+    security: securityConfigSchema.optional(),
     skills: z.array(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
