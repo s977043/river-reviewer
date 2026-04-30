@@ -18,6 +18,27 @@ Place `.river-reviewer.json` in the repository root to customize review model se
 - `exclude`
   - `files`: Glob patterns to exclude from change diffs.
   - `prLabelsToIgnore`: Skips review if Pull Request label contains target keywords. Matches partial case-insensitive against `RIVER_PR_LABELS` (comma separated) or GitHub Actions `GITHUB_EVENT_PATH`.
+- `security` ([#692](https://github.com/s977043/river-reviewer/issues/692))
+  - `redact.enabled`: `true` (default). Redacts secrets in repo-wide context and prompts before sending to the LLM.
+  - `redact.categories`: Toggle individual categories. Keys:
+    - Keys: `githubToken` / `openaiKey` / `anthropicKey` / `googleApiKey` / `awsAccessKey` / `awsSecretKey` / `privateKey`
+    - Auth: `bearerToken` / `databaseUrl` / `webhookUrl` / `oauthSecret` / `envAssignment`
+    - Fallback: `highEntropy`
+  - `redact.extraPatterns`: Additional regex (`{ id, pattern, replacement? }`) for project-specific key formats.
+  - `redact.allowlist`: Tokens matching these strings are not redacted (useful for protecting test fixtures).
+  - `redact.denyFiles`: Globs added to the path-level deny list (on top of the built-in `.env*` / `*.pem` / `*.key` / `secrets.*`).
+  - `redact.entropyThreshold`: `3.0`–`6.0` (default `4.5`). Threshold for the Shannon-entropy fallback detector.
+  - `redact.entropyMinLength`: Default `24`. Minimum substring length the fallback detector considers.
+- `memory` ([#687](https://github.com/s977043/river-reviewer/issues/687))
+  - `suppressionEnabled`: `true` (default). Applies suppression entries from Riverbed Memory. Set to `false` to bypass the gate (emergency override).
+- `context` ([#689](https://github.com/s977043/river-reviewer/issues/689))
+  - `reviewMode`: `tiny` / `medium` / `large`. When `budget` is omitted, the preset from `src/lib/context-presets.mjs` is applied. An explicit `budget` always wins.
+  - `budget.maxTokens`: `256`–`64000`.
+  - `budget.maxChars`: `1024`–`200000`. Both char and token caps apply simultaneously.
+  - `budget.perSectionCaps`: Per-section char caps for `fullFile` / `tests` / `usages` / `config`.
+  - `ranking.enabled`: `true` to enable proximity-based reordering of context candidates.
+  - `ranking.weights`: Per-signal weights for `pathProximity` / `symbolUsage` / `siblingTest` / `commitRecency`, each in `0.0`–`1.0`. Equal weighting if omitted.
+  - `tokenizer`: Only `heuristic` is accepted (reserved for future expansion).
 
 ### Configuration Example
 

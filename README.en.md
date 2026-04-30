@@ -133,10 +133,12 @@ Latest release: [v0.28.1](https://github.com/s977043/river-reviewer/releases/lat
 1. Environment: Node 22+ recommended (CI runs on Node 22; Unit tests also validate Node 20.x)
 2. Install dependencies: `npm install`
 3. Validate skills: `npm run skills:validate`
-4. Tests: `npm test`
-5. Planner evaluation (optional): `npm run planner:eval`
-6. Repo-wide evaluation (optional): `npm run eval:repo-context` (measures detection / context lift / false positive against the [#688](https://github.com/s977043/river-reviewer/issues/688) repo-wide fixtures)
-7. Docs development (optional): `npm run dev`
+4. Validate Agent Skills (optional): `npm run agent-skills:validate`
+5. Tests: `npm test`
+6. Planner evaluation (optional): `npm run planner:eval`
+7. Review fixtures evaluation (optional): `npm run eval:fixtures` (must_include style)
+8. Repo-wide evaluation (optional): `npm run eval:repo-context` (measures detection / context lift / false positive against the [#688](https://github.com/s977043/river-reviewer/issues/688) repo-wide fixtures)
+9. Docs development (optional): `npm run dev`
 
 ### Major features added in v0.21–v0.28
 
