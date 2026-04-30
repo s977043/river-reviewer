@@ -102,6 +102,37 @@ test('collectRepoContext truncates when token budget is too small for any file',
   }
 });
 
+// --- #689 PR-D: reviewMode preset budgets ---
+
+test('collectRepoContext applies the reviewMode preset when budget is omitted (#689 PR-D)', async () => {
+  const dir = setupRepo();
+  try {
+    const result = await collectRepoContext({
+      changedFiles: ['src/auth/login.ts'],
+      repoRoot: dir,
+      context: { reviewMode: 'medium' },
+    });
+    assert.ok(result.tokenBudget, 'tokenBudget should be populated by the preset');
+    assert.equal(result.tokenBudget.max, 4000); // medium preset
+  } finally {
+    cleanupTempDir(dir);
+  }
+});
+
+test('collectRepoContext: explicit budget overrides reviewMode preset', async () => {
+  const dir = setupRepo();
+  try {
+    const result = await collectRepoContext({
+      changedFiles: ['src/auth/login.ts'],
+      repoRoot: dir,
+      context: { reviewMode: 'tiny', budget: { maxTokens: 12000 } },
+    });
+    assert.equal(result.tokenBudget?.max, 12000);
+  } finally {
+    cleanupTempDir(dir);
+  }
+});
+
 test('ranking is a no-op for a single-file change set', async () => {
   const dir = setupRepo();
   try {
