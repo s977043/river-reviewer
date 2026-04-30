@@ -35920,10 +35920,13 @@ function tokensToChars(maxTokens, _opts = {}) {
 
 // Default weights mirror the proposal in the #689 plan §3. Callers can
 // override per-signal via scoreContextCandidate(..., { weights: ... }).
+// Keys must match the user-facing schema in src/config/schema.mjs
+// (contextRankingSchema.weights) so `signals[k]` and `weights[k]` line
+// up when user config flows through scoreContextCandidate.
 const DEFAULT_WEIGHTS = Object.freeze({
   pathProximity: 0.25,
-  symbolOverlap: 0.2,
-  testAffinity: 0.15,
+  symbolUsage: 0.2,
+  siblingTest: 0.15,
   // Reserved for PR-C; PR-B does not compute these but the combiner
   // accepts them as `signals.<name>` if the caller pre-computed them.
   importGraph: 0.15,
@@ -35964,16 +35967,18 @@ function pathProximity(candidate, changed) {
 }
 
 /**
- * Symbol-overlap signal: fraction of `candidateSymbols` that appear in
- * `referenceSymbols`. Unlike a Jaccard index this is asymmetric — we
- * care whether the candidate's exports are referenced anywhere in the
- * known usage set, not whether the sets agree as a whole.
+ * Symbol-usage signal (a.k.a. asymmetric symbol overlap): fraction of
+ * `candidateSymbols` that appear in `referenceSymbols`. Unlike a Jaccard
+ * index this is asymmetric — we care whether the candidate's exports
+ * are referenced anywhere in the known usage set, not whether the sets
+ * agree as a whole. The name matches contextRankingSchema.weights in
+ * src/config/schema.mjs so user config flows through unchanged.
  *
  * @param {string[]} candidateSymbols
  * @param {string[]} referenceSymbols
  * @returns {number} 0..1
  */
-function symbolOverlap(candidateSymbols, referenceSymbols) {
+function symbolUsage(candidateSymbols, referenceSymbols) {
   if (!Array.isArray(candidateSymbols) || candidateSymbols.length === 0) return 0;
   if (!Array.isArray(referenceSymbols) || referenceSymbols.length === 0) return 0;
   const refSet = new Set(referenceSymbols);
@@ -35985,15 +35990,17 @@ function symbolOverlap(candidateSymbols, referenceSymbols) {
 }
 
 /**
- * Test-affinity signal: did the candidate look like a test file paired
- * with `changed`? Returns 1 when the candidate path matches one of the
- * standard test path heuristics for `changed`, else 0.
+ * Sibling-test signal (a.k.a. test affinity): did the candidate look
+ * like a test file paired with `changed`? Returns 1 when the candidate
+ * path matches one of the standard test path heuristics for `changed`,
+ * else 0. The name matches contextRankingSchema.weights in
+ * src/config/schema.mjs so user config flows through unchanged.
  *
  * @param {string} candidate
  * @param {string} changed
  * @returns {number} 0..1
  */
-function testAffinity(candidate, changed) {
+function siblingTest(candidate, changed) {
   if (typeof candidate !== 'string' || typeof changed !== 'string') return 0;
   if (!candidate || !changed) return 0;
 
