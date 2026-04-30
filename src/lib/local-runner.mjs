@@ -361,6 +361,7 @@ export async function runLocalReview({
   const repoContext = await collectRepoContext({
     changedFiles: context.changedFiles,
     repoRoot: path.resolve(context.repoRoot),
+    security: context.config?.security,
   }).catch(() => null);
 
   const reviewArgs = {
@@ -437,7 +438,21 @@ export async function runLocalReview({
     rawTokenEstimate: context.diff.rawTokenEstimate,
     reduction: context.diff.reduction,
     prompt: review.prompt,
-    reviewDebug: { ...(review.debug ?? {}), suppressionsApplied },
+    reviewDebug: {
+      ...(review.debug ?? {}),
+      suppressionsApplied,
+      // #692 PR-C: surface redaction telemetry without leaking the
+      // pre-redaction text. `redactionHits` is a small {category, count}
+      // tally; raw context never appears here.
+      ...(repoContext?.redactionHits?.length || repoContext?.excludedPaths?.length
+        ? {
+            repoContextSecurity: {
+              redactionHits: repoContext?.redactionHits ?? [],
+              excludedPaths: repoContext?.excludedPaths ?? [],
+            },
+          }
+        : {}),
+    },
     projectRules: context.projectRules,
     availableContexts: context.availableContexts,
     availableDependencies: context.availableDependencies,

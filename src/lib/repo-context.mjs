@@ -9,6 +9,8 @@ import { promisify } from 'node:util';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { redactText, shouldExcludeForContext } from './secret-redactor.mjs';
+
 const execFileAsync = promisify(execFile);
 
 /** Maximum total characters of repo context injected into the prompt. */
@@ -35,7 +37,13 @@ const TEST_SUFFIXES = [
 ];
 
 /** Config files to include a snippet of. */
-const CONFIG_GLOBS = ['tsconfig.json', 'package.json', 'next.config.*', '.eslintrc*', 'vite.config.*'];
+const CONFIG_GLOBS = [
+  'tsconfig.json',
+  'package.json',
+  'next.config.*',
+  '.eslintrc*',
+  'vite.config.*',
+];
 
 /**
  * Collect repo-wide context relevant to the changed files.
@@ -44,21 +52,70 @@ const CONFIG_GLOBS = ['tsconfig.json', 'package.json', 'next.config.*', '.eslint
  * @param {string[]} opts.changedFiles - Relative paths of changed files
  * @param {string} opts.repoRoot - Absolute path to the repository root
  * @param {number} [opts.maxChars] - Total character budget (default 8000)
+ * @param {object} [opts.security] - `config.security` block (#692). When omitted,
+ *   redaction defaults are used and `shouldExcludeForContext` runs against
+ *   `DEFAULT_DENY_GLOBS` only.
  * @returns {Promise<RepoContext>}
  */
-export async function collectRepoContext({ changedFiles, repoRoot, maxChars = DEFAULT_MAX_CHARS }) {
+export async function collectRepoContext({
+  changedFiles,
+  repoRoot,
+  maxChars = DEFAULT_MAX_CHARS,
+  security,
+}) {
   const sections = [];
   let budget = maxChars;
+
+  // #692 PR-C: redaction & path-level deny.
+  // - shouldExcludeForContext runs BEFORE we even read a file so dotenv,
+  //   pem keys, lock files, build artifacts never enter process memory.
+  // - redactText runs AFTER reading so any secret that slipped past the
+  //   path filter (e.g. an inline AWS key in a regular .ts file) is masked
+  //   before being injected into the prompt.
+  // The tally feeds debug output via redactionHits below.
+  const redactCfg = security?.redact;
+  const redactionEnabled = redactCfg?.enabled !== false; // default true
+  const denyExtra = Array.isArray(redactCfg?.denyFiles) ? redactCfg.denyFiles : [];
+  const allowExtra = Array.isArray(redactCfg?.allowlist) ? redactCfg.allowlist : [];
+  const redactOpts = redactionEnabled
+    ? {
+        allowlist: allowExtra,
+        ...(redactCfg?.entropyThreshold != null
+          ? { entropyThreshold: redactCfg.entropyThreshold }
+          : {}),
+        ...(redactCfg?.categories?.highEntropy === false ? { highEntropy: false } : {}),
+      }
+    : null;
+  const totalHits = new Map();
+  const excludedPaths = [];
+  const bumpHits = (hits) => {
+    for (const { category, count } of hits) {
+      totalHits.set(category, (totalHits.get(category) || 0) + count);
+    }
+  };
+  const isPathExcluded = (rel) =>
+    shouldExcludeForContext(rel, { extraDenyGlobs: denyExtra, allowlist: allowExtra });
+  const maybeRedact = (text) => {
+    if (!redactionEnabled || !text) return text;
+    const { text: redacted, hits } = redactText(text, redactOpts);
+    if (hits.length) bumpHits(hits);
+    return redacted;
+  };
 
   // 1. Full text of changed source files
   for (const rel of changedFiles.slice(0, 5)) {
     if (budget <= 0) break;
+    if (isPathExcluded(rel)) {
+      excludedPaths.push({ path: rel, section: 'fullFile' });
+      continue;
+    }
     const abs = path.join(repoRoot, rel);
     if (!isSourceFile(rel) || !fileExists(abs)) continue;
     const raw = readFileCapped(abs, Math.min(SECTION_CAPS.fullFile, budget));
     if (raw) {
-      sections.push({ label: `Full file: ${rel}`, content: raw, file: rel });
-      budget -= raw.length;
+      const content = maybeRedact(raw);
+      sections.push({ label: `Full file: ${rel}`, content, file: rel });
+      budget -= content.length;
     }
   }
 
@@ -68,19 +125,32 @@ export async function collectRepoContext({ changedFiles, repoRoot, maxChars = DE
     if (budget <= 0) break;
     for (const toTest of TEST_SUFFIXES) {
       const candidate = toTest(rel);
+      if (isPathExcluded(candidate)) {
+        excludedPaths.push({ path: candidate, section: 'tests' });
+        break;
+      }
       const abs = path.join(repoRoot, candidate);
       if (fileExists(abs)) {
         const raw = readFileCapped(abs, Math.min(SECTION_CAPS.tests, budget));
         if (raw) {
-          testContents.push(`// ${candidate}\n${raw}`);
-          budget -= raw.length;
+          const content = maybeRedact(raw);
+          // The pushed entry includes a `// candidate\n` header; bill the
+          // entire entry against the budget so the running total stays
+          // accurate when many test files are aggregated.
+          const entry = `// ${candidate}\n${content}`;
+          testContents.push(entry);
+          budget -= entry.length;
         }
         break;
       }
     }
   }
   if (testContents.length) {
-    sections.push({ label: 'Corresponding test files', content: testContents.join('\n\n'), file: null });
+    sections.push({
+      label: 'Corresponding test files',
+      content: testContents.join('\n\n'),
+      file: null,
+    });
   }
 
   // 3. Symbol usage search via ripgrep
@@ -94,8 +164,9 @@ export async function collectRepoContext({ changedFiles, repoRoot, maxChars = DE
         maxChars: Math.min(SECTION_CAPS.usages, budget),
       });
       if (usages) {
-        sections.push({ label: 'Symbol usage references', content: usages, file: null });
-        budget -= usages.length;
+        const content = maybeRedact(usages);
+        sections.push({ label: 'Symbol usage references', content, file: null });
+        budget -= content.length;
       }
     }
   }
@@ -104,10 +175,17 @@ export async function collectRepoContext({ changedFiles, repoRoot, maxChars = DE
   if (budget > 0) {
     const configSnippets = [];
     for (const glob of CONFIG_GLOBS) {
+      if (isPathExcluded(glob)) {
+        excludedPaths.push({ path: glob, section: 'config' });
+        continue;
+      }
       const abs = path.join(repoRoot, glob);
       if (fileExists(abs)) {
-        const snippet = readFileCapped(abs, Math.min(SECTION_CAPS.config, budget - configSnippets.reduce((s, c) => s + c.length, 0)));
-        if (snippet) configSnippets.push(`// ${glob}\n${snippet}`);
+        const snippet = readFileCapped(
+          abs,
+          Math.min(SECTION_CAPS.config, budget - configSnippets.reduce((s, c) => s + c.length, 0))
+        );
+        if (snippet) configSnippets.push(`// ${glob}\n${maybeRedact(snippet)}`);
       }
     }
     if (configSnippets.length) {
@@ -117,10 +195,14 @@ export async function collectRepoContext({ changedFiles, repoRoot, maxChars = DE
     }
   }
 
+  const redactionHits = [...totalHits.entries()].map(([category, count]) => ({ category, count }));
+
   return {
     sections,
     totalChars: maxChars - budget,
     truncated: budget <= 0,
+    redactionHits,
+    excludedPaths,
   };
 }
 
@@ -196,11 +278,15 @@ async function searchSymbolUsages({ symbols, repoRoot, excludeFiles, maxChars })
       [
         '--no-heading',
         '--line-number',
-        '--max-count', '3',
-        '--max-filesize', '200K',
-        '--glob', '*.{ts,tsx,js,jsx,mjs,cjs}',
+        '--max-count',
+        '3',
+        '--max-filesize',
+        '200K',
+        '--glob',
+        '*.{ts,tsx,js,jsx,mjs,cjs}',
         ...excludeArgs,
-        '-e', pattern,
+        '-e',
+        pattern,
         '.',
       ],
       { cwd: repoRoot, timeout: 5000 }
