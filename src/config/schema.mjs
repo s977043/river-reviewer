@@ -126,11 +126,20 @@ export const contextRankingSchema = z
   })
   .strict();
 
+// --- #689 PR-D: reviewMode preset budgets ---
+//
+// reviewMode is a friendly knob that picks a preset budget so users do
+// not have to think in token counts. The runtime preset table lives in
+// src/lib/context-presets.mjs; PR-D applies the preset when budget is
+// omitted, so an explicit `budget: { ... }` always wins.
+export const contextReviewModeSchema = z.enum(['tiny', 'medium', 'large']);
+
 export const contextConfigSchema = z
   .object({
     budget: contextBudgetSchema.optional(),
     ranking: contextRankingSchema.optional(),
     tokenizer: z.enum(['heuristic']).optional(),
+    reviewMode: contextReviewModeSchema.optional(),
   })
   .strict();
 

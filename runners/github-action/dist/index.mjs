@@ -34423,10 +34423,19 @@ const contextRankingSchema = external/* object */.Ikc({
   })
   .strict();
 
+// --- #689 PR-D: reviewMode preset budgets ---
+//
+// reviewMode is a friendly knob that picks a preset budget so users do
+// not have to think in token counts. The runtime preset table lives in
+// src/lib/context-presets.mjs; PR-D applies the preset when budget is
+// omitted, so an explicit `budget: { ... }` always wins.
+const contextReviewModeSchema = external/* enum */.k5n(['tiny', 'medium', 'large']);
+
 const contextConfigSchema = external/* object */.Ikc({
     budget: contextBudgetSchema.optional(),
     ranking: contextRankingSchema.optional(),
     tokenizer: external/* enum */.k5n(['heuristic']).optional(),
+    reviewMode: contextReviewModeSchema.optional(),
   })
   .strict();
 
@@ -35751,7 +35760,7 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
 
 /***/ }),
 
-/***/ 1656:
+/***/ 8601:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -36039,12 +36048,94 @@ function scoreContextCandidate({ signals = {}, weights = DEFAULT_WEIGHTS } = {})
   return Math.max(0, Math.min(1, dot / usedWeight));
 }
 
+;// CONCATENATED MODULE: ./src/lib/context-presets.mjs
+// Context preset budgets for collectRepoContext (#689 PR-D).
+//
+// reviewMode is a friendly knob that picks a preset budget so users do
+// not have to think in token counts. When the user sets
+// config.context.reviewMode but omits config.context.budget, the
+// collector applies the preset below; an explicit `budget: { ... }`
+// always wins.
+//
+// Per-section caps are deliberately conservative so the legacy char
+// budget is also respected automatically (collectRepoContext uses
+// Math.min(SECTION_CAPS, perSectionCap, charBudget, tokenBudget)).
+
+const PRESETS = Object.freeze({
+  // tiny: short prompts, model with a tight context window, or a CI
+  // regression run that wants the absolute minimum context.
+  tiny: Object.freeze({
+    maxTokens: 1024,
+    perSectionCaps: Object.freeze({
+      fullFile: 1500,
+      tests: 1000,
+      usages: 800,
+      config: 300,
+    }),
+  }),
+  // medium: default working budget — good for typical PRs on
+  // gpt-4o-mini / sonnet-class models.
+  medium: Object.freeze({
+    maxTokens: 4000,
+    perSectionCaps: Object.freeze({
+      fullFile: 3000,
+      tests: 2000,
+      usages: 1500,
+      config: 500,
+    }),
+  }),
+  // large: roomy budget for big-model deep dives. Stops shy of the
+  // contextBudgetSchema upper bound (64k) so callers still have head
+  // room for the diff and the system prompt itself.
+  large: Object.freeze({
+    maxTokens: 16000,
+    perSectionCaps: Object.freeze({
+      fullFile: 8000,
+      tests: 4000,
+      usages: 3000,
+      config: 1000,
+    }),
+  }),
+});
+
+/**
+ * Look up the preset for a reviewMode value. Unknown / falsy values
+ * return null so callers fall back to their existing defaults.
+ *
+ * @param {('tiny'|'medium'|'large'|null|undefined)} reviewMode
+ * @returns {{ maxTokens: number, perSectionCaps: object } | null}
+ */
+function presetForReviewMode(reviewMode) {
+  if (!reviewMode) return null;
+  return PRESETS[reviewMode] ?? null;
+}
+
+/**
+ * Resolve the effective budget given a `config.context` payload. The
+ * resolution order is:
+ *   1. explicit `budget` (always wins)
+ *   2. preset matching `reviewMode`
+ *   3. null (collector uses its built-in defaults)
+ *
+ * @param {object} [contextConfig]
+ * @returns {{ maxTokens?: number, maxChars?: number, perSectionCaps?: object } | null}
+ */
+function resolveContextBudget(contextConfig) {
+  if (!contextConfig) return null;
+  if (contextConfig.budget) return contextConfig.budget;
+  return presetForReviewMode(contextConfig.reviewMode);
+}
+
+// Exported for tests.
+const _PRESETS = (/* unused pure expression or super */ null && (PRESETS));
+
 ;// CONCATENATED MODULE: ./src/lib/repo-context.mjs
 /**
  * Repo-wide context collector for River Reviewer.
  * Gathers full file text, corresponding tests, symbol usages, and config
  * snippets relevant to the changed files, within a configurable token budget.
  */
+
 
 
 
@@ -36117,7 +36208,10 @@ async function collectRepoContext({
   // satisfied for a candidate to land. estimateTokens is approximate
   // (ASCII chars/4, CJK chars/2 in #689 PR-A) so callers should treat
   // the result as best-effort, not a hard ceiling.
-  const budgetCfg = contextConfig?.budget;
+  // PR-D (#689): if the user picks a reviewMode without an explicit
+  // budget, resolve the preset; the explicit `budget: { ... }` always
+  // wins. resolveContextBudget returns null when both are absent.
+  const budgetCfg = resolveContextBudget(contextConfig);
   const maxTokensCfg = Number.isFinite(budgetCfg?.maxTokens) ? budgetCfg.maxTokens : null;
   let tokenBudget = maxTokensCfg;
   const billTokens = (text) => {
@@ -36456,7 +36550,7 @@ async function searchSymbolUsages({ symbols, repoRoot, excludeFiles, maxChars })
 /* harmony import */ var _heuristic_review_mjs__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(2294);
 /* harmony import */ var _finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(5942);
 /* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(8069);
-/* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(1656);
+/* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(8601);
 /* harmony import */ var _secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(12);
 
 
@@ -38834,8 +38928,8 @@ function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
   };
 }
 
-// EXTERNAL MODULE: ./src/lib/repo-context.mjs + 2 modules
-var repo_context = __nccwpck_require__(1656);
+// EXTERNAL MODULE: ./src/lib/repo-context.mjs + 3 modules
+var repo_context = __nccwpck_require__(8601);
 // EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
 var skill_loader = __nccwpck_require__(5541);
 ;// CONCATENATED MODULE: ./src/lib/utils.mjs
