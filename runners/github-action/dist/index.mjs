@@ -34387,12 +34387,56 @@ const memoryConfigSchema = external/* object */.Ikc({
   })
   .strict();
 
+// --- #689 PR-A: context.budget config surface ---
+//
+// Companion to src/lib/token-estimator.mjs. PR-A teaches the loader to
+// accept and validate the new keys; pipeline integration (collectRepoContext
+// reading these and adjusting per-section caps) lands in #689 PR-C.
+//
+// Defaults are documented at runtime in repo-context.mjs (DEFAULT_MAX_CHARS,
+// SECTION_CAPS) and preserved when this block is omitted entirely.
+
+const contextBudgetSchema = external/* object */.Ikc({
+    maxTokens: external/* number */.aig().int().min(256).max(64000).optional(),
+    maxChars: external/* number */.aig().int().min(1024).max(200000).optional(),
+    perSectionCaps: external/* object */.Ikc({
+        fullFile: external/* number */.aig().int().min(0).optional(),
+        tests: external/* number */.aig().int().min(0).optional(),
+        usages: external/* number */.aig().int().min(0).optional(),
+        config: external/* number */.aig().int().min(0).optional(),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+
+const contextRankingSchema = external/* object */.Ikc({
+    enabled: external/* boolean */.zMY().optional(),
+    weights: external/* object */.Ikc({
+        pathProximity: external/* number */.aig().min(0).max(1).optional(),
+        symbolUsage: external/* number */.aig().min(0).max(1).optional(),
+        siblingTest: external/* number */.aig().min(0).max(1).optional(),
+        commitRecency: external/* number */.aig().min(0).max(1).optional(),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+
+const contextConfigSchema = external/* object */.Ikc({
+    budget: contextBudgetSchema.optional(),
+    ranking: contextRankingSchema.optional(),
+    tokenizer: external/* enum */.k5n(['heuristic']).optional(),
+  })
+  .strict();
+
 const riverReviewerConfigSchema = external/* object */.Ikc({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
   exclude: excludeConfigSchema.optional(),
   security: securityConfigSchema.optional(),
   memory: memoryConfigSchema.optional(),
+  context: contextConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -34435,6 +34479,7 @@ const ConfigSchema = external/* object */.Ikc({
     exclude: excludeConfigSchema.optional(),
     security: securityConfigSchema.optional(),
     memory: memoryConfigSchema.optional(),
+    context: contextConfigSchema.optional(),
     skills: external/* array */.YOg(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
