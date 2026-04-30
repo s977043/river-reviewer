@@ -43,6 +43,7 @@
     "planner:eval": "node scripts/evaluate-planner.mjs",
     "planner:eval:dataset": "node scripts/evaluate-planner-dataset.mjs",
     "eval:fixtures": "node scripts/evaluate-review-fixtures.mjs",
+    "eval:repo-context": "node scripts/evaluate-repo-wide-fixtures.mjs",
     "meta:validate": "node scripts/validate-meta-consistency.mjs",
     "eval:all": "node scripts/evaluate-all.mjs",
     "check:bilingual": "node scripts/check-bilingual-pairs.mjs",
