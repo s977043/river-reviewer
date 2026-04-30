@@ -1,0 +1,14 @@
+diff --git a/src/components/UserProfile.tsx b/src/components/UserProfile.tsx
+index 1111111..2222222 100644
+--- a/src/components/UserProfile.tsx
++++ b/src/components/UserProfile.tsx
+@@ -1,8 +1,7 @@
+ import { useTranslation } from 'react-i18next';
+
+ export function UserProfile() {
+   const { t } = useTranslation();
+-  const bio = t('user.deprecated_bio_label');
+   const name = t('user.name');
+-  return <div>{name}: {bio}</div>;
++  return <div>{name}</div>;
+ }
