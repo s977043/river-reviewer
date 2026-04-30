@@ -32,6 +32,41 @@ const plan = {
   skipped: [],
 };
 
+// --- #692 PR-D: defense-in-depth redaction at the artifact boundary ---
+//
+// Even after PR-C redacts repo context before it reaches the prompt, secrets
+// could still slip in through other channels (project rules with a pasted
+// token, additional instructions, etc.). PR-D defends the artifact boundary
+// by redacting both `debug.promptPreview` and the returned `prompt` so any
+// such leak is masked before leaving process memory. The LLM call itself is
+// unaffected — it still sees the original prompt as it must.
+
+test('generateReview redacts secrets in debug.promptPreview and returned prompt (#692 PR-D)', async () => {
+  // Build a token at runtime so GitHub Push Protection does not flag this
+  // file (same trick as tests/secret-redactor.test.mjs).
+  const ghpat =
+    'ghp_' + ['kZpL3xQ8mNvW', '5tJfRy2HcBd9', 'eAuQs7TgwY1i', 'OzMrPqXdLcVy'].join('').slice(0, 36);
+  const result = await generateReview({
+    diff,
+    plan,
+    phase: 'midstream',
+    dryRun: true,
+    includeFallback: false,
+    // Inject a leaked token through `additionalInstructions`. After PR-D
+    // both promptPreview and the returned prompt must mask it.
+    config: {
+      review: {
+        additionalInstructions: ['Do not leak the token: ' + ghpat],
+      },
+    },
+  });
+
+  assert.match(result.debug.promptPreview, /<REDACTED:githubToken>/);
+  assert.equal(/ghp_[A-Za-z0-9]{36,}/.test(result.debug.promptPreview), false);
+  assert.match(result.prompt, /<REDACTED:githubToken>/);
+  assert.equal(/ghp_[A-Za-z0-9]{36,}/.test(result.prompt), false);
+});
+
 test('generateReview runs heuristics when LLM is skipped', async () => {
   // スキルが選択されている場合、ヒューリスティックが実行される。
   // ヒューリスティックが何も検出しなかった場合、コメントは0件となる（正常な動作）。
@@ -93,8 +128,16 @@ test('generateReview: verifier stats exist in debug output', async () => {
 
 test('buildPrompt includes ADR context section when relatedADRs provided', () => {
   const relatedADRs = [
-    { title: 'ADR-001 Eval Loop', path: 'docs/adr/001-eval.md', matchReason: 'keyword: evaluation' },
-    { title: 'ADR-002 Scoring', path: 'docs/adr/002-scoring.md', matchReason: 'references: src/app.ts' },
+    {
+      title: 'ADR-001 Eval Loop',
+      path: 'docs/adr/001-eval.md',
+      matchReason: 'keyword: evaluation',
+    },
+    {
+      title: 'ADR-002 Scoring',
+      path: 'docs/adr/002-scoring.md',
+      matchReason: 'references: src/app.ts',
+    },
   ];
   const { prompt } = buildPrompt({
     diffText,

@@ -46,6 +46,9 @@ Commands:
   skills list           List all skills (RR and Agent Skills)
   doctor <path>         Check setup and print hints for common issues
   eval                  Run review fixtures evaluation (must_include checks)
+  suppression add       Create a Riverbed Memory suppression entry
+                        (--fingerprint --feedback --rationale [--scope]
+                         [--severity] [--files] [--expires] [--pr])
 
 Skills Subcommand Options:
   --from <path>         (import) Source directory to scan for SKILL.md files
@@ -104,6 +107,17 @@ function parseArgs(argv) {
     runsSubcommand: null,
     runsId1: null,
     runsId2: null,
+    // suppression subcommand fields (#687 PR-D)
+    suppressionSubcommand: null,
+    suppressionFingerprint: null,
+    suppressionFindingId: null,
+    suppressionFeedbackType: null,
+    suppressionScope: 'file',
+    suppressionRationale: null,
+    suppressionSeverity: null,
+    suppressionFiles: null,
+    suppressionExpiresAt: null,
+    suppressionPrNumber: null,
     // skills subcommand fields
     skillsSubcommand: null,
     fromPath: null,
@@ -117,7 +131,11 @@ function parseArgs(argv) {
     const arg = args.shift();
     if (
       !parsed.command &&
-      (arg === 'run' || arg === 'doctor' || arg === 'skills' || arg === 'runs')
+      (arg === 'run' ||
+        arg === 'doctor' ||
+        arg === 'skills' ||
+        arg === 'runs' ||
+        arg === 'suppression')
     ) {
       parsed.command = arg;
       // Check for skills subcommands (import/export/list)
@@ -130,10 +148,51 @@ function parseArgs(argv) {
           parsed.runsId1 = args.shift() ?? null;
           parsed.runsId2 = args.shift() ?? null;
         }
-      } else if (arg !== 'runs' && args[0] && !args[0].startsWith('-')) {
+      } else if (arg === 'suppression' && args[0] && !args[0].startsWith('-')) {
+        parsed.suppressionSubcommand = args.shift(); // add (only one for now)
+      } else if (arg !== 'runs' && arg !== 'suppression' && args[0] && !args[0].startsWith('-')) {
         parsed.target = args.shift();
       }
       continue;
+    }
+    if (parsed.command === 'suppression') {
+      if (arg === '--fingerprint') {
+        parsed.suppressionFingerprint = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--finding') {
+        parsed.suppressionFindingId = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--feedback') {
+        parsed.suppressionFeedbackType = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--scope') {
+        parsed.suppressionScope = args.shift() ?? 'file';
+        continue;
+      }
+      if (arg === '--rationale') {
+        parsed.suppressionRationale = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--severity') {
+        parsed.suppressionSeverity = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--files') {
+        parsed.suppressionFiles = parseList(args.shift() ?? '');
+        continue;
+      }
+      if (arg === '--expires') {
+        parsed.suppressionExpiresAt = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--pr') {
+        const v = parseInt(args.shift() ?? '', 10);
+        if (!Number.isNaN(v) && v > 0) parsed.suppressionPrNumber = v;
+        continue;
+      }
     }
     if (!parsed.command && arg === 'eval') {
       parsed.command = 'eval';
@@ -685,7 +744,7 @@ async function main(argv = process.argv.slice(2)) {
     printHelp();
     return 0;
   }
-  if (!['run', 'doctor', 'eval', 'skills'].includes(parsed.command)) {
+  if (!['run', 'doctor', 'eval', 'skills', 'runs', 'suppression'].includes(parsed.command)) {
     console.error(`Unknown command: ${parsed.command}`);
     printHelp();
     return 1;
@@ -733,6 +792,71 @@ async function main(argv = process.argv.slice(2)) {
       } else {
         console.log(JSON.stringify(results, null, 2));
       }
+      return 0;
+    }
+
+    if (parsed.command === 'suppression') {
+      if (parsed.suppressionSubcommand !== 'add') {
+        console.error(
+          'Error: only `river suppression add` is supported (need: --fingerprint --feedback --rationale).'
+        );
+        return 1;
+      }
+      if (!parsed.suppressionFingerprint) {
+        console.error('Error: --fingerprint <16-hex> is required.');
+        return 1;
+      }
+      if (!/^[0-9a-f]{16}$/.test(parsed.suppressionFingerprint)) {
+        console.error('Error: --fingerprint must be exactly 16 lowercase hex chars.');
+        return 1;
+      }
+      if (!parsed.suppressionFeedbackType) {
+        console.error(
+          'Error: --feedback <false_positive|accepted_risk|wont_fix|not_relevant|duplicate> is required.'
+        );
+        return 1;
+      }
+      const validFeedback = new Set([
+        'false_positive',
+        'accepted_risk',
+        'wont_fix',
+        'not_relevant',
+        'duplicate',
+      ]);
+      if (!validFeedback.has(parsed.suppressionFeedbackType)) {
+        console.error('Error: --feedback must be one of: ' + [...validFeedback].join(', ') + '.');
+        return 1;
+      }
+      if (!parsed.suppressionRationale) {
+        console.error('Error: --rationale "<why this finding is being suppressed>" is required.');
+        return 1;
+      }
+      const validScope = new Set(['global', 'subsystem', 'file']);
+      if (!validScope.has(parsed.suppressionScope)) {
+        console.error('Error: --scope must be one of: global, subsystem, file.');
+        return 1;
+      }
+      const repoRoot = await ensureGitRepo(targetPath);
+      const indexPath = path.resolve(repoRoot, '.river', 'memory', 'index.json');
+      const { createSuppression } = await import('./lib/suppression.mjs');
+      const entry = createSuppression({
+        indexPath,
+        findingId: parsed.suppressionFindingId,
+        fingerprint: parsed.suppressionFingerprint,
+        feedbackType: parsed.suppressionFeedbackType,
+        scope: parsed.suppressionScope,
+        rationale: parsed.suppressionRationale,
+        severity: parsed.suppressionSeverity,
+        filePaths: parsed.suppressionFiles,
+        expiresAt: parsed.suppressionExpiresAt,
+        prNumber: parsed.suppressionPrNumber,
+      });
+      console.log('Suppression created: ' + entry.id);
+      console.log('  fingerprint: ' + entry.context.fingerprint);
+      console.log('  feedbackType: ' + entry.context.feedbackType);
+      console.log('  scope: ' + entry.context.scope);
+      if (entry.context.severity) console.log('  severity: ' + entry.context.severity);
+      console.log('  written to: ' + indexPath);
       return 0;
     }
 

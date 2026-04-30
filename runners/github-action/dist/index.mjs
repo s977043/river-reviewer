@@ -34376,11 +34376,23 @@ const securityConfigSchema = external/* object */.Ikc({
   })
   .strict();
 
+// --- #687 PR-D: memory.suppressionEnabled ---
+//
+// Companion to applySuppressions in src/lib/suppression-apply.mjs. When
+// `false`, the suppression gate is bypassed entirely (debugging /
+// emergency disable). Defaults to true at runtime; the schema only needs
+// to know the field exists.
+const memoryConfigSchema = external/* object */.Ikc({
+    suppressionEnabled: external/* boolean */.zMY().optional(),
+  })
+  .strict();
+
 const riverReviewerConfigSchema = external/* object */.Ikc({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
   exclude: excludeConfigSchema.optional(),
   security: securityConfigSchema.optional(),
+  memory: memoryConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -34422,6 +34434,7 @@ const ConfigSchema = external/* object */.Ikc({
     review: reviewConfigSchema.optional(),
     exclude: excludeConfigSchema.optional(),
     security: securityConfigSchema.optional(),
+    memory: memoryConfigSchema.optional(),
     skills: external/* array */.YOg(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
@@ -35693,308 +35706,18 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
 
 /***/ }),
 
-/***/ 7685:
+/***/ 9865:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  l: () => (/* binding */ buildRepoContextSection),
-  o: () => (/* binding */ collectRepoContext)
-});
-
-// EXTERNAL MODULE: external "node:child_process"
-var external_node_child_process_ = __nccwpck_require__(1421);
-// EXTERNAL MODULE: external "node:util"
-var external_node_util_ = __nccwpck_require__(7975);
-// EXTERNAL MODULE: external "node:fs"
-var external_node_fs_ = __nccwpck_require__(3024);
-// EXTERNAL MODULE: external "node:path"
-var external_node_path_ = __nccwpck_require__(6760);
-// EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
-var esm = __nccwpck_require__(9519);
-;// CONCATENATED MODULE: ./src/lib/secret-redactor.mjs
-// Secret redaction for repo-wide review context (#692 PR-A).
-//
-// This module is **additive** and not yet wired into the review pipeline.
-// PR-C of #692 will hook it into src/lib/repo-context.mjs and
-// src/lib/local-runner.mjs so that prompt input and debug artifacts are
-// redacted before they leave process memory.
-//
-// Design notes (see Issue #692 plan):
-// - Replacements are *length-independent* (`<REDACTED:category>`) so that
-//   suppression fingerprints stay stable when redaction is toggled on/off
-//   (interaction with #687 PR-B applySuppressions).
-// - High-entropy detection is opt-in by config and runs LAST so that named
-//   categories take priority and avoid double-counting.
-// - Allowlist substrings (example, dummy, placeholder, missing, xxxxx)
-//   suppress redaction on the surrounding token to protect documentation
-//   examples and obvious test fixtures from being mangled.
-// - DEFAULT_DENY_GLOBS is exported separately so that path-level exclusion
-//   can run BEFORE redaction (avoids reading .env / *.pem files at all).
-
-
-
-/**
- * Path globs that must be excluded from repo-wide context regardless of
- * user config. Lock files and build artifacts are also denied because they
- * carry no review value but inflate the budget.
- */
-const DEFAULT_DENY_GLOBS = Object.freeze([
-  '**/.env',
-  '**/.env.*',
-  '**/.envrc',
-  '**/secrets.*',
-  '**/credentials.*',
-  '**/credentials/**',
-  '**/*.pem',
-  '**/*.key',
-  '**/*.p12',
-  '**/*.pfx',
-  '**/*.jks',
-  '**/*.keystore',
-  '**/id_rsa',
-  '**/id_dsa',
-  '**/id_ecdsa',
-  '**/id_ed25519',
-  '**/*.lock',
-  '**/package-lock.json',
-  '**/pnpm-lock.yaml',
-  '**/yarn.lock',
-  '**/composer.lock',
-  '**/Cargo.lock',
-  '**/poetry.lock',
-  '**/Gemfile.lock',
-  '**/dist/**',
-  '**/build/**',
-  '**/out/**',
-  '**/.next/**',
-  '**/coverage/**',
-  '**/*.min.js',
-  '**/*.min.css',
-  '**/*.map',
-]);
-
-/**
- * Substrings that, when found near a candidate match, mark the match as a
- * documentation example or test placeholder rather than a real secret.
- *
- * `xxxxx` was rejected as too aggressive: legitimate hex / base64 tokens
- * frequently contain runs of repeated characters and would be incorrectly
- * skipped. The high-entropy fallback already protects monotonic strings
- * (entropy below threshold) so the placeholder list is intentionally short.
- */
-const ALLOWLIST_TOKENS = Object.freeze(['example', 'dummy', 'placeholder', '<missing>']);
-
-const ALLOWLIST_RE = new RegExp(
-  ALLOWLIST_TOKENS.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
-  'i'
-);
-
-const REPLACEMENT = (category) => `<REDACTED:${category}>`;
-
-/**
- * Pattern categories. Order matters — more specific / longer alternatives
- * come first so they win over weaker patterns and don't get partly eaten by
- * the high-entropy fallback.
- *
- * Each entry: { id, regex, replacement?, requireValueShape? }.
- */
-const PATTERNS = [
-  // GitHub
-  { id: 'githubToken', regex: /\b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}\b/g },
-  { id: 'githubToken', regex: /\bgithub_pat_[A-Za-z0-9_]{82}\b/g },
-  // OpenAI / Anthropic / Google
-  { id: 'openaiKey', regex: /\bsk-proj-[A-Za-z0-9_-]{40,}\b/g },
-  { id: 'anthropicKey', regex: /\bsk-ant-[A-Za-z0-9_-]{40,}\b/g },
-  { id: 'openaiKey', regex: /\bsk-[A-Za-z0-9]{20,}\b/g },
-  { id: 'googleApiKey', regex: /\bAIza[0-9A-Za-z_-]{35}\b/g },
-  // AWS
-  { id: 'awsAccessKey', regex: /\b(AKIA|ASIA)[0-9A-Z]{16}\b/g },
-  // Long-form private keys (multi-line block)
-  {
-    id: 'privateKey',
-    regex:
-      /-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP |)PRIVATE KEY-----[\s\S]*?-----END[^-]*PRIVATE KEY-----/g,
-  },
-  // Bearer tokens — capture the surrounding "Bearer " keyword to limit FP
-  { id: 'bearerToken', regex: /\b[Bb]earer\s+[A-Za-z0-9._~+/=-]{20,}\b/g },
-  // Database connection strings
-  {
-    id: 'databaseUrl',
-    regex: /\b(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?|redis|amqp|mssql):\/\/[^\s'"`<>]+/g,
-  },
-  // Webhook URLs (Slack / Discord)
-  { id: 'webhookUrl', regex: /https:\/\/hooks\.slack\.com\/[A-Z0-9/]+/g },
-  {
-    id: 'webhookUrl',
-    regex: /https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+/g,
-  },
-];
-
-/**
- * Patterns that are case-insensitive *value-shape* patterns and require an
- * explicit assignment context (key=value). These run after the explicit
- * patterns above so a literal `aws_secret_access_key=...` does not get
- * partially consumed.
- */
-const ASSIGNMENT_PATTERNS = [
-  // aws_secret_access_key = "..."
-  {
-    id: 'awsSecretKey',
-    regex: /\baws[_-]?secret[_-]?access[_-]?key\s*[:=]\s*['"]?[A-Za-z0-9/+=]{40}['"]?/gi,
-  },
-  // client_secret = "...", consumer_secret = "..."
-  {
-    id: 'oauthSecret',
-    regex: /\b(?:client|consumer)[_-]?secret\s*[:=]\s*['"][^'"]{16,}['"]/gi,
-  },
-];
-
-/**
- * Variable-name based assignment redaction. Only redacts values when the
- * name itself implies a secret, so plain dotenv lines like `PORT=3000` or
- * `LOG_LEVEL=info` are left alone.
- */
-// Two-step approach so the regex can capture short and unprefixed names
-// (`TOKEN=`, `MY_TOKEN=`, `export TOKEN=`) without exploding the alternation.
-// The captured name is then sanity-checked with SENSITIVE_NAME_RE before
-// the value is masked, which keeps `PORT=3000` and `LOG_LEVEL=info`
-// untouched.
-const ENV_VAR_RE = /^[ \t]*(?:export[ \t]+)?([A-Z][A-Z0-9_]*)\s*=\s*(.+)$/gm;
-const SENSITIVE_NAME_RE =
-  /(?:^|_)(?:TOKEN|SECRET|KEY|PASSWORD|PASSWD|CREDENTIAL|CREDENTIALS|API_KEY|ACCESS_KEY|PRIVATE_KEY)$/;
-
-const MIN_HIGH_ENTROPY_LENGTH = 24;
-const DEFAULT_HIGH_ENTROPY_THRESHOLD = 4.5;
-const HIGH_ENTROPY_TOKEN_RE = /[A-Za-z0-9+/=_-]{24,}/g;
-
-/**
- * Shannon entropy in bits per character. Higher = more random.
- * @param {string} s
- */
-function shannonEntropy(s) {
-  if (!s) return 0;
-  const counts = new Map();
-  for (const ch of s) counts.set(ch, (counts.get(ch) || 0) + 1);
-  const len = s.length;
-  let h = 0;
-  for (const c of counts.values()) {
-    const p = c / len;
-    h -= p * Math.log2(p);
-  }
-  return h;
-}
-
-function isAllowlisted(snippet) {
-  return ALLOWLIST_RE.test(snippet);
-}
-
-/**
- * Redact secrets in a text string.
- *
- * @param {string} text
- * @param {object} [opts]
- * @param {boolean} [opts.highEntropy] enable Shannon-entropy fallback (default true)
- * @param {number} [opts.entropyThreshold] entropy bits/char threshold (default 4.5)
- * @param {string[]} [opts.allowlist] additional substrings that suppress redaction
- * @returns {{ text: string, hits: Array<{ category: string, count: number }> }}
- */
-function redactText(text, opts = {}) {
-  if (text == null || text === '') return { text: text ?? '', hits: [] };
-  const {
-    highEntropy = true,
-    entropyThreshold = DEFAULT_HIGH_ENTROPY_THRESHOLD,
-    allowlist = [],
-  } = opts;
-  const extraAllow = allowlist.length
-    ? new RegExp(allowlist.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i')
-    : null;
-
-  const hits = new Map();
-  const bump = (category, n = 1) => hits.set(category, (hits.get(category) || 0) + n);
-  const skipMatch = (full) => isAllowlisted(full) || (extraAllow ? extraAllow.test(full) : false);
-
-  let out = String(text);
-
-  for (const { id, regex } of PATTERNS) {
-    out = out.replace(regex, (m) => {
-      if (skipMatch(m)) return m;
-      bump(id);
-      return REPLACEMENT(id);
-    });
-  }
-
-  for (const { id, regex } of ASSIGNMENT_PATTERNS) {
-    out = out.replace(regex, (m) => {
-      if (skipMatch(m)) return m;
-      bump(id);
-      return REPLACEMENT(id);
-    });
-  }
-
-  out = out.replace(ENV_VAR_RE, (full, name, value) => {
-    if (skipMatch(full)) return full;
-    if (!SENSITIVE_NAME_RE.test(name)) return full;
-    if (!value || value.trim().length < 8) return full;
-    bump('envAssignment');
-    // Reconstruct so we keep the (optional) `export ` prefix and the exact
-    // whitespace around `=`. Slicing `full` up to the start of `value` is
-    // safer than rebuilding the line by hand.
-    const valueStart = full.length - value.length;
-    return full.slice(0, valueStart) + REPLACEMENT('envAssignment');
-  });
-
-  if (highEntropy) {
-    out = out.replace(HIGH_ENTROPY_TOKEN_RE, (m) => {
-      if (m.length < MIN_HIGH_ENTROPY_LENGTH) return m;
-      if (skipMatch(m)) return m;
-      // Skip tokens that are still mid-replacement (we already redacted nearby).
-      if (m.includes('REDACTED')) return m;
-      const h = shannonEntropy(m);
-      if (h < entropyThreshold) return m;
-      bump('highEntropy');
-      return REPLACEMENT('highEntropy');
-    });
-  }
-
-  return {
-    text: out,
-    hits: [...hits.entries()].map(([category, count]) => ({ category, count })),
-  };
-}
-
-/**
- * True when `relPath` should be excluded from repo-wide context.
- * Combines the built-in deny list with caller-supplied additions, then
- * applies an allowlist of explicit "force-include" globs.
- *
- * @param {string} relPath
- * @param {object} [opts]
- * @param {string[]} [opts.extraDenyGlobs]
- * @param {string[]} [opts.allowlist] globs that override deny matches
- * @returns {boolean}
- */
-function shouldExcludeForContext(relPath, opts = {}) {
-  if (!relPath) return false;
-  const { extraDenyGlobs = [], allowlist = [] } = opts;
-  const deny = [...DEFAULT_DENY_GLOBS, ...extraDenyGlobs];
-
-  // nocase: case-insensitive so `.ENV`, `Package-Lock.json`, `ID_RSA` etc.
-  // are still excluded on case-preserving filesystems.
-  const matchOpts = { dot: true, nocase: true, matchBase: false };
-  // Allowlist beats deny so users can opt back into specific paths if they
-  // truly need them (e.g., a sample .env they want reviewed).
-  for (const g of allowlist) {
-    if ((0,esm/* minimatch */.xF)(relPath, g, matchOpts)) return false;
-  }
-  for (const g of deny) {
-    if ((0,esm/* minimatch */.xF)(relPath, g, matchOpts)) return true;
-  }
-  return false;
-}
-
-;// CONCATENATED MODULE: ./src/lib/repo-context.mjs
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   l: () => (/* binding */ buildRepoContextSection),
+/* harmony export */   o: () => (/* binding */ collectRepoContext)
+/* harmony export */ });
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1421);
+/* harmony import */ var node_util__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7975);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(3024);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6760);
+/* harmony import */ var _secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(12);
 /**
  * Repo-wide context collector for River Reviewer.
  * Gathers full file text, corresponding tests, symbol usages, and config
@@ -36008,7 +35731,7 @@ function shouldExcludeForContext(relPath, opts = {}) {
 
 
 
-const execFileAsync = (0,external_node_util_.promisify)(external_node_child_process_.execFile);
+const execFileAsync = (0,node_util__WEBPACK_IMPORTED_MODULE_1__.promisify)(node_child_process__WEBPACK_IMPORTED_MODULE_0__.execFile);
 
 /** Maximum total characters of repo context injected into the prompt. */
 const DEFAULT_MAX_CHARS = 8000;
@@ -36027,9 +35750,9 @@ const TEST_SUFFIXES = [
   (f) => f.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.spec.$1'),
   (f) => f.replace(/src\//, 'tests/').replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.test.$1'),
   (f) => {
-    const base = external_node_path_.basename(f);
-    const dir = external_node_path_.dirname(f);
-    return external_node_path_.join(dir, '__tests__', base.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.test.$1'));
+    const base = node_path__WEBPACK_IMPORTED_MODULE_3__.basename(f);
+    const dir = node_path__WEBPACK_IMPORTED_MODULE_3__.dirname(f);
+    return node_path__WEBPACK_IMPORTED_MODULE_3__.join(dir, '__tests__', base.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '.test.$1'));
   },
 ];
 
@@ -36091,10 +35814,10 @@ async function collectRepoContext({
     }
   };
   const isPathExcluded = (rel) =>
-    shouldExcludeForContext(rel, { extraDenyGlobs: denyExtra, allowlist: allowExtra });
+    (0,_secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_4__/* .shouldExcludeForContext */ .g)(rel, { extraDenyGlobs: denyExtra, allowlist: allowExtra });
   const maybeRedact = (text) => {
     if (!redactionEnabled || !text) return text;
-    const { text: redacted, hits } = redactText(text, redactOpts);
+    const { text: redacted, hits } = (0,_secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_4__/* .redactText */ .Rd)(text, redactOpts);
     if (hits.length) bumpHits(hits);
     return redacted;
   };
@@ -36106,7 +35829,7 @@ async function collectRepoContext({
       excludedPaths.push({ path: rel, section: 'fullFile' });
       continue;
     }
-    const abs = external_node_path_.join(repoRoot, rel);
+    const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, rel);
     if (!isSourceFile(rel) || !fileExists(abs)) continue;
     const raw = readFileCapped(abs, Math.min(SECTION_CAPS.fullFile, budget));
     if (raw) {
@@ -36126,7 +35849,7 @@ async function collectRepoContext({
         excludedPaths.push({ path: candidate, section: 'tests' });
         break;
       }
-      const abs = external_node_path_.join(repoRoot, candidate);
+      const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, candidate);
       if (fileExists(abs)) {
         const raw = readFileCapped(abs, Math.min(SECTION_CAPS.tests, budget));
         if (raw) {
@@ -36176,7 +35899,7 @@ async function collectRepoContext({
         excludedPaths.push({ path: glob, section: 'config' });
         continue;
       }
-      const abs = external_node_path_.join(repoRoot, glob);
+      const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, glob);
       if (fileExists(abs)) {
         const snippet = readFileCapped(
           abs,
@@ -36231,7 +35954,7 @@ function isSourceFile(rel) {
 
 function fileExists(abs) {
   try {
-    return external_node_fs_.statSync(abs).isFile();
+    return node_fs__WEBPACK_IMPORTED_MODULE_2__.statSync(abs).isFile();
   } catch {
     return false;
   }
@@ -36239,7 +35962,7 @@ function fileExists(abs) {
 
 function readFileCapped(abs, cap) {
   try {
-    const raw = external_node_fs_.readFileSync(abs, 'utf8');
+    const raw = node_fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync(abs, 'utf8');
     if (!raw.trim()) return null;
     return raw.length > cap ? raw.slice(0, cap) + '\n// ...[truncated]' : raw;
   } catch {
@@ -36251,10 +35974,10 @@ function extractExportedSymbols({ changedFiles, repoRoot }) {
   const symbols = [];
   const exportRe = /^export\s+(?:(?:async\s+)?function|class|const|let|var)\s+(\w+)/gm;
   for (const rel of changedFiles.slice(0, 5)) {
-    const abs = external_node_path_.join(repoRoot, rel);
+    const abs = node_path__WEBPACK_IMPORTED_MODULE_3__.join(repoRoot, rel);
     if (!isSourceFile(rel) || !fileExists(abs)) continue;
     try {
-      const text = external_node_fs_.readFileSync(abs, 'utf8');
+      const text = node_fs__WEBPACK_IMPORTED_MODULE_2__.readFileSync(abs, 'utf8');
       for (const m of text.matchAll(exportRe)) {
         if (m[1] && !symbols.includes(m[1])) symbols.push(m[1]);
       }
@@ -36313,14 +36036,16 @@ async function searchSymbolUsages({ symbols, repoRoot, excludeFiles, maxChars })
 /* harmony export */ });
 /* unused harmony exports buildPrompt, parseLineComments */
 /* harmony import */ var _config_loader_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(3833);
-/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(9946);
+/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_9__ = __nccwpck_require__(9946);
 /* harmony import */ var _finding_classifier_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7440);
 /* harmony import */ var _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(4807);
 /* harmony import */ var _runners_core_review_runner_mjs__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(4584);
 /* harmony import */ var _heuristic_review_mjs__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(2294);
 /* harmony import */ var _finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(5942);
-/* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(8069);
-/* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(7685);
+/* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(8069);
+/* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(9865);
+/* harmony import */ var _secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(12);
+
 
 
 
@@ -36474,7 +36199,7 @@ function buildPrompt({
   const severity = reviewConfig.severity ?? _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s.review.severity;
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
-  const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_7__/* .getReviewDepthConfig */ .i)(reviewMode ?? 'medium');
+  const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_8__/* .getReviewDepthConfig */ .i)(reviewMode ?? 'medium');
   const prompt = `You are River Reviewer, an AI code review agent.
 Phase: ${phase}
 
@@ -36800,10 +36525,28 @@ async function generateReview({
   const openAIConfig = resolveOpenAIConfig({ model, apiKey }, effectiveConfig);
   const language = promptInfo.language ?? effectiveConfig.review.language;
 
+  // #692 PR-D: defense-in-depth redaction at the artifact boundary.
+  // PR-C already redacts repo context before it reaches the prompt, but
+  // any other path (project rules with a pasted token, additional
+  // instructions, etc.) could still slip a secret in. Build a single
+  // redacted view of the prompt and use it everywhere the prompt would
+  // otherwise leave process memory (debug.promptPreview, returned
+  // `prompt`, downstream artifact writes). The LLM call still uses the
+  // original `promptInfo.prompt` because it must.
+  const safePrompt = (0,_secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_7__/* .redactText */ .Rd)(promptInfo.prompt, {
+    allowlist: effectiveConfig.security?.redact?.allowlist ?? [],
+    ...(effectiveConfig.security?.redact?.entropyThreshold != null
+      ? { entropyThreshold: effectiveConfig.security.redact.entropyThreshold }
+      : {}),
+    ...(effectiveConfig.security?.redact?.categories?.highEntropy === false
+      ? { highEntropy: false }
+      : {}),
+  }).text;
+
   let comments = [];
   const debug = {
     promptTruncated: promptInfo.truncated,
-    promptPreview: promptInfo.prompt.slice(0, MAX_PROMPT_PREVIEW_CHARS),
+    promptPreview: safePrompt.slice(0, MAX_PROMPT_PREVIEW_CHARS),
     llmModel: openAIConfig.model,
     llmProvider: openAIConfig.provider,
     reviewLanguage: language,
@@ -36953,8 +36696,8 @@ async function generateReview({
   });
 
   findings.sort((a, b) => {
-    const bA = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_8__/* .computeFindingBreakdown */ ._)(a);
-    const bB = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_8__/* .computeFindingBreakdown */ ._)(b);
+    const bA = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_9__/* .computeFindingBreakdown */ ._)(a);
+    const bB = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_9__/* .computeFindingBreakdown */ ._)(b);
     return bB.composite - bA.composite;
   });
 
@@ -36964,7 +36707,11 @@ async function generateReview({
     comments,
     findings,
     classified,
-    prompt: promptInfo.prompt,
+    // The returned prompt flows into local-runner result, artifacts, and
+    // dashboards. Use the redacted view so a leaked secret never leaves
+    // process memory through these paths. The LLM call above used the
+    // original promptInfo.prompt and is unaffected.
+    prompt: safePrompt,
     promptTruncated: promptInfo.truncated,
     llmModel: openAIConfig.model,
     debug,
@@ -37204,6 +36951,140 @@ function aggregateRiskLevel(fileRisks, fallback = 'comment_only') {
     }
   }
   return maxAction;
+}
+
+
+/***/ }),
+
+/***/ 4216:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   D4: () => (/* binding */ appendEntry),
+/* harmony export */   ab: () => (/* binding */ loadMemory),
+/* harmony export */   qU: () => (/* binding */ queryMemory)
+/* harmony export */ });
+/* unused harmony exports supersede, expireEntries */
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(3024);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(6760);
+
+
+
+/**
+ * Load the Riverbed Memory index from disk.
+ * Returns empty structure if file doesn't exist (stateless fallback).
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @returns {{ entries: object[], version: string }}
+ */
+function loadMemory(indexPath) {
+  try {
+    const raw = node_fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync(indexPath, 'utf-8');
+    return JSON.parse(raw);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      return { entries: [], version: '1' };
+    }
+    throw err;
+  }
+}
+
+/**
+ * Append a memory entry to the index.
+ * Creates the directory and file if they don't exist.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @param {object} entry - Entry conforming to riverbed-entry.schema.json
+ */
+function appendEntry(indexPath, entry) {
+  const index = loadMemory(indexPath);
+
+  // Validate required fields
+  if (!entry.id || !entry.type || !entry.content || !entry.metadata) {
+    throw new Error('Entry must have id, type, content, and metadata fields');
+  }
+
+  // Prevent duplicate IDs
+  if (index.entries.some((e) => e.id === entry.id)) {
+    throw new Error(`Duplicate entry ID: ${entry.id}`);
+  }
+
+  index.entries.push(entry);
+
+  const dir = node_path__WEBPACK_IMPORTED_MODULE_1__.dirname(indexPath);
+  if (!node_fs__WEBPACK_IMPORTED_MODULE_0__.existsSync(dir)) {
+    node_fs__WEBPACK_IMPORTED_MODULE_0__.mkdirSync(dir, { recursive: true });
+  }
+  node_fs__WEBPACK_IMPORTED_MODULE_0__.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+}
+
+/**
+ * Query memory entries by filter criteria.
+ * All filter fields are optional; entries must match ALL provided criteria.
+ * By default, only active entries are returned.
+ *
+ * @param {{ entries: object[] }} index - Loaded memory index
+ * @param {{ type?: string, tags?: string[], phase?: string, includeInactive?: boolean }} filter
+ * @returns {object[]}
+ */
+function queryMemory(index, { type, tags, phase, includeInactive = false } = {}) {
+  return index.entries.filter((entry) => {
+    if (!includeInactive) {
+      const status = entry.status ?? 'active';
+      if (status !== 'active') return false;
+    }
+    if (type && entry.type !== type) return false;
+    if (phase && entry.metadata?.phase !== phase) return false;
+    if (tags && tags.length > 0) {
+      const entryTags = entry.metadata?.tags ?? [];
+      if (!tags.every((t) => entryTags.includes(t))) return false;
+    }
+    return true;
+  });
+}
+
+/**
+ * Supersede an entry by marking it as superseded and pointing to the new entry.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @param {string} oldId - ID of the entry to supersede
+ * @param {string} newId - ID of the superseding entry
+ */
+function supersede(indexPath, oldId, newId) {
+  const index = loadMemory(indexPath);
+  const entry = index.entries.find((e) => e.id === oldId);
+  if (!entry) {
+    throw new Error(`Entry not found: ${oldId}`);
+  }
+  entry.status = 'superseded';
+  entry.supersededBy = newId;
+  fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+}
+
+/**
+ * Archive entries whose expiresAt timestamp has passed.
+ *
+ * @param {string} indexPath - Path to the index.json file
+ * @returns {number} Number of entries archived
+ */
+function expireEntries(indexPath) {
+  const index = loadMemory(indexPath);
+  const now = new Date();
+  let count = 0;
+  for (const entry of index.entries) {
+    if (
+      entry.expiresAt &&
+      new Date(entry.expiresAt) <= now &&
+      (entry.status ?? 'active') === 'active'
+    ) {
+      entry.status = 'archived';
+      count++;
+    }
+  }
+  if (count > 0) {
+    fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
+  }
+  return count;
 }
 
 
@@ -37556,6 +37437,298 @@ const VERDICT_THRESHOLDS = {
   },
   // below humanReviewRecommended threshold -> humanReviewRequired
 };
+
+
+/***/ }),
+
+/***/ 12:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   Rd: () => (/* binding */ redactText),
+/* harmony export */   g: () => (/* binding */ shouldExcludeForContext)
+/* harmony export */ });
+/* unused harmony exports DEFAULT_DENY_GLOBS, shannonEntropy */
+/* harmony import */ var minimatch__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(9519);
+// Secret redaction for repo-wide review context (#692 PR-A).
+//
+// This module is **additive** and not yet wired into the review pipeline.
+// PR-C of #692 will hook it into src/lib/repo-context.mjs and
+// src/lib/local-runner.mjs so that prompt input and debug artifacts are
+// redacted before they leave process memory.
+//
+// Design notes (see Issue #692 plan):
+// - Replacements are *length-independent* (`<REDACTED:category>`) so that
+//   suppression fingerprints stay stable when redaction is toggled on/off
+//   (interaction with #687 PR-B applySuppressions).
+// - High-entropy detection is opt-in by config and runs LAST so that named
+//   categories take priority and avoid double-counting.
+// - Allowlist substrings (example, dummy, placeholder, missing, xxxxx)
+//   suppress redaction on the surrounding token to protect documentation
+//   examples and obvious test fixtures from being mangled.
+// - DEFAULT_DENY_GLOBS is exported separately so that path-level exclusion
+//   can run BEFORE redaction (avoids reading .env / *.pem files at all).
+
+
+
+/**
+ * Path globs that must be excluded from repo-wide context regardless of
+ * user config. Lock files and build artifacts are also denied because they
+ * carry no review value but inflate the budget.
+ */
+const DEFAULT_DENY_GLOBS = Object.freeze([
+  '**/.env',
+  '**/.env.*',
+  '**/.envrc',
+  '**/secrets.*',
+  '**/credentials.*',
+  '**/credentials/**',
+  '**/*.pem',
+  '**/*.key',
+  '**/*.p12',
+  '**/*.pfx',
+  '**/*.jks',
+  '**/*.keystore',
+  '**/id_rsa',
+  '**/id_dsa',
+  '**/id_ecdsa',
+  '**/id_ed25519',
+  '**/*.lock',
+  '**/package-lock.json',
+  '**/pnpm-lock.yaml',
+  '**/yarn.lock',
+  '**/composer.lock',
+  '**/Cargo.lock',
+  '**/poetry.lock',
+  '**/Gemfile.lock',
+  '**/dist/**',
+  '**/build/**',
+  '**/out/**',
+  '**/.next/**',
+  '**/coverage/**',
+  '**/*.min.js',
+  '**/*.min.css',
+  '**/*.map',
+]);
+
+/**
+ * Substrings that, when found near a candidate match, mark the match as a
+ * documentation example or test placeholder rather than a real secret.
+ *
+ * `xxxxx` was rejected as too aggressive: legitimate hex / base64 tokens
+ * frequently contain runs of repeated characters and would be incorrectly
+ * skipped. The high-entropy fallback already protects monotonic strings
+ * (entropy below threshold) so the placeholder list is intentionally short.
+ */
+const ALLOWLIST_TOKENS = Object.freeze(['example', 'dummy', 'placeholder', '<missing>']);
+
+const ALLOWLIST_RE = new RegExp(
+  ALLOWLIST_TOKENS.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
+  'i'
+);
+
+const REPLACEMENT = (category) => `<REDACTED:${category}>`;
+
+/**
+ * Pattern categories. Order matters — more specific / longer alternatives
+ * come first so they win over weaker patterns and don't get partly eaten by
+ * the high-entropy fallback.
+ *
+ * Each entry: { id, regex, replacement?, requireValueShape? }.
+ */
+const PATTERNS = [
+  // GitHub
+  { id: 'githubToken', regex: /\b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}\b/g },
+  { id: 'githubToken', regex: /\bgithub_pat_[A-Za-z0-9_]{82}\b/g },
+  // OpenAI / Anthropic / Google
+  { id: 'openaiKey', regex: /\bsk-proj-[A-Za-z0-9_-]{40,}\b/g },
+  { id: 'anthropicKey', regex: /\bsk-ant-[A-Za-z0-9_-]{40,}\b/g },
+  { id: 'openaiKey', regex: /\bsk-[A-Za-z0-9]{20,}\b/g },
+  { id: 'googleApiKey', regex: /\bAIza[0-9A-Za-z_-]{35}\b/g },
+  // AWS
+  { id: 'awsAccessKey', regex: /\b(AKIA|ASIA)[0-9A-Z]{16}\b/g },
+  // Long-form private keys (multi-line block)
+  {
+    id: 'privateKey',
+    regex:
+      /-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP |)PRIVATE KEY-----[\s\S]*?-----END[^-]*PRIVATE KEY-----/g,
+  },
+  // Bearer tokens — capture the surrounding "Bearer " keyword to limit FP
+  { id: 'bearerToken', regex: /\b[Bb]earer\s+[A-Za-z0-9._~+/=-]{20,}\b/g },
+  // Database connection strings
+  {
+    id: 'databaseUrl',
+    regex: /\b(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?|redis|amqp|mssql):\/\/[^\s'"`<>]+/g,
+  },
+  // Webhook URLs (Slack / Discord)
+  { id: 'webhookUrl', regex: /https:\/\/hooks\.slack\.com\/[A-Z0-9/]+/g },
+  {
+    id: 'webhookUrl',
+    regex: /https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+/g,
+  },
+];
+
+/**
+ * Patterns that are case-insensitive *value-shape* patterns and require an
+ * explicit assignment context (key=value). These run after the explicit
+ * patterns above so a literal `aws_secret_access_key=...` does not get
+ * partially consumed.
+ */
+const ASSIGNMENT_PATTERNS = [
+  // aws_secret_access_key = "..."
+  {
+    id: 'awsSecretKey',
+    regex: /\baws[_-]?secret[_-]?access[_-]?key\s*[:=]\s*['"]?[A-Za-z0-9/+=]{40}['"]?/gi,
+  },
+  // client_secret = "...", consumer_secret = "..."
+  {
+    id: 'oauthSecret',
+    regex: /\b(?:client|consumer)[_-]?secret\s*[:=]\s*['"][^'"]{16,}['"]/gi,
+  },
+];
+
+/**
+ * Variable-name based assignment redaction. Only redacts values when the
+ * name itself implies a secret, so plain dotenv lines like `PORT=3000` or
+ * `LOG_LEVEL=info` are left alone.
+ */
+// Two-step approach so the regex can capture short and unprefixed names
+// (`TOKEN=`, `MY_TOKEN=`, `export TOKEN=`) without exploding the alternation.
+// The captured name is then sanity-checked with SENSITIVE_NAME_RE before
+// the value is masked, which keeps `PORT=3000` and `LOG_LEVEL=info`
+// untouched.
+const ENV_VAR_RE = /^[ \t]*(?:export[ \t]+)?([A-Z][A-Z0-9_]*)\s*=\s*(.+)$/gm;
+const SENSITIVE_NAME_RE =
+  /(?:^|_)(?:TOKEN|SECRET|KEY|PASSWORD|PASSWD|CREDENTIAL|CREDENTIALS|API_KEY|ACCESS_KEY|PRIVATE_KEY)$/;
+
+const MIN_HIGH_ENTROPY_LENGTH = 24;
+const DEFAULT_HIGH_ENTROPY_THRESHOLD = 4.5;
+const HIGH_ENTROPY_TOKEN_RE = /[A-Za-z0-9+/=_-]{24,}/g;
+
+/**
+ * Shannon entropy in bits per character. Higher = more random.
+ * @param {string} s
+ */
+function shannonEntropy(s) {
+  if (!s) return 0;
+  const counts = new Map();
+  for (const ch of s) counts.set(ch, (counts.get(ch) || 0) + 1);
+  const len = s.length;
+  let h = 0;
+  for (const c of counts.values()) {
+    const p = c / len;
+    h -= p * Math.log2(p);
+  }
+  return h;
+}
+
+function isAllowlisted(snippet) {
+  return ALLOWLIST_RE.test(snippet);
+}
+
+/**
+ * Redact secrets in a text string.
+ *
+ * @param {string} text
+ * @param {object} [opts]
+ * @param {boolean} [opts.highEntropy] enable Shannon-entropy fallback (default true)
+ * @param {number} [opts.entropyThreshold] entropy bits/char threshold (default 4.5)
+ * @param {string[]} [opts.allowlist] additional substrings that suppress redaction
+ * @returns {{ text: string, hits: Array<{ category: string, count: number }> }}
+ */
+function redactText(text, opts = {}) {
+  if (text == null || text === '') return { text: text ?? '', hits: [] };
+  const {
+    highEntropy = true,
+    entropyThreshold = DEFAULT_HIGH_ENTROPY_THRESHOLD,
+    allowlist = [],
+  } = opts;
+  const extraAllow = allowlist.length
+    ? new RegExp(allowlist.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i')
+    : null;
+
+  const hits = new Map();
+  const bump = (category, n = 1) => hits.set(category, (hits.get(category) || 0) + n);
+  const skipMatch = (full) => isAllowlisted(full) || (extraAllow ? extraAllow.test(full) : false);
+
+  let out = String(text);
+
+  for (const { id, regex } of PATTERNS) {
+    out = out.replace(regex, (m) => {
+      if (skipMatch(m)) return m;
+      bump(id);
+      return REPLACEMENT(id);
+    });
+  }
+
+  for (const { id, regex } of ASSIGNMENT_PATTERNS) {
+    out = out.replace(regex, (m) => {
+      if (skipMatch(m)) return m;
+      bump(id);
+      return REPLACEMENT(id);
+    });
+  }
+
+  out = out.replace(ENV_VAR_RE, (full, name, value) => {
+    if (skipMatch(full)) return full;
+    if (!SENSITIVE_NAME_RE.test(name)) return full;
+    if (!value || value.trim().length < 8) return full;
+    bump('envAssignment');
+    // Reconstruct so we keep the (optional) `export ` prefix and the exact
+    // whitespace around `=`. Slicing `full` up to the start of `value` is
+    // safer than rebuilding the line by hand.
+    const valueStart = full.length - value.length;
+    return full.slice(0, valueStart) + REPLACEMENT('envAssignment');
+  });
+
+  if (highEntropy) {
+    out = out.replace(HIGH_ENTROPY_TOKEN_RE, (m) => {
+      if (m.length < MIN_HIGH_ENTROPY_LENGTH) return m;
+      if (skipMatch(m)) return m;
+      // Skip tokens that are still mid-replacement (we already redacted nearby).
+      if (m.includes('REDACTED')) return m;
+      const h = shannonEntropy(m);
+      if (h < entropyThreshold) return m;
+      bump('highEntropy');
+      return REPLACEMENT('highEntropy');
+    });
+  }
+
+  return {
+    text: out,
+    hits: [...hits.entries()].map(([category, count]) => ({ category, count })),
+  };
+}
+
+/**
+ * True when `relPath` should be excluded from repo-wide context.
+ * Combines the built-in deny list with caller-supplied additions, then
+ * applies an allowlist of explicit "force-include" globs.
+ *
+ * @param {string} relPath
+ * @param {object} [opts]
+ * @param {string[]} [opts.extraDenyGlobs]
+ * @param {string[]} [opts.allowlist] globs that override deny matches
+ * @returns {boolean}
+ */
+function shouldExcludeForContext(relPath, opts = {}) {
+  if (!relPath) return false;
+  const { extraDenyGlobs = [], allowlist = [] } = opts;
+  const deny = [...DEFAULT_DENY_GLOBS, ...extraDenyGlobs];
+
+  // nocase: case-insensitive so `.ENV`, `Package-Lock.json`, `ID_RSA` etc.
+  // are still excluded on case-preserving filesystems.
+  const matchOpts = { dot: true, nocase: true, matchBase: false };
+  // Allowlist beats deny so users can opt back into specific paths if they
+  // truly need them (e.g., a sample .env they want reviewed).
+  for (const g of allowlist) {
+    if ((0,minimatch__WEBPACK_IMPORTED_MODULE_0__/* .minimatch */ .xF)(relPath, g, matchOpts)) return false;
+  }
+  for (const g of deny) {
+    if ((0,minimatch__WEBPACK_IMPORTED_MODULE_0__/* .minimatch */ .xF)(relPath, g, matchOpts)) return true;
+  }
+  return false;
+}
 
 
 /***/ }),
@@ -38167,127 +38340,8 @@ async function loadProjectRules(repoRoot, options = {}) {
 
 // EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
 var risk_map = __nccwpck_require__(572);
-;// CONCATENATED MODULE: ./src/lib/riverbed-memory.mjs
-
-
-
-/**
- * Load the Riverbed Memory index from disk.
- * Returns empty structure if file doesn't exist (stateless fallback).
- *
- * @param {string} indexPath - Path to the index.json file
- * @returns {{ entries: object[], version: string }}
- */
-function loadMemory(indexPath) {
-  try {
-    const raw = external_node_fs_.readFileSync(indexPath, 'utf-8');
-    return JSON.parse(raw);
-  } catch (err) {
-    if (err.code === 'ENOENT') {
-      return { entries: [], version: '1' };
-    }
-    throw err;
-  }
-}
-
-/**
- * Append a memory entry to the index.
- * Creates the directory and file if they don't exist.
- *
- * @param {string} indexPath - Path to the index.json file
- * @param {object} entry - Entry conforming to riverbed-entry.schema.json
- */
-function appendEntry(indexPath, entry) {
-  const index = loadMemory(indexPath);
-
-  // Validate required fields
-  if (!entry.id || !entry.type || !entry.content || !entry.metadata) {
-    throw new Error('Entry must have id, type, content, and metadata fields');
-  }
-
-  // Prevent duplicate IDs
-  if (index.entries.some((e) => e.id === entry.id)) {
-    throw new Error(`Duplicate entry ID: ${entry.id}`);
-  }
-
-  index.entries.push(entry);
-
-  const dir = path.dirname(indexPath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
-}
-
-/**
- * Query memory entries by filter criteria.
- * All filter fields are optional; entries must match ALL provided criteria.
- * By default, only active entries are returned.
- *
- * @param {{ entries: object[] }} index - Loaded memory index
- * @param {{ type?: string, tags?: string[], phase?: string, includeInactive?: boolean }} filter
- * @returns {object[]}
- */
-function queryMemory(index, { type, tags, phase, includeInactive = false } = {}) {
-  return index.entries.filter((entry) => {
-    if (!includeInactive) {
-      const status = entry.status ?? 'active';
-      if (status !== 'active') return false;
-    }
-    if (type && entry.type !== type) return false;
-    if (phase && entry.metadata?.phase !== phase) return false;
-    if (tags && tags.length > 0) {
-      const entryTags = entry.metadata?.tags ?? [];
-      if (!tags.every((t) => entryTags.includes(t))) return false;
-    }
-    return true;
-  });
-}
-
-/**
- * Supersede an entry by marking it as superseded and pointing to the new entry.
- *
- * @param {string} indexPath - Path to the index.json file
- * @param {string} oldId - ID of the entry to supersede
- * @param {string} newId - ID of the superseding entry
- */
-function supersede(indexPath, oldId, newId) {
-  const index = loadMemory(indexPath);
-  const entry = index.entries.find((e) => e.id === oldId);
-  if (!entry) {
-    throw new Error(`Entry not found: ${oldId}`);
-  }
-  entry.status = 'superseded';
-  entry.supersededBy = newId;
-  fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
-}
-
-/**
- * Archive entries whose expiresAt timestamp has passed.
- *
- * @param {string} indexPath - Path to the index.json file
- * @returns {number} Number of entries archived
- */
-function expireEntries(indexPath) {
-  const index = loadMemory(indexPath);
-  const now = new Date();
-  let count = 0;
-  for (const entry of index.entries) {
-    if (
-      entry.expiresAt &&
-      new Date(entry.expiresAt) <= now &&
-      (entry.status ?? 'active') === 'active'
-    ) {
-      entry.status = 'archived';
-      count++;
-    }
-  }
-  if (count > 0) {
-    fs.writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
-  }
-  return count;
-}
-
+// EXTERNAL MODULE: ./src/lib/riverbed-memory.mjs
+var riverbed_memory = __nccwpck_require__(4216);
 ;// CONCATENATED MODULE: ./src/lib/memory-context.mjs
 
 
@@ -38296,11 +38350,11 @@ const DEFAULT_MEMORY_PATH = external_node_path_.join('.river', 'memory', 'index.
 
 function loadReviewMemory(repoRoot, { phase, changedFiles } = {}) {
   const indexPath = external_node_path_.resolve(repoRoot, DEFAULT_MEMORY_PATH);
-  const index = loadMemory(indexPath);
+  const index = (0,riverbed_memory/* loadMemory */.ab)(indexPath);
   // includeInactive: true keeps the phase and no-phase branches symmetric and
   // preserves pre-lifecycle semantics where historical entries were surfaced.
   const allEntries = phase
-    ? queryMemory(index, { phase, includeInactive: true })
+    ? (0,riverbed_memory/* queryMemory */.qU)(index, { phase, includeInactive: true })
     : (index.entries ?? []);
   const relevant = changedFiles?.length
     ? allEntries.filter((e) => {
@@ -38367,8 +38421,8 @@ function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
   };
 }
 
-// EXTERNAL MODULE: ./src/lib/repo-context.mjs + 1 modules
-var repo_context = __nccwpck_require__(7685);
+// EXTERNAL MODULE: ./src/lib/repo-context.mjs
+var repo_context = __nccwpck_require__(9865);
 // EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
 var skill_loader = __nccwpck_require__(5541);
 ;// CONCATENATED MODULE: ./src/lib/utils.mjs
@@ -42913,7 +42967,7 @@ const createPathTagFunction = (pathEncoder = encodeURIPath) => function path(sta
 /**
  * URI-encodes path params and ensures no unsafe /./ or /../ path segments are introduced.
  */
-const path_path = /* @__PURE__ */ createPathTagFunction(encodeURIPath);
+const path = /* @__PURE__ */ createPathTagFunction(encodeURIPath);
 //# sourceMappingURL=path.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/resources/chat/completions/messages.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
@@ -42939,7 +42993,7 @@ class Messages extends APIResource {
      * ```
      */
     list(completionID, query = {}, options) {
-        return this._client.getAPIList(path_path `/chat/completions/${completionID}/messages`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path `/chat/completions/${completionID}/messages`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=messages.mjs.map
@@ -44420,7 +44474,7 @@ class Completions extends APIResource {
      * ```
      */
     retrieve(completionID, options) {
-        return this._client.get(path_path `/chat/completions/${completionID}`, options);
+        return this._client.get(path `/chat/completions/${completionID}`, options);
     }
     /**
      * Modify a stored chat completion. Only Chat Completions that have been created
@@ -44436,7 +44490,7 @@ class Completions extends APIResource {
      * ```
      */
     update(completionID, body, options) {
-        return this._client.post(path_path `/chat/completions/${completionID}`, { body, ...options });
+        return this._client.post(path `/chat/completions/${completionID}`, { body, ...options });
     }
     /**
      * List stored Chat Completions. Only Chat Completions that have been stored with
@@ -44464,7 +44518,7 @@ class Completions extends APIResource {
      * ```
      */
     delete(completionID, options) {
-        return this._client.delete(path_path `/chat/completions/${completionID}`, options);
+        return this._client.delete(path `/chat/completions/${completionID}`, options);
     }
     parse(body, options) {
         validateInputTools(body.tools);
@@ -44702,7 +44756,7 @@ class Batches extends APIResource {
      * Retrieves a batch.
      */
     retrieve(batchID, options) {
-        return this._client.get(path_path `/batches/${batchID}`, options);
+        return this._client.get(path `/batches/${batchID}`, options);
     }
     /**
      * List your organization's batches.
@@ -44716,7 +44770,7 @@ class Batches extends APIResource {
      * (if any) available in the output file.
      */
     cancel(batchID, options) {
-        return this._client.post(path_path `/batches/${batchID}/cancel`, options);
+        return this._client.post(path `/batches/${batchID}/cancel`, options);
     }
 }
 //# sourceMappingURL=batches.mjs.map
@@ -44748,7 +44802,7 @@ class Assistants extends APIResource {
      * @deprecated
      */
     retrieve(assistantID, options) {
-        return this._client.get(path_path `/assistants/${assistantID}`, {
+        return this._client.get(path `/assistants/${assistantID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -44759,7 +44813,7 @@ class Assistants extends APIResource {
      * @deprecated
      */
     update(assistantID, body, options) {
-        return this._client.post(path_path `/assistants/${assistantID}`, {
+        return this._client.post(path `/assistants/${assistantID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -44783,7 +44837,7 @@ class Assistants extends APIResource {
      * @deprecated
      */
     delete(assistantID, options) {
-        return this._client.delete(path_path `/assistants/${assistantID}`, {
+        return this._client.delete(path `/assistants/${assistantID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -44905,7 +44959,7 @@ class sessions_Sessions extends APIResource {
      * ```
      */
     cancel(sessionID, options) {
-        return this._client.post(path_path `/chatkit/sessions/${sessionID}/cancel`, {
+        return this._client.post(path `/chatkit/sessions/${sessionID}/cancel`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]),
         });
@@ -44929,7 +44983,7 @@ class Threads extends APIResource {
      * ```
      */
     retrieve(threadID, options) {
-        return this._client.get(path_path `/chatkit/threads/${threadID}`, {
+        return this._client.get(path `/chatkit/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]),
         });
@@ -44963,7 +45017,7 @@ class Threads extends APIResource {
      * ```
      */
     delete(threadID, options) {
-        return this._client.delete(path_path `/chatkit/threads/${threadID}`, {
+        return this._client.delete(path `/chatkit/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]),
         });
@@ -44982,7 +45036,7 @@ class Threads extends APIResource {
      * ```
      */
     listItems(threadID, query = {}, options) {
-        return this._client.getAPIList(path_path `/chatkit/threads/${threadID}/items`, (ConversationCursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]) });
+        return this._client.getAPIList(path `/chatkit/threads/${threadID}/items`, (ConversationCursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'chatkit_beta=v1' }, options?.headers]) });
     }
 }
 //# sourceMappingURL=threads.mjs.map
@@ -45021,7 +45075,7 @@ class messages_Messages extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     create(threadID, body, options) {
-        return this._client.post(path_path `/threads/${threadID}/messages`, {
+        return this._client.post(path `/threads/${threadID}/messages`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45034,7 +45088,7 @@ class messages_Messages extends APIResource {
      */
     retrieve(messageID, params, options) {
         const { thread_id } = params;
-        return this._client.get(path_path `/threads/${thread_id}/messages/${messageID}`, {
+        return this._client.get(path `/threads/${thread_id}/messages/${messageID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45046,7 +45100,7 @@ class messages_Messages extends APIResource {
      */
     update(messageID, params, options) {
         const { thread_id, ...body } = params;
-        return this._client.post(path_path `/threads/${thread_id}/messages/${messageID}`, {
+        return this._client.post(path `/threads/${thread_id}/messages/${messageID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45058,7 +45112,7 @@ class messages_Messages extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     list(threadID, query = {}, options) {
-        return this._client.getAPIList(path_path `/threads/${threadID}/messages`, (CursorPage), {
+        return this._client.getAPIList(path `/threads/${threadID}/messages`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45071,7 +45125,7 @@ class messages_Messages extends APIResource {
      */
     delete(messageID, params, options) {
         const { thread_id } = params;
-        return this._client.delete(path_path `/threads/${thread_id}/messages/${messageID}`, {
+        return this._client.delete(path `/threads/${thread_id}/messages/${messageID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45097,7 +45151,7 @@ class Steps extends APIResource {
      */
     retrieve(stepID, params, options) {
         const { thread_id, run_id, ...query } = params;
-        return this._client.get(path_path `/threads/${thread_id}/runs/${run_id}/steps/${stepID}`, {
+        return this._client.get(path `/threads/${thread_id}/runs/${run_id}/steps/${stepID}`, {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45110,7 +45164,7 @@ class Steps extends APIResource {
      */
     list(runID, params, options) {
         const { thread_id, ...query } = params;
-        return this._client.getAPIList(path_path `/threads/${thread_id}/runs/${runID}/steps`, (CursorPage), {
+        return this._client.getAPIList(path `/threads/${thread_id}/runs/${runID}/steps`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45775,7 +45829,7 @@ class Runs extends APIResource {
     }
     create(threadID, params, options) {
         const { include, ...body } = params;
-        return this._client.post(path_path `/threads/${threadID}/runs`, {
+        return this._client.post(path `/threads/${threadID}/runs`, {
             query: { include },
             body,
             ...options,
@@ -45791,7 +45845,7 @@ class Runs extends APIResource {
      */
     retrieve(runID, params, options) {
         const { thread_id } = params;
-        return this._client.get(path_path `/threads/${thread_id}/runs/${runID}`, {
+        return this._client.get(path `/threads/${thread_id}/runs/${runID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45803,7 +45857,7 @@ class Runs extends APIResource {
      */
     update(runID, params, options) {
         const { thread_id, ...body } = params;
-        return this._client.post(path_path `/threads/${thread_id}/runs/${runID}`, {
+        return this._client.post(path `/threads/${thread_id}/runs/${runID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45815,7 +45869,7 @@ class Runs extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     list(threadID, query = {}, options) {
-        return this._client.getAPIList(path_path `/threads/${threadID}/runs`, (CursorPage), {
+        return this._client.getAPIList(path `/threads/${threadID}/runs`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45828,7 +45882,7 @@ class Runs extends APIResource {
      */
     cancel(runID, params, options) {
         const { thread_id } = params;
-        return this._client.post(path_path `/threads/${thread_id}/runs/${runID}/cancel`, {
+        return this._client.post(path `/threads/${thread_id}/runs/${runID}/cancel`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45907,7 +45961,7 @@ class Runs extends APIResource {
     }
     submitToolOutputs(runID, params, options) {
         const { thread_id, ...body } = params;
-        return this._client.post(path_path `/threads/${thread_id}/runs/${runID}/submit_tool_outputs`, {
+        return this._client.post(path `/threads/${thread_id}/runs/${runID}/submit_tool_outputs`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45974,7 +46028,7 @@ class threads_Threads extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     retrieve(threadID, options) {
-        return this._client.get(path_path `/threads/${threadID}`, {
+        return this._client.get(path `/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -45985,7 +46039,7 @@ class threads_Threads extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     update(threadID, body, options) {
-        return this._client.post(path_path `/threads/${threadID}`, {
+        return this._client.post(path `/threads/${threadID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -45997,7 +46051,7 @@ class threads_Threads extends APIResource {
      * @deprecated The Assistants API is deprecated in favor of the Responses API
      */
     delete(threadID, options) {
-        return this._client.delete(path_path `/threads/${threadID}`, {
+        return this._client.delete(path `/threads/${threadID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -46078,7 +46132,7 @@ class Content extends APIResource {
      */
     retrieve(fileID, params, options) {
         const { container_id } = params;
-        return this._client.get(path_path `/containers/${container_id}/files/${fileID}/content`, {
+        return this._client.get(path `/containers/${container_id}/files/${fileID}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -46107,20 +46161,20 @@ class Files extends APIResource {
      * a JSON request with a file ID.
      */
     create(containerID, body, options) {
-        return this._client.post(path_path `/containers/${containerID}/files`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path `/containers/${containerID}/files`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
     /**
      * Retrieve Container File
      */
     retrieve(fileID, params, options) {
         const { container_id } = params;
-        return this._client.get(path_path `/containers/${container_id}/files/${fileID}`, options);
+        return this._client.get(path `/containers/${container_id}/files/${fileID}`, options);
     }
     /**
      * List Container files
      */
     list(containerID, query = {}, options) {
-        return this._client.getAPIList(path_path `/containers/${containerID}/files`, (CursorPage), {
+        return this._client.getAPIList(path `/containers/${containerID}/files`, (CursorPage), {
             query,
             ...options,
         });
@@ -46130,7 +46184,7 @@ class Files extends APIResource {
      */
     delete(fileID, params, options) {
         const { container_id } = params;
-        return this._client.delete(path_path `/containers/${container_id}/files/${fileID}`, {
+        return this._client.delete(path `/containers/${container_id}/files/${fileID}`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -46161,7 +46215,7 @@ class Containers extends APIResource {
      * Retrieve Container
      */
     retrieve(containerID, options) {
-        return this._client.get(path_path `/containers/${containerID}`, options);
+        return this._client.get(path `/containers/${containerID}`, options);
     }
     /**
      * List Containers
@@ -46173,7 +46227,7 @@ class Containers extends APIResource {
      * Delete Container
      */
     delete(containerID, options) {
-        return this._client.delete(path_path `/containers/${containerID}`, {
+        return this._client.delete(path `/containers/${containerID}`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -46195,7 +46249,7 @@ class Items extends APIResource {
      */
     create(conversationID, params, options) {
         const { include, ...body } = params;
-        return this._client.post(path_path `/conversations/${conversationID}/items`, {
+        return this._client.post(path `/conversations/${conversationID}/items`, {
             query: { include },
             body,
             ...options,
@@ -46206,20 +46260,20 @@ class Items extends APIResource {
      */
     retrieve(itemID, params, options) {
         const { conversation_id, ...query } = params;
-        return this._client.get(path_path `/conversations/${conversation_id}/items/${itemID}`, { query, ...options });
+        return this._client.get(path `/conversations/${conversation_id}/items/${itemID}`, { query, ...options });
     }
     /**
      * List all items for a conversation with the given ID.
      */
     list(conversationID, query = {}, options) {
-        return this._client.getAPIList(path_path `/conversations/${conversationID}/items`, (ConversationCursorPage), { query, ...options });
+        return this._client.getAPIList(path `/conversations/${conversationID}/items`, (ConversationCursorPage), { query, ...options });
     }
     /**
      * Delete an item from a conversation with the given IDs.
      */
     delete(itemID, params, options) {
         const { conversation_id } = params;
-        return this._client.delete(path_path `/conversations/${conversation_id}/items/${itemID}`, options);
+        return this._client.delete(path `/conversations/${conversation_id}/items/${itemID}`, options);
     }
 }
 //# sourceMappingURL=items.mjs.map
@@ -46247,19 +46301,19 @@ class Conversations extends APIResource {
      * Get a conversation
      */
     retrieve(conversationID, options) {
-        return this._client.get(path_path `/conversations/${conversationID}`, options);
+        return this._client.get(path `/conversations/${conversationID}`, options);
     }
     /**
      * Update a conversation
      */
     update(conversationID, body, options) {
-        return this._client.post(path_path `/conversations/${conversationID}`, { body, ...options });
+        return this._client.post(path `/conversations/${conversationID}`, { body, ...options });
     }
     /**
      * Delete a conversation. Items in the conversation will not be deleted.
      */
     delete(conversationID, options) {
-        return this._client.delete(path_path `/conversations/${conversationID}`, options);
+        return this._client.delete(path `/conversations/${conversationID}`, options);
     }
 }
 Conversations.Items = Items;
@@ -46334,14 +46388,14 @@ class OutputItems extends APIResource {
      */
     retrieve(outputItemID, params, options) {
         const { eval_id, run_id } = params;
-        return this._client.get(path_path `/evals/${eval_id}/runs/${run_id}/output_items/${outputItemID}`, options);
+        return this._client.get(path `/evals/${eval_id}/runs/${run_id}/output_items/${outputItemID}`, options);
     }
     /**
      * Get a list of output items for an evaluation run.
      */
     list(runID, params, options) {
         const { eval_id, ...query } = params;
-        return this._client.getAPIList(path_path `/evals/${eval_id}/runs/${runID}/output_items`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path `/evals/${eval_id}/runs/${runID}/output_items`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=output-items.mjs.map
@@ -46366,20 +46420,20 @@ class runs_Runs extends APIResource {
      * schema specified in the config of the evaluation.
      */
     create(evalID, body, options) {
-        return this._client.post(path_path `/evals/${evalID}/runs`, { body, ...options });
+        return this._client.post(path `/evals/${evalID}/runs`, { body, ...options });
     }
     /**
      * Get an evaluation run by ID.
      */
     retrieve(runID, params, options) {
         const { eval_id } = params;
-        return this._client.get(path_path `/evals/${eval_id}/runs/${runID}`, options);
+        return this._client.get(path `/evals/${eval_id}/runs/${runID}`, options);
     }
     /**
      * Get a list of runs for an evaluation.
      */
     list(evalID, query = {}, options) {
-        return this._client.getAPIList(path_path `/evals/${evalID}/runs`, (CursorPage), {
+        return this._client.getAPIList(path `/evals/${evalID}/runs`, (CursorPage), {
             query,
             ...options,
         });
@@ -46389,14 +46443,14 @@ class runs_Runs extends APIResource {
      */
     delete(runID, params, options) {
         const { eval_id } = params;
-        return this._client.delete(path_path `/evals/${eval_id}/runs/${runID}`, options);
+        return this._client.delete(path `/evals/${eval_id}/runs/${runID}`, options);
     }
     /**
      * Cancel an ongoing evaluation run.
      */
     cancel(runID, params, options) {
         const { eval_id } = params;
-        return this._client.post(path_path `/evals/${eval_id}/runs/${runID}`, options);
+        return this._client.post(path `/evals/${eval_id}/runs/${runID}`, options);
     }
 }
 runs_Runs.OutputItems = OutputItems;
@@ -46431,13 +46485,13 @@ class Evals extends APIResource {
      * Get an evaluation by ID.
      */
     retrieve(evalID, options) {
-        return this._client.get(path_path `/evals/${evalID}`, options);
+        return this._client.get(path `/evals/${evalID}`, options);
     }
     /**
      * Update certain properties of an evaluation.
      */
     update(evalID, body, options) {
-        return this._client.post(path_path `/evals/${evalID}`, { body, ...options });
+        return this._client.post(path `/evals/${evalID}`, { body, ...options });
     }
     /**
      * List evaluations for a project.
@@ -46449,7 +46503,7 @@ class Evals extends APIResource {
      * Delete an evaluation.
      */
     delete(evalID, options) {
-        return this._client.delete(path_path `/evals/${evalID}`, options);
+        return this._client.delete(path `/evals/${evalID}`, options);
     }
 }
 Evals.Runs = runs_Runs;
@@ -46496,7 +46550,7 @@ class files_Files extends APIResource {
      * Returns information about a specific file.
      */
     retrieve(fileID, options) {
-        return this._client.get(path_path `/files/${fileID}`, options);
+        return this._client.get(path `/files/${fileID}`, options);
     }
     /**
      * Returns a list of files.
@@ -46508,13 +46562,13 @@ class files_Files extends APIResource {
      * Delete a file and remove it from all vector stores.
      */
     delete(fileID, options) {
-        return this._client.delete(path_path `/files/${fileID}`, options);
+        return this._client.delete(path `/files/${fileID}`, options);
     }
     /**
      * Returns the contents of the specified file.
      */
     content(fileID, options) {
-        return this._client.get(path_path `/files/${fileID}/content`, {
+        return this._client.get(path `/files/${fileID}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -46635,7 +46689,7 @@ class Permissions extends APIResource {
      * ```
      */
     create(fineTunedModelCheckpoint, body, options) {
-        return this._client.getAPIList(path_path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, (Page), { body, method: 'post', ...options });
+        return this._client.getAPIList(path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, (Page), { body, method: 'post', ...options });
     }
     /**
      * **NOTE:** This endpoint requires an [admin API key](../admin-api-keys).
@@ -46646,7 +46700,7 @@ class Permissions extends APIResource {
      * @deprecated Retrieve is deprecated. Please swap to the paginated list method instead.
      */
     retrieve(fineTunedModelCheckpoint, query = {}, options) {
-        return this._client.get(path_path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, {
+        return this._client.get(path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, {
             query,
             ...options,
         });
@@ -46668,7 +46722,7 @@ class Permissions extends APIResource {
      * ```
      */
     list(fineTunedModelCheckpoint, query = {}, options) {
-        return this._client.getAPIList(path_path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, (ConversationCursorPage), { query, ...options });
+        return this._client.getAPIList(path `/fine_tuning/checkpoints/${fineTunedModelCheckpoint}/permissions`, (ConversationCursorPage), { query, ...options });
     }
     /**
      * **NOTE:** This endpoint requires an [admin API key](../admin-api-keys).
@@ -46690,7 +46744,7 @@ class Permissions extends APIResource {
      */
     delete(permissionID, params, options) {
         const { fine_tuned_model_checkpoint } = params;
-        return this._client.delete(path_path `/fine_tuning/checkpoints/${fine_tuned_model_checkpoint}/permissions/${permissionID}`, options);
+        return this._client.delete(path `/fine_tuning/checkpoints/${fine_tuned_model_checkpoint}/permissions/${permissionID}`, options);
     }
 }
 //# sourceMappingURL=permissions.mjs.map
@@ -46730,7 +46784,7 @@ class checkpoints_Checkpoints extends APIResource {
      * ```
      */
     list(fineTuningJobID, query = {}, options) {
-        return this._client.getAPIList(path_path `/fine_tuning/jobs/${fineTuningJobID}/checkpoints`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path `/fine_tuning/jobs/${fineTuningJobID}/checkpoints`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=checkpoints.mjs.map
@@ -46782,7 +46836,7 @@ class Jobs extends APIResource {
      * ```
      */
     retrieve(fineTuningJobID, options) {
-        return this._client.get(path_path `/fine_tuning/jobs/${fineTuningJobID}`, options);
+        return this._client.get(path `/fine_tuning/jobs/${fineTuningJobID}`, options);
     }
     /**
      * List your organization's fine-tuning jobs
@@ -46809,7 +46863,7 @@ class Jobs extends APIResource {
      * ```
      */
     cancel(fineTuningJobID, options) {
-        return this._client.post(path_path `/fine_tuning/jobs/${fineTuningJobID}/cancel`, options);
+        return this._client.post(path `/fine_tuning/jobs/${fineTuningJobID}/cancel`, options);
     }
     /**
      * Get status updates for a fine-tuning job.
@@ -46825,7 +46879,7 @@ class Jobs extends APIResource {
      * ```
      */
     listEvents(fineTuningJobID, query = {}, options) {
-        return this._client.getAPIList(path_path `/fine_tuning/jobs/${fineTuningJobID}/events`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path `/fine_tuning/jobs/${fineTuningJobID}/events`, (CursorPage), { query, ...options });
     }
     /**
      * Pause a fine-tune job.
@@ -46838,7 +46892,7 @@ class Jobs extends APIResource {
      * ```
      */
     pause(fineTuningJobID, options) {
-        return this._client.post(path_path `/fine_tuning/jobs/${fineTuningJobID}/pause`, options);
+        return this._client.post(path `/fine_tuning/jobs/${fineTuningJobID}/pause`, options);
     }
     /**
      * Resume a fine-tune job.
@@ -46851,7 +46905,7 @@ class Jobs extends APIResource {
      * ```
      */
     resume(fineTuningJobID, options) {
-        return this._client.post(path_path `/fine_tuning/jobs/${fineTuningJobID}/resume`, options);
+        return this._client.post(path `/fine_tuning/jobs/${fineTuningJobID}/resume`, options);
     }
 }
 Jobs.Checkpoints = checkpoints_Checkpoints;
@@ -46943,7 +46997,7 @@ class Models extends APIResource {
      * the owner and permissioning.
      */
     retrieve(model, options) {
-        return this._client.get(path_path `/models/${model}`, options);
+        return this._client.get(path `/models/${model}`, options);
     }
     /**
      * Lists the currently available models, and provides basic information about each
@@ -46957,7 +47011,7 @@ class Models extends APIResource {
      * delete a model.
      */
     delete(model, options) {
-        return this._client.delete(path_path `/models/${model}`, options);
+        return this._client.delete(path `/models/${model}`, options);
     }
 }
 //# sourceMappingURL=models.mjs.map
@@ -46995,7 +47049,7 @@ class Calls extends APIResource {
      * ```
      */
     accept(callID, body, options) {
-        return this._client.post(path_path `/realtime/calls/${callID}/accept`, {
+        return this._client.post(path `/realtime/calls/${callID}/accept`, {
             body,
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
@@ -47010,7 +47064,7 @@ class Calls extends APIResource {
      * ```
      */
     hangup(callID, options) {
-        return this._client.post(path_path `/realtime/calls/${callID}/hangup`, {
+        return this._client.post(path `/realtime/calls/${callID}/hangup`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -47026,7 +47080,7 @@ class Calls extends APIResource {
      * ```
      */
     refer(callID, body, options) {
-        return this._client.post(path_path `/realtime/calls/${callID}/refer`, {
+        return this._client.post(path `/realtime/calls/${callID}/refer`, {
             body,
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
@@ -47041,7 +47095,7 @@ class Calls extends APIResource {
      * ```
      */
     reject(callID, body = {}, options) {
-        return this._client.post(path_path `/realtime/calls/${callID}/reject`, {
+        return this._client.post(path `/realtime/calls/${callID}/reject`, {
             body,
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
@@ -47541,7 +47595,7 @@ class InputItems extends APIResource {
      * ```
      */
     list(responseID, query = {}, options) {
-        return this._client.getAPIList(path_path `/responses/${responseID}/input_items`, (CursorPage), { query, ...options });
+        return this._client.getAPIList(path `/responses/${responseID}/input_items`, (CursorPage), { query, ...options });
     }
 }
 //# sourceMappingURL=input-items.mjs.map
@@ -47591,7 +47645,7 @@ class Responses extends APIResource {
         });
     }
     retrieve(responseID, query = {}, options) {
-        return this._client.get(path_path `/responses/${responseID}`, {
+        return this._client.get(path `/responses/${responseID}`, {
             query,
             ...options,
             stream: query?.stream ?? false,
@@ -47613,7 +47667,7 @@ class Responses extends APIResource {
      * ```
      */
     delete(responseID, options) {
-        return this._client.delete(path_path `/responses/${responseID}`, {
+        return this._client.delete(path `/responses/${responseID}`, {
             ...options,
             headers: buildHeaders([{ Accept: '*/*' }, options?.headers]),
         });
@@ -47642,7 +47696,7 @@ class Responses extends APIResource {
      * ```
      */
     cancel(responseID, options) {
-        return this._client.post(path_path `/responses/${responseID}/cancel`, options);
+        return this._client.post(path `/responses/${responseID}/cancel`, options);
     }
     /**
      * Compact a conversation. Returns a compacted response object.
@@ -47676,7 +47730,7 @@ class content_Content extends APIResource {
      * Download a skill zip bundle by its ID.
      */
     retrieve(skillID, options) {
-        return this._client.get(path_path `/skills/${skillID}/content`, {
+        return this._client.get(path `/skills/${skillID}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -47695,7 +47749,7 @@ class versions_content_Content extends APIResource {
      */
     retrieve(version, params, options) {
         const { skill_id } = params;
-        return this._client.get(path_path `/skills/${skill_id}/versions/${version}/content`, {
+        return this._client.get(path `/skills/${skill_id}/versions/${version}/content`, {
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
             __binaryResponse: true,
@@ -47720,20 +47774,20 @@ class Versions extends APIResource {
      * Create a new immutable skill version.
      */
     create(skillID, body = {}, options) {
-        return this._client.post(path_path `/skills/${skillID}/versions`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path `/skills/${skillID}/versions`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
     /**
      * Get a specific skill version.
      */
     retrieve(version, params, options) {
         const { skill_id } = params;
-        return this._client.get(path_path `/skills/${skill_id}/versions/${version}`, options);
+        return this._client.get(path `/skills/${skill_id}/versions/${version}`, options);
     }
     /**
      * List skill versions for a skill.
      */
     list(skillID, query = {}, options) {
-        return this._client.getAPIList(path_path `/skills/${skillID}/versions`, (CursorPage), {
+        return this._client.getAPIList(path `/skills/${skillID}/versions`, (CursorPage), {
             query,
             ...options,
         });
@@ -47743,7 +47797,7 @@ class Versions extends APIResource {
      */
     delete(version, params, options) {
         const { skill_id } = params;
-        return this._client.delete(path_path `/skills/${skill_id}/versions/${version}`, options);
+        return this._client.delete(path `/skills/${skill_id}/versions/${version}`, options);
     }
 }
 Versions.Content = versions_content_Content;
@@ -47774,13 +47828,13 @@ class Skills extends APIResource {
      * Get a skill by its ID.
      */
     retrieve(skillID, options) {
-        return this._client.get(path_path `/skills/${skillID}`, options);
+        return this._client.get(path `/skills/${skillID}`, options);
     }
     /**
      * Update the default version pointer for a skill.
      */
     update(skillID, body, options) {
-        return this._client.post(path_path `/skills/${skillID}`, { body, ...options });
+        return this._client.post(path `/skills/${skillID}`, { body, ...options });
     }
     /**
      * List all skills for the current project.
@@ -47792,7 +47846,7 @@ class Skills extends APIResource {
      * Delete a skill by its ID.
      */
     delete(skillID, options) {
-        return this._client.delete(path_path `/skills/${skillID}`, options);
+        return this._client.delete(path `/skills/${skillID}`, options);
     }
 }
 Skills.Content = content_Content;
@@ -47821,7 +47875,7 @@ class Parts extends APIResource {
      * [complete the Upload](https://platform.openai.com/docs/api-reference/uploads/complete).
      */
     create(uploadID, body, options) {
-        return this._client.post(path_path `/uploads/${uploadID}/parts`, multipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path `/uploads/${uploadID}/parts`, multipartFormRequestOptions({ body, ...options }, this._client));
     }
 }
 //# sourceMappingURL=parts.mjs.map
@@ -47871,7 +47925,7 @@ class Uploads extends APIResource {
      * Returns the Upload object with status `cancelled`.
      */
     cancel(uploadID, options) {
-        return this._client.post(path_path `/uploads/${uploadID}/cancel`, options);
+        return this._client.post(path `/uploads/${uploadID}/cancel`, options);
     }
     /**
      * Completes the
@@ -47891,7 +47945,7 @@ class Uploads extends APIResource {
      * object.
      */
     complete(uploadID, body, options) {
-        return this._client.post(path_path `/uploads/${uploadID}/complete`, { body, ...options });
+        return this._client.post(path `/uploads/${uploadID}/complete`, { body, ...options });
     }
 }
 Uploads.Parts = Parts;
@@ -47932,7 +47986,7 @@ class FileBatches extends APIResource {
      * Create a vector store file batch.
      */
     create(vectorStoreID, body, options) {
-        return this._client.post(path_path `/vector_stores/${vectorStoreID}/file_batches`, {
+        return this._client.post(path `/vector_stores/${vectorStoreID}/file_batches`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -47943,7 +47997,7 @@ class FileBatches extends APIResource {
      */
     retrieve(batchID, params, options) {
         const { vector_store_id } = params;
-        return this._client.get(path_path `/vector_stores/${vector_store_id}/file_batches/${batchID}`, {
+        return this._client.get(path `/vector_stores/${vector_store_id}/file_batches/${batchID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -47954,7 +48008,7 @@ class FileBatches extends APIResource {
      */
     cancel(batchID, params, options) {
         const { vector_store_id } = params;
-        return this._client.post(path_path `/vector_stores/${vector_store_id}/file_batches/${batchID}/cancel`, {
+        return this._client.post(path `/vector_stores/${vector_store_id}/file_batches/${batchID}/cancel`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -47971,7 +48025,7 @@ class FileBatches extends APIResource {
      */
     listFiles(batchID, params, options) {
         const { vector_store_id, ...query } = params;
-        return this._client.getAPIList(path_path `/vector_stores/${vector_store_id}/file_batches/${batchID}/files`, (CursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
+        return this._client.getAPIList(path `/vector_stores/${vector_store_id}/file_batches/${batchID}/files`, (CursorPage), { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
     }
     /**
      * Wait for the given file batch to be processed.
@@ -48063,7 +48117,7 @@ class vector_stores_files_Files extends APIResource {
      * [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object).
      */
     create(vectorStoreID, body, options) {
-        return this._client.post(path_path `/vector_stores/${vectorStoreID}/files`, {
+        return this._client.post(path `/vector_stores/${vectorStoreID}/files`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -48074,7 +48128,7 @@ class vector_stores_files_Files extends APIResource {
      */
     retrieve(fileID, params, options) {
         const { vector_store_id } = params;
-        return this._client.get(path_path `/vector_stores/${vector_store_id}/files/${fileID}`, {
+        return this._client.get(path `/vector_stores/${vector_store_id}/files/${fileID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -48084,7 +48138,7 @@ class vector_stores_files_Files extends APIResource {
      */
     update(fileID, params, options) {
         const { vector_store_id, ...body } = params;
-        return this._client.post(path_path `/vector_stores/${vector_store_id}/files/${fileID}`, {
+        return this._client.post(path `/vector_stores/${vector_store_id}/files/${fileID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -48094,7 +48148,7 @@ class vector_stores_files_Files extends APIResource {
      * Returns a list of vector store files.
      */
     list(vectorStoreID, query = {}, options) {
-        return this._client.getAPIList(path_path `/vector_stores/${vectorStoreID}/files`, (CursorPage), {
+        return this._client.getAPIList(path `/vector_stores/${vectorStoreID}/files`, (CursorPage), {
             query,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -48108,7 +48162,7 @@ class vector_stores_files_Files extends APIResource {
      */
     delete(fileID, params, options) {
         const { vector_store_id } = params;
-        return this._client.delete(path_path `/vector_stores/${vector_store_id}/files/${fileID}`, {
+        return this._client.delete(path `/vector_stores/${vector_store_id}/files/${fileID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -48184,7 +48238,7 @@ class vector_stores_files_Files extends APIResource {
      */
     content(fileID, params, options) {
         const { vector_store_id } = params;
-        return this._client.getAPIList(path_path `/vector_stores/${vector_store_id}/files/${fileID}/content`, (Page), { ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
+        return this._client.getAPIList(path `/vector_stores/${vector_store_id}/files/${fileID}/content`, (Page), { ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) });
     }
 }
 //# sourceMappingURL=files.mjs.map
@@ -48218,7 +48272,7 @@ class VectorStores extends APIResource {
      * Retrieves a vector store.
      */
     retrieve(vectorStoreID, options) {
-        return this._client.get(path_path `/vector_stores/${vectorStoreID}`, {
+        return this._client.get(path `/vector_stores/${vectorStoreID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -48227,7 +48281,7 @@ class VectorStores extends APIResource {
      * Modifies a vector store.
      */
     update(vectorStoreID, body, options) {
-        return this._client.post(path_path `/vector_stores/${vectorStoreID}`, {
+        return this._client.post(path `/vector_stores/${vectorStoreID}`, {
             body,
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
@@ -48247,7 +48301,7 @@ class VectorStores extends APIResource {
      * Delete a vector store.
      */
     delete(vectorStoreID, options) {
-        return this._client.delete(path_path `/vector_stores/${vectorStoreID}`, {
+        return this._client.delete(path `/vector_stores/${vectorStoreID}`, {
             ...options,
             headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
         });
@@ -48257,7 +48311,7 @@ class VectorStores extends APIResource {
      * filter.
      */
     search(vectorStoreID, body, options) {
-        return this._client.getAPIList(path_path `/vector_stores/${vectorStoreID}/search`, (Page), {
+        return this._client.getAPIList(path `/vector_stores/${vectorStoreID}/search`, (Page), {
             body,
             method: 'post',
             ...options,
@@ -48286,7 +48340,7 @@ class Videos extends APIResource {
      * Fetch the latest metadata for a generated video.
      */
     retrieve(videoID, options) {
-        return this._client.get(path_path `/videos/${videoID}`, options);
+        return this._client.get(path `/videos/${videoID}`, options);
     }
     /**
      * List recently generated videos for the current project.
@@ -48298,7 +48352,7 @@ class Videos extends APIResource {
      * Permanently delete a completed or failed video and its stored assets.
      */
     delete(videoID, options) {
-        return this._client.delete(path_path `/videos/${videoID}`, options);
+        return this._client.delete(path `/videos/${videoID}`, options);
     }
     /**
      * Create a character from an uploaded video.
@@ -48312,7 +48366,7 @@ class Videos extends APIResource {
      * Streams the rendered video content for the specified video job.
      */
     downloadContent(videoID, query = {}, options) {
-        return this._client.get(path_path `/videos/${videoID}/content`, {
+        return this._client.get(path `/videos/${videoID}/content`, {
             query,
             ...options,
             headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
@@ -48336,13 +48390,13 @@ class Videos extends APIResource {
      * Fetch a character.
      */
     getCharacter(characterID, options) {
-        return this._client.get(path_path `/videos/characters/${characterID}`, options);
+        return this._client.get(path `/videos/characters/${characterID}`, options);
     }
     /**
      * Create a remix of a completed video using a refreshed prompt.
      */
     remix(videoID, body, options) {
-        return this._client.post(path_path `/videos/${videoID}/remix`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
+        return this._client.post(path `/videos/${videoID}/remix`, maybeMultipartFormRequestOptions({ body, ...options }, this._client));
     }
 }
 //# sourceMappingURL=videos.mjs.map
@@ -49658,6 +49712,9 @@ Commands:
   skills list           List all skills (RR and Agent Skills)
   doctor <path>         Check setup and print hints for common issues
   eval                  Run review fixtures evaluation (must_include checks)
+  suppression add       Create a Riverbed Memory suppression entry
+                        (--fingerprint --feedback --rationale [--scope]
+                         [--severity] [--files] [--expires] [--pr])
 
 Skills Subcommand Options:
   --from <path>         (import) Source directory to scan for SKILL.md files
@@ -49716,6 +49773,17 @@ function parseArgs(argv) {
     runsSubcommand: null,
     runsId1: null,
     runsId2: null,
+    // suppression subcommand fields (#687 PR-D)
+    suppressionSubcommand: null,
+    suppressionFingerprint: null,
+    suppressionFindingId: null,
+    suppressionFeedbackType: null,
+    suppressionScope: 'file',
+    suppressionRationale: null,
+    suppressionSeverity: null,
+    suppressionFiles: null,
+    suppressionExpiresAt: null,
+    suppressionPrNumber: null,
     // skills subcommand fields
     skillsSubcommand: null,
     fromPath: null,
@@ -49729,7 +49797,11 @@ function parseArgs(argv) {
     const arg = args.shift();
     if (
       !parsed.command &&
-      (arg === 'run' || arg === 'doctor' || arg === 'skills' || arg === 'runs')
+      (arg === 'run' ||
+        arg === 'doctor' ||
+        arg === 'skills' ||
+        arg === 'runs' ||
+        arg === 'suppression')
     ) {
       parsed.command = arg;
       // Check for skills subcommands (import/export/list)
@@ -49742,10 +49814,51 @@ function parseArgs(argv) {
           parsed.runsId1 = args.shift() ?? null;
           parsed.runsId2 = args.shift() ?? null;
         }
-      } else if (arg !== 'runs' && args[0] && !args[0].startsWith('-')) {
+      } else if (arg === 'suppression' && args[0] && !args[0].startsWith('-')) {
+        parsed.suppressionSubcommand = args.shift(); // add (only one for now)
+      } else if (arg !== 'runs' && arg !== 'suppression' && args[0] && !args[0].startsWith('-')) {
         parsed.target = args.shift();
       }
       continue;
+    }
+    if (parsed.command === 'suppression') {
+      if (arg === '--fingerprint') {
+        parsed.suppressionFingerprint = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--finding') {
+        parsed.suppressionFindingId = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--feedback') {
+        parsed.suppressionFeedbackType = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--scope') {
+        parsed.suppressionScope = args.shift() ?? 'file';
+        continue;
+      }
+      if (arg === '--rationale') {
+        parsed.suppressionRationale = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--severity') {
+        parsed.suppressionSeverity = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--files') {
+        parsed.suppressionFiles = parseList(args.shift() ?? '');
+        continue;
+      }
+      if (arg === '--expires') {
+        parsed.suppressionExpiresAt = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--pr') {
+        const v = parseInt(args.shift() ?? '', 10);
+        if (!Number.isNaN(v) && v > 0) parsed.suppressionPrNumber = v;
+        continue;
+      }
     }
     if (!parsed.command && arg === 'eval') {
       parsed.command = 'eval';
@@ -50297,7 +50410,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
     printHelp();
     return 0;
   }
-  if (!['run', 'doctor', 'eval', 'skills'].includes(parsed.command)) {
+  if (!['run', 'doctor', 'eval', 'skills', 'runs', 'suppression'].includes(parsed.command)) {
     console.error(`Unknown command: ${parsed.command}`);
     printHelp();
     return 1;
@@ -50345,6 +50458,71 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       } else {
         console.log(JSON.stringify(results, null, 2));
       }
+      return 0;
+    }
+
+    if (parsed.command === 'suppression') {
+      if (parsed.suppressionSubcommand !== 'add') {
+        console.error(
+          'Error: only `river suppression add` is supported (need: --fingerprint --feedback --rationale).'
+        );
+        return 1;
+      }
+      if (!parsed.suppressionFingerprint) {
+        console.error('Error: --fingerprint <16-hex> is required.');
+        return 1;
+      }
+      if (!/^[0-9a-f]{16}$/.test(parsed.suppressionFingerprint)) {
+        console.error('Error: --fingerprint must be exactly 16 lowercase hex chars.');
+        return 1;
+      }
+      if (!parsed.suppressionFeedbackType) {
+        console.error(
+          'Error: --feedback <false_positive|accepted_risk|wont_fix|not_relevant|duplicate> is required.'
+        );
+        return 1;
+      }
+      const validFeedback = new Set([
+        'false_positive',
+        'accepted_risk',
+        'wont_fix',
+        'not_relevant',
+        'duplicate',
+      ]);
+      if (!validFeedback.has(parsed.suppressionFeedbackType)) {
+        console.error('Error: --feedback must be one of: ' + [...validFeedback].join(', ') + '.');
+        return 1;
+      }
+      if (!parsed.suppressionRationale) {
+        console.error('Error: --rationale "<why this finding is being suppressed>" is required.');
+        return 1;
+      }
+      const validScope = new Set(['global', 'subsystem', 'file']);
+      if (!validScope.has(parsed.suppressionScope)) {
+        console.error('Error: --scope must be one of: global, subsystem, file.');
+        return 1;
+      }
+      const repoRoot = await (0,git/* ensureGitRepo */.NC)(targetPath);
+      const indexPath = external_node_path_.resolve(repoRoot, '.river', 'memory', 'index.json');
+      const { createSuppression } = await __nccwpck_require__.e(/* import() */ 528).then(__nccwpck_require__.bind(__nccwpck_require__, 3528));
+      const entry = createSuppression({
+        indexPath,
+        findingId: parsed.suppressionFindingId,
+        fingerprint: parsed.suppressionFingerprint,
+        feedbackType: parsed.suppressionFeedbackType,
+        scope: parsed.suppressionScope,
+        rationale: parsed.suppressionRationale,
+        severity: parsed.suppressionSeverity,
+        filePaths: parsed.suppressionFiles,
+        expiresAt: parsed.suppressionExpiresAt,
+        prNumber: parsed.suppressionPrNumber,
+      });
+      console.log('Suppression created: ' + entry.id);
+      console.log('  fingerprint: ' + entry.context.fingerprint);
+      console.log('  feedbackType: ' + entry.context.feedbackType);
+      console.log('  scope: ' + entry.context.scope);
+      if (entry.context.severity) console.log('  severity: ' + entry.context.severity);
+      console.log('  written to: ' + indexPath);
       return 0;
     }
 
