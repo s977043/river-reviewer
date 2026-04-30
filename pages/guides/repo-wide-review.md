@@ -203,7 +203,7 @@ context:
 | `medium`   | 4000      | gpt-4o-mini / sonnet 級モデルでの通常 PR              |
 | `large`    | 16000     | 大型モデルでの深掘りレビュー                          |
 
-ranking のスコアリングは `src/lib/context-ranker.mjs` の `pathProximity` / `symbolOverlap` / `testAffinity` / `commitRecency` で構成され、変更ファイルから「近い」順に候補を絞ります。スコア内訳は `reviewDebug.repoContextRanking` で確認できます。
+ranking のスコアリングは `src/lib/context-ranker.mjs` の `pathProximity` / `symbolUsage` / `siblingTest` / `commitRecency` で構成され、変更ファイルから「近い」順に候補を絞ります。スコア内訳は `reviewDebug.repoContextRanking` で確認できます。
 
 その他、ノイズが多いと感じたら `.river-reviewer.yaml` の `exclude.files` を強化したり、`risk-map.yaml` の `action: comment_only` を docs に当てて gating だけ外すといった既存運用も引き続き有効です。
 
