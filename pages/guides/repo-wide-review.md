@@ -53,7 +53,7 @@ jobs:
         with:
           fetch-depth: 0 # repo-wide context collector が周辺コミット履歴を読むため必須
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.14.1
+        uses: s977043/river-reviewer/runners/github-action@v0.28.0
         with:
           phase: midstream
           dry_run: false
@@ -61,7 +61,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-> 例では `@v0.14.1` に固定しています。最新リリースが出た場合はそのタグへ置き換えてください。
+> 例では `@v0.28.0` に固定しています。最新リリースが出た場合はそのタグへ置き換えてください。
 >
 > `fetch-depth: 0` は repo-wide context collector が変更ファイル周辺のコミット履歴・関連ファイルを参照するために必要です。shallow clone のままだと collector が劣化します。
 
