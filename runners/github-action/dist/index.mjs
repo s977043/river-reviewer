@@ -34910,9 +34910,9 @@ function classifyFindings(findings, options = {}) {
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   Y: () => (/* binding */ computeFingerprint),
 /* harmony export */   i: () => (/* binding */ annotateFingerprints)
 /* harmony export */ });
-/* unused harmony export computeFingerprint */
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7598);
 
 
@@ -37967,7 +37967,139 @@ function isLlmEnabled() {
 
 // EXTERNAL MODULE: ./src/lib/finding-fingerprint.mjs
 var finding_fingerprint = __nccwpck_require__(9597);
+;// CONCATENATED MODULE: ./src/lib/suppression-apply.mjs
+// Apply Riverbed Memory suppressions to a list of findings (#687 PR-B).
+//
+// PR-A landed the data model (suppression context schema and the new
+// fingerprint / feedbackType / severity fields on createSuppression). This
+// PR-B is the gate that consumes those entries: given a list of findings
+// already annotated with fingerprints (see src/lib/finding-fingerprint.mjs)
+// and a memoryContext loaded by src/lib/memory-context.mjs, it splits the
+// findings into kept vs suppressed and returns observability metadata.
+//
+// PR-C of #687 will inject one call to applySuppressions inside
+// src/lib/local-runner.mjs:runLocalReview between annotateFingerprints and
+// the return statement so the pipeline behavior changes there, not here.
+//
+// P1 guard policy (do not silently auto-suppress dangerous findings):
+//   - findings of severity `major` or `critical` are kept unless the
+//     suppression's feedbackType is explicitly `accepted_risk`.
+//   - lower severities (`minor`, `info`) are auto-suppressed for any
+//     non-revoked, non-expired suppression that matches the fingerprint.
+//   - the per-suppression `minSeverityToAutoSuppress` (added in PR-A)
+//     can RAISE the bar but never lower it; the global P1 guard wins.
+
+const HIGH_SEVERITY = new Set(['major', 'critical']);
+const SEVERITY_RANK = { info: 0, minor: 1, major: 2, critical: 3 };
+
+function severityOf(finding) {
+  return String(finding.severity || 'info').toLowerCase();
+}
+
+/**
+ * Apply matching suppressions to findings.
+ *
+ * @param {Array<object>} findings  Findings already annotated with `.fingerprint`
+ *   by `annotateFingerprints` (src/lib/finding-fingerprint.mjs).
+ * @param {object} memoryContext    Bucketed memory from `loadReviewMemory`.
+ *   Only `memoryContext.suppressions` is consulted.
+ * @param {object} [opts]
+ * @param {object} [opts.config]    Effective config; `config.memory.suppressionEnabled === false`
+ *   bypasses suppression entirely (returns all findings as-is).
+ * @returns {{ keptFindings: Array<object>, suppressedFindings: Array<object>, applied: Array<object> }}
+ *   `applied` is the observability log. Each entry: `{ fingerprint, suppressionId,
+ *   feedbackType, severity, action: 'suppressed' | 'skipped', reason? }`. Findings
+ *   moved to `suppressedFindings` carry a `status: 'suppressed'` flag and a
+ *   `suppressionRef` pointing back at the suppression entry id.
+ */
+function applySuppressions(findings, memoryContext, opts = {}) {
+  const list = Array.isArray(findings) ? findings : [];
+  const result = { keptFindings: list, suppressedFindings: [], applied: [] };
+
+  if (opts?.config?.memory?.suppressionEnabled === false) return result;
+
+  const suppressions = memoryContext?.suppressions;
+  if (!Array.isArray(suppressions) || suppressions.length === 0) return result;
+  if (list.length === 0) return result;
+
+  // Index suppressions by canonical fingerprint. Entries that lack a
+  // fingerprint (pre-#687 PR-A) are intentionally ignored — they cannot
+  // gate findings safely without reintroducing the old hashFinding /
+  // computeFingerprint mismatch that PR-A documented as tech debt.
+  const byFingerprint = new Map();
+  for (const s of suppressions) {
+    const fp = s?.context?.fingerprint;
+    if (typeof fp === 'string' && fp.length === 16) byFingerprint.set(fp, s);
+  }
+  if (byFingerprint.size === 0) return result;
+
+  const kept = [];
+  const suppressed = [];
+  const applied = [];
+
+  for (const finding of list) {
+    const fp = finding?.fingerprint;
+    const match = fp ? byFingerprint.get(fp) : undefined;
+    if (!match) {
+      kept.push(finding);
+      continue;
+    }
+
+    const sev = severityOf(finding);
+    const feedbackType = match.context?.feedbackType ?? null;
+    const minSeverity = match.context?.minSeverityToAutoSuppress;
+
+    // Per-suppression cap: `minSeverityToAutoSuppress` is the highest
+    // severity this entry is allowed to auto-suppress. A finding above
+    // that rank stays.
+    if (minSeverity && SEVERITY_RANK[sev] > SEVERITY_RANK[String(minSeverity).toLowerCase()]) {
+      kept.push(finding);
+      applied.push({
+        fingerprint: fp,
+        suppressionId: match.id,
+        feedbackType,
+        severity: sev,
+        action: 'skipped',
+        reason: 'severity-above-min-severity-cap',
+      });
+      continue;
+    }
+
+    // Global P1 guard: never auto-suppress major/critical without
+    // accepted_risk. Other feedbackTypes (false_positive, wont_fix, ...)
+    // require manual handling for high-severity findings.
+    if (HIGH_SEVERITY.has(sev) && feedbackType !== 'accepted_risk') {
+      kept.push(finding);
+      applied.push({
+        fingerprint: fp,
+        suppressionId: match.id,
+        feedbackType,
+        severity: sev,
+        action: 'skipped',
+        reason: 'high-severity-requires-accepted-risk',
+      });
+      continue;
+    }
+
+    suppressed.push({
+      ...finding,
+      status: 'suppressed',
+      suppressionRef: match.id,
+    });
+    applied.push({
+      fingerprint: fp,
+      suppressionId: match.id,
+      feedbackType,
+      severity: sev,
+      action: 'suppressed',
+    });
+  }
+
+  return { keptFindings: kept, suppressedFindings: suppressed, applied };
+}
+
 ;// CONCATENATED MODULE: ./src/lib/local-runner.mjs
+
 
 
 
@@ -38347,6 +38479,40 @@ async function runLocalReview({
     ? await runReviewerOrchestration({ ...reviewArgs, reviewers })
     : await (0,review_engine/* generateReview */.G1)(reviewArgs);
 
+  // #687 PR-C: gate findings by Riverbed Memory suppressions.
+  // Run AFTER fingerprint annotation so applySuppressions sees the canonical
+  // 16-hex fingerprint produced by computeFingerprint(). Bypassed when
+  // config.memory.suppressionEnabled === false (see suppression-apply.mjs).
+  const annotatedFindings = (0,finding_fingerprint/* annotateFingerprints */.i)(review.findings ?? []);
+  const {
+    keptFindings,
+    suppressedFindings,
+    applied: suppressionsApplied,
+  } = applySuppressions(annotatedFindings, memoryContext, { config: context.config });
+
+  // Comments and findings are 1:1 in review-engine.mjs (`findings =
+  // comments.map(...)`). When a finding is suppressed, the corresponding
+  // PR comment must also be filtered — otherwise the suppressed finding
+  // still surfaces verbatim in the review thread, defeating the entire
+  // point of the suppression. Match by fingerprint computed from the
+  // comment's own fields so this stays robust if the 1:1 ordering ever
+  // drifts.
+  const suppressedFingerprints = new Set(
+    suppressedFindings.map((f) => f.fingerprint).filter(Boolean)
+  );
+  const reviewComments = review.comments ?? [];
+  const keptComments =
+    suppressedFingerprints.size === 0
+      ? reviewComments
+      : reviewComments.filter((c) => {
+          const fp = (0,finding_fingerprint/* computeFingerprint */.Y)({
+            ruleId: c.skillId || 'unknown',
+            file: c.file,
+            message: c.message,
+          });
+          return !suppressedFingerprints.has(fp);
+        });
+
   return {
     status: 'ok',
     repoRoot: external_node_path_.resolve(context.repoRoot),
@@ -38357,15 +38523,16 @@ async function runLocalReview({
     reviewMode: context.plan?.reviewMode ?? 'medium',
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
-    comments: review.comments,
-    findings: (0,finding_fingerprint/* annotateFingerprints */.i)(review.findings ?? []),
+    comments: keptComments,
+    findings: keptFindings,
+    suppressedFindings,
     classified: review.classified,
     reviewerResults: review.reviewerResults ?? null,
     tokenEstimate: context.diff.tokenEstimate,
     rawTokenEstimate: context.diff.rawTokenEstimate,
     reduction: context.diff.reduction,
     prompt: review.prompt,
-    reviewDebug: review.debug,
+    reviewDebug: { ...(review.debug ?? {}), suppressionsApplied },
     projectRules: context.projectRules,
     availableContexts: context.availableContexts,
     availableDependencies: context.availableDependencies,

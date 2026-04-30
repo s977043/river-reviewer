@@ -16,7 +16,8 @@ import { loadReviewMemory } from './memory-context.mjs';
 import { collectRepoContext } from './repo-context.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import { isLlmEnabled, parseList } from './utils.mjs';
-import { annotateFingerprints } from './finding-fingerprint.mjs';
+import { annotateFingerprints, computeFingerprint } from './finding-fingerprint.mjs';
+import { applySuppressions } from './suppression-apply.mjs';
 
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
@@ -383,6 +384,40 @@ export async function runLocalReview({
     ? await runReviewerOrchestration({ ...reviewArgs, reviewers })
     : await generateReview(reviewArgs);
 
+  // #687 PR-C: gate findings by Riverbed Memory suppressions.
+  // Run AFTER fingerprint annotation so applySuppressions sees the canonical
+  // 16-hex fingerprint produced by computeFingerprint(). Bypassed when
+  // config.memory.suppressionEnabled === false (see suppression-apply.mjs).
+  const annotatedFindings = annotateFingerprints(review.findings ?? []);
+  const {
+    keptFindings,
+    suppressedFindings,
+    applied: suppressionsApplied,
+  } = applySuppressions(annotatedFindings, memoryContext, { config: context.config });
+
+  // Comments and findings are 1:1 in review-engine.mjs (`findings =
+  // comments.map(...)`). When a finding is suppressed, the corresponding
+  // PR comment must also be filtered — otherwise the suppressed finding
+  // still surfaces verbatim in the review thread, defeating the entire
+  // point of the suppression. Match by fingerprint computed from the
+  // comment's own fields so this stays robust if the 1:1 ordering ever
+  // drifts.
+  const suppressedFingerprints = new Set(
+    suppressedFindings.map((f) => f.fingerprint).filter(Boolean)
+  );
+  const reviewComments = review.comments ?? [];
+  const keptComments =
+    suppressedFingerprints.size === 0
+      ? reviewComments
+      : reviewComments.filter((c) => {
+          const fp = computeFingerprint({
+            ruleId: c.skillId || 'unknown',
+            file: c.file,
+            message: c.message,
+          });
+          return !suppressedFingerprints.has(fp);
+        });
+
   return {
     status: 'ok',
     repoRoot: path.resolve(context.repoRoot),
@@ -393,15 +428,16 @@ export async function runLocalReview({
     reviewMode: context.plan?.reviewMode ?? 'medium',
     diffText: context.diff.diffText,
     files: context.diff.filesForReview ?? context.diff.files,
-    comments: review.comments,
-    findings: annotateFingerprints(review.findings ?? []),
+    comments: keptComments,
+    findings: keptFindings,
+    suppressedFindings,
     classified: review.classified,
     reviewerResults: review.reviewerResults ?? null,
     tokenEstimate: context.diff.tokenEstimate,
     rawTokenEstimate: context.diff.rawTokenEstimate,
     reduction: context.diff.reduction,
     prompt: review.prompt,
-    reviewDebug: review.debug,
+    reviewDebug: { ...(review.debug ?? {}), suppressionsApplied },
     projectRules: context.projectRules,
     availableContexts: context.availableContexts,
     availableDependencies: context.availableDependencies,
