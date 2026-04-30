@@ -306,22 +306,46 @@ memory:
 | `not_relevant`   | このコードベースには無関係なルール                 | ❌                        |
 | `duplicate`      | 既存 suppression と同義（`--duplicate-of` の代替） | ❌                        |
 
-## eval fixtures の実行方法（計画中）
+## eval fixtures の実行方法
 
-「context あり/なしで検出差を計測する」regression fixtures は [Issue #688](https://github.com/s977043/river-reviewer/issues/688) で追跡しています。実装後は次のコマンドで実行できる予定です。
-
-```bash
-npm run eval:repo-context
-```
-
-現状利用できる近い評価系は次の通りです。
+「context あり/なしで検出差を計測する」regression fixtures が [Issue #688](https://github.com/s977043/river-reviewer/issues/688) として用意されています（v0.28.0 で全機能着地）。
 
 ```bash
-npm run eval:fixtures   # 既存の review fixture eval（PR 差分のみ）
-npm run eval            # 統合 eval driver（planner / fixtures / gate / meta）
+npm run eval:repo-context        # repo-wide eval 単体実行
+npm run eval:all                 # 統合 driver（planner / fixtures / regression / meta / repo-context）
 ```
 
-`tests/fixtures/review-eval/cases.json` の構造を `tests/fixtures/repo-wide-eval/` に派生させる前提で設計が進んでいます（詳細は Issue #688）。
+### Fixture 構造
+
+`tests/fixtures/repo-wide-eval/` に以下の 8 ケースが同梱されています:
+
+| Case                            | Category      | 目的                                                  |
+| ------------------------------- | ------------- | ----------------------------------------------------- |
+| `i18n-unused-key-01`            | i18n          | 削除した翻訳キーが locale に残るパターン              |
+| `normalization-id-format-01`    | normalization | 既存の正規化ヘルパーをバイパスする呼び出し            |
+| `loading-state-early-return-01` | loading       | loading guard 削除による null deref                   |
+| `nullability-api-response-01`   | nullability   | nullable 契約の不安全な dereference                   |
+| `api-contract-no-test-01`       | api-compat    | 必須フィールド追加に伴うテスト未更新                  |
+| `guard-future-use-comment`      | guard         | TODO を rationale に置き換え（指摘は false positive） |
+| `guard-generated-file`          | guard         | 生成ファイルのヘッダー更新                            |
+| `guard-related-test-updated`    | guard         | source 変更と同 PR でテストを更新済み                 |
+
+新しい fixture を追加する手順は `tests/fixtures/repo-wide-eval/README.md` を参照。
+
+### 出力されるメトリクス
+
+`evaluateRepoWideFixtures` の summary は以下を返します:
+
+| Metric                                             | 意味                                                                                        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `detectionRateWith / detectionRateWithout`         | 検出ケースのうち finding が出た割合（context あり / なし）                                  |
+| `contextLiftRate`                                  | `withCtx − withoutCtx` の平均（正なら repo-wide context が検出力を上げている）              |
+| `falsePositiveRateWith / falsePositiveRateWithout` | guard ケースのうち false positive を出した割合（理想は 0）                                  |
+| `categoriesCovered`                                | 検出されたカテゴリ一覧（i18n / normalization / loading / nullability / api-compat / guard） |
+
+### Nightly drift detection
+
+`.github/workflows/nightly-eval.yml` が `evaluate-all.mjs` を呼ぶため、repo-context メトリクスは自動で `artifacts/evals/results.jsonl` の ledger に追記されます。日々の値の変化が drift detection になります。
 
 ## troubleshooting
 
