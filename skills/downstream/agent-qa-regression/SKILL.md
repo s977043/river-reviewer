@@ -18,6 +18,7 @@ tags:
 severity: major
 inputContext:
   - diff
+  - tests
 outputKind:
   - actions
   - findings

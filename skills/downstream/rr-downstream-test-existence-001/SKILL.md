@@ -12,7 +12,7 @@ applyTo:
   - '**/*.spec.*'
 tags: [tests, coverage, downstream]
 severity: major
-inputContext: [diff]
+inputContext: [diff, tests]
 outputKind: [tests, findings, actions]
 modelHint: balanced
 dependencies: [test_runner, coverage_report]
