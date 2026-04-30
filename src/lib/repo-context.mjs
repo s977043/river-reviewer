@@ -134,8 +134,12 @@ export async function collectRepoContext({
         const raw = readFileCapped(abs, Math.min(SECTION_CAPS.tests, budget));
         if (raw) {
           const content = maybeRedact(raw);
-          testContents.push(`// ${candidate}\n${content}`);
-          budget -= content.length;
+          // The pushed entry includes a `// candidate\n` header; bill the
+          // entire entry against the budget so the running total stays
+          // accurate when many test files are aggregated.
+          const entry = `// ${candidate}\n${content}`;
+          testContents.push(entry);
+          budget -= entry.length;
         }
         break;
       }
