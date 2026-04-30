@@ -14,7 +14,7 @@
  *   --append-ledger        Append result to artifacts/evals/results.jsonl
  *   --description <text>   Optional description for ledger entry
  *   --json                 Print result as JSON instead of human-readable
- *   --skip <name>          Skip a sub-eval (planner|fixtures|gate|meta). Repeatable
+ *   --skip <name>          Skip a sub-eval (planner|fixtures|gate|meta|repo-context). Repeatable
  *   --persist-memory       Write eval result as Riverbed Memory entry
  *   -h, --help             Show help
  */
@@ -46,6 +46,12 @@ const RATIO_METRICS = new Set([
   'escalationAccuracy',
   'suppressionAccuracy',
   'resurfaceAccuracy',
+  // #688 PR-4: repo-context eval ratio metrics
+  'detectionRateWith',
+  'detectionRateWithout',
+  'contextLiftRate',
+  'falsePositiveRateWith',
+  'falsePositiveRateWithout',
 ]);
 
 // --- arg parsing -----------------------------------------------------------
@@ -170,6 +176,37 @@ async function runFixturesEval() {
   };
 }
 
+async function runRepoContextEval() {
+  // #688 PR-4: integrate the repo-wide eval harness landed in PR-1..3.
+  // The eval harness is API-key-free (dryRun: true) so it is safe to
+  // run as part of evaluate-all.mjs without secrets. Surfaces detection
+  // / context-lift / false-positive rates as ratio metrics consumed by
+  // the ledger downstream.
+  const { evaluateRepoWideFixtures } = await import('../src/lib/repo-wide-fixtures-eval.mjs');
+  const casesPath = path.join(ROOT, 'tests', 'fixtures', 'repo-wide-eval', 'cases.json');
+  if (!fs.existsSync(casesPath)) {
+    return skipResult('repo-context');
+  }
+  const result = await evaluateRepoWideFixtures({ casesPath });
+  return {
+    name: 'repo-context',
+    // No hard pass/fail gate yet — the suite is for drift detection.
+    // Failures from upstream regressions surface in the ledger Δ check
+    // (see scripts/evaluate-all.mjs ledger append).
+    pass: true,
+    skipped: false,
+    metrics: {
+      detectionRateWith: result.summary.detectionRateWith,
+      detectionRateWithout: result.summary.detectionRateWithout,
+      contextLiftRate: result.summary.contextLiftRate,
+      falsePositiveRateWith: result.summary.falsePositiveRateWith,
+      falsePositiveRateWithout: result.summary.falsePositiveRateWithout,
+      categoriesCovered: result.summary.categoriesCovered.length,
+    },
+    errors: [],
+  };
+}
+
 async function runGateEval(inputPath) {
   const { evaluateGate } = await import('./evaluate-review-gate.mjs');
   const result = await evaluateGate({ input: inputPath });
@@ -195,7 +232,6 @@ async function runMetaValidation() {
     errors,
   };
 }
-
 
 async function runRegressionEval() {
   const { evaluateRegression } = await import('../src/lib/regression-eval.mjs');
@@ -274,6 +310,13 @@ Options:
     parallel.push(
       runMetaValidation().catch((err) =>
         errorResult('meta', `Meta validation error: ${err.message}`)
+      )
+    );
+  }
+  if (!parsed.skip.has('repo-context')) {
+    parallel.push(
+      runRepoContextEval().catch((err) =>
+        errorResult('repo-context', `Repo-context eval error: ${err.message}`)
       )
     );
   }
