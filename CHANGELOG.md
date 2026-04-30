@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.25.0](https://github.com/s977043/river-reviewer/compare/v0.24.0...v0.25.0) (2026-04-30)
+
+
+### Features
+
+* **context:** add token-estimator and context.* config schema ([#689](https://github.com/s977043/river-reviewer/issues/689) PR-A) ([#712](https://github.com/s977043/river-reviewer/issues/712)) ([2514d6a](https://github.com/s977043/river-reviewer/commit/2514d6acb8b4c59e11950610c28284cab734eb45))
+* **eval:** add repo-wide review regression fixtures harness ([#688](https://github.com/s977043/river-reviewer/issues/688) PR-1) ([#711](https://github.com/s977043/river-reviewer/issues/711)) ([3b61fbc](https://github.com/s977043/river-reviewer/commit/3b61fbc1148add2291d67e87150315b54546ae7e))
+
 ## [0.24.0](https://github.com/s977043/river-reviewer/compare/v0.23.0...v0.24.0) (2026-04-30)
 
 
