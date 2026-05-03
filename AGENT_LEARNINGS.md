@@ -37,3 +37,7 @@
 - `2026-04-30`: Secret redaction is **multi-stage** by design. Deny-glob runs BEFORE files are read (`.env*` / `*.pem` / `*.key` / `secrets.*` never enter process memory). Content-level redaction runs AFTER read with named categories plus an entropy fallback (default 4.5 bits / char, 24-char minimum). Replacements use length-stable `<REDACTED:category>` so suppression fingerprints stay deterministic across redaction. Final boundary redaction in `review-engine.mjs` covers prompt previews and debug output. Allowlist is for fixed test fixtures only.
   - `Applies to`: any change touching repo-wide context, prompt construction, or debug observability.
   - `Evidence`: `src/lib/secret-redactor.mjs`, wiring at `src/lib/repo-context.mjs` / `local-runner.mjs` / `review-engine.mjs`, `pages/guides/repo-wide-review.md` "secret redaction" section.
+
+- `2026-05-03`: Root scripts assume Node.js 22.x; running validations on older Node versions can fail before repo logic executes.
+  - `Applies to`: local/CI execution of `npm run lint`, `npm test`, and validation scripts.
+  - `Evidence`: `package.json` `engines.node` is pinned to `22.x`.
