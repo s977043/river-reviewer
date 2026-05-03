@@ -38,6 +38,6 @@
   - `Applies to`: any change touching repo-wide context, prompt construction, or debug observability.
   - `Evidence`: `src/lib/secret-redactor.mjs`, wiring at `src/lib/repo-context.mjs` / `local-runner.mjs` / `review-engine.mjs`, `pages/guides/repo-wide-review.md` "secret redaction" section.
 
-- `2026-05-03`: Root scripts assume Node.js 22.x; running validations on older Node versions can fail before repo logic executes.
+- `2026-05-03`: Root scripts assume Node.js `22.x`; running validations on older Node versions can fail before repo logic executes.
   - `Applies to`: local/CI execution of `npm run lint`, `npm test`, and validation scripts.
   - `Evidence`: `package.json` `engines.node` is pinned to `22.x`.
