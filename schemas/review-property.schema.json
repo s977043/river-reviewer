@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://river-reviewer.dev/schemas/review-property.schema.json",
+  "title": "River Reviewer Review Property",
+  "description": "A typed review property extracted from specifications, ADRs, requirements, API contracts, or design documents.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "property_id",
+    "type",
+    "statement",
+    "source",
+    "phase",
+    "severity",
+    "confidence"
+  ],
+  "$defs": {
+    "propertyType": {
+      "type": "string",
+      "enum": ["invariant", "precondition", "postcondition", "assumption"]
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["upstream", "midstream", "downstream"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "minor", "major", "critical"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["adr", "spec", "requirements", "openapi", "readme", "issue", "pr", "other"]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "type": "string"
+        },
+        "line_start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "line_end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "quote": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "pattern": "^RR-PROP-[A-Za-z0-9_.:-]+$",
+      "description": "Stable property identifier. Example: RR-PROP-auth-inv-001."
+    },
+    "type": {
+      "$ref": "#/$defs/propertyType"
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable property statement."
+    },
+    "formal_hint": {
+      "type": "string",
+      "description": "Optional pseudo-formal assertion that helps proof-attempt review."
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "phase": {
+      "$ref": "#/$defs/phase"
+    },
+    "severity": {
+      "$ref": "#/$defs/severity"
+    },
+    "confidence": {
+      "$ref": "#/$defs/confidence"
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["in_scope", "out_of_scope", "unknown"],
+      "default": "unknown"
+    },
+    "threat_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "stride": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["spoofing", "tampering", "repudiation", "information_disclosure", "denial_of_service", "elevation_of_privilege"]
+          },
+          "uniqueItems": true
+        },
+        "cwe": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^CWE-[0-9]+$"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "reachability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "entry_points": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "attacker_controlled": {
+          "type": "boolean"
+        },
+        "trusted_only": {
+          "type": "boolean"
+        }
+      }
+    },
+    "implementation_hints": {
+      "type": "array",
+      "description": "Optional files, symbols, or runtime paths that may implement this property.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": { "type": "string" },
+          "symbol": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
