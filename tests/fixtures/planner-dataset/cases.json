@@ -176,5 +176,36 @@
     "availableContexts": ["diff", "adr"],
     "availableDependencies": ["repo_metadata", "tracing"],
     "expectedAny": ["rr-upstream-api-design-001", "rr-upstream-failure-modes-observability-001"]
+  },
+  {
+    "name": "routing: architecture intent (bounded context boundaries) — Epic #743 / #746",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-architecture-bounded-context.diff",
+    "availableContexts": ["diff", "adr"],
+    "availableDependencies": ["repo_metadata"],
+    "expectedAny": ["rr-upstream-architecture-boundaries-001"],
+    "expectedTop1": ["rr-upstream-architecture-boundaries-001"]
+  },
+  {
+    "name": "routing: pre-mortem / adversarial design intent — Epic #743 / #746",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-design-pre-mortem.diff",
+    "availableContexts": ["diff", "adr", "fullFile", "commitMessage"],
+    "availableDependencies": ["repo_metadata", "code_search"],
+    "expectedAny": ["rr-upstream-pre-mortem-001"],
+    "expectedTop1": [
+      "rr-upstream-security-privacy-design-001",
+      "rr-upstream-pre-mortem-001",
+      "rr-upstream-architecture-boundaries-001"
+    ]
+  },
+  {
+    "name": "routing: multi-skill (security + observability) — Epic #743 / #746",
+    "phase": "midstream",
+    "diffFile": "diffs/midstream-security-and-observability.diff",
+    "availableContexts": ["diff", "fullFile"],
+    "availableDependencies": ["code_search", "tracing"],
+    "expectedAny": ["rr-midstream-security-basic-001", "rr-midstream-logging-observability-001"],
+    "expectedTop1": ["rr-midstream-security-basic-001", "rr-midstream-logging-observability-001"]
   }
 ]
