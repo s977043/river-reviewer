@@ -1,5 +1,5 @@
 ---
-id: embedding-code-index-research
+id: embedding-code-index-research-en
 ---
 
 # Embedding-based code index (research note)
