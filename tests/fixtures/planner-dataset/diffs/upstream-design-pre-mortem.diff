@@ -1,0 +1,26 @@
+diff --git a/docs/architecture/payment-retry-design.md b/docs/architecture/payment-retry-design.md
+index 1111111..2222222 100644
+--- a/docs/architecture/payment-retry-design.md
++++ b/docs/architecture/payment-retry-design.md
+@@ -1,4 +1,18 @@
+ # Payment retry design
+
++## Pre-mortem questions
++
++Imagine 12 months from now an incident happens because of this design. What went wrong?
++
++- Idempotency key collision when the same `paymentId` is retried via two different
++  channels at once → duplicate charge.
++- Retry storm cascades into the upstream payment provider's rate limit, dropping
++  legitimate first-time charges.
++- A partial failure leaves the order in `PAYMENT_PENDING` indefinitely; we have
++  no compensating action.
++
++## Risk inventory
++
++| Risk | Likelihood | Impact | Mitigation |
++| ---- | ---------- | ------ | ---------- |
++| Duplicate charge | medium | high | server-side dedupe by idempotency key with 24h TTL |
++| Retry storm | low | medium | exponential backoff + jitter, 5 retry cap |
++
+ ## Retry policy

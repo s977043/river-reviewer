@@ -1,0 +1,24 @@
+diff --git a/docs/architecture/inventory-bounded-context.md b/docs/architecture/inventory-bounded-context.md
+index 1111111..2222222 100644
+--- a/docs/architecture/inventory-bounded-context.md
++++ b/docs/architecture/inventory-bounded-context.md
+@@ -1,6 +1,18 @@
+ # Inventory bounded context
+
+ ## Boundary
++
++### Owned aggregates
++
++- `Stock` — current quantity per (sku, warehouse)
++- `Reservation` — pending checkout holds
++
++### External dependencies (in-bound)
++
++- `Order` (from order context) — only via published `OrderPlaced` event
++
++### External dependencies (out-bound)
++
++- `WarehousePicking` (from logistics context) — only via `ReservationConfirmed` event
+
+ ## Module ownership
+ The inventory team owns this module.
