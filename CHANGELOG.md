@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.31.0](https://github.com/s977043/river-reviewer/compare/v0.30.0...v0.31.0) (2026-05-06)
+
+
+### Features
+
+* **skills:** redefine river-reviewer as improvement-loop orchestrator ([#744](https://github.com/s977043/river-reviewer/issues/744) [#745](https://github.com/s977043/river-reviewer/issues/745)) ([#755](https://github.com/s977043/river-reviewer/issues/755)) ([658d039](https://github.com/s977043/river-reviewer/commit/658d0396d92fd1b31b55054930cace355c7a43da))
+
 ## [0.30.0](https://github.com/s977043/river-reviewer/compare/v0.29.0...v0.30.0) (2026-05-06)
 
 
