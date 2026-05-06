@@ -24,6 +24,8 @@ outputKind:
   - actions
   - findings
 modelHint: balanced
+dependencies:
+  - code_search
 ---
 
 ## Guidance

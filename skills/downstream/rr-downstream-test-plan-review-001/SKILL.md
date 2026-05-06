@@ -27,6 +27,7 @@ outputKind:
 modelHint: balanced
 dependencies:
   - test_runner
+  - code_search
 ---
 
 ## Pattern declaration
