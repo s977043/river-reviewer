@@ -6,10 +6,10 @@ version: 0.1.0
 category: midstream
 phase: midstream
 applyTo:
-  - '**/*.ts'
-  - '**/*.tsx'
-  - '**/*.js'
-  - '**/*.jsx'
+  - 'src/**/*.{ts,tsx,js,jsx}'
+  - 'app/**/*.{ts,tsx,js,jsx}'
+  - 'lib/**/*.{ts,tsx,js,jsx}'
+  - 'packages/**/*.{ts,tsx,js,jsx}'
 tags:
   - consistency
   - normalization

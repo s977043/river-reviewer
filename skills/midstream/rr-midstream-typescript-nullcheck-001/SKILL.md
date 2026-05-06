@@ -6,8 +6,10 @@ version: 0.1.0
 category: midstream
 phase: midstream
 applyTo:
-  - '**/*.ts'
-  - '**/*.tsx'
+  - 'src/**/*.{ts,tsx}'
+  - 'app/**/*.{ts,tsx}'
+  - 'lib/**/*.{ts,tsx}'
+  - 'packages/**/*.{ts,tsx}'
 tags: [typescript, type-safety, midstream]
 severity: major
 inputContext: [diff, fullFile]
