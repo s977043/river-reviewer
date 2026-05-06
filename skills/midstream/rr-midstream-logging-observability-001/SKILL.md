@@ -6,12 +6,10 @@ version: 0.1.0
 category: midstream
 phase: midstream
 applyTo:
-  - 'src/**/*'
-  - 'lib/**/*'
-  - '**/*.js'
-  - '**/*.mjs'
-  - '**/*.ts'
-  - '**/*.tsx'
+  - 'src/**/*.{ts,tsx,js,jsx,mjs,cjs}'
+  - 'app/**/*.{ts,tsx,js,jsx,mjs,cjs}'
+  - 'lib/**/*.{ts,tsx,js,jsx,mjs,cjs}'
+  - 'packages/**/*.{ts,tsx,js,jsx,mjs,cjs}'
 tags:
   - observability
   - logging

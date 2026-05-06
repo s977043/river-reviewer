@@ -6,9 +6,11 @@ version: 0.1.0
 category: midstream
 phase: midstream
 applyTo:
-  - '**/*.ts'
-  - '**/*.tsx'
-  - '**/*.js'
+  - 'src/**/*.{ts,tsx,js}'
+  - 'app/**/*.{ts,tsx,js}'
+  - 'lib/**/*.{ts,tsx,js}'
+  - 'packages/**/*.{ts,tsx,js}'
+  - 'pages/api/**/*.{ts,js}'
 tags: [api, compatibility, dto, breaking-change, test-coverage, midstream]
 severity: major
 inputContext: [diff, fullFile]
