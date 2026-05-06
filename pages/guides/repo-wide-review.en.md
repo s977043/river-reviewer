@@ -301,14 +301,15 @@ A mechanism that accumulates feedback such as "this was a false positive" or "ac
 ### Adding a suppression via CLI
 
 ```bash
+# --scope defaults to "file"; --pr is optional (source PR)
 river suppression add \
   --fingerprint <16-hex> \
   --feedback <false_positive|accepted_risk|wont_fix|not_relevant|duplicate> \
   --rationale "<why suppress>" \
-  --scope <global|subsystem|file> \   # default: file
+  --scope <global|subsystem|file> \
   --severity <info|minor|major|critical> \
   --files src/auth.ts,src/login.ts \
-  --pr 123                             # optional: source PR
+  --pr 123
 ```
 
 Pick the fingerprint from the `--debug` output or `reviewDebug.suppressionsApplied`. Strict `<16-hex>` checks and feedbackType enum checks run up front, so typos exit with code 1.
