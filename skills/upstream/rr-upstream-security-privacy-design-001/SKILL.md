@@ -6,9 +6,10 @@ version: 0.1.0
 category: upstream
 phase: upstream
 applyTo:
-  - '**/*.md'
+  - 'docs/**/*.md'
   - '**/design/**/*'
   - '**/rfc/**/*'
+  - 'docs/architecture/**/*'
 tags:
   - security
   - privacy

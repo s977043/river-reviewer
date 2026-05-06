@@ -8,7 +8,7 @@ phase: upstream
 applyTo:
   - 'docs/**/*'
   - 'pages/**/*'
-  - '**/*.md'
+  - 'docs/adr/**/*'
   - '**/*.adr'
 tags:
   - planning
