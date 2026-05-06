@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://river-reviewer.dev/schemas/review-gate-result.schema.json",
+  "title": "River Reviewer Review Gate Result",
+  "description": "Structured output from downstream false-positive gates for proof-attempt findings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["property_id", "decision", "gates", "rationale"],
+  "$defs": {
+    "gateVerdict": {
+      "type": "string",
+      "enum": ["passed", "failed", "unknown"]
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["confirmed_issue", "disputed_false_positive", "needs_human_review"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "minor", "major", "critical"]
+    }
+  },
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "pattern": "^RR-PROP-[A-Za-z0-9_.:-]+$"
+    },
+    "decision": {
+      "$ref": "#/$defs/decision"
+    },
+    "adjusted_severity": {
+      "$ref": "#/$defs/severity"
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dead_code", "trust_boundary", "scope"],
+      "properties": {
+        "dead_code": { "$ref": "#/$defs/gateVerdict" },
+        "trust_boundary": { "$ref": "#/$defs/gateVerdict" },
+        "scope": { "$ref": "#/$defs/gateVerdict" }
+      }
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "human_handoff_reason": {
+      "type": "string"
+    }
+  }
+}
