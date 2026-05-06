@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://river-reviewer.dev/schemas/review-scope.schema.json",
+  "title": "River Reviewer Review Scope",
+  "description": "Project-specific scope, trust assumptions, and severity rubric for property-grounded review.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "in_scope", "out_of_scope", "trust_assumptions", "severity_classification"],
+  "$defs": {
+    "severity": {
+      "type": "string",
+      "enum": ["info", "minor", "major", "critical"]
+    },
+    "trustLevel": {
+      "type": "string",
+      "enum": ["untrusted", "semi_trusted", "trusted"]
+    },
+    "scopePattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pattern", "reason"],
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "in_scope": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/scopePattern" },
+      "minItems": 1
+    },
+    "out_of_scope": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/scopePattern" },
+      "minItems": 1
+    },
+    "trust_assumptions": {
+      "type": "object",
+      "description": "Named trust assumptions used by proof-attempt and false-positive gates.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["trust_level", "rationale"],
+        "properties": {
+          "trust_level": {
+            "$ref": "#/$defs/trustLevel"
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "examples": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "severity_classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["info", "minor", "major", "critical"],
+      "properties": {
+        "info": { "type": "string", "minLength": 1 },
+        "minor": { "type": "string", "minLength": 1 },
+        "major": { "type": "string", "minLength": 1 },
+        "critical": { "type": "string", "minLength": 1 }
+      }
+    },
+    "review_modes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "$ref": "#/$defs/severity"
+        },
+        "security_label": {
+          "$ref": "#/$defs/severity"
+        },
+        "release_gate": {
+          "$ref": "#/$defs/severity"
+        }
+      }
+    }
+  }
+}
