@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://river-reviewer.dev/schemas/proof-attempt-result.schema.json",
+  "title": "River Reviewer Proof Attempt Result",
+  "description": "Structured output from a property-grounded proof-attempt review.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["property_id", "verdict", "code_path", "proof_trace", "evidence"],
+  "$defs": {
+    "severity": {
+      "type": "string",
+      "enum": ["info", "minor", "major", "critical"]
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["proved", "broken", "unknown", "not_applicable"]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "line_start": { "type": "integer", "minimum": 1 },
+        "line_end": { "type": "integer", "minimum": 1 },
+        "symbol": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    }
+  },
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "pattern": "^RR-PROP-[A-Za-z0-9_.:-]+$"
+    },
+    "verdict": {
+      "$ref": "#/$defs/verdict"
+    },
+    "severity": {
+      "$ref": "#/$defs/severity"
+    },
+    "code_path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Concrete file/function/path reviewed for this property."
+    },
+    "proof_trace": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Concise explanation of why the property is proved, broken, unknown, or not applicable."
+    },
+    "attack_or_failure_scenario": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidence" },
+      "minItems": 1
+    },
+    "required_follow_up": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "questions": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
