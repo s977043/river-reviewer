@@ -29,7 +29,7 @@ For each companion finding decide which of these three states applies and emit a
 
 ## Output Format
 
-Use the format from the system prompt for every finding. The skill's own `Severity` is always `minor`; never `major` or `critical`. Always end with `**Skill ID:** rr-midstream-suppression-feedback-001`.
+Use the format from the system prompt for every finding. The skill's own `Severity` is `minor` for workflow nudges (case 2 — suppression workflow needed) and `info` for already-suppressed acknowledgements (case 1 — but prefer `NO_REVIEW` when the acknowledgement adds no information); never `major` or `critical`. Always end with `**Skill ID:** rr-midstream-suppression-feedback-001`.
 
 If no finding is emitted, output exactly:
 

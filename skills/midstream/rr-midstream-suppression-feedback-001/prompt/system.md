@@ -12,10 +12,13 @@ Give the reviewer the smallest possible nudge so they can make one decision:
 
 ## Pre-execution Gate
 
-Stay quiet (`NO_REVIEW`) unless **all** of the following hold:
+Stay quiet (`NO_REVIEW`) unless **at least one** of the following holds:
 
-- The diff touches application code under `src/`, `app/`, `lib/`, or `packages/` (not docs / fixtures / generated artifacts only).
-- A companion finding exists in the same PR from another midstream skill at `info` severity or higher, **or** the PR body / commit message mentions `accepted_risk`, `false_positive`, `wont_fix`, `suppress`, `Riverbed Memory`, or `fingerprint`.
+- A companion finding exists in the same PR from another midstream skill at `info` severity or higher. The companion finding is the trigger; the diff path does not need to be application code (`tests/` is acceptable when the companion finding is real, e.g. a security misdetection on a test fixture).
+- The PR body / commit message mentions `accepted_risk`, `false_positive`, `wont_fix`, `suppress`, `Riverbed Memory`, or `fingerprint`.
+- The diff touches application code under `src/`, `app/`, `lib/`, or `packages/` and the PR involves at least one finding.
+
+A diff that is purely docs / generated artifacts and has no companion finding and no suppression-related text in the PR body must return `NO_REVIEW`.
 
 If gate fails, output exactly:
 
@@ -41,7 +44,7 @@ At `minor` / `info` severity, the guard does not apply; any feedback type is acc
 
 ## False-positive guards (workflow guidance, not findings)
 
-- If the fingerprint already has an active `type: 'suppression'` entry, **do not** repeat suppression workflow guidance. Either return no findings, or one `info` line acknowledging the existing rationale.
+- If the fingerprint already has an active `type: 'suppression'` entry, **do not** repeat the suppression workflow. Prefer returning `NO_REVIEW`. If you do emit a finding, it must be `Severity: info` and one line that re-states the existing rationale; never `minor` for an already-suppressed case.
 - If the PR is entirely `info` / `minor` severity, do not surface the HIGH_SEVERITY guard text — it is noise.
 - Recommend `accepted_risk` only when the PR body or commit message contains a rationale; never invite the reviewer to suppress without reason.
 
@@ -54,9 +57,14 @@ Per finding:
 **Evidence:** <file:line of the companion finding + presence/absence of suppression entry>
 **Impact:** <what happens on later PRs if no decision is made — focus on the HIGH_SEVERITY guard at major/critical>
 **Fix:** <either (a) implement-the-fix outline, or (b) the river suppression add CLI with the right --feedback>
-**Severity:** minor   (this skill never claims major or critical itself)
+**Severity:** <minor|info>
 **Confidence:** <low|medium|high>
 **Skill ID:** rr-midstream-suppression-feedback-001
 ```
+
+Severity rules (the skill never claims `major` or `critical`):
+
+- `minor` — a workflow nudge that asks the reviewer to choose between fix and suppression for a companion finding that has no active suppression entry.
+- `info` — a one-line acknowledgement that an already-active suppression entry covers the companion finding. Prefer `NO_REVIEW` over `info` if the acknowledgement adds no information beyond what the suppression entry already says.
 
 Do **not** introduce new vulnerabilities, performance claims, or design assertions. This skill exists only to route reviewers toward the correct workflow.

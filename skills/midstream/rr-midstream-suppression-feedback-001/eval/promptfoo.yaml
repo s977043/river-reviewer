@@ -46,16 +46,18 @@ tests:
       diff: file://../fixtures/02-already-suppressed-finding.md
     assert:
       - type: not-contains
-        value: 'river suppression add'
-      - type: not-contains
         value: 'Severity: major'
       - type: not-contains
-        value: 'Severity: minor'
+        value: 'Severity: critical'
       - type: llm-rubric
         value: |
           The output must NOT repeat the suppression-vs-fix workflow.
-          Score 1 if it returns no findings or only a single info-level acknowledgement that the existing suppression covers the case.
-          Score 0 if it asks the reviewer to decide suppression vs fix again.
+          Score 1 if the output (a) returns NO_REVIEW, or (b) returns only a single
+          `Severity: info` acknowledgement that the existing suppression covers the case
+          and does NOT prescribe a new `river suppression add` CLI invocation for the reviewer.
+          Score 0 if it emits a `minor` finding that asks the reviewer to choose suppression
+          vs fix, or if it prescribes new CLI input even though an active entry already
+          covers the fingerprint.
       - type: similar
         value: file://../golden/02-already-suppressed-finding.md
         threshold: 0.5
@@ -66,17 +68,19 @@ tests:
     assert:
       - type: contains
         value: 'false_positive'
-      - type: not-contains
-        value: 'accepted_risk'
       - type: contains
         value: 'tests/'
       - type: contains
         value: 'Severity: minor'
       - type: not-contains
         value: 'Severity: major'
+      - type: not-contains
+        value: 'Severity: critical'
       - type: llm-rubric
         value: |
-          The output must recommend feedbackType=false_positive (not accepted_risk) and acknowledge the test-file context.
+          The output must recommend feedbackType=false_positive as the action and acknowledge the test-file context.
+          The output may mention `accepted_risk` for contrast (e.g. "use false_positive, not accepted_risk")
+          but the recommended `--feedback` value passed to `river suppression add` must be `false_positive`.
           Score 1 if both conditions hold. Score 0 otherwise.
       - type: similar
         value: file://../golden/03-false-positive-candidate.md
