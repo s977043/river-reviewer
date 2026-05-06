@@ -125,4 +125,5 @@ Finding は以下のフィールドを満たすこと。詳細条件は [VERIFIC
 - [ROUTING.md](./references/ROUTING.md) — 詳細なルーティングルールと優先度
 - [VERIFICATION.md](./references/VERIFICATION.md) — finding 出力前の self-check 条件
 - [FEEDBACK.md](./references/FEEDBACK.md) — 人間/エージェントフィードバックの 7 分類と repository action
+- [FEEDBACK_TO_FIXTURE.md](./references/FEEDBACK_TO_FIXTURE.md) — フィードバックを fixture / suppression / reference / routing 更新へ変換する運用フロー（eval コマンド付き）
 - [IMPROVEMENT_LOOP.md](./references/IMPROVEMENT_LOOP.md) — 9 ステップ改善ループ
