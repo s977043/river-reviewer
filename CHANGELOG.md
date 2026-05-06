@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.33.0](https://github.com/s977043/river-reviewer/compare/v0.32.0...v0.33.0) (2026-05-06)
+
+
+### Features
+
+* **eval:** add routing/planner eval cases for river-reviewer entry skill ([#763](https://github.com/s977043/river-reviewer/issues/763)) ([599edae](https://github.com/s977043/river-reviewer/commit/599edae42b8fa769299ae3e98224ffe9105bc0d7))
+
 ## [0.32.0](https://github.com/s977043/river-reviewer/compare/v0.31.0...v0.32.0) (2026-05-06)
 
 
