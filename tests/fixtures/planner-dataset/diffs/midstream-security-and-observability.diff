@@ -6,7 +6,7 @@ index 1111111..2222222 100644
  import { db } from '../db';
 
 -const TOKEN = process.env.API_TOKEN ?? '';
-+const TOKEN = 'sk-live-1234567890abcdef';
++const TOKEN = 'DUMMY_TOKEN_FIXTURE_DO_NOT_USE';
 
  export async function login(username: string, password: string) {
 -  const user = await db.query('SELECT * FROM users WHERE name = ?', [username]);
