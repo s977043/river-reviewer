@@ -5,7 +5,7 @@ title: CLI Spec — `river review verify`
 `river review verify` は、既に生成されたレビュー結果（`review-self` / `review-external`）と元の上流アーティファクト（`plan` / `diff` / `test-cases` など）を入力として受け取る CLI コマンドです。verify 系 skill を走らせて **W チェック（レビューの再監査）** を行い、既存レビューの抜け・誤検知・ハルシネーションを再点検し、META finding（レビューに対するレビュー）を [Review Artifact](./review-artifact.md) として出力します。本ドキュメントはコマンドの引数・入力・出力・終了コードを spec として固定し、CI から安定して呼び出せる契約を定義します。
 
 > 関連 Issue: #575（Task）/ #509（Capability）/ #507（Epic）
-> 関連 spec: `river review plan`（#517）/ `river review exec`（#518）/ `rr-upstream-plangate-verification-audit-001`（skill spec は #577 で作成予定）
+> 関連 spec: `river review plan`（#517）/ `river review exec`（#518）/ `rr-upstream-plangate-verification-audit-001`（skill spec は #577 で完了済み、`skills/upstream/rr-upstream-plangate-verification-audit-001/SKILL.md`）
 
 ## 責務分担（plan / exec / verify の関係）
 
@@ -93,7 +93,7 @@ META finding の severity 語彙は [`schemas/output.schema.json`](../../schemas
 
 `verify` は実行対象を **verify 系 skill** に限定します。判定は次のいずれかを満たす skill を verify 系と見なすヒューリスティクスです。
 
-- `id` が `rr-upstream-plangate-verification-` で始まる（代表: `rr-upstream-plangate-verification-audit-001`、spec は #577 で作成予定）。
+- `id` が `rr-upstream-plangate-verification-` で始まる（代表: `rr-upstream-plangate-verification-audit-001`、spec は #577 で完了済み）。
 - skill メタデータの `outputKind` に `review-audit` が含まれる。
 
 非 verify skill は `plan.selectedSkills` には含めず、`plan.skippedSkills` に `reason: "not-verify-skill"` として記録します。Review Artifact を読む CI や Riverbed Memory 側で、`verify` 経由のレビュー監査であることを明示的に判別できるようにするためです。
