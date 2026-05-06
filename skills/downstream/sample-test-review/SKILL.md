@@ -27,6 +27,7 @@ modelHint: balanced
 dependencies:
   - test_runner
   - coverage_report
+  - code_search
 ---
 
 ## Goal / 目的

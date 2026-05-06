@@ -25,6 +25,7 @@ modelHint: balanced
 dependencies:
   - test_runner
   - coverage_report
+  - code_search
 tags:
   - policy
   - downstream

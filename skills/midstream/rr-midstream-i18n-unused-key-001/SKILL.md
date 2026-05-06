@@ -22,6 +22,8 @@ inputContext:
 outputKind:
   - findings
 modelHint: balanced
+dependencies:
+  - code_search
 ---
 
 ## Pattern declaration

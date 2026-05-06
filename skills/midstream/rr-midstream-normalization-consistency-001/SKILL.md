@@ -22,6 +22,8 @@ inputContext:
 outputKind:
   - findings
 modelHint: high-accuracy
+dependencies:
+  - code_search
 ---
 
 ## Pattern declaration
