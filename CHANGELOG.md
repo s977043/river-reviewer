@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.30.0](https://github.com/s977043/river-reviewer/compare/v0.29.0...v0.30.0) (2026-05-06)
+
+
+### Features
+
+* **skills:** add context-budget-tuning skill ([#742](https://github.com/s977043/river-reviewer/issues/742)) ([22704a6](https://github.com/s977043/river-reviewer/commit/22704a6201e2278e8a6a3075844906d160d48889))
+
 ## [0.29.0](https://github.com/s977043/river-reviewer/compare/v0.28.1...v0.29.0) (2026-04-30)
 
 
