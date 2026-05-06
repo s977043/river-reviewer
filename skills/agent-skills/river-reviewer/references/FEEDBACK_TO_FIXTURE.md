@@ -19,17 +19,17 @@
 
 ## Conversion table / 変換表（eval コマンド付き）
 
-各 feedback type は 1 つの destination + 1 つの eval コマンドにマッピングされる。
+各 feedback type は **主 destination（必要なら副 destination）** と、**実行すべき eval コマンド群** にマッピングされる。複数候補が併記されているセルは、どれを選ぶかが本ドキュメント以下で明示される（例: `false_positive` は guard fixture を最優先、不可能なときのみ suppression）。
 
-| feedback type    | 主な destination                                                  | 副 destination                                 | 必須 eval コマンド                                                             | rationale 必須? |
-| ---------------- | ----------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------ | --------------- |
-| `accepted`       | （変更なし）                                                      | positive fixture（必要時）                     | `npm run eval:fixtures`                                                        | 不要            |
-| `false_positive` | guard fixture（`<NN>-guard.md` / `*-should-not-detect`）          | suppression（guard 不可時）                    | `npm run eval:fixtures` + `npm run eval:repo-context`                          | 任意            |
-| `missed_issue`   | happy-path fixture（`<NN>-happy.md` / `*-should-detect`）         | routing 更新（後述の root cause 判定で必要時） | `npm run eval:fixtures` + `npm run eval:repo-context` + `npm run planner:eval` | 不要            |
-| `not_actionable` | reference の fix template / example 追記                          | skill SKILL.md の output 例                    | `npm run skills:validate`                                                      | 不要            |
-| `duplicate`      | routing 更新（owner skill 明確化）または skill 内 dedupe ロジック | dedupe key の見直し                            | `npm run planner:eval` + `npm run skills:validate`                             | 不要            |
-| `accepted_risk`  | suppression entry（rationale 必須）                               | （なし）                                       | `npm run skills:validate`                                                      | **必須**        |
-| `unclear`        | skill SKILL.md / reference の wording 改善                        | VERIFICATION.md への追記                       | `npm run skills:validate`                                                      | 不要            |
+| feedback type    | 主な destination                                                  | 副 destination                                 | 必須 eval コマンド                                                                     | rationale 必須? |
+| ---------------- | ----------------------------------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------- | --------------- |
+| `accepted`       | （変更なし）                                                      | positive fixture（必要時）                     | `npm run eval:fixtures`                                                                | 不要            |
+| `false_positive` | guard fixture（`<NN>-guard.md` / `*-should-not-detect`）          | suppression（guard 不可時）                    | `npm run eval:fixtures` + `npm run eval:repo-context`                                  | 任意            |
+| `missed_issue`   | happy-path fixture（`<NN>-happy.md` / `*-should-detect`）         | routing 更新（後述の root cause 判定で必要時） | `npm run eval:fixtures` + `npm run eval:repo-context` + `npm run planner:eval:dataset` | 不要            |
+| `not_actionable` | reference の fix template / example 追記                          | skill SKILL.md の output 例                    | `npm run skills:validate`                                                              | 不要            |
+| `duplicate`      | routing 更新（owner skill 明確化）または skill 内 dedupe ロジック | dedupe key の見直し                            | `npm run planner:eval:dataset` + `npm run skills:validate`                             | 不要            |
+| `accepted_risk`  | suppression entry（rationale 必須）                               | （なし）                                       | `npm run skills:validate`                                                              | **必須**        |
+| `unclear`        | skill SKILL.md / reference の wording 改善                        | VERIFICATION.md への追記                       | `npm run skills:validate`                                                              | 不要            |
 
 `accepted_risk` の rationale は `--rationale` で suppression entry に必ず記録する。**特に `severity: major` / `critical` の指摘を `accepted_risk` で抑止する場合は、なぜ residual risk を許容できるのかを 1 文以上で説明する**（HIGH_SEVERITY guard で `accepted_risk` 以外の type は弾かれるため、結果的にこの型を選ぶこと自体が判断責任を伴う）。
 
@@ -37,11 +37,11 @@
 
 `missed_issue` は「レビューが見落とした」事象だが、**なぜ見落としたか** で対処が変わる。fixture を追加するだけでは不十分なケースがある。
 
-| root cause            | 兆候                                                                                                             | 対処                                                                                                                                                                       |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **routing miss**      | 該当 skill が plan に入っていない（`plan.selected` に出ていない）                                                | `tests/fixtures/planner-dataset/cases.json` に対応する case を追加し、`npm run planner:eval` で再現させる。`applyTo` / `inputContext` / `availableContexts` の組合せを修正 |
-| **missing context**   | skill は plan に入ったが、レビュー時に必要な周辺情報（fullFile / tests / usages）が context に含まれていなかった | 該当 skill の `inputContext` を拡張、または `.river-reviewer.yaml` の `context.budget.perSectionCaps` を見直す                                                             |
-| **weak instructions** | skill は plan に入り context も足りていたが、prompt が拾い方を教えていない                                       | skill の SKILL.md / `prompt/system.md` を更新し、happy-path fixture を追加して再現性を保証                                                                                 |
+| root cause            | 兆候                                                                                                             | 対処                                                                                                                                                                               |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **routing miss**      | 該当 skill が plan に入っていない（`plan.selected` に出ていない）                                                | `tests/fixtures/planner-dataset/cases.json` に対応する case を追加し、`npm run planner:eval:dataset` で再現させる。`applyTo` / `inputContext` / `availableContexts` の組合せを修正 |
+| **missing context**   | skill は plan に入ったが、レビュー時に必要な周辺情報（fullFile / tests / usages）が context に含まれていなかった | 該当 skill の `inputContext` を拡張、または `.river-reviewer.yaml` の `context.budget.perSectionCaps` を見直す                                                                     |
+| **weak instructions** | skill は plan に入り context も足りていたが、prompt が拾い方を教えていない                                       | skill の SKILL.md / `prompt/system.md` を更新し、happy-path fixture を追加して再現性を保証                                                                                         |
 
 3 つのうち 1 つだけが当てはまるとは限らない。例えば routing miss + missing context が同時に起きていることもあるので、**まず planner:eval で routing 単独を切り分けてから** context / instructions を順に検証する。
 
