@@ -6,14 +6,12 @@ version: 0.1.0
 category: upstream
 phase: upstream
 applyTo:
-  - '**/*.md'
-  - '**/*.yaml'
-  - '**/*.yml'
-  - '**/*.json'
   - 'docs/**/*'
   - 'design/**/*'
   - 'architecture/**/*'
   - 'specs/**/*'
+  - 'config/**/*'
+  - 'infrastructure/**/*'
 tags:
   - multitenancy
   - isolation

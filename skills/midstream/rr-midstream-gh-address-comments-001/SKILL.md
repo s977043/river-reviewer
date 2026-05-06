@@ -13,7 +13,6 @@ applyTo:
   - 'tests/**/*'
   - 'docs/**/*'
   - 'pages/**/*'
-  - '**/*.md'
 tags:
   - review
   - github

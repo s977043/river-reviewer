@@ -8,8 +8,9 @@ phase: upstream
 applyTo:
   - 'docs/**/*'
   - 'pages/**/*'
-  - '**/*.md'
   - 'README*.md'
+  - 'README*.markdown'
+  - '**/README.md'
 tags:
   - agent
   - documentation
