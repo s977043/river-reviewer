@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.39.0](https://github.com/s977043/river-reviewer/compare/v0.38.0...v0.39.0) (2026-05-07)
+
+
+### Features
+
+* **eos:** codify 5-layer EOS structure + agent-skills license:MIT ([#786](https://github.com/s977043/river-reviewer/issues/786)) ([f702b6b](https://github.com/s977043/river-reviewer/commit/f702b6b98d54a7dc5a56e1402983bc6fb0785a7e))
+
 ## [0.38.0](https://github.com/s977043/river-reviewer/compare/v0.37.0...v0.38.0) (2026-05-07)
 
 
