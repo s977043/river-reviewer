@@ -178,7 +178,7 @@
     "expectedAny": ["rr-upstream-api-design-001", "rr-upstream-failure-modes-observability-001"]
   },
   {
-    "name": "routing: architecture intent (bounded context boundaries) — Epic #743 / #746",
+    "name": "routing: architecture intent (bounded context boundaries) \u2014 Epic #743 / #746",
     "phase": "upstream",
     "diffFile": "diffs/upstream-architecture-bounded-context.diff",
     "availableContexts": ["diff", "adr"],
@@ -187,7 +187,7 @@
     "expectedTop1": ["rr-upstream-architecture-boundaries-001"]
   },
   {
-    "name": "routing: pre-mortem / adversarial design intent — Epic #743 / #746",
+    "name": "routing: pre-mortem / adversarial design intent \u2014 Epic #743 / #746",
     "phase": "upstream",
     "diffFile": "diffs/upstream-design-pre-mortem.diff",
     "availableContexts": ["diff", "adr", "fullFile", "commitMessage"],
@@ -200,7 +200,7 @@
     ]
   },
   {
-    "name": "routing: multi-skill (security + observability) — Epic #743 / #746",
+    "name": "routing: multi-skill (security + observability) \u2014 Epic #743 / #746",
     "phase": "midstream",
     "diffFile": "diffs/midstream-security-and-observability.diff",
     "availableContexts": ["diff", "fullFile"],
@@ -322,5 +322,27 @@
     "diffFile": "diffs/midstream-agent-skill-bridge.diff",
     "availableContexts": ["diff"],
     "expectedAny": ["rr-midstream-agent-skill-bridge-001"]
+  },
+  {
+    "name": "coverage: upstream create-plan (batch 5)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-create-plan.diff",
+    "availableContexts": ["diff", "repoConfig"],
+    "expectedAny": ["rr-upstream-create-plan-001"]
+  },
+  {
+    "name": "coverage: plangate GC deterministic (batch 5)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-plangate-gc-deterministic.diff",
+    "availableContexts": ["repoConfig", "fullFile"],
+    "expectedAny": ["rr-upstream-plangate-gc-deterministic-001"]
+  },
+  {
+    "name": "coverage: downstream test plan review (batch 5)",
+    "phase": "downstream",
+    "diffFile": "diffs/downstream-test-plan-review.diff",
+    "availableContexts": ["diff", "tests"],
+    "availableDependencies": ["test_runner", "code_search"],
+    "expectedAny": ["rr-downstream-test-plan-review-001"]
   }
 ]

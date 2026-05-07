@@ -1,0 +1,22 @@
+diff --git a/docs/plan/2026-checkout-latency-cut.md b/docs/plan/2026-checkout-latency-cut.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/docs/plan/2026-checkout-latency-cut.md
+@@ -0,0 +1,16 @@
++# Plan: cut checkout latency
++
++## Goal
++
++Reduce p95 latency from 420ms to <200ms.
++
++## Steps
++
++1. Wire Redis cache for session lookup.
++2. Parallelize OrderService.place DB calls.
++3. Move PII redaction to background queue.
++
++## Risks
++
++- Redis outage compounds checkout failure.
++- Step 3 may break audit pipeline.

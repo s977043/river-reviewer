@@ -1,0 +1,11 @@
+diff --git a/.river/memory/suppressions.jsonl b/.river/memory/suppressions.jsonl
+index 1111111..2222222 100644
+--- a/.river/memory/suppressions.jsonl
++++ b/.river/memory/suppressions.jsonl
+@@ -1,3 +1,5 @@
+ {"type":"suppression","fingerprint":"a1b2c3d4e5f60718","feedbackType":"accepted_risk","rationale":"legacy adapter, fire-and-forget metrics","createdAt":"2026-01-15T00:00:00Z"}
+ {"type":"suppression","fingerprint":"f0e1d2c3b4a59687","feedbackType":"false_positive","rationale":"test fixture password","createdAt":"2026-02-20T00:00:00Z","scope":"file","files":["tests/auth.test.ts"]}
+-{"type":"suppression","fingerprint":"9876543210abcdef","feedbackType":"wont_fix","rationale":"low priority","createdAt":"2025-09-10T00:00:00Z"}
++{"type":"suppression","fingerprint":"9876543210abcdef","feedbackType":"wont_fix","rationale":"low priority","createdAt":"2025-09-10T00:00:00Z","expiresAt":"2026-12-31T00:00:00Z"}
++{"type":"suppression","fingerprint":"deadbeefcafe0123","feedbackType":"accepted_risk","rationale":"compliance review pending","createdAt":"2026-05-01T00:00:00Z"}
++{"type":"suppression","fingerprint":"abcdef0123456789","feedbackType":"duplicate","duplicateOfFingerprint":"a1b2c3d4e5f60718","createdAt":"2026-05-07T00:00:00Z"}

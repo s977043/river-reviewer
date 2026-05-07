@@ -1,0 +1,35 @@
+diff --git a/tests/checkout-pricing.test.ts b/tests/checkout-pricing.test.ts
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/tests/checkout-pricing.test.ts
+@@ -0,0 +1,18 @@
++import { describe, it, expect } from 'vitest';
++import { computeFinalPrice } from '../src/lib/checkout-pricing';
++
++describe('computeFinalPrice', () => {
++  it('applies percent coupon correctly', () => {
++    const cart = { items: [{ price: 1000, qty: 2 }] };
++    const coupon = { type: 'percent', value: 10, isActive: true };
++    expect(computeFinalPrice(cart, coupon, { isVip: false })).toBe(1800);
++  });
++
++  it('falls back to subtotal when coupon is inactive', () => {
++    const cart = { items: [{ price: 500, qty: 1 }] };
++    const coupon = { type: 'percent', value: 50, isActive: false };
++    expect(computeFinalPrice(cart, coupon, { isVip: false })).toBe(500);
++  });
++
++  // TODO: edge cases — VIP + active coupon overlap, fixed type, zero qty
++});
+diff --git a/src/lib/checkout-pricing.ts b/src/lib/checkout-pricing.ts
+index 1111111..2222222 100644
+--- a/src/lib/checkout-pricing.ts
++++ b/src/lib/checkout-pricing.ts
+@@ -1,5 +1,5 @@
+ import { Cart, Coupon, User } from './types';
+
+ export function computeFinalPrice(cart: Cart, coupon: Coupon | null, user: User): number {
+-  return 0;
++  return cart.items.reduce((acc, it) => acc + it.price * it.qty, 0);
+ }
