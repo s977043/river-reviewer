@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.36.0](https://github.com/s977043/river-reviewer/compare/v0.35.0...v0.36.0) (2026-05-07)
+
+
+### Features
+
+* **eval:** add planner-dataset coverage batch 4 (5 more never-selected skills) ([#778](https://github.com/s977043/river-reviewer/issues/778)) ([e775c4e](https://github.com/s977043/river-reviewer/commit/e775c4eb0b99af18f1c2afba6a2b597211af5eeb))
+
 ## [0.35.0](https://github.com/s977043/river-reviewer/compare/v0.34.0...v0.35.0) (2026-05-07)
 
 
