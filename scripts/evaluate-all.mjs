@@ -351,13 +351,14 @@ Options:
   // affect pass/fail. See src/lib/eval-snapshots.mjs.
   let snapshots;
   try {
-    const { getSeverityDistribution, getTop1PerCase } =
+    const { getSeverityDistribution, getTop1PerCase, getPerSkillFpRate } =
       await import('../src/lib/eval-snapshots.mjs');
-    const [severity, top1PerCase] = await Promise.all([
+    const [severity, top1PerCase, perSkillFp] = await Promise.all([
       getSeverityDistribution(),
       getTop1PerCase(),
+      getPerSkillFpRate(),
     ]);
-    snapshots = { severity, top1PerCase };
+    snapshots = { severity, top1PerCase, perSkillFp };
   } catch (err) {
     snapshots = { error: `snapshot collection failed: ${err.message}` };
   }
