@@ -13,7 +13,7 @@ applyTo:
 tags:
   - planning
   - upstream
-severity: major
+severity: minor
 inputContext:
   - diff
   - repoConfig
