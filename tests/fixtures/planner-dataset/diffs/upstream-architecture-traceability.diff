@@ -1,0 +1,22 @@
+diff --git a/docs/architecture/order-context-design.md b/docs/architecture/order-context-design.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/docs/architecture/order-context-design.md
+@@ -0,0 +1,16 @@
++# Order context design
++
++## Decisions traced from ADRs
++
++- ADR 0042 (payment retry policy) → idempotency key flow on `Order.create`
++- ADR 0038 (event delivery semantics) → at-least-once + revision counter
++
++## Component diagram
++
++See `docs/architecture/diagrams/order-c4.svg`.
++
++## Open questions
++
++- Does the inventory context need to know the cancellation reason?
++- Should `OrderCancelled` carry the original `OrderPlaced` payload, or just the
++  `orderId` and a timestamp?
