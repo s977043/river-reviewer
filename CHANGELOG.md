@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.37.0](https://github.com/s977043/river-reviewer/compare/v0.36.0...v0.37.0) (2026-05-07)
+
+
+### Features
+
+* **eval:** add planner-dataset coverage batch 5 + clarify agent-tag exclusion ([#780](https://github.com/s977043/river-reviewer/issues/780)) ([f6ad68d](https://github.com/s977043/river-reviewer/commit/f6ad68dbb4e584874f4ac941e1c66ff2a88e4021))
+
 ## [0.36.0](https://github.com/s977043/river-reviewer/compare/v0.35.0...v0.36.0) (2026-05-07)
 
 
