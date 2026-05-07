@@ -1,0 +1,26 @@
+diff --git a/docs/architecture/order-dr-multi-region.md b/docs/architecture/order-dr-multi-region.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/docs/architecture/order-dr-multi-region.md
+@@ -0,0 +1,20 @@
++# Order context: multi-region disaster recovery
++
++## Active region topology
++
++Primary: ap-northeast-1 (tokyo). Secondary: us-east-1 (warm standby).
++
++## RPO / RTO targets
++
++- RPO: 30 seconds (cross-region replication for orders DB)
++- RTO: 5 minutes (DNS failover + warm-pool scale-out)
++
++## Failover triggers
++
++- p99 latency > 2s for 3 consecutive minutes
++- Health check fail rate > 50% in primary region
++
++## Open questions
++
++- Does the inventory context need RPO/RTO matched to orders, or can it tolerate weaker SLOs?
++- Where is the runbook? Is the on-call team trained on it?

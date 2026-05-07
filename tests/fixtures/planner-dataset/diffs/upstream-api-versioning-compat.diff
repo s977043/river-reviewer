@@ -1,0 +1,23 @@
+diff --git a/docs/api/orders-v2-contract.md b/docs/api/orders-v2-contract.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/docs/api/orders-v2-contract.md
+@@ -0,0 +1,18 @@
++# Orders API v2 contract
++
++## Breaking changes from v1
++
++- `POST /orders` now requires `idempotencyKey` (was optional).
++- Response envelope renamed `data` → `result`.
++- Removed deprecated `cancellationReason` field.
++
++## Versioning policy
++
++v1 will be sunset 90 days after v2 GA. Clients must send `Accept: application/vnd.acme.orders.v2+json`.
++
++## Compatibility considerations
++
++- v1 callers receive `406 Not Acceptable` if they request v2 without the header.
++- The deprecated `cancellationReason` is mirrored under `metadata.legacy_cancellation_reason` for one minor version only.
++- SDK auto-upgrade flag must default to `false` to avoid silent client behavior changes.

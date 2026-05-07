@@ -247,5 +247,44 @@
     "availableContexts": ["diff", "adr"],
     "availableDependencies": ["adr_lookup", "repo_metadata"],
     "expectedAny": ["rr-upstream-architecture-traceability-001"]
+  },
+  {
+    "name": "coverage: plangate plan integrity (batch 3)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-plangate-plan-integrity.diff",
+    "availableContexts": ["diff", "fullFile"],
+    "expectedAny": ["rr-upstream-plangate-plan-integrity-001"]
+  },
+  {
+    "name": "coverage: API versioning compatibility (batch 3)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-api-versioning-compat.diff",
+    "availableContexts": ["diff", "fullFile", "adr"],
+    "availableDependencies": ["repo_metadata"],
+    "expectedAny": ["rr-upstream-api-versioning-compat-001"]
+  },
+  {
+    "name": "coverage: DR multi-region design (batch 3)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-dr-multiregion.diff",
+    "availableContexts": ["diff", "adr"],
+    "availableDependencies": ["repo_metadata"],
+    "expectedAny": ["rr-upstream-dr-multiregion-001"]
+  },
+  {
+    "name": "coverage: integration contracts (batch 3)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-integration-contracts.diff",
+    "availableContexts": ["diff", "fullFile", "adr"],
+    "availableDependencies": ["repo_metadata"],
+    "expectedAny": ["rr-upstream-integration-contracts-001"]
+  },
+  {
+    "name": "coverage: midstream logic torturing / adversarial (batch 3)",
+    "phase": "midstream",
+    "diffFile": "diffs/midstream-logic-torturing.diff",
+    "availableContexts": ["diff", "fullFile", "commitMessage", "adr"],
+    "availableDependencies": ["code_search", "repo_metadata"],
+    "expectedAny": ["rr-midstream-logic-torturing-001"]
   }
 ]
