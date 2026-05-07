@@ -214,7 +214,8 @@
     "diffFile": "diffs/upstream-adr-decision-quality.diff",
     "availableContexts": ["diff", "adr"],
     "availableDependencies": ["adr_lookup", "repo_metadata"],
-    "expectedAny": ["rr-upstream-adr-decision-quality-001"]
+    "expectedAny": ["rr-upstream-adr-decision-quality-001"],
+    "expectedTop1": ["rr-upstream-adr-decision-quality-001"]
   },
   {
     "name": "coverage: DB schema migration design (#762 audit follow-up)",
@@ -222,7 +223,8 @@
     "diffFile": "diffs/upstream-db-schema-migration.diff",
     "availableContexts": ["diff", "fullFile", "adr"],
     "availableDependencies": ["repo_metadata"],
-    "expectedAny": ["rr-upstream-data-model-db-design-001"]
+    "expectedAny": ["rr-upstream-data-model-db-design-001"],
+    "expectedTop1": ["rr-upstream-data-model-db-design-001"]
   },
   {
     "name": "coverage: OpenAPI contract change (#762 audit follow-up)",
@@ -230,7 +232,8 @@
     "diffFile": "diffs/upstream-openapi-contract.diff",
     "availableContexts": ["diff", "fullFile", "adr"],
     "availableDependencies": ["repo_metadata"],
-    "expectedAny": ["rr-upstream-openapi-contract-001"]
+    "expectedAny": ["rr-upstream-openapi-contract-001"],
+    "expectedTop1": ["rr-upstream-openapi-contract-001"]
   },
   {
     "name": "coverage: event-driven design (#762 audit follow-up)",
@@ -238,7 +241,11 @@
     "diffFile": "diffs/upstream-event-driven-design.diff",
     "availableContexts": ["diff", "adr"],
     "availableDependencies": ["repo_metadata"],
-    "expectedAny": ["rr-upstream-event-driven-semantics-001"]
+    "expectedAny": ["rr-upstream-event-driven-semantics-001"],
+    "expectedTop1": [
+      "rr-upstream-architecture-boundaries-001",
+      "rr-upstream-event-driven-semantics-001"
+    ]
   },
   {
     "name": "coverage: architecture traceability (#762 audit follow-up)",
@@ -246,14 +253,22 @@
     "diffFile": "diffs/upstream-architecture-traceability.diff",
     "availableContexts": ["diff", "adr"],
     "availableDependencies": ["adr_lookup", "repo_metadata"],
-    "expectedAny": ["rr-upstream-architecture-traceability-001"]
+    "expectedAny": ["rr-upstream-architecture-traceability-001"],
+    "expectedTop1": [
+      "rr-upstream-architecture-boundaries-001",
+      "rr-upstream-architecture-traceability-001"
+    ]
   },
   {
     "name": "coverage: plangate plan integrity (batch 3)",
     "phase": "upstream",
     "diffFile": "diffs/upstream-plangate-plan-integrity.diff",
     "availableContexts": ["diff", "fullFile"],
-    "expectedAny": ["rr-upstream-plangate-plan-integrity-001"]
+    "expectedAny": ["rr-upstream-plangate-plan-integrity-001"],
+    "expectedTop1": [
+      "rr-upstream-security-privacy-design-001",
+      "rr-upstream-plangate-plan-integrity-001"
+    ]
   },
   {
     "name": "coverage: API versioning compatibility (batch 3)",
@@ -261,7 +276,8 @@
     "diffFile": "diffs/upstream-api-versioning-compat.diff",
     "availableContexts": ["diff", "fullFile", "adr"],
     "availableDependencies": ["repo_metadata"],
-    "expectedAny": ["rr-upstream-api-versioning-compat-001"]
+    "expectedAny": ["rr-upstream-api-versioning-compat-001"],
+    "expectedTop1": ["rr-upstream-api-design-001", "rr-upstream-api-versioning-compat-001"]
   },
   {
     "name": "coverage: DR multi-region design (batch 3)",
@@ -269,7 +285,8 @@
     "diffFile": "diffs/upstream-dr-multiregion.diff",
     "availableContexts": ["diff", "adr"],
     "availableDependencies": ["repo_metadata"],
-    "expectedAny": ["rr-upstream-dr-multiregion-001"]
+    "expectedAny": ["rr-upstream-dr-multiregion-001"],
+    "expectedTop1": ["rr-upstream-architecture-boundaries-001", "rr-upstream-dr-multiregion-001"]
   },
   {
     "name": "coverage: integration contracts (batch 3)",
@@ -277,7 +294,11 @@
     "diffFile": "diffs/upstream-integration-contracts.diff",
     "availableContexts": ["diff", "fullFile", "adr"],
     "availableDependencies": ["repo_metadata"],
-    "expectedAny": ["rr-upstream-integration-contracts-001"]
+    "expectedAny": ["rr-upstream-integration-contracts-001"],
+    "expectedTop1": [
+      "rr-upstream-api-versioning-compat-001",
+      "rr-upstream-integration-contracts-001"
+    ]
   },
   {
     "name": "coverage: midstream logic torturing / adversarial (batch 3)",
@@ -285,28 +306,35 @@
     "diffFile": "diffs/midstream-logic-torturing.diff",
     "availableContexts": ["diff", "fullFile", "commitMessage", "adr"],
     "availableDependencies": ["code_search", "repo_metadata"],
-    "expectedAny": ["rr-midstream-logic-torturing-001"]
+    "expectedAny": ["rr-midstream-logic-torturing-001"],
+    "expectedTop1": ["rr-midstream-type-driven-design-001", "rr-midstream-logic-torturing-001"]
   },
   {
     "name": "coverage: plangate rule promotion from retrospective (batch 4)",
     "phase": "upstream",
     "diffFile": "diffs/upstream-plangate-rule-promotion.diff",
     "availableContexts": ["fullFile", "repoConfig"],
-    "expectedAny": ["rr-upstream-plangate-rule-promotion-001"]
+    "expectedAny": ["rr-upstream-plangate-rule-promotion-001"],
+    "expectedTop1": [
+      "rr-upstream-security-privacy-design-001",
+      "rr-upstream-plangate-rule-promotion-001"
+    ]
   },
   {
     "name": "coverage: plangate verification audit (batch 4)",
     "phase": "upstream",
     "diffFile": "diffs/upstream-plangate-verification-audit.diff",
     "availableContexts": ["diff", "fullFile"],
-    "expectedAny": ["rr-upstream-plangate-verification-audit-001"]
+    "expectedAny": ["rr-upstream-plangate-verification-audit-001"],
+    "expectedTop1": ["rr-upstream-plangate-verification-audit-001"]
   },
   {
     "name": "coverage: midstream config json/yaml/yml (batch 4)",
     "phase": "midstream",
     "diffFile": "diffs/midstream-config-json.diff",
     "availableContexts": ["diff"],
-    "expectedAny": ["rr-midstream-config-json-001"]
+    "expectedAny": ["rr-midstream-config-json-001"],
+    "expectedTop1": ["rr-midstream-review-automation-boundary-001", "rr-midstream-config-json-001"]
   },
   {
     "name": "coverage: midstream i18n unused key (batch 4)",
@@ -314,28 +342,32 @@
     "diffFile": "diffs/midstream-i18n-unused-key.diff",
     "availableContexts": ["diff", "fullFile"],
     "availableDependencies": ["code_search"],
-    "expectedAny": ["rr-midstream-i18n-unused-key-001"]
+    "expectedAny": ["rr-midstream-i18n-unused-key-001"],
+    "expectedTop1": ["rr-midstream-type-driven-design-001", "rr-midstream-i18n-unused-key-001"]
   },
   {
     "name": "coverage: midstream agent-skill-bridge (batch 4)",
     "phase": "midstream",
     "diffFile": "diffs/midstream-agent-skill-bridge.diff",
     "availableContexts": ["diff"],
-    "expectedAny": ["rr-midstream-agent-skill-bridge-001"]
+    "expectedAny": ["rr-midstream-agent-skill-bridge-001"],
+    "expectedTop1": ["rr-midstream-agent-skill-bridge-001"]
   },
   {
     "name": "coverage: upstream create-plan (batch 5)",
     "phase": "upstream",
     "diffFile": "diffs/upstream-create-plan.diff",
     "availableContexts": ["diff", "repoConfig"],
-    "expectedAny": ["rr-upstream-create-plan-001"]
+    "expectedAny": ["rr-upstream-create-plan-001"],
+    "expectedTop1": ["rr-upstream-cache-strategy-consistency-001", "rr-upstream-create-plan-001"]
   },
   {
     "name": "coverage: plangate GC deterministic (batch 5)",
     "phase": "upstream",
     "diffFile": "diffs/upstream-plangate-gc-deterministic.diff",
     "availableContexts": ["repoConfig", "fullFile"],
-    "expectedAny": ["rr-upstream-plangate-gc-deterministic-001"]
+    "expectedAny": ["rr-upstream-plangate-gc-deterministic-001"],
+    "expectedTop1": ["rr-upstream-plangate-gc-deterministic-001"]
   },
   {
     "name": "coverage: downstream test plan review (batch 5)",
@@ -343,6 +375,7 @@
     "diffFile": "diffs/downstream-test-plan-review.diff",
     "availableContexts": ["diff", "tests"],
     "availableDependencies": ["test_runner", "code_search"],
-    "expectedAny": ["rr-downstream-test-plan-review-001"]
+    "expectedAny": ["rr-downstream-test-plan-review-001"],
+    "expectedTop1": ["rr-downstream-flaky-test-001", "rr-downstream-test-plan-review-001"]
   }
 ]
