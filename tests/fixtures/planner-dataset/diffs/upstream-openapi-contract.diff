@@ -1,0 +1,35 @@
+diff --git a/openapi/orders.yaml b/openapi/orders.yaml
+index 1111111..2222222 100644
+--- a/openapi/orders.yaml
++++ b/openapi/orders.yaml
+@@ -10,6 +10,18 @@ paths:
+       responses:
+         '200':
+           description: list of orders
++    post:
++      summary: create a new order
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CreateOrderRequest'
++      responses:
++        '201':
++          description: created
++
+ components:
+   schemas:
+     Order:
+@@ -19,3 +31,11 @@ components:
+           type: integer
+         status:
+           type: string
++    CreateOrderRequest:
++      type: object
++      required:
++        - userId
++        - totalAmount
++      properties:
++        userId:
++          type: integer

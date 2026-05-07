@@ -1,0 +1,26 @@
+diff --git a/docs/architecture/order-event-design.md b/docs/architecture/order-event-design.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/docs/architecture/order-event-design.md
+@@ -0,0 +1,20 @@
++# Order event design
++
++## Events
++
++- `OrderPlaced` — emitted by the order context after a successful checkout.
++- `OrderCancelled` — emitted when the user cancels within the cancellation window.
++
++## Topic / queue
++
++| Event           | Topic                | Partitioning key | Retention |
++| --------------- | -------------------- | ---------------- | --------- |
++| `OrderPlaced`   | `orders.placed.v1`   | `orderId`        | 7d        |
++| `OrderCancelled`| `orders.cancelled.v1`| `orderId`        | 7d        |
++
++## Delivery semantics
++
++At-least-once. Consumers must be idempotent on `orderId`.
++
++The `OrderPlaced` payload includes `revision: number` so out-of-order
++delivery can be detected and ignored on the consumer side.

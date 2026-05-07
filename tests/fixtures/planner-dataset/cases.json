@@ -207,5 +207,45 @@
     "availableDependencies": ["code_search", "tracing"],
     "expectedAny": ["rr-midstream-security-basic-001", "rr-midstream-logging-observability-001"],
     "expectedTop1": ["rr-midstream-security-basic-001", "rr-midstream-logging-observability-001"]
+  },
+  {
+    "name": "coverage: ADR decision quality (#762 audit follow-up)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-adr-decision-quality.diff",
+    "availableContexts": ["diff", "adr"],
+    "availableDependencies": ["adr_lookup", "repo_metadata"],
+    "expectedAny": ["rr-upstream-adr-decision-quality-001"]
+  },
+  {
+    "name": "coverage: DB schema migration design (#762 audit follow-up)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-db-schema-migration.diff",
+    "availableContexts": ["diff", "fullFile", "adr"],
+    "availableDependencies": ["repo_metadata"],
+    "expectedAny": ["rr-upstream-data-model-db-design-001"]
+  },
+  {
+    "name": "coverage: OpenAPI contract change (#762 audit follow-up)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-openapi-contract.diff",
+    "availableContexts": ["diff", "fullFile", "adr"],
+    "availableDependencies": ["repo_metadata"],
+    "expectedAny": ["rr-upstream-openapi-contract-001"]
+  },
+  {
+    "name": "coverage: event-driven design (#762 audit follow-up)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-event-driven-design.diff",
+    "availableContexts": ["diff", "adr"],
+    "availableDependencies": ["repo_metadata"],
+    "expectedAny": ["rr-upstream-event-driven-semantics-001"]
+  },
+  {
+    "name": "coverage: architecture traceability (#762 audit follow-up)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-architecture-traceability.diff",
+    "availableContexts": ["diff", "adr"],
+    "availableDependencies": ["adr_lookup", "repo_metadata"],
+    "expectedAny": ["rr-upstream-architecture-traceability-001"]
   }
 ]

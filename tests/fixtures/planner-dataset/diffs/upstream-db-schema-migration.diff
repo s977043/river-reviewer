@@ -1,0 +1,35 @@
+diff --git a/db/migrations/2026-05-07-add-orders-table.sql b/db/migrations/2026-05-07-add-orders-table.sql
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/db/migrations/2026-05-07-add-orders-table.sql
+@@ -0,0 +1,12 @@
++-- migration: add orders table
++CREATE TABLE orders (
++  id BIGSERIAL PRIMARY KEY,
++  user_id BIGINT NOT NULL,
++  total_amount NUMERIC(12, 2) NOT NULL,
++  currency VARCHAR(3) NOT NULL DEFAULT 'JPY',
++  status VARCHAR(32) NOT NULL,
++  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
++  updated_at TIMESTAMPTZ
++);
++
++CREATE INDEX idx_orders_user_id ON orders(user_id);
+diff --git a/prisma/schema.prisma b/prisma/schema.prisma
+index 1111111..2222222 100644
+--- a/prisma/schema.prisma
++++ b/prisma/schema.prisma
+@@ -8,3 +8,12 @@ model User {
+   id    BigInt @id @default(autoincrement())
+   email String @unique
+ }
++
++model Order {
++  id          BigInt   @id @default(autoincrement())
++  userId      BigInt
++  totalAmount Decimal  @db.Decimal(12, 2)
++  currency    String   @default("JPY") @db.VarChar(3)
++  status      String   @db.VarChar(32)
++  createdAt   DateTime @default(now())
++}
