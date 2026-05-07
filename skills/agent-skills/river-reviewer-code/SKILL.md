@@ -13,6 +13,7 @@ inputContext: [diff, fullFile]
 outputKind: [findings, actions]
 tags: [code-quality, default, entry, routing]
 version: 0.1.0
+license: MIT
 ---
 
 # Code Quality Review（一般コード品質レビュー）
