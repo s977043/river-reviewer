@@ -668,7 +668,7 @@ skills:
     category: upstream
     phase: upstream
     tags: [planning, upstream]
-    severity: major
+    severity: minor
     recommended: true
     description: '課題のゴールと制約を整理し、仮説・リスク付きの実行計画を段階的に提示して人間レビューにかける'
 
