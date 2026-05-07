@@ -1,0 +1,37 @@
+diff --git a/src/lib/checkout-pricing.ts b/src/lib/checkout-pricing.ts
+index 1111111..2222222 100644
+--- a/src/lib/checkout-pricing.ts
++++ b/src/lib/checkout-pricing.ts
+@@ -3,12 +3,28 @@ import { Cart, Coupon, User } from './types';
+ export function computeFinalPrice(cart: Cart, coupon: Coupon | null, user: User): number {
+   const subtotal = cart.items.reduce((acc, it) => acc + it.price * it.qty, 0);
+
+-  if (coupon) {
+-    return subtotal - coupon.discountAmount;
++  if (coupon && coupon.isActive) {
++    if (coupon.type === 'percent') {
++      return subtotal * (1 - coupon.value / 100);
++    }
++    if (coupon.type === 'fixed') {
++      return Math.max(0, subtotal - coupon.value);
++    }
+   }
+
+   if (user.isVip) {
+-    return subtotal * 0.9;
++    return subtotal * 0.9;
++  }
++
++  return subtotal;
++}
++
++export function applyTax(price: number, country: string): number {
++  if (country === 'JP') return price * 1.1;
++  if (country === 'US') return price; // US handles tax at next step
++  if (country) {
++    return price * 1.2; // EU default
+   }
+
+-  return subtotal;
++  return price;
+ }
