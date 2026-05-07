@@ -17,6 +17,7 @@ inputContext: [diff, fullFile, tests]
 outputKind: [findings, actions]
 tags: [testing, coverage, entry, routing]
 version: 0.1.0
+license: MIT
 ---
 
 # Testing Review（テストレビュー）

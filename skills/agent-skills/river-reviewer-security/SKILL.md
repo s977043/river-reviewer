@@ -16,6 +16,7 @@ inputContext: [diff, fullFile]
 outputKind: [findings, actions]
 tags: [security, entry, routing]
 version: 0.1.0
+license: MIT
 ---
 
 # Security Review（セキュリティレビュー）

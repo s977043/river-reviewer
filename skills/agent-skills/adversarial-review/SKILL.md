@@ -17,6 +17,7 @@ applyTo:
 inputContext: [diff, fullFile]
 outputKind: [findings, questions, actions]
 tags: [adversarial, pre-mortem, war-game, logic-torturing, cognitive-bias, entry, routing]
+license: MIT
 ---
 
 # Adversarial Review（敵対的レビュー）

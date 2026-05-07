@@ -14,6 +14,7 @@ inputContext: [diff, fullFile]
 outputKind: [findings, actions]
 tags: [performance, optimization, entry, routing]
 version: 0.1.0
+license: MIT
 ---
 
 # Performance Review（パフォーマンスレビュー）

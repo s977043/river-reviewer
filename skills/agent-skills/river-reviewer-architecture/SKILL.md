@@ -16,6 +16,7 @@ inputContext: [diff, fullFile, adr]
 outputKind: [findings, questions, actions]
 tags: [architecture, design, entry, routing]
 version: 0.1.0
+license: MIT
 ---
 
 # Architecture Review（設計・アーキテクチャレビュー）
