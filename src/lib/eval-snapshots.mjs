@@ -16,46 +16,42 @@
  * They do not affect pass/fail. `compare-eval-ledger.mjs` renders their
  * diff as informational, never as a regression.
  */
-import fs from 'node:fs/promises';
 import path from 'node:path';
 import url from 'node:url';
-import yaml from 'js-yaml';
+import { loadAllSkillMetadata } from '../../runners/core/skill-loader.mjs';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 
-const STREAMS = ['upstream', 'midstream', 'downstream'];
-
 /**
- * Walk skills/{stream}/* and return per-stream severity counts.
+ * Read all loadable skill metadata via the official loader and return a
+ * `{stream: {severity: count}}` map. Skills filtered by the loader's
+ * default `excludedTags` (e.g. `agent`) are not counted, matching the
+ * planner's view of the skill set.
+ *
  * @returns {Promise<Record<string, Record<string, number>>>}
  */
 export async function getSeverityDistribution() {
-  const out = {};
-  for (const stream of STREAMS) {
-    const streamDir = path.join(REPO_ROOT, 'skills', stream);
-    out[stream] = {};
-    let entries;
-    try {
-      entries = await fs.readdir(streamDir, { withFileTypes: true });
-    } catch (err) {
-      if (err.code === 'ENOENT') continue;
-      throw err;
+  const out = { upstream: {}, midstream: {}, downstream: {} };
+  let entries;
+  try {
+    entries = await loadAllSkillMetadata();
+  } catch {
+    return out;
+  }
+  for (const entry of entries) {
+    const meta = entry.metadata ?? {};
+    const sev = meta.severity ?? 'unknown';
+    // Prefer category for stream classification; fall back to derived
+    // path segment so even non-standard skills get bucketed somewhere.
+    let stream = meta.category;
+    if (!stream || !out[stream]) {
+      const rel = path.relative(path.join(REPO_ROOT, 'skills'), entry.path);
+      const top = rel.split(path.sep)[0];
+      if (out[top]) stream = top;
     }
-    for (const dirent of entries) {
-      if (!dirent.isDirectory()) continue;
-      const skillMd = path.join(streamDir, dirent.name, 'SKILL.md');
-      let text;
-      try {
-        text = await fs.readFile(skillMd, 'utf8');
-      } catch {
-        continue;
-      }
-      const fm = parseFrontmatter(text);
-      if (!fm) continue;
-      const sev = fm.severity ?? 'unknown';
-      out[stream][sev] = (out[stream][sev] ?? 0) + 1;
-    }
+    if (!stream || !out[stream]) continue;
+    out[stream][sev] = (out[stream][sev] ?? 0) + 1;
   }
   return out;
 }

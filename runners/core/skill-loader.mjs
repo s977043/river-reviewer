@@ -55,11 +55,6 @@ const ignoredSkillDirNames = new Set([
   'eval',
   'prompt',
   'prompts',
-  // skills/agent-skills/ uses a loose Agent Skills schema (`name` /
-  // `description` / `license` only) and is intentionally excluded from
-  // the planner-driven workflow skill loader. validate-agent-skills.mjs
-  // has its own walker for these.
-  'agent-skills',
 ]);
 const ignoredFileNames = new Set([
   '.gitkeep',
