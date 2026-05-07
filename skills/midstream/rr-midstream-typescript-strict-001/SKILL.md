@@ -14,6 +14,7 @@ tags: [typescript, type-safety, midstream]
 severity: major
 inputContext: [diff, fullFile]
 outputKind: [findings, actions]
+modelHint: balanced
 dependencies: [code_search]
 ---
 

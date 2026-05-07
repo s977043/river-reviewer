@@ -12,6 +12,7 @@ tags: [tests, naming, downstream]
 severity: minor
 inputContext: [tests, diff]
 outputKind: [tests, findings, summary]
+modelHint: balanced
 ---
 
 ## Pattern declaration
