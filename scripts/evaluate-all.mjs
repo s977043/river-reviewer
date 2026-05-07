@@ -347,12 +347,28 @@ Options:
     }
   }
 
+  // Descriptive snapshots that travel with the ledger entry but do NOT
+  // affect pass/fail. See src/lib/eval-snapshots.mjs.
+  let snapshots;
+  try {
+    const { getSeverityDistribution, getTop1PerCase } =
+      await import('../src/lib/eval-snapshots.mjs');
+    const [severity, top1PerCase] = await Promise.all([
+      getSeverityDistribution(),
+      getTop1PerCase(),
+    ]);
+    snapshots = { severity, top1PerCase };
+  } catch (err) {
+    snapshots = { error: `snapshot collection failed: ${err.message}` };
+  }
+
   const envelope = {
     version: pkg.version,
     timestamp: new Date().toISOString(),
     commit: gitCommit(),
     branch: gitBranch(),
     scores,
+    snapshots,
     results: subResults
       .filter((r) => !r.skipped)
       .map((r) => ({

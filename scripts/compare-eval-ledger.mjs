@@ -99,6 +99,43 @@ function formatNumber(v) {
   return v.toFixed(4).replace(/\.?0+$/, '');
 }
 
+/**
+ * Per (stream, severity) cell diff. Returns only cells that changed.
+ */
+function diffSeverity(prev, curr) {
+  if (!prev && !curr) return [];
+  const streams = new Set([...Object.keys(prev ?? {}), ...Object.keys(curr ?? {})]);
+  const out = [];
+  for (const s of [...streams].sort()) {
+    const a = prev?.[s] ?? {};
+    const b = curr?.[s] ?? {};
+    const sevs = new Set([...Object.keys(a), ...Object.keys(b)]);
+    for (const sev of [...sevs].sort()) {
+      const pv = a[sev] ?? 0;
+      const cv = b[sev] ?? 0;
+      if (pv === cv) continue;
+      out.push({ stream: s, severity: sev, prev: pv, curr: cv, delta: cv - pv });
+    }
+  }
+  return out;
+}
+
+/**
+ * Per-case top1 changes. Returns only cases where top1 differs.
+ */
+function diffTop1PerCase(prev, curr) {
+  if (!prev && !curr) return [];
+  const names = new Set([...Object.keys(prev ?? {}), ...Object.keys(curr ?? {})]);
+  const out = [];
+  for (const n of [...names].sort()) {
+    const pv = prev?.[n] ?? null;
+    const cv = curr?.[n] ?? null;
+    if (pv === cv) continue;
+    out.push({ name: n, prev: pv, curr: cv });
+  }
+  return out;
+}
+
 function renderMarkdown(prev, curr, delta) {
   const lines = [];
   lines.push('# KPI Ledger Comparison');
@@ -126,6 +163,33 @@ function renderMarkdown(prev, curr, delta) {
       } | ${noteFull} |`
     );
   }
+  // --- snapshot diffs (informational, never regression) ---
+  const sevDiff = diffSeverity(prev.snapshots?.severity, curr.snapshots?.severity);
+  if (sevDiff.length) {
+    lines.push('');
+    lines.push('## Severity distribution changes');
+    lines.push('');
+    lines.push('| Stream | Severity | Prev | Latest | Δ |');
+    lines.push('| ------ | -------- | ---- | ------ | - |');
+    for (const r of sevDiff) {
+      lines.push(
+        `| ${r.stream} | ${r.severity} | ${r.prev ?? 0} | ${r.curr ?? 0} | ${(r.delta >= 0 ? '+' : '') + r.delta} |`
+      );
+    }
+  }
+
+  const top1Diff = diffTop1PerCase(prev.snapshots?.top1PerCase, curr.snapshots?.top1PerCase);
+  if (top1Diff.length) {
+    lines.push('');
+    lines.push('## Top1 skill changes per case');
+    lines.push('');
+    lines.push('| Case | Prev top1 | Latest top1 |');
+    lines.push('| ---- | --------- | ----------- |');
+    for (const r of top1Diff) {
+      lines.push(`| ${r.name} | ${r.prev ?? '(none)'} | ${r.curr ?? '(none)'} |`);
+    }
+  }
+
   lines.push('');
   if (delta.regression) {
     lines.push('**Status**: ⚠ One or more KPIs regressed.');
