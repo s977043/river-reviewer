@@ -1,0 +1,19 @@
+diff --git a/config/feature-flags.json b/config/feature-flags.json
+index 1111111..2222222 100644
+--- a/config/feature-flags.json
++++ b/config/feature-flags.json
+@@ -1,8 +1,12 @@
+ {
+   "features": {
+     "newCheckoutFlow": {
+-      "enabled": false
++      "enabled": true,
++      "rolloutPercent": 25
++    },
++    "experimentalRedisCache": {
++      "enabled": true
+     }
+   },
+-  "version": "1.2.0"
++  "version": "1.3.0"
+ }

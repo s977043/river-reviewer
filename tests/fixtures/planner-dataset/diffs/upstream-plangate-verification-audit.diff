@@ -1,0 +1,18 @@
+diff --git a/artifacts/sample/review-self.md b/artifacts/sample/review-self.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/artifacts/sample/review-self.md
+@@ -0,0 +1,12 @@
++# Self review (sample for verify audit)
++
++## Findings
++
++- src/api/auth.ts:42 hardcoded token (Severity: major, Confidence: high)
++- src/lib/cache.ts:18 missing TTL on Redis set (Severity: minor, Confidence: medium)
++
++## Coverage check
++
++- All planned skills ran.
++- 1 finding lacks `Evidence:` line (auth.ts:42 — only "see line" reference).
++- 1 finding restates the rule rather than the diff impact.

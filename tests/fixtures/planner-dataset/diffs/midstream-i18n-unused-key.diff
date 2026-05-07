@@ -1,0 +1,28 @@
+diff --git a/src/i18n/keys.ts b/src/i18n/keys.ts
+index 1111111..2222222 100644
+--- a/src/i18n/keys.ts
++++ b/src/i18n/keys.ts
+@@ -3,8 +3,7 @@ export const messageKeys = {
+   common: {
+     confirm: 'common.confirm',
+     cancel: 'common.cancel',
+-    welcome: 'common.welcome',
+-    legacyHelp: 'common.legacyHelp',
++    welcome: 'common.welcome'
+   },
+   checkout: {
+     placeOrder: 'checkout.placeOrder',
+diff --git a/locales/en.json b/locales/en.json
+index 1111111..2222222 100644
+--- a/locales/en.json
++++ b/locales/en.json
+@@ -3,8 +3,7 @@
+     "confirm": "Confirm",
+     "cancel": "Cancel",
+     "welcome": "Welcome",
+-    "legacyHelp": "Need help? Click the help icon.",
+-    "deprecatedFooter": "Old footer text"
++    "welcome2": "Welcome v2"
+   },
+   "checkout": {
+     "placeOrder": "Place order"

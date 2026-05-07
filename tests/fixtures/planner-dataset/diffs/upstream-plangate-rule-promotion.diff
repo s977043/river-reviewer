@@ -1,0 +1,22 @@
+diff --git a/docs/retrospective.md b/docs/retrospective.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/docs/retrospective.md
+@@ -0,0 +1,16 @@
++# Retrospective: orders checkout latency reduction
++
++## What worked
++
++- Redis cache wiring landed without regression.
++- Parallel DB calls cut p95 latency by 38%.
++
++## What needs improvement
++
++- 3 minor findings repeated across PRs (same auth check pattern). Should
++  promote the rule into the skill body, not rely on PR-by-PR catches.
++
++## Recommendations
++
++- Add a guard fixture for the duplicated auth-check pattern.
++- Promote the "verify session before write" rule into the security skill.

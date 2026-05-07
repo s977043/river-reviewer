@@ -286,5 +286,41 @@
     "availableContexts": ["diff", "fullFile", "commitMessage", "adr"],
     "availableDependencies": ["code_search", "repo_metadata"],
     "expectedAny": ["rr-midstream-logic-torturing-001"]
+  },
+  {
+    "name": "coverage: plangate rule promotion from retrospective (batch 4)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-plangate-rule-promotion.diff",
+    "availableContexts": ["fullFile", "repoConfig"],
+    "expectedAny": ["rr-upstream-plangate-rule-promotion-001"]
+  },
+  {
+    "name": "coverage: plangate verification audit (batch 4)",
+    "phase": "upstream",
+    "diffFile": "diffs/upstream-plangate-verification-audit.diff",
+    "availableContexts": ["diff", "fullFile"],
+    "expectedAny": ["rr-upstream-plangate-verification-audit-001"]
+  },
+  {
+    "name": "coverage: midstream config json/yaml/yml (batch 4)",
+    "phase": "midstream",
+    "diffFile": "diffs/midstream-config-json.diff",
+    "availableContexts": ["diff"],
+    "expectedAny": ["rr-midstream-config-json-001"]
+  },
+  {
+    "name": "coverage: midstream i18n unused key (batch 4)",
+    "phase": "midstream",
+    "diffFile": "diffs/midstream-i18n-unused-key.diff",
+    "availableContexts": ["diff", "fullFile"],
+    "availableDependencies": ["code_search"],
+    "expectedAny": ["rr-midstream-i18n-unused-key-001"]
+  },
+  {
+    "name": "coverage: midstream agent-skill-bridge (batch 4)",
+    "phase": "midstream",
+    "diffFile": "diffs/midstream-agent-skill-bridge.diff",
+    "availableContexts": ["diff"],
+    "expectedAny": ["rr-midstream-agent-skill-bridge-001"]
   }
 ]
