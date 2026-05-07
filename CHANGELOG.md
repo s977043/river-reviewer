@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.38.0](https://github.com/s977043/river-reviewer/compare/v0.37.0...v0.38.0) (2026-05-07)
+
+
+### Features
+
+* **eval:** expand expectedTop1 coverage from 13 to 31 cases (audit follow-up) ([#783](https://github.com/s977043/river-reviewer/issues/783)) ([55f57f1](https://github.com/s977043/river-reviewer/commit/55f57f1a5db43ebe9d6a2481e76881e68cd98794))
+
 ## [0.37.0](https://github.com/s977043/river-reviewer/compare/v0.36.0...v0.37.0) (2026-05-07)
 
 
