@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.42.0](https://github.com/s977043/river-reviewer/compare/v0.41.0...v0.42.0) (2026-05-07)
+
+
+### Features
+
+* **schema,eval:** allow license field; add per-skill FP rate snapshot ([#792](https://github.com/s977043/river-reviewer/issues/792)) ([632cc76](https://github.com/s977043/river-reviewer/commit/632cc765b5289a5c9f334561b80783b4e8acdd67))
+
 ## [0.41.0](https://github.com/s977043/river-reviewer/compare/v0.40.0...v0.41.0) (2026-05-07)
 
 
