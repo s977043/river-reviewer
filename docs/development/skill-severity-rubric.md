@@ -96,6 +96,33 @@ A skill's `severity` is decided by the **worst case finding it is allowed to emi
 - 1 PR で **同時に 2 つ以上の skill の severity を上げ下げしない**（影響の切り分けが困難になる）
 - severity を変える PR は本書の該当節に明示的にリンクし、判断根拠を 3 行で書く
 - 変更前後で `npm run eval:all` の主要メトリクスを記録し、PR 本文に before / after を残す
+- **registry.yaml の同期を忘れない**: `skills/registry.yaml` にエントリがある skill は、SKILL.md の severity と registry の severity を同 PR 内で揃える（不揃いだと skill カタログ表示が誤る）
+
+## 既往の再分類事例（learnings）
+
+本書に基づいて完了した再分類:
+
+| skill                                        | from  | to    | PR   | rubric criterion                                                                                                       |
+| -------------------------------------------- | ----- | ----- | ---- | ---------------------------------------------------------------------------------------------------------------------- |
+| `rr-midstream-normalization-consistency-001` | major | minor | #777 | minor の "naming, formatting, dead code, 軽微な inconsistency" に該当。normalization drift は merge blocker ではない。 |
+| `rr-upstream-create-plan-001`                | major | minor | #781 | minor の "教育・案内目的のスキル" に該当。outputKind が `[summary, actions, questions]` で advisory artifacts のみ。   |
+
+### 共通パターン（観察）
+
+1. **outputKind が `summary` / `questions` / `actions` のみの skill は minor 候補**: 直接の修正提案ではなく議論や次の一手の提示なので merge blocker にならない
+2. **「教育・案内」「formatting drift」のような soft 領域 skill が major のまま放置されているケースが多い**: 過去の severity 設計が "全 skill major" 寄りで、後続の「目立つ findings のみ出す」要件にズレている
+3. **registry.yaml の同期漏れは Copilot review で検出される**: PR 本体だけでなく registry も同 PR で touch するのを習慣化する（#781 で実例）
+
+### 再分類を避けるべきケース
+
+以下は安易な major → minor を行わない:
+
+- セキュリティ系（`rr-midstream-security-basic-001`, `rr-upstream-trust-boundaries-authz-001`）— 検知対象が直接的な脆弱性
+- API 互換性破壊系（`rr-midstream-api-compatibility-001`, `rr-upstream-api-versioning-compat-001`）— 既存クライアントを壊す可能性
+- 失敗モード / 観測性系（`rr-upstream-failure-modes-observability-001`, `rr-midstream-logging-observability-001`）— 本番運用での復旧能力に直結
+- 実装ガード系（`rr-midstream-typescript-strict-001`, `rr-midstream-nullability-contract-001`）— type-unsafety は実害につながる
+
+これらは検知される問題そのものが major 級なので severity も major のままが妥当。
 
 ## References
 
