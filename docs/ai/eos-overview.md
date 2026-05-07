@@ -63,11 +63,11 @@ oz-Skills EOS の各層が、river-reviewer のどこに実装されているか
 
 ## ロードマップ
 
-| Phase   | スコープ                                                                        | 状態    |
-| ------- | ------------------------------------------------------------------------------- | ------- |
-| Phase 1 | EOS 5 layer の codify (本 doc + KPI doc + governance index + license: MIT 追加) | この PR |
-| Phase 2 | KPI の自動計測フロー（CI でメトリクス保存、history 比較）                       | TODO    |
-| Phase 3 | Memory layer の structured representation（architecture / glossary 抽出）       | TODO    |
+| Phase   | スコープ                                                                        | 状態                                                                                  |
+| ------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Phase 1 | EOS 5 layer の codify (本 doc + KPI doc + governance index + license: MIT 追加) | 完了 (#786)                                                                           |
+| Phase 2 | KPI の自動計測 + 比較（nightly-eval ledger / `eval:compare` script / 回帰検出） | 部分実装 (per-run + 直近 2-entry 比較は実装済 / 90-day 超 history と分布追跡は未実装) |
+| Phase 3 | Memory layer の structured representation（architecture / glossary 抽出）       | TODO                                                                                  |
 
 ## 参考
 
