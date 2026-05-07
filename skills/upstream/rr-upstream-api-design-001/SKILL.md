@@ -12,6 +12,7 @@ tags: [api, design, upstream]
 severity: major
 inputContext: [diff, adr]
 outputKind: [findings, summary, actions]
+modelHint: balanced
 dependencies: [repo_metadata]
 ---
 
