@@ -136,6 +136,34 @@ function diffTop1PerCase(prev, curr) {
   return out;
 }
 
+/**
+ * Per-skill FP rate diff. Returns rows where the FP rate changed by
+ * more than 0.001 (or where guards count changed). Sort by abs(delta)
+ * descending so the most impactful skills surface first.
+ */
+function diffPerSkillFp(prev, curr) {
+  if (!prev && !curr) return [];
+  const ids = new Set([...Object.keys(prev ?? {}), ...Object.keys(curr ?? {})]);
+  const out = [];
+  for (const id of ids) {
+    const a = prev?.[id] ?? { guards: 0, fps: 0, fpRate: 0 };
+    const b = curr?.[id] ?? { guards: 0, fps: 0, fpRate: 0 };
+    const rateDelta = (b.fpRate ?? 0) - (a.fpRate ?? 0);
+    const fpsDelta = (b.fps ?? 0) - (a.fps ?? 0);
+    if (Math.abs(rateDelta) < 0.001 && fpsDelta === 0) continue;
+    out.push({
+      id,
+      prev: a,
+      curr: b,
+      rateDelta,
+      fpsDelta,
+      regression: rateDelta > 0.001 || fpsDelta > 0,
+    });
+  }
+  out.sort((x, y) => Math.abs(y.rateDelta) - Math.abs(x.rateDelta));
+  return out;
+}
+
 function renderMarkdown(prev, curr, delta) {
   const lines = [];
   lines.push('# KPI Ledger Comparison');
@@ -187,6 +215,23 @@ function renderMarkdown(prev, curr, delta) {
     lines.push('| ---- | --------- | ----------- |');
     for (const r of top1Diff) {
       lines.push(`| ${r.name} | ${r.prev ?? '(none)'} | ${r.curr ?? '(none)'} |`);
+    }
+  }
+
+  const fpDiff = diffPerSkillFp(prev.snapshots?.perSkillFp, curr.snapshots?.perSkillFp);
+  if (fpDiff.length) {
+    lines.push('');
+    lines.push('## Per-skill false-positive rate changes');
+    lines.push('');
+    lines.push('| Skill | Prev (fps/guards = rate) | Latest (fps/guards = rate) | Δ rate | Note |');
+    lines.push('| ----- | ------------------------ | -------------------------- | ------ | ---- |');
+    for (const r of fpDiff) {
+      const fmtCell = (s) => `${s.fps}/${s.guards} = ${formatNumber(s.fpRate)}`;
+      const sign = r.rateDelta >= 0 ? '+' : '';
+      const note = r.regression ? '⚠ FP increased' : '✓ FP decreased';
+      lines.push(
+        `| ${r.id} | ${fmtCell(r.prev)} | ${fmtCell(r.curr)} | ${sign}${formatNumber(r.rateDelta)} | ${note} |`
+      );
     }
   }
 

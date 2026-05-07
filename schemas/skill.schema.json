@@ -147,6 +147,10 @@
       "$ref": "#/$defs/modelHint",
       "description": "Hint for model selection (cost/accuracy balance)"
     },
+    "license": {
+      "type": "string",
+      "description": "SPDX license identifier (e.g. MIT). Optional. Aligns with the Agent Skills standard frontmatter (agentskills.io / Warp / Oz / Claude Code) so river-reviewer skill files can be discovered by external tooling."
+    },
     "dependencies": {
       "type": "array",
       "description": "Tools or resources this skill depends on",

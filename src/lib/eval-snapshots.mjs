@@ -11,11 +11,16 @@
  * - `top1PerCase`: the planner-selected top1 skill for each
  *   planner-dataset case. Used to detect routing-ordering shifts that
  *   may not show up in coarse top1Match metric.
+ * - `perSkillFp`: per-skill false-positive aggregation derived from the
+ *   review-eval guard cases. Used to spot skills whose guards are
+ *   failing more often than the rest, which the global
+ *   `falsePositiveRate` metric averages away.
  *
- * Both are pure functions on the repo state at the time of the run.
+ * All are pure functions on the repo state at the time of the run.
  * They do not affect pass/fail. `compare-eval-ledger.mjs` renders their
  * diff as informational, never as a regression.
  */
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import url from 'node:url';
 import { loadAllSkillMetadata } from '../../runners/core/skill-loader.mjs';
@@ -83,12 +88,66 @@ export async function getTop1PerCase() {
   }
 }
 
-function parseFrontmatter(text) {
-  const m = text.match(/^---\n([\s\S]*?)\n---/);
-  if (!m) return null;
+/**
+ * Run the review-eval fixtures and return a per-skill false-positive
+ * aggregate. For every guard case (`expectNoFindings: true`) that the
+ * skill participated in (via `planSkills`), count it as a "guard
+ * exposure"; if the guard was violated, count it as an "fp hit".
+ *
+ * Output shape: `{ skillId: { guards, fps, fpRate } }` where `fpRate =
+ * fps / guards` (or 0 when the skill has no guard exposure).
+ *
+ * Returns `{}` when the review-eval cannot be invoked (e.g. cases.json
+ * missing).
+ *
+ * @returns {Promise<Record<string, {guards: number, fps: number, fpRate: number}>>}
+ */
+export async function getPerSkillFpRate() {
+  const casesPath = path.join(REPO_ROOT, 'tests', 'fixtures', 'review-eval', 'cases.json');
+  let casesText;
   try {
-    return yaml.load(m[1]) ?? null;
+    casesText = await fs.readFile(casesPath, 'utf8');
   } catch {
-    return null;
+    return {};
   }
+  let cases;
+  try {
+    cases = JSON.parse(casesText);
+  } catch {
+    return {};
+  }
+  // Build a lookup so we can attribute results back to planSkills.
+  const planByName = new Map(cases.map((c) => [c.name, c.planSkills ?? []]));
+
+  let evaluateReviewFixtures;
+  try {
+    ({ evaluateReviewFixtures } = await import('./review-fixtures-eval.mjs'));
+  } catch {
+    return {};
+  }
+  let result;
+  try {
+    result = await evaluateReviewFixtures({ casesPath, verbose: false });
+  } catch {
+    return {};
+  }
+
+  const acc = {};
+  const ensure = (id) => {
+    if (!acc[id]) acc[id] = { guards: 0, fps: 0, fpRate: 0 };
+    return acc[id];
+  };
+  for (const c of result.cases ?? []) {
+    if (!c.isGuardCase) continue;
+    const skills = planByName.get(c.name) ?? [];
+    for (const sid of skills) {
+      const slot = ensure(sid);
+      slot.guards += 1;
+      if (c.guardViolated) slot.fps += 1;
+    }
+  }
+  for (const slot of Object.values(acc)) {
+    slot.fpRate = slot.guards > 0 ? slot.fps / slot.guards : 0;
+  }
+  return acc;
 }
