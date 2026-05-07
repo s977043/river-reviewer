@@ -55,8 +55,19 @@ const ignoredSkillDirNames = new Set([
   'eval',
   'prompt',
   'prompts',
+  // skills/agent-skills/ uses a loose Agent Skills schema (`name` /
+  // `description` / `license` only) and is intentionally excluded from
+  // the planner-driven workflow skill loader. validate-agent-skills.mjs
+  // has its own walker for these.
+  'agent-skills',
 ]);
-const ignoredFileNames = new Set(['.gitkeep', 'README.md', 'registry.yaml', 'registry.yml', '_template.md']);
+const ignoredFileNames = new Set([
+  '.gitkeep',
+  'README.md',
+  'registry.yaml',
+  'registry.yml',
+  '_template.md',
+]);
 const legacySkillFiles = new Set(['skill.yaml', 'skill.yml']);
 const streamCategories = new Set(['core', 'upstream', 'midstream', 'downstream']);
 const allPhases = ['upstream', 'midstream', 'downstream'];
@@ -94,9 +105,13 @@ export async function listSkillFiles(dir = defaultSkillsDir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = [];
 
-  const hasLegacySkillFile = entries.some(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+  const hasLegacySkillFile = entries.some(
+    (entry) => !entry.isDirectory() && legacySkillFiles.has(entry.name)
+  );
   if (hasLegacySkillFile) {
-    const legacyEntry = entries.find(entry => !entry.isDirectory() && legacySkillFiles.has(entry.name));
+    const legacyEntry = entries.find(
+      (entry) => !entry.isDirectory() && legacySkillFiles.has(entry.name)
+    );
     if (!legacyEntry) {
       throw new Error(`skill.yaml detected but not found in ${dir}`);
     }
@@ -129,7 +144,7 @@ function normalizeStringArray(value) {
   if (!value) return undefined;
   const asArray = Array.isArray(value) ? value : [value];
   const filtered = asArray
-    .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
+    .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
     .filter(Boolean);
   return filtered.length ? filtered : undefined;
 }
@@ -191,7 +206,8 @@ function normalizeMetadata(metadata, { filePath } = {}) {
   const meta = { ...metadata };
 
   if (meta.priority !== undefined) {
-    const parsedPriority = typeof meta.priority === 'string' ? Number(meta.priority) : meta.priority;
+    const parsedPriority =
+      typeof meta.priority === 'string' ? Number(meta.priority) : meta.priority;
     if (Number.isFinite(parsedPriority)) {
       meta.priority = parsedPriority;
     } else {
@@ -311,7 +327,9 @@ function validateMetadata(metadata, validate) {
   const metaCopy = JSON.parse(JSON.stringify(metadata ?? {}));
   const ok = validate(metaCopy);
   if (!ok) {
-    const details = (validate.errors ?? []).map(err => `${err.instancePath || '/'} ${err.message}`).join('; ');
+    const details = (validate.errors ?? [])
+      .map((err) => `${err.instancePath || '/'} ${err.message}`)
+      .join('; ');
     throw new SkillLoaderError(`Validation failed: ${details}`, validate.errors);
   }
   return metaCopy;
@@ -336,13 +354,15 @@ function logSkillLoadError(filePath, err) {
 function logDuplicateSkill(id, filePath, originalPath) {
   const location = relativeToRepo(filePath);
   const first = relativeToRepo(originalPath);
-  console.warn(`⚠️  Duplicate skill id "${id}" in ${location}; already loaded from ${first}. Skipping.`);
+  console.warn(
+    `⚠️  Duplicate skill id "${id}" in ${location}; already loaded from ${first}. Skipping.`
+  );
 }
 
 function hasExcludedTag(metadata, excludedTags) {
   if (!excludedTags?.length) return false;
   const tags = metadata?.tags ?? [];
-  return tags.some(tag => excludedTags.includes(tag));
+  return tags.some((tag) => excludedTags.includes(tag));
 }
 
 export async function loadSkillFile(filePath, options = {}) {
