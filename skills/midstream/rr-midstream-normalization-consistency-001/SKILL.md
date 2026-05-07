@@ -15,7 +15,7 @@ tags:
   - normalization
   - formatting
   - midstream
-severity: major
+severity: minor
 inputContext:
   - diff
   - fullFile
