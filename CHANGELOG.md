@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.41.0](https://github.com/s977043/river-reviewer/compare/v0.40.0...v0.41.0) (2026-05-07)
+
+
+### Features
+
+* **eval:** add severity + top1 ledger snapshots (EOS Phase 2.1/2.2) ([#790](https://github.com/s977043/river-reviewer/issues/790)) ([8ed8420](https://github.com/s977043/river-reviewer/commit/8ed8420b5e57aaeff645243f7237f6e07ba15784))
+
 ## [0.40.0](https://github.com/s977043/river-reviewer/compare/v0.39.0...v0.40.0) (2026-05-07)
 
 
