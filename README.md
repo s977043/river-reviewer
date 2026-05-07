@@ -132,7 +132,7 @@ jobs:
 
 <!-- x-release-please-start-version -->
 
-最新リリース: [v0.37.0](https://github.com/s977043/river-reviewer/releases/latest)
+最新リリース: [v0.38.0](https://github.com/s977043/river-reviewer/releases/latest)
 
 <!-- x-release-please-end -->
 
