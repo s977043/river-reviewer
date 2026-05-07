@@ -57,14 +57,40 @@ pipeline   ── 全体としてレビューが終わるか
 
 ## 既知の制約 / 改善ロードマップ
 
-| 項目                                           | 状態   | 次のアクション                                                                 |
-| ---------------------------------------------- | ------ | ------------------------------------------------------------------------------ |
-| KPI の history 自動記録                        | 未実装 | `artifacts/evals/results.jsonl` への append + nightly 比較を CI に組み込む     |
-| severity-rubric 適用後の severity 分布変化追跡 | 未実装 | severity を上下した PR ごとに分布スナップショットを残す                        |
-| FP rate の skill 別ブレイクダウン              | 未実装 | per-skill FP rate を artifact に出して history 比較                            |
-| Planner top1 stability over time               | 未実装 | top1 が時系列で動いた回数を記録（routing regression detection の感度を上げる） |
+| 項目                                           | 状態     | 詳細 / 次のアクション                                                                                                                                                             |
+| ---------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| KPI の history 自動記録 (per-run)              | 実装済   | `evaluate-all.mjs --append-ledger` で `artifacts/evals/results.jsonl` に追記。`.github/workflows/nightly-eval.yml` が毎日実行し、artifact として 90 日保管。                      |
+| KPI の cross-run 比較                          | 部分実装 | `npm run eval:compare` (`scripts/compare-eval-ledger.mjs`) で ledger 内の最後 2 entry を比較し、回帰時 exit 1。nightly 跨ぎは 90-day artifact のダウンロード→ローカル比較が必要。 |
+| Planner-dataset の baseline 比較               | 実装済   | `npm run planner:eval:dataset -- --compare <baseline.json>` で任意 baseline と比較。                                                                                              |
+| 90 日超の history persistence                  | 未実装   | データ branch / GitHub Pages / 外部ストレージ等のアーカイブ先を決める必要あり。                                                                                                   |
+| severity-rubric 適用後の severity 分布変化追跡 | 未実装   | severity を上下した PR ごとに stream 別分布スナップショットを残す。                                                                                                               |
+| FP rate の skill 別ブレイクダウン              | 未実装   | per-skill FP rate を artifact に出して history 比較。                                                                                                                             |
+| Planner top1 stability over time               | 未実装   | top1 が時系列で動いた回数を記録（routing regression detection の感度を上げる）。                                                                                                  |
 
-これらは Phase 2/3 (`docs/ai/eos-overview.md` 参照) で取り組む。
+これらは Phase 2/3 (`docs/ai/eos-overview.md` 参照) で順次取り組む。
+
+## eval:compare の使い方
+
+```bash
+# baseline を取る (例: main 上で)
+git switch main
+npm run eval:all -- --append-ledger --description "baseline"
+
+# 変更を検証 (任意のブランチで)
+git switch feat/your-branch
+npm run eval:all -- --append-ledger --description "candidate: <change>"
+
+# 直近 2 entry を比較
+npm run eval:compare
+# → markdown delta table が出力される。回帰検出時は exit 1
+```
+
+90-day artifact からの比較例:
+
+```bash
+gh run download <nightly-run-id> -n nightly-eval-<run-id> -D /tmp/prev
+npm run eval:compare -- --ledger /tmp/prev/artifacts/evals/results.jsonl
+```
 
 ## 参考
 
