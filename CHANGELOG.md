@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.40.0](https://github.com/s977043/river-reviewer/compare/v0.39.0...v0.40.0) (2026-05-07)
+
+
+### Features
+
+* **eval:** add eval:compare ledger comparison + EOS Phase 2 doc accuracy ([#788](https://github.com/s977043/river-reviewer/issues/788)) ([a938e68](https://github.com/s977043/river-reviewer/commit/a938e68febad5dbb84f4225e1496815c17864434))
+
 ## [0.39.0](https://github.com/s977043/river-reviewer/compare/v0.38.0...v0.39.0) (2026-05-07)
 
 
