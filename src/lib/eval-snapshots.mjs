@@ -116,9 +116,6 @@ export async function getPerSkillFpRate() {
   } catch {
     return {};
   }
-  // Build a lookup so we can attribute results back to planSkills.
-  const planByName = new Map(cases.map((c) => [c.name, c.planSkills ?? []]));
-
   let evaluateReviewFixtures;
   try {
     ({ evaluateReviewFixtures } = await import('./review-fixtures-eval.mjs'));
@@ -137,9 +134,15 @@ export async function getPerSkillFpRate() {
     if (!acc[id]) acc[id] = { guards: 0, fps: 0, fpRate: 0 };
     return acc[id];
   };
-  for (const c of result.cases ?? []) {
+  // Attribute results back by array index rather than case name —
+  // names in cases.json are not guaranteed unique, so a name-keyed Map
+  // would silently drop the planSkills of duplicates. evaluateReviewFixtures
+  // emits cases in input order, so index alignment is reliable.
+  const resultCases = result.cases ?? [];
+  for (let i = 0; i < resultCases.length; i++) {
+    const c = resultCases[i];
     if (!c.isGuardCase) continue;
-    const skills = planByName.get(c.name) ?? [];
+    const skills = cases[i]?.planSkills ?? [];
     for (const sid of skills) {
       const slot = ensure(sid);
       slot.guards += 1;

@@ -157,7 +157,10 @@ function diffPerSkillFp(prev, curr) {
       curr: b,
       rateDelta,
       fpsDelta,
-      regression: rateDelta > 0.001 || fpsDelta > 0,
+      // Regression is rate-only — an absolute fps count increase paired
+      // with a larger guards increase actually improves the rate, so
+      // raw count is not a reliable signal.
+      regression: rateDelta > 0.001,
     });
   }
   out.sort((x, y) => Math.abs(y.rateDelta) - Math.abs(x.rateDelta));
