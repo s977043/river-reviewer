@@ -1,0 +1,38 @@
+diff --git a/docs/plangate/sample/plan.md b/docs/plangate/sample/plan.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/docs/plangate/sample/plan.md
+@@ -0,0 +1,18 @@
++# Plan
++
++## Goal
++
++Reduce checkout latency from p95=420ms to p95<200ms.
++
++## Steps
++
++1. Add Redis cache for session lookup (Step 1).
++2. Convert sync DB calls in `OrderService.place` to parallel (Step 2).
++3. Move PII redaction to background queue (Step 3).
++
++## Acceptance criteria
++
++- p95 < 200ms over 24h sample
++- error rate unchanged
++
++## Open questions
++
++- Does Step 3 affect downstream audit pipelines?
+diff --git a/docs/plangate/sample/todo.md b/docs/plangate/sample/todo.md
+new file mode 100644
+index 0000000..2222222
+--- /dev/null
++++ b/docs/plangate/sample/todo.md
+@@ -0,0 +1,6 @@
++# TODO
++
++- [ ] Step 1: Redis cache wired in
++- [ ] Step 2: parallel calls in OrderService.place
++- [ ] (Step 3 not in TODO — drift)
++- [ ] Step 4: emit metrics (not in plan — drift)

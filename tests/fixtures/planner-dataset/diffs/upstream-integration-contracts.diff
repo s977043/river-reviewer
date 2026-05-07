@@ -1,0 +1,24 @@
+diff --git a/docs/integration/payment-provider-contract.md b/docs/integration/payment-provider-contract.md
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/docs/integration/payment-provider-contract.md
+@@ -0,0 +1,18 @@
++# Payment provider integration contract
++
++## Inbound: webhook
++
++- `POST /webhooks/payment-provider`
++- HMAC-SHA256 signature in `X-Provider-Signature`
++- Retries up to 5x with exponential backoff
++
++## Outbound: charge API
++
++- `POST <provider>/v1/charges` with idempotency key
++- 30s timeout, no retry on 4xx, retry on 5xx with jitter
++
++## Ownership
++
++- Provider-side schema: vendor managed, version pinned in `payment-provider.openapi.yaml`
++- Inbound webhook payload: must validate against `webhook-payment.schema.json` before persisting
++- Failed validation increments `webhook_validation_failures{type="payment"}` and drops to DLQ
