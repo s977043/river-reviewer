@@ -7,6 +7,8 @@ import {
   parseRetryAfter,
   getBackoffMs,
   resolveAnthropicMaxTokens,
+  isAnthropicPromptCacheEnabled,
+  buildAnthropicSystem,
   __clearAIClientCacheForTests,
   AIClientFactory,
 } from '../src/ai/factory.mjs';
@@ -341,7 +343,9 @@ describe('AnthropicClient.generateReview', () => {
     assert.equal(received.model, 'claude-sonnet-4-6');
     assert.equal(received.max_tokens, 2048);
     assert.equal(received.temperature, 0.1);
-    assert.equal(received.system, 'system-prompt');
+    // Prompt caching is on by default, so system arrives as a cached block array.
+    assert.ok(Array.isArray(received.system));
+    assert.equal(received.system[0].text, 'system-prompt');
     assert.deepEqual(received.messages, [{ role: 'user', content: 'diff-text' }]);
   });
 
@@ -411,5 +415,122 @@ describe('AnthropicClient.generateReview', () => {
     });
     await client.generateReview('s', 'd');
     assert.equal(received.max_tokens, 8192);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Anthropic prompt caching
+// ---------------------------------------------------------------------------
+
+describe('isAnthropicPromptCacheEnabled', () => {
+  let original;
+  beforeEach(() => {
+    original = process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+  });
+  afterEach(() => {
+    if (original === undefined) delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    else process.env.RIVER_ANTHROPIC_PROMPT_CACHE = original;
+  });
+
+  test('defaults to true when env var is unset', () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    assert.equal(isAnthropicPromptCacheEnabled(), true);
+  });
+
+  test('returns false when env var is "0"', () => {
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '0';
+    assert.equal(isAnthropicPromptCacheEnabled(), false);
+  });
+
+  test('returns true for any other value', () => {
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '1';
+    assert.equal(isAnthropicPromptCacheEnabled(), true);
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = 'true';
+    assert.equal(isAnthropicPromptCacheEnabled(), true);
+  });
+});
+
+describe('buildAnthropicSystem', () => {
+  test('returns a cached block array when cacheEnabled', () => {
+    const result = buildAnthropicSystem('system text', { cacheEnabled: true });
+    assert.deepEqual(result, [
+      { type: 'text', text: 'system text', cache_control: { type: 'ephemeral' } },
+    ]);
+  });
+
+  test('returns the bare string when cacheEnabled is false', () => {
+    const result = buildAnthropicSystem('system text', { cacheEnabled: false });
+    assert.equal(result, 'system text');
+  });
+});
+
+describe('AnthropicClient.generateReview (prompt caching integration)', () => {
+  let originalAnthropicKey;
+  let originalCacheEnv;
+
+  beforeEach(() => {
+    originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+    originalCacheEnv = process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+    __clearAIClientCacheForTests();
+  });
+
+  afterEach(() => {
+    if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+    if (originalCacheEnv === undefined) delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    else process.env.RIVER_ANTHROPIC_PROMPT_CACHE = originalCacheEnv;
+    __clearAIClientCacheForTests();
+  });
+
+  function stubMessagesCreate(client, fn) {
+    client.anthropic = { messages: { create: fn } };
+  }
+
+  test('sends system as array with cache_control by default', async () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: 'ok' }] };
+    });
+
+    await client.generateReview('long system prompt for review', 'diff');
+    assert.ok(Array.isArray(received.system), 'system should be an array form');
+    assert.equal(received.system.length, 1);
+    assert.equal(received.system[0].type, 'text');
+    assert.equal(received.system[0].text, 'long system prompt for review');
+    assert.deepEqual(received.system[0].cache_control, { type: 'ephemeral' });
+  });
+
+  test('sends system as plain string when RIVER_ANTHROPIC_PROMPT_CACHE=0', async () => {
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '0';
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: 'ok' }] };
+    });
+
+    await client.generateReview('system text', 'diff');
+    assert.equal(received.system, 'system text');
+  });
+
+  test('cache decision is read per call (not frozen at construction)', async () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    const seen = [];
+    stubMessagesCreate(client, async (args) => {
+      seen.push(args.system);
+      return { content: [{ type: 'text', text: '' }] };
+    });
+
+    await client.generateReview('s1', 'd1');
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '0';
+    await client.generateReview('s2', 'd2');
+
+    assert.ok(Array.isArray(seen[0]), 'first call cached');
+    assert.equal(seen[1], 's2', 'second call uses plain string after opt-out');
   });
 });

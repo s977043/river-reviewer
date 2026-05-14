@@ -269,6 +269,8 @@ GitHub Actions では:
     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
+**Prompt caching（自動）**: skill の systemPrompt は Anthropic の 5 分 ephemeral cache を自動利用します。同じ skill で複数ファイルをレビューする際、2 回目以降の system トークンが大幅に割引（cache_read 単価は通常の 1/10）されます。無効化したい場合は `RIVER_ANTHROPIC_PROMPT_CACHE=0` を環境変数で設定してください。
+
 ### セキュリティ考慮事項
 
 - `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GOOGLE_API_KEY` は必ず Repository Secrets に設定し、`env:` で参照する
