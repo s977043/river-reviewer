@@ -32649,7 +32649,16 @@ const DEFAULT_DENY_GLOBS = Object.freeze([
  * skipped. The high-entropy fallback already protects monotonic strings
  * (entropy below threshold) so the placeholder list is intentionally short.
  */
-const ALLOWLIST_TOKENS = Object.freeze(['example', 'dummy', 'placeholder', '<missing>']);
+const ALLOWLIST_TOKENS = Object.freeze([
+  'example',
+  'dummy',
+  'placeholder',
+  '<missing>',
+  // Common substrings used in test fixtures so they don't get redacted
+  // when test files are included in repo-wide context scans (#808 follow-up).
+  'test-key',
+  'fake-key',
+]);
 
 const ALLOWLIST_RE = new RegExp(
   ALLOWLIST_TOKENS.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
