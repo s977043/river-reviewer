@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict';
-import test, { describe } from 'node:test';
+import test, { afterEach, beforeEach, describe } from 'node:test';
 
-import { isRetriableError, withRetry, AIClientFactory } from '../src/ai/factory.mjs';
+import {
+  isRetriableError,
+  withRetry,
+  parseRetryAfter,
+  getBackoffMs,
+  resolveAnthropicMaxTokens,
+  __clearAIClientCacheForTests,
+  AIClientFactory,
+} from '../src/ai/factory.mjs';
 
 // ---------------------------------------------------------------------------
 // isRetriableError
@@ -138,39 +146,270 @@ describe('AIClientFactory.create', () => {
 
   // --- Anthropic (Claude) provider ---
   describe('claude-* models', () => {
-    const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
-    const originalRiverAnthropicKey = process.env.RIVER_ANTHROPIC_API_KEY;
+    let originalAnthropicKey;
+    let originalRiverAnthropicKey;
+
+    beforeEach(() => {
+      originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+      originalRiverAnthropicKey = process.env.RIVER_ANTHROPIC_API_KEY;
+      __clearAIClientCacheForTests();
+    });
+
+    afterEach(() => {
+      if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+      else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+      if (originalRiverAnthropicKey === undefined) delete process.env.RIVER_ANTHROPIC_API_KEY;
+      else process.env.RIVER_ANTHROPIC_API_KEY = originalRiverAnthropicKey;
+      __clearAIClientCacheForTests();
+    });
 
     test('throws when ANTHROPIC_API_KEY is not set', () => {
       delete process.env.ANTHROPIC_API_KEY;
       delete process.env.RIVER_ANTHROPIC_API_KEY;
       assert.throws(
-        () => AIClientFactory.create({ modelName: 'claude-sonnet-4-6-test-noenv' }),
+        () => AIClientFactory.create({ modelName: 'claude-sonnet-4-6' }),
         /ANTHROPIC_API_KEY/,
       );
-      if (originalAnthropicKey !== undefined) process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
-      if (originalRiverAnthropicKey !== undefined)
-        process.env.RIVER_ANTHROPIC_API_KEY = originalRiverAnthropicKey;
     });
 
     test('creates AnthropicClient when ANTHROPIC_API_KEY is set', () => {
       process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
-      const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6-test-env' });
+      const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
       assert.ok(client);
       assert.equal(typeof client.generateReview, 'function');
-      if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
-      else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
     });
 
     test('falls back to RIVER_ANTHROPIC_API_KEY when ANTHROPIC_API_KEY is unset', () => {
       delete process.env.ANTHROPIC_API_KEY;
       process.env.RIVER_ANTHROPIC_API_KEY = 'sk-ant-river-test-key';
-      const client = AIClientFactory.create({ modelName: 'claude-haiku-4-5-test-fallback' });
+      const client = AIClientFactory.create({ modelName: 'claude-haiku-4-5' });
       assert.ok(client);
       assert.equal(typeof client.generateReview, 'function');
-      if (originalAnthropicKey !== undefined) process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
-      if (originalRiverAnthropicKey === undefined) delete process.env.RIVER_ANTHROPIC_API_KEY;
-      else process.env.RIVER_ANTHROPIC_API_KEY = originalRiverAnthropicKey;
     });
+
+    test('returns same cached instance for repeated calls with identical args', () => {
+      process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+      const a = AIClientFactory.create({ modelName: 'claude-sonnet-4-6', temperature: 0 });
+      const b = AIClientFactory.create({ modelName: 'claude-sonnet-4-6', temperature: 0 });
+      assert.strictEqual(a, b);
+    });
+
+    test('returns distinct instances for different maxTokens', () => {
+      process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+      const small = AIClientFactory.create({ modelName: 'claude-sonnet-4-6', maxTokens: 1024 });
+      const large = AIClientFactory.create({ modelName: 'claude-sonnet-4-6', maxTokens: 8192 });
+      assert.notStrictEqual(small, large);
+      assert.equal(small.maxTokens, 1024);
+      assert.equal(large.maxTokens, 8192);
+    });
+  });
+
+  // --- unsupported model placeholder ---
+  // Use a clearly-reserved fake provider prefix so adding a real Mistral
+  // provider later cannot silently turn this expectation into a false pass.
+  test('throws for fully unknown provider prefix', () => {
+    assert.throws(
+      () => AIClientFactory.create({ modelName: 'unsupported-fake-provider-xyz' }),
+      /Unsupported model/,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseRetryAfter / getBackoffMs
+// ---------------------------------------------------------------------------
+
+describe('parseRetryAfter', () => {
+  test('parses integer seconds', () => {
+    assert.equal(parseRetryAfter('2'), 2000);
+  });
+
+  test('parses fractional seconds (floored to ms)', () => {
+    assert.equal(parseRetryAfter('1.5'), 1500);
+  });
+
+  test('parses HTTP-date format', () => {
+    const future = new Date(Date.now() + 60000).toUTCString();
+    const ms = parseRetryAfter(future);
+    assert.ok(ms !== null && ms >= 55000 && ms <= 65000, `expected ~60000ms, got ${ms}`);
+  });
+
+  test('returns null for invalid input', () => {
+    assert.equal(parseRetryAfter(''), null);
+    assert.equal(parseRetryAfter(undefined), null);
+    assert.equal(parseRetryAfter('not-a-date'), null);
+  });
+
+  test('clamps negative numeric values to null', () => {
+    assert.equal(parseRetryAfter('-3'), null);
+  });
+});
+
+describe('getBackoffMs', () => {
+  test('returns linear backoff when no retry-after header', () => {
+    assert.equal(getBackoffMs({}, 1), 500);
+    assert.equal(getBackoffMs({}, 2), 1000);
+  });
+
+  test('honors retry-after header from err.headers', () => {
+    assert.equal(getBackoffMs({ headers: { 'retry-after': '3' } }, 1), 3000);
+  });
+
+  test('honors retry-after header from err.response.headers', () => {
+    assert.equal(getBackoffMs({ response: { headers: { 'retry-after': '4' } } }, 1), 4000);
+  });
+
+  test('honors Anthropic-specific rate-limit reset headers', () => {
+    // toUTCString() only encodes whole seconds, so the round-trip can drop
+    // up to ~1s of precision; we just assert the value is in a sane window
+    // and clearly comes from the header (not the 500ms linear fallback).
+    const future = new Date(Date.now() + 5000).toUTCString();
+    const ms = getBackoffMs(
+      { headers: { 'anthropic-ratelimit-requests-reset': future } },
+      1,
+    );
+    assert.ok(ms > 1000 && ms <= 6000, `expected ~5s, got ${ms}ms`);
+  });
+
+  test('caps absurd retry-after values at MAX_RETRY_DELAY_MS (30s)', () => {
+    assert.equal(getBackoffMs({ headers: { 'retry-after': '99999' } }, 1), 30_000);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// resolveAnthropicMaxTokens
+// ---------------------------------------------------------------------------
+
+describe('resolveAnthropicMaxTokens', () => {
+  test('explicit positive value wins', () => {
+    assert.equal(resolveAnthropicMaxTokens('claude-opus-4-7', 2048), 2048);
+  });
+
+  test('falls back to model table when explicit is omitted', () => {
+    assert.equal(resolveAnthropicMaxTokens('claude-opus-4-7'), 8192);
+    assert.equal(resolveAnthropicMaxTokens('claude-sonnet-4-6'), 8192);
+    assert.equal(resolveAnthropicMaxTokens('claude-haiku-4-5'), 4096);
+  });
+
+  test('falls back to global default for unknown claude variants', () => {
+    assert.equal(resolveAnthropicMaxTokens('claude-future-9000'), 4096);
+  });
+
+  test('ignores non-positive explicit values', () => {
+    assert.equal(resolveAnthropicMaxTokens('claude-opus-4-7', 0), 8192);
+    assert.equal(resolveAnthropicMaxTokens('claude-opus-4-7', -1), 8192);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// AnthropicClient.generateReview (mocked SDK)
+// ---------------------------------------------------------------------------
+
+describe('AnthropicClient.generateReview', () => {
+  let originalAnthropicKey;
+
+  beforeEach(() => {
+    originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+    process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+    __clearAIClientCacheForTests();
+  });
+
+  afterEach(() => {
+    if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+    __clearAIClientCacheForTests();
+  });
+
+  function stubMessagesCreate(client, fn) {
+    client.anthropic = { messages: { create: fn } };
+  }
+
+  test('calls messages.create with model / max_tokens / system / messages and returns text', async () => {
+    const client = AIClientFactory.create({
+      modelName: 'claude-sonnet-4-6',
+      temperature: 0.1,
+      maxTokens: 2048,
+    });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: 'looks good' }] };
+    });
+
+    const review = await client.generateReview('system-prompt', 'diff-text');
+    assert.equal(review, 'looks good');
+    assert.equal(received.model, 'claude-sonnet-4-6');
+    assert.equal(received.max_tokens, 2048);
+    assert.equal(received.temperature, 0.1);
+    assert.equal(received.system, 'system-prompt');
+    assert.deepEqual(received.messages, [{ role: 'user', content: 'diff-text' }]);
+  });
+
+  test('concatenates multiple text blocks (skips non-text blocks)', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    stubMessagesCreate(client, async () => ({
+      content: [
+        { type: 'thinking', text: 'internal-thought-should-be-skipped' },
+        { type: 'text', text: 'first' },
+        { type: 'tool_use', name: 'noop' },
+        { type: 'text', text: 'second' },
+      ],
+    }));
+
+    const review = await client.generateReview('s', 'd');
+    assert.equal(review, 'first\nsecond');
+  });
+
+  test('returns empty string for empty / missing content array', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    stubMessagesCreate(client, async () => ({ content: [] }));
+    assert.equal(await client.generateReview('s', 'd'), '');
+
+    __clearAIClientCacheForTests();
+    const client2 = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    stubMessagesCreate(client2, async () => ({}));
+    assert.equal(await client2.generateReview('s', 'd'), '');
+  });
+
+  test('retries on 429 then succeeds (withRetry integration)', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    let calls = 0;
+    stubMessagesCreate(client, async () => {
+      calls += 1;
+      if (calls === 1) {
+        const err = new Error('rate limited');
+        err.status = 429;
+        err.headers = { 'retry-after': '0' };
+        throw err;
+      }
+      return { content: [{ type: 'text', text: 'ok-after-retry' }] };
+    });
+    const review = await client.generateReview('s', 'd');
+    assert.equal(review, 'ok-after-retry');
+    assert.equal(calls, 2);
+  });
+
+  test('does not retry on 401 (auth error)', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    let calls = 0;
+    stubMessagesCreate(client, async () => {
+      calls += 1;
+      const err = new Error('unauthorized');
+      err.status = 401;
+      throw err;
+    });
+    await assert.rejects(client.generateReview('s', 'd'), /unauthorized/);
+    assert.equal(calls, 1);
+  });
+
+  test('uses model-default max_tokens when caller omits it', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-opus-4-7' });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: '' }] };
+    });
+    await client.generateReview('s', 'd');
+    assert.equal(received.max_tokens, 8192);
   });
 });

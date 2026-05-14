@@ -6,7 +6,14 @@ const clientCache = new Map();
 
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 500;
-const ANTHROPIC_MAX_TOKENS = 4096;
+// Cap retry-after to avoid pathological wait times when servers return huge values.
+const MAX_RETRY_DELAY_MS = 30_000;
+const ANTHROPIC_MAX_TOKENS_DEFAULT = 4096;
+const ANTHROPIC_MAX_TOKENS_BY_MODEL = {
+  'claude-opus-4-7': 8192,
+  'claude-sonnet-4-6': 8192,
+  'claude-haiku-4-5': 4096,
+};
 
 function isRetriableError(err) {
   const status = err?.status ?? err?.response?.status;
@@ -17,9 +24,37 @@ function isRetriableError(err) {
   return false;
 }
 
+function parseRetryAfter(value) {
+  if (value === undefined || value === null || value === '') return null;
+  const seconds = Number(value);
+  if (Number.isFinite(seconds)) {
+    // Numeric inputs are seconds-since-now. Negative values are nonsensical
+    // for retry-after, so reject them rather than falling through to
+    // Date.parse (which interprets bare "-3" as year -3).
+    return seconds >= 0 ? Math.floor(seconds * 1000) : null;
+  }
+  const httpDate = Date.parse(value);
+  if (!Number.isNaN(httpDate)) return Math.max(0, httpDate - Date.now());
+  return null;
+}
+
+function getBackoffMs(err, attempt) {
+  // Provider SDKs (OpenAI / Anthropic) expose response headers via err.headers
+  // or err.response.headers; check both shapes. Anthropic also publishes
+  // rate-limit reset hints under `anthropic-ratelimit-*-reset` (HTTP-date).
+  const headers = err?.headers ?? err?.response?.headers ?? {};
+  const retryAfter =
+    parseRetryAfter(headers['retry-after']) ??
+    parseRetryAfter(headers['anthropic-ratelimit-requests-reset']) ??
+    parseRetryAfter(headers['anthropic-ratelimit-tokens-reset']);
+  if (retryAfter !== null) {
+    return Math.min(retryAfter, MAX_RETRY_DELAY_MS);
+  }
+  return RETRY_DELAY_MS * attempt;
+}
+
 async function withRetry(fn) {
   let attempt = 0;
-  // simple linear backoff; enough to smooth transient 429/timeout for now
   while (true) {
     try {
       return await fn();
@@ -33,24 +68,47 @@ async function withRetry(fn) {
         }
         throw err;
       }
+      const delay = getBackoffMs(err, attempt);
       if (process.env.RIVER_AI_RETRY_DEBUG === '1') {
         // eslint-disable-next-line no-console
-        console.warn(`[AI retry] attempt ${attempt} failed (${err?.message || err}); retrying...`);
+        console.warn(
+          `[AI retry] attempt ${attempt} failed (${err?.message || err}); retrying in ${delay}ms...`,
+        );
       }
-      await new Promise((res) => setTimeout(res, RETRY_DELAY_MS * attempt));
+      await new Promise((res) => setTimeout(res, delay));
     }
   }
 }
 
+function resolveAnthropicMaxTokens(modelName, explicit) {
+  if (typeof explicit === 'number' && explicit > 0) return explicit;
+  return ANTHROPIC_MAX_TOKENS_BY_MODEL[modelName] ?? ANTHROPIC_MAX_TOKENS_DEFAULT;
+}
+
+// Test-only: clear the cached client map so unit tests can re-construct
+// clients with different env vars without colliding on cacheKey.
+function __clearAIClientCacheForTests() {
+  clientCache.clear();
+}
+
 // --- テスト用 named export (内部ヘルパー) ---
-export { isRetriableError, withRetry };
+export {
+  isRetriableError,
+  withRetry,
+  parseRetryAfter,
+  getBackoffMs,
+  resolveAnthropicMaxTokens,
+  __clearAIClientCacheForTests,
+};
 
 export class AIClientFactory {
-  static create({ modelName, temperature }) {
+  static create({ modelName, temperature, maxTokens }) {
     if (!modelName) {
       throw new Error('モデル名が指定されていません (config.skills[].model を確認してください)');
     }
-    const cacheKey = `${modelName}::${temperature ?? 'default'}`;
+    // maxTokens is part of the cache key so two skills targeting the same
+    // model with different output budgets do not stomp on each other.
+    const cacheKey = `${modelName}::${temperature ?? 'default'}::${maxTokens ?? 'default'}`;
     if (clientCache.has(cacheKey)) {
       return clientCache.get(cacheKey);
     }
@@ -64,7 +122,7 @@ export class AIClientFactory {
       client = new OpenAIClient(modelName, apiKey, temperature);
     } else if (modelName.startsWith('claude')) {
       const apiKey = process.env.ANTHROPIC_API_KEY || process.env.RIVER_ANTHROPIC_API_KEY;
-      client = new AnthropicClient(modelName, apiKey, temperature);
+      client = new AnthropicClient(modelName, apiKey, temperature, maxTokens);
     }
 
     if (!client) throw new Error(`Unsupported model: ${modelName}`);
@@ -140,9 +198,10 @@ class OpenAIClient {
 }
 
 class AnthropicClient {
-  constructor(modelName, apiKey, temperature) {
+  constructor(modelName, apiKey, temperature, maxTokens) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
+    this.maxTokens = resolveAnthropicMaxTokens(modelName, maxTokens);
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY (または RIVER_ANTHROPIC_API_KEY) が設定されていません');
     }
@@ -153,14 +212,17 @@ class AnthropicClient {
     const response = await withRetry(() =>
       this.anthropic.messages.create({
         model: this.modelName,
-        max_tokens: ANTHROPIC_MAX_TOKENS,
+        max_tokens: this.maxTokens,
         temperature: this.temperature,
         system: systemPrompt,
         messages: [{ role: 'user', content: diff }],
       })
     );
 
-    const firstTextBlock = response.content?.find((block) => block.type === 'text');
-    return firstTextBlock?.text || '';
+    // Concatenate every text block. Extended-thinking and tool-use responses
+    // can interleave non-text blocks, so we filter+join rather than picking
+    // only the first text element.
+    const textBlocks = (response.content ?? []).filter((block) => block?.type === 'text');
+    return textBlocks.map((block) => block.text ?? '').join('\n');
   }
 }

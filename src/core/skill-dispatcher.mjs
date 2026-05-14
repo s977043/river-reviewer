@@ -122,7 +122,11 @@ export class SkillDispatcher {
              };
           }
 
-          const client = AIClientFactory.create({ modelName, temperature: skill.temperature ?? 0 });
+          const client = AIClientFactory.create({
+            modelName,
+            temperature: skill.temperature ?? 0,
+            maxTokens: skill.maxTokens,
+          });
           console.log(`  -> Invoking ${modelName} for skill "${skill.name}"...`);
           const review = await client.generateReview(systemPrompt, diff);
 
