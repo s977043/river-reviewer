@@ -19947,10 +19947,11 @@ __nccwpck_require__.d(__webpack_exports__, {
   ai: () => (/* binding */ schemas_number),
   Ik: () => (/* binding */ object),
   Yj: () => (/* binding */ schemas_string),
+  KC: () => (/* binding */ union),
   L5: () => (/* binding */ unknown)
 });
 
-// UNUSED EXPORTS: ZodAny, ZodArray, ZodBase64, ZodBase64URL, ZodBigInt, ZodBigIntFormat, ZodBoolean, ZodCIDRv4, ZodCIDRv6, ZodCUID, ZodCUID2, ZodCatch, ZodCodec, ZodCustom, ZodCustomStringFormat, ZodDate, ZodDefault, ZodDiscriminatedUnion, ZodE164, ZodEmail, ZodEmoji, ZodEnum, ZodExactOptional, ZodFile, ZodFunction, ZodGUID, ZodIPv4, ZodIPv6, ZodIntersection, ZodJWT, ZodKSUID, ZodLazy, ZodLiteral, ZodMAC, ZodMap, ZodNaN, ZodNanoID, ZodNever, ZodNonOptional, ZodNull, ZodNullable, ZodNumber, ZodNumberFormat, ZodObject, ZodOptional, ZodPipe, ZodPrefault, ZodPreprocess, ZodPromise, ZodReadonly, ZodRecord, ZodSet, ZodString, ZodSuccess, ZodSymbol, ZodTemplateLiteral, ZodTransform, ZodTuple, ZodType, ZodULID, ZodURL, ZodUUID, ZodUndefined, ZodUnion, ZodUnknown, ZodVoid, ZodXID, ZodXor, _ZodString, _default, _function, any, base64, base64url, bigint, catch, check, cidrv4, cidrv6, codec, cuid, cuid2, custom, date, describe, discriminatedUnion, e164, email, emoji, exactOptional, file, float32, float64, function, guid, hash, hex, hostname, httpUrl, instanceof, int, int32, int64, intersection, invertCodec, ipv4, ipv6, json, jwt, keyof, ksuid, lazy, literal, looseObject, looseRecord, mac, map, meta, nan, nanoid, nativeEnum, never, nonoptional, null, nullable, nullish, optional, partialRecord, pipe, prefault, preprocess, promise, readonly, record, refine, set, strictObject, stringFormat, stringbool, success, superRefine, symbol, templateLiteral, transform, tuple, uint32, uint64, ulid, undefined, union, url, uuid, uuidv4, uuidv6, uuidv7, void, xid, xor
+// UNUSED EXPORTS: ZodAny, ZodArray, ZodBase64, ZodBase64URL, ZodBigInt, ZodBigIntFormat, ZodBoolean, ZodCIDRv4, ZodCIDRv6, ZodCUID, ZodCUID2, ZodCatch, ZodCodec, ZodCustom, ZodCustomStringFormat, ZodDate, ZodDefault, ZodDiscriminatedUnion, ZodE164, ZodEmail, ZodEmoji, ZodEnum, ZodExactOptional, ZodFile, ZodFunction, ZodGUID, ZodIPv4, ZodIPv6, ZodIntersection, ZodJWT, ZodKSUID, ZodLazy, ZodLiteral, ZodMAC, ZodMap, ZodNaN, ZodNanoID, ZodNever, ZodNonOptional, ZodNull, ZodNullable, ZodNumber, ZodNumberFormat, ZodObject, ZodOptional, ZodPipe, ZodPrefault, ZodPreprocess, ZodPromise, ZodReadonly, ZodRecord, ZodSet, ZodString, ZodSuccess, ZodSymbol, ZodTemplateLiteral, ZodTransform, ZodTuple, ZodType, ZodULID, ZodURL, ZodUUID, ZodUndefined, ZodUnion, ZodUnknown, ZodVoid, ZodXID, ZodXor, _ZodString, _default, _function, any, base64, base64url, bigint, catch, check, cidrv4, cidrv6, codec, cuid, cuid2, custom, date, describe, discriminatedUnion, e164, email, emoji, exactOptional, file, float32, float64, function, guid, hash, hex, hostname, httpUrl, instanceof, int, int32, int64, intersection, invertCodec, ipv4, ipv6, json, jwt, keyof, ksuid, lazy, literal, looseObject, looseRecord, mac, map, meta, nan, nanoid, nativeEnum, never, nonoptional, null, nullable, nullish, optional, partialRecord, pipe, prefault, preprocess, promise, readonly, record, refine, set, strictObject, stringFormat, stringbool, success, superRefine, symbol, templateLiteral, transform, tuple, uint32, uint64, ulid, undefined, url, uuid, uuidv4, uuidv6, uuidv7, void, xid, xor
 
 ;// CONCATENATED MODULE: ./node_modules/zod/v4/core/core.js
 var _a;
@@ -29062,7 +29063,13 @@ const riverReviewerConfigSchema = schemas/* object */.Ik({
 // --- New Skill-based Schema (for river skills) ---
 
 // Skill-based schemas
-const AIModelSchema = schemas/* enum */.k5([
+// Hybrid model identifier: keep the curated enum for typo protection on
+// well-known names, but also accept any string that matches a known provider
+// prefix. This lets users adopt newer SDK-supported snapshots (e.g.
+// `claude-sonnet-4-6-20260301`, `gpt-4o-mini-2026`) without waiting for an
+// enum update PR. Completely foreign prefixes (e.g. `mistral-*`) still fail
+// validation upstream, surfacing typos early.
+const KnownAIModels = schemas/* enum */.k5([
   'gemini-2.0-flash', // Default: Fast & Smart
   'gemini-2.0-flash-thinking', // Reasoning: For Security/Architecture
   'gemini-2.0-pro', // High Spec
@@ -29073,6 +29080,15 @@ const AIModelSchema = schemas/* enum */.k5([
   'claude-sonnet-4-6', // Anthropic Balanced
   'claude-opus-4-7', // Anthropic Top-tier
   'claude-haiku-4-5', // Anthropic Fast
+]);
+
+const AIModelSchema = schemas/* union */.KC([
+  KnownAIModels,
+  schemas/* string */.Yj()
+    .regex(/^(gemini|gpt|o1|claude)-[a-z0-9.\-_]+$/i, {
+      message:
+        'modelName must be a known model or match a supported provider prefix (gemini-* / gpt-* / o1-* / claude-*)',
+    }),
 ]);
 
 const RuleSchema = schemas/* object */.Ik({
@@ -55835,10 +55851,27 @@ class AIClientFactory {
   }
 }
 
+// Normalize Google Gemini `usageMetadata` into the same camelCase shape as
+// the other providers. Gemini reports `cachedContentTokenCount` for context
+// caching hits; we map it to `cacheReadInputTokens`. Gemini does not bill
+// separately for cache creation, so `cacheCreationInputTokens` stays 0.
+function normalizeGeminiUsage(raw, modelName) {
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    provider: 'google',
+    model: modelName,
+    inputTokens: raw.promptTokenCount ?? 0,
+    outputTokens: raw.candidatesTokenCount ?? 0,
+    cacheCreationInputTokens: 0,
+    cacheReadInputTokens: raw.cachedContentTokenCount ?? 0,
+  };
+}
+
 class GeminiClient {
   constructor(modelName, apiKey, temperature) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0.2;
+    this.lastUsage = null;
     if (!apiKey) {
       throw new Error('GOOGLE_API_KEY が設定されていません');
     }
@@ -55859,6 +55892,8 @@ class GeminiClient {
         ],
       })
     );
+
+    this.lastUsage = normalizeGeminiUsage(result?.response?.usageMetadata, this.modelName);
 
     return result.response.text();
   }
@@ -55929,6 +55964,26 @@ function isAnthropicPromptCacheEnabled() {
   return process.env.RIVER_ANTHROPIC_PROMPT_CACHE !== '0';
 }
 
+// Defense-in-depth allow-list for Anthropic model names (independent of the
+// upstream config schema gate). The factory's prefix check (`startsWith('claude')`)
+// is intentionally lenient for forward compatibility, but the SDK-facing
+// client should still reject obviously-malformed names — both to fail fast
+// on typos and to limit the blast radius if upstream validation is ever
+// bypassed (e.g. programmatic API callers, future plugin entry points).
+//
+// Pattern intent: `claude-<family>-<version-or-snapshot>`. Update when
+// Anthropic adds a new model family beyond sonnet/opus/haiku.
+const ANTHROPIC_MODEL_PATTERN = /^claude-(sonnet|opus|haiku)-[a-z0-9.\-_]+$/i;
+
+function assertAnthropicModelName(modelName) {
+  if (!ANTHROPIC_MODEL_PATTERN.test(modelName)) {
+    throw new Error(
+      `Invalid Anthropic model name: ${modelName} ` +
+        `(expected claude-{sonnet|opus|haiku}-<version>)`,
+    );
+  }
+}
+
 // Normalize the raw `response.usage` block returned by the Anthropic SDK
 // into a stable shape that cost-estimation tooling (and #803 benchmark
 // guides) can consume without depending on SDK internals.
@@ -55960,6 +56015,7 @@ function buildAnthropicSystem(systemPrompt, { cacheEnabled }) {
 
 class AnthropicClient {
   constructor(modelName, apiKey, temperature, maxTokens, options = {}) {
+    assertAnthropicModelName(modelName);
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
     this.maxTokens = resolveAnthropicMaxTokens(modelName, maxTokens);

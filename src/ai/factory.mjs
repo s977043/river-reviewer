@@ -102,6 +102,8 @@ export {
   buildAnthropicSystem,
   normalizeAnthropicUsage,
   normalizeOpenAIUsage,
+  normalizeGeminiUsage,
+  assertAnthropicModelName,
   __clearAIClientCacheForTests,
 };
 
@@ -138,10 +140,27 @@ export class AIClientFactory {
   }
 }
 
+// Normalize Google Gemini `usageMetadata` into the same camelCase shape as
+// the other providers. Gemini reports `cachedContentTokenCount` for context
+// caching hits; we map it to `cacheReadInputTokens`. Gemini does not bill
+// separately for cache creation, so `cacheCreationInputTokens` stays 0.
+function normalizeGeminiUsage(raw, modelName) {
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    provider: 'google',
+    model: modelName,
+    inputTokens: raw.promptTokenCount ?? 0,
+    outputTokens: raw.candidatesTokenCount ?? 0,
+    cacheCreationInputTokens: 0,
+    cacheReadInputTokens: raw.cachedContentTokenCount ?? 0,
+  };
+}
+
 class GeminiClient {
   constructor(modelName, apiKey, temperature) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0.2;
+    this.lastUsage = null;
     if (!apiKey) {
       throw new Error('GOOGLE_API_KEY が設定されていません');
     }
@@ -162,6 +181,8 @@ class GeminiClient {
         ],
       })
     );
+
+    this.lastUsage = normalizeGeminiUsage(result?.response?.usageMetadata, this.modelName);
 
     return result.response.text();
   }
@@ -232,6 +253,26 @@ function isAnthropicPromptCacheEnabled() {
   return process.env.RIVER_ANTHROPIC_PROMPT_CACHE !== '0';
 }
 
+// Defense-in-depth allow-list for Anthropic model names (independent of the
+// upstream config schema gate). The factory's prefix check (`startsWith('claude')`)
+// is intentionally lenient for forward compatibility, but the SDK-facing
+// client should still reject obviously-malformed names — both to fail fast
+// on typos and to limit the blast radius if upstream validation is ever
+// bypassed (e.g. programmatic API callers, future plugin entry points).
+//
+// Pattern intent: `claude-<family>-<version-or-snapshot>`. Update when
+// Anthropic adds a new model family beyond sonnet/opus/haiku.
+const ANTHROPIC_MODEL_PATTERN = /^claude-(sonnet|opus|haiku)-[a-z0-9.\-_]+$/i;
+
+function assertAnthropicModelName(modelName) {
+  if (!ANTHROPIC_MODEL_PATTERN.test(modelName)) {
+    throw new Error(
+      `Invalid Anthropic model name: ${modelName} ` +
+        `(expected claude-{sonnet|opus|haiku}-<version>)`,
+    );
+  }
+}
+
 // Normalize the raw `response.usage` block returned by the Anthropic SDK
 // into a stable shape that cost-estimation tooling (and #803 benchmark
 // guides) can consume without depending on SDK internals.
@@ -263,6 +304,7 @@ function buildAnthropicSystem(systemPrompt, { cacheEnabled }) {
 
 class AnthropicClient {
   constructor(modelName, apiKey, temperature, maxTokens, options = {}) {
+    assertAnthropicModelName(modelName);
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
     this.maxTokens = resolveAnthropicMaxTokens(modelName, maxTokens);

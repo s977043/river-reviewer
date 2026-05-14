@@ -267,15 +267,40 @@ describe('redaction-config.schema.json (#692 PR-B)', () => {
 // Skill-based schemas
 // ---------------------------------------------------------------------------
 
-describe('AIModelSchema', () => {
-  test('accepts known models', () => {
-    for (const model of ['gemini-2.0-flash', 'gpt-4o', 'o1', 'o1-mini']) {
+describe('AIModelSchema (hybrid enum + prefix regex)', () => {
+  test('accepts known enum members', () => {
+    for (const model of [
+      'gemini-2.0-flash',
+      'gpt-4o',
+      'o1',
+      'o1-mini',
+      'claude-sonnet-4-6',
+      'claude-opus-4-7',
+      'claude-haiku-4-5',
+    ]) {
       assert.ok(AIModelSchema.safeParse(model).success, `should accept ${model}`);
     }
   });
 
-  test('rejects unknown models', () => {
-    assert.ok(!AIModelSchema.safeParse('claude-3').success);
+  test('accepts forward-compatible names matching the provider prefix', () => {
+    for (const model of [
+      'gemini-3.0-flash',
+      'gpt-4o-mini-2026-01',
+      'o1-pro',
+      'claude-sonnet-5-1',
+      'claude-haiku-4-5-20260101',
+    ]) {
+      assert.ok(
+        AIModelSchema.safeParse(model).success,
+        `should accept future model ${model}`,
+      );
+    }
+  });
+
+  test('rejects names that do not match any supported provider prefix', () => {
+    for (const model of ['mistral-large', 'llama-3', 'random-string', 'claude', '']) {
+      assert.ok(!AIModelSchema.safeParse(model).success, `should reject ${model}`);
+    }
   });
 });
 
