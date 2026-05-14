@@ -101,6 +101,7 @@ export {
   isAnthropicPromptCacheEnabled,
   buildAnthropicSystem,
   normalizeAnthropicUsage,
+  normalizeOpenAIUsage,
   __clearAIClientCacheForTests,
 };
 
@@ -166,10 +167,27 @@ class GeminiClient {
   }
 }
 
+// Normalize the OpenAI Chat Completions usage block. Recent SDK versions
+// also expose cached prompt tokens via `prompt_tokens_details.cached_tokens`;
+// we surface that as `cacheReadInputTokens` so the shape matches Anthropic.
+function normalizeOpenAIUsage(raw, modelName) {
+  if (!raw || typeof raw !== 'object') return null;
+  const cachedTokens = raw.prompt_tokens_details?.cached_tokens ?? 0;
+  return {
+    provider: 'openai',
+    model: modelName,
+    inputTokens: raw.prompt_tokens ?? 0,
+    outputTokens: raw.completion_tokens ?? 0,
+    cacheCreationInputTokens: 0,
+    cacheReadInputTokens: cachedTokens,
+  };
+}
+
 class OpenAIClient {
   constructor(modelName, apiKey, temperature) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
+    this.lastUsage = null;
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY (または RIVER_OPENAI_API_KEY) が設定されていません');
     }
@@ -198,6 +216,8 @@ class OpenAIClient {
         temperature: this.temperature,
       })
     );
+
+    this.lastUsage = normalizeOpenAIUsage(response?.usage, this.modelName);
 
     return response.choices[0].message.content || '';
   }
