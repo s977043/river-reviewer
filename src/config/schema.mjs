@@ -186,6 +186,10 @@ export const SkillSchema = z.object({
   model: AIModelSchema.default('gemini-2.0-flash'),
   temperature: z.number().min(0).max(1).default(0.2),
   maxTokens: z.number().int().positive().optional(),
+  // Anthropic-specific: opt out of ephemeral prompt caching for this skill.
+  // Useful for skills whose systemPrompt is highly dynamic (where cache
+  // misses dominate), or for A/B testing cache impact.
+  disableCache: z.boolean().optional(),
   rules: z.array(RuleSchema),
 });
 

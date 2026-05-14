@@ -126,6 +126,7 @@ export class SkillDispatcher {
             modelName,
             temperature: skill.temperature ?? 0,
             maxTokens: skill.maxTokens,
+            disableCache: skill.disableCache,
           });
           console.log(`  -> Invoking ${modelName} for skill "${skill.name}"...`);
           const review = await client.generateReview(systemPrompt, diff);

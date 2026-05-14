@@ -204,6 +204,21 @@ describe('AIClientFactory.create', () => {
       assert.equal(small.maxTokens, 1024);
       assert.equal(large.maxTokens, 8192);
     });
+
+    test('returns distinct instances for different disableCache values', () => {
+      process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+      const cached = AIClientFactory.create({
+        modelName: 'claude-sonnet-4-6',
+        disableCache: false,
+      });
+      const nocache = AIClientFactory.create({
+        modelName: 'claude-sonnet-4-6',
+        disableCache: true,
+      });
+      assert.notStrictEqual(cached, nocache);
+      assert.equal(cached.disableCache, false);
+      assert.equal(nocache.disableCache, true);
+    });
   });
 
   // --- unsupported model placeholder ---
@@ -532,5 +547,58 @@ describe('AnthropicClient.generateReview (prompt caching integration)', () => {
 
     assert.ok(Array.isArray(seen[0]), 'first call cached');
     assert.equal(seen[1], 's2', 'second call uses plain string after opt-out');
+  });
+
+  test('skill-level disableCache overrides the global default', async () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    const client = AIClientFactory.create({
+      modelName: 'claude-sonnet-4-6',
+      disableCache: true,
+    });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: '' }] };
+    });
+
+    await client.generateReview('skill-system', 'diff');
+    assert.equal(
+      received.system,
+      'skill-system',
+      'disableCache:true should bypass caching even when env default is on',
+    );
+  });
+
+  test('disableCache:false keeps caching when env default is on', async () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    const client = AIClientFactory.create({
+      modelName: 'claude-sonnet-4-6',
+      disableCache: false,
+    });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: '' }] };
+    });
+
+    await client.generateReview('skill-system', 'diff');
+    assert.ok(Array.isArray(received.system));
+    assert.equal(received.system[0].text, 'skill-system');
+  });
+
+  test('env var OFF wins over skill disableCache:false (both gates must allow)', async () => {
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '0';
+    const client = AIClientFactory.create({
+      modelName: 'claude-sonnet-4-6',
+      disableCache: false,
+    });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: '' }] };
+    });
+
+    await client.generateReview('s', 'd');
+    assert.equal(received.system, 's', 'env opt-out should still suppress caching');
   });
 });
