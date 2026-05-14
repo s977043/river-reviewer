@@ -55840,6 +55840,29 @@ class OpenAIClient {
   }
 }
 
+// Prompt caching opt-out: set RIVER_ANTHROPIC_PROMPT_CACHE=0 to send the
+// system prompt as a plain string (no cache_control). Default is enabled
+// because review pipelines repeatedly send the same skill systemPrompt
+// across many files, where the 5-minute ephemeral cache delivers a large
+// cost reduction with no behavioral change.
+function isAnthropicPromptCacheEnabled() {
+  return process.env.RIVER_ANTHROPIC_PROMPT_CACHE !== '0';
+}
+
+function buildAnthropicSystem(systemPrompt, { cacheEnabled }) {
+  if (!cacheEnabled) return systemPrompt;
+  // Array form is required to attach cache_control. Anthropic ignores the
+  // hint when the block falls below the model's minimum cacheable length
+  // (1024 tokens for sonnet/opus, 2048 for haiku) — safe to set unconditionally.
+  return [
+    {
+      type: 'text',
+      text: systemPrompt,
+      cache_control: { type: 'ephemeral' },
+    },
+  ];
+}
+
 class AnthropicClient {
   constructor(modelName, apiKey, temperature, maxTokens) {
     this.modelName = modelName;
@@ -55852,15 +55875,26 @@ class AnthropicClient {
   }
 
   async generateReview(systemPrompt, diff) {
+    const cacheEnabled = isAnthropicPromptCacheEnabled();
     const response = await withRetry(() =>
       this.anthropic.messages.create({
         model: this.modelName,
         max_tokens: this.maxTokens,
         temperature: this.temperature,
-        system: systemPrompt,
+        system: buildAnthropicSystem(systemPrompt, { cacheEnabled }),
         messages: [{ role: 'user', content: diff }],
       })
     );
+
+    if (process.env.RIVER_AI_RETRY_DEBUG === '1' && response?.usage) {
+      const u = response.usage;
+      // eslint-disable-next-line no-console
+      console.log(
+        `[Anthropic usage] input=${u.input_tokens ?? 0} output=${u.output_tokens ?? 0} ` +
+          `cache_create=${u.cache_creation_input_tokens ?? 0} ` +
+          `cache_read=${u.cache_read_input_tokens ?? 0}`,
+      );
+    }
 
     // Concatenate every text block. Extended-thinking and tool-use responses
     // can interleave non-text blocks, so we filter+join rather than picking
