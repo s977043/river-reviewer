@@ -104,13 +104,14 @@ export {
 };
 
 export class AIClientFactory {
-  static create({ modelName, temperature, maxTokens }) {
+  static create({ modelName, temperature, maxTokens, disableCache }) {
     if (!modelName) {
       throw new Error('モデル名が指定されていません (config.skills[].model を確認してください)');
     }
-    // maxTokens is part of the cache key so two skills targeting the same
-    // model with different output budgets do not stomp on each other.
-    const cacheKey = `${modelName}::${temperature ?? 'default'}::${maxTokens ?? 'default'}`;
+    // maxTokens and disableCache are part of the cache key so two skills
+    // targeting the same model with different settings do not stomp on
+    // each other in the module-level clientCache.
+    const cacheKey = `${modelName}::${temperature ?? 'default'}::${maxTokens ?? 'default'}::${disableCache ? 'nocache' : 'cache'}`;
     if (clientCache.has(cacheKey)) {
       return clientCache.get(cacheKey);
     }
@@ -124,7 +125,9 @@ export class AIClientFactory {
       client = new OpenAIClient(modelName, apiKey, temperature);
     } else if (modelName.startsWith('claude')) {
       const apiKey = process.env.ANTHROPIC_API_KEY || process.env.RIVER_ANTHROPIC_API_KEY;
-      client = new AnthropicClient(modelName, apiKey, temperature, maxTokens);
+      client = new AnthropicClient(modelName, apiKey, temperature, maxTokens, {
+        disableCache: Boolean(disableCache),
+      });
     }
 
     if (!client) throw new Error(`Unsupported model: ${modelName}`);
@@ -223,10 +226,11 @@ function buildAnthropicSystem(systemPrompt, { cacheEnabled }) {
 }
 
 class AnthropicClient {
-  constructor(modelName, apiKey, temperature, maxTokens) {
+  constructor(modelName, apiKey, temperature, maxTokens, options = {}) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
     this.maxTokens = resolveAnthropicMaxTokens(modelName, maxTokens);
+    this.disableCache = Boolean(options.disableCache);
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY (または RIVER_ANTHROPIC_API_KEY) が設定されていません');
     }
@@ -234,7 +238,7 @@ class AnthropicClient {
   }
 
   async generateReview(systemPrompt, diff) {
-    const cacheEnabled = isAnthropicPromptCacheEnabled();
+    const cacheEnabled = isAnthropicPromptCacheEnabled() && !this.disableCache;
     const response = await withRetry(() =>
       this.anthropic.messages.create({
         model: this.modelName,
