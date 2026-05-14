@@ -25,6 +25,7 @@
 | 5分で試す                | [クイックスタート（GitHub Actions）](#クイックスタートgithub-actions)                              |
 | 既存リポジトリに導入する | [セットアップガイド](https://river-reviewer.vercel.app/guides/github-actions/)                     |
 | スキルを1個作る          | [スキル作成チュートリアル](https://river-reviewer.vercel.app/tutorials/creating-your-first-skill/) |
+| コストを見積もる         | [コスト見積もりガイド](pages/guides/cost-estimation.md)                                            |
 | 設計思想を理解する       | [アーキテクチャ解説](https://river-reviewer.vercel.app/explanation/river-architecture/)            |
 
 Philosophy: [なぜ作ったのか](#philosophy)

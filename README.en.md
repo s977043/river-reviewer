@@ -26,6 +26,7 @@ English edition. The primary Japanese README lives in `README.md`.
 | Try it in 5 minutes     | [Quick start (GitHub Actions)](#quick-start-github-actions)                              |
 | Add to an existing repo | [Setup guide](https://river-reviewer.vercel.app/guides/github-actions/)                  |
 | Create your first skill | [Skill tutorial](https://river-reviewer.vercel.app/tutorials/creating-your-first-skill/) |
+| Estimate run cost       | [Cost estimation guide](pages/guides/cost-estimation.en.md)                              |
 | Understand the design   | [Architecture docs](https://river-reviewer.vercel.app/explanation/river-architecture/)   |
 
 Philosophy: [Why we built it](#philosophy)
