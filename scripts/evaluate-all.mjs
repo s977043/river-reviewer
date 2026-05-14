@@ -149,9 +149,23 @@ async function runPlannerEval() {
   };
 }
 
+// Symbol-keyed slot used to hand the full fixture-eval result + parsed
+// cases.json from runFixturesEval() to the snapshot phase further down
+// in main(). This avoids re-running evaluateReviewFixtures() purely to
+// derive per-skill FP rates (see Issue #793).
+const FIXTURES_RAW = Symbol('fixturesRaw');
+
 async function runFixturesEval() {
   const { evaluateReviewFixtures } = await import('../src/lib/review-fixtures-eval.mjs');
   const casesPath = path.join(ROOT, 'tests', 'fixtures', 'review-eval', 'cases.json');
+
+  let cases = null;
+  try {
+    cases = JSON.parse(fs.readFileSync(casesPath, 'utf-8'));
+  } catch {
+    // Leave cases as null; the snapshot phase will fall back to its
+    // legacy disk-reading path if this happens (e.g. missing fixtures).
+  }
 
   const result = await evaluateReviewFixtures({ casesPath, verbose: false });
 
@@ -162,7 +176,7 @@ async function runFixturesEval() {
     topFailureMetrics[`fail_${cat}`] = count;
   }
 
-  return {
+  const sub = {
     name: 'fixtures',
     pass: result.exitCode === 0,
     skipped: false,
@@ -174,7 +188,14 @@ async function runFixturesEval() {
     },
     errors: result.exitCode === 0 ? [] : ['One or more fixture checks failed'],
   };
+  // Stash raw data on a Symbol property; consumers in main() unpack it
+  // for getPerSkillFpRate, while existing scores/metrics iteration
+  // (Object.entries) is unaffected.
+  sub[FIXTURES_RAW] = cases ? { result, cases } : null;
+  return sub;
 }
+
+export { FIXTURES_RAW };
 
 async function runRepoContextEval() {
   // #688 PR-4: integrate the repo-wide eval harness landed in PR-1..3.
@@ -353,10 +374,20 @@ Options:
   try {
     const { getSeverityDistribution, getTop1PerCase, getPerSkillFpRate } =
       await import('../src/lib/eval-snapshots.mjs');
+
+    // Reuse the fixture-eval result captured by runFixturesEval() when
+    // available, so getPerSkillFpRate() does not re-invoke
+    // evaluateReviewFixtures(). Falls back to the legacy disk-loading
+    // path when fixtures eval was skipped or the raw slot is empty.
+    const fixturesSub = subResults.find((r) => r?.name === 'fixtures');
+    const fixturesRaw = fixturesSub?.[FIXTURES_RAW] ?? null;
+
     const [severity, top1PerCase, perSkillFp] = await Promise.all([
       getSeverityDistribution(),
       getTop1PerCase(),
-      getPerSkillFpRate(),
+      fixturesRaw
+        ? getPerSkillFpRate(fixturesRaw.result, fixturesRaw.cases)
+        : getPerSkillFpRate(),
     ]);
     snapshots = { severity, top1PerCase, perSkillFp };
   } catch (err) {
