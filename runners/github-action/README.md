@@ -156,6 +156,8 @@ The action requires API credentials to function. Pass at least one of the follow
 
 Set these as GitHub secrets in your repository settings.
 
+For provider-specific `.river-reviewer.json` snippets (Anthropic / OpenAI / Gemini), see the [main README](../../README.md) and the [GitHub Actions guide](../../pages/guides/github-actions.md).
+
 ## Permissions
 
 The action requires the following GitHub token permissions:
