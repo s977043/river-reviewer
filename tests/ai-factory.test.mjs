@@ -229,9 +229,9 @@ describe('parseRetryAfter', () => {
   });
 
   test('parses HTTP-date format', () => {
-    const future = new Date(Date.now() + 5000).toUTCString();
+    const future = new Date(Date.now() + 60000).toUTCString();
     const ms = parseRetryAfter(future);
-    assert.ok(ms !== null && ms >= 4000 && ms <= 6000, `expected ~5000ms, got ${ms}`);
+    assert.ok(ms !== null && ms >= 55000 && ms <= 65000, `expected ~60000ms, got ${ms}`);
   });
 
   test('returns null for invalid input', () => {
@@ -260,12 +260,15 @@ describe('getBackoffMs', () => {
   });
 
   test('honors Anthropic-specific rate-limit reset headers', () => {
-    const future = new Date(Date.now() + 2500).toUTCString();
+    // toUTCString() only encodes whole seconds, so the round-trip can drop
+    // up to ~1s of precision; we just assert the value is in a sane window
+    // and clearly comes from the header (not the 500ms linear fallback).
+    const future = new Date(Date.now() + 5000).toUTCString();
     const ms = getBackoffMs(
       { headers: { 'anthropic-ratelimit-requests-reset': future } },
       1,
     );
-    assert.ok(ms >= 2000 && ms <= 3500);
+    assert.ok(ms > 1000 && ms <= 6000, `expected ~5s, got ${ms}ms`);
   });
 
   test('caps absurd retry-after values at MAX_RETRY_DELAY_MS (30s)', () => {
