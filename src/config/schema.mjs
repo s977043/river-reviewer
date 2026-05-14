@@ -185,6 +185,7 @@ export const SkillSchema = z.object({
   exclude: z.array(z.string()).optional(),
   model: AIModelSchema.default('gemini-2.0-flash'),
   temperature: z.number().min(0).max(1).default(0.2),
+  maxTokens: z.number().int().positive().optional(),
   rules: z.array(RuleSchema),
 });
 
