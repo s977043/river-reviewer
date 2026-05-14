@@ -10,6 +10,7 @@ import {
   isAnthropicPromptCacheEnabled,
   buildAnthropicSystem,
   normalizeAnthropicUsage,
+  normalizeOpenAIUsage,
   __clearAIClientCacheForTests,
   AIClientFactory,
 } from '../src/ai/factory.mjs';
@@ -718,5 +719,105 @@ describe('AnthropicClient.lastUsage', () => {
 
     await client.generateReview('s', 'd');
     assert.equal(client.lastUsage, null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizeOpenAIUsage
+// ---------------------------------------------------------------------------
+
+describe('normalizeOpenAIUsage', () => {
+  test('maps prompt_tokens / completion_tokens into normalized shape', () => {
+    const raw = { prompt_tokens: 800, completion_tokens: 200 };
+    assert.deepEqual(normalizeOpenAIUsage(raw, 'gpt-4o'), {
+      provider: 'openai',
+      model: 'gpt-4o',
+      inputTokens: 800,
+      outputTokens: 200,
+      cacheCreationInputTokens: 0,
+      cacheReadInputTokens: 0,
+    });
+  });
+
+  test('reads cached_tokens from prompt_tokens_details', () => {
+    const raw = {
+      prompt_tokens: 800,
+      completion_tokens: 200,
+      prompt_tokens_details: { cached_tokens: 300 },
+    };
+    const result = normalizeOpenAIUsage(raw, 'gpt-4o-mini');
+    assert.equal(result.cacheReadInputTokens, 300);
+    assert.equal(result.cacheCreationInputTokens, 0);
+  });
+
+  test('returns null for null / non-object input', () => {
+    assert.equal(normalizeOpenAIUsage(null, 'gpt-4o'), null);
+    assert.equal(normalizeOpenAIUsage('weird', 'gpt-4o'), null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// OpenAIClient.lastUsage capture (telemetry integration)
+// ---------------------------------------------------------------------------
+
+describe('OpenAIClient.lastUsage', () => {
+  let originalKey;
+  let originalRiverKey;
+
+  beforeEach(() => {
+    originalKey = process.env.OPENAI_API_KEY;
+    originalRiverKey = process.env.RIVER_OPENAI_API_KEY;
+    process.env.OPENAI_API_KEY = 'sk-openai-test-key';
+    __clearAIClientCacheForTests();
+  });
+
+  afterEach(() => {
+    if (originalKey === undefined) delete process.env.OPENAI_API_KEY;
+    else process.env.OPENAI_API_KEY = originalKey;
+    if (originalRiverKey === undefined) delete process.env.RIVER_OPENAI_API_KEY;
+    else process.env.RIVER_OPENAI_API_KEY = originalRiverKey;
+    __clearAIClientCacheForTests();
+  });
+
+  function stubChatCompletions(client, fn) {
+    client.openai = { chat: { completions: { create: fn } } };
+  }
+
+  test('lastUsage is null before any call', () => {
+    const client = AIClientFactory.create({ modelName: 'gpt-4o' });
+    assert.equal(client.lastUsage, null);
+  });
+
+  test('lastUsage is populated after generateReview', async () => {
+    const client = AIClientFactory.create({ modelName: 'gpt-4o' });
+    stubChatCompletions(client, async () => ({
+      choices: [{ message: { content: 'ok' } }],
+      usage: { prompt_tokens: 500, completion_tokens: 100 },
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.deepEqual(client.lastUsage, {
+      provider: 'openai',
+      model: 'gpt-4o',
+      inputTokens: 500,
+      outputTokens: 100,
+      cacheCreationInputTokens: 0,
+      cacheReadInputTokens: 0,
+    });
+  });
+
+  test('lastUsage surfaces cached_tokens when SDK provides it', async () => {
+    const client = AIClientFactory.create({ modelName: 'gpt-4o-mini' });
+    stubChatCompletions(client, async () => ({
+      choices: [{ message: { content: '' } }],
+      usage: {
+        prompt_tokens: 1000,
+        completion_tokens: 50,
+        prompt_tokens_details: { cached_tokens: 700 },
+      },
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.equal(client.lastUsage.cacheReadInputTokens, 700);
   });
 });

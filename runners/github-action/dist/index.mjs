@@ -55810,10 +55810,27 @@ class GeminiClient {
   }
 }
 
+// Normalize the OpenAI Chat Completions usage block. Recent SDK versions
+// also expose cached prompt tokens via `prompt_tokens_details.cached_tokens`;
+// we surface that as `cacheReadInputTokens` so the shape matches Anthropic.
+function normalizeOpenAIUsage(raw, modelName) {
+  if (!raw || typeof raw !== 'object') return null;
+  const cachedTokens = raw.prompt_tokens_details?.cached_tokens ?? 0;
+  return {
+    provider: 'openai',
+    model: modelName,
+    inputTokens: raw.prompt_tokens ?? 0,
+    outputTokens: raw.completion_tokens ?? 0,
+    cacheCreationInputTokens: 0,
+    cacheReadInputTokens: cachedTokens,
+  };
+}
+
 class OpenAIClient {
   constructor(modelName, apiKey, temperature) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
+    this.lastUsage = null;
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY (または RIVER_OPENAI_API_KEY) が設定されていません');
     }
@@ -55842,6 +55859,8 @@ class OpenAIClient {
         temperature: this.temperature,
       })
     );
+
+    this.lastUsage = normalizeOpenAIUsage(response?.usage, this.modelName);
 
     return response.choices[0].message.content || '';
   }
@@ -56000,11 +56019,103 @@ Provide your review as a JSON array of comments (compatible with GitHub Review A
 `.trim();
 };
 
+// EXTERNAL MODULE: external "node:crypto"
+var external_node_crypto_ = __nccwpck_require__(7598);
+;// CONCATENATED MODULE: ./src/lib/usage-persistence.mjs
+
+
+
+
+/**
+ * Opt-in: set RIVER_USAGE_TELEMETRY=1 to persist per-call AI usage to
+ * artifacts/usage/<ISO date>-<runId>.jsonl. Defaults to OFF because writing
+ * to disk during a review run is a side effect that should be explicit.
+ */
+function isUsageTelemetryEnabled() {
+  return process.env.RIVER_USAGE_TELEMETRY === '1';
+}
+
+/**
+ * Generate a short random run identifier so concurrent dispatcher runs
+ * (or repeated runs within the same second) do not collide on filename.
+ */
+function generateRunId() {
+  return (0,external_node_crypto_.randomBytes)(4).toString('hex');
+}
+
+/**
+ * Build the JSONL line for a single (file, skill) usage event. The shape
+ * is intentionally stable so external cost-analysis tooling can rely on it
+ * without depending on internal types.
+ *
+ * @param {object} event
+ * @param {string} event.file
+ * @param {string} event.skill
+ * @param {{provider, model, inputTokens, outputTokens, cacheCreationInputTokens, cacheReadInputTokens}} event.usage
+ * @param {string} [event.runId]
+ * @param {string} [event.commit]
+ */
+function buildUsageRecord(event) {
+  const { file, skill, usage, runId, commit } = event;
+  if (!usage) return null;
+  return {
+    timestamp: new Date().toISOString(),
+    runId: runId ?? null,
+    commit: commit ?? null,
+    file,
+    skill,
+    provider: usage.provider,
+    model: usage.model,
+    inputTokens: usage.inputTokens ?? 0,
+    outputTokens: usage.outputTokens ?? 0,
+    cacheCreationInputTokens: usage.cacheCreationInputTokens ?? 0,
+    cacheReadInputTokens: usage.cacheReadInputTokens ?? 0,
+  };
+}
+
+/**
+ * Write usage events as JSONL to `<rootDir>/artifacts/usage/<date>-<runId>.jsonl`.
+ * Silently no-ops when there are no events with `usage` populated, so
+ * dispatchers can call this unconditionally without first filtering.
+ *
+ * @param {Array} events     SkillDispatcher result items (need .usage to be persisted)
+ * @param {object} opts
+ * @param {string} opts.rootDir  Project root (artifacts/usage is created under here)
+ * @param {string} [opts.runId]
+ * @param {string} [opts.commit]
+ * @returns {Promise<string | null>}  Path to the written file, or null if skipped
+ */
+async function persistUsageEvents(events, opts) {
+  const records = (events || [])
+    .map((e) =>
+      buildUsageRecord({
+        file: e.file,
+        skill: e.skill,
+        usage: e.usage,
+        runId: opts.runId,
+        commit: opts.commit,
+      }),
+    )
+    .filter(Boolean);
+
+  if (records.length === 0) return null;
+
+  const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const runId = opts.runId ?? generateRunId();
+  const dir = external_node_path_.join(opts.rootDir, 'artifacts', 'usage');
+  await promises_.mkdir(dir, { recursive: true });
+  const filePath = external_node_path_.join(dir, `${date}-${runId}.jsonl`);
+  const body = records.map((r) => JSON.stringify(r)).join('\n') + '\n';
+  await promises_.writeFile(filePath, body, 'utf8');
+  return filePath;
+}
+
 ;// CONCATENATED MODULE: ./src/core/skill-dispatcher.mjs
  // Added for path.join
 
 
  // Added
+
 
 
 
@@ -56159,6 +56270,19 @@ class SkillDispatcher {
       const fileResults = await Promise.all(skillPromises);
       results.push(...fileResults);
     }
+
+    if (isUsageTelemetryEnabled()) {
+      try {
+        await persistUsageEvents(results, { rootDir: this.repoRoot });
+      } catch (err) {
+        // Persistence is non-critical; failing here must not break the
+        // review pipeline. Log and continue.
+        console.warn(
+          `[usage telemetry] failed to persist events: ${err?.message || err}`,
+        );
+      }
+    }
+
     return results;
   }
 
