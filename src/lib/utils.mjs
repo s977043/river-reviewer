@@ -11,13 +11,15 @@ export function parseList(value) {
 }
 
 /**
- * Check if an LLM (OpenAI) API key is configured in the environment.
+ * Check if an LLM (OpenAI / Gemini / Anthropic) API key is configured in the environment.
  * @returns {boolean}
  */
 export function isLlmEnabled() {
   return !!(
     process.env.RIVER_OPENAI_API_KEY ||
     process.env.OPENAI_API_KEY ||
-    process.env.GOOGLE_API_KEY
+    process.env.GOOGLE_API_KEY ||
+    process.env.ANTHROPIC_API_KEY ||
+    process.env.RIVER_ANTHROPIC_API_KEY
   );
 }

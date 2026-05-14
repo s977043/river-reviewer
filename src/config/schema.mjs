@@ -163,6 +163,9 @@ export const AIModelSchema = z.enum([
   'gpt-4o', // OpenAI Option
   'o1', // OpenAI Reasoning
   'o1-mini', // OpenAI Fast Reasoning
+  'claude-sonnet-4-6', // Anthropic Balanced
+  'claude-opus-4-7', // Anthropic Top-tier
+  'claude-haiku-4-5', // Anthropic Fast
 ]);
 
 export const RuleSchema = z.object({
