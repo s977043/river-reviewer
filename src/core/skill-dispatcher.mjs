@@ -131,11 +131,17 @@ export class SkillDispatcher {
           console.log(`  -> Invoking ${modelName} for skill "${skill.name}"...`);
           const review = await client.generateReview(systemPrompt, diff);
 
-          return {
+          const result = {
             file,
             skill: skill.name,
             review,
           };
+          // Only Anthropic populates lastUsage today. Future providers can
+          // adopt the same convention; consumers should handle `undefined`.
+          if (client.lastUsage) {
+            result.usage = client.lastUsage;
+          }
+          return result;
         } catch (error) {
           console.error(`  [Error] Failed to execute skill "${skill.name}" on ${file}:`, error);
           // Return error info in the result so it can be reported if needed
