@@ -102,7 +102,17 @@ export async function getTop1PerCase() {
  *
  * @returns {Promise<Record<string, {guards: number, fps: number, fpRate: number}>>}
  */
-export async function getPerSkillFpRate() {
+export async function getPerSkillFpRate(result, cases) {
+  // Fast path: caller has already invoked evaluateReviewFixtures (e.g.
+  // scripts/evaluate-all.mjs running --append-ledger) and passes the
+  // result + parsed cases in. Skips the duplicate fixture eval that
+  // PR #792 introduced (see Issue #793).
+  if (result && Array.isArray(cases)) {
+    return computePerSkillFpRate(result, cases);
+  }
+
+  // Legacy / standalone path: re-derive from disk. Used when callers
+  // invoke getPerSkillFpRate() in isolation (e.g. ad-hoc tooling).
   const casesPath = path.join(REPO_ROOT, 'tests', 'fixtures', 'review-eval', 'cases.json');
   let casesText;
   try {
@@ -110,9 +120,9 @@ export async function getPerSkillFpRate() {
   } catch {
     return {};
   }
-  let cases;
+  let loadedCases;
   try {
-    cases = JSON.parse(casesText);
+    loadedCases = JSON.parse(casesText);
   } catch {
     return {};
   }
@@ -122,13 +132,26 @@ export async function getPerSkillFpRate() {
   } catch {
     return {};
   }
-  let result;
+  let loadedResult;
   try {
-    result = await evaluateReviewFixtures({ casesPath, verbose: false });
+    loadedResult = await evaluateReviewFixtures({ casesPath, verbose: false });
   } catch {
     return {};
   }
+  return computePerSkillFpRate(loadedResult, loadedCases);
+}
 
+/**
+ * Pure accumulator: derives per-skill false-positive metrics from a
+ * fixture-eval result + the input cases array used to produce it.
+ * Kept separate so the data path can be exercised without filesystem
+ * or worker-pool overhead.
+ *
+ * @param {{cases?: Array<{isGuardCase?: boolean, guardViolated?: boolean}>}} result
+ * @param {Array<{planSkills?: string[]}>} cases
+ * @returns {Record<string, {guards: number, fps: number, fpRate: number}>}
+ */
+export function computePerSkillFpRate(result, cases) {
   const acc = {};
   const ensure = (id) => {
     if (!acc[id]) acc[id] = { guards: 0, fps: 0, fpRate: 0 };
