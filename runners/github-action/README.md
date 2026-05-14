@@ -148,10 +148,11 @@ jobs:
 
 ## Environment Variables
 
-The action requires API credentials to function:
+The action requires API credentials to function. Pass at least one of the following, matching the `modelName` configured in `.river-reviewer.json`:
 
-- `OPENAI_API_KEY`: OpenAI API key for GPT models
-- `ANTHROPIC_API_KEY`: Anthropic API key for Claude models (alternative)
+- `OPENAI_API_KEY` (or `RIVER_OPENAI_API_KEY`): for `gpt-*` / `o1-*` models
+- `GOOGLE_API_KEY`: for `gemini-*` models
+- `ANTHROPIC_API_KEY` (or `RIVER_ANTHROPIC_API_KEY`): for `claude-*` models
 
 Set these as GitHub secrets in your repository settings.
 

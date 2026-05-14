@@ -242,9 +242,36 @@ exclude:
 設定は `ConfigLoader` が Zod で検証したうえでデフォルトとマージされます。値を部分的に指定するだけで残りは自動補完されるため、JSON/YAML どちらでも最小限の記述でカスタムできます。
 トップレベルはオブジェクトのみ受け付けるため、配列やスカラー値のみのファイルはエラーとなります。
 
+#### Anthropic (Claude) プロバイダーを使う
+
+`@anthropic-ai/sdk` ベースの Claude モデル (`claude-sonnet-4-6` / `claude-opus-4-7` / `claude-haiku-4-5`) を指定できます。`ANTHROPIC_API_KEY`（または `RIVER_ANTHROPIC_API_KEY`）を環境変数で渡してください。
+
+```json
+{
+  "model": {
+    "provider": "anthropic",
+    "modelName": "claude-sonnet-4-6",
+    "temperature": 0
+  },
+  "review": {
+    "language": "ja"
+  }
+}
+```
+
+GitHub Actions では:
+
+```yaml
+- uses: s977043/river-reviewer/runners/github-action@v0.28.0
+  with:
+    phase: midstream
+  env:
+    ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
 ### セキュリティ考慮事項
 
-- `OPENAI_API_KEY` は必ず Repository Secrets に設定し、`env:` で参照する
+- `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GOOGLE_API_KEY` は必ず Repository Secrets に設定し、`env:` で参照する
 - Private リポジトリでは必要な permissions（contents, pull-requests）を明示する
 - `fetch-depth: 0` でマージベースを正しく取得し、誤差分を避ける
 

@@ -32,3 +32,28 @@ jobs:
 PR へのコメント投稿には `issues: write` が必要です。権限不足の場合は workflow の `permissions` を見直してください。
 
 > 例では `@v0.33.0` に固定しています。新しいリリースが出た場合はそのタグへ置き換えてください。安定動作のため、可能な限りリリースタグへピン留めしてください。
+
+## Anthropic (Claude) を使う場合
+
+`.river-reviewer.json` で `claude-*` モデルを指定し、`ANTHROPIC_API_KEY` を渡します。
+
+```yaml
+- name: Run River Reviewer (midstream, Claude)
+  uses: s977043/river-reviewer/runners/github-action@v0.33.0
+  with:
+    phase: midstream
+  env:
+    ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+```json
+{
+  "model": {
+    "provider": "anthropic",
+    "modelName": "claude-sonnet-4-6",
+    "temperature": 0
+  }
+}
+```
+
+`RIVER_ANTHROPIC_API_KEY` を fallback として参照するため、他のツールとキーを分けたい場合はそちらを使っても動作します。

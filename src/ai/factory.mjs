@@ -1,3 +1,4 @@
+import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import OpenAI from 'openai';
 
@@ -5,6 +6,7 @@ const clientCache = new Map();
 
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 500;
+const ANTHROPIC_MAX_TOKENS = 4096;
 
 function isRetriableError(err) {
   const status = err?.status ?? err?.response?.status;
@@ -60,6 +62,9 @@ export class AIClientFactory {
     } else if (modelName.match(/^(gpt|o1)/)) {
       const apiKey = process.env.OPENAI_API_KEY || process.env.RIVER_OPENAI_API_KEY;
       client = new OpenAIClient(modelName, apiKey, temperature);
+    } else if (modelName.startsWith('claude')) {
+      const apiKey = process.env.ANTHROPIC_API_KEY || process.env.RIVER_ANTHROPIC_API_KEY;
+      client = new AnthropicClient(modelName, apiKey, temperature);
     }
 
     if (!client) throw new Error(`Unsupported model: ${modelName}`);
@@ -131,5 +136,31 @@ class OpenAIClient {
     );
 
     return response.choices[0].message.content || '';
+  }
+}
+
+class AnthropicClient {
+  constructor(modelName, apiKey, temperature) {
+    this.modelName = modelName;
+    this.temperature = temperature ?? 0;
+    if (!apiKey) {
+      throw new Error('ANTHROPIC_API_KEY (または RIVER_ANTHROPIC_API_KEY) が設定されていません');
+    }
+    this.anthropic = new Anthropic({ apiKey });
+  }
+
+  async generateReview(systemPrompt, diff) {
+    const response = await withRetry(() =>
+      this.anthropic.messages.create({
+        model: this.modelName,
+        max_tokens: ANTHROPIC_MAX_TOKENS,
+        temperature: this.temperature,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: diff }],
+      })
+    );
+
+    const firstTextBlock = response.content?.find((block) => block.type === 'text');
+    return firstTextBlock?.text || '';
   }
 }

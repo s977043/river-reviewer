@@ -7,10 +7,10 @@
 ### サポート項目とデフォルト
 
 - `model`
-  - `provider`: `openai`（デフォルト）。設定スキーマ上は `google` / `anthropic` も受理されるが、現在のレビューパイプラインは OpenAI 専用である (#490 参照)。
-  - `modelName`: `gpt-4o-mini`（デフォルト）
+  - `provider`: `openai`（デフォルト）/ `google` / `anthropic`。`modelName` の prefix で実体クライアントが自動選択される（`gpt|o1` → OpenAI, `gemini` → Gemini, `claude` → Anthropic）。Anthropic 対応は [#804](https://github.com/s977043/river-reviewer/issues/804) で追加。
+  - `modelName`: `gpt-4o-mini`（デフォルト）。例: `claude-sonnet-4-6`, `gemini-2.0-flash`。
   - `temperature`: `0`
-  - `maxTokens`: `600`
+  - `maxTokens`: `600`（OpenAI/Gemini 向け。Anthropic クライアントは内部で `max_tokens=4096` を固定使用する）
 - `review`
   - `language`: `ja`（日本語）/`en`（英語）。プロンプトの本文と出力言語を切り替える。
   - `severity`: `normal`（デフォルト）/`strict`/`relaxed`

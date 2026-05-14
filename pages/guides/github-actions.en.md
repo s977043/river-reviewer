@@ -32,3 +32,28 @@ jobs:
 `issues: write` is required to post comments on PRs. Review workflow `permissions` if you encounter permission errors.
 
 > The example pins to `@v0.33.0`. Replace it with a newer tag once one is released. Pinning to a release tag is recommended for stability.
+
+## Using Anthropic (Claude)
+
+Specify a `claude-*` model in `.river-reviewer.json` and pass `ANTHROPIC_API_KEY`.
+
+```yaml
+- name: Run River Reviewer (midstream, Claude)
+  uses: s977043/river-reviewer/runners/github-action@v0.33.0
+  with:
+    phase: midstream
+  env:
+    ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+```json
+{
+  "model": {
+    "provider": "anthropic",
+    "modelName": "claude-sonnet-4-6",
+    "temperature": 0
+  }
+}
+```
+
+`RIVER_ANTHROPIC_API_KEY` is also accepted as a fallback environment variable when you want to separate keys from other tools.

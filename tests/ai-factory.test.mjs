@@ -130,6 +130,47 @@ describe('AIClientFactory.create', () => {
   });
 
   test('throws for unsupported model name', () => {
-    assert.throws(() => AIClientFactory.create({ modelName: 'claude-3' }), /Unsupported model/);
+    assert.throws(
+      () => AIClientFactory.create({ modelName: 'mistral-large' }),
+      /Unsupported model/,
+    );
+  });
+
+  // --- Anthropic (Claude) provider ---
+  describe('claude-* models', () => {
+    const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+    const originalRiverAnthropicKey = process.env.RIVER_ANTHROPIC_API_KEY;
+
+    test('throws when ANTHROPIC_API_KEY is not set', () => {
+      delete process.env.ANTHROPIC_API_KEY;
+      delete process.env.RIVER_ANTHROPIC_API_KEY;
+      assert.throws(
+        () => AIClientFactory.create({ modelName: 'claude-sonnet-4-6-test-noenv' }),
+        /ANTHROPIC_API_KEY/,
+      );
+      if (originalAnthropicKey !== undefined) process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+      if (originalRiverAnthropicKey !== undefined)
+        process.env.RIVER_ANTHROPIC_API_KEY = originalRiverAnthropicKey;
+    });
+
+    test('creates AnthropicClient when ANTHROPIC_API_KEY is set', () => {
+      process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+      const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6-test-env' });
+      assert.ok(client);
+      assert.equal(typeof client.generateReview, 'function');
+      if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+      else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+    });
+
+    test('falls back to RIVER_ANTHROPIC_API_KEY when ANTHROPIC_API_KEY is unset', () => {
+      delete process.env.ANTHROPIC_API_KEY;
+      process.env.RIVER_ANTHROPIC_API_KEY = 'sk-ant-river-test-key';
+      const client = AIClientFactory.create({ modelName: 'claude-haiku-4-5-test-fallback' });
+      assert.ok(client);
+      assert.equal(typeof client.generateReview, 'function');
+      if (originalAnthropicKey !== undefined) process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+      if (originalRiverAnthropicKey === undefined) delete process.env.RIVER_ANTHROPIC_API_KEY;
+      else process.env.RIVER_ANTHROPIC_API_KEY = originalRiverAnthropicKey;
+    });
   });
 });
