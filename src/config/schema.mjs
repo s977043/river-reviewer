@@ -155,7 +155,13 @@ export const riverReviewerConfigSchema = z.object({
 // --- New Skill-based Schema (for river skills) ---
 
 // Skill-based schemas
-export const AIModelSchema = z.enum([
+// Hybrid model identifier: keep the curated enum for typo protection on
+// well-known names, but also accept any string that matches a known provider
+// prefix. This lets users adopt newer SDK-supported snapshots (e.g.
+// `claude-sonnet-4-6-20260301`, `gpt-4o-mini-2026`) without waiting for an
+// enum update PR. Completely foreign prefixes (e.g. `mistral-*`) still fail
+// validation upstream, surfacing typos early.
+export const KnownAIModels = z.enum([
   'gemini-2.0-flash', // Default: Fast & Smart
   'gemini-2.0-flash-thinking', // Reasoning: For Security/Architecture
   'gemini-2.0-pro', // High Spec
@@ -166,6 +172,16 @@ export const AIModelSchema = z.enum([
   'claude-sonnet-4-6', // Anthropic Balanced
   'claude-opus-4-7', // Anthropic Top-tier
   'claude-haiku-4-5', // Anthropic Fast
+]);
+
+export const AIModelSchema = z.union([
+  KnownAIModels,
+  z
+    .string()
+    .regex(/^(gemini|gpt|o1|claude)-[a-z0-9.\-_]+$/i, {
+      message:
+        'modelName must be a known model or match a supported provider prefix (gemini-* / gpt-* / o1-* / claude-*)',
+    }),
 ]);
 
 export const RuleSchema = z.object({

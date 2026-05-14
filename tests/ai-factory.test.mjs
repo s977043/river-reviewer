@@ -11,6 +11,8 @@ import {
   buildAnthropicSystem,
   normalizeAnthropicUsage,
   normalizeOpenAIUsage,
+  normalizeGeminiUsage,
+  assertAnthropicModelName,
   __clearAIClientCacheForTests,
   AIClientFactory,
 } from '../src/ai/factory.mjs';
@@ -819,5 +821,118 @@ describe('OpenAIClient.lastUsage', () => {
 
     await client.generateReview('s', 'd');
     assert.equal(client.lastUsage.cacheReadInputTokens, 700);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizeGeminiUsage
+// ---------------------------------------------------------------------------
+
+describe('normalizeGeminiUsage', () => {
+  test('maps usageMetadata into the camelCase shape', () => {
+    const raw = {
+      promptTokenCount: 1200,
+      candidatesTokenCount: 300,
+      cachedContentTokenCount: 400,
+    };
+    assert.deepEqual(normalizeGeminiUsage(raw, 'gemini-2.0-flash'), {
+      provider: 'google',
+      model: 'gemini-2.0-flash',
+      inputTokens: 1200,
+      outputTokens: 300,
+      cacheCreationInputTokens: 0,
+      cacheReadInputTokens: 400,
+    });
+  });
+
+  test('defaults missing fields to 0', () => {
+    const result = normalizeGeminiUsage({}, 'gemini-2.0-pro');
+    assert.equal(result.inputTokens, 0);
+    assert.equal(result.outputTokens, 0);
+    assert.equal(result.cacheCreationInputTokens, 0);
+    assert.equal(result.cacheReadInputTokens, 0);
+  });
+
+  test('returns null for null / non-object input', () => {
+    assert.equal(normalizeGeminiUsage(null, 'gemini-2.0-flash'), null);
+    assert.equal(normalizeGeminiUsage(undefined, 'gemini-2.0-flash'), null);
+    assert.equal(normalizeGeminiUsage('weird', 'gemini-2.0-flash'), null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// assertAnthropicModelName (defense-in-depth)
+// ---------------------------------------------------------------------------
+
+describe('assertAnthropicModelName', () => {
+  test('accepts known Anthropic families with version suffix', () => {
+    assert.doesNotThrow(() => assertAnthropicModelName('claude-sonnet-4-6'));
+    assert.doesNotThrow(() => assertAnthropicModelName('claude-opus-4-7'));
+    assert.doesNotThrow(() => assertAnthropicModelName('claude-haiku-4-5'));
+    assert.doesNotThrow(() => assertAnthropicModelName('claude-sonnet-4-6-20260101'));
+    assert.doesNotThrow(() => assertAnthropicModelName('claude-opus-5-0'));
+  });
+
+  test('rejects names without a known family token', () => {
+    assert.throws(
+      () => assertAnthropicModelName('claude-future-9000'),
+      /Invalid Anthropic model name/,
+    );
+    assert.throws(
+      () => assertAnthropicModelName('claude-3-opus'),
+      /Invalid Anthropic model name/,
+    );
+  });
+
+  test('rejects non-claude prefixes', () => {
+    assert.throws(
+      () => assertAnthropicModelName('gpt-4o'),
+      /Invalid Anthropic model name/,
+    );
+    assert.throws(() => assertAnthropicModelName('claude'), /Invalid Anthropic model name/);
+  });
+
+  test('rejects spaces and slashes (injection-shaped strings)', () => {
+    assert.throws(
+      () => assertAnthropicModelName('claude-sonnet-4-6 ../foo'),
+      /Invalid Anthropic model name/,
+    );
+    assert.throws(
+      () => assertAnthropicModelName('claude-sonnet-4-6/admin'),
+      /Invalid Anthropic model name/,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// AIClientFactory + AnthropicClient: defense-in-depth integration
+// ---------------------------------------------------------------------------
+
+describe('AIClientFactory rejects malformed claude-* names at AnthropicClient construction', () => {
+  let originalAnthropicKey;
+
+  beforeEach(() => {
+    originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+    process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+    __clearAIClientCacheForTests();
+  });
+
+  afterEach(() => {
+    if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+    __clearAIClientCacheForTests();
+  });
+
+  test('throws for malformed claude-* name even though factory prefix matches', () => {
+    assert.throws(
+      () => AIClientFactory.create({ modelName: 'claude-evil-injection' }),
+      /Invalid Anthropic model name/,
+    );
+  });
+
+  test('still accepts known sonnet/opus/haiku families', () => {
+    assert.doesNotThrow(() =>
+      AIClientFactory.create({ modelName: 'claude-sonnet-4-6' }),
+    );
   });
 });
