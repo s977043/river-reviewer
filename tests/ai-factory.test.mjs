@@ -7,6 +7,10 @@ import {
   parseRetryAfter,
   getBackoffMs,
   resolveAnthropicMaxTokens,
+  isAnthropicPromptCacheEnabled,
+  buildAnthropicSystem,
+  normalizeAnthropicUsage,
+  normalizeOpenAIUsage,
   __clearAIClientCacheForTests,
   AIClientFactory,
 } from '../src/ai/factory.mjs';
@@ -202,6 +206,21 @@ describe('AIClientFactory.create', () => {
       assert.equal(small.maxTokens, 1024);
       assert.equal(large.maxTokens, 8192);
     });
+
+    test('returns distinct instances for different disableCache values', () => {
+      process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+      const cached = AIClientFactory.create({
+        modelName: 'claude-sonnet-4-6',
+        disableCache: false,
+      });
+      const nocache = AIClientFactory.create({
+        modelName: 'claude-sonnet-4-6',
+        disableCache: true,
+      });
+      assert.notStrictEqual(cached, nocache);
+      assert.equal(cached.disableCache, false);
+      assert.equal(nocache.disableCache, true);
+    });
   });
 
   // --- unsupported model placeholder ---
@@ -341,7 +360,9 @@ describe('AnthropicClient.generateReview', () => {
     assert.equal(received.model, 'claude-sonnet-4-6');
     assert.equal(received.max_tokens, 2048);
     assert.equal(received.temperature, 0.1);
-    assert.equal(received.system, 'system-prompt');
+    // Prompt caching is on by default, so system arrives as a cached block array.
+    assert.ok(Array.isArray(received.system));
+    assert.equal(received.system[0].text, 'system-prompt');
     assert.deepEqual(received.messages, [{ role: 'user', content: 'diff-text' }]);
   });
 
@@ -411,5 +432,392 @@ describe('AnthropicClient.generateReview', () => {
     });
     await client.generateReview('s', 'd');
     assert.equal(received.max_tokens, 8192);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Anthropic prompt caching
+// ---------------------------------------------------------------------------
+
+describe('isAnthropicPromptCacheEnabled', () => {
+  let original;
+  beforeEach(() => {
+    original = process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+  });
+  afterEach(() => {
+    if (original === undefined) delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    else process.env.RIVER_ANTHROPIC_PROMPT_CACHE = original;
+  });
+
+  test('defaults to true when env var is unset', () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    assert.equal(isAnthropicPromptCacheEnabled(), true);
+  });
+
+  test('returns false when env var is "0"', () => {
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '0';
+    assert.equal(isAnthropicPromptCacheEnabled(), false);
+  });
+
+  test('returns true for any other value', () => {
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '1';
+    assert.equal(isAnthropicPromptCacheEnabled(), true);
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = 'true';
+    assert.equal(isAnthropicPromptCacheEnabled(), true);
+  });
+});
+
+describe('buildAnthropicSystem', () => {
+  test('returns a cached block array when cacheEnabled', () => {
+    const result = buildAnthropicSystem('system text', { cacheEnabled: true });
+    assert.deepEqual(result, [
+      { type: 'text', text: 'system text', cache_control: { type: 'ephemeral' } },
+    ]);
+  });
+
+  test('returns the bare string when cacheEnabled is false', () => {
+    const result = buildAnthropicSystem('system text', { cacheEnabled: false });
+    assert.equal(result, 'system text');
+  });
+});
+
+describe('AnthropicClient.generateReview (prompt caching integration)', () => {
+  let originalAnthropicKey;
+  let originalCacheEnv;
+
+  beforeEach(() => {
+    originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+    originalCacheEnv = process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+    __clearAIClientCacheForTests();
+  });
+
+  afterEach(() => {
+    if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+    if (originalCacheEnv === undefined) delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    else process.env.RIVER_ANTHROPIC_PROMPT_CACHE = originalCacheEnv;
+    __clearAIClientCacheForTests();
+  });
+
+  function stubMessagesCreate(client, fn) {
+    client.anthropic = { messages: { create: fn } };
+  }
+
+  test('sends system as array with cache_control by default', async () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: 'ok' }] };
+    });
+
+    await client.generateReview('long system prompt for review', 'diff');
+    assert.ok(Array.isArray(received.system), 'system should be an array form');
+    assert.equal(received.system.length, 1);
+    assert.equal(received.system[0].type, 'text');
+    assert.equal(received.system[0].text, 'long system prompt for review');
+    assert.deepEqual(received.system[0].cache_control, { type: 'ephemeral' });
+  });
+
+  test('sends system as plain string when RIVER_ANTHROPIC_PROMPT_CACHE=0', async () => {
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '0';
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: 'ok' }] };
+    });
+
+    await client.generateReview('system text', 'diff');
+    assert.equal(received.system, 'system text');
+  });
+
+  test('cache decision is read per call (not frozen at construction)', async () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    const seen = [];
+    stubMessagesCreate(client, async (args) => {
+      seen.push(args.system);
+      return { content: [{ type: 'text', text: '' }] };
+    });
+
+    await client.generateReview('s1', 'd1');
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '0';
+    await client.generateReview('s2', 'd2');
+
+    assert.ok(Array.isArray(seen[0]), 'first call cached');
+    assert.equal(seen[1], 's2', 'second call uses plain string after opt-out');
+  });
+
+  test('skill-level disableCache overrides the global default', async () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    const client = AIClientFactory.create({
+      modelName: 'claude-sonnet-4-6',
+      disableCache: true,
+    });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: '' }] };
+    });
+
+    await client.generateReview('skill-system', 'diff');
+    assert.equal(
+      received.system,
+      'skill-system',
+      'disableCache:true should bypass caching even when env default is on',
+    );
+  });
+
+  test('disableCache:false keeps caching when env default is on', async () => {
+    delete process.env.RIVER_ANTHROPIC_PROMPT_CACHE;
+    const client = AIClientFactory.create({
+      modelName: 'claude-sonnet-4-6',
+      disableCache: false,
+    });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: '' }] };
+    });
+
+    await client.generateReview('skill-system', 'diff');
+    assert.ok(Array.isArray(received.system));
+    assert.equal(received.system[0].text, 'skill-system');
+  });
+
+  test('env var OFF wins over skill disableCache:false (both gates must allow)', async () => {
+    process.env.RIVER_ANTHROPIC_PROMPT_CACHE = '0';
+    const client = AIClientFactory.create({
+      modelName: 'claude-sonnet-4-6',
+      disableCache: false,
+    });
+    let received;
+    stubMessagesCreate(client, async (args) => {
+      received = args;
+      return { content: [{ type: 'text', text: '' }] };
+    });
+
+    await client.generateReview('s', 'd');
+    assert.equal(received.system, 's', 'env opt-out should still suppress caching');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizeAnthropicUsage
+// ---------------------------------------------------------------------------
+
+describe('normalizeAnthropicUsage', () => {
+  test('maps SDK snake_case fields into stable camelCase shape', () => {
+    const raw = {
+      input_tokens: 100,
+      output_tokens: 200,
+      cache_creation_input_tokens: 50,
+      cache_read_input_tokens: 25,
+    };
+    assert.deepEqual(normalizeAnthropicUsage(raw, 'claude-sonnet-4-6'), {
+      provider: 'anthropic',
+      model: 'claude-sonnet-4-6',
+      inputTokens: 100,
+      outputTokens: 200,
+      cacheCreationInputTokens: 50,
+      cacheReadInputTokens: 25,
+    });
+  });
+
+  test('defaults missing token counts to 0', () => {
+    const result = normalizeAnthropicUsage({ input_tokens: 10 }, 'claude-haiku-4-5');
+    assert.equal(result.inputTokens, 10);
+    assert.equal(result.outputTokens, 0);
+    assert.equal(result.cacheCreationInputTokens, 0);
+    assert.equal(result.cacheReadInputTokens, 0);
+  });
+
+  test('returns null for null / non-object input', () => {
+    assert.equal(normalizeAnthropicUsage(null, 'claude-sonnet-4-6'), null);
+    assert.equal(normalizeAnthropicUsage(undefined, 'claude-sonnet-4-6'), null);
+    assert.equal(normalizeAnthropicUsage('weird', 'claude-sonnet-4-6'), null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// AnthropicClient.lastUsage capture (telemetry integration)
+// ---------------------------------------------------------------------------
+
+describe('AnthropicClient.lastUsage', () => {
+  let originalAnthropicKey;
+
+  beforeEach(() => {
+    originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+    process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+    __clearAIClientCacheForTests();
+  });
+
+  afterEach(() => {
+    if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+    __clearAIClientCacheForTests();
+  });
+
+  function stubMessagesCreate(client, fn) {
+    client.anthropic = { messages: { create: fn } };
+  }
+
+  test('lastUsage is null before any call', () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    assert.equal(client.lastUsage, null);
+  });
+
+  test('lastUsage is populated with normalized shape after generateReview', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    stubMessagesCreate(client, async () => ({
+      content: [{ type: 'text', text: 'ok' }],
+      usage: {
+        input_tokens: 1234,
+        output_tokens: 567,
+        cache_creation_input_tokens: 100,
+        cache_read_input_tokens: 50,
+      },
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.deepEqual(client.lastUsage, {
+      provider: 'anthropic',
+      model: 'claude-sonnet-4-6',
+      inputTokens: 1234,
+      outputTokens: 567,
+      cacheCreationInputTokens: 100,
+      cacheReadInputTokens: 50,
+    });
+  });
+
+  test('lastUsage is overwritten on each call', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    const payloads = [
+      { input_tokens: 100, output_tokens: 10 },
+      { input_tokens: 200, output_tokens: 20 },
+    ];
+    let i = 0;
+    stubMessagesCreate(client, async () => ({
+      content: [{ type: 'text', text: 'ok' }],
+      usage: payloads[i++],
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.equal(client.lastUsage.inputTokens, 100);
+    await client.generateReview('s', 'd');
+    assert.equal(client.lastUsage.inputTokens, 200);
+  });
+
+  test('lastUsage stays null when SDK omits the usage block', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    stubMessagesCreate(client, async () => ({
+      content: [{ type: 'text', text: 'ok' }],
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.equal(client.lastUsage, null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizeOpenAIUsage
+// ---------------------------------------------------------------------------
+
+describe('normalizeOpenAIUsage', () => {
+  test('maps prompt_tokens / completion_tokens into normalized shape', () => {
+    const raw = { prompt_tokens: 800, completion_tokens: 200 };
+    assert.deepEqual(normalizeOpenAIUsage(raw, 'gpt-4o'), {
+      provider: 'openai',
+      model: 'gpt-4o',
+      inputTokens: 800,
+      outputTokens: 200,
+      cacheCreationInputTokens: 0,
+      cacheReadInputTokens: 0,
+    });
+  });
+
+  test('reads cached_tokens from prompt_tokens_details', () => {
+    const raw = {
+      prompt_tokens: 800,
+      completion_tokens: 200,
+      prompt_tokens_details: { cached_tokens: 300 },
+    };
+    const result = normalizeOpenAIUsage(raw, 'gpt-4o-mini');
+    assert.equal(result.cacheReadInputTokens, 300);
+    assert.equal(result.cacheCreationInputTokens, 0);
+  });
+
+  test('returns null for null / non-object input', () => {
+    assert.equal(normalizeOpenAIUsage(null, 'gpt-4o'), null);
+    assert.equal(normalizeOpenAIUsage('weird', 'gpt-4o'), null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// OpenAIClient.lastUsage capture (telemetry integration)
+// ---------------------------------------------------------------------------
+
+describe('OpenAIClient.lastUsage', () => {
+  let originalKey;
+  let originalRiverKey;
+
+  beforeEach(() => {
+    originalKey = process.env.OPENAI_API_KEY;
+    originalRiverKey = process.env.RIVER_OPENAI_API_KEY;
+    process.env.OPENAI_API_KEY = 'sk-openai-test-key';
+    __clearAIClientCacheForTests();
+  });
+
+  afterEach(() => {
+    if (originalKey === undefined) delete process.env.OPENAI_API_KEY;
+    else process.env.OPENAI_API_KEY = originalKey;
+    if (originalRiverKey === undefined) delete process.env.RIVER_OPENAI_API_KEY;
+    else process.env.RIVER_OPENAI_API_KEY = originalRiverKey;
+    __clearAIClientCacheForTests();
+  });
+
+  function stubChatCompletions(client, fn) {
+    client.openai = { chat: { completions: { create: fn } } };
+  }
+
+  test('lastUsage is null before any call', () => {
+    const client = AIClientFactory.create({ modelName: 'gpt-4o' });
+    assert.equal(client.lastUsage, null);
+  });
+
+  test('lastUsage is populated after generateReview', async () => {
+    const client = AIClientFactory.create({ modelName: 'gpt-4o' });
+    stubChatCompletions(client, async () => ({
+      choices: [{ message: { content: 'ok' } }],
+      usage: { prompt_tokens: 500, completion_tokens: 100 },
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.deepEqual(client.lastUsage, {
+      provider: 'openai',
+      model: 'gpt-4o',
+      inputTokens: 500,
+      outputTokens: 100,
+      cacheCreationInputTokens: 0,
+      cacheReadInputTokens: 0,
+    });
+  });
+
+  test('lastUsage surfaces cached_tokens when SDK provides it', async () => {
+    const client = AIClientFactory.create({ modelName: 'gpt-4o-mini' });
+    stubChatCompletions(client, async () => ({
+      choices: [{ message: { content: '' } }],
+      usage: {
+        prompt_tokens: 1000,
+        completion_tokens: 50,
+        prompt_tokens_details: { cached_tokens: 700 },
+      },
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.equal(client.lastUsage.cacheReadInputTokens, 700);
   });
 });

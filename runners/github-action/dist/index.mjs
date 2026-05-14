@@ -29093,6 +29093,10 @@ const SkillSchema = schemas/* object */.Ik({
   model: AIModelSchema.default('gemini-2.0-flash'),
   temperature: schemas/* number */.ai().min(0).max(1).default(0.2),
   maxTokens: schemas/* number */.ai().int().positive().optional(),
+  // Anthropic-specific: opt out of ephemeral prompt caching for this skill.
+  // Useful for skills whose systemPrompt is highly dynamic (where cache
+  // misses dominate), or for A/B testing cache impact.
+  disableCache: schemas/* boolean */.zM().optional(),
   rules: schemas/* array */.YO(RuleSchema),
 });
 
@@ -32649,7 +32653,16 @@ const DEFAULT_DENY_GLOBS = Object.freeze([
  * skipped. The high-entropy fallback already protects monotonic strings
  * (entropy below threshold) so the placeholder list is intentionally short.
  */
-const ALLOWLIST_TOKENS = Object.freeze(['example', 'dummy', 'placeholder', '<missing>']);
+const ALLOWLIST_TOKENS = Object.freeze([
+  'example',
+  'dummy',
+  'placeholder',
+  '<missing>',
+  // Common substrings used in test fixtures so they don't get redacted
+  // when test files are included in repo-wide context scans (#808 follow-up).
+  'test-key',
+  'fake-key',
+]);
 
 const ALLOWLIST_RE = new RegExp(
   ALLOWLIST_TOKENS.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
@@ -34246,13 +34259,26 @@ async function doctorLocalReview({
 
 ;// CONCATENATED MODULE: ./src/core/cost-estimator.mjs
 const DEFAULT_MODEL = 'gpt-4-turbo';
-const PRICING_LAST_UPDATED = '2025-12-01'; // adjust when pricing changes
+const PRICING_LAST_UPDATED = '2026-05-14'; // adjust when pricing changes
 
+// Per-1k-token rates in USD. `cacheReadPer1k` (optional) covers Anthropic
+// ephemeral prompt cache reads and OpenAI `cached_tokens` discounted inputs;
+// fallbacks to inputPer1k * 0.1 when omitted.
 const MODEL_PRICES = {
+  // --- OpenAI ---
   'gpt-4': { inputPer1k: 0.03, outputPer1k: 0.06 },
   'gpt-4-turbo': { inputPer1k: 0.01, outputPer1k: 0.03 },
   'gpt-3.5-turbo': { inputPer1k: 0.0005, outputPer1k: 0.0015 },
-  'gpt-4o-mini': { inputPer1k: 0.00015, outputPer1k: 0.0006 },
+  'gpt-4o': { inputPer1k: 0.0025, outputPer1k: 0.01, cacheReadPer1k: 0.00125 },
+  'gpt-4o-mini': { inputPer1k: 0.00015, outputPer1k: 0.0006, cacheReadPer1k: 0.000075 },
+  o1: { inputPer1k: 0.015, outputPer1k: 0.06 },
+  'o1-mini': { inputPer1k: 0.003, outputPer1k: 0.012 },
+  // --- Anthropic ---
+  // Cache write surcharge (1.25x input) is included implicitly via inputPer1k
+  // for cacheCreationInputTokens billing; cache read is 0.1x input.
+  'claude-opus-4-7': { inputPer1k: 0.015, outputPer1k: 0.075, cacheReadPer1k: 0.0015 },
+  'claude-sonnet-4-6': { inputPer1k: 0.003, outputPer1k: 0.015, cacheReadPer1k: 0.0003 },
+  'claude-haiku-4-5': { inputPer1k: 0.001, outputPer1k: 0.005, cacheReadPer1k: 0.0001 },
 };
 
 function getPricing(model) {
@@ -34292,6 +34318,46 @@ class CostEstimator {
   }
 
   /**
+   * Compute cost from a normalized usage record (the shape produced by
+   * AnthropicClient.lastUsage / OpenAIClient.lastUsage). Splits the input
+   * bucket into fresh vs cache-read so prompt-caching savings are surfaced.
+   *
+   * @param {{model?: string, inputTokens?: number, outputTokens?: number, cacheCreationInputTokens?: number, cacheReadInputTokens?: number}} usage
+   */
+  estimateFromUsage(usage) {
+    if (!usage) return null;
+    const pricing = MODEL_PRICES[usage.model] ?? this.pricing;
+    const freshInput =
+      (usage.inputTokens ?? 0) - (usage.cacheReadInputTokens ?? 0);
+    const cacheRead = usage.cacheReadInputTokens ?? 0;
+    const cacheCreate = usage.cacheCreationInputTokens ?? 0;
+    const output = usage.outputTokens ?? 0;
+    const cacheReadRate = pricing.cacheReadPer1k ?? pricing.inputPer1k * 0.1;
+    // Anthropic charges 1.25x input rate for cache writes; we already count
+    // them via inputTokens (SDK reports cache_creation separately but it
+    // overlaps with input_tokens). Treat cacheCreation as a *surcharge* delta:
+    // extra 0.25 * input rate per token. OpenAI does not bill cache writes.
+    const cacheWriteSurcharge =
+      usage.provider === 'anthropic' ? (cacheCreate / 1000) * pricing.inputPer1k * 0.25 : 0;
+    const usd =
+      (Math.max(0, freshInput) / 1000) * pricing.inputPer1k +
+      (cacheRead / 1000) * cacheReadRate +
+      cacheWriteSurcharge +
+      (output / 1000) * pricing.outputPer1k;
+    return {
+      usd: toUSD(usd),
+      model: usage.model ?? this.model,
+      provider: usage.provider ?? null,
+      breakdown: {
+        freshInputTokens: Math.max(0, freshInput),
+        cacheReadTokens: cacheRead,
+        cacheCreationTokens: cacheCreate,
+        outputTokens: output,
+      },
+    };
+  }
+
+  /**
    * Rough estimate from diff+skills.
    * Uses diff token estimate plus skill overhead (instructions/prompts).
    * @param {{tokenEstimate?: number, rawTokenEstimate?: number}} diff
@@ -34317,6 +34383,7 @@ Tokens: ${cost.inputTokens} (input) + ${cost.outputTokens} (output)
 Pricing last updated: ${this.lastUpdated}`;
   }
 }
+
 
 /* harmony default export */ const cost_estimator = (CostEstimator);
 
@@ -55736,13 +55803,14 @@ function __clearAIClientCacheForTests() {
 
 
 class AIClientFactory {
-  static create({ modelName, temperature, maxTokens }) {
+  static create({ modelName, temperature, maxTokens, disableCache }) {
     if (!modelName) {
       throw new Error('モデル名が指定されていません (config.skills[].model を確認してください)');
     }
-    // maxTokens is part of the cache key so two skills targeting the same
-    // model with different output budgets do not stomp on each other.
-    const cacheKey = `${modelName}::${temperature ?? 'default'}::${maxTokens ?? 'default'}`;
+    // maxTokens and disableCache are part of the cache key so two skills
+    // targeting the same model with different settings do not stomp on
+    // each other in the module-level clientCache.
+    const cacheKey = `${modelName}::${temperature ?? 'default'}::${maxTokens ?? 'default'}::${disableCache ? 'nocache' : 'cache'}`;
     if (clientCache.has(cacheKey)) {
       return clientCache.get(cacheKey);
     }
@@ -55756,7 +55824,9 @@ class AIClientFactory {
       client = new OpenAIClient(modelName, apiKey, temperature);
     } else if (modelName.startsWith('claude')) {
       const apiKey = process.env.ANTHROPIC_API_KEY || process.env.RIVER_ANTHROPIC_API_KEY;
-      client = new AnthropicClient(modelName, apiKey, temperature, maxTokens);
+      client = new AnthropicClient(modelName, apiKey, temperature, maxTokens, {
+        disableCache: Boolean(disableCache),
+      });
     }
 
     if (!client) throw new Error(`Unsupported model: ${modelName}`);
@@ -55794,10 +55864,27 @@ class GeminiClient {
   }
 }
 
+// Normalize the OpenAI Chat Completions usage block. Recent SDK versions
+// also expose cached prompt tokens via `prompt_tokens_details.cached_tokens`;
+// we surface that as `cacheReadInputTokens` so the shape matches Anthropic.
+function normalizeOpenAIUsage(raw, modelName) {
+  if (!raw || typeof raw !== 'object') return null;
+  const cachedTokens = raw.prompt_tokens_details?.cached_tokens ?? 0;
+  return {
+    provider: 'openai',
+    model: modelName,
+    inputTokens: raw.prompt_tokens ?? 0,
+    outputTokens: raw.completion_tokens ?? 0,
+    cacheCreationInputTokens: 0,
+    cacheReadInputTokens: cachedTokens,
+  };
+}
+
 class OpenAIClient {
   constructor(modelName, apiKey, temperature) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
+    this.lastUsage = null;
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY (または RIVER_OPENAI_API_KEY) が設定されていません');
     }
@@ -55827,15 +55914,61 @@ class OpenAIClient {
       })
     );
 
+    this.lastUsage = normalizeOpenAIUsage(response?.usage, this.modelName);
+
     return response.choices[0].message.content || '';
   }
 }
 
+// Prompt caching opt-out: set RIVER_ANTHROPIC_PROMPT_CACHE=0 to send the
+// system prompt as a plain string (no cache_control). Default is enabled
+// because review pipelines repeatedly send the same skill systemPrompt
+// across many files, where the 5-minute ephemeral cache delivers a large
+// cost reduction with no behavioral change.
+function isAnthropicPromptCacheEnabled() {
+  return process.env.RIVER_ANTHROPIC_PROMPT_CACHE !== '0';
+}
+
+// Normalize the raw `response.usage` block returned by the Anthropic SDK
+// into a stable shape that cost-estimation tooling (and #803 benchmark
+// guides) can consume without depending on SDK internals.
+function normalizeAnthropicUsage(raw, modelName) {
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    provider: 'anthropic',
+    model: modelName,
+    inputTokens: raw.input_tokens ?? 0,
+    outputTokens: raw.output_tokens ?? 0,
+    cacheCreationInputTokens: raw.cache_creation_input_tokens ?? 0,
+    cacheReadInputTokens: raw.cache_read_input_tokens ?? 0,
+  };
+}
+
+function buildAnthropicSystem(systemPrompt, { cacheEnabled }) {
+  if (!cacheEnabled) return systemPrompt;
+  // Array form is required to attach cache_control. Anthropic ignores the
+  // hint when the block falls below the model's minimum cacheable length
+  // (1024 tokens for sonnet/opus, 2048 for haiku) — safe to set unconditionally.
+  return [
+    {
+      type: 'text',
+      text: systemPrompt,
+      cache_control: { type: 'ephemeral' },
+    },
+  ];
+}
+
 class AnthropicClient {
-  constructor(modelName, apiKey, temperature, maxTokens) {
+  constructor(modelName, apiKey, temperature, maxTokens, options = {}) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
     this.maxTokens = resolveAnthropicMaxTokens(modelName, maxTokens);
+    this.disableCache = Boolean(options.disableCache);
+    // Normalized usage from the most recent generateReview call. Callers
+    // (e.g. skill-dispatcher) read this after `await client.generateReview`
+    // to attribute token counts and cache effectiveness to a specific
+    // (skill, file) pair. Stays null until the first successful call.
+    this.lastUsage = null;
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY (または RIVER_ANTHROPIC_API_KEY) が設定されていません');
     }
@@ -55843,15 +55976,27 @@ class AnthropicClient {
   }
 
   async generateReview(systemPrompt, diff) {
+    const cacheEnabled = isAnthropicPromptCacheEnabled() && !this.disableCache;
     const response = await withRetry(() =>
       this.anthropic.messages.create({
         model: this.modelName,
         max_tokens: this.maxTokens,
         temperature: this.temperature,
-        system: systemPrompt,
+        system: buildAnthropicSystem(systemPrompt, { cacheEnabled }),
         messages: [{ role: 'user', content: diff }],
       })
     );
+
+    this.lastUsage = normalizeAnthropicUsage(response?.usage, this.modelName);
+
+    if (process.env.RIVER_AI_RETRY_DEBUG === '1' && this.lastUsage) {
+      const u = this.lastUsage;
+      // eslint-disable-next-line no-console
+      console.log(
+        `[Anthropic usage] input=${u.inputTokens} output=${u.outputTokens} ` +
+          `cache_create=${u.cacheCreationInputTokens} cache_read=${u.cacheReadInputTokens}`,
+      );
+    }
 
     // Concatenate every text block. Extended-thinking and tool-use responses
     // can interleave non-text blocks, so we filter+join rather than picking
@@ -55928,11 +56073,103 @@ Provide your review as a JSON array of comments (compatible with GitHub Review A
 `.trim();
 };
 
+// EXTERNAL MODULE: external "node:crypto"
+var external_node_crypto_ = __nccwpck_require__(7598);
+;// CONCATENATED MODULE: ./src/lib/usage-persistence.mjs
+
+
+
+
+/**
+ * Opt-in: set RIVER_USAGE_TELEMETRY=1 to persist per-call AI usage to
+ * artifacts/usage/<ISO date>-<runId>.jsonl. Defaults to OFF because writing
+ * to disk during a review run is a side effect that should be explicit.
+ */
+function isUsageTelemetryEnabled() {
+  return process.env.RIVER_USAGE_TELEMETRY === '1';
+}
+
+/**
+ * Generate a short random run identifier so concurrent dispatcher runs
+ * (or repeated runs within the same second) do not collide on filename.
+ */
+function generateRunId() {
+  return (0,external_node_crypto_.randomBytes)(4).toString('hex');
+}
+
+/**
+ * Build the JSONL line for a single (file, skill) usage event. The shape
+ * is intentionally stable so external cost-analysis tooling can rely on it
+ * without depending on internal types.
+ *
+ * @param {object} event
+ * @param {string} event.file
+ * @param {string} event.skill
+ * @param {{provider, model, inputTokens, outputTokens, cacheCreationInputTokens, cacheReadInputTokens}} event.usage
+ * @param {string} [event.runId]
+ * @param {string} [event.commit]
+ */
+function buildUsageRecord(event) {
+  const { file, skill, usage, runId, commit } = event;
+  if (!usage) return null;
+  return {
+    timestamp: new Date().toISOString(),
+    runId: runId ?? null,
+    commit: commit ?? null,
+    file,
+    skill,
+    provider: usage.provider,
+    model: usage.model,
+    inputTokens: usage.inputTokens ?? 0,
+    outputTokens: usage.outputTokens ?? 0,
+    cacheCreationInputTokens: usage.cacheCreationInputTokens ?? 0,
+    cacheReadInputTokens: usage.cacheReadInputTokens ?? 0,
+  };
+}
+
+/**
+ * Write usage events as JSONL to `<rootDir>/artifacts/usage/<date>-<runId>.jsonl`.
+ * Silently no-ops when there are no events with `usage` populated, so
+ * dispatchers can call this unconditionally without first filtering.
+ *
+ * @param {Array} events     SkillDispatcher result items (need .usage to be persisted)
+ * @param {object} opts
+ * @param {string} opts.rootDir  Project root (artifacts/usage is created under here)
+ * @param {string} [opts.runId]
+ * @param {string} [opts.commit]
+ * @returns {Promise<string | null>}  Path to the written file, or null if skipped
+ */
+async function persistUsageEvents(events, opts) {
+  const records = (events || [])
+    .map((e) =>
+      buildUsageRecord({
+        file: e.file,
+        skill: e.skill,
+        usage: e.usage,
+        runId: opts.runId,
+        commit: opts.commit,
+      }),
+    )
+    .filter(Boolean);
+
+  if (records.length === 0) return null;
+
+  const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const runId = opts.runId ?? generateRunId();
+  const dir = external_node_path_.join(opts.rootDir, 'artifacts', 'usage');
+  await promises_.mkdir(dir, { recursive: true });
+  const filePath = external_node_path_.join(dir, `${date}-${runId}.jsonl`);
+  const body = records.map((r) => JSON.stringify(r)).join('\n') + '\n';
+  await promises_.writeFile(filePath, body, 'utf8');
+  return filePath;
+}
+
 ;// CONCATENATED MODULE: ./src/core/skill-dispatcher.mjs
  // Added for path.join
 
 
  // Added
+
 
 
 
@@ -56057,15 +56294,22 @@ class SkillDispatcher {
             modelName,
             temperature: skill.temperature ?? 0,
             maxTokens: skill.maxTokens,
+            disableCache: skill.disableCache,
           });
           console.log(`  -> Invoking ${modelName} for skill "${skill.name}"...`);
           const review = await client.generateReview(systemPrompt, diff);
 
-          return {
+          const result = {
             file,
             skill: skill.name,
             review,
           };
+          // Only Anthropic populates lastUsage today. Future providers can
+          // adopt the same convention; consumers should handle `undefined`.
+          if (client.lastUsage) {
+            result.usage = client.lastUsage;
+          }
+          return result;
         } catch (error) {
           console.error(`  [Error] Failed to execute skill "${skill.name}" on ${file}:`, error);
           // Return error info in the result so it can be reported if needed
@@ -56080,6 +56324,19 @@ class SkillDispatcher {
       const fileResults = await Promise.all(skillPromises);
       results.push(...fileResults);
     }
+
+    if (isUsageTelemetryEnabled()) {
+      try {
+        await persistUsageEvents(results, { rootDir: this.repoRoot });
+      } catch (err) {
+        // Persistence is non-critical; failing here must not break the
+        // review pipeline. Log and continue.
+        console.warn(
+          `[usage telemetry] failed to persist events: ${err?.message || err}`,
+        );
+      }
+    }
+
     return results;
   }
 

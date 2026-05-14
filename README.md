@@ -25,6 +25,7 @@
 | 5分で試す                | [クイックスタート（GitHub Actions）](#クイックスタートgithub-actions)                              |
 | 既存リポジトリに導入する | [セットアップガイド](https://river-reviewer.vercel.app/guides/github-actions/)                     |
 | スキルを1個作る          | [スキル作成チュートリアル](https://river-reviewer.vercel.app/tutorials/creating-your-first-skill/) |
+| コストを見積もる         | [コスト見積もりガイド](pages/guides/cost-estimation.md)                                            |
 | 設計思想を理解する       | [アーキテクチャ解説](https://river-reviewer.vercel.app/explanation/river-architecture/)            |
 
 Philosophy: [なぜ作ったのか](#philosophy)
@@ -121,14 +122,14 @@ jobs:
         with:
           fetch-depth: 0 # merge-base を安定取得
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.28.0
+        uses: s977043/river-reviewer/runners/github-action@v0.42.0
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-タグは `@v0.28.0` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
+タグは `@v0.42.0` などのリリースタグにピン留めしてください。浮動タグを使う場合は `@v0` のようなエイリアスタグを用意して運用します（任意）。
 
 <!-- x-release-please-start-version -->
 
@@ -149,7 +150,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.28.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.42.0
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -158,7 +159,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.28.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.42.0
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -167,7 +168,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.28.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.42.0
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -181,7 +182,7 @@ review:
   steps:
     - uses: actions/checkout@v6
       with: { fetch-depth: 0 }
-    - uses: s977043/river-reviewer/runners/github-action@v0.28.0
+    - uses: s977043/river-reviewer/runners/github-action@v0.42.0
       with:
         phase: midstream
         estimate: true # コスト見積もりのみ
@@ -199,7 +200,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.28.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.42.0
         with:
           phase: midstream
           dry_run: true            # Draft はドライランでプロンプト確認のみ
@@ -212,7 +213,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-reviewer/runners/github-action@v0.28.0
+      - uses: s977043/river-reviewer/runners/github-action@v0.42.0
         with:
           phase: midstream
           dry_run: false           # Ready ではフルレビュー
@@ -262,12 +263,18 @@ exclude:
 GitHub Actions では:
 
 ```yaml
-- uses: s977043/river-reviewer/runners/github-action@v0.28.0
+- uses: s977043/river-reviewer/runners/github-action@v0.42.0
   with:
     phase: midstream
   env:
     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
+
+**Prompt caching（自動）**: skill の systemPrompt は Anthropic の 5 分 ephemeral cache を自動利用します。同じ skill で複数ファイルをレビューする際、2 回目以降の system トークンが大幅に割引（cache_read 単価は通常の 1/10）されます。グローバル無効化は `RIVER_ANTHROPIC_PROMPT_CACHE=0`、skill 単位無効化は `skill.disableCache: true` を使用します。
+
+**コスト計測（usage telemetry）**: `AIClientFactory.create(...)` が返す Anthropic / OpenAI クライアントは、`generateReview()` 完了後に `client.lastUsage` を `{ provider, model, inputTokens, outputTokens, cacheCreationInputTokens, cacheReadInputTokens }` 形式で公開します。`SkillDispatcher` の結果配列にも `usage` フィールドとして含まれるため、独自スクリプトでコスト集計や cache 効率の計測に利用できます。`RIVER_AI_RETRY_DEBUG=1` を設定すると 1 呼び出しごとに usage が標準出力にも記録されます。
+
+**Disk への永続化（opt-in）**: `RIVER_USAGE_TELEMETRY=1` を設定すると、`SkillDispatcher` 実行完了時に `artifacts/usage/<YYYY-MM-DD>-<runId>.jsonl` へ 1 (file, skill) ペアにつき 1 行の JSONL を書き出します。各行は `{ timestamp, runId, commit, file, skill, provider, model, inputTokens, outputTokens, cacheCreationInputTokens, cacheReadInputTokens }` の安定スキーマで、外部のコスト分析ツールに直接食わせられます。永続化失敗はレビュー本体を止めません（警告のみ）。
 
 ### セキュリティ考慮事項
 

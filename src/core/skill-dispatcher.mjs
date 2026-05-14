@@ -5,6 +5,10 @@ import { loadSkills } from '../../runners/core/skill-loader.mjs'; // Added
 import { AIClientFactory } from '../ai/factory.mjs';
 import { buildSystemPrompt } from '../prompts/buildSystemPrompt.mjs';
 import { isLlmEnabled } from '../lib/utils.mjs';
+import {
+  isUsageTelemetryEnabled,
+  persistUsageEvents,
+} from '../lib/usage-persistence.mjs';
 
 const MODEL_HINT_TO_NAME = {
   cheap: 'gpt-4o-mini',
@@ -126,15 +130,22 @@ export class SkillDispatcher {
             modelName,
             temperature: skill.temperature ?? 0,
             maxTokens: skill.maxTokens,
+            disableCache: skill.disableCache,
           });
           console.log(`  -> Invoking ${modelName} for skill "${skill.name}"...`);
           const review = await client.generateReview(systemPrompt, diff);
 
-          return {
+          const result = {
             file,
             skill: skill.name,
             review,
           };
+          // Only Anthropic populates lastUsage today. Future providers can
+          // adopt the same convention; consumers should handle `undefined`.
+          if (client.lastUsage) {
+            result.usage = client.lastUsage;
+          }
+          return result;
         } catch (error) {
           console.error(`  [Error] Failed to execute skill "${skill.name}" on ${file}:`, error);
           // Return error info in the result so it can be reported if needed
@@ -149,6 +160,19 @@ export class SkillDispatcher {
       const fileResults = await Promise.all(skillPromises);
       results.push(...fileResults);
     }
+
+    if (isUsageTelemetryEnabled()) {
+      try {
+        await persistUsageEvents(results, { rootDir: this.repoRoot });
+      } catch (err) {
+        // Persistence is non-critical; failing here must not break the
+        // review pipeline. Log and continue.
+        console.warn(
+          `[usage telemetry] failed to persist events: ${err?.message || err}`,
+        );
+      }
+    }
+
     return results;
   }
 

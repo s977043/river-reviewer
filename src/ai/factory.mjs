@@ -98,17 +98,22 @@ export {
   parseRetryAfter,
   getBackoffMs,
   resolveAnthropicMaxTokens,
+  isAnthropicPromptCacheEnabled,
+  buildAnthropicSystem,
+  normalizeAnthropicUsage,
+  normalizeOpenAIUsage,
   __clearAIClientCacheForTests,
 };
 
 export class AIClientFactory {
-  static create({ modelName, temperature, maxTokens }) {
+  static create({ modelName, temperature, maxTokens, disableCache }) {
     if (!modelName) {
       throw new Error('モデル名が指定されていません (config.skills[].model を確認してください)');
     }
-    // maxTokens is part of the cache key so two skills targeting the same
-    // model with different output budgets do not stomp on each other.
-    const cacheKey = `${modelName}::${temperature ?? 'default'}::${maxTokens ?? 'default'}`;
+    // maxTokens and disableCache are part of the cache key so two skills
+    // targeting the same model with different settings do not stomp on
+    // each other in the module-level clientCache.
+    const cacheKey = `${modelName}::${temperature ?? 'default'}::${maxTokens ?? 'default'}::${disableCache ? 'nocache' : 'cache'}`;
     if (clientCache.has(cacheKey)) {
       return clientCache.get(cacheKey);
     }
@@ -122,7 +127,9 @@ export class AIClientFactory {
       client = new OpenAIClient(modelName, apiKey, temperature);
     } else if (modelName.startsWith('claude')) {
       const apiKey = process.env.ANTHROPIC_API_KEY || process.env.RIVER_ANTHROPIC_API_KEY;
-      client = new AnthropicClient(modelName, apiKey, temperature, maxTokens);
+      client = new AnthropicClient(modelName, apiKey, temperature, maxTokens, {
+        disableCache: Boolean(disableCache),
+      });
     }
 
     if (!client) throw new Error(`Unsupported model: ${modelName}`);
@@ -160,10 +167,27 @@ class GeminiClient {
   }
 }
 
+// Normalize the OpenAI Chat Completions usage block. Recent SDK versions
+// also expose cached prompt tokens via `prompt_tokens_details.cached_tokens`;
+// we surface that as `cacheReadInputTokens` so the shape matches Anthropic.
+function normalizeOpenAIUsage(raw, modelName) {
+  if (!raw || typeof raw !== 'object') return null;
+  const cachedTokens = raw.prompt_tokens_details?.cached_tokens ?? 0;
+  return {
+    provider: 'openai',
+    model: modelName,
+    inputTokens: raw.prompt_tokens ?? 0,
+    outputTokens: raw.completion_tokens ?? 0,
+    cacheCreationInputTokens: 0,
+    cacheReadInputTokens: cachedTokens,
+  };
+}
+
 class OpenAIClient {
   constructor(modelName, apiKey, temperature) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
+    this.lastUsage = null;
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY (または RIVER_OPENAI_API_KEY) が設定されていません');
     }
@@ -193,15 +217,61 @@ class OpenAIClient {
       })
     );
 
+    this.lastUsage = normalizeOpenAIUsage(response?.usage, this.modelName);
+
     return response.choices[0].message.content || '';
   }
 }
 
+// Prompt caching opt-out: set RIVER_ANTHROPIC_PROMPT_CACHE=0 to send the
+// system prompt as a plain string (no cache_control). Default is enabled
+// because review pipelines repeatedly send the same skill systemPrompt
+// across many files, where the 5-minute ephemeral cache delivers a large
+// cost reduction with no behavioral change.
+function isAnthropicPromptCacheEnabled() {
+  return process.env.RIVER_ANTHROPIC_PROMPT_CACHE !== '0';
+}
+
+// Normalize the raw `response.usage` block returned by the Anthropic SDK
+// into a stable shape that cost-estimation tooling (and #803 benchmark
+// guides) can consume without depending on SDK internals.
+function normalizeAnthropicUsage(raw, modelName) {
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    provider: 'anthropic',
+    model: modelName,
+    inputTokens: raw.input_tokens ?? 0,
+    outputTokens: raw.output_tokens ?? 0,
+    cacheCreationInputTokens: raw.cache_creation_input_tokens ?? 0,
+    cacheReadInputTokens: raw.cache_read_input_tokens ?? 0,
+  };
+}
+
+function buildAnthropicSystem(systemPrompt, { cacheEnabled }) {
+  if (!cacheEnabled) return systemPrompt;
+  // Array form is required to attach cache_control. Anthropic ignores the
+  // hint when the block falls below the model's minimum cacheable length
+  // (1024 tokens for sonnet/opus, 2048 for haiku) — safe to set unconditionally.
+  return [
+    {
+      type: 'text',
+      text: systemPrompt,
+      cache_control: { type: 'ephemeral' },
+    },
+  ];
+}
+
 class AnthropicClient {
-  constructor(modelName, apiKey, temperature, maxTokens) {
+  constructor(modelName, apiKey, temperature, maxTokens, options = {}) {
     this.modelName = modelName;
     this.temperature = temperature ?? 0;
     this.maxTokens = resolveAnthropicMaxTokens(modelName, maxTokens);
+    this.disableCache = Boolean(options.disableCache);
+    // Normalized usage from the most recent generateReview call. Callers
+    // (e.g. skill-dispatcher) read this after `await client.generateReview`
+    // to attribute token counts and cache effectiveness to a specific
+    // (skill, file) pair. Stays null until the first successful call.
+    this.lastUsage = null;
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY (または RIVER_ANTHROPIC_API_KEY) が設定されていません');
     }
@@ -209,15 +279,27 @@ class AnthropicClient {
   }
 
   async generateReview(systemPrompt, diff) {
+    const cacheEnabled = isAnthropicPromptCacheEnabled() && !this.disableCache;
     const response = await withRetry(() =>
       this.anthropic.messages.create({
         model: this.modelName,
         max_tokens: this.maxTokens,
         temperature: this.temperature,
-        system: systemPrompt,
+        system: buildAnthropicSystem(systemPrompt, { cacheEnabled }),
         messages: [{ role: 'user', content: diff }],
       })
     );
+
+    this.lastUsage = normalizeAnthropicUsage(response?.usage, this.modelName);
+
+    if (process.env.RIVER_AI_RETRY_DEBUG === '1' && this.lastUsage) {
+      const u = this.lastUsage;
+      // eslint-disable-next-line no-console
+      console.log(
+        `[Anthropic usage] input=${u.inputTokens} output=${u.outputTokens} ` +
+          `cache_create=${u.cacheCreationInputTokens} cache_read=${u.cacheReadInputTokens}`,
+      );
+    }
 
     // Concatenate every text block. Extended-thinking and tool-use responses
     // can interleave non-text blocks, so we filter+join rather than picking
