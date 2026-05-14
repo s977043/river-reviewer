@@ -34,6 +34,12 @@ exclude = [
   # Compare URLs exist only after tag creation (release-please chicken-and-egg)
   'github\.com/.*/compare/',
 
+  # Upstream openai/skills repository moves `.experimental` / `.curated`
+  # subdirectories around; these references are documentation pointers
+  # in Codex-installed agent skills (.codex/) and don't need to be
+  # perpetually live for river-reviewer functionality.
+  '^https?://github\.com/openai/skills/tree/.+/skills/\.',
+
 ]
 
 # Exclude specific files that contain Docusaurus-internal routing links
