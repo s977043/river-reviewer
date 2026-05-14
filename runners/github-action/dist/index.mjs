@@ -55856,6 +55856,21 @@ function isAnthropicPromptCacheEnabled() {
   return process.env.RIVER_ANTHROPIC_PROMPT_CACHE !== '0';
 }
 
+// Normalize the raw `response.usage` block returned by the Anthropic SDK
+// into a stable shape that cost-estimation tooling (and #803 benchmark
+// guides) can consume without depending on SDK internals.
+function normalizeAnthropicUsage(raw, modelName) {
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    provider: 'anthropic',
+    model: modelName,
+    inputTokens: raw.input_tokens ?? 0,
+    outputTokens: raw.output_tokens ?? 0,
+    cacheCreationInputTokens: raw.cache_creation_input_tokens ?? 0,
+    cacheReadInputTokens: raw.cache_read_input_tokens ?? 0,
+  };
+}
+
 function buildAnthropicSystem(systemPrompt, { cacheEnabled }) {
   if (!cacheEnabled) return systemPrompt;
   // Array form is required to attach cache_control. Anthropic ignores the
@@ -55876,6 +55891,11 @@ class AnthropicClient {
     this.temperature = temperature ?? 0;
     this.maxTokens = resolveAnthropicMaxTokens(modelName, maxTokens);
     this.disableCache = Boolean(options.disableCache);
+    // Normalized usage from the most recent generateReview call. Callers
+    // (e.g. skill-dispatcher) read this after `await client.generateReview`
+    // to attribute token counts and cache effectiveness to a specific
+    // (skill, file) pair. Stays null until the first successful call.
+    this.lastUsage = null;
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY (または RIVER_ANTHROPIC_API_KEY) が設定されていません');
     }
@@ -55894,13 +55914,14 @@ class AnthropicClient {
       })
     );
 
-    if (process.env.RIVER_AI_RETRY_DEBUG === '1' && response?.usage) {
-      const u = response.usage;
+    this.lastUsage = normalizeAnthropicUsage(response?.usage, this.modelName);
+
+    if (process.env.RIVER_AI_RETRY_DEBUG === '1' && this.lastUsage) {
+      const u = this.lastUsage;
       // eslint-disable-next-line no-console
       console.log(
-        `[Anthropic usage] input=${u.input_tokens ?? 0} output=${u.output_tokens ?? 0} ` +
-          `cache_create=${u.cache_creation_input_tokens ?? 0} ` +
-          `cache_read=${u.cache_read_input_tokens ?? 0}`,
+        `[Anthropic usage] input=${u.inputTokens} output=${u.outputTokens} ` +
+          `cache_create=${u.cacheCreationInputTokens} cache_read=${u.cacheReadInputTokens}`,
       );
     }
 
@@ -56113,11 +56134,17 @@ class SkillDispatcher {
           console.log(`  -> Invoking ${modelName} for skill "${skill.name}"...`);
           const review = await client.generateReview(systemPrompt, diff);
 
-          return {
+          const result = {
             file,
             skill: skill.name,
             review,
           };
+          // Only Anthropic populates lastUsage today. Future providers can
+          // adopt the same convention; consumers should handle `undefined`.
+          if (client.lastUsage) {
+            result.usage = client.lastUsage;
+          }
+          return result;
         } catch (error) {
           console.error(`  [Error] Failed to execute skill "${skill.name}" on ${file}:`, error);
           // Return error info in the result so it can be reported if needed

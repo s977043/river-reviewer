@@ -9,6 +9,7 @@ import {
   resolveAnthropicMaxTokens,
   isAnthropicPromptCacheEnabled,
   buildAnthropicSystem,
+  normalizeAnthropicUsage,
   __clearAIClientCacheForTests,
   AIClientFactory,
 } from '../src/ai/factory.mjs';
@@ -600,5 +601,122 @@ describe('AnthropicClient.generateReview (prompt caching integration)', () => {
 
     await client.generateReview('s', 'd');
     assert.equal(received.system, 's', 'env opt-out should still suppress caching');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizeAnthropicUsage
+// ---------------------------------------------------------------------------
+
+describe('normalizeAnthropicUsage', () => {
+  test('maps SDK snake_case fields into stable camelCase shape', () => {
+    const raw = {
+      input_tokens: 100,
+      output_tokens: 200,
+      cache_creation_input_tokens: 50,
+      cache_read_input_tokens: 25,
+    };
+    assert.deepEqual(normalizeAnthropicUsage(raw, 'claude-sonnet-4-6'), {
+      provider: 'anthropic',
+      model: 'claude-sonnet-4-6',
+      inputTokens: 100,
+      outputTokens: 200,
+      cacheCreationInputTokens: 50,
+      cacheReadInputTokens: 25,
+    });
+  });
+
+  test('defaults missing token counts to 0', () => {
+    const result = normalizeAnthropicUsage({ input_tokens: 10 }, 'claude-haiku-4-5');
+    assert.equal(result.inputTokens, 10);
+    assert.equal(result.outputTokens, 0);
+    assert.equal(result.cacheCreationInputTokens, 0);
+    assert.equal(result.cacheReadInputTokens, 0);
+  });
+
+  test('returns null for null / non-object input', () => {
+    assert.equal(normalizeAnthropicUsage(null, 'claude-sonnet-4-6'), null);
+    assert.equal(normalizeAnthropicUsage(undefined, 'claude-sonnet-4-6'), null);
+    assert.equal(normalizeAnthropicUsage('weird', 'claude-sonnet-4-6'), null);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// AnthropicClient.lastUsage capture (telemetry integration)
+// ---------------------------------------------------------------------------
+
+describe('AnthropicClient.lastUsage', () => {
+  let originalAnthropicKey;
+
+  beforeEach(() => {
+    originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+    process.env.ANTHROPIC_API_KEY = 'sk-ant-test-key';
+    __clearAIClientCacheForTests();
+  });
+
+  afterEach(() => {
+    if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+    __clearAIClientCacheForTests();
+  });
+
+  function stubMessagesCreate(client, fn) {
+    client.anthropic = { messages: { create: fn } };
+  }
+
+  test('lastUsage is null before any call', () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    assert.equal(client.lastUsage, null);
+  });
+
+  test('lastUsage is populated with normalized shape after generateReview', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    stubMessagesCreate(client, async () => ({
+      content: [{ type: 'text', text: 'ok' }],
+      usage: {
+        input_tokens: 1234,
+        output_tokens: 567,
+        cache_creation_input_tokens: 100,
+        cache_read_input_tokens: 50,
+      },
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.deepEqual(client.lastUsage, {
+      provider: 'anthropic',
+      model: 'claude-sonnet-4-6',
+      inputTokens: 1234,
+      outputTokens: 567,
+      cacheCreationInputTokens: 100,
+      cacheReadInputTokens: 50,
+    });
+  });
+
+  test('lastUsage is overwritten on each call', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    const payloads = [
+      { input_tokens: 100, output_tokens: 10 },
+      { input_tokens: 200, output_tokens: 20 },
+    ];
+    let i = 0;
+    stubMessagesCreate(client, async () => ({
+      content: [{ type: 'text', text: 'ok' }],
+      usage: payloads[i++],
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.equal(client.lastUsage.inputTokens, 100);
+    await client.generateReview('s', 'd');
+    assert.equal(client.lastUsage.inputTokens, 200);
+  });
+
+  test('lastUsage stays null when SDK omits the usage block', async () => {
+    const client = AIClientFactory.create({ modelName: 'claude-sonnet-4-6' });
+    stubMessagesCreate(client, async () => ({
+      content: [{ type: 'text', text: 'ok' }],
+    }));
+
+    await client.generateReview('s', 'd');
+    assert.equal(client.lastUsage, null);
   });
 });
