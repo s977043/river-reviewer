@@ -40,6 +40,11 @@ exclude = [
   # perpetually live for river-reviewer functionality.
   '^https?://github\.com/openai/skills/tree/.+/skills/\.',
 
+  # openai.com/pricing returns 403 to bot user-agents (Cloudflare challenge);
+  # the URL is valid in browsers, so we link to it from the cost estimation
+  # guide without making CI gate on it.
+  '^https?://openai\.com/pricing',
+
 ]
 
 # Exclude specific files that contain Docusaurus-internal routing links
