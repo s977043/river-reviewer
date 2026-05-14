@@ -55,7 +55,8 @@
     "river": "node ./src/cli.mjs",
     "prepare": "husky install",
     "eval:regression": "node scripts/evaluate-regression.mjs",
-    "eval:compare": "node scripts/compare-eval-ledger.mjs"
+    "eval:compare": "node scripts/compare-eval-ledger.mjs",
+    "usage:summary": "node scripts/usage-summary.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
