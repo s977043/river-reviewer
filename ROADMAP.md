@@ -4,6 +4,10 @@
 
 単なる自動レビューツールではなく、開発組織の品質基準をコード化・運用・監査する「Review OS」へ進化させる。
 
+AI が人間の可読量を超えるコードを生成できる時代において、River Reviewer は生成コードの全行確認ではなく、信頼できるソフトウェアを生む開発フロー全体をレビュー対象にする。
+
+> Review the Flow, Not Just the Code.
+
 ## Strategy
 
 "Metadata First"—すべてのレビューロジック、設定、そして戦略自体を構造化データ（Markdown + Frontmatter）として管理し、決定論的な制御と自律的な改善を実現する。
@@ -11,6 +15,8 @@
 - **Flow-based**: フェーズ別（upstream/midstream/downstream）のスキルで、開発フローに寄り添う非ブロッキングなレビューを行う。
 - **Metadata-first**: YAML frontmatter + Markdown を「スキル」とし、`schemas/skill.schema.json` で厳格に定義・検証する。
 - **Automation-ready**: GitHub Actions など CI/CD から容易に呼び出せるランナーとルーティング層を用意する。
+- **Harness-first**: テスト、型、Lint、静的解析、セキュリティチェックなどの検証ハーネスを品質保証の中心に置く。
+- **Risk-based HITL**: 人間レビューは全行確認ではなく、認証・認可、決済、データ削除、大規模リファクタなど高リスク変更へ集中させる。
 
 ## Phase 0: Branding & Foundation (完了)
 
@@ -42,25 +48,31 @@
 - [ ] ゴールデンケース（差分・期待出力）を fixtures として追加し、回帰を検知できるテストを追加
 - [ ] スキルごとの失敗パス（コンテキスト不足/依存不足）をテストで検知
 - [ ] Evals/回帰テストを CI へ組み込み、スキル変更時に必ず実行
+- [ ] Harness Assessment Skill を追加し、テスト/型/Lint/静的解析/セキュリティチェックの有無を評価
+- [ ] Human Escalation Skill を追加し、高リスク変更を人間レビューへエスカレーション
 
 ## Phase 3: Reliability & Evals
 
 - [ ] Prompt/Evals 環境の整備（例: Promptfoo）とゴールデンケースの準備
 - [ ] スキルごとの「検出すべき/避けるべき」テストケースを追加し、回帰を検知
 - [ ] CI にスキル回帰テストを組み込み、失敗時はブロック
-- Exit Criteria: スキル変更で自動評価が走り、デグレを防止できる。
+- [ ] 検証ハーネスの充足度を評価する Harness Assessment Skill を導入
+- [ ] 認証・認可、決済、データ削除、アーキテクチャ変更などを Human Escalation 対象として定義
+- Exit Criteria: スキル変更で自動評価が走り、デグレを防止できる。加えて、高リスク変更は自動的に人間レビューへ誘導される。
 
 ## Phase 4: Riverbed Memory & Intelligence
 
 - [ ] Riverbed Memory の設計（ADR/WontFix/過去指摘の永続化と再利用）
 - [ ] セマンティック/コンテキストルーティング（PR タイトル/差分/依存関係を考慮）
 - [ ] 抑止・再提示の仕組み（抑制した指摘の再浮上条件を定義）
-- Exit Criteria: コンテキストに応じたスキル選択が行われ、不要実行が削減される。
+- [ ] Review Philosophy Skill を追加し、「Review the System, Not Every Line」を River Reviewer の判断原則として形式知化
+- [ ] Riverbed Memory にレビュー思想、検証ハーネス、エスカレーション判断の履歴を蓄積し、継続的改善へ接続
+- Exit Criteria: コンテキストに応じたスキル選択が行われ、不要実行が削減される。さらに、過去の判断とレビュー思想を再利用して、AI 開発フロー全体の信頼性を高められる。
 
 ## GitHub Projects 推奨フィールド
 
 - **Phase (Single Select)**: Phase 0〜4（上記に対応）
-- **Component (Single Select)**: Schema / Loader / Runner / Skills / Evals / Memory
+- **Component (Single Select)**: Schema / Loader / Runner / Skills / Evals / Memory / Harness / Governance
 - **View 例**:
   - Roadmap View: Target Date × Phase のタイムライン
   - Kanban View: Status 別の進行管理
@@ -79,3 +91,7 @@
 - `v1.0.0 – Community Edition`（互換性/安定 I/F/運用の固定）
 
 具体的な 1〜2 週間粒度のバックログ（Issue にコピペ可能）は `docs/implementation-plan.md` にまとめます。
+
+## Related Issues
+
+- #819 AI時代のレビュー思想をRiver Reviewerへ取り込む
