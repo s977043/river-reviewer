@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.45.0](https://github.com/s977043/river-reviewer/compare/v0.44.0...v0.45.0) (2026-05-17)
+
+
+### Features
+
+* **cli:** wire river review plan --plan-only into main CLI ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3) ([#839](https://github.com/s977043/river-reviewer/issues/839)) ([61028f6](https://github.com/s977043/river-reviewer/commit/61028f693c03493352cb3d5cd9b4f2f165bf9034))
+
 ## [0.44.0](https://github.com/s977043/river-reviewer/compare/v0.43.0...v0.44.0) (2026-05-17)
 
 
