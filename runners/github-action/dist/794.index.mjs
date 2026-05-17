@@ -183,6 +183,8 @@ async function _fileExists(filePath, fsImpl) {
   }
 }
 
+// EXTERNAL MODULE: ./src/lib/planner-utils.mjs
+var planner_utils = __webpack_require__(1013);
 ;// CONCATENATED MODULE: ./src/lib/review-plan.mjs
 /**
  * `river review plan` core — #802 Phase 3 (slice 1)
@@ -209,7 +211,8 @@ async function _fileExists(filePath, fsImpl) {
 
 
 
-const VALID_PHASES = new Set(['upstream', 'midstream', 'downstream']);
+
+const VALID_PHASES = new Set(planner_utils/* PHASES */.ZG);
 
 /** Raised for argument/config errors that map to CLI exit code 3. */
 class ReviewPlanError extends Error {

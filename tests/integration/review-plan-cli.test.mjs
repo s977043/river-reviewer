@@ -15,29 +15,18 @@
 // (技術的負債: --output-file 非依存の stdout 捕捉は別 slice で扱う。)
 
 import assert from 'node:assert/strict';
-import { mkdirSync, copyFileSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { copyFileSync, readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 import test, { describe } from 'node:test';
-
-import Ajv2020 from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
 
 import { runCliInProcess, runCliAsSubprocess } from '../helpers/cli.mjs';
 import { createTempDir, cleanupTempDir } from '../helpers/temp-dir.mjs';
+import { compileReviewArtifactValidator } from '../helpers/schema-validator.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE = resolve(__dirname, '..', 'fixtures', 'plangate-review-artifacts');
-const schema = JSON.parse(
-  readFileSync(resolve(__dirname, '..', '..', 'schemas', 'review-artifact.schema.json'), 'utf8')
-);
-
-function makeValidator() {
-  const ajv = new Ajv2020({ allErrors: true, strict: false });
-  addFormats(ajv);
-  return ajv.compile(schema);
-}
+const validate = compileReviewArtifactValidator();
 
 /** Lay the PlanGate fixture out into a fresh temp repo root. */
 function setupRepo(t, { withConfig = false } = {}) {
@@ -47,7 +36,10 @@ function setupRepo(t, { withConfig = false } = {}) {
     copyFileSync(join(FIXTURE, f), join(dir, f));
   }
   if (withConfig) {
-    copyFileSync(join(FIXTURE, 'config', '.river-reviewer.json'), join(dir, '.river-reviewer.json'));
+    copyFileSync(
+      join(FIXTURE, 'config', '.river-reviewer.json'),
+      join(dir, '.river-reviewer.json')
+    );
   }
   return dir;
 }
@@ -63,7 +55,6 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.equal(result.code, 0, result.stderr);
 
     const artifact = JSON.parse(readFileSync(out, 'utf8'));
-    const validate = makeValidator();
     assert.equal(validate(artifact), true, JSON.stringify(validate.errors));
     assert.equal(artifact.version, '1');
     assert.equal(artifact.phase, 'upstream');
@@ -83,7 +74,7 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.equal(result.code, 0, result.stderr);
 
     const artifact = JSON.parse(readFileSync(out, 'utf8'));
-    assert.equal(makeValidator()(artifact), true);
+    assert.equal(validate(artifact), true);
     const resolved = artifact.debug.resolvedArtifacts;
     assert.equal(resolved.plan.source, 'cwd');
     assert.equal(resolved.plan.exists, true);
@@ -134,10 +125,9 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
 
   test('invalid --phase exits 3', async (t) => {
     const dir = setupRepo(t);
-    const result = await runCliInProcess(
-      ['review', 'plan', '--plan-only', '--phase', 'bogus'],
-      { cwd: dir }
-    );
+    const result = await runCliInProcess(['review', 'plan', '--plan-only', '--phase', 'bogus'], {
+      cwd: dir,
+    });
     assert.equal(result.code, 3);
     assert.match(result.stderr, /Invalid --phase/);
   });
@@ -158,7 +148,7 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     );
     assert.equal(result.code, 0, result.stderr);
     const artifact = JSON.parse(result.stdout);
-    assert.equal(makeValidator()(artifact), true, JSON.stringify(artifact));
+    assert.equal(validate(artifact), true, JSON.stringify(artifact));
     assert.equal(artifact.phase, 'midstream');
     assert.equal(artifact.status, 'ok');
   });

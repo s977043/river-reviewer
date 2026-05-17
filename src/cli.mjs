@@ -131,7 +131,6 @@ function parseArgs(argv) {
     reviewSubcommand: null,
     planOnly: false,
     outputFile: null,
-    configPath: null,
     artifactsDir: null,
     cliArtifacts: {},
   };
@@ -226,16 +225,6 @@ function parseArgs(argv) {
         break;
       }
       parsed.outputFile = value;
-      continue;
-    }
-    if (arg === '--config') {
-      const value = args.shift();
-      if (!value || value.startsWith('-')) {
-        console.error('Error: --config option requires a path.');
-        parsed.command = 'help';
-        break;
-      }
-      parsed.configPath = value;
       continue;
     }
     if (arg === '--artifacts-dir') {

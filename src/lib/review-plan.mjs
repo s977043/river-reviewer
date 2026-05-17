@@ -22,8 +22,9 @@ import path from 'node:path';
 
 import { loadConfig as defaultLoadConfig } from '../config/loader.mjs';
 import { resolveAllArtifacts as defaultResolveAllArtifacts } from '../config/artifact-resolver.mjs';
+import { PHASES } from './planner-utils.mjs';
 
-const VALID_PHASES = new Set(['upstream', 'midstream', 'downstream']);
+const VALID_PHASES = new Set(PHASES);
 
 /** Raised for argument/config errors that map to CLI exit code 3. */
 export class ReviewPlanError extends Error {
