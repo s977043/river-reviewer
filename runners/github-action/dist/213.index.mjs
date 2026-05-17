@@ -117,7 +117,7 @@ async function evaluateReviewFixtures({ casesPath, phase = null, verbose = false
     const name = c.name ?? '(unnamed case)';
     const diffPath = node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(fixturesDir, c.diffFile);
     const diffText = node_fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync(diffPath, 'utf8');
-    const parsedDiff = (0,_diff_mjs__WEBPACK_IMPORTED_MODULE_2__/* .parseUnifiedDiff */ .r)(diffText);
+    const parsedDiff = (0,_diff_mjs__WEBPACK_IMPORTED_MODULE_2__/* .parseUnifiedDiff */ .rj)(diffText);
     const plan = {
       selected: (c.planSkills ?? []).map((id) => ({ metadata: { id } })),
       skipped: [],

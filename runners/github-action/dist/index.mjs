@@ -29639,8 +29639,9 @@ function renderDiffText(files) {
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   K: () => (/* binding */ collectRepoDiff),
-/* harmony export */   r: () => (/* binding */ parseUnifiedDiff)
+/* harmony export */   KD: () => (/* binding */ collectRepoDiff),
+/* harmony export */   dc: () => (/* binding */ deriveChangedFiles),
+/* harmony export */   rj: () => (/* binding */ parseUnifiedDiff)
 /* harmony export */ });
 /* harmony import */ var _git_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(8613);
 /* harmony import */ var _diff_optimizer_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1092);
@@ -29725,6 +29726,18 @@ function parseUnifiedDiff(diffText) {
   return { files };
 }
 
+/**
+ * Derive the list of changed file paths from unified diff text,
+ * excluding deletions (/dev/null).
+ * @param {string} diffText
+ * @returns {string[]}
+ */
+function deriveChangedFiles(diffText) {
+  const parsed = parseUnifiedDiff(diffText);
+  const files = parsed.files?.map((f) => f.path).filter(Boolean) ?? [];
+  return files.filter((p) => p !== '/dev/null');
+}
+
 async function collectRepoDiff(repoRoot, baseRef, { contextLines = 3 } = {}) {
   const changedFiles = await (0,_git_mjs__WEBPACK_IMPORTED_MODULE_0__/* .listChangedFiles */ .AC)(repoRoot, baseRef);
   if (!changedFiles.length) {
@@ -29743,7 +29756,7 @@ async function collectRepoDiff(repoRoot, baseRef, { contextLines = 3 } = {}) {
   const parsed = parseUnifiedDiff(rawDiffText);
   const files = parsed.files.length
     ? parsed.files
-    : changedFiles.map(file => ({
+    : changedFiles.map((file) => ({
         path: file,
         hunks: [],
         addedLines: [],
@@ -34093,7 +34106,7 @@ async function collectLocalContext({
   const riskMap = await (0,risk_map/* loadRiskMap */.E$)(repoRoot);
   const defaultBranch = await (0,git/* detectDefaultBranch */.Rd)(repoRoot);
   const mergeBase = await (0,git/* findMergeBase */.fe)(repoRoot, defaultBranch);
-  const rawDiff = await (0,lib_diff/* collectRepoDiff */.K)(repoRoot, mergeBase, { contextLines });
+  const rawDiff = await (0,lib_diff/* collectRepoDiff */.KD)(repoRoot, mergeBase, { contextLines });
   const diff = applyFileExclusions(rawDiff, config.exclude?.files ?? []);
   const reviewFiles = diff.filesForReview?.map((file) => file.path) ?? diff.changedFiles;
   const contexts = resolveAvailableContexts(availableContexts);
@@ -57478,7 +57491,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       const repoRoot = await (0,git/* ensureGitRepo */.NC)(targetPath);
       const defaultBranch = await (0,git/* detectDefaultBranch */.Rd)(repoRoot);
       const mergeBase = await (0,git/* findMergeBase */.fe)(repoRoot, defaultBranch);
-      const repoDiff = await (0,lib_diff/* collectRepoDiff */.K)(repoRoot, mergeBase);
+      const repoDiff = await (0,lib_diff/* collectRepoDiff */.KD)(repoRoot, mergeBase);
 
       const dispatcher = new SkillDispatcher(repoRoot);
 

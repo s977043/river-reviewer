@@ -46,7 +46,7 @@ describe('runReviewPlan — guards (#802 Phase 3)', () => {
 });
 
 describe('runReviewPlan — output (#802 Phase 3)', () => {
-  test('emits a schema-valid Review Artifact (version "1")', async () => {
+  test('no diff artifact → schema-valid no-changes artifact (version "1")', async () => {
     const artifact = await runReviewPlan({
       planOnly: true,
       phase: 'upstream',
@@ -57,11 +57,75 @@ describe('runReviewPlan — output (#802 Phase 3)', () => {
     assert.equal(validate(artifact), true, JSON.stringify(validate.errors));
     assert.equal(artifact.version, '1');
     assert.equal(artifact.phase, 'upstream');
-    assert.equal(artifact.status, 'ok');
+    assert.equal(artifact.status, 'no-changes');
     assert.deepEqual(artifact.findings, []);
     assert.equal(artifact.plan.plannerMode, 'off');
     assert.deepEqual(artifact.plan.selectedSkills, []);
     assert.equal('debug' in artifact, false);
+  });
+
+  test('resolved diff artifact → deterministic skill selection (status ok), no LLM', async () => {
+    let planArgs;
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      phase: 'midstream',
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: async () => ({
+        diff: { id: 'diff', path: '/repo/d.patch', source: 'cwd', exists: true, optional: true },
+      }),
+      readFileImpl: async () => '+++ b/src/foo.mjs\n@@ -0,0 +1 @@\n+x\n',
+      buildExecutionPlanImpl: async (args) => {
+        planArgs = args;
+        return {
+          selected: [
+            {
+              metadata: { id: 's1', name: 'Skill One', phase: 'midstream', modelHint: 'balanced' },
+            },
+          ],
+          skipped: [
+            { skill: { metadata: { id: 's2', name: 'Skill Two' } }, reasons: ['phase mismatch'] },
+          ],
+        };
+      },
+    });
+    assert.equal(validate(artifact), true, JSON.stringify(validate.errors));
+    assert.equal(artifact.status, 'ok');
+    assert.deepEqual(artifact.plan.selectedSkills, [
+      { id: 's1', name: 'Skill One', phase: 'midstream', modelHint: 'balanced' },
+    ]);
+    assert.deepEqual(artifact.plan.skippedSkills, [{ id: 's2', reasons: ['phase mismatch'] }]);
+    assert.equal(artifact.plan.plannerMode, 'off');
+    // Hard guarantee: no LLM path (planner undefined, dryRun, llm disabled).
+    assert.equal(planArgs.planner, undefined);
+    assert.equal(planArgs.dryRun, true);
+    assert.equal(planArgs.llmEnabled, false);
+    assert.equal(planArgs.plannerMode, 'off');
+    assert.deepEqual(planArgs.changedFiles, ['src/foo.mjs']);
+  });
+
+  test('wraps buildExecutionPlan failure as ReviewPlanError', async () => {
+    await assert.rejects(
+      () =>
+        runReviewPlan({
+          planOnly: true,
+          loadConfigImpl: okConfig,
+          resolveAllArtifactsImpl: async () => ({
+            diff: {
+              id: 'diff',
+              path: '/repo/d.patch',
+              source: 'cwd',
+              exists: true,
+              optional: true,
+            },
+          }),
+          readFileImpl: async () => 'diff --git a/x b/x\n',
+          buildExecutionPlanImpl: async () => {
+            throw new Error('skill load boom');
+          },
+        }),
+      (err) => err instanceof ReviewPlanError && /skill load boom/.test(err.message)
+    );
   });
 
   test('attaches resolved artifacts under debug only when debug is set (still schema-valid)', async () => {

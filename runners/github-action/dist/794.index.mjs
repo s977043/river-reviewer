@@ -14,10 +14,10 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: external "node:path"
 var external_node_path_ = __webpack_require__(6760);
-// EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
-var loader = __webpack_require__(3833);
 // EXTERNAL MODULE: external "node:fs/promises"
 var promises_ = __webpack_require__(1455);
+// EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
+var loader = __webpack_require__(3833);
 ;// CONCATENATED MODULE: ./src/config/artifact-resolver.mjs
 /**
  * Artifact Input resolver — #802 Phase 2b
@@ -183,27 +183,38 @@ async function _fileExists(filePath, fsImpl) {
   }
 }
 
+// EXTERNAL MODULE: ./src/lib/diff.mjs
+var diff = __webpack_require__(4382);
+// EXTERNAL MODULE: ./runners/core/review-runner.mjs + 5 modules
+var review_runner = __webpack_require__(4584);
 // EXTERNAL MODULE: ./src/lib/planner-utils.mjs
 var planner_utils = __webpack_require__(1013);
 ;// CONCATENATED MODULE: ./src/lib/review-plan.mjs
 /**
- * `river review plan` core — #802 Phase 3 (slice 1)
+ * `river review plan` core — #802 Phase 3 (slices 1 + B-1)
  *
- * Scope: wire the artifact resolver into the main CLI's public
- * `river review plan --plan-only` entrypoint and emit a schema-valid
- * Review Artifact. Skill/planner execution, `exec`/`verify`, the
- * `--output`/`--format` contract unification, and the
- * PLANGATE_REVIEW_CLI_READY workflow flag are intentionally out of scope
- * for this slice.
+ * Scope: the public `river review plan --plan-only` entrypoint resolves
+ * input artifacts (slice 1) and now also computes a deterministic skill
+ * selection plan from the resolved `diff` artifact (B-1).
+ *
+ * Out of scope (later slices, design-gated): actual skill EXECUTION
+ * (findings stay []), the LLM-backed planner modes (`--planner
+ * order/prune`), `exec`/`verify`, the `--output`/`--format` contract
+ * unification, the PLANGATE_REVIEW_CLI_READY flag, and a stable
+ * `context.artifacts` field (deferred to a v2 schema per the versioning
+ * policy embedded in review-artifact.schema.json).
  *
  * The emitted artifact conforms to schemas/review-artifact.schema.json
  * version "1". Resolved artifact paths are only attached under `debug`
- * (free-form, additionalProperties:true) and only when `debug` is set —
- * consistent with cli-review-plan-spec.md. A stable `context.artifacts`
- * field is deferred to a v2 schema per the versioning policy embedded in
- * review-artifact.schema.json.
+ * (free-form) and only when `debug` is set, consistent with
+ * cli-review-plan-spec.md.
  *
- * Pure-ish module: config loader and resolver are injectable for tests.
+ * Skill selection reuses parseUnifiedDiff + buildExecutionPlan (the same
+ * path tests/planner-dataset eval uses) with planner:undefined /
+ * dryRun:true / llmEnabled:false, so no LLM call is ever made here.
+ *
+ * Pure-ish module: config loader, resolver, buildExecutionPlan and the
+ * diff reader are injectable for tests.
  */
 
 
@@ -212,7 +223,11 @@ var planner_utils = __webpack_require__(1013);
 
 
 
+
+
+
 const VALID_PHASES = new Set(planner_utils/* PHASES */.ZG);
+const MODEL_HINTS = new Set(['cheap', 'balanced', 'high-accuracy']);
 
 /** Raised for argument/config errors that map to CLI exit code 3. */
 class ReviewPlanError extends Error {
@@ -220,6 +235,20 @@ class ReviewPlanError extends Error {
     super(message);
     this.name = 'ReviewPlanError';
   }
+}
+
+/** skill objects carry their fields under `.metadata` (or inline). */
+function meta(skill) {
+  return skill?.metadata ?? skill ?? {};
+}
+
+/** Project a selected skill onto the schema's selectedSkills item shape. */
+function toSelectedView(skill) {
+  const m = meta(skill);
+  const view = { id: String(m.id ?? ''), name: String(m.name ?? m.id ?? '') };
+  if (VALID_PHASES.has(m.phase)) view.phase = m.phase;
+  if (MODEL_HINTS.has(m.modelHint)) view.modelHint = m.modelHint;
+  return view;
 }
 
 /**
@@ -236,6 +265,8 @@ class ReviewPlanError extends Error {
  * @param {() => string} [opts.now] - timestamp factory (ISO 8601)
  * @param {(repoRoot: string) => Promise<object>} [opts.loadConfigImpl]
  * @param {Function} [opts.resolveAllArtifactsImpl]
+ * @param {Function} [opts.buildExecutionPlanImpl]
+ * @param {(p: string) => Promise<string>} [opts.readFileImpl]
  * @returns {Promise<object>} Review Artifact (schema version "1")
  */
 async function runReviewPlan({
@@ -248,10 +279,12 @@ async function runReviewPlan({
   now = () => new Date().toISOString(),
   loadConfigImpl = loader/* loadConfig */.Z9,
   resolveAllArtifactsImpl = resolveAllArtifacts,
+  buildExecutionPlanImpl = review_runner/* buildExecutionPlan */.kN,
+  readFileImpl = (p) => (0,promises_.readFile)(p, 'utf8'),
 } = {}) {
   if (!planOnly) {
     throw new ReviewPlanError(
-      'river review plan currently supports only --plan-only (Phase 3 slice 1). ' +
+      'river review plan currently supports only --plan-only (Phase 3). ' +
         'Skill execution is not yet wired.'
     );
   }
@@ -285,12 +318,46 @@ async function runReviewPlan({
     phase,
     status: 'ok',
     findings: [],
-    plan: {
-      plannerMode: 'off',
-      selectedSkills: [],
-      skippedSkills: [],
-    },
+    plan: { plannerMode: 'off', selectedSkills: [], skippedSkills: [] },
   };
+
+  const diffRes = resolved?.diff;
+  if (diffRes?.exists && diffRes.path) {
+    let diffText;
+    try {
+      diffText = await readFileImpl(diffRes.path);
+    } catch (err) {
+      throw new ReviewPlanError(`Failed to read diff artifact: ${err.message}`);
+    }
+    const changedFiles = (0,diff/* deriveChangedFiles */.dc)(diffText);
+
+    let plan;
+    try {
+      plan = await buildExecutionPlanImpl({
+        phase,
+        changedFiles,
+        diffText,
+        plannerMode: 'off',
+        planner: undefined,
+        dryRun: true,
+        llmEnabled: false,
+        repoRoot: cwd,
+        riskMap: undefined,
+      });
+    } catch (err) {
+      throw new ReviewPlanError(`Failed to build execution plan: ${err.message}`);
+    }
+
+    artifact.plan.selectedSkills = (plan.selected ?? []).map(toSelectedView);
+    artifact.plan.skippedSkills = (plan.skipped ?? []).map((s) => ({
+      id: String(meta(s.skill).id ?? ''),
+      reasons: Array.isArray(s.reasons) ? s.reasons.map(String) : [],
+    }));
+  } else {
+    // No diff artifact resolved and no git fallback in this slice:
+    // per cli-review-plan-spec.md this is a no-op review, not an error.
+    artifact.status = 'no-changes';
+  }
 
   if (debug) {
     artifact.debug = { resolvedArtifacts: resolved };
