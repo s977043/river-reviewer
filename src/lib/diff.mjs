@@ -79,6 +79,18 @@ export function parseUnifiedDiff(diffText) {
   return { files };
 }
 
+/**
+ * Derive the list of changed file paths from unified diff text,
+ * excluding deletions (/dev/null).
+ * @param {string} diffText
+ * @returns {string[]}
+ */
+export function deriveChangedFiles(diffText) {
+  const parsed = parseUnifiedDiff(diffText);
+  const files = parsed.files?.map((f) => f.path).filter(Boolean) ?? [];
+  return files.filter((p) => p !== '/dev/null');
+}
+
 export async function collectRepoDiff(repoRoot, baseRef, { contextLines = 3 } = {}) {
   const changedFiles = await listChangedFiles(repoRoot, baseRef);
   if (!changedFiles.length) {
@@ -97,7 +109,7 @@ export async function collectRepoDiff(repoRoot, baseRef, { contextLines = 3 } = 
   const parsed = parseUnifiedDiff(rawDiffText);
   const files = parsed.files.length
     ? parsed.files
-    : changedFiles.map(file => ({
+    : changedFiles.map((file) => ({
         path: file,
         hunks: [],
         addedLines: [],

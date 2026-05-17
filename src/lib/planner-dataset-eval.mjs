@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { parseUnifiedDiff } from './diff.mjs';
+import { deriveChangedFiles } from './diff.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import { buildExecutionPlan } from '../../runners/core/review-runner.mjs';
 
@@ -17,12 +17,6 @@ function hasExcludedTag(skill, excludedTags) {
 function ensureArray(value) {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
-}
-
-function deriveChangedFiles(diffText) {
-  const parsed = parseUnifiedDiff(diffText);
-  const files = parsed.files?.map((f) => f.path).filter(Boolean) ?? [];
-  return files.filter((p) => p !== '/dev/null');
 }
 
 export async function evaluatePlannerDataset({
