@@ -94,7 +94,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.0.5",
     "markdownlint-cli": "^0.48.0",
-    "prettier": "^3.8.1",
+    "prettier": "^3.8.3",
     "prh": "^6.0.6",
     "textlint": "^15.6.0",
     "textlint-rule-preset-ja-technical-writing": "^12.0.2",
