@@ -308,3 +308,35 @@ test('parseArgs: suppression add silently drops non-positive --pr', () => {
   ]);
   assert.equal(parsed.suppressionPrNumber, null);
 });
+
+// --- #802 Phase 3: review plan flags ---
+
+test('parseArgs: review plan with --summary-file and --quiet', () => {
+  const parsed = parseArgs([
+    'review',
+    'plan',
+    '--plan-only',
+    '--output-file',
+    'a.json',
+    '--summary-file',
+    's.md',
+    '--quiet',
+  ]);
+  assert.equal(parsed.command, 'review');
+  assert.equal(parsed.reviewSubcommand, 'plan');
+  assert.equal(parsed.planOnly, true);
+  assert.equal(parsed.outputFile, 'a.json');
+  assert.equal(parsed.summaryFile, 's.md');
+  assert.equal(parsed.quiet, true);
+});
+
+test('parseArgs: --summary-file requires a value', () => {
+  const parsed = parseArgs(['review', 'plan', '--summary-file']);
+  assert.equal(parsed.command, 'help');
+});
+
+test('parseArgs: review plan defaults (no summary, not quiet)', () => {
+  const parsed = parseArgs(['review', 'plan', '--plan-only']);
+  assert.equal(parsed.summaryFile, null);
+  assert.equal(parsed.quiet, false);
+});
