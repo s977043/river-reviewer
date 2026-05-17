@@ -6,6 +6,11 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule: { interval: 'weekly' }
+    groups:
+      react:
+        patterns:
+          - 'react'
+          - 'react-dom'
   - package-ecosystem: 'pip'
     directory: '/'
     schedule: { interval: 'weekly' }
