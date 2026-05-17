@@ -143,6 +143,46 @@ export const contextConfigSchema = z
   })
   .strict();
 
+// --- #802 Phase 2a: artifacts.* schema ---
+//
+// Pure schema addition: this PR only teaches the loader to accept and
+// validate the `artifacts.*` config section. The keys are not yet read
+// by the review pipeline; the artifact resolver (Phase 2b) and the
+// `river review plan/exec/verify` CLI vertical slice (Phase 3) plumb
+// these into the resolution order documented in
+// pages/reference/artifact-input-contract.md (CLI/Action args -> config
+// -> cwd default filenames).
+//
+// The known artifact IDs mirror the Artifact Input Contract. `.catchall`
+// (not `.strict`) is intentional: the contract treats adding a new
+// artifact ID as a backward-compatible minor bump, so a config naming a
+// future artifact ID must not fail validation against an older schema.
+export const artifactPathConfigSchema = z.union([
+  z.string().min(1),
+  z
+    .object({
+      path: z.string().min(1),
+      optional: z.boolean().optional(),
+    })
+    .strict(),
+]);
+
+export const artifactsConfigSchema = z
+  .object({
+    'pbi-input': artifactPathConfigSchema.optional(),
+    plan: artifactPathConfigSchema.optional(),
+    todo: artifactPathConfigSchema.optional(),
+    'test-cases': artifactPathConfigSchema.optional(),
+    'review-self': artifactPathConfigSchema.optional(),
+    'review-external': artifactPathConfigSchema.optional(),
+    diff: artifactPathConfigSchema.optional(),
+    junit: artifactPathConfigSchema.optional(),
+    coverage: artifactPathConfigSchema.optional(),
+    lint: artifactPathConfigSchema.optional(),
+    typecheck: artifactPathConfigSchema.optional(),
+  })
+  .catchall(z.unknown());
+
 export const riverReviewerConfigSchema = z.object({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
@@ -150,6 +190,7 @@ export const riverReviewerConfigSchema = z.object({
   security: securityConfigSchema.optional(),
   memory: memoryConfigSchema.optional(),
   context: contextConfigSchema.optional(),
+  artifacts: artifactsConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -176,12 +217,10 @@ export const KnownAIModels = z.enum([
 
 export const AIModelSchema = z.union([
   KnownAIModels,
-  z
-    .string()
-    .regex(/^(gemini|gpt|o1|claude)-[a-z0-9.\-_]+$/i, {
-      message:
-        'modelName must be a known model or match a supported provider prefix (gemini-* / gpt-* / o1-* / claude-*)',
-    }),
+  z.string().regex(/^(gemini|gpt|o1|claude)-[a-z0-9.\-_]+$/i, {
+    message:
+      'modelName must be a known model or match a supported provider prefix (gemini-* / gpt-* / o1-* / claude-*)',
+  }),
 ]);
 
 export const RuleSchema = z.object({
@@ -218,6 +257,7 @@ export const ConfigSchema = z
     security: securityConfigSchema.optional(),
     memory: memoryConfigSchema.optional(),
     context: contextConfigSchema.optional(),
+    artifacts: artifactsConfigSchema.optional(),
     skills: z.array(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings

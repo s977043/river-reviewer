@@ -20,6 +20,8 @@ import {
   redactCategoriesSchema,
   redactConfigSchema,
   securityConfigSchema,
+  artifactPathConfigSchema,
+  artifactsConfigSchema,
 } from '../src/config/schema.mjs';
 
 import { RiskActionSchema, RiskRuleSchema, RiskMapSchema } from '../src/config/risk-map-schema.mjs';
@@ -162,6 +164,18 @@ describe('riverReviewerConfigSchema', () => {
       false
     );
   });
+
+  test('accepts artifacts block (#802 Phase 2a)', () => {
+    const result = riverReviewerConfigSchema.safeParse({
+      artifacts: {
+        'pbi-input': './docs/working/TASK-1/pbi-input.md',
+        plan: { path: './docs/working/TASK-1/plan.md' },
+        diff: { path: './artifacts/diff.patch', optional: false },
+        'review-self': { path: './review-self.md', optional: true },
+      },
+    });
+    assert.ok(result.success, JSON.stringify(result.error?.format()));
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -290,10 +304,7 @@ describe('AIModelSchema (hybrid enum + prefix regex)', () => {
       'claude-sonnet-5-1',
       'claude-haiku-4-5-20260101',
     ]) {
-      assert.ok(
-        AIModelSchema.safeParse(model).success,
-        `should accept future model ${model}`,
-      );
+      assert.ok(AIModelSchema.safeParse(model).success, `should accept future model ${model}`);
     }
   });
 
@@ -323,6 +334,59 @@ describe('RuleSchema', () => {
   });
 });
 
+describe('artifactsConfigSchema (#802 Phase 2a)', () => {
+  test('accepts string path form', () => {
+    assert.ok(artifactPathConfigSchema.safeParse('./plan.md').success);
+  });
+
+  test('accepts object form with optional flag', () => {
+    assert.ok(artifactPathConfigSchema.safeParse({ path: './plan.md', optional: true }).success);
+  });
+
+  test('rejects empty path', () => {
+    assert.ok(!artifactPathConfigSchema.safeParse('').success);
+    assert.ok(!artifactPathConfigSchema.safeParse({ path: '' }).success);
+  });
+
+  test('rejects unknown keys inside the object form (.strict)', () => {
+    assert.ok(!artifactPathConfigSchema.safeParse({ path: './x.md', extra: 1 }).success);
+  });
+
+  test('accepts all known artifact IDs', () => {
+    const result = artifactsConfigSchema.safeParse({
+      'pbi-input': './pbi-input.md',
+      plan: './plan.md',
+      todo: './todo.md',
+      'test-cases': './test-cases.md',
+      'review-self': './review-self.md',
+      'review-external': './review-external.md',
+      diff: './diff.patch',
+      junit: './junit.xml',
+      coverage: './coverage.xml',
+      lint: './lint.json',
+      typecheck: './typecheck.txt',
+    });
+    assert.ok(result.success, JSON.stringify(result.error?.format()));
+  });
+
+  test('accepts empty object (all optional)', () => {
+    assert.ok(artifactsConfigSchema.safeParse({}).success);
+  });
+
+  test('allows unknown artifact IDs (catchall: contract treats new IDs as a backward-compatible minor bump)', () => {
+    const result = artifactsConfigSchema.safeParse({
+      plan: './plan.md',
+      'future-artifact': './future.md',
+    });
+    assert.ok(result.success, JSON.stringify(result.error?.format()));
+  });
+
+  test('rejects an invalid value for a known artifact ID', () => {
+    assert.ok(!artifactsConfigSchema.safeParse({ plan: 123 }).success);
+    assert.ok(!artifactsConfigSchema.safeParse({ plan: { optional: true } }).success);
+  });
+});
+
 describe('ConfigSchema', () => {
   test('accepts minimal config with defaults', () => {
     const result = ConfigSchema.safeParse({});
@@ -335,6 +399,13 @@ describe('ConfigSchema', () => {
     const result = ConfigSchema.safeParse({ customField: 'value' });
     assert.ok(result.success);
     assert.equal(result.data.customField, 'value');
+  });
+
+  test('accepts artifacts block (#802 Phase 2a)', () => {
+    const result = ConfigSchema.safeParse({
+      artifacts: { plan: './plan.md', diff: { path: './diff.patch', optional: false } },
+    });
+    assert.ok(result.success, JSON.stringify(result.error?.format()));
   });
 });
 
