@@ -365,6 +365,7 @@ describe('artifactsConfigSchema (#802 Phase 2a)', () => {
       coverage: './coverage.xml',
       lint: './lint.json',
       typecheck: './typecheck.txt',
+      'findings-pool': './findings-pool.json',
     });
     assert.ok(result.success, JSON.stringify(result.error?.format()));
   });

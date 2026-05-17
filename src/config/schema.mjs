@@ -180,6 +180,7 @@ export const artifactsConfigSchema = z
     coverage: artifactPathConfigSchema.optional(),
     lint: artifactPathConfigSchema.optional(),
     typecheck: artifactPathConfigSchema.optional(),
+    'findings-pool': artifactPathConfigSchema.optional(),
   })
   .catchall(z.unknown());
 

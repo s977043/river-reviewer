@@ -18,17 +18,18 @@ import fs from 'node:fs/promises';
 
 /** @type {Readonly<Record<string, string>>} */
 export const CWD_DEFAULTS = Object.freeze({
-  'pbi-input':       'pbi-input.md',
-  plan:              'plan.md',
-  todo:              'todo.md',
-  'test-cases':      'test-cases.md',
-  'review-self':     'review-self.md',
+  'pbi-input': 'pbi-input.md',
+  plan: 'plan.md',
+  todo: 'todo.md',
+  'test-cases': 'test-cases.md',
+  'review-self': 'review-self.md',
   'review-external': 'review-external.md',
-  diff:              'diff.patch',
-  junit:             'junit.xml',
-  coverage:          'coverage.xml',
-  lint:              'lint.json',
-  typecheck:         'typecheck.txt',
+  diff: 'diff.patch',
+  junit: 'junit.xml',
+  coverage: 'coverage.xml',
+  lint: 'lint.json',
+  typecheck: 'typecheck.txt',
+  'findings-pool': 'findings-pool.json',
 });
 
 /**
@@ -96,7 +97,16 @@ export async function resolveArtifact({
 }
 
 /**
- * Resolve all known artifact IDs in parallel.
+ * Resolve all artifact IDs in parallel.
+ *
+ * The ID set is the union of the contract's known IDs (CWD_DEFAULTS) plus
+ * any IDs explicitly named via cliArgs or configArtifacts. Explicitly
+ * named IDs are never silently dropped — this keeps the resolver
+ * consistent with the Phase 2a schema, which accepts unknown artifact
+ * keys via `.catchall` so the contract can add IDs in a
+ * backward-compatible minor bump. cwd-default lookup still only applies
+ * to known IDs (CWD_DEFAULTS); an unknown ID resolves only if supplied
+ * via CLI/config, otherwise it reports path:null/source:null.
  *
  * @param {object} [opts]
  * @param {Record<string,string>} [opts.cliArgs]
@@ -113,8 +123,13 @@ export async function resolveAllArtifacts({
   cwd,
   fsImpl,
 } = {}) {
+  const ids = new Set([
+    ...Object.keys(CWD_DEFAULTS),
+    ...Object.keys(cliArgs),
+    ...Object.keys(configArtifacts),
+  ]);
   const entries = await Promise.all(
-    Object.keys(CWD_DEFAULTS).map(id =>
+    [...ids].map((id) =>
       resolveArtifact({
         id,
         cliArg: cliArgs[id] ?? null,
@@ -122,8 +137,8 @@ export async function resolveAllArtifacts({
         configDir,
         cwd,
         fsImpl,
-      }).then(r => [id, r]),
-    ),
+      }).then((r) => [id, r])
+    )
   );
   return Object.fromEntries(entries);
 }

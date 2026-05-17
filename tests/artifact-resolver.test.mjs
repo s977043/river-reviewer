@@ -12,7 +12,7 @@ import {
 // Stub fs factory: files listed in 'existing' are accessible, others reject
 // ---------------------------------------------------------------------------
 function makeFsStub(existing = []) {
-  const set = new Set(existing.map(p => path.resolve(p)));
+  const set = new Set(existing.map((p) => path.resolve(p)));
   return {
     access(p) {
       return set.has(path.resolve(p))
@@ -27,20 +27,31 @@ const CFG_DIR = '/repo/cfg';
 
 // ---------------------------------------------------------------------------
 describe('CWD_DEFAULTS', () => {
-  test('exports all 11 canonical artifact IDs', () => {
+  test('exports all 12 canonical artifact IDs from the contract', () => {
     const ids = Object.keys(CWD_DEFAULTS);
-    assert.equal(ids.length, 11);
+    assert.equal(ids.length, 12);
     for (const id of [
-      'pbi-input', 'plan', 'todo', 'test-cases', 'review-self',
-      'review-external', 'diff', 'junit', 'coverage', 'lint', 'typecheck',
+      'pbi-input',
+      'plan',
+      'todo',
+      'test-cases',
+      'review-self',
+      'review-external',
+      'diff',
+      'junit',
+      'coverage',
+      'lint',
+      'typecheck',
+      'findings-pool',
     ]) {
       assert.ok(id in CWD_DEFAULTS, id + ' missing from CWD_DEFAULTS');
     }
   });
 
-  test('diff default is diff.patch, junit is junit.xml', () => {
+  test('diff default is diff.patch, junit is junit.xml, findings-pool is findings-pool.json', () => {
     assert.equal(CWD_DEFAULTS.diff, 'diff.patch');
     assert.equal(CWD_DEFAULTS.junit, 'junit.xml');
+    assert.equal(CWD_DEFAULTS['findings-pool'], 'findings-pool.json');
   });
 });
 
@@ -64,7 +75,13 @@ describe('resolveArtifact — Tier 1: CLI arg', () => {
 
   test('CLI resolves path relative to cwd, not configDir', async () => {
     const fsImpl = makeFsStub(['/repo/my-plan.md']);
-    const r = await resolveArtifact({ id: 'plan', cliArg: 'my-plan.md', cwd: CWD, configDir: CFG_DIR, fsImpl });
+    const r = await resolveArtifact({
+      id: 'plan',
+      cliArg: 'my-plan.md',
+      cwd: CWD,
+      configDir: CFG_DIR,
+      fsImpl,
+    });
     assert.equal(r.path, '/repo/my-plan.md');
   });
 });
@@ -73,7 +90,13 @@ describe('resolveArtifact — Tier 1: CLI arg', () => {
 describe('resolveArtifact — Tier 2: config (string form)', () => {
   test('returns config source when configValue is a string and file exists', async () => {
     const fsImpl = makeFsStub(['/repo/cfg/plan.md']);
-    const r = await resolveArtifact({ id: 'plan', configValue: 'plan.md', configDir: CFG_DIR, cwd: CWD, fsImpl });
+    const r = await resolveArtifact({
+      id: 'plan',
+      configValue: 'plan.md',
+      configDir: CFG_DIR,
+      cwd: CWD,
+      fsImpl,
+    });
     assert.equal(r.source, 'config');
     assert.equal(r.path, '/repo/cfg/plan.md');
     assert.equal(r.exists, true);
@@ -82,7 +105,13 @@ describe('resolveArtifact — Tier 2: config (string form)', () => {
 
   test('config path is resolved relative to configDir', async () => {
     const fsImpl = makeFsStub(['/repo/cfg/sub/plan.md']);
-    const r = await resolveArtifact({ id: 'plan', configValue: 'sub/plan.md', configDir: CFG_DIR, cwd: CWD, fsImpl });
+    const r = await resolveArtifact({
+      id: 'plan',
+      configValue: 'sub/plan.md',
+      configDir: CFG_DIR,
+      cwd: CWD,
+      fsImpl,
+    });
     assert.equal(r.path, '/repo/cfg/sub/plan.md');
   });
 
@@ -97,20 +126,38 @@ describe('resolveArtifact — Tier 2: config (string form)', () => {
 describe('resolveArtifact — Tier 2: config (object form)', () => {
   test('accepts object form with optional:true', async () => {
     const fsImpl = makeFsStub(['/repo/cfg/plan.md']);
-    const r = await resolveArtifact({ id: 'plan', configValue: { path: 'plan.md', optional: true }, configDir: CFG_DIR, cwd: CWD, fsImpl });
+    const r = await resolveArtifact({
+      id: 'plan',
+      configValue: { path: 'plan.md', optional: true },
+      configDir: CFG_DIR,
+      cwd: CWD,
+      fsImpl,
+    });
     assert.equal(r.source, 'config');
     assert.equal(r.optional, true);
   });
 
   test('accepts object form with optional:false', async () => {
     const fsImpl = makeFsStub(['/repo/cfg/plan.md']);
-    const r = await resolveArtifact({ id: 'plan', configValue: { path: 'plan.md', optional: false }, configDir: CFG_DIR, cwd: CWD, fsImpl });
+    const r = await resolveArtifact({
+      id: 'plan',
+      configValue: { path: 'plan.md', optional: false },
+      configDir: CFG_DIR,
+      cwd: CWD,
+      fsImpl,
+    });
     assert.equal(r.optional, false);
   });
 
   test('config object reports exists=false when file absent', async () => {
     const fsImpl = makeFsStub([]);
-    const r = await resolveArtifact({ id: 'plan', configValue: { path: 'plan.md', optional: true }, configDir: CFG_DIR, cwd: CWD, fsImpl });
+    const r = await resolveArtifact({
+      id: 'plan',
+      configValue: { path: 'plan.md', optional: true },
+      configDir: CFG_DIR,
+      cwd: CWD,
+      fsImpl,
+    });
     assert.equal(r.exists, false);
     assert.equal(r.source, 'config');
   });
@@ -142,8 +189,12 @@ describe('resolveArtifact — priority order', () => {
   test('CLI wins over config and cwd', async () => {
     const fsImpl = makeFsStub(['/repo/cli.md', '/repo/cfg/cfg.md', '/repo/plan.md']);
     const r = await resolveArtifact({
-      id: 'plan', cliArg: 'cli.md', configValue: 'cfg/cfg.md',
-      configDir: CFG_DIR, cwd: CWD, fsImpl,
+      id: 'plan',
+      cliArg: 'cli.md',
+      configValue: 'cfg/cfg.md',
+      configDir: CFG_DIR,
+      cwd: CWD,
+      fsImpl,
     });
     assert.equal(r.source, 'cli');
     assert.equal(r.path, '/repo/cli.md');
@@ -152,7 +203,11 @@ describe('resolveArtifact — priority order', () => {
   test('config wins over cwd when CLI not provided', async () => {
     const fsImpl = makeFsStub(['/repo/cfg/cfg-plan.md', '/repo/plan.md']);
     const r = await resolveArtifact({
-      id: 'plan', configValue: 'cfg-plan.md', configDir: CFG_DIR, cwd: CWD, fsImpl,
+      id: 'plan',
+      configValue: 'cfg-plan.md',
+      configDir: CFG_DIR,
+      cwd: CWD,
+      fsImpl,
     });
     assert.equal(r.source, 'config');
     assert.equal(r.path, '/repo/cfg/cfg-plan.md');
@@ -161,12 +216,13 @@ describe('resolveArtifact — priority order', () => {
 
 // ---------------------------------------------------------------------------
 describe('resolveAllArtifacts', () => {
-  test('returns a record with all 11 known IDs', async () => {
+  test('returns a record with all 12 known IDs', async () => {
     const fsImpl = makeFsStub([]);
     const result = await resolveAllArtifacts({ cwd: CWD, fsImpl });
-    assert.equal(Object.keys(result).length, 11);
+    assert.equal(Object.keys(result).length, 12);
     assert.ok('plan' in result);
     assert.ok('typecheck' in result);
+    assert.ok('findings-pool' in result);
   });
 
   test('mixes CLI + config + cwd across IDs correctly', async () => {
@@ -184,12 +240,35 @@ describe('resolveAllArtifacts', () => {
     assert.equal(result.diff.source, null);
   });
 
-  test('unknown artifact IDs from config are ignored (not in CWD_DEFAULTS)', async () => {
-    const fsImpl = makeFsStub([]);
+  test('explicitly configured unknown artifact IDs are resolved, not dropped (union with .catchall schema)', async () => {
+    const fsImpl = makeFsStub(['/repo/cfg/future.md']);
     const result = await resolveAllArtifacts({
       configArtifacts: { 'future-artifact': './future.md' },
-      cwd: CWD, fsImpl,
+      configDir: CFG_DIR,
+      cwd: CWD,
+      fsImpl,
     });
+    assert.ok('future-artifact' in result);
+    assert.equal(result['future-artifact'].source, 'config');
+    assert.equal(result['future-artifact'].path, '/repo/cfg/future.md');
+    assert.equal(result['future-artifact'].exists, true);
+  });
+
+  test('explicitly named unknown ID via CLI is resolved (no cwd-default fallback applied)', async () => {
+    const fsImpl = makeFsStub([]);
+    const result = await resolveAllArtifacts({
+      cliArgs: { 'future-artifact': 'future.md' },
+      cwd: CWD,
+      fsImpl,
+    });
+    assert.ok('future-artifact' in result);
+    assert.equal(result['future-artifact'].source, 'cli');
+    assert.equal(result['future-artifact'].exists, false);
+  });
+
+  test('unknown ID not named anywhere is absent (no cwd default for it)', async () => {
+    const fsImpl = makeFsStub([]);
+    const result = await resolveAllArtifacts({ cwd: CWD, fsImpl });
     assert.ok(!('future-artifact' in result));
   });
 });
