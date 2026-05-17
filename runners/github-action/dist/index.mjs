@@ -33982,7 +33982,7 @@ function applySuppressions(findings, memoryContext, opts = {}) {
 
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
-  if (['upstream', 'midstream', 'downstream'].includes(normalized)) return normalized;
+  if (planner_utils/* PHASES */.ZG.includes(normalized)) return normalized;
   return 'midstream';
 }
 
