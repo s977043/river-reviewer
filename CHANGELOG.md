@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.47.0](https://github.com/s977043/river-reviewer/compare/v0.46.0...v0.47.0) (2026-05-17)
+
+
+### Features
+
+* **cli:** --summary-file and --quiet for river review plan ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3) ([#849](https://github.com/s977043/river-reviewer/issues/849)) ([9ec7460](https://github.com/s977043/river-reviewer/commit/9ec7460cb6857eea8217c7cff8b5dca6c8721a3b))
+
 ## [0.46.0](https://github.com/s977043/river-reviewer/compare/v0.45.0...v0.46.0) (2026-05-17)
 
 
