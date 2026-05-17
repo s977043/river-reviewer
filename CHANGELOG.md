@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.44.0](https://github.com/s977043/river-reviewer/compare/v0.43.0...v0.44.0) (2026-05-17)
+
+
+### Features
+
+* **config:** artifact resolver + findings-pool 整合 ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 2b) ([#838](https://github.com/s977043/river-reviewer/issues/838)) ([e18b4e2](https://github.com/s977043/river-reviewer/commit/e18b4e264468950eae2d99713af57d4b071648e7))
+* **config:** artifacts.* 設定スキーマ追加 ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 2a) ([#835](https://github.com/s977043/river-reviewer/issues/835)) ([e67960d](https://github.com/s977043/river-reviewer/commit/e67960d4364be820a7302c674847957702cb18cd))
+
 ## [0.43.0](https://github.com/s977043/river-reviewer/compare/v0.42.0...v0.43.0) (2026-05-17)
 
 
