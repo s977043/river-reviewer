@@ -2,35 +2,16 @@
 // If the index schema drifts from the v1 implementation again (see #563/#565), this test catches it.
 
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
 import test, { describe } from 'node:test';
-
-import Ajv2020 from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
 
 import { loadMemory, appendEntry, supersede, expireEntries } from '../src/lib/riverbed-memory.mjs';
 import { createTempMemory, makeMemoryEntry } from './helpers/memory.mjs';
+import { compileRiverbedIndexValidator } from './helpers/schema-validator.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const indexSchemaPath = resolve(__dirname, '..', 'schemas', 'riverbed-index.schema.json');
-const entrySchemaPath = resolve(__dirname, '..', 'schemas', 'riverbed-entry.schema.json');
-const indexSchema = JSON.parse(readFileSync(indexSchemaPath, 'utf8'));
-const entrySchema = JSON.parse(readFileSync(entrySchemaPath, 'utf8'));
-
-// Compile the schema once — ajv compile is expensive and the schemas are static.
-// strict mode stays on so future schema typos / unknown keywords surface here.
-const validate = (() => {
-  const ajv = new Ajv2020({ allErrors: true });
-  addFormats(ajv);
-  // The index schema references riverbed-entry.schema.json via relative $ref,
-  // which ajv resolves against the index schema's $id. Resolve the entry
-  // schema URL from $id so a future $id change does not silently break this.
-  const entryRefId = new URL('./riverbed-entry.schema.json', indexSchema.$id).toString();
-  ajv.addSchema(entrySchema, entryRefId);
-  return ajv.compile(indexSchema);
-})();
+// Compiled once at module scope (ajv compile is expensive, schemas are
+// static). strict mode stays on so future schema typos surface here; the
+// riverbed-entry $ref wiring lives in the shared helper.
+const validate = compileRiverbedIndexValidator();
 
 describe('riverbed-index.schema.json', () => {
   test('empty index from loadMemory conforms to schema', () => {
