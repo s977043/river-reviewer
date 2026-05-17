@@ -8,7 +8,7 @@ import { generateReview } from './review-engine.mjs';
 import { runReviewerOrchestration } from './reviewer-orchestrator.mjs';
 import { detectDefaultBranch, ensureGitRepo, findMergeBase } from './git.mjs';
 import { createOpenAIPlanner } from './openai-planner.mjs';
-import { normalizePlannerMode } from './planner-utils.mjs';
+import { normalizePlannerMode, PHASES } from './planner-utils.mjs';
 import { buildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { loadProjectRules } from './rules.mjs';
 import { loadRiskMap } from './risk-map.mjs';
@@ -21,7 +21,7 @@ import { applySuppressions } from './suppression-apply.mjs';
 
 function normalizePhase(phase) {
   const normalized = (phase || '').toLowerCase();
-  if (['upstream', 'midstream', 'downstream'].includes(normalized)) return normalized;
+  if (PHASES.includes(normalized)) return normalized;
   return 'midstream';
 }
 
