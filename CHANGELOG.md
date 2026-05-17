@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.43.0](https://github.com/s977043/river-reviewer/compare/v0.42.0...v0.43.0) (2026-05-17)
+
+
+### Features
+
+* **ai:** add Anthropic (Claude) provider to AIClientFactory ([1f4c16e](https://github.com/s977043/river-reviewer/commit/1f4c16ed5b6f829fd9e0c0e855bae340d2181aeb)), closes [#804](https://github.com/s977043/river-reviewer/issues/804)
+* **ai:** allow per-skill opt-out of Anthropic prompt caching ([032537e](https://github.com/s977043/river-reviewer/commit/032537ea012179022c967839543f50e65003f96e))
+* **ai:** capture Anthropic usage telemetry per call (Phase 1) ([24a4299](https://github.com/s977043/river-reviewer/commit/24a42996a0477667a3102ec33b4d7925943b05c4))
+* **ai:** enable Anthropic prompt caching for system prompts ([5a344ff](https://github.com/s977043/river-reviewer/commit/5a344fffcd4b62f8203586e26ec5082e9f77c1a7))
+* **ai:** finish Anthropic provider leftover hardening (3 items) ([21370aa](https://github.com/s977043/river-reviewer/commit/21370aa2ab3db8f4dd2c05654b433bf33bf695ad))
+* **ai:** harden Anthropic provider — generateReview tests, max_tokens config, retry-after ([5099da7](https://github.com/s977043/river-reviewer/commit/5099da72cdd3f3808251ca9b1fde9ba0dcff5eb9)), closes [#808](https://github.com/s977043/river-reviewer/issues/808)
+* **ai:** usage telemetry Phase 2 — OpenAI capture + JSONL persistence ([d94fcc9](https://github.com/s977043/river-reviewer/commit/d94fcc96ea3a749bef60c16cc025c330803ae72e))
+
 ## [0.42.0](https://github.com/s977043/river-reviewer/compare/v0.41.0...v0.42.0) (2026-05-07)
 
 
