@@ -85,7 +85,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.0",
+    "@commitlint/cli": "^21.0.1",
     "@commitlint/config-conventional": "^21.0.1",
     "@vercel/ncc": "^0.38.4",
     "ajv": "^8.20.0",
