@@ -77,7 +77,7 @@
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.1",
     "minimatch": "^10.1.1",
-    "openai": "^6.37.0",
+    "openai": "^6.38.0",
     "ora": "^9.4.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
