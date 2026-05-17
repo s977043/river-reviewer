@@ -1,11 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
 import test from 'node:test';
-import { fileURLToPath } from 'node:url';
-
-import Ajv2020 from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
 
 import {
   hashFinding,
@@ -16,20 +10,9 @@ import {
 } from '../src/lib/suppression.mjs';
 import { loadMemory } from '../src/lib/riverbed-memory.mjs';
 import { createTempMemory } from './helpers/memory.mjs';
+import { compileSuppressionContextValidator } from './helpers/schema-validator.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const suppressionContextSchemaPath = resolve(
-  __dirname,
-  '..',
-  'schemas',
-  'suppression-context.schema.json'
-);
-const suppressionContextSchema = JSON.parse(readFileSync(suppressionContextSchemaPath, 'utf8'));
-const validateSuppressionContext = (() => {
-  const ajv = new Ajv2020({ allErrors: true });
-  addFormats(ajv);
-  return ajv.compile(suppressionContextSchema);
-})();
+const validateSuppressionContext = compileSuppressionContextValidator();
 
 const tmpIndex = () => createTempMemory({ layout: 'nested', prefix: 'river-supp-' });
 
