@@ -29224,6 +29224,44 @@ const contextConfigSchema = schemas/* object */.Ik({
   })
   .strict();
 
+// --- #802 Phase 2a: artifacts.* schema ---
+//
+// Pure schema addition: this PR only teaches the loader to accept and
+// validate the `artifacts.*` config section. The keys are not yet read
+// by the review pipeline; the artifact resolver (Phase 2b) and the
+// `river review plan/exec/verify` CLI vertical slice (Phase 3) plumb
+// these into the resolution order documented in
+// pages/reference/artifact-input-contract.md (CLI/Action args -> config
+// -> cwd default filenames).
+//
+// The known artifact IDs mirror the Artifact Input Contract. `.catchall`
+// (not `.strict`) is intentional: the contract treats adding a new
+// artifact ID as a backward-compatible minor bump, so a config naming a
+// future artifact ID must not fail validation against an older schema.
+const artifactPathConfigSchema = schemas/* union */.KC([
+  schemas/* string */.Yj().min(1),
+  schemas/* object */.Ik({
+      path: schemas/* string */.Yj().min(1),
+      optional: schemas/* boolean */.zM().optional(),
+    })
+    .strict(),
+]);
+
+const artifactsConfigSchema = schemas/* object */.Ik({
+    'pbi-input': artifactPathConfigSchema.optional(),
+    plan: artifactPathConfigSchema.optional(),
+    todo: artifactPathConfigSchema.optional(),
+    'test-cases': artifactPathConfigSchema.optional(),
+    'review-self': artifactPathConfigSchema.optional(),
+    'review-external': artifactPathConfigSchema.optional(),
+    diff: artifactPathConfigSchema.optional(),
+    junit: artifactPathConfigSchema.optional(),
+    coverage: artifactPathConfigSchema.optional(),
+    lint: artifactPathConfigSchema.optional(),
+    typecheck: artifactPathConfigSchema.optional(),
+  })
+  .catchall(schemas/* unknown */.L5());
+
 const riverReviewerConfigSchema = schemas/* object */.Ik({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
@@ -29231,6 +29269,7 @@ const riverReviewerConfigSchema = schemas/* object */.Ik({
   security: securityConfigSchema.optional(),
   memory: memoryConfigSchema.optional(),
   context: contextConfigSchema.optional(),
+  artifacts: artifactsConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -29257,11 +29296,10 @@ const KnownAIModels = schemas/* enum */.k5([
 
 const AIModelSchema = schemas/* union */.KC([
   KnownAIModels,
-  schemas/* string */.Yj()
-    .regex(/^(gemini|gpt|o1|claude)-[a-z0-9.\-_]+$/i, {
-      message:
-        'modelName must be a known model or match a supported provider prefix (gemini-* / gpt-* / o1-* / claude-*)',
-    }),
+  schemas/* string */.Yj().regex(/^(gemini|gpt|o1|claude)-[a-z0-9.\-_]+$/i, {
+    message:
+      'modelName must be a known model or match a supported provider prefix (gemini-* / gpt-* / o1-* / claude-*)',
+  }),
 ]);
 
 const RuleSchema = schemas/* object */.Ik({
@@ -29297,6 +29335,7 @@ const ConfigSchema = schemas/* object */.Ik({
     security: securityConfigSchema.optional(),
     memory: memoryConfigSchema.optional(),
     context: contextConfigSchema.optional(),
+    artifacts: artifactsConfigSchema.optional(),
     skills: schemas/* array */.YO(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
@@ -45517,7 +45556,7 @@ const values_safeJSON = (text) => {
 const sleep_sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 //# sourceMappingURL=sleep.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/version.mjs
-const version_VERSION = '6.37.0'; // x-release-please-version
+const version_VERSION = '6.38.0'; // x-release-please-version
 //# sourceMappingURL=version.mjs.map
 ;// CONCATENATED MODULE: ./node_modules/openai/internal/detect-platform.mjs
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
@@ -47139,19 +47178,22 @@ class WorkloadIdentityAuth {
     }
     async refreshToken() {
         const subjectToken = await this.config.provider.getToken();
+        const body = {
+            grant_type: TOKEN_EXCHANGE_GRANT_TYPE,
+            subject_token: subjectToken,
+            subject_token_type: SUBJECT_TOKEN_TYPES[this.config.provider.tokenType],
+            identity_provider_id: this.config.identityProviderId,
+            service_account_id: this.config.serviceAccountId,
+        };
+        if (this.config.clientId) {
+            body['client_id'] = this.config.clientId;
+        }
         const response = await this.fetch(this.tokenExchangeUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                grant_type: TOKEN_EXCHANGE_GRANT_TYPE,
-                client_id: this.config.clientId,
-                subject_token: subjectToken,
-                subject_token_type: SUBJECT_TOKEN_TYPES[this.config.provider.tokenType],
-                identity_provider_id: this.config.identityProviderId,
-                service_account_id: this.config.serviceAccountId,
-            }),
+            body: JSON.stringify(body),
         });
         if (!response.ok) {
             const errorText = await response.text();
