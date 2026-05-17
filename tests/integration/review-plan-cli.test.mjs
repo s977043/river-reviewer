@@ -152,4 +152,53 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.equal(artifact.phase, 'midstream');
     assert.equal(artifact.status, 'ok');
   });
+
+  test('--summary-file writes Markdown; JSON artifact unchanged (#802 Phase 3)', async (t) => {
+    const dir = setupRepo(t);
+    const out = join(dir, 'a.json');
+    const summary = join(dir, 's.md');
+    const result = await runCliInProcess(
+      [
+        'review',
+        'plan',
+        '--plan-only',
+        '--phase',
+        'upstream',
+        '--output-file',
+        out,
+        '--summary-file',
+        summary,
+      ],
+      { cwd: dir }
+    );
+    assert.equal(result.code, 0, result.stderr);
+    const artifact = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(validate(artifact), true, JSON.stringify(validate.errors));
+    const md = readFileSync(summary, 'utf8');
+    assert.match(md, /^# river review plan/m);
+    assert.match(md, /Status: `(ok|no-changes)`/);
+    assert.match(md, /## Selected skills \(\d+\)/);
+  });
+
+  test('--quiet still emits the JSON artifact to stdout (subprocess, exit 0)', async (t) => {
+    const dir = setupRepo(t);
+    const result = await runCliAsSubprocess(
+      ['review', 'plan', '--plan-only', '--phase', 'midstream', '--quiet'],
+      { cwd: dir }
+    );
+    assert.equal(result.code, 0, result.stderr);
+    const artifact = JSON.parse(result.stdout);
+    assert.equal(validate(artifact), true, JSON.stringify(artifact));
+  });
+
+  test('--output-file and --summary-file pointing to the same path exits 3', async (t) => {
+    const dir = setupRepo(t);
+    const same = join(dir, 'same.json');
+    const result = await runCliInProcess(
+      ['review', 'plan', '--plan-only', '--output-file', same, '--summary-file', same],
+      { cwd: dir }
+    );
+    assert.equal(result.code, 3);
+    assert.match(result.stderr, /same path/);
+  });
 });

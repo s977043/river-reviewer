@@ -56762,6 +56762,8 @@ function parseArgs(argv) {
     reviewSubcommand: null,
     planOnly: false,
     outputFile: null,
+    summaryFile: null,
+    quiet: false,
     artifactsDir: null,
     cliArtifacts: {},
   };
@@ -56856,6 +56858,20 @@ function parseArgs(argv) {
         break;
       }
       parsed.outputFile = value;
+      continue;
+    }
+    if (arg === '--summary-file') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --summary-file option requires a path.');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.summaryFile = value;
+      continue;
+    }
+    if (arg === '--quiet') {
+      parsed.quiet = true;
       continue;
     }
     if (arg === '--artifacts-dir') {
@@ -57464,12 +57480,24 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
         }
         throw err;
       }
+      const outputFilePath = parsed.outputFile ? external_node_path_.resolve(parsed.outputFile) : null;
+      const summaryFilePath = parsed.summaryFile ? external_node_path_.resolve(parsed.summaryFile) : null;
+      if (outputFilePath && summaryFilePath && outputFilePath === summaryFilePath) {
+        console.error('Error: --output-file and --summary-file must not point to the same path.');
+        return 3;
+      }
       const serialized = JSON.stringify(artifact, null, 2);
-      if (parsed.outputFile) {
-        const { writeFile } = await Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 1455, 19));
-        await writeFile(external_node_path_.resolve(parsed.outputFile), serialized + '\n', 'utf8');
+      const { writeFile } = await Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 1455, 19));
+      if (outputFilePath) {
+        await writeFile(outputFilePath, serialized + '\n', 'utf8');
       } else {
+        // JSON is the machine-readable artifact, not a progress log:
+        // --quiet does not suppress it.
         external_node_process_namespaceObject.stdout.write(serialized + '\n');
+      }
+      if (summaryFilePath) {
+        const { formatReviewPlanSummaryMarkdown } = await __nccwpck_require__.e(/* import() */ 466).then(__nccwpck_require__.bind(__nccwpck_require__, 7466));
+        await writeFile(summaryFilePath, formatReviewPlanSummaryMarkdown(artifact) + '\n', 'utf8');
       }
       return 0;
     } catch (err) {
