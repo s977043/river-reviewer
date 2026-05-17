@@ -29259,6 +29259,7 @@ const artifactsConfigSchema = schemas/* object */.Ik({
     coverage: artifactPathConfigSchema.optional(),
     lint: artifactPathConfigSchema.optional(),
     typecheck: artifactPathConfigSchema.optional(),
+    'findings-pool': artifactPathConfigSchema.optional(),
   })
   .catchall(schemas/* unknown */.L5());
 

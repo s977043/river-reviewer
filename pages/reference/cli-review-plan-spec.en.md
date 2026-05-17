@@ -82,7 +82,7 @@ The severity vocabulary is the same as [`schemas/output.schema.json`](../../sche
 
 ## Input Artifacts
 
-`river review plan` recognizes the artifacts listed in [Artifact Input Contract](./artifact-input-contract.en.md) "Artifact Catalog" verbatim (`pbi-input` / `plan` / `todo` / `test-cases` / `review-self` / `review-external` / `diff` / `junit` / `coverage` / `lint` / `typecheck`).
+`river review plan` recognizes the artifacts listed in [Artifact Input Contract](./artifact-input-contract.en.md) "Artifact Catalog" verbatim. The set of artifact IDs and their default filenames is owned by that contract as the SSoT and is not restated here (currently 12).
 
 - The set of artifact IDs and their formats is governed by the Artifact Input Contract, not this spec.
 - When `diff` is unspecified and the `git diff` fallback is also empty, `status` becomes `no-changes` and no skills run (exit `0`).

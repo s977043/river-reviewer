@@ -82,7 +82,7 @@ severity の語彙は [`schemas/output.schema.json`](../../schemas/output.schema
 
 ## 入力アーティファクト
 
-`river review plan` が認識する artifact は [Artifact Input Contract](./artifact-input-contract.md) の「対象アーティファクト一覧」と完全に一致する。具体的には `pbi-input` / `plan` / `todo` / `test-cases` / `review-self` / `review-external` / `diff` / `junit` / `coverage` / `lint` / `typecheck` の 11 種類を対象とします。
+`river review plan` が認識する artifact は [Artifact Input Contract](./artifact-input-contract.md) の「対象アーティファクト一覧」と完全に一致する。対象 ID の集合と既定ファイル名は同契約を SSoT とし、本仕様では再掲しない（現時点で 12 種類）。
 
 - artifact ID とファイル形式の追加・変更・削除は本仕様ではなく Artifact Input Contract 側で管理する。
 - `diff` artifact が未指定で `git diff` フォールバックも空の場合、`status` を `no-changes` とし、skill は実行されない（exit `0`）。
