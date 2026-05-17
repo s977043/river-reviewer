@@ -56661,6 +56661,8 @@ Commands:
   skills export         Export River Reviewer skills to Agent Skills format
   skills list           List all skills (RR and Agent Skills)
   doctor <path>         Check setup and print hints for common issues
+  review plan           Resolve upstream artifacts and emit a Review Artifact
+                        (Phase 3 slice: --plan-only only)
   eval                  Run review fixtures evaluation (must_include checks)
   suppression add       Create a Riverbed Memory suppression entry
                         (--fingerprint --feedback --rationale [--scope]
@@ -56741,6 +56743,13 @@ function parseArgs(argv) {
     validationMode: 'strict',
     listSource: 'all',
     includeAssets: false,
+    // review subcommand fields (#802 Phase 3)
+    reviewSubcommand: null,
+    planOnly: false,
+    outputFile: null,
+    configPath: null,
+    artifactsDir: null,
+    cliArtifacts: {},
   };
 
   while (args.length) {
@@ -56812,6 +56821,58 @@ function parseArgs(argv) {
     }
     if (!parsed.command && arg === 'eval') {
       parsed.command = 'eval';
+      continue;
+    }
+    if (!parsed.command && arg === 'review') {
+      parsed.command = 'review';
+      if (args[0] && !args[0].startsWith('-')) {
+        parsed.reviewSubcommand = args.shift(); // plan | exec | verify
+      }
+      continue;
+    }
+    if (arg === '--plan-only') {
+      parsed.planOnly = true;
+      continue;
+    }
+    if (arg === '--output-file') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --output-file option requires a path.');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.outputFile = value;
+      continue;
+    }
+    if (arg === '--config') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --config option requires a path.');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.configPath = value;
+      continue;
+    }
+    if (arg === '--artifacts-dir') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --artifacts-dir option requires a path.');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.artifactsDir = value;
+      continue;
+    }
+    if (arg === '--artifact') {
+      const value = args.shift();
+      const eq = value ? value.indexOf('=') : -1;
+      if (!value || value.startsWith('-') || eq <= 0) {
+        console.error('Error: --artifact requires <id>=<path> (e.g. --artifact plan=./plan.md).');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.cliArtifacts[value.slice(0, eq)] = value.slice(eq + 1);
       continue;
     }
     if (arg === '--phase') {
@@ -57360,10 +57421,57 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
     printHelp();
     return 0;
   }
-  if (!['run', 'doctor', 'eval', 'skills', 'runs', 'suppression'].includes(parsed.command)) {
+  if (
+    !['run', 'doctor', 'eval', 'skills', 'runs', 'suppression', 'review'].includes(parsed.command)
+  ) {
     console.error(`Unknown command: ${parsed.command}`);
     printHelp();
     return 1;
+  }
+
+  // review subcommand (#802 Phase 3) — no git repo required; pure
+  // config + artifact resolution. Only `review plan --plan-only` is
+  // wired in this slice.
+  if (parsed.command === 'review') {
+    if (parsed.reviewSubcommand !== 'plan') {
+      console.error(
+        parsed.reviewSubcommand
+          ? `river review ${parsed.reviewSubcommand} is not implemented yet. Use: river review plan --plan-only`
+          : 'Usage: river review plan --plan-only'
+      );
+      return 3;
+    }
+    try {
+      const { runReviewPlan, ReviewPlanError } = await __nccwpck_require__.e(/* import() */ 794).then(__nccwpck_require__.bind(__nccwpck_require__, 2794));
+      let artifact;
+      try {
+        artifact = await runReviewPlan({
+          cwd: external_node_path_.resolve(parsed.target),
+          phase: parsed.phase,
+          planOnly: parsed.planOnly,
+          cliArtifacts: parsed.cliArtifacts,
+          artifactsDir: parsed.artifactsDir,
+          debug: parsed.debug,
+        });
+      } catch (err) {
+        if (err instanceof ReviewPlanError) {
+          console.error(`Error: ${err.message}`);
+          return 3;
+        }
+        throw err;
+      }
+      const serialized = JSON.stringify(artifact, null, 2);
+      if (parsed.outputFile) {
+        const { writeFile } = await Promise.resolve(/* import() */).then(__nccwpck_require__.t.bind(__nccwpck_require__, 1455, 19));
+        await writeFile(external_node_path_.resolve(parsed.outputFile), serialized + '\n', 'utf8');
+      } else {
+        external_node_process_namespaceObject.stdout.write(serialized + '\n');
+      }
+      return 0;
+    } catch (err) {
+      console.error(`Error: ${err?.message ?? err}`);
+      return 1;
+    }
   }
 
   const targetPath = external_node_path_.resolve(parsed.target);
