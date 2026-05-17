@@ -1,24 +1,11 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import test, { describe } from 'node:test';
 
-import Ajv2020 from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
-
 import { runReviewPlan, ReviewPlanError } from '../src/lib/review-plan.mjs';
+import { compileReviewArtifactValidator } from './helpers/schema-validator.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const schema = JSON.parse(
-  readFileSync(resolve(__dirname, '..', 'schemas', 'review-artifact.schema.json'), 'utf8')
-);
-
-function makeValidator() {
-  const ajv = new Ajv2020({ allErrors: true, strict: false });
-  addFormats(ajv);
-  return ajv.compile(schema);
-}
+const validate = compileReviewArtifactValidator();
 
 const fixedNow = () => '2026-05-17T00:00:00Z';
 const okConfig = async () => ({});
@@ -60,7 +47,6 @@ describe('runReviewPlan — guards (#802 Phase 3)', () => {
 
 describe('runReviewPlan — output (#802 Phase 3)', () => {
   test('emits a schema-valid Review Artifact (version "1")', async () => {
-    const validate = makeValidator();
     const artifact = await runReviewPlan({
       planOnly: true,
       phase: 'upstream',
@@ -79,7 +65,6 @@ describe('runReviewPlan — output (#802 Phase 3)', () => {
   });
 
   test('attaches resolved artifacts under debug only when debug is set (still schema-valid)', async () => {
-    const validate = makeValidator();
     const resolved = {
       plan: { id: 'plan', path: '/repo/plan.md', source: 'cli', exists: true, optional: false },
     };

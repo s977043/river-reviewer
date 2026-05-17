@@ -28488,7 +28488,7 @@ async function buildExecutionPlan(options) {
 
   // If planner is provided, try LLM-based planning, fallback to deterministic rank
   const effectivePlannerMode = planner
-    ? (0,planner_utils/* normalizePlannerMode */.p)(plannerMode, { defaultMode: 'order' })
+    ? (0,planner_utils/* normalizePlannerMode */.p$)(plannerMode, { defaultMode: 'order' })
     : 'off';
   if (planner && effectivePlannerMode !== 'off') {
     const context = {
@@ -30592,10 +30592,13 @@ function buildHeuristicComments({ diff, plan }) {
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   E: () => (/* binding */ PLANNER_MODES),
-/* harmony export */   p: () => (/* binding */ normalizePlannerMode)
+/* harmony export */   Er: () => (/* binding */ PLANNER_MODES),
+/* harmony export */   ZG: () => (/* binding */ PHASES),
+/* harmony export */   p$: () => (/* binding */ normalizePlannerMode)
 /* harmony export */ });
 const PLANNER_MODES = /** @type {const} */ (['off', 'order', 'prune']);
+
+const PHASES = /** @type {const} */ (['upstream', 'midstream', 'downstream']);
 
 function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
   const fallback = PLANNER_MODES.includes(defaultMode) ? defaultMode : 'off';
@@ -30603,7 +30606,6 @@ function normalizePlannerMode(mode, { defaultMode = 'off' } = {}) {
   if (PLANNER_MODES.includes(normalized)) return normalized;
   return fallback;
 }
-
 
 
 /***/ }),
@@ -34150,7 +34152,7 @@ async function planLocalReview({
     configSource,
     prLabels,
   } = base;
-  const requestedPlannerMode = (0,planner_utils/* normalizePlannerMode */.p)(plannerMode ?? process.env.RIVER_PLANNER_MODE, {
+  const requestedPlannerMode = (0,planner_utils/* normalizePlannerMode */.p$)(plannerMode ?? process.env.RIVER_PLANNER_MODE, {
     defaultMode: 'off',
   });
   const plannerRequested = requestedPlannerMode !== 'off';
@@ -56747,7 +56749,6 @@ function parseArgs(argv) {
     reviewSubcommand: null,
     planOnly: false,
     outputFile: null,
-    configPath: null,
     artifactsDir: null,
     cliArtifacts: {},
   };
@@ -56844,16 +56845,6 @@ function parseArgs(argv) {
       parsed.outputFile = value;
       continue;
     }
-    if (arg === '--config') {
-      const value = args.shift();
-      if (!value || value.startsWith('-')) {
-        console.error('Error: --config option requires a path.');
-        parsed.command = 'help';
-        break;
-      }
-      parsed.configPath = value;
-      continue;
-    }
     if (arg === '--artifacts-dir') {
       const value = args.shift();
       if (!value || value.startsWith('-')) {
@@ -56900,9 +56891,9 @@ function parseArgs(argv) {
         break;
       }
       const mode = value.toLowerCase();
-      if (!planner_utils/* PLANNER_MODES */.E.includes(mode)) {
+      if (!planner_utils/* PLANNER_MODES */.Er.includes(mode)) {
         console.error(
-          `Error: --planner must be one of: ${planner_utils/* PLANNER_MODES */.E.join(', ')} (got "${value}").`
+          `Error: --planner must be one of: ${planner_utils/* PLANNER_MODES */.Er.join(', ')} (got "${value}").`
         );
         parsed.command = 'help';
         break;
