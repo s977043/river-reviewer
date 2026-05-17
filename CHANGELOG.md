@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.46.0](https://github.com/s977043/river-reviewer/compare/v0.45.0...v0.46.0) (2026-05-17)
+
+
+### Features
+
+* **cli:** deterministic skill selection for river review plan ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 B-1) ([#847](https://github.com/s977043/river-reviewer/issues/847)) ([b6ee913](https://github.com/s977043/river-reviewer/commit/b6ee913fbfc5ccb60cb68bc8c5566d2f0582e562))
+
 ## [0.45.0](https://github.com/s977043/river-reviewer/compare/v0.44.0...v0.45.0) (2026-05-17)
 
 
