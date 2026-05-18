@@ -2,10 +2,69 @@ import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import test, { describe } from 'node:test';
 
-import { runReviewPlan, ReviewPlanError } from '../src/lib/review-plan.mjs';
+import {
+  runReviewPlan,
+  ReviewPlanError,
+  resolveReviewOutputFormat,
+} from '../src/lib/review-plan.mjs';
 import { compileReviewArtifactValidator } from './helpers/schema-validator.mjs';
 
 const validate = compileReviewArtifactValidator();
+
+describe('resolveReviewOutputFormat (#802 Phase 3 PR-2)', () => {
+  test('no flags → json (backward compatible)', () => {
+    assert.equal(resolveReviewOutputFormat({}), 'json');
+    assert.equal(resolveReviewOutputFormat({ output: 'text' }), 'json'); // default, not explicit
+  });
+
+  test('explicit --output json / --format json → json', () => {
+    assert.equal(resolveReviewOutputFormat({ output: 'json', outputExplicit: true }), 'json');
+    assert.equal(resolveReviewOutputFormat({ format: 'json', formatExplicit: true }), 'json');
+  });
+
+  test('matching --output and --format → json', () => {
+    assert.equal(
+      resolveReviewOutputFormat({
+        output: 'json',
+        outputExplicit: true,
+        format: 'json',
+        formatExplicit: true,
+      }),
+      'json'
+    );
+  });
+
+  test('conflicting --output and --format → ReviewPlanError', () => {
+    assert.throws(
+      () =>
+        resolveReviewOutputFormat({
+          output: 'json',
+          outputExplicit: true,
+          format: 'markdown',
+          formatExplicit: true,
+        }),
+      (e) => e instanceof ReviewPlanError && /conflicts/.test(e.message)
+    );
+  });
+
+  test('explicit text/markdown → ReviewPlanError (not implemented)', () => {
+    assert.throws(
+      () => resolveReviewOutputFormat({ output: 'text', outputExplicit: true }),
+      (e) => e instanceof ReviewPlanError && /not implemented/.test(e.message)
+    );
+    assert.throws(
+      () => resolveReviewOutputFormat({ format: 'markdown', formatExplicit: true }),
+      ReviewPlanError
+    );
+  });
+
+  test('explicit --output yaml → ReviewPlanError (review disallows yaml)', () => {
+    assert.throws(
+      () => resolveReviewOutputFormat({ output: 'yaml', outputExplicit: true }),
+      (e) => e instanceof ReviewPlanError && /Unsupported output format/.test(e.message)
+    );
+  });
+});
 
 const fixedNow = () => '2026-05-17T00:00:00Z';
 const okConfig = async () => ({});

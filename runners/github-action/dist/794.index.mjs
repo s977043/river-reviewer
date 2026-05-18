@@ -9,6 +9,7 @@ export const modules = {
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
   ReviewPlanError: () => (/* binding */ ReviewPlanError),
+  resolveReviewOutputFormat: () => (/* binding */ resolveReviewOutputFormat),
   runReviewPlan: () => (/* binding */ runReviewPlan)
 });
 
@@ -235,6 +236,49 @@ class ReviewPlanError extends Error {
     super(message);
     this.name = 'ReviewPlanError';
   }
+}
+
+/**
+ * Resolve the effective output format for the `river review` namespace
+ * from parsed CLI args (#802 Phase 3 PR-2).
+ *
+ * Contract (per cli-review-plan-spec / plangate-cli-roadmap): canonical
+ * is `--output <format>`; `--format` is a compat alias. The unified
+ * format set is text|markdown|json. Until text/markdown rendering is
+ * implemented, only `json` is honored; when neither flag is given the
+ * format falls back to `json` for backward compatibility with the
+ * slice-1/B-1/B-2 behavior (and the plangate-review workflow).
+ *
+ * @param {{output?:string, outputExplicit?:boolean, format?:string|null,
+ *   formatExplicit?:boolean}} parsed
+ * @returns {'json'}
+ * @throws {ReviewPlanError} on an unsupported or conflicting combination
+ */
+function resolveReviewOutputFormat({
+  output = 'text',
+  outputExplicit = false,
+  format = null,
+  formatExplicit = false,
+} = {}) {
+  if (outputExplicit && formatExplicit && output !== format) {
+    throw new ReviewPlanError(
+      `--output "${output}" conflicts with --format "${format}". ` +
+        'Pass only one, or matching values.'
+    );
+  }
+  let effective;
+  if (formatExplicit) effective = format;
+  else if (outputExplicit) effective = output;
+  else effective = 'json'; // backward-compatible default
+  if (effective === 'json') return 'json';
+  if (effective === 'text' || effective === 'markdown') {
+    throw new ReviewPlanError(
+      `Output format "${effective}" is not implemented yet for river review; only "json" is supported.`
+    );
+  }
+  throw new ReviewPlanError(
+    `Unsupported output format "${effective}" for river review. Expected: json (text/markdown not yet implemented).`
+  );
 }
 
 /** skill objects carry their fields under `.metadata` (or inline). */
