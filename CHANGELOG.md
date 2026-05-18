@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.48.0](https://github.com/s977043/river-reviewer/compare/v0.47.0...v0.48.0) (2026-05-18)
+
+
+### Features
+
+* **cli:** honor --output/--format in river review plan ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 PR-2) ([#852](https://github.com/s977043/river-reviewer/issues/852)) ([616a3ab](https://github.com/s977043/river-reviewer/commit/616a3abb3d0b4c1a5f4c31c83f66d4080faa8ee5))
+
 ## [0.47.0](https://github.com/s977043/river-reviewer/compare/v0.46.0...v0.47.0) (2026-05-17)
 
 
