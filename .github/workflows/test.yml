@@ -151,3 +151,33 @@ jobs:
       - uses: ./.github/actions/setup-node-deps
       - name: Run CLI integration tests
         run: npm test -- tests/integration/local-review.test.mjs
+
+  engine-install:
+    name: Engine-only install (--omit=dev)
+    runs-on: ubuntu-latest
+    needs: lint
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - name: Install engine deps only
+        run: npm ci --omit=dev --ignore-scripts
+      - name: Engine CLI runs without docs/dev dependencies
+        run: |
+          set -euo pipefail
+          for d in react react-dom recharts @docusaurus/core @mermaid-js/layout-elk; do
+            if [ -d "node_modules/$d" ]; then
+              echo "::error::$d should not be installed with --omit=dev"; exit 1
+            fi
+          done
+          node src/cli.mjs --help > /dev/null
+          tmp="$(mktemp -d)"
+          printf 'plan\n' > "$tmp/plan.md"
+          node src/cli.mjs review plan --plan-only --phase upstream \
+            --output-file "$tmp/o.json"
+          node -e "const a=require(process.argv[1]); if(a.version!=='1') process.exit(1)" "$tmp/o.json"
