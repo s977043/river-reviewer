@@ -71,6 +71,8 @@ Resolution order matches Artifact Input Contract "Input Channels" (CLI args → 
 | `--debug`               | flag   | false   | Include debug data in the [Review Artifact](./review-artifact.en.md) `debug` field.                       |
 
 > Note (#802 Phase 3, 2026-05-18): the `--output <format>` = format, `--output-file <path>` = destination contract is unified across `plan`/`exec`/`verify` and matches the global `--output <mode>` (`river run`) (decision in the [PlanGate CLI Stabilization Roadmap](./plangate-cli-roadmap.en.md)). `--format <format>` is accepted as a review-namespace compatibility alias, but the canonical flag is `--output`. If `--output` and `--format` are both given and disagree, it is a configuration error (exit 3).
+>
+> PR-2 transitional behavior (current implementation): for backward compatibility, when neither `--output` nor `--format` is given, JSON is emitted. Explicit `json` is accepted; explicit `text`/`markdown` is a not-implemented error (exit 3); `yaml` is outside the review contract (exit 3). `text`/`markdown` rendering is implemented later.
 
 ### Failure thresholds
 

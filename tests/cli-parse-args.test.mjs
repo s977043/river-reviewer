@@ -339,4 +339,28 @@ test('parseArgs: review plan defaults (no summary, not quiet)', () => {
   const parsed = parseArgs(['review', 'plan', '--plan-only']);
   assert.equal(parsed.summaryFile, null);
   assert.equal(parsed.quiet, false);
+  assert.equal(parsed.outputExplicit, false);
+  assert.equal(parsed.format, null);
+  assert.equal(parsed.formatExplicit, false);
+});
+
+test('parseArgs: --output sets outputExplicit; --format sets format/formatExplicit', () => {
+  const a = parseArgs(['review', 'plan', '--plan-only', '--output', 'json']);
+  assert.equal(a.output, 'json');
+  assert.equal(a.outputExplicit, true);
+  assert.equal(a.formatExplicit, false);
+  const b = parseArgs(['review', 'plan', '--plan-only', '--format', 'markdown']);
+  assert.equal(b.format, 'markdown');
+  assert.equal(b.formatExplicit, true);
+  assert.equal(b.outputExplicit, false);
+});
+
+test('parseArgs: --format rejects unknown value', () => {
+  const parsed = parseArgs(['review', 'plan', '--format', 'yaml']);
+  assert.equal(parsed.command, 'help');
+});
+
+test('parseArgs: --format requires a value', () => {
+  const parsed = parseArgs(['review', 'plan', '--format']);
+  assert.equal(parsed.command, 'help');
 });

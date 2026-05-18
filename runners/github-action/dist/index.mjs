@@ -56731,6 +56731,9 @@ function parseArgs(argv) {
     estimate: false,
     maxCost: null,
     output: 'text',
+    outputExplicit: false,
+    format: null,
+    formatExplicit: false,
     availableContexts: null,
     availableDependencies: null,
     reviewers: null,
@@ -56968,6 +56971,24 @@ function parseArgs(argv) {
         break;
       }
       parsed.output = mode;
+      parsed.outputExplicit = true;
+      continue;
+    }
+    if (arg === '--format') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --format option requires a value.');
+        parsed.command = 'help';
+        break;
+      }
+      const mode = value.toLowerCase();
+      if (!['text', 'markdown', 'json'].includes(mode)) {
+        console.error(`Error: --format must be one of: text, markdown, json (got "${value}").`);
+        parsed.command = 'help';
+        break;
+      }
+      parsed.format = mode;
+      parsed.formatExplicit = true;
       continue;
     }
     if (arg === '--context') {
@@ -57462,7 +57483,17 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       return 3;
     }
     try {
-      const { runReviewPlan, ReviewPlanError } = await __nccwpck_require__.e(/* import() */ 794).then(__nccwpck_require__.bind(__nccwpck_require__, 2794));
+      const { runReviewPlan, ReviewPlanError, resolveReviewOutputFormat } =
+        await __nccwpck_require__.e(/* import() */ 794).then(__nccwpck_require__.bind(__nccwpck_require__, 2794));
+      try {
+        resolveReviewOutputFormat(parsed);
+      } catch (err) {
+        if (err instanceof ReviewPlanError) {
+          console.error(`Error: ${err.message}`);
+          return 3;
+        }
+        throw err;
+      }
       let artifact;
       try {
         artifact = await runReviewPlan({

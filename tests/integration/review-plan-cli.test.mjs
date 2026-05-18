@@ -201,4 +201,64 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.equal(result.code, 3);
     assert.match(result.stderr, /same path/);
   });
+
+  // --- #802 Phase 3 PR-2: --output / --format contract ---
+
+  test('--output json is accepted (exit 0)', async (t) => {
+    const dir = setupRepo(t);
+    const out = join(dir, 'o.json');
+    const r = await runCliInProcess(
+      ['review', 'plan', '--plan-only', '--output', 'json', '--output-file', out],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+    assert.equal(validate(JSON.parse(readFileSync(out, 'utf8'))), true);
+  });
+
+  test('--format json (alias) is accepted (exit 0)', async (t) => {
+    const dir = setupRepo(t);
+    const out = join(dir, 'o.json');
+    const r = await runCliInProcess(
+      ['review', 'plan', '--plan-only', '--format', 'json', '--output-file', out],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+  });
+
+  test('explicit --output text → exit 3 (not implemented)', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(['review', 'plan', '--plan-only', '--output', 'text'], {
+      cwd: dir,
+    });
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /not implemented/);
+  });
+
+  test('--output json --format markdown (conflict) → exit 3', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(
+      ['review', 'plan', '--plan-only', '--output', 'json', '--format', 'markdown'],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /conflicts/);
+  });
+
+  test('--output yaml → exit 3 (review disallows yaml)', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(['review', 'plan', '--plan-only', '--output', 'yaml'], {
+      cwd: dir,
+    });
+    assert.equal(r.code, 3);
+  });
+
+  test('no --output/--format → JSON still emitted (backward compatible, exit 0)', async (t) => {
+    const dir = setupRepo(t);
+    const out = join(dir, 'bc.json');
+    const r = await runCliInProcess(['review', 'plan', '--plan-only', '--output-file', out], {
+      cwd: dir,
+    });
+    assert.equal(r.code, 0, r.stderr);
+    assert.equal(validate(JSON.parse(readFileSync(out, 'utf8'))), true);
+  });
 });
