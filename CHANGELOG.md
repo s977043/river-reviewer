@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.50.0](https://github.com/s977043/river-reviewer/compare/v0.49.0...v0.50.0) (2026-05-18)
+
+
+### Features
+
+* **cli:** river review exec --dry-run foundation ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3) ([#857](https://github.com/s977043/river-reviewer/issues/857)) ([d9ba92b](https://github.com/s977043/river-reviewer/commit/d9ba92b3b575675683d08b15f2e5ef96201198b2))
+
 ## [0.49.0](https://github.com/s977043/river-reviewer/compare/v0.48.0...v0.49.0) (2026-05-18)
 
 
