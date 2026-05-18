@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.49.0](https://github.com/s977043/river-reviewer/compare/v0.48.0...v0.49.0) (2026-05-18)
+
+
+### Features
+
+* **cli:** exec/verify parser/dispatch contract foundation ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 PR-3) ([#855](https://github.com/s977043/river-reviewer/issues/855)) ([c4d7527](https://github.com/s977043/river-reviewer/commit/c4d75276c1a2885b4b955f774df6863e54ad3362))
+
 ## [0.48.0](https://github.com/s977043/river-reviewer/compare/v0.47.0...v0.48.0) (2026-05-18)
 
 
