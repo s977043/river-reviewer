@@ -299,4 +299,79 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.equal(r.code, 3);
     assert.match(r.stderr, /not a known subcommand/);
   });
+
+  // --- #802 Phase 3: review exec --dry-run foundation ---
+
+  test('review exec --dry-run emits a schema-valid v1 artifact (exit 0)', async (t) => {
+    const dir = setupRepo(t);
+    const out = join(dir, 'exec.json');
+    const r = await runCliInProcess(
+      [
+        'review',
+        'exec',
+        '--dry-run',
+        '--phase',
+        'upstream',
+        '--output',
+        'json',
+        '--output-file',
+        out,
+      ],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+    const artifact = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(validate(artifact), true, JSON.stringify(validate.errors));
+    assert.equal(artifact.version, '1');
+    assert.equal(artifact.phase, 'upstream');
+    assert.equal(artifact.plan.plannerMode, 'off');
+    assert.deepEqual(artifact.findings, []);
+  });
+
+  test('review exec --dry-run --debug attaches resolvedArtifacts', async (t) => {
+    const dir = setupRepo(t);
+    const out = join(dir, 'execd.json');
+    const r = await runCliInProcess(
+      ['review', 'exec', '--dry-run', '--debug', '--output', 'json', '--output-file', out],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+    const a = JSON.parse(readFileSync(out, 'utf8'));
+    assert.ok(a.debug && a.debug.resolvedArtifacts);
+  });
+
+  test('review exec without --dry-run → not implemented (exit 3)', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(['review', 'exec', '--output', 'json'], { cwd: dir });
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /not implemented yet/);
+  });
+
+  test('review exec --dry-run --plan (replay) → not implemented (exit 3)', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(
+      ['review', 'exec', '--dry-run', '--plan', './plan.json', '--output', 'json'],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /not implemented yet/);
+  });
+
+  test('review verify --dry-run → still not implemented (exit 3)', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(['review', 'verify', '--dry-run', '--output', 'json'], {
+      cwd: dir,
+    });
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /not implemented yet/);
+  });
+
+  test('review exec --dry-run --output text → output-contract error (exit 3)', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(['review', 'exec', '--dry-run', '--output', 'text'], {
+      cwd: dir,
+    });
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /not implemented/);
+  });
 });

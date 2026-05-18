@@ -84,6 +84,8 @@ river review exec --max-cost 0.50
 > 備考（#802 Phase 3、2026-05-18 改訂）: 出力契約は `plan`/`exec`/`verify` で統一され、`--output <format>` = 形式、`--output-file <path>` = 出力先となります（[PlanGate CLI 安定化ロードマップ](./plangate-cli-roadmap.md) の決定）。グローバル `--output <mode>`（`river run`）と意味が一致します。`--format` は review 系の互換 alias として受理されますが canonical は `--output` であり、`--output` と `--format` が両指定かつ不一致なら設定エラー（exit 3）。旧 spec の `--output <path>`（出力先）は撤回されました。
 >
 > 実装状況（#802 Phase 3 PR-3、2026-05-18）: 現時点では **CLI 引数 / 出力契約の parser・dispatch foundation のみ実装**。`river review exec` は `--plan` / `--artifact <id=path>` / `--output` / `--format` / `--output-file` 等を受理し出力契約を検証するが、skill 実行・plan 再生・artifact 読み込み・LLM は未実装で exit 3 を返す。この parser 契約は [Artifact Input Contract](./artifact-input-contract.md) の artifact ID のみに依存し、**PlanGate には依存しない**（PlanGate は artifact 生成元の一例に過ぎない）。
+>
+> 追補（#802 Phase 3、2026-05-18）: **`river review exec --dry-run`（`--plan` 併用なし）は実装済み**。spec どおり外部 LLM・skill 実行を行わず、入力解決 + 決定論 plan のみを実行し、`status` は `ok` / `no-changes`、`findings` は `[]`、Review Artifact v1 を出力して exit 0（`runReviewPlan` を再利用、`river review plan --plan-only` と同一の非破壊経路）。通常 `exec`（非 dry-run）、`--plan` 再生、verify 実行は引き続き未実装で exit 3。
 
 ## 入力アーティファクト
 
