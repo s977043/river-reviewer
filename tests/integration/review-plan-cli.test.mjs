@@ -261,4 +261,42 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.equal(r.code, 0, r.stderr);
     assert.equal(validate(JSON.parse(readFileSync(out, 'utf8'))), true);
   });
+
+  // --- #802 Phase 3 PR-3: exec/verify parser/dispatch contract ---
+
+  for (const sub of ['exec', 'verify']) {
+    test(`review ${sub} --output json: contract accepted, execution not implemented (exit 3)`, async (t) => {
+      const dir = setupRepo(t);
+      const r = await runCliInProcess(
+        ['review', sub, '--plan', './plan.json', '--output', 'json'],
+        { cwd: dir }
+      );
+      assert.equal(r.code, 3);
+      assert.match(r.stderr, /not implemented yet/);
+      assert.match(r.stderr, new RegExp(`cli-review-${sub}-spec`));
+    });
+
+    test(`review ${sub} --output text → output-contract error (exit 3)`, async (t) => {
+      const dir = setupRepo(t);
+      const r = await runCliInProcess(['review', sub, '--output', 'text'], { cwd: dir });
+      assert.equal(r.code, 3);
+      assert.match(r.stderr, /not implemented/);
+    });
+
+    test(`review ${sub} --output json --format markdown (conflict) → exit 3`, async (t) => {
+      const dir = setupRepo(t);
+      const r = await runCliInProcess(['review', sub, '--output', 'json', '--format', 'markdown'], {
+        cwd: dir,
+      });
+      assert.equal(r.code, 3);
+      assert.match(r.stderr, /conflicts/);
+    });
+  }
+
+  test('unknown review subcommand → exit 3 with guidance', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(['review', 'bogus'], { cwd: dir });
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /not a known subcommand/);
+  });
 });

@@ -56769,6 +56769,7 @@ function parseArgs(argv) {
     quiet: false,
     artifactsDir: null,
     cliArtifacts: {},
+    planFile: null,
   };
 
   while (args.length) {
@@ -56851,6 +56852,16 @@ function parseArgs(argv) {
     }
     if (arg === '--plan-only') {
       parsed.planOnly = true;
+      continue;
+    }
+    if (arg === '--plan') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --plan option requires a path.');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.planFile = value;
       continue;
     }
     if (arg === '--output-file') {
@@ -57474,10 +57485,40 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
   // config + artifact resolution. Only `review plan --plan-only` is
   // wired in this slice.
   if (parsed.command === 'review') {
+    // exec/verify: the CLI/output contract is fixed and validated here
+    // (PR-3 foundation), but skill execution / plan replay / artifact
+    // reading are not implemented yet. The contract depends only on the
+    // Artifact Input Contract IDs — it does not depend on PlanGate.
+    if (parsed.reviewSubcommand === 'exec' || parsed.reviewSubcommand === 'verify') {
+      try {
+        const { ReviewPlanError, resolveReviewOutputFormat } =
+          await __nccwpck_require__.e(/* import() */ 794).then(__nccwpck_require__.bind(__nccwpck_require__, 2794));
+        try {
+          resolveReviewOutputFormat(parsed);
+        } catch (err) {
+          if (err instanceof ReviewPlanError) {
+            console.error(`Error: ${err.message}`);
+            return 3;
+          }
+          throw err;
+        }
+      } catch (err) {
+        console.error(`Error: ${err?.message ?? err}`);
+        return 1;
+      }
+      console.error(
+        `river review ${parsed.reviewSubcommand}: the argument/output contract is accepted, ` +
+          'but execution is not implemented yet (#802 Phase 3). ' +
+          'See pages/reference/cli-review-' +
+          parsed.reviewSubcommand +
+          '-spec.md.'
+      );
+      return 3;
+    }
     if (parsed.reviewSubcommand !== 'plan') {
       console.error(
         parsed.reviewSubcommand
-          ? `river review ${parsed.reviewSubcommand} is not implemented yet. Use: river review plan --plan-only`
+          ? `river review ${parsed.reviewSubcommand} is not a known subcommand. Use: plan | exec | verify`
           : 'Usage: river review plan --plan-only'
       );
       return 3;

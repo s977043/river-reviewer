@@ -364,3 +364,50 @@ test('parseArgs: --format requires a value', () => {
   const parsed = parseArgs(['review', 'plan', '--format']);
   assert.equal(parsed.command, 'help');
 });
+
+// --- #802 Phase 3 PR-3: exec/verify parser contract ---
+
+test('parseArgs: review exec accepts --plan/--artifact/--output/--format', () => {
+  const parsed = parseArgs([
+    'review',
+    'exec',
+    '--plan',
+    './plan.json',
+    '--artifact',
+    'diff=./d.patch',
+    '--output',
+    'json',
+    '--format',
+    'json',
+  ]);
+  assert.equal(parsed.command, 'review');
+  assert.equal(parsed.reviewSubcommand, 'exec');
+  assert.equal(parsed.planFile, './plan.json');
+  assert.deepEqual(parsed.cliArtifacts, { diff: './d.patch' });
+  assert.equal(parsed.output, 'json');
+  assert.equal(parsed.format, 'json');
+});
+
+test('parseArgs: review verify accepts --plan and review artifacts', () => {
+  const parsed = parseArgs([
+    'review',
+    'verify',
+    '--plan',
+    './plan.json',
+    '--artifact',
+    'review-self=./rs.md',
+  ]);
+  assert.equal(parsed.reviewSubcommand, 'verify');
+  assert.equal(parsed.planFile, './plan.json');
+  assert.deepEqual(parsed.cliArtifacts, { 'review-self': './rs.md' });
+});
+
+test('parseArgs: --plan requires a value', () => {
+  const parsed = parseArgs(['review', 'exec', '--plan']);
+  assert.equal(parsed.command, 'help');
+});
+
+test('parseArgs: planFile defaults to null', () => {
+  const parsed = parseArgs(['review', 'plan', '--plan-only']);
+  assert.equal(parsed.planFile, null);
+});

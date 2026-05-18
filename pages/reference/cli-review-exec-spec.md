@@ -82,6 +82,8 @@ river review exec --max-cost 0.50
 | `--no-write`           | bool                           | `false` | 標準出力にのみ書き出し、ファイルを生成しない。                               |
 
 > 備考（#802 Phase 3、2026-05-18 改訂）: 出力契約は `plan`/`exec`/`verify` で統一され、`--output <format>` = 形式、`--output-file <path>` = 出力先となります（[PlanGate CLI 安定化ロードマップ](./plangate-cli-roadmap.md) の決定）。グローバル `--output <mode>`（`river run`）と意味が一致します。`--format` は review 系の互換 alias として受理されますが canonical は `--output` であり、`--output` と `--format` が両指定かつ不一致なら設定エラー（exit 3）。旧 spec の `--output <path>`（出力先）は撤回されました。
+>
+> 実装状況（#802 Phase 3 PR-3、2026-05-18）: 現時点では **CLI 引数 / 出力契約の parser・dispatch foundation のみ実装**。`river review exec` は `--plan` / `--artifact <id=path>` / `--output` / `--format` / `--output-file` 等を受理し出力契約を検証するが、skill 実行・plan 再生・artifact 読み込み・LLM は未実装で exit 3 を返す。この parser 契約は [Artifact Input Contract](./artifact-input-contract.md) の artifact ID のみに依存し、**PlanGate には依存しない**（PlanGate は artifact 生成元の一例に過ぎない）。
 
 ## 入力アーティファクト
 
