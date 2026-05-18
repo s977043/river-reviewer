@@ -134,8 +134,8 @@ jobs:
             npx --no-install river review exec \
               --phase upstream \
               --plan "$PLAN_JSON" \
-              --output "$EXEC_JSON" \
-              --format json
+              --output json \
+              --output-file "$EXEC_JSON"
           else
             echo "PlanGate review CLI is not yet implemented (tracking: #509)."
             echo "Emitting placeholder review artifact so verify job can proceed."

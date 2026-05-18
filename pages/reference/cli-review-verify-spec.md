@@ -32,10 +32,10 @@ river review verify \
   --artifact review-external=./artifacts/review-external.md \
   --artifact plan=./artifacts/plan.md \
   --artifact diff=./artifacts/diff.patch \
-  --output ./artifacts/review-audit-artifact.json
+  --output json --output-file ./artifacts/review-audit-artifact.json
 
 # 2) plan を別工程で算出し verify 側で再生する
-river review plan --phase upstream --output ./artifacts/plan.json
+river review plan --phase upstream --output json --output-file ./artifacts/plan.json
 river review verify --plan ./artifacts/plan.json \
   --artifact review-external=./artifacts/review-external.md
 
@@ -79,13 +79,13 @@ river review verify --advisory-only \
 
 ### 出力
 
-| オプション         | 型                   | 既定値                             | 説明                                                                       |
-| ------------------ | -------------------- | ---------------------------------- | -------------------------------------------------------------------------- |
-| `--output <path>`  | string               | `./artifacts/review-artifact.json` | Review Artifact JSON の書き出し先。`-` 指定時は stdout に書き出す。        |
-| `--format <value>` | `json` \| `markdown` | `json`                             | `--output` に書き出す形式。`markdown` は CI コメント用の整形版を出力する。 |
-| `--no-write`       | bool                 | `false`                            | 標準出力にのみ書き出し、ファイルを生成しない。                             |
+| オプション             | 型                             | 既定値  | 説明                                                                         |
+| ---------------------- | ------------------------------ | ------- | ---------------------------------------------------------------------------- |
+| `--output <format>`    | `text` \| `markdown` \| `json` | `text`  | 出力形式。`json` が machine-readable 契約。互換 alias: `--format <format>`。 |
+| `--output-file <path>` | string                         | -       | Review Artifact の書き出し先。未指定時は標準出力。`-` も標準出力として許容。 |
+| `--no-write`           | bool                           | `false` | 標準出力にのみ書き出し、ファイルを生成しない。                               |
 
-`--output` と `--format` の組み合わせは [Review Artifact](./review-artifact.md) スキーマ（JSON）と既存 Action の Markdown 出力契約（[Stable Interfaces](./stable-interfaces.md)）に準じます。
+> 備考（#802 Phase 3、2026-05-18 改訂）: 出力契約は `plan`/`exec`/`verify` で統一され、`--output <format>` = 形式、`--output-file <path>` = 出力先となります（[PlanGate CLI 安定化ロードマップ](./plangate-cli-roadmap.md) の決定）。グローバル `--output <mode>`（`river run`）と意味が一致します。`--format` は review 系の互換 alias として受理されますが canonical は `--output` であり、`--output` と `--format` が両指定かつ不一致なら設定エラー（exit 3）。旧 spec の `--output <path>`（出力先）は撤回されました。
 
 META finding の severity 語彙は [`schemas/output.schema.json`](../../schemas/output.schema.json) と `.claude/rules/review-core.md` の severity マッピングに準ずる（`critical` / `major` / `minor` / `info`）。不明な severity 値は fail-safe として `major` に分類される。severity に応じた fail / warn 判定は `exec` と同様に CLI では行わず、Review Artifact の `findings` を読んだ CI 側のゲートで判定する運用を推奨する。
 

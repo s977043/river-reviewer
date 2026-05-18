@@ -52,8 +52,10 @@ The following are the inconsistencies across specs and the recommended unificati
 
 ### 1. Unify `--output` / `--format` semantics
 
-- Current: `plan` uses `--output <format>` + `--output-file <path>`; `exec`/`verify` use `--output <path>` + `--format <value>`.
-- Recommendation: **unify to the `exec`/`verify` side** (`--output <path>` = destination, `--format <json|markdown>` = format, `-` = stdout). The reason is that writing out a [Review Artifact](./review-artifact.en.md) is the shared primary use case across plan/exec/verify, and separating destination and format lets CI scripts be shared across all 3 subcommands. The `plan` spec's `--output-file` migrates to `--output`, and `--output <format>` migrates to `--format`.
+- Current: `plan` uses `--output <format>` + `--output-file <path>`; `exec`/`verify` spec uses `--output <path>` + `--format <value>`.
+- **Decision (#802 Phase 3, approved 2026-05-18): unify to the `plan` side** (`--output <format>` = format, `--output-file <path>` = destination). The `exec`/`verify` spec is revised so `--output <path>` becomes `--output-file <path>` and `--format` becomes `--output <format>`. `--format` is accepted as a compatibility alias in the review namespace (plan/exec/verify); the canonical flag is `--output <format>`. If both `--output` and `--format` are given and disagree, it is a configuration error (exit 3).
+  - Why the original recommendation (unify to the `exec`/`verify` `--output <path>` side) was withdrawn: it inverts the meaning of the global `--output <mode>` (`river run`, `text|markdown|json|yaml`) and contradicts the actual `river review plan` implementation (which never honored `--output`, always emits JSON, destination via `--output-file`) and `plangate-review.yml`'s own `--output json --output-file` invocation. Unifying to the `plan` side keeps the global flag, the implementation, and the workflow consistent with minimal breakage.
+  - Versioning: `review plan --output` was never honored and `exec`/`verify` are unimplemented, so there is no runtime breakage. Call it out in the release notes as a Beta spec correction.
 
 ### 2. Unify exit codes
 
