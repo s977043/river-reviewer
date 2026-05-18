@@ -84,6 +84,8 @@ Resolution priority (CLI > config > directory detection) follows the contract.
 > Note (#802 Phase 3, revised 2026-05-18): the output contract is unified across `plan`/`exec`/`verify` to `--output <format>` = format, `--output-file <path>` = destination (decision in the [PlanGate CLI Stabilization Roadmap](./plangate-cli-roadmap.en.md)). This matches the global `--output <mode>` (`river run`). `--format` is accepted as a review-namespace compatibility alias, but the canonical flag is `--output`; if `--output` and `--format` are both given and disagree, it is a configuration error (exit 3). The old spec's `--output <path>` (destination) is withdrawn.
 >
 > Implementation status (#802 Phase 3 PR-3, 2026-05-18): only the CLI argument / output-contract parser & dispatch foundation is implemented so far. `river review exec` accepts `--plan` / `--artifact <id=path>` / `--output` / `--format` / `--output-file` and validates the output contract, but skill execution, plan replay, artifact reading, and LLM are not implemented and it returns exit 3. This parser contract depends only on the [Artifact Input Contract](./artifact-input-contract.en.md) artifact IDs and **does not depend on PlanGate** (PlanGate is just one possible artifact producer).
+>
+> Addendum (#802 Phase 3, 2026-05-18): **`river review exec --dry-run` (without `--plan`) is implemented.** Per spec, dry-run makes no external LLM / skill execution — it only resolves inputs and produces a deterministic plan, emitting a v1 Review Artifact with `status` `ok`/`no-changes` and `findings: []`, exit 0 (it reuses `runReviewPlan`, the same non-breaking path as `river review plan --plan-only`). Non-dry-run `exec`, `--plan` replay, and `verify` execution remain unimplemented (exit 3).
 
 ## Input artifacts
 

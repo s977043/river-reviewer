@@ -57485,11 +57485,22 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
   // config + artifact resolution. Only `review plan --plan-only` is
   // wired in this slice.
   if (parsed.command === 'review') {
-    // exec/verify: the CLI/output contract is fixed and validated here
-    // (PR-3 foundation), but skill execution / plan replay / artifact
-    // reading are not implemented yet. The contract depends only on the
-    // Artifact Input Contract IDs — it does not depend on PlanGate.
-    if (parsed.reviewSubcommand === 'exec' || parsed.reviewSubcommand === 'verify') {
+    // `review exec --dry-run` (without --plan): per spec, dry-run does
+    // no LLM/skill execution — it only resolves inputs and produces a
+    // deterministic plan, which is exactly `runReviewPlan`'s behavior.
+    // It is routed through the shared plan path below. `--plan` replay
+    // and non-dry-run exec are execution responsibilities (still exit 3).
+    const isExecDryRun = parsed.reviewSubcommand === 'exec' && parsed.dryRun && !parsed.planFile;
+
+    // exec/verify (other than the dry-run foundation above): the
+    // CLI/output contract is fixed and validated here (PR-3), but skill
+    // execution / plan replay / artifact reading are not implemented
+    // yet. The contract depends only on the Artifact Input Contract IDs
+    // — it does not depend on PlanGate.
+    if (
+      (parsed.reviewSubcommand === 'exec' || parsed.reviewSubcommand === 'verify') &&
+      !isExecDryRun
+    ) {
       try {
         const { ReviewPlanError, resolveReviewOutputFormat } =
           await __nccwpck_require__.e(/* import() */ 794).then(__nccwpck_require__.bind(__nccwpck_require__, 2794));
@@ -57515,7 +57526,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       );
       return 3;
     }
-    if (parsed.reviewSubcommand !== 'plan') {
+    if (parsed.reviewSubcommand !== 'plan' && !isExecDryRun) {
       console.error(
         parsed.reviewSubcommand
           ? `river review ${parsed.reviewSubcommand} is not a known subcommand. Use: plan | exec | verify`
@@ -57540,7 +57551,9 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
         artifact = await runReviewPlan({
           cwd: external_node_path_.resolve(parsed.target),
           phase: parsed.phase,
-          planOnly: parsed.planOnly,
+          // exec --dry-run == plan-only semantics (resolve + deterministic
+          // plan, no execution): force planOnly so runReviewPlan accepts it.
+          planOnly: isExecDryRun ? true : parsed.planOnly,
           cliArtifacts: parsed.cliArtifacts,
           artifactsDir: parsed.artifactsDir,
           debug: parsed.debug,
