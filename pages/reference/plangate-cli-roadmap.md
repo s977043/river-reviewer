@@ -52,8 +52,10 @@ AI-agent-template の C-1 / C-2 ワークフローへの組込みは、各サブ
 
 ### 1. `--output` / `--format` の意味論統一
 
-- 現状: `plan` は `--output <format>` + `--output-file <path>`、`exec`/`verify` は `--output <path>` + `--format <value>`。
-- 推奨: **`exec`/`verify` 側に統一**（`--output <path>` = 出力先、`--format <json|markdown>` = 形式、`-` = stdout）。理由は [Review Artifact](./review-artifact.md) を伴う書き出しが plan/exec/verify 共通の主用途であり、出力先と形式を分離する方が CI スクリプトを 3 サブコマンドで共有できるため。`plan` spec の `--output-file` は `--output` に、`--output <format>` は `--format` に移行する。
+- 現状: `plan` は `--output <format>` + `--output-file <path>`、`exec`/`verify` spec は `--output <path>` + `--format <value>`。
+- **決定（#802 Phase 3、2026-05-18 承認済み）: `plan` 側に統一する**（`--output <format>` = 形式、`--output-file <path>` = 出力先）。`exec`/`verify` spec を改訂して `--output <path>` を `--output-file <path>` に、`--format` を `--output <format>` に移行する。`--format` は review 系（plan/exec/verify）の互換 alias として受理し、canonical は `--output <format>`。`--output` と `--format` が両指定かつ不一致なら設定エラー（exit 3）。
+  - 当初案（exec/verify 側 `--output <path>` への統一）を撤回した理由は次の矛盾である。グローバル `--output <mode>`（`river run`、`text|markdown|json|yaml`）と意味が反転する。`river review plan` の実装実態（`--output` を honor せず常に JSON、宛先は `--output-file`）と食い違う。`plangate-review.yml` 自身の `--output json --output-file` 呼び出しとも矛盾する。`plan` 側統一なら global flag・実装・workflow と整合し破壊が最小になる。
+  - バージョニング: `review plan --output` は一度も honor されておらず `exec`/`verify` は未実装のため runtime breaking は無い。Beta spec の訂正としてリリースノートに明記する。
 
 ### 2. 終了コードの統一
 

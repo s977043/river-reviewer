@@ -34,11 +34,11 @@ river review exec \
   --artifact junit=./artifacts/junit.xml \
   --artifact lint=./artifacts/lint.json \
   --artifact typecheck=./artifacts/typecheck.txt \
-  --output ./artifacts/review-artifact.json
+  --output json --output-file ./artifacts/review-artifact.json
 
 # 3) plan を別工程で算出し、それを再生する
-river review plan --output ./artifacts/plan.json
-river review exec --plan ./artifacts/plan.json --output ./artifacts/review-artifact.json
+river review plan --output json --output-file ./artifacts/plan.json
+river review exec --plan ./artifacts/plan.json --output json --output-file ./artifacts/review-artifact.json
 
 # 4) コスト見積もり超過時は実行しない
 river review exec --max-cost 0.50
@@ -75,15 +75,13 @@ river review exec --max-cost 0.50
 
 ### 出力
 
-| オプション         | 型                   | 既定値                             | 説明                                                                       |
-| ------------------ | -------------------- | ---------------------------------- | -------------------------------------------------------------------------- |
-| `--output <path>`  | string               | `./artifacts/review-artifact.json` | Review Artifact JSON の書き出し先。`-` 指定時は stdout に書き出す。        |
-| `--format <value>` | `json` \| `markdown` | `json`                             | `--output` に書き出す形式。`markdown` は CI コメント用の整形版を出力する。 |
-| `--no-write`       | bool                 | `false`                            | 標準出力にのみ書き出し、ファイルを生成しない。                             |
+| オプション             | 型                             | 既定値  | 説明                                                                         |
+| ---------------------- | ------------------------------ | ------- | ---------------------------------------------------------------------------- |
+| `--output <format>`    | `text` \| `markdown` \| `json` | `text`  | 出力形式。`json` が machine-readable 契約。互換 alias: `--format <format>`。 |
+| `--output-file <path>` | string                         | -       | Review Artifact の書き出し先。未指定時は標準出力。`-` も標準出力として許容。 |
+| `--no-write`           | bool                           | `false` | 標準出力にのみ書き出し、ファイルを生成しない。                               |
 
-`--output` と `--format` の組み合わせは [Review Artifact](./review-artifact.md) スキーマ（JSON）と既存 Action の Markdown 出力契約（[Stable Interfaces](./stable-interfaces.md)）に準じます。
-
-> 備考: [Stable Interfaces](./stable-interfaces.md) の最小 CLI リファレンスでは `--output <text|markdown>` が出力形式を表しますが、`river review exec` サブコマンドでは **出力先ファイルパス** を `--output`、**出力形式** を `--format` に分離します。これは artifact 書き出しを伴う `exec` 固有の拡張であり、既存 `river run` のオプション意味論は変更しません。
+> 備考（#802 Phase 3、2026-05-18 改訂）: 出力契約は `plan`/`exec`/`verify` で統一され、`--output <format>` = 形式、`--output-file <path>` = 出力先となります（[PlanGate CLI 安定化ロードマップ](./plangate-cli-roadmap.md) の決定）。グローバル `--output <mode>`（`river run`）と意味が一致します。`--format` は review 系の互換 alias として受理されますが canonical は `--output` であり、`--output` と `--format` が両指定かつ不一致なら設定エラー（exit 3）。旧 spec の `--output <path>`（出力先）は撤回されました。
 
 ## 入力アーティファクト
 

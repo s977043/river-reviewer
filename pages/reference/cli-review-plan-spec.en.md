@@ -70,6 +70,8 @@ Resolution order matches Artifact Input Contract "Input Channels" (CLI args → 
 | `--quiet`               | flag   | false   | Suppress progress logs on stdout (errors still go to stderr). For CI use.                                 |
 | `--debug`               | flag   | false   | Include debug data in the [Review Artifact](./review-artifact.en.md) `debug` field.                       |
 
+> Note (#802 Phase 3, 2026-05-18): the `--output <format>` = format, `--output-file <path>` = destination contract is unified across `plan`/`exec`/`verify` and matches the global `--output <mode>` (`river run`) (decision in the [PlanGate CLI Stabilization Roadmap](./plangate-cli-roadmap.en.md)). `--format <format>` is accepted as a review-namespace compatibility alias, but the canonical flag is `--output`. If `--output` and `--format` are both given and disagree, it is a configuration error (exit 3).
+
 ### Failure thresholds
 
 | Option                 | Type | Default    | Description                                                                                            |

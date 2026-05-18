@@ -32,10 +32,10 @@ river review verify \
   --artifact review-external=./artifacts/review-external.md \
   --artifact plan=./artifacts/plan.md \
   --artifact diff=./artifacts/diff.patch \
-  --output ./artifacts/review-audit-artifact.json
+  --output json --output-file ./artifacts/review-audit-artifact.json
 
 # 2) Replay a plan computed in a separate step
-river review plan --phase upstream --output ./artifacts/plan.json
+river review plan --phase upstream --output json --output-file ./artifacts/plan.json
 river review verify --plan ./artifacts/plan.json \
   --artifact review-external=./artifacts/review-external.md
 
@@ -79,13 +79,13 @@ Resolution priority (CLI > config > directory detection) follows the contract. I
 
 ### Output
 
-| Option             | Type                 | Default                            | Description                                                         |
-| ------------------ | -------------------- | ---------------------------------- | ------------------------------------------------------------------- |
-| `--output <path>`  | string               | `./artifacts/review-artifact.json` | Path to write the Review Artifact JSON. Use `-` to write to stdout. |
-| `--format <value>` | `json` \| `markdown` | `json`                             | Output format. `markdown` is the CI-comment formatted variant.      |
-| `--no-write`       | bool                 | `false`                            | Print to stdout only; do not create files.                          |
+| Option                 | Type                           | Default | Description                                                                                |
+| ---------------------- | ------------------------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `--output <format>`    | `text` \| `markdown` \| `json` | `text`  | Output format. `json` is the machine-readable contract. Compat alias: `--format <format>`. |
+| `--output-file <path>` | string                         | -       | Where to write the Review Artifact. Defaults to stdout when unset; `-` is also stdout.     |
+| `--no-write`           | bool                           | `false` | Print to stdout only; do not create files.                                                 |
 
-The combination follows [Review Artifact](./review-artifact.en.md) for JSON and the existing Action contract ([Stable Interfaces](./stable-interfaces.en.md)) for Markdown.
+> Note (#802 Phase 3, revised 2026-05-18): the output contract is unified across `plan`/`exec`/`verify` to `--output <format>` = format, `--output-file <path>` = destination (decision in the [PlanGate CLI Stabilization Roadmap](./plangate-cli-roadmap.en.md)). This matches the global `--output <mode>` (`river run`). `--format` is accepted as a review-namespace compatibility alias, but the canonical flag is `--output`; if `--output` and `--format` are both given and disagree, it is a configuration error (exit 3). The old spec's `--output <path>` (destination) is withdrawn.
 
 The META finding severity vocabulary follows [`schemas/output.schema.json`](../../schemas/output.schema.json) and the severity mapping in `.claude/rules/review-core.md` (`critical` / `major` / `minor` / `info`). Unknown severity values default to `major` as a fail-safe. As with `exec`, the CLI does not perform fail / warn gating based on severity; CI should read the Review Artifact `findings` and gate there (see [Stable Interfaces](./stable-interfaces.en.md)).
 
