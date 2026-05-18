@@ -86,6 +86,8 @@ river review verify --advisory-only \
 | `--no-write`           | bool                           | `false` | 標準出力にのみ書き出し、ファイルを生成しない。                               |
 
 > 備考（#802 Phase 3、2026-05-18 改訂）: 出力契約は `plan`/`exec`/`verify` で統一され、`--output <format>` = 形式、`--output-file <path>` = 出力先となります（[PlanGate CLI 安定化ロードマップ](./plangate-cli-roadmap.md) の決定）。グローバル `--output <mode>`（`river run`）と意味が一致します。`--format` は review 系の互換 alias として受理されますが canonical は `--output` であり、`--output` と `--format` が両指定かつ不一致なら設定エラー（exit 3）。旧 spec の `--output <path>`（出力先）は撤回されました。
+>
+> 実装状況（#802 Phase 3 PR-3、2026-05-18）: 現時点では **CLI 引数 / 出力契約の parser・dispatch foundation のみ実装**。`river review verify` は `--plan` / `--artifact <id=path>`（`review-self` / `review-external` 等）/ `--output` / `--format` / `--output-file` を受理し出力契約を検証するが、verify skill 実行・artifact 読み込みは未実装で exit 3 を返す。この parser 契約は [Artifact Input Contract](./artifact-input-contract.md) の artifact ID のみに依存し、**PlanGate には依存しない**。verify skill レイヤ（`rr-upstream-plangate-verification-*`）は別レイヤであり parser 契約とは独立。
 
 META finding の severity 語彙は [`schemas/output.schema.json`](../../schemas/output.schema.json) と `.claude/rules/review-core.md` の severity マッピングに準ずる（`critical` / `major` / `minor` / `info`）。不明な severity 値は fail-safe として `major` に分類される。severity に応じた fail / warn 判定は `exec` と同様に CLI では行わず、Review Artifact の `findings` を読んだ CI 側のゲートで判定する運用を推奨する。
 
