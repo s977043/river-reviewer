@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.51.1](https://github.com/s977043/river-reviewer/compare/v0.51.0...v0.51.1) (2026-05-21)
+
+
+### Bug Fixes
+
+* **cli:** forward fileTypes/relatedADRs/reviewMode to generateReview ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 A2-fix-3) ([#871](https://github.com/s977043/river-reviewer/issues/871)) ([74b6c6f](https://github.com/s977043/river-reviewer/commit/74b6c6f581e584b50620ca7e26e0fe82ccef5dcf))
+* **cli:** propagate availableDependencies to plan layer ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 A2-fix-2) ([#869](https://github.com/s977043/river-reviewer/issues/869)) ([40a01bb](https://github.com/s977043/river-reviewer/commit/40a01bb9ef89b8f9cb9e9e9864b09aa551712a78))
+
 ## [0.51.0](https://github.com/s977043/river-reviewer/compare/v0.50.0...v0.51.0) (2026-05-21)
 
 
