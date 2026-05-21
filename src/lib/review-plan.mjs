@@ -30,10 +30,11 @@ import { readFile } from 'node:fs/promises';
 
 import { loadConfig as defaultLoadConfig } from '../config/loader.mjs';
 import { resolveAllArtifacts as defaultResolveAllArtifacts } from '../config/artifact-resolver.mjs';
-import { deriveChangedFiles, parseUnifiedDiff } from './diff.mjs';
+import { parseUnifiedDiff } from './diff.mjs';
 import { buildExecutionPlan as defaultBuildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { generateReview as defaultGenerateReview } from './review-engine.mjs';
 import { PHASES, PLANNER_MODES } from './planner-utils.mjs';
+import { parseList } from './utils.mjs';
 
 const VALID_PHASES = new Set(PHASES);
 const VALID_PLANNER_MODES = new Set(PLANNER_MODES);
@@ -223,6 +224,18 @@ export function resolveReviewOutputFormat({
   );
 }
 
+/**
+ * Combine the caller-provided contexts (or the diff-resolved default)
+ * with `RIVER_AVAILABLE_CONTEXTS` env var, deduplicated. Mirrors the
+ * behaviour of `resolveAvailableContexts` in src/lib/local-runner.mjs so
+ * both entrypoints have the same selection semantics.
+ */
+function resolveEffectiveContexts(inputContexts) {
+  const envContexts = parseList(process.env.RIVER_AVAILABLE_CONTEXTS);
+  const base = inputContexts?.length ? inputContexts : ['diff'];
+  return [...new Set([...base, ...envContexts])];
+}
+
 /** skill objects carry their fields under `.metadata` (or inline). */
 function meta(skill) {
   return skill?.metadata ?? skill ?? {};
@@ -259,6 +272,14 @@ function toSelectedView(skill) {
  *   execution plan is built with `llmEnabled: true` so LLM-backed skills
  *   are selectable, and `generateReview` is invoked to populate the
  *   artifact `findings` array. Mutually exclusive with `executionDeferred`.
+ * @param {string[]} [opts.availableContexts] Contexts (artifact IDs) that
+ *   should satisfy a skill's `inputContext` requirement during selection.
+ *   When omitted, defaults to `['diff']` if a diff artifact is resolved.
+ *   Extra contexts from `RIVER_AVAILABLE_CONTEXTS` are always merged in
+ *   so CI environments can grant additional artifacts (tests, junit, ...)
+ *   without code changes. Without this, `buildExecutionPlan` receives an
+ *   empty list and every skill that declares `inputContext: ['diff']` is
+ *   silently skipped — the dogfood failure mode that motivated A2-fix-1.
  * @param {() => string} [opts.now] - timestamp factory (ISO 8601)
  * @param {(repoRoot: string) => Promise<object>} [opts.loadConfigImpl]
  * @param {Function} [opts.resolveAllArtifactsImpl]
@@ -277,6 +298,7 @@ export async function runReviewPlan({
   debug = false,
   executionDeferred = false,
   executeReview = false,
+  availableContexts,
   now = () => new Date().toISOString(),
   loadConfigImpl = defaultLoadConfig,
   resolveAllArtifactsImpl = defaultResolveAllArtifacts,
@@ -337,13 +359,19 @@ export async function runReviewPlan({
     } catch (err) {
       throw new ReviewPlanError(`Failed to read diff artifact: ${err.message}`);
     }
-    // Parse the diff once and reuse the result for both deriveChangedFiles
-    // (planning input) and generateReview (execution input) so we don't pay
-    // the parsing cost twice when executeReview is on.
+    // Parse the diff once and reuse the result. The same parser used to
+    // power deriveChangedFiles (planning input) also exposes the per-file
+    // structure generateReview needs (execution input).
     const parsedDiff = parseUnifiedDiff(diffText);
     const changedFiles = (parsedDiff.files ?? [])
       .map((f) => f.path)
       .filter((p) => p && p !== '/dev/null');
+
+    // Declare which artifact contexts are actually available so the plan
+    // layer's inputContext check doesn't silently skip skills that need a
+    // diff. Default to `['diff']` whenever we resolved a diff artifact;
+    // env var RIVER_AVAILABLE_CONTEXTS is merged in for CI overrides.
+    const effectiveAvailableContexts = resolveEffectiveContexts(availableContexts);
 
     // The plan layer's selection rules differ by exec mode: for
     // plan-only/dry-run/deferred we restrict to heuristic skills, while
@@ -361,6 +389,7 @@ export async function runReviewPlan({
         llmEnabled: executeReview,
         repoRoot: cwd,
         riskMap: undefined,
+        availableContexts: effectiveAvailableContexts,
       });
     } catch (err) {
       throw new ReviewPlanError(`Failed to build execution plan: ${err.message}`);
