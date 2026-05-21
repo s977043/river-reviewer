@@ -34,7 +34,7 @@ import { parseUnifiedDiff } from './diff.mjs';
 import { buildExecutionPlan as defaultBuildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { generateReview as defaultGenerateReview } from './review-engine.mjs';
 import { PHASES, PLANNER_MODES } from './planner-utils.mjs';
-import { resolveAvailableContexts } from './utils.mjs';
+import { resolveAvailableContexts, resolveAvailableDependencies } from './utils.mjs';
 
 const VALID_PHASES = new Set(PHASES);
 const VALID_PLANNER_MODES = new Set(PLANNER_MODES);
@@ -268,6 +268,11 @@ function toSelectedView(skill) {
  *   without code changes. Without this, `buildExecutionPlan` receives an
  *   empty list and every skill that declares `inputContext: ['diff']` is
  *   silently skipped — the dogfood failure mode that motivated A2-fix-1.
+ * @param {string[]} [opts.availableDependencies] Optional dependency IDs
+ *   (e.g. `code_search`, `test_runner`). When omitted and the env var
+ *   `RIVER_AVAILABLE_DEPENDENCIES` is unset, dependency-based skipping is
+ *   disabled (backward-compatible). `RIVER_DEPENDENCY_STUBS=1` opts into
+ *   the default stub set so all known dependencies appear available.
  * @param {() => string} [opts.now] - timestamp factory (ISO 8601)
  * @param {(repoRoot: string) => Promise<object>} [opts.loadConfigImpl]
  * @param {Function} [opts.resolveAllArtifactsImpl]
@@ -287,6 +292,7 @@ export async function runReviewPlan({
   executionDeferred = false,
   executeReview = false,
   availableContexts,
+  availableDependencies,
   now = () => new Date().toISOString(),
   loadConfigImpl = defaultLoadConfig,
   resolveAllArtifactsImpl = defaultResolveAllArtifacts,
@@ -365,6 +371,11 @@ export async function runReviewPlan({
       alwaysInclude: ['diff'],
     });
 
+    // Same silent-skip pattern for dependencies. `null` is the documented
+    // disabled sentinel — dependency-based skipping is opt-in via env or
+    // `--dependency` so legacy invocations stay backward-compatible.
+    const effectiveAvailableDependencies = resolveAvailableDependencies(availableDependencies);
+
     // The plan layer's selection rules differ by exec mode: for
     // plan-only/dry-run/deferred we restrict to heuristic skills, while
     // executeReview must allow LLM-backed skills so the planner can
@@ -382,6 +393,7 @@ export async function runReviewPlan({
         repoRoot: cwd,
         riskMap: undefined,
         availableContexts: effectiveAvailableContexts,
+        availableDependencies: effectiveAvailableDependencies,
       });
     } catch (err) {
       throw new ReviewPlanError(`Failed to build execution plan: ${err.message}`);

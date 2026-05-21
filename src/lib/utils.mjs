@@ -49,3 +49,41 @@ export function resolveAvailableContexts(
   const base = inputContexts && inputContexts.length ? inputContexts : defaultContexts;
   return [...new Set([...alwaysInclude, ...base, ...envContexts])];
 }
+
+/**
+ * Known dependency identifiers that `RIVER_DEPENDENCY_STUBS=1` should
+ * mark as "available". Keep in sync with `schemas/skill.schema.json`
+ * dependencies enum.
+ */
+export const dependencyStubs = [
+  'code_search',
+  'test_runner',
+  'coverage_report',
+  'adr_lookup',
+  'repo_metadata',
+  'tracing',
+];
+
+/**
+ * Resolve the effective `availableDependencies` for `buildExecutionPlan`.
+ * Returns `null` (the disabled sentinel) when the caller passes nothing
+ * and neither `RIVER_AVAILABLE_DEPENDENCIES` nor `RIVER_DEPENDENCY_STUBS`
+ * is set, which preserves backward-compatible "do not skip on missing
+ * dependency" behavior.
+ *
+ * Shared between `src/lib/local-runner.mjs` and `src/lib/review-plan.mjs`
+ * (#802 Phase 3 silent-skip follow-up).
+ *
+ * @param {string[] | null | undefined} inputDependencies
+ * @returns {string[] | null}
+ */
+export function resolveAvailableDependencies(inputDependencies) {
+  const envDeps = parseList(process.env.RIVER_AVAILABLE_DEPENDENCIES);
+  const stubEnabled =
+    typeof process.env.RIVER_DEPENDENCY_STUBS === 'string' &&
+    ['1', 'true', 'yes', 'stub'].includes(process.env.RIVER_DEPENDENCY_STUBS.toLowerCase());
+  if (inputDependencies?.length) return [...new Set(inputDependencies)];
+  if (envDeps.length) return [...new Set(envDeps)];
+  if (stubEnabled) return [...dependencyStubs];
+  return null; // null disables dependency-based skipping
+}

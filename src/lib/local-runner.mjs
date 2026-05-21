@@ -19,6 +19,7 @@ import {
   isLlmEnabled,
   parseList,
   resolveAvailableContexts as resolveAvailableContextsShared,
+  resolveAvailableDependencies as resolveAvailableDependenciesShared,
 } from './utils.mjs';
 import { annotateFingerprints, computeFingerprint } from './finding-fingerprint.mjs';
 import { applySuppressions } from './suppression-apply.mjs';
@@ -28,16 +29,6 @@ function normalizePhase(phase) {
   if (PHASES.includes(normalized)) return normalized;
   return 'midstream';
 }
-
-// NOTE: Keep this list in sync with schemas/skill.schema.json dependencies enum.
-const dependencyStubs = [
-  'code_search',
-  'test_runner',
-  'coverage_report',
-  'adr_lookup',
-  'repo_metadata',
-  'tracing',
-];
 
 const configLoader = new ConfigLoader();
 
@@ -111,16 +102,10 @@ function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
 // used by src/lib/review-plan.mjs (#802 Phase 3 A2-fix-1).
 const resolveAvailableContexts = (inputContexts) => resolveAvailableContextsShared(inputContexts);
 
-function resolveAvailableDependencies(inputDependencies) {
-  const envDeps = parseList(process.env.RIVER_AVAILABLE_DEPENDENCIES);
-  const stubEnabled =
-    typeof process.env.RIVER_DEPENDENCY_STUBS === 'string' &&
-    ['1', 'true', 'yes', 'stub'].includes(process.env.RIVER_DEPENDENCY_STUBS.toLowerCase());
-  if (inputDependencies?.length) return [...new Set(inputDependencies)];
-  if (envDeps.length) return [...new Set(envDeps)];
-  if (stubEnabled) return [...dependencyStubs];
-  return null; // null disables dependency-based skipping (backward-compatible)
-}
+// The helper now lives in src/lib/utils.mjs; this thin wrapper preserves
+// the legacy call sites inside this module unchanged.
+const resolveAvailableDependencies = (inputDependencies) =>
+  resolveAvailableDependenciesShared(inputDependencies);
 
 async function collectLocalContext({
   cwd,
