@@ -34,7 +34,7 @@ import { parseUnifiedDiff } from './diff.mjs';
 import { buildExecutionPlan as defaultBuildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { generateReview as defaultGenerateReview } from './review-engine.mjs';
 import { PHASES, PLANNER_MODES } from './planner-utils.mjs';
-import { parseList } from './utils.mjs';
+import { resolveAvailableContexts } from './utils.mjs';
 
 const VALID_PHASES = new Set(PHASES);
 const VALID_PLANNER_MODES = new Set(PLANNER_MODES);
@@ -224,18 +224,6 @@ export function resolveReviewOutputFormat({
   );
 }
 
-/**
- * Combine the caller-provided contexts (or the diff-resolved default)
- * with `RIVER_AVAILABLE_CONTEXTS` env var, deduplicated. Mirrors the
- * behaviour of `resolveAvailableContexts` in src/lib/local-runner.mjs so
- * both entrypoints have the same selection semantics.
- */
-function resolveEffectiveContexts(inputContexts) {
-  const envContexts = parseList(process.env.RIVER_AVAILABLE_CONTEXTS);
-  const base = inputContexts?.length ? inputContexts : ['diff'];
-  return [...new Set([...base, ...envContexts])];
-}
-
 /** skill objects carry their fields under `.metadata` (or inline). */
 function meta(skill) {
   return skill?.metadata ?? skill ?? {};
@@ -369,9 +357,13 @@ export async function runReviewPlan({
 
     // Declare which artifact contexts are actually available so the plan
     // layer's inputContext check doesn't silently skip skills that need a
-    // diff. Default to `['diff']` whenever we resolved a diff artifact;
+    // diff. We are in the diff-resolved branch, so `alwaysInclude: ['diff']`
+    // guarantees that a CLI override like `--context tests` does NOT drop
+    // 'diff' from the set (would re-introduce the A1 silent-skip failure).
     // env var RIVER_AVAILABLE_CONTEXTS is merged in for CI overrides.
-    const effectiveAvailableContexts = resolveEffectiveContexts(availableContexts);
+    const effectiveAvailableContexts = resolveAvailableContexts(availableContexts, {
+      alwaysInclude: ['diff'],
+    });
 
     // The plan layer's selection rules differ by exec mode: for
     // plan-only/dry-run/deferred we restrict to heuristic skills, while

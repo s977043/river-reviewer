@@ -33123,8 +33123,9 @@ function shouldExcludeForContext(relPath, opts = {}) {
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   E: () => (/* binding */ parseList),
-/* harmony export */   R: () => (/* binding */ isLlmEnabled)
+/* harmony export */   E1: () => (/* binding */ parseList),
+/* harmony export */   Rq: () => (/* binding */ isLlmEnabled),
+/* harmony export */   ud: () => (/* binding */ resolveAvailableContexts)
 /* harmony export */ });
 /**
  * Parse a comma-separated list string into a trimmed array.
@@ -33134,7 +33135,7 @@ function parseList(value) {
   if (!value) return [];
   return String(value)
     .split(',')
-    .map(item => item.trim())
+    .map((item) => item.trim())
     .filter(Boolean);
 }
 
@@ -33150,6 +33151,32 @@ function isLlmEnabled() {
     process.env.ANTHROPIC_API_KEY ||
     process.env.RIVER_ANTHROPIC_API_KEY
   );
+}
+
+/**
+ * Resolve the effective `availableContexts` for `buildExecutionPlan`'s
+ * `inputContext`-based skill selection. Combines caller-supplied contexts
+ * with `RIVER_AVAILABLE_CONTEXTS` (deduplicated). If the caller does not
+ * supply any contexts, falls back to `defaultContexts` (defaults to
+ * `['diff']`). The `alwaysInclude` option forces specific contexts to
+ * remain present even when the caller passes a narrower list — useful
+ * when the runtime has actually resolved an artifact (e.g. diff) and
+ * should not let a CLI override silently strip it.
+ *
+ * Shared between `src/lib/local-runner.mjs` (legacy `river run`) and
+ * `src/lib/review-plan.mjs` (`river review exec` / Phase 3).
+ *
+ * @param {string[] | null | undefined} inputContexts
+ * @param {{ defaultContexts?: string[]; alwaysInclude?: string[] }} [options]
+ * @returns {string[]}
+ */
+function resolveAvailableContexts(
+  inputContexts,
+  { defaultContexts = ['diff'], alwaysInclude = [] } = {}
+) {
+  const envContexts = parseList(process.env.RIVER_AVAILABLE_CONTEXTS);
+  const base = inputContexts && inputContexts.length ? inputContexts : defaultContexts;
+  return [...new Set([...alwaysInclude, ...base, ...envContexts])];
 }
 
 
@@ -34060,7 +34087,7 @@ function applyFileExclusions(diff, patterns = []) {
 }
 
 async function resolvePullRequestLabels() {
-  const envLabels = (0,utils/* parseList */.E)(process.env.RIVER_PR_LABELS);
+  const envLabels = (0,utils/* parseList */.E1)(process.env.RIVER_PR_LABELS);
   if (envLabels.length) return envLabels;
 
   const eventPath = process.env.GITHUB_EVENT_PATH;
@@ -34086,14 +34113,14 @@ function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
   return { matched, shouldSkip: matched.length > 0 };
 }
 
-function resolveAvailableContexts(inputContexts) {
-  const envContexts = (0,utils/* parseList */.E)(process.env.RIVER_AVAILABLE_CONTEXTS);
-  const base = inputContexts?.length ? inputContexts : ['diff'];
-  return [...new Set([...base, ...envContexts])];
-}
+// Re-export the shared helper under the legacy name so the rest of this
+// module continues to call `resolveAvailableContexts(...)` unchanged.
+// The single source of truth now lives in src/lib/utils.mjs and is also
+// used by src/lib/review-plan.mjs (#802 Phase 3 A2-fix-1).
+const resolveAvailableContexts = (inputContexts) => (0,utils/* resolveAvailableContexts */.ud)(inputContexts);
 
 function resolveAvailableDependencies(inputDependencies) {
-  const envDeps = (0,utils/* parseList */.E)(process.env.RIVER_AVAILABLE_DEPENDENCIES);
+  const envDeps = (0,utils/* parseList */.E1)(process.env.RIVER_AVAILABLE_DEPENDENCIES);
   const stubEnabled =
     typeof process.env.RIVER_DEPENDENCY_STUBS === 'string' &&
     ['1', 'true', 'yes', 'stub'].includes(process.env.RIVER_DEPENDENCY_STUBS.toLowerCase());
@@ -34222,7 +34249,7 @@ async function planLocalReview({
 
   let planner = null;
   let plannerSkipped = null;
-  const llmEnabled = (0,utils/* isLlmEnabled */.R)();
+  const llmEnabled = (0,utils/* isLlmEnabled */.Rq)();
 
   if (plannerRequested) {
     if (dryRun) {
@@ -34478,7 +34505,7 @@ async function doctorLocalReview({
     availableDependencies: dependencies,
   } = base;
 
-  const llmEnabled = (0,utils/* isLlmEnabled */.R)();
+  const llmEnabled = (0,utils/* isLlmEnabled */.Rq)();
 
   const plan = reviewFiles.length
     ? await (0,review_runner/* buildExecutionPlan */.kN)({
@@ -56499,7 +56526,7 @@ class SkillDispatcher {
     const config = await (0,loader/* loadConfig */.Z9)(this.repoRoot);
     const results = [];
     const language = config.review?.language || 'en';
-    const llmEnabled = (0,utils/* isLlmEnabled */.R)();
+    const llmEnabled = (0,utils/* isLlmEnabled */.Rq)();
 
     let skills = (config.skills || []).map(skill => ({
       ...skill,
@@ -56837,7 +56864,7 @@ function parseArgs(argv) {
         continue;
       }
       if (arg === '--files') {
-        parsed.suppressionFiles = (0,utils/* parseList */.E)(args.shift() ?? '');
+        parsed.suppressionFiles = (0,utils/* parseList */.E1)(args.shift() ?? '');
         continue;
       }
       if (arg === '--expires') {
@@ -57014,11 +57041,11 @@ function parseArgs(argv) {
       continue;
     }
     if (arg === '--context') {
-      parsed.availableContexts = (0,utils/* parseList */.E)(args.shift());
+      parsed.availableContexts = (0,utils/* parseList */.E1)(args.shift());
       continue;
     }
     if (arg === '--dependency') {
-      parsed.availableDependencies = (0,utils/* parseList */.E)(args.shift());
+      parsed.availableDependencies = (0,utils/* parseList */.E1)(args.shift());
       continue;
     }
     if (arg === '--reviewers') {
@@ -57030,7 +57057,7 @@ function parseArgs(argv) {
         parsed.command = 'help';
         break;
       }
-      parsed.reviewers = (0,utils/* parseList */.E)(value);
+      parsed.reviewers = (0,utils/* parseList */.E1)(value);
       continue;
     }
     if (arg === '--baseline') {

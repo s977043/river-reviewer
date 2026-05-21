@@ -683,6 +683,24 @@ index 1111111..2222222 100644
     assert.deepEqual(captured.args.availableContexts, ['diff', 'tests', 'junit']);
   });
 
+  test('forces "diff" to remain present when CLI passes only narrower contexts', async () => {
+    // Regression for Gemini PR #865 review: previously `--context tests`
+    // would silently drop the diff context and re-introduce the A1
+    // silent-skip failure. We now alwaysInclude: ['diff'] when running
+    // in the diff-resolved branch.
+    const { captured, impl } = captureBuildExecutionPlanArgs();
+    await runReviewPlan({
+      planOnly: true,
+      availableContexts: ['tests'],
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: impl,
+    });
+    assert.deepEqual([...captured.args.availableContexts].sort(), ['diff', 'tests']);
+  });
+
   test('merges RIVER_AVAILABLE_CONTEXTS into the effective set (dedup)', async () => {
     const previous = process.env.RIVER_AVAILABLE_CONTEXTS;
     process.env.RIVER_AVAILABLE_CONTEXTS = 'tests, junit';

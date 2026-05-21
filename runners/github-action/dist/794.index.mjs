@@ -422,18 +422,6 @@ function resolveReviewOutputFormat({
   );
 }
 
-/**
- * Combine the caller-provided contexts (or the diff-resolved default)
- * with `RIVER_AVAILABLE_CONTEXTS` env var, deduplicated. Mirrors the
- * behaviour of `resolveAvailableContexts` in src/lib/local-runner.mjs so
- * both entrypoints have the same selection semantics.
- */
-function resolveEffectiveContexts(inputContexts) {
-  const envContexts = (0,utils/* parseList */.E)(process.env.RIVER_AVAILABLE_CONTEXTS);
-  const base = inputContexts?.length ? inputContexts : ['diff'];
-  return [...new Set([...base, ...envContexts])];
-}
-
 /** skill objects carry their fields under `.metadata` (or inline). */
 function meta(skill) {
   return skill?.metadata ?? skill ?? {};
@@ -567,9 +555,13 @@ async function runReviewPlan({
 
     // Declare which artifact contexts are actually available so the plan
     // layer's inputContext check doesn't silently skip skills that need a
-    // diff. Default to `['diff']` whenever we resolved a diff artifact;
+    // diff. We are in the diff-resolved branch, so `alwaysInclude: ['diff']`
+    // guarantees that a CLI override like `--context tests` does NOT drop
+    // 'diff' from the set (would re-introduce the A1 silent-skip failure).
     // env var RIVER_AVAILABLE_CONTEXTS is merged in for CI overrides.
-    const effectiveAvailableContexts = resolveEffectiveContexts(availableContexts);
+    const effectiveAvailableContexts = (0,utils/* resolveAvailableContexts */.ud)(availableContexts, {
+      alwaysInclude: ['diff'],
+    });
 
     // The plan layer's selection rules differ by exec mode: for
     // plan-only/dry-run/deferred we restrict to heuristic skills, while
