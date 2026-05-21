@@ -264,13 +264,37 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
 
   // --- #802 Phase 3 PR-3: exec/verify parser/dispatch contract ---
 
-  // exec without --plan and without --dry-run: still not implemented.
-  test('review exec --output json (no --plan / --dry-run): not implemented (exit 3)', async (t) => {
+  // exec without --plan and without --dry-run (#802 Phase 3 A1):
+  // resolves artifacts and builds the plan exactly like dry-run, but
+  // tags the artifact with debug.executionDeferred so consumers can tell
+  // that skill execution has not yet been wired (lands in A2).
+  test('review exec --output json (no flags): exit 0 with executionDeferred marker', async (t) => {
     const dir = setupRepo(t);
-    const r = await runCliInProcess(['review', 'exec', '--output', 'json'], { cwd: dir });
-    assert.equal(r.code, 3);
-    assert.match(r.stderr, /not implemented yet/);
-    assert.match(r.stderr, /cli-review-exec-spec/);
+    const out = join(dir, 'exec-deferred.json');
+    const r = await runCliInProcess(
+      ['review', 'exec', '--phase', 'upstream', '--output', 'json', '--output-file', out],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+    const a = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(validate(a), true, JSON.stringify(validate.errors));
+    assert.equal(a.version, '1');
+    assert.equal(a.phase, 'upstream');
+    assert.deepEqual(a.findings, []);
+    assert.equal(a.debug?.executionDeferred, true, 'debug.executionDeferred must be set');
+  });
+
+  test('review exec --dry-run does NOT set executionDeferred (explicit dry-run)', async (t) => {
+    const dir = setupRepo(t);
+    const out = join(dir, 'exec-dry.json');
+    const r = await runCliInProcess(
+      ['review', 'exec', '--dry-run', '--debug', '--output', 'json', '--output-file', out],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+    const a = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(a.debug?.executionDeferred, undefined);
+    assert.ok(a.debug?.resolvedArtifacts);
   });
 
   // verify still has no replay/execution path.

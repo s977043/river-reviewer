@@ -235,6 +235,46 @@ describe('runReviewPlan — output (#802 Phase 3)', () => {
     });
     assert.deepEqual(received.configArtifacts, {});
   });
+
+  test('executionDeferred:true sets debug.executionDeferred without debug:true', async () => {
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      executionDeferred: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: async () => ({}),
+    });
+    assert.ok(validate(artifact));
+    assert.equal(artifact.debug?.executionDeferred, true);
+    assert.equal(
+      artifact.debug?.resolvedArtifacts,
+      undefined,
+      'resolvedArtifacts requires debug:true'
+    );
+  });
+
+  test('executionDeferred:true coexists with debug:true (both fields present)', async () => {
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      executionDeferred: true,
+      debug: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: async () => ({}),
+    });
+    assert.equal(artifact.debug.executionDeferred, true);
+    assert.ok(artifact.debug.resolvedArtifacts);
+  });
+
+  test('executionDeferred:false (default) leaves debug.executionDeferred unset', async () => {
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: async () => ({}),
+    });
+    assert.equal(artifact.debug?.executionDeferred, undefined);
+  });
 });
 
 describe('runReviewExecReplay (#802 Phase 3 — --plan replay contract)', () => {

@@ -867,16 +867,20 @@ async function main(argv = process.argv.slice(2)) {
     const isExecPlanReplay =
       parsed.reviewSubcommand === 'exec' && typeof parsed.planFile === 'string';
 
-    // exec/verify (other than the dry-run / replay paths above): the
+    // `review exec` (no flags): #802 Phase 3 A1. Resolve artifacts and
+    // build the deterministic plan exactly like dry-run, but mark the
+    // artifact with `debug.executionDeferred: true` so consumers know
+    // skill execution was intentionally not performed yet. Findings will
+    // be populated in A2 once the skill execution adapter lands.
+    const isExecDeferred =
+      parsed.reviewSubcommand === 'exec' && !parsed.dryRun && typeof parsed.planFile !== 'string';
+
+    // verify (and any future review subcommand that is not exec): the
     // CLI/output contract is fixed and validated here (PR-3), but skill
     // execution and verify-side artifact reading are not implemented
     // yet. The contract depends only on the Artifact Input Contract IDs
     // — it does not depend on PlanGate.
-    if (
-      (parsed.reviewSubcommand === 'exec' || parsed.reviewSubcommand === 'verify') &&
-      !isExecDryRun &&
-      !isExecPlanReplay
-    ) {
+    if (parsed.reviewSubcommand === 'verify') {
       try {
         const { ReviewPlanError, resolveReviewOutputFormat } =
           await import('./lib/review-plan.mjs');
@@ -902,7 +906,10 @@ async function main(argv = process.argv.slice(2)) {
       );
       return 3;
     }
-    if (parsed.reviewSubcommand !== 'plan' && !isExecDryRun && !isExecPlanReplay) {
+    // At this point, the verify branch above has already returned, so the
+    // remaining valid subcommands are `plan` and `exec` (in any of its
+    // exec dry-run / replay / deferred forms). Anything else is unknown.
+    if (parsed.reviewSubcommand !== 'plan' && parsed.reviewSubcommand !== 'exec') {
       console.error(
         parsed.reviewSubcommand
           ? `river review ${parsed.reviewSubcommand} is not a known subcommand. Use: plan | exec | verify`
@@ -933,12 +940,13 @@ async function main(argv = process.argv.slice(2)) {
           artifact = await runReviewPlan({
             cwd: path.resolve(parsed.target),
             phase: parsed.phase,
-            // exec --dry-run == plan-only semantics (resolve + deterministic
-            // plan, no execution): force planOnly so runReviewPlan accepts it.
-            planOnly: isExecDryRun ? true : parsed.planOnly,
+            // exec --dry-run and exec (deferred) both reuse plan-only
+            // semantics (resolve + deterministic plan, no execution).
+            planOnly: isExecDryRun || isExecDeferred ? true : parsed.planOnly,
             cliArtifacts: parsed.cliArtifacts,
             artifactsDir: parsed.artifactsDir,
             debug: parsed.debug,
+            executionDeferred: isExecDeferred,
           });
         }
       } catch (err) {
