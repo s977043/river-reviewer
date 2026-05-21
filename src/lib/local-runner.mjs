@@ -15,7 +15,11 @@ import { loadRiskMap } from './risk-map.mjs';
 import { loadReviewMemory } from './memory-context.mjs';
 import { collectRepoContext } from './repo-context.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
-import { isLlmEnabled, parseList } from './utils.mjs';
+import {
+  isLlmEnabled,
+  parseList,
+  resolveAvailableContexts as resolveAvailableContextsShared,
+} from './utils.mjs';
 import { annotateFingerprints, computeFingerprint } from './finding-fingerprint.mjs';
 import { applySuppressions } from './suppression-apply.mjs';
 
@@ -101,11 +105,11 @@ function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
   return { matched, shouldSkip: matched.length > 0 };
 }
 
-function resolveAvailableContexts(inputContexts) {
-  const envContexts = parseList(process.env.RIVER_AVAILABLE_CONTEXTS);
-  const base = inputContexts?.length ? inputContexts : ['diff'];
-  return [...new Set([...base, ...envContexts])];
-}
+// Re-export the shared helper under the legacy name so the rest of this
+// module continues to call `resolveAvailableContexts(...)` unchanged.
+// The single source of truth now lives in src/lib/utils.mjs and is also
+// used by src/lib/review-plan.mjs (#802 Phase 3 A2-fix-1).
+const resolveAvailableContexts = (inputContexts) => resolveAvailableContextsShared(inputContexts);
 
 function resolveAvailableDependencies(inputDependencies) {
   const envDeps = parseList(process.env.RIVER_AVAILABLE_DEPENDENCIES);

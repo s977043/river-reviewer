@@ -193,6 +193,8 @@ var review_runner = __webpack_require__(4584);
 var review_engine = __webpack_require__(2022);
 // EXTERNAL MODULE: ./src/lib/planner-utils.mjs
 var planner_utils = __webpack_require__(1013);
+// EXTERNAL MODULE: ./src/lib/utils.mjs
+var utils = __webpack_require__(9746);
 ;// CONCATENATED MODULE: ./src/lib/review-plan.mjs
 /**
  * `river review plan` core — #802 Phase 3 (slices 1 + B-1)
@@ -220,6 +222,7 @@ var planner_utils = __webpack_require__(1013);
  * Pure-ish module: config loader, resolver, buildExecutionPlan and the
  * diff reader are injectable for tests.
  */
+
 
 
 
@@ -455,6 +458,14 @@ function toSelectedView(skill) {
  *   execution plan is built with `llmEnabled: true` so LLM-backed skills
  *   are selectable, and `generateReview` is invoked to populate the
  *   artifact `findings` array. Mutually exclusive with `executionDeferred`.
+ * @param {string[]} [opts.availableContexts] Contexts (artifact IDs) that
+ *   should satisfy a skill's `inputContext` requirement during selection.
+ *   When omitted, defaults to `['diff']` if a diff artifact is resolved.
+ *   Extra contexts from `RIVER_AVAILABLE_CONTEXTS` are always merged in
+ *   so CI environments can grant additional artifacts (tests, junit, ...)
+ *   without code changes. Without this, `buildExecutionPlan` receives an
+ *   empty list and every skill that declares `inputContext: ['diff']` is
+ *   silently skipped — the dogfood failure mode that motivated A2-fix-1.
  * @param {() => string} [opts.now] - timestamp factory (ISO 8601)
  * @param {(repoRoot: string) => Promise<object>} [opts.loadConfigImpl]
  * @param {Function} [opts.resolveAllArtifactsImpl]
@@ -473,6 +484,7 @@ async function runReviewPlan({
   debug = false,
   executionDeferred = false,
   executeReview = false,
+  availableContexts,
   now = () => new Date().toISOString(),
   loadConfigImpl = loader/* loadConfig */.Z9,
   resolveAllArtifactsImpl = resolveAllArtifacts,
@@ -533,13 +545,23 @@ async function runReviewPlan({
     } catch (err) {
       throw new ReviewPlanError(`Failed to read diff artifact: ${err.message}`);
     }
-    // Parse the diff once and reuse the result for both deriveChangedFiles
-    // (planning input) and generateReview (execution input) so we don't pay
-    // the parsing cost twice when executeReview is on.
+    // Parse the diff once and reuse the result. The same parser used to
+    // power deriveChangedFiles (planning input) also exposes the per-file
+    // structure generateReview needs (execution input).
     const parsedDiff = (0,diff/* parseUnifiedDiff */.rj)(diffText);
     const changedFiles = (parsedDiff.files ?? [])
       .map((f) => f.path)
       .filter((p) => p && p !== '/dev/null');
+
+    // Declare which artifact contexts are actually available so the plan
+    // layer's inputContext check doesn't silently skip skills that need a
+    // diff. We are in the diff-resolved branch, so `alwaysInclude: ['diff']`
+    // guarantees that a CLI override like `--context tests` does NOT drop
+    // 'diff' from the set (would re-introduce the A1 silent-skip failure).
+    // env var RIVER_AVAILABLE_CONTEXTS is merged in for CI overrides.
+    const effectiveAvailableContexts = (0,utils/* resolveAvailableContexts */.ud)(availableContexts, {
+      alwaysInclude: ['diff'],
+    });
 
     // The plan layer's selection rules differ by exec mode: for
     // plan-only/dry-run/deferred we restrict to heuristic skills, while
@@ -557,6 +579,7 @@ async function runReviewPlan({
         llmEnabled: executeReview,
         repoRoot: cwd,
         riskMap: undefined,
+        availableContexts: effectiveAvailableContexts,
       });
     } catch (err) {
       throw new ReviewPlanError(`Failed to build execution plan: ${err.message}`);

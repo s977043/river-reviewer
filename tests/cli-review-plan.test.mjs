@@ -630,3 +630,123 @@ index 1111111..2222222 100644
     assert.equal(called, false);
   });
 });
+
+describe('runReviewPlan availableContexts propagation (#802 Phase 3 A2-fix-1)', () => {
+  const diffPath = '/repo/diff.patch';
+  const sampleDiff = `diff --git a/src/foo.ts b/src/foo.ts
+index 1111111..2222222 100644
+--- a/src/foo.ts
++++ b/src/foo.ts
+@@ -1,3 +1,4 @@
+ export function foo() {
++  console.log('debug');
+   return 42;
+ }
+`;
+  const resolveDiff = () => ({ diff: { exists: true, path: diffPath, source: 'cwd' } });
+
+  function captureBuildExecutionPlanArgs() {
+    const captured = { args: null };
+    return {
+      captured,
+      impl: async (args) => {
+        captured.args = args;
+        return { selected: [], skipped: [] };
+      },
+    };
+  }
+
+  test('defaults to ["diff"] when a diff artifact is resolved', async () => {
+    const { captured, impl } = captureBuildExecutionPlanArgs();
+    await runReviewPlan({
+      planOnly: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: impl,
+    });
+    assert.deepEqual(captured.args.availableContexts, ['diff']);
+  });
+
+  test('respects an explicit availableContexts argument', async () => {
+    const { captured, impl } = captureBuildExecutionPlanArgs();
+    await runReviewPlan({
+      planOnly: true,
+      availableContexts: ['diff', 'tests', 'junit'],
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: impl,
+    });
+    assert.deepEqual(captured.args.availableContexts, ['diff', 'tests', 'junit']);
+  });
+
+  test('forces "diff" to remain present when CLI passes only narrower contexts', async () => {
+    // Regression for Gemini PR #865 review: previously `--context tests`
+    // would silently drop the diff context and re-introduce the A1
+    // silent-skip failure. We now alwaysInclude: ['diff'] when running
+    // in the diff-resolved branch.
+    const { captured, impl } = captureBuildExecutionPlanArgs();
+    await runReviewPlan({
+      planOnly: true,
+      availableContexts: ['tests'],
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: impl,
+    });
+    assert.deepEqual([...captured.args.availableContexts].sort(), ['diff', 'tests']);
+  });
+
+  test('merges RIVER_AVAILABLE_CONTEXTS into the effective set (dedup)', async () => {
+    const previous = process.env.RIVER_AVAILABLE_CONTEXTS;
+    process.env.RIVER_AVAILABLE_CONTEXTS = 'tests, junit';
+    try {
+      const { captured, impl } = captureBuildExecutionPlanArgs();
+      await runReviewPlan({
+        planOnly: true,
+        availableContexts: ['diff'],
+        now: fixedNow,
+        loadConfigImpl: okConfig,
+        resolveAllArtifactsImpl: resolveDiff,
+        readFileImpl: async () => sampleDiff,
+        buildExecutionPlanImpl: impl,
+      });
+      assert.deepEqual([...captured.args.availableContexts].sort(), ['diff', 'junit', 'tests']);
+    } finally {
+      if (previous == null) delete process.env.RIVER_AVAILABLE_CONTEXTS;
+      else process.env.RIVER_AVAILABLE_CONTEXTS = previous;
+    }
+  });
+
+  test('empty availableContexts falls back to the diff default', async () => {
+    const { captured, impl } = captureBuildExecutionPlanArgs();
+    await runReviewPlan({
+      planOnly: true,
+      availableContexts: [],
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: impl,
+    });
+    assert.deepEqual(captured.args.availableContexts, ['diff']);
+  });
+
+  test('availableContexts does not leak into the artifact (debug-only field)', async () => {
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      availableContexts: ['diff'],
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async () => ({ selected: [], skipped: [] }),
+    });
+    assert.ok(validate(artifact), `schema invalid: ${JSON.stringify(validate.errors)}`);
+    assert.equal(artifact.plan.availableContexts, undefined);
+  });
+});
