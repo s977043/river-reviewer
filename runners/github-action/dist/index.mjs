@@ -57488,18 +57488,25 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
     // `review exec --dry-run` (without --plan): per spec, dry-run does
     // no LLM/skill execution — it only resolves inputs and produces a
     // deterministic plan, which is exactly `runReviewPlan`'s behavior.
-    // It is routed through the shared plan path below. `--plan` replay
-    // and non-dry-run exec are execution responsibilities (still exit 3).
+    // It is routed through the shared plan path below.
     const isExecDryRun = parsed.reviewSubcommand === 'exec' && parsed.dryRun && !parsed.planFile;
 
-    // exec/verify (other than the dry-run foundation above): the
+    // `review exec --plan <path>` (replay): the external plan is the
+    // source of truth (#802 Phase 3, replay contract). Artifact
+    // resolution and buildExecutionPlan are NOT re-run. Skill execution
+    // is out of scope here, so `findings` stays empty for now.
+    const isExecPlanReplay =
+      parsed.reviewSubcommand === 'exec' && typeof parsed.planFile === 'string';
+
+    // exec/verify (other than the dry-run / replay paths above): the
     // CLI/output contract is fixed and validated here (PR-3), but skill
-    // execution / plan replay / artifact reading are not implemented
+    // execution and verify-side artifact reading are not implemented
     // yet. The contract depends only on the Artifact Input Contract IDs
     // — it does not depend on PlanGate.
     if (
       (parsed.reviewSubcommand === 'exec' || parsed.reviewSubcommand === 'verify') &&
-      !isExecDryRun
+      !isExecDryRun &&
+      !isExecPlanReplay
     ) {
       try {
         const { ReviewPlanError, resolveReviewOutputFormat } =
@@ -57526,7 +57533,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       );
       return 3;
     }
-    if (parsed.reviewSubcommand !== 'plan' && !isExecDryRun) {
+    if (parsed.reviewSubcommand !== 'plan' && !isExecDryRun && !isExecPlanReplay) {
       console.error(
         parsed.reviewSubcommand
           ? `river review ${parsed.reviewSubcommand} is not a known subcommand. Use: plan | exec | verify`
@@ -57535,7 +57542,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       return 3;
     }
     try {
-      const { runReviewPlan, ReviewPlanError, resolveReviewOutputFormat } =
+      const { runReviewPlan, runReviewExecReplay, ReviewPlanError, resolveReviewOutputFormat } =
         await __nccwpck_require__.e(/* import() */ 794).then(__nccwpck_require__.bind(__nccwpck_require__, 2794));
       try {
         resolveReviewOutputFormat(parsed);
@@ -57548,16 +57555,23 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       }
       let artifact;
       try {
-        artifact = await runReviewPlan({
-          cwd: external_node_path_.resolve(parsed.target),
-          phase: parsed.phase,
-          // exec --dry-run == plan-only semantics (resolve + deterministic
-          // plan, no execution): force planOnly so runReviewPlan accepts it.
-          planOnly: isExecDryRun ? true : parsed.planOnly,
-          cliArtifacts: parsed.cliArtifacts,
-          artifactsDir: parsed.artifactsDir,
-          debug: parsed.debug,
-        });
+        if (isExecPlanReplay) {
+          artifact = await runReviewExecReplay({
+            planFile: external_node_path_.resolve(parsed.planFile),
+            debug: parsed.debug,
+          });
+        } else {
+          artifact = await runReviewPlan({
+            cwd: external_node_path_.resolve(parsed.target),
+            phase: parsed.phase,
+            // exec --dry-run == plan-only semantics (resolve + deterministic
+            // plan, no execution): force planOnly so runReviewPlan accepts it.
+            planOnly: isExecDryRun ? true : parsed.planOnly,
+            cliArtifacts: parsed.cliArtifacts,
+            artifactsDir: parsed.artifactsDir,
+            debug: parsed.debug,
+          });
+        }
       } catch (err) {
         if (err instanceof ReviewPlanError) {
           console.error(`Error: ${err.message}`);

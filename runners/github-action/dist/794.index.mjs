@@ -10,6 +10,7 @@ export const modules = {
 __webpack_require__.d(__webpack_exports__, {
   ReviewPlanError: () => (/* binding */ ReviewPlanError),
   resolveReviewOutputFormat: () => (/* binding */ resolveReviewOutputFormat),
+  runReviewExecReplay: () => (/* binding */ runReviewExecReplay),
   runReviewPlan: () => (/* binding */ runReviewPlan)
 });
 
@@ -236,6 +237,134 @@ class ReviewPlanError extends Error {
     super(message);
     this.name = 'ReviewPlanError';
   }
+}
+
+const PLANNER_MODES = new Set(['off', 'order', 'prune']);
+
+/**
+ * Replay a previously emitted plan as a Review Artifact (`--plan <path>`).
+ *
+ * Contract (#802 Phase 3 — replay foundation):
+ *   - Input may be either a full Review Artifact (with `plan` and `phase`)
+ *     or the bare plan object (must contain `selectedSkills`).
+ *   - The source plan's `phase` is authoritative; the CLI `--phase` value
+ *     is intentionally ignored to preserve determinism of the replay.
+ *   - Artifact resolution and `buildExecutionPlan` are NOT re-run, so the
+ *     selectedSkills/skippedSkills are echoed verbatim (subject to schema
+ *     normalization). This locks the spec contract: "external plan wins".
+ *   - Skill execution is out of scope here; `findings` stays `[]` and
+ *     `status` is derived from the plan's selectedSkills emptiness, the
+ *     same as `runReviewPlan`'s no-changes branch.
+ *
+ * @param {object} opts
+ * @param {string} opts.planFile  Path to the plan JSON file.
+ * @param {boolean} [opts.debug]  Attach replay debug info under `debug`.
+ * @param {() => string} [opts.now]
+ * @param {(p: string) => Promise<string>} [opts.readFileImpl]
+ * @returns {Promise<object>} Review Artifact (schema version "1")
+ */
+async function runReviewExecReplay({
+  planFile,
+  debug = false,
+  now = () => new Date().toISOString(),
+  readFileImpl = (p) => (0,promises_.readFile)(p, 'utf8'),
+} = {}) {
+  if (!planFile || typeof planFile !== 'string') {
+    throw new ReviewPlanError('--plan requires a file path.');
+  }
+
+  let raw;
+  try {
+    raw = await readFileImpl(planFile);
+  } catch (err) {
+    throw new ReviewPlanError(`Failed to read --plan file "${planFile}": ${err.message}`);
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    throw new ReviewPlanError(`Failed to parse --plan JSON at "${planFile}": ${err.message}`);
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new ReviewPlanError(`--plan JSON at "${planFile}" must be a JSON object.`);
+  }
+
+  // Accept either a full Review Artifact (extract .plan) or a bare plan.
+  const sourcePlan =
+    parsed.plan && typeof parsed.plan === 'object' && !Array.isArray(parsed.plan)
+      ? parsed.plan
+      : parsed;
+  const phaseFromArtifact =
+    typeof parsed.phase === 'string' && VALID_PHASES.has(parsed.phase) ? parsed.phase : null;
+
+  if (!Array.isArray(sourcePlan.selectedSkills)) {
+    throw new ReviewPlanError(
+      `--plan JSON at "${planFile}" must have plan.selectedSkills (array). ` +
+        'Pass a Review Artifact produced by `river review plan` or its bare `plan` object.'
+    );
+  }
+
+  const plannerMode =
+    typeof sourcePlan.plannerMode === 'string' && PLANNER_MODES.has(sourcePlan.plannerMode)
+      ? sourcePlan.plannerMode
+      : 'off';
+
+  const selectedSkills = sourcePlan.selectedSkills.map((entry, index) => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      throw new ReviewPlanError(
+        `--plan plan.selectedSkills[${index}] must be an object with an id.`
+      );
+    }
+    if (typeof entry.id !== 'string' || entry.id.length === 0) {
+      throw new ReviewPlanError(
+        `--plan plan.selectedSkills[${index}].id must be a non-empty string.`
+      );
+    }
+    const out = { id: entry.id, name: typeof entry.name === 'string' ? entry.name : entry.id };
+    if (VALID_PHASES.has(entry.phase)) out.phase = entry.phase;
+    if (MODEL_HINTS.has(entry.modelHint)) out.modelHint = entry.modelHint;
+    return out;
+  });
+
+  const skippedRaw = Array.isArray(sourcePlan.skippedSkills) ? sourcePlan.skippedSkills : [];
+  const skippedSkills = skippedRaw.map((entry, index) => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      throw new ReviewPlanError(
+        `--plan plan.skippedSkills[${index}] must be an object with id and reasons.`
+      );
+    }
+    if (typeof entry.id !== 'string' || entry.id.length === 0) {
+      throw new ReviewPlanError(
+        `--plan plan.skippedSkills[${index}].id must be a non-empty string.`
+      );
+    }
+    const reasons = Array.isArray(entry.reasons) ? entry.reasons.map(String) : [];
+    return { id: entry.id, reasons };
+  });
+
+  const phase = phaseFromArtifact ?? 'midstream';
+
+  const artifact = {
+    version: '1',
+    timestamp: now(),
+    phase,
+    status: selectedSkills.length > 0 ? 'ok' : 'no-changes',
+    findings: [],
+    plan: { plannerMode, selectedSkills, skippedSkills },
+  };
+
+  if (debug) {
+    artifact.debug = {
+      replay: {
+        source: planFile,
+        sourcePhase: phaseFromArtifact,
+        sourceTimestamp: typeof parsed.timestamp === 'string' ? parsed.timestamp : null,
+      },
+    };
+  }
+
+  return artifact;
 }
 
 /**
