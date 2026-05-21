@@ -264,15 +264,27 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
 
   // --- #802 Phase 3 PR-3: exec/verify parser/dispatch contract ---
 
-  // exec without --plan and without --dry-run (#802 Phase 3 A1):
-  // resolves artifacts and builds the plan exactly like dry-run, but
-  // tags the artifact with debug.executionDeferred so consumers can tell
-  // that skill execution has not yet been wired (lands in A2).
-  test('review exec --output json (no flags): exit 0 with executionDeferred marker', async (t) => {
+  // exec without --plan and without --dry-run (#802 Phase 3 A2-1):
+  // resolves artifacts, builds the execution plan with llmEnabled:true so
+  // non-heuristic skills can be selected, and calls generateReview to
+  // populate findings via the LLM-or-heuristic pipeline. Without an API
+  // key the LLM is skipped and findings stay empty, but the structure is
+  // exercised end-to-end and `debug.execution` captures the wiring.
+  test('review exec --output json (no flags): exit 0 with execution trace', async (t) => {
     const dir = setupRepo(t);
-    const out = join(dir, 'exec-deferred.json');
+    const out = join(dir, 'exec-execute.json');
     const r = await runCliInProcess(
-      ['review', 'exec', '--phase', 'upstream', '--output', 'json', '--output-file', out],
+      [
+        'review',
+        'exec',
+        '--phase',
+        'upstream',
+        '--debug',
+        '--output',
+        'json',
+        '--output-file',
+        out,
+      ],
       { cwd: dir }
     );
     assert.equal(r.code, 0, r.stderr);
@@ -280,11 +292,18 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.equal(validate(a), true, JSON.stringify(validate.errors));
     assert.equal(a.version, '1');
     assert.equal(a.phase, 'upstream');
-    assert.deepEqual(a.findings, []);
-    assert.equal(a.debug?.executionDeferred, true, 'debug.executionDeferred must be set');
+    assert.ok(Array.isArray(a.findings), 'findings must be an array');
+    assert.equal(
+      a.debug?.executionDeferred,
+      undefined,
+      'executionDeferred must NOT be set in A2-1'
+    );
+    assert.ok(a.debug?.execution, 'debug.execution must record the run');
+    assert.equal(typeof a.debug.execution.skillsExecuted, 'number');
+    assert.equal(typeof a.debug.execution.findingsCount, 'number');
   });
 
-  test('review exec --dry-run does NOT set executionDeferred (explicit dry-run)', async (t) => {
+  test('review exec --dry-run keeps the deterministic plan path (no execution trace)', async (t) => {
     const dir = setupRepo(t);
     const out = join(dir, 'exec-dry.json');
     const r = await runCliInProcess(
@@ -294,6 +313,7 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.equal(r.code, 0, r.stderr);
     const a = JSON.parse(readFileSync(out, 'utf8'));
     assert.equal(a.debug?.executionDeferred, undefined);
+    assert.equal(a.debug?.execution, undefined, '--dry-run must not populate execution trace');
     assert.ok(a.debug?.resolvedArtifacts);
   });
 

@@ -30,8 +30,9 @@ import { readFile } from 'node:fs/promises';
 
 import { loadConfig as defaultLoadConfig } from '../config/loader.mjs';
 import { resolveAllArtifacts as defaultResolveAllArtifacts } from '../config/artifact-resolver.mjs';
-import { deriveChangedFiles } from './diff.mjs';
+import { deriveChangedFiles, parseUnifiedDiff } from './diff.mjs';
 import { buildExecutionPlan as defaultBuildExecutionPlan } from '../../runners/core/review-runner.mjs';
+import { generateReview as defaultGenerateReview } from './review-engine.mjs';
 import { PHASES, PLANNER_MODES } from './planner-utils.mjs';
 
 const VALID_PHASES = new Set(PHASES);
@@ -254,10 +255,16 @@ function toSelectedView(skill) {
  *   effect on `selectedSkills`/`skippedSkills` — the plan path is identical
  *   to `--dry-run`; this flag is the marker so consumers can distinguish
  *   "deferred" from "really did nothing".
+ * @param {boolean} [opts.executeReview] When true (#802 Phase 3 A2-1), the
+ *   execution plan is built with `llmEnabled: true` so LLM-backed skills
+ *   are selectable, and `generateReview` is invoked to populate the
+ *   artifact `findings` array. Mutually exclusive with `executionDeferred`.
  * @param {() => string} [opts.now] - timestamp factory (ISO 8601)
  * @param {(repoRoot: string) => Promise<object>} [opts.loadConfigImpl]
  * @param {Function} [opts.resolveAllArtifactsImpl]
  * @param {Function} [opts.buildExecutionPlanImpl]
+ * @param {Function} [opts.generateReviewImpl] Injectable for tests so the
+ *   adapter wiring can be verified without calling an external LLM.
  * @param {(p: string) => Promise<string>} [opts.readFileImpl]
  * @returns {Promise<object>} Review Artifact (schema version "1")
  */
@@ -269,12 +276,19 @@ export async function runReviewPlan({
   artifactsDir,
   debug = false,
   executionDeferred = false,
+  executeReview = false,
   now = () => new Date().toISOString(),
   loadConfigImpl = defaultLoadConfig,
   resolveAllArtifactsImpl = defaultResolveAllArtifacts,
   buildExecutionPlanImpl = defaultBuildExecutionPlan,
+  generateReviewImpl = defaultGenerateReview,
   readFileImpl = (p) => readFile(p, 'utf8'),
 } = {}) {
+  if (executeReview && executionDeferred) {
+    throw new ReviewPlanError(
+      'executeReview and executionDeferred are mutually exclusive options.'
+    );
+  }
   if (!planOnly) {
     throw new ReviewPlanError(
       'river review plan currently supports only --plan-only (Phase 3). ' +
@@ -315,6 +329,7 @@ export async function runReviewPlan({
   };
 
   const diffRes = resolved?.diff;
+  let executionTrace = null;
   if (diffRes?.exists && diffRes.path) {
     let diffText;
     try {
@@ -322,8 +337,18 @@ export async function runReviewPlan({
     } catch (err) {
       throw new ReviewPlanError(`Failed to read diff artifact: ${err.message}`);
     }
-    const changedFiles = deriveChangedFiles(diffText);
+    // Parse the diff once and reuse the result for both deriveChangedFiles
+    // (planning input) and generateReview (execution input) so we don't pay
+    // the parsing cost twice when executeReview is on.
+    const parsedDiff = parseUnifiedDiff(diffText);
+    const changedFiles = (parsedDiff.files ?? [])
+      .map((f) => f.path)
+      .filter((p) => p && p !== '/dev/null');
 
+    // The plan layer's selection rules differ by exec mode: for
+    // plan-only/dry-run/deferred we restrict to heuristic skills, while
+    // executeReview must allow LLM-backed skills so the planner can
+    // produce a meaningful selectedSkills set for generateReview.
     let plan;
     try {
       plan = await buildExecutionPlanImpl({
@@ -332,8 +357,8 @@ export async function runReviewPlan({
         diffText,
         plannerMode: 'off',
         planner: undefined,
-        dryRun: true,
-        llmEnabled: false,
+        dryRun: !executeReview,
+        llmEnabled: executeReview,
         repoRoot: cwd,
         riskMap: undefined,
       });
@@ -346,17 +371,103 @@ export async function runReviewPlan({
       id: String(meta(s.skill).id ?? ''),
       reasons: Array.isArray(s.reasons) ? s.reasons.map(String) : [],
     }));
+
+    if (executeReview) {
+      let review;
+      try {
+        // Pass the loaded config through so generateReview honors
+        // project-level review settings (language, severity preset, etc.).
+        // Wider context (fileTypes/relatedADRs/reviewMode) is deferred to
+        // a follow-up slice that pulls those producers into the exec path.
+        review = await generateReviewImpl({
+          diff: { diffText, files: parsedDiff.files ?? [] },
+          plan: { selected: plan.selected ?? [] },
+          phase,
+          dryRun: false,
+          config,
+        });
+      } catch (err) {
+        throw new ReviewPlanError(`Failed to execute review skills: ${err.message}`);
+      }
+      const rawFindings = Array.isArray(review?.findings) ? review.findings : [];
+      artifact.findings = rawFindings.map((f, i) => normalizeFindingForArtifact(f, i, phase));
+      executionTrace = {
+        skillsExecuted: artifact.plan.selectedSkills.length,
+        findingsCount: artifact.findings.length,
+        llmUsed: review?.debug?.llmUsed === true,
+        llmSkipped: review?.debug?.llmSkipped ?? null,
+        heuristicsUsed: review?.debug?.heuristicsUsed === true,
+      };
+    }
   } else {
     // No diff artifact resolved and no git fallback in this slice:
     // per cli-review-plan-spec.md this is a no-op review, not an error.
     artifact.status = 'no-changes';
   }
 
-  if (debug || executionDeferred) {
+  if (debug || executionDeferred || executionTrace) {
     artifact.debug = artifact.debug ?? {};
     if (debug) artifact.debug.resolvedArtifacts = resolved;
     if (executionDeferred) artifact.debug.executionDeferred = true;
+    if (executionTrace) artifact.debug.execution = executionTrace;
   }
 
   return artifact;
+}
+
+/**
+ * Convert a generateReview finding to the Review Artifact schema shape
+ * (#802 Phase 3 A2-1). The internal pipeline uses `lineStart`/`lineEnd`;
+ * the schema requires `line`/`lineEnd`. This is the local adapter — the
+ * same bridge exists in `formatJsonOutput` (src/cli.mjs) for the
+ * `river run .` legacy path.
+ */
+function normalizeFindingForArtifact(finding, index, phase) {
+  const id =
+    typeof finding.id === 'string' && finding.id.length > 0 ? finding.id : `rr-${index + 1}`;
+  const ruleId =
+    typeof finding.ruleId === 'string' && finding.ruleId.length > 0 ? finding.ruleId : 'unknown';
+  const title =
+    typeof finding.title === 'string' && finding.title.length > 0
+      ? finding.title
+      : (finding.message ?? '').slice(0, 80) || ruleId;
+  const message = typeof finding.message === 'string' ? finding.message : '';
+  const severity = ['info', 'minor', 'major', 'critical'].includes(finding.severity)
+    ? finding.severity
+    : 'major';
+  const out = {
+    id,
+    ruleId,
+    title,
+    message,
+    severity,
+    phase: VALID_PHASES.has(finding.phase) ? finding.phase : phase,
+    file: typeof finding.file === 'string' ? finding.file : '<unknown>',
+  };
+  if (finding.lineStart && Number.isInteger(finding.lineStart) && finding.lineStart >= 1) {
+    out.line = finding.lineStart;
+  } else if (finding.line && Number.isInteger(finding.line) && finding.line >= 1) {
+    out.line = finding.line;
+  }
+  if (
+    finding.lineEnd &&
+    Number.isInteger(finding.lineEnd) &&
+    finding.lineEnd >= 1 &&
+    finding.lineEnd !== (finding.lineStart ?? finding.line)
+  ) {
+    out.lineEnd = finding.lineEnd;
+  }
+  if (finding.confidence && ['high', 'medium', 'low'].includes(finding.confidence)) {
+    out.confidence = finding.confidence;
+  }
+  if (finding.status && ['open', 'suppressed', 'verified'].includes(finding.status)) {
+    out.status = finding.status;
+  }
+  if (Array.isArray(finding.evidence) && finding.evidence.length > 0) {
+    out.evidence = finding.evidence;
+  }
+  if (typeof finding.suggestion === 'string' && finding.suggestion.length > 0) {
+    out.suggestion = finding.suggestion;
+  }
+  return out;
 }

@@ -419,3 +419,214 @@ describe('runReviewExecReplay (#802 Phase 3 — --plan replay contract)', () => 
     );
   });
 });
+
+describe('runReviewPlan({ executeReview }) (#802 Phase 3 A2-1)', () => {
+  const diffPath = '/repo/diff.patch';
+  const sampleDiff = `diff --git a/src/foo.ts b/src/foo.ts
+index 1111111..2222222 100644
+--- a/src/foo.ts
++++ b/src/foo.ts
+@@ -1,3 +1,4 @@
+ export function foo() {
++  console.log('debug');
+   return 42;
+ }
+`;
+
+  function resolveDiff() {
+    return { diff: { exists: true, path: diffPath, source: 'cwd' } };
+  }
+
+  function planWithSkill() {
+    return {
+      selected: [{ metadata: { id: 'rr-test-skill', name: 'Test', phase: 'midstream' } }],
+      skipped: [],
+    };
+  }
+
+  test('executeReview:true wires generateReview and populates schema-valid findings', async () => {
+    let received;
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      executeReview: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async () => planWithSkill(),
+      generateReviewImpl: async (opts) => {
+        received = opts;
+        return {
+          findings: [
+            {
+              id: 'rr-1',
+              ruleId: 'rr-test-skill',
+              title: 'Avoid console.log in production',
+              message: 'Use the logger instead.',
+              severity: 'minor',
+              file: 'src/foo.ts',
+              lineStart: 2,
+              lineEnd: 2,
+              confidence: 'high',
+              status: 'open',
+              suggestion: 'Remove the debug log',
+            },
+          ],
+          debug: { llmUsed: false, heuristicsUsed: true },
+        };
+      },
+    });
+    assert.ok(validate(artifact), `schema invalid: ${JSON.stringify(validate.errors)}`);
+    assert.equal(artifact.status, 'ok');
+    assert.equal(artifact.findings.length, 1);
+    const f = artifact.findings[0];
+    assert.equal(f.line, 2, 'lineStart must be projected as line');
+    assert.equal(f.lineEnd, undefined, 'lineEnd is omitted when equal to lineStart');
+    assert.equal(f.phase, 'midstream', 'phase falls back to artifact phase');
+    assert.equal(f.severity, 'minor');
+    assert.equal(received.diff.diffText, sampleDiff);
+    assert.equal(received.dryRun, false);
+    assert.equal(received.plan.selected.length, 1);
+  });
+
+  test('executeReview:true builds plan with llmEnabled:true (fixes A1 emptiness)', async () => {
+    let planArgs;
+    await runReviewPlan({
+      planOnly: true,
+      executeReview: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async (args) => {
+        planArgs = args;
+        return planWithSkill();
+      },
+      generateReviewImpl: async () => ({ findings: [] }),
+    });
+    assert.equal(planArgs.llmEnabled, true);
+    assert.equal(planArgs.dryRun, false);
+  });
+
+  test('executeReview:false (default) keeps llmEnabled:false (plan-only path)', async () => {
+    let planArgs;
+    await runReviewPlan({
+      planOnly: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async (args) => {
+        planArgs = args;
+        return planWithSkill();
+      },
+      generateReviewImpl: async () => {
+        throw new Error('generateReview must NOT be called when executeReview is false');
+      },
+    });
+    assert.equal(planArgs.llmEnabled, false);
+    assert.equal(planArgs.dryRun, true);
+  });
+
+  test('executeReview:true attaches debug.execution trace', async () => {
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      executeReview: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async () => planWithSkill(),
+      generateReviewImpl: async () => ({
+        findings: [],
+        debug: { llmUsed: false, llmSkipped: 'API key missing', heuristicsUsed: false },
+      }),
+    });
+    assert.equal(artifact.debug.execution.skillsExecuted, 1);
+    assert.equal(artifact.debug.execution.findingsCount, 0);
+    assert.equal(artifact.debug.execution.llmUsed, false);
+    assert.equal(artifact.debug.execution.llmSkipped, 'API key missing');
+  });
+
+  test('throws when both executeReview and executionDeferred are true', async () => {
+    await assert.rejects(
+      () =>
+        runReviewPlan({
+          planOnly: true,
+          executeReview: true,
+          executionDeferred: true,
+          now: fixedNow,
+          loadConfigImpl: okConfig,
+        }),
+      (e) => e instanceof ReviewPlanError && /mutually exclusive/.test(e.message)
+    );
+  });
+
+  test('generateReview failure surfaces as ReviewPlanError', async () => {
+    await assert.rejects(
+      () =>
+        runReviewPlan({
+          planOnly: true,
+          executeReview: true,
+          now: fixedNow,
+          loadConfigImpl: okConfig,
+          resolveAllArtifactsImpl: resolveDiff,
+          readFileImpl: async () => sampleDiff,
+          buildExecutionPlanImpl: async () => planWithSkill(),
+          generateReviewImpl: async () => {
+            throw new Error('LLM blew up');
+          },
+        }),
+      (e) => e instanceof ReviewPlanError && /Failed to execute review skills/.test(e.message)
+    );
+  });
+
+  test('finding with phase upstream is preserved (not overwritten by artifact phase)', async () => {
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      executeReview: true,
+      phase: 'midstream',
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async () => planWithSkill(),
+      generateReviewImpl: async () => ({
+        findings: [
+          {
+            ruleId: 'rr-upstream-x',
+            title: 'design review',
+            message: 'plan mismatch',
+            severity: 'major',
+            phase: 'upstream',
+            file: 'docs/plan.md',
+            lineStart: 5,
+            lineEnd: 7,
+          },
+        ],
+      }),
+    });
+    assert.ok(validate(artifact));
+    const f = artifact.findings[0];
+    assert.equal(f.phase, 'upstream');
+    assert.equal(f.line, 5);
+    assert.equal(f.lineEnd, 7);
+  });
+
+  test('no-diff path returns no-changes without invoking generateReview', async () => {
+    let called = false;
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      executeReview: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: async () => ({ diff: { exists: false } }),
+      generateReviewImpl: async () => {
+        called = true;
+        return { findings: [] };
+      },
+    });
+    assert.equal(artifact.status, 'no-changes');
+    assert.equal(called, false);
+  });
+});
