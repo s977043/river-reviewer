@@ -408,16 +408,22 @@ export async function runReviewPlan({
     if (executeReview) {
       let review;
       try {
-        // Pass the loaded config through so generateReview honors
-        // project-level review settings (language, severity preset, etc.).
-        // Wider context (fileTypes/relatedADRs/reviewMode) is deferred to
-        // a follow-up slice that pulls those producers into the exec path.
+        // Pass the loaded config plus the analysis context that
+        // buildExecutionPlan already derived (fileTypes / relatedADRs /
+        // reviewMode). generateReview uses fileTypes for the verifier's
+        // file-phase coherence check and the others for prompt enrichment
+        // — when omitted, the prompt loses ADR cross-references and the
+        // reviewMode-driven budget preset, which is a quiet quality loss
+        // rather than a hard failure (Codex silent-skip taxonomy).
         review = await generateReviewImpl({
           diff: { diffText, files: parsedDiff.files ?? [] },
           plan: { selected: plan.selected ?? [] },
           phase,
           dryRun: false,
           config,
+          fileTypes: plan.fileTypes ?? undefined,
+          relatedADRs: plan.relatedADRs ?? undefined,
+          reviewMode: plan.reviewMode ?? undefined,
         });
       } catch (err) {
         throw new ReviewPlanError(`Failed to execute review skills: ${err.message}`);
