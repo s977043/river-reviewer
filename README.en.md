@@ -63,7 +63,7 @@ npx river run . --dry-run
 | Estimate run cost       | [Cost estimation guide](pages/guides/cost-estimation.en.md)                              |
 | Understand the design   | [Architecture docs](https://river-reviewer.vercel.app/explanation/river-architecture/)   |
 
-License details are at the [bottom of this file](#license).
+See [docs/runbook/dev.md](docs/runbook/dev.md) for the development runbook. License details are at the [bottom of this file](#license).
 
 ## FAQ
 
@@ -285,7 +285,7 @@ Following the concept refresh (2026-05), the roadmap is organized into the follo
 - **Epic 0**: Official Skill Pack and Minimal Registry (security / a11y / migration-safety / dependency-policy / plan-conformance)
 - **Epic 1**: First-Run Adoption (npm distribution, `npx river try`, 10-minute Quick Start, [#800](https://github.com/s977043/river-reviewer/issues/800))
 - **Epic 2**: SDLC Gates (stabilize `plan` / `exec` / `verify` CLI, artifact-input-contract v1, [#802](https://github.com/s977043/river-reviewer/issues/802))
-- **Epic 3**: Concept Refresh (README / vision / intro — landing with this PR)
+- **Epic 3**: Concept Refresh (README / vision / intro)
 - **Epic 4**: Skill Authoring and Governance (`npx river create skill`, catalog, contribution policy)
 - **Epic 5**: Evaluation Observability (CI regression, skill badges, dashboard)
 - **Epic 6**: Docs IA and Onboarding (first-run / skill authoring / CI operation paths)

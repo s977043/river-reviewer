@@ -3,7 +3,7 @@ id: intro
 title: River Reviewer へようこそ
 ---
 
-River Reviewer (RR) は、**チームのレビュー判断を skill として明示化・バージョン管理し、SDLC の各ゲートで実行する OSS フレームワーク**です。plan / diff / test-cases / junit / 既存レビュー結果といったアーティファクトをまたいで動作し、AI 支援開発における **チーム所有の監査レイヤー** として機能します。
+River Reviewer (RR) は、**チームのレビュー判断を skill として明示化・バージョン管理し、SDLC の各ゲートで実行する OSS フレームワーク**です。plan / diff / tests / JUnit / 既存レビュー結果といったアーティファクトをまたいで動作し、AI 支援開発における **チーム所有の監査レイヤー** として機能します。
 
 ## コアモデル
 
