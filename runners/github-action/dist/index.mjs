@@ -57511,12 +57511,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
     // execution and verify-side artifact reading are not implemented
     // yet. The contract depends only on the Artifact Input Contract IDs
     // — it does not depend on PlanGate.
-    if (
-      parsed.reviewSubcommand === 'verify' &&
-      !isExecDryRun &&
-      !isExecPlanReplay &&
-      !isExecDeferred
-    ) {
+    if (parsed.reviewSubcommand === 'verify') {
       try {
         const { ReviewPlanError, resolveReviewOutputFormat } =
           await __nccwpck_require__.e(/* import() */ 794).then(__nccwpck_require__.bind(__nccwpck_require__, 2794));
@@ -57542,12 +57537,10 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       );
       return 3;
     }
-    if (
-      parsed.reviewSubcommand !== 'plan' &&
-      !isExecDryRun &&
-      !isExecPlanReplay &&
-      !isExecDeferred
-    ) {
+    // At this point, the verify branch above has already returned, so the
+    // remaining valid subcommands are `plan` and `exec` (in any of its
+    // exec dry-run / replay / deferred forms). Anything else is unknown.
+    if (parsed.reviewSubcommand !== 'plan' && parsed.reviewSubcommand !== 'exec') {
       console.error(
         parsed.reviewSubcommand
           ? `river review ${parsed.reviewSubcommand} is not a known subcommand. Use: plan | exec | verify`
