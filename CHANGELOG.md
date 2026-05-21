@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.51.0](https://github.com/s977043/river-reviewer/compare/v0.50.0...v0.51.0) (2026-05-21)
+
+
+### Features
+
+* **cli:** river review exec --plan replay foundation ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3) ([#861](https://github.com/s977043/river-reviewer/issues/861)) ([9445a7a](https://github.com/s977043/river-reviewer/commit/9445a7a7b85cdb214238c692ac335b0171d6d0cb))
+* **cli:** river review exec deferred execution path ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 A1) ([#863](https://github.com/s977043/river-reviewer/issues/863)) ([0e246d7](https://github.com/s977043/river-reviewer/commit/0e246d726331554f8573bc0d0067d7ddafc2af49))
+* **cli:** river review exec generateReview adapter ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 A2-1) ([#864](https://github.com/s977043/river-reviewer/issues/864)) ([66943b3](https://github.com/s977043/river-reviewer/commit/66943b313a5d6c07203aac84fe60ace7d2f85a74))
+
+
+### Bug Fixes
+
+* **cli:** propagate availableContexts to plan layer ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 A2-fix-1) ([#865](https://github.com/s977043/river-reviewer/issues/865)) ([074db50](https://github.com/s977043/river-reviewer/commit/074db50344522fd0ad477c0f94783ae83a80cca5))
+
 ## [0.50.0](https://github.com/s977043/river-reviewer/compare/v0.49.0...v0.50.0) (2026-05-18)
 
 
