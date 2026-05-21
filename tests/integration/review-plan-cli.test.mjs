@@ -15,7 +15,7 @@
 // (技術的負債: --output-file 非依存の stdout 捕捉は別 slice で扱う。)
 
 import assert from 'node:assert/strict';
-import { copyFileSync, readFileSync } from 'node:fs';
+import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test, { describe } from 'node:test';
@@ -264,18 +264,28 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
 
   // --- #802 Phase 3 PR-3: exec/verify parser/dispatch contract ---
 
-  for (const sub of ['exec', 'verify']) {
-    test(`review ${sub} --output json: contract accepted, execution not implemented (exit 3)`, async (t) => {
-      const dir = setupRepo(t);
-      const r = await runCliInProcess(
-        ['review', sub, '--plan', './plan.json', '--output', 'json'],
-        { cwd: dir }
-      );
-      assert.equal(r.code, 3);
-      assert.match(r.stderr, /not implemented yet/);
-      assert.match(r.stderr, new RegExp(`cli-review-${sub}-spec`));
-    });
+  // exec without --plan and without --dry-run: still not implemented.
+  test('review exec --output json (no --plan / --dry-run): not implemented (exit 3)', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(['review', 'exec', '--output', 'json'], { cwd: dir });
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /not implemented yet/);
+    assert.match(r.stderr, /cli-review-exec-spec/);
+  });
 
+  // verify still has no replay/execution path.
+  test('review verify --plan ./plan.json --output json: not implemented (exit 3)', async (t) => {
+    const dir = setupRepo(t);
+    const r = await runCliInProcess(
+      ['review', 'verify', '--plan', './plan.json', '--output', 'json'],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /not implemented yet/);
+    assert.match(r.stderr, /cli-review-verify-spec/);
+  });
+
+  for (const sub of ['exec', 'verify']) {
     test(`review ${sub} --output text → output-contract error (exit 3)`, async (t) => {
       const dir = setupRepo(t);
       const r = await runCliInProcess(['review', sub, '--output', 'text'], { cwd: dir });
@@ -340,21 +350,125 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.ok(a.debug && a.debug.resolvedArtifacts);
   });
 
-  test('review exec without --dry-run → not implemented (exit 3)', async (t) => {
+  // --- #802 Phase 3: review exec --plan <path> replay foundation ---
+
+  /** Write a minimal valid plan JSON to the test repo and return its path. */
+  function writePlan(dir, plan) {
+    const out = join(dir, 'replay-source.json');
+    writeFileSync(out, JSON.stringify(plan), 'utf8');
+    return out;
+  }
+
+  test('review exec --plan replays a full Review Artifact (exit 0)', async (t) => {
     const dir = setupRepo(t);
-    const r = await runCliInProcess(['review', 'exec', '--output', 'json'], { cwd: dir });
-    assert.equal(r.code, 3);
-    assert.match(r.stderr, /not implemented yet/);
+    const planPath = writePlan(dir, {
+      version: '1',
+      timestamp: '2026-05-19T00:00:00Z',
+      phase: 'upstream',
+      status: 'ok',
+      findings: [],
+      plan: {
+        plannerMode: 'off',
+        selectedSkills: [{ id: 'rr-upstream-x', name: 'X', phase: 'upstream', modelHint: 'cheap' }],
+        skippedSkills: [],
+      },
+    });
+    const out = join(dir, 'replay.json');
+    const r = await runCliInProcess(
+      ['review', 'exec', '--plan', planPath, '--output', 'json', '--output-file', out],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+    const artifact = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(validate(artifact), true, JSON.stringify(validate.errors));
+    assert.equal(artifact.phase, 'upstream', 'phase echoed from source plan');
+    assert.equal(artifact.status, 'ok');
+    assert.deepEqual(artifact.findings, []);
+    assert.equal(artifact.plan.selectedSkills[0].id, 'rr-upstream-x');
   });
 
-  test('review exec --dry-run --plan (replay) → not implemented (exit 3)', async (t) => {
+  test('review exec --plan --debug attaches replay metadata', async (t) => {
+    const dir = setupRepo(t);
+    const planPath = writePlan(dir, {
+      version: '1',
+      timestamp: '2026-05-19T00:00:00Z',
+      phase: 'midstream',
+      status: 'ok',
+      findings: [],
+      plan: { plannerMode: 'off', selectedSkills: [{ id: 's', name: 'S' }], skippedSkills: [] },
+    });
+    const out = join(dir, 'replay-d.json');
+    const r = await runCliInProcess(
+      ['review', 'exec', '--plan', planPath, '--debug', '--output', 'json', '--output-file', out],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+    const a = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(a.debug?.replay?.source, planPath);
+    assert.equal(a.debug.replay.sourcePhase, 'midstream');
+    assert.equal(a.debug.replay.sourceTimestamp, '2026-05-19T00:00:00Z');
+  });
+
+  test('review exec --plan with missing file → exit 3', async (t) => {
     const dir = setupRepo(t);
     const r = await runCliInProcess(
-      ['review', 'exec', '--dry-run', '--plan', './plan.json', '--output', 'json'],
+      ['review', 'exec', '--plan', './nope.json', '--output', 'json'],
       { cwd: dir }
     );
     assert.equal(r.code, 3);
-    assert.match(r.stderr, /not implemented yet/);
+    assert.match(r.stderr, /Failed to read/);
+  });
+
+  test('review exec --plan with malformed JSON → exit 3', async (t) => {
+    const dir = setupRepo(t);
+    const bad = join(dir, 'bad.json');
+    writeFileSync(bad, '{ not json', 'utf8');
+    const r = await runCliInProcess(['review', 'exec', '--plan', bad, '--output', 'json'], {
+      cwd: dir,
+    });
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /Failed to parse/);
+  });
+
+  test('review exec --plan with missing plan.selectedSkills → exit 3', async (t) => {
+    const dir = setupRepo(t);
+    const bad = writePlan(dir, { plannerMode: 'off' });
+    const r = await runCliInProcess(['review', 'exec', '--plan', bad, '--output', 'json'], {
+      cwd: dir,
+    });
+    assert.equal(r.code, 3);
+    assert.match(r.stderr, /selectedSkills/);
+  });
+
+  test('review exec --plan replay ignores CLI --phase (source plan is authoritative)', async (t) => {
+    const dir = setupRepo(t);
+    const planPath = writePlan(dir, {
+      version: '1',
+      timestamp: '2026-05-19T00:00:00Z',
+      phase: 'downstream',
+      status: 'ok',
+      findings: [],
+      plan: { plannerMode: 'off', selectedSkills: [{ id: 's', name: 'S' }], skippedSkills: [] },
+    });
+    const out = join(dir, 'r.json');
+    const r = await runCliInProcess(
+      [
+        'review',
+        'exec',
+        '--plan',
+        planPath,
+        '--phase',
+        'upstream',
+        '--output',
+        'json',
+        '--output-file',
+        out,
+      ],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+    const a = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(a.phase, 'downstream', 'CLI --phase must be ignored under --plan replay');
   });
 
   test('review verify --dry-run → still not implemented (exit 3)', async (t) => {

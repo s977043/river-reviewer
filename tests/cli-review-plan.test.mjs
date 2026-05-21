@@ -4,6 +4,7 @@ import test, { describe } from 'node:test';
 
 import {
   runReviewPlan,
+  runReviewExecReplay,
   ReviewPlanError,
   resolveReviewOutputFormat,
 } from '../src/lib/review-plan.mjs';
@@ -233,5 +234,148 @@ describe('runReviewPlan — output (#802 Phase 3)', () => {
       },
     });
     assert.deepEqual(received.configArtifacts, {});
+  });
+});
+
+describe('runReviewExecReplay (#802 Phase 3 — --plan replay contract)', () => {
+  const samplePlanArtifact = {
+    version: '1',
+    timestamp: '2026-05-19T00:00:00Z',
+    phase: 'upstream',
+    status: 'ok',
+    findings: [],
+    plan: {
+      plannerMode: 'off',
+      selectedSkills: [{ id: 'rr-upstream-x', name: 'X', phase: 'upstream', modelHint: 'cheap' }],
+      skippedSkills: [{ id: 'rr-upstream-y', reasons: ['phase-mismatch'] }],
+    },
+  };
+
+  test('echoes a schema-valid Review Artifact from a full plan JSON', async () => {
+    const artifact = await runReviewExecReplay({
+      planFile: '/tmp/plan.json',
+      now: fixedNow,
+      readFileImpl: async () => JSON.stringify(samplePlanArtifact),
+    });
+    assert.ok(validate(artifact), `schema invalid: ${JSON.stringify(validate.errors)}`);
+    assert.equal(artifact.version, '1');
+    assert.equal(artifact.timestamp, '2026-05-17T00:00:00Z');
+    assert.equal(artifact.phase, 'upstream', 'phase from source plan');
+    assert.equal(artifact.status, 'ok');
+    assert.deepEqual(artifact.findings, []);
+    assert.equal(artifact.plan.plannerMode, 'off');
+    assert.deepEqual(artifact.plan.selectedSkills, samplePlanArtifact.plan.selectedSkills);
+    assert.deepEqual(artifact.plan.skippedSkills, samplePlanArtifact.plan.skippedSkills);
+  });
+
+  test('accepts a bare plan object (no version/phase) → defaults to midstream', async () => {
+    const bare = {
+      plannerMode: 'order',
+      selectedSkills: [{ id: 'rr-midstream-z', name: 'Z' }],
+      skippedSkills: [],
+    };
+    const artifact = await runReviewExecReplay({
+      planFile: '/tmp/bare.json',
+      now: fixedNow,
+      readFileImpl: async () => JSON.stringify(bare),
+    });
+    assert.ok(validate(artifact));
+    assert.equal(artifact.phase, 'midstream');
+    assert.equal(artifact.plan.plannerMode, 'order');
+    assert.equal(artifact.status, 'ok');
+  });
+
+  test('empty selectedSkills → status no-changes', async () => {
+    const empty = {
+      version: '1',
+      timestamp: '2026-05-19T00:00:00Z',
+      phase: 'downstream',
+      status: 'no-changes',
+      findings: [],
+      plan: { plannerMode: 'off', selectedSkills: [], skippedSkills: [] },
+    };
+    const artifact = await runReviewExecReplay({
+      planFile: '/tmp/empty.json',
+      now: fixedNow,
+      readFileImpl: async () => JSON.stringify(empty),
+    });
+    assert.equal(artifact.status, 'no-changes');
+    assert.equal(artifact.phase, 'downstream');
+  });
+
+  test('normalizes unknown plannerMode to "off"', async () => {
+    const artifact = await runReviewExecReplay({
+      planFile: '/tmp/p.json',
+      now: fixedNow,
+      readFileImpl: async () =>
+        JSON.stringify({
+          plannerMode: 'bogus',
+          selectedSkills: [{ id: 'rr-x', name: 'X' }],
+        }),
+    });
+    assert.equal(artifact.plan.plannerMode, 'off');
+  });
+
+  test('debug:true attaches replay metadata', async () => {
+    const artifact = await runReviewExecReplay({
+      planFile: '/tmp/dbg.json',
+      debug: true,
+      now: fixedNow,
+      readFileImpl: async () => JSON.stringify(samplePlanArtifact),
+    });
+    assert.ok(artifact.debug?.replay);
+    assert.equal(artifact.debug.replay.source, '/tmp/dbg.json');
+    assert.equal(artifact.debug.replay.sourcePhase, 'upstream');
+    assert.equal(artifact.debug.replay.sourceTimestamp, '2026-05-19T00:00:00Z');
+  });
+
+  test('throws ReviewPlanError when planFile is missing', async () => {
+    await assert.rejects(() => runReviewExecReplay({}), ReviewPlanError);
+  });
+
+  test('throws ReviewPlanError when file read fails', async () => {
+    await assert.rejects(
+      () =>
+        runReviewExecReplay({
+          planFile: '/missing',
+          readFileImpl: async () => {
+            throw new Error('ENOENT');
+          },
+        }),
+      (e) => e instanceof ReviewPlanError && /Failed to read/.test(e.message)
+    );
+  });
+
+  test('throws ReviewPlanError when JSON is malformed', async () => {
+    await assert.rejects(
+      () =>
+        runReviewExecReplay({
+          planFile: '/bad',
+          readFileImpl: async () => '{not json',
+        }),
+      (e) => e instanceof ReviewPlanError && /Failed to parse/.test(e.message)
+    );
+  });
+
+  test('throws ReviewPlanError when selectedSkills is missing', async () => {
+    await assert.rejects(
+      () =>
+        runReviewExecReplay({
+          planFile: '/x',
+          readFileImpl: async () => JSON.stringify({ plannerMode: 'off' }),
+        }),
+      (e) => e instanceof ReviewPlanError && /selectedSkills/.test(e.message)
+    );
+  });
+
+  test('throws ReviewPlanError when a selectedSkills entry has no id', async () => {
+    await assert.rejects(
+      () =>
+        runReviewExecReplay({
+          planFile: '/x',
+          readFileImpl: async () => JSON.stringify({ selectedSkills: [{ name: 'noid' }] }),
+        }),
+      (e) => e instanceof ReviewPlanError && /selectedSkills\[0\]\.id/.test(e.message)
+    );
   });
 });
