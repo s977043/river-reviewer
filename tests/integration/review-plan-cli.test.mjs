@@ -317,6 +317,37 @@ describe('river review plan --plan-only — CLI E2E (#802 Phase 3)', () => {
     assert.ok(a.debug?.resolvedArtifacts);
   });
 
+  // #802 Phase 3 A2-fix-1: availableContexts propagation. Without this,
+  // every skill that declares `inputContext: ['diff']` was silently
+  // skipped by buildExecutionPlan. With CLI --context, callers can extend
+  // the default ['diff'] set without env vars.
+  test('review exec --context diff,tests forwards through to plan selection', async (t) => {
+    const dir = setupRepo(t);
+    const out = join(dir, 'exec-ctx.json');
+    const r = await runCliInProcess(
+      [
+        'review',
+        'exec',
+        '--context',
+        'diff,tests',
+        '--debug',
+        '--output',
+        'json',
+        '--output-file',
+        out,
+      ],
+      { cwd: dir }
+    );
+    assert.equal(r.code, 0, r.stderr);
+    const a = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(validate(a), true, JSON.stringify(validate.errors));
+    // The plan path stays schema-compliant (availableContexts is debug,
+    // not surfaced on the artifact). The behavioral effect is that
+    // inputContext-requiring skills are no longer auto-skipped — see
+    // unit tests in tests/cli-review-plan.test.mjs for the exact wiring.
+    assert.ok(a.debug?.execution, 'debug.execution must still record the run');
+  });
+
   // verify still has no replay/execution path.
   test('review verify --plan ./plan.json --output json: not implemented (exit 3)', async (t) => {
     const dir = setupRepo(t);
