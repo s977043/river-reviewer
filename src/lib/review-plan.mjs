@@ -337,7 +337,13 @@ export async function runReviewPlan({
     } catch (err) {
       throw new ReviewPlanError(`Failed to read diff artifact: ${err.message}`);
     }
-    const changedFiles = deriveChangedFiles(diffText);
+    // Parse the diff once and reuse the result for both deriveChangedFiles
+    // (planning input) and generateReview (execution input) so we don't pay
+    // the parsing cost twice when executeReview is on.
+    const parsedDiff = parseUnifiedDiff(diffText);
+    const changedFiles = (parsedDiff.files ?? [])
+      .map((f) => f.path)
+      .filter((p) => p && p !== '/dev/null');
 
     // The plan layer's selection rules differ by exec mode: for
     // plan-only/dry-run/deferred we restrict to heuristic skills, while
@@ -367,14 +373,18 @@ export async function runReviewPlan({
     }));
 
     if (executeReview) {
-      const parsedDiff = parseUnifiedDiff(diffText);
       let review;
       try {
+        // Pass the loaded config through so generateReview honors
+        // project-level review settings (language, severity preset, etc.).
+        // Wider context (fileTypes/relatedADRs/reviewMode) is deferred to
+        // a follow-up slice that pulls those producers into the exec path.
         review = await generateReviewImpl({
           diff: { diffText, files: parsedDiff.files ?? [] },
           plan: { selected: plan.selected ?? [] },
           phase,
           dryRun: false,
+          config,
         });
       } catch (err) {
         throw new ReviewPlanError(`Failed to execute review skills: ${err.message}`);

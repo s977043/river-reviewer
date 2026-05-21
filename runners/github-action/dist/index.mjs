@@ -29640,9 +29640,9 @@ function renderDiffText(files) {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
 /* harmony export */   KD: () => (/* binding */ collectRepoDiff),
-/* harmony export */   dc: () => (/* binding */ deriveChangedFiles),
 /* harmony export */   rj: () => (/* binding */ parseUnifiedDiff)
 /* harmony export */ });
+/* unused harmony export deriveChangedFiles */
 /* harmony import */ var _git_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(8613);
 /* harmony import */ var _diff_optimizer_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1092);
 
