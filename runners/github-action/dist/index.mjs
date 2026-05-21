@@ -33119,6 +33119,42 @@ function shouldExcludeForContext(relPath, opts = {}) {
 
 /***/ }),
 
+/***/ 9746:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   E: () => (/* binding */ parseList),
+/* harmony export */   R: () => (/* binding */ isLlmEnabled)
+/* harmony export */ });
+/**
+ * Parse a comma-separated list string into a trimmed array.
+ * Empty/undefined input returns an empty array.
+ */
+function parseList(value) {
+  if (!value) return [];
+  return String(value)
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Check if an LLM (OpenAI / Gemini / Anthropic) API key is configured in the environment.
+ * @returns {boolean}
+ */
+function isLlmEnabled() {
+  return !!(
+    process.env.RIVER_OPENAI_API_KEY ||
+    process.env.OPENAI_API_KEY ||
+    process.env.GOOGLE_API_KEY ||
+    process.env.ANTHROPIC_API_KEY ||
+    process.env.RIVER_ANTHROPIC_API_KEY
+  );
+}
+
+
+/***/ }),
+
 /***/ 3837:
 /***/ ((module) => {
 
@@ -33811,33 +33847,8 @@ function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
 var repo_context = __nccwpck_require__(8601);
 // EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
 var skill_loader = __nccwpck_require__(5541);
-;// CONCATENATED MODULE: ./src/lib/utils.mjs
-/**
- * Parse a comma-separated list string into a trimmed array.
- * Empty/undefined input returns an empty array.
- */
-function parseList(value) {
-  if (!value) return [];
-  return String(value)
-    .split(',')
-    .map(item => item.trim())
-    .filter(Boolean);
-}
-
-/**
- * Check if an LLM (OpenAI / Gemini / Anthropic) API key is configured in the environment.
- * @returns {boolean}
- */
-function isLlmEnabled() {
-  return !!(
-    process.env.RIVER_OPENAI_API_KEY ||
-    process.env.OPENAI_API_KEY ||
-    process.env.GOOGLE_API_KEY ||
-    process.env.ANTHROPIC_API_KEY ||
-    process.env.RIVER_ANTHROPIC_API_KEY
-  );
-}
-
+// EXTERNAL MODULE: ./src/lib/utils.mjs
+var utils = __nccwpck_require__(9746);
 // EXTERNAL MODULE: ./src/lib/finding-fingerprint.mjs
 var finding_fingerprint = __nccwpck_require__(9597);
 ;// CONCATENATED MODULE: ./src/lib/suppression-apply.mjs
@@ -34049,7 +34060,7 @@ function applyFileExclusions(diff, patterns = []) {
 }
 
 async function resolvePullRequestLabels() {
-  const envLabels = parseList(process.env.RIVER_PR_LABELS);
+  const envLabels = (0,utils/* parseList */.E)(process.env.RIVER_PR_LABELS);
   if (envLabels.length) return envLabels;
 
   const eventPath = process.env.GITHUB_EVENT_PATH;
@@ -34076,13 +34087,13 @@ function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
 }
 
 function resolveAvailableContexts(inputContexts) {
-  const envContexts = parseList(process.env.RIVER_AVAILABLE_CONTEXTS);
+  const envContexts = (0,utils/* parseList */.E)(process.env.RIVER_AVAILABLE_CONTEXTS);
   const base = inputContexts?.length ? inputContexts : ['diff'];
   return [...new Set([...base, ...envContexts])];
 }
 
 function resolveAvailableDependencies(inputDependencies) {
-  const envDeps = parseList(process.env.RIVER_AVAILABLE_DEPENDENCIES);
+  const envDeps = (0,utils/* parseList */.E)(process.env.RIVER_AVAILABLE_DEPENDENCIES);
   const stubEnabled =
     typeof process.env.RIVER_DEPENDENCY_STUBS === 'string' &&
     ['1', 'true', 'yes', 'stub'].includes(process.env.RIVER_DEPENDENCY_STUBS.toLowerCase());
@@ -34211,7 +34222,7 @@ async function planLocalReview({
 
   let planner = null;
   let plannerSkipped = null;
-  const llmEnabled = isLlmEnabled();
+  const llmEnabled = (0,utils/* isLlmEnabled */.R)();
 
   if (plannerRequested) {
     if (dryRun) {
@@ -34467,7 +34478,7 @@ async function doctorLocalReview({
     availableDependencies: dependencies,
   } = base;
 
-  const llmEnabled = isLlmEnabled();
+  const llmEnabled = (0,utils/* isLlmEnabled */.R)();
 
   const plan = reviewFiles.length
     ? await (0,review_runner/* buildExecutionPlan */.kN)({
@@ -56488,7 +56499,7 @@ class SkillDispatcher {
     const config = await (0,loader/* loadConfig */.Z9)(this.repoRoot);
     const results = [];
     const language = config.review?.language || 'en';
-    const llmEnabled = isLlmEnabled();
+    const llmEnabled = (0,utils/* isLlmEnabled */.R)();
 
     let skills = (config.skills || []).map(skill => ({
       ...skill,
@@ -56826,7 +56837,7 @@ function parseArgs(argv) {
         continue;
       }
       if (arg === '--files') {
-        parsed.suppressionFiles = parseList(args.shift() ?? '');
+        parsed.suppressionFiles = (0,utils/* parseList */.E)(args.shift() ?? '');
         continue;
       }
       if (arg === '--expires') {
@@ -57003,11 +57014,11 @@ function parseArgs(argv) {
       continue;
     }
     if (arg === '--context') {
-      parsed.availableContexts = parseList(args.shift());
+      parsed.availableContexts = (0,utils/* parseList */.E)(args.shift());
       continue;
     }
     if (arg === '--dependency') {
-      parsed.availableDependencies = parseList(args.shift());
+      parsed.availableDependencies = (0,utils/* parseList */.E)(args.shift());
       continue;
     }
     if (arg === '--reviewers') {
@@ -57019,7 +57030,7 @@ function parseArgs(argv) {
         parsed.command = 'help';
         break;
       }
-      parsed.reviewers = parseList(value);
+      parsed.reviewers = (0,utils/* parseList */.E)(value);
       continue;
     }
     if (arg === '--baseline') {
@@ -57581,6 +57592,9 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
             artifactsDir: parsed.artifactsDir,
             debug: parsed.debug,
             executeReview: isExecExecute,
+            // Forward CLI-level --context overrides so authors can opt
+            // additional artifact IDs into selection without env vars.
+            availableContexts: parsed.availableContexts ?? undefined,
           });
         }
       } catch (err) {
