@@ -466,6 +466,11 @@ function toSelectedView(skill) {
  *   without code changes. Without this, `buildExecutionPlan` receives an
  *   empty list and every skill that declares `inputContext: ['diff']` is
  *   silently skipped — the dogfood failure mode that motivated A2-fix-1.
+ * @param {string[]} [opts.availableDependencies] Optional dependency IDs
+ *   (e.g. `code_search`, `test_runner`). When omitted and the env var
+ *   `RIVER_AVAILABLE_DEPENDENCIES` is unset, dependency-based skipping is
+ *   disabled (backward-compatible). `RIVER_DEPENDENCY_STUBS=1` opts into
+ *   the default stub set so all known dependencies appear available.
  * @param {() => string} [opts.now] - timestamp factory (ISO 8601)
  * @param {(repoRoot: string) => Promise<object>} [opts.loadConfigImpl]
  * @param {Function} [opts.resolveAllArtifactsImpl]
@@ -485,6 +490,7 @@ async function runReviewPlan({
   executionDeferred = false,
   executeReview = false,
   availableContexts,
+  availableDependencies,
   now = () => new Date().toISOString(),
   loadConfigImpl = loader/* loadConfig */.Z9,
   resolveAllArtifactsImpl = resolveAllArtifacts,
@@ -563,6 +569,11 @@ async function runReviewPlan({
       alwaysInclude: ['diff'],
     });
 
+    // Same silent-skip pattern for dependencies. `null` is the documented
+    // disabled sentinel — dependency-based skipping is opt-in via env or
+    // `--dependency` so legacy invocations stay backward-compatible.
+    const effectiveAvailableDependencies = (0,utils/* resolveAvailableDependencies */.TK)(availableDependencies);
+
     // The plan layer's selection rules differ by exec mode: for
     // plan-only/dry-run/deferred we restrict to heuristic skills, while
     // executeReview must allow LLM-backed skills so the planner can
@@ -580,6 +591,7 @@ async function runReviewPlan({
         repoRoot: cwd,
         riskMap: undefined,
         availableContexts: effectiveAvailableContexts,
+        availableDependencies: effectiveAvailableDependencies,
       });
     } catch (err) {
       throw new ReviewPlanError(`Failed to build execution plan: ${err.message}`);

@@ -33125,8 +33125,10 @@ function shouldExcludeForContext(relPath, opts = {}) {
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
 /* harmony export */   E1: () => (/* binding */ parseList),
 /* harmony export */   Rq: () => (/* binding */ isLlmEnabled),
+/* harmony export */   TK: () => (/* binding */ resolveAvailableDependencies),
 /* harmony export */   ud: () => (/* binding */ resolveAvailableContexts)
 /* harmony export */ });
+/* unused harmony export dependencyStubs */
 /**
  * Parse a comma-separated list string into a trimmed array.
  * Empty/undefined input returns an empty array.
@@ -33177,6 +33179,44 @@ function resolveAvailableContexts(
   const envContexts = parseList(process.env.RIVER_AVAILABLE_CONTEXTS);
   const base = inputContexts && inputContexts.length ? inputContexts : defaultContexts;
   return [...new Set([...alwaysInclude, ...base, ...envContexts])];
+}
+
+/**
+ * Known dependency identifiers that `RIVER_DEPENDENCY_STUBS=1` should
+ * mark as "available". Keep in sync with `schemas/skill.schema.json`
+ * dependencies enum.
+ */
+const dependencyStubs = [
+  'code_search',
+  'test_runner',
+  'coverage_report',
+  'adr_lookup',
+  'repo_metadata',
+  'tracing',
+];
+
+/**
+ * Resolve the effective `availableDependencies` for `buildExecutionPlan`.
+ * Returns `null` (the disabled sentinel) when the caller passes nothing
+ * and neither `RIVER_AVAILABLE_DEPENDENCIES` nor `RIVER_DEPENDENCY_STUBS`
+ * is set, which preserves backward-compatible "do not skip on missing
+ * dependency" behavior.
+ *
+ * Shared between `src/lib/local-runner.mjs` and `src/lib/review-plan.mjs`
+ * (#802 Phase 3 silent-skip follow-up).
+ *
+ * @param {string[] | null | undefined} inputDependencies
+ * @returns {string[] | null}
+ */
+function resolveAvailableDependencies(inputDependencies) {
+  const envDeps = parseList(process.env.RIVER_AVAILABLE_DEPENDENCIES);
+  const stubEnabled =
+    typeof process.env.RIVER_DEPENDENCY_STUBS === 'string' &&
+    ['1', 'true', 'yes', 'stub'].includes(process.env.RIVER_DEPENDENCY_STUBS.toLowerCase());
+  if (inputDependencies?.length) return [...new Set(inputDependencies)];
+  if (envDeps.length) return [...new Set(envDeps)];
+  if (stubEnabled) return [...dependencyStubs];
+  return null; // null disables dependency-based skipping
 }
 
 
@@ -34037,16 +34077,6 @@ function normalizePhase(phase) {
   return 'midstream';
 }
 
-// NOTE: Keep this list in sync with schemas/skill.schema.json dependencies enum.
-const dependencyStubs = [
-  'code_search',
-  'test_runner',
-  'coverage_report',
-  'adr_lookup',
-  'repo_metadata',
-  'tracing',
-];
-
 const configLoader = new loader/* ConfigLoader */.UT();
 
 function shouldExclude(filePath, patterns = []) {
@@ -34119,16 +34149,10 @@ function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
 // used by src/lib/review-plan.mjs (#802 Phase 3 A2-fix-1).
 const resolveAvailableContexts = (inputContexts) => (0,utils/* resolveAvailableContexts */.ud)(inputContexts);
 
-function resolveAvailableDependencies(inputDependencies) {
-  const envDeps = (0,utils/* parseList */.E1)(process.env.RIVER_AVAILABLE_DEPENDENCIES);
-  const stubEnabled =
-    typeof process.env.RIVER_DEPENDENCY_STUBS === 'string' &&
-    ['1', 'true', 'yes', 'stub'].includes(process.env.RIVER_DEPENDENCY_STUBS.toLowerCase());
-  if (inputDependencies?.length) return [...new Set(inputDependencies)];
-  if (envDeps.length) return [...new Set(envDeps)];
-  if (stubEnabled) return [...dependencyStubs];
-  return null; // null disables dependency-based skipping (backward-compatible)
-}
+// The helper now lives in src/lib/utils.mjs; this thin wrapper preserves
+// the legacy call sites inside this module unchanged.
+const resolveAvailableDependencies = (inputDependencies) =>
+  (0,utils/* resolveAvailableDependencies */.TK)(inputDependencies);
 
 async function collectLocalContext({
   cwd,
@@ -57619,9 +57643,11 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
             artifactsDir: parsed.artifactsDir,
             debug: parsed.debug,
             executeReview: isExecExecute,
-            // Forward CLI-level --context overrides so authors can opt
-            // additional artifact IDs into selection without env vars.
+            // Forward CLI-level --context / --dependency overrides so
+            // authors can opt additional artifact IDs / dependency stubs
+            // into selection without env vars.
             availableContexts: parsed.availableContexts ?? undefined,
+            availableDependencies: parsed.availableDependencies ?? undefined,
           });
         }
       } catch (err) {

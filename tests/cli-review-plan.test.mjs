@@ -750,3 +750,109 @@ index 1111111..2222222 100644
     assert.equal(artifact.plan.availableContexts, undefined);
   });
 });
+
+describe('runReviewPlan availableDependencies propagation (#802 Phase 3 A2-fix-2)', () => {
+  const sampleDiff = `diff --git a/src/foo.ts b/src/foo.ts
+index 1111111..2222222 100644
+--- a/src/foo.ts
++++ b/src/foo.ts
+@@ -1,3 +1,4 @@
+ export function foo() {
++  console.log('debug');
+   return 42;
+ }
+`;
+  const resolveDiff = () => ({ diff: { exists: true, path: '/repo/diff.patch', source: 'cwd' } });
+
+  function captureArgs() {
+    const captured = { args: null };
+    return {
+      captured,
+      impl: async (args) => {
+        captured.args = args;
+        return { selected: [], skipped: [] };
+      },
+    };
+  }
+
+  test('defaults to null when no dependencies are configured (skipping disabled)', async () => {
+    const previousEnvDeps = process.env.RIVER_AVAILABLE_DEPENDENCIES;
+    const previousStubs = process.env.RIVER_DEPENDENCY_STUBS;
+    delete process.env.RIVER_AVAILABLE_DEPENDENCIES;
+    delete process.env.RIVER_DEPENDENCY_STUBS;
+    try {
+      const { captured, impl } = captureArgs();
+      await runReviewPlan({
+        planOnly: true,
+        now: fixedNow,
+        loadConfigImpl: okConfig,
+        resolveAllArtifactsImpl: resolveDiff,
+        readFileImpl: async () => sampleDiff,
+        buildExecutionPlanImpl: impl,
+      });
+      assert.equal(captured.args.availableDependencies, null);
+    } finally {
+      if (previousEnvDeps != null) process.env.RIVER_AVAILABLE_DEPENDENCIES = previousEnvDeps;
+      if (previousStubs != null) process.env.RIVER_DEPENDENCY_STUBS = previousStubs;
+    }
+  });
+
+  test('forwards an explicit availableDependencies argument', async () => {
+    const { captured, impl } = captureArgs();
+    await runReviewPlan({
+      planOnly: true,
+      availableDependencies: ['code_search', 'test_runner'],
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: impl,
+    });
+    assert.deepEqual(captured.args.availableDependencies, ['code_search', 'test_runner']);
+  });
+
+  test('RIVER_DEPENDENCY_STUBS=1 enables the default stub set', async () => {
+    const previousStubs = process.env.RIVER_DEPENDENCY_STUBS;
+    process.env.RIVER_DEPENDENCY_STUBS = '1';
+    try {
+      const { captured, impl } = captureArgs();
+      await runReviewPlan({
+        planOnly: true,
+        now: fixedNow,
+        loadConfigImpl: okConfig,
+        resolveAllArtifactsImpl: resolveDiff,
+        readFileImpl: async () => sampleDiff,
+        buildExecutionPlanImpl: impl,
+      });
+      assert.ok(Array.isArray(captured.args.availableDependencies));
+      assert.ok(captured.args.availableDependencies.includes('code_search'));
+      assert.ok(captured.args.availableDependencies.includes('test_runner'));
+    } finally {
+      if (previousStubs == null) delete process.env.RIVER_DEPENDENCY_STUBS;
+      else process.env.RIVER_DEPENDENCY_STUBS = previousStubs;
+    }
+  });
+
+  test('RIVER_AVAILABLE_DEPENDENCIES env var is honored when no arg is passed', async () => {
+    const previousEnvDeps = process.env.RIVER_AVAILABLE_DEPENDENCIES;
+    process.env.RIVER_AVAILABLE_DEPENDENCIES = 'code_search, adr_lookup';
+    try {
+      const { captured, impl } = captureArgs();
+      await runReviewPlan({
+        planOnly: true,
+        now: fixedNow,
+        loadConfigImpl: okConfig,
+        resolveAllArtifactsImpl: resolveDiff,
+        readFileImpl: async () => sampleDiff,
+        buildExecutionPlanImpl: impl,
+      });
+      assert.deepEqual([...captured.args.availableDependencies].sort(), [
+        'adr_lookup',
+        'code_search',
+      ]);
+    } finally {
+      if (previousEnvDeps == null) delete process.env.RIVER_AVAILABLE_DEPENDENCIES;
+      else process.env.RIVER_AVAILABLE_DEPENDENCIES = previousEnvDeps;
+    }
+  });
+});

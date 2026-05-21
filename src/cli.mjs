@@ -950,9 +950,11 @@ async function main(argv = process.argv.slice(2)) {
             artifactsDir: parsed.artifactsDir,
             debug: parsed.debug,
             executeReview: isExecExecute,
-            // Forward CLI-level --context overrides so authors can opt
-            // additional artifact IDs into selection without env vars.
+            // Forward CLI-level --context / --dependency overrides so
+            // authors can opt additional artifact IDs / dependency stubs
+            // into selection without env vars.
             availableContexts: parsed.availableContexts ?? undefined,
+            availableDependencies: parsed.availableDependencies ?? undefined,
           });
         }
       } catch (err) {
