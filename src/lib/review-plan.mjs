@@ -32,9 +32,10 @@ import { loadConfig as defaultLoadConfig } from '../config/loader.mjs';
 import { resolveAllArtifacts as defaultResolveAllArtifacts } from '../config/artifact-resolver.mjs';
 import { deriveChangedFiles } from './diff.mjs';
 import { buildExecutionPlan as defaultBuildExecutionPlan } from '../../runners/core/review-runner.mjs';
-import { PHASES } from './planner-utils.mjs';
+import { PHASES, PLANNER_MODES } from './planner-utils.mjs';
 
 const VALID_PHASES = new Set(PHASES);
+const VALID_PLANNER_MODES = new Set(PLANNER_MODES);
 const MODEL_HINTS = new Set(['cheap', 'balanced', 'high-accuracy']);
 
 /** Raised for argument/config errors that map to CLI exit code 3. */
@@ -44,8 +45,6 @@ export class ReviewPlanError extends Error {
     this.name = 'ReviewPlanError';
   }
 }
-
-const PLANNER_MODES = new Set(['off', 'order', 'prune']);
 
 /**
  * Replay a previously emitted plan as a Review Artifact (`--plan <path>`).
@@ -97,12 +96,19 @@ export async function runReviewExecReplay({
   }
 
   // Accept either a full Review Artifact (extract .plan) or a bare plan.
-  const sourcePlan =
-    parsed.plan && typeof parsed.plan === 'object' && !Array.isArray(parsed.plan)
-      ? parsed.plan
-      : parsed;
+  // A full artifact is identified by `version: "1"` (the schema's required
+  // const) plus a `plan` object; falling back to `parsed.plan` alone would
+  // accept arbitrary wrappers, so require both.
+  const looksLikeFullArtifact =
+    parsed.version === '1' &&
+    parsed.plan &&
+    typeof parsed.plan === 'object' &&
+    !Array.isArray(parsed.plan);
+  const sourcePlan = looksLikeFullArtifact ? parsed.plan : parsed;
   const phaseFromArtifact =
-    typeof parsed.phase === 'string' && VALID_PHASES.has(parsed.phase) ? parsed.phase : null;
+    looksLikeFullArtifact && typeof parsed.phase === 'string' && VALID_PHASES.has(parsed.phase)
+      ? parsed.phase
+      : null;
 
   if (!Array.isArray(sourcePlan.selectedSkills)) {
     throw new ReviewPlanError(
@@ -112,7 +118,7 @@ export async function runReviewExecReplay({
   }
 
   const plannerMode =
-    typeof sourcePlan.plannerMode === 'string' && PLANNER_MODES.has(sourcePlan.plannerMode)
+    typeof sourcePlan.plannerMode === 'string' && VALID_PLANNER_MODES.has(sourcePlan.plannerMode)
       ? sourcePlan.plannerMode
       : 'off';
 
