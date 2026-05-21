@@ -856,3 +856,67 @@ index 1111111..2222222 100644
     }
   });
 });
+
+describe('runReviewPlan analysis context propagation (#802 Phase 3 A2-fix-3)', () => {
+  const sampleDiff = `diff --git a/src/foo.ts b/src/foo.ts
+index 1111111..2222222 100644
+--- a/src/foo.ts
++++ b/src/foo.ts
+@@ -1,3 +1,4 @@
+ export function foo() {
++  console.log('debug');
+   return 42;
+ }
+`;
+  const resolveDiff = () => ({ diff: { exists: true, path: '/repo/diff.patch', source: 'cwd' } });
+  const planWithAnalysisContext = () => ({
+    selected: [{ metadata: { id: 'rr-test-skill', name: 'Test', phase: 'midstream' } }],
+    skipped: [],
+    fileTypes: { 'src/foo.ts': 'code' },
+    relatedADRs: [{ id: 'ADR-001', title: 'Logging policy' }],
+    reviewMode: 'medium',
+  });
+
+  test('forwards fileTypes / relatedADRs / reviewMode from plan to generateReview', async () => {
+    let received;
+    await runReviewPlan({
+      planOnly: true,
+      executeReview: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async () => planWithAnalysisContext(),
+      generateReviewImpl: async (opts) => {
+        received = opts;
+        return { findings: [], debug: { heuristicsUsed: false } };
+      },
+    });
+    assert.deepEqual(received.fileTypes, { 'src/foo.ts': 'code' });
+    assert.deepEqual(received.relatedADRs, [{ id: 'ADR-001', title: 'Logging policy' }]);
+    assert.equal(received.reviewMode, 'medium');
+  });
+
+  test('analysis context fields stay undefined when buildExecutionPlan omits them', async () => {
+    let received;
+    await runReviewPlan({
+      planOnly: true,
+      executeReview: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      // The minimal plan shape used by older tests does NOT include
+      // fileTypes/relatedADRs/reviewMode. Passing undefined keeps the
+      // generateReview call backwards-compatible.
+      buildExecutionPlanImpl: async () => ({ selected: [], skipped: [] }),
+      generateReviewImpl: async (opts) => {
+        received = opts;
+        return { findings: [] };
+      },
+    });
+    assert.equal(received.fileTypes, undefined);
+    assert.equal(received.relatedADRs, undefined);
+    assert.equal(received.reviewMode, undefined);
+  });
+});
