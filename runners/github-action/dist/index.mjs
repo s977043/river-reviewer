@@ -57498,12 +57498,13 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
     const isExecPlanReplay =
       parsed.reviewSubcommand === 'exec' && typeof parsed.planFile === 'string';
 
-    // `review exec` (no flags): #802 Phase 3 A1. Resolve artifacts and
-    // build the deterministic plan exactly like dry-run, but mark the
-    // artifact with `debug.executionDeferred: true` so consumers know
-    // skill execution was intentionally not performed yet. Findings will
-    // be populated in A2 once the skill execution adapter lands.
-    const isExecDeferred =
+    // `review exec` (no flags): #802 Phase 3 A2-1. Resolve artifacts,
+    // build the execution plan with `llmEnabled: true` so non-heuristic
+    // skills can be selected, and call generateReview to populate the
+    // artifact findings via the LLM-or-heuristic pipeline. When no API
+    // key is configured, generateReview gracefully falls back to
+    // heuristic findings (or an empty set) instead of failing.
+    const isExecExecute =
       parsed.reviewSubcommand === 'exec' && !parsed.dryRun && typeof parsed.planFile !== 'string';
 
     // verify (and any future review subcommand that is not exec): the
@@ -57571,13 +57572,15 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
           artifact = await runReviewPlan({
             cwd: external_node_path_.resolve(parsed.target),
             phase: parsed.phase,
-            // exec --dry-run and exec (deferred) both reuse plan-only
-            // semantics (resolve + deterministic plan, no execution).
-            planOnly: isExecDryRun || isExecDeferred ? true : parsed.planOnly,
+            // exec --dry-run and exec (real run) both reuse the plan path
+            // entrypoint; the differentiator is `executeReview`, which
+            // enables LLM-backed skill selection and the generateReview
+            // adapter so findings are populated.
+            planOnly: isExecDryRun || isExecExecute ? true : parsed.planOnly,
             cliArtifacts: parsed.cliArtifacts,
             artifactsDir: parsed.artifactsDir,
             debug: parsed.debug,
-            executionDeferred: isExecDeferred,
+            executeReview: isExecExecute,
           });
         }
       } catch (err) {
