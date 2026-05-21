@@ -92,3 +92,46 @@ If you have questions about migration, please:
 1. Check the [Migration Guide](migration/runners-migration-guide.md)
 2. Review [Epic #242](https://github.com/s977043/river-reviewer/issues/242)
 3. Open an issue with the `migration-help` label
+
+## Output artifact field executionDeferred (v0.51.0)
+
+### artifact.executionDeferred -> use artifact.plan.skippedSkills
+
+**Deprecated in:** v0.51.0  
+**Planned removal:** v0.53.0
+
+The boolean executionDeferred field on the review artifact was added during Phase 3
+to signal that some skills were deferred/skipped. It is superseded by the richer
+plan.skippedSkills array, which carries a per-skill skip reason.
+
+
+#### Migration
+
+**Before:**
+
+```js
+if (artifact.executionDeferred) {
+  console.warn("some skills were skipped");
+}
+```
+
+
+**After:**
+
+```js
+const skipped = artifact.plan?.skippedSkills ?? [];
+if (skipped.length > 0) {
+  console.warn(skipped.length + " skills skipped:", skipped.map(s => s.reason));
+}
+```
+
+
+plan.skippedSkills is available on all artifacts from river review plan
+and river review exec (v0.45.0+).
+
+
+#### Related
+
+- [Troubleshooting: skill selection](review/troubleshooting.md)
+
+- Issue [#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 A2-fix-1
