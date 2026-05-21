@@ -1,5 +1,8 @@
 node_modules
 
+# Session-local working drafts (discussion prompts, scratch)
+docs/Working/
+
 # Docusaurus build artifacts
 build/
 .docusaurus/

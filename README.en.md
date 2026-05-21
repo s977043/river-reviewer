@@ -1,7 +1,6 @@
 # River Reviewer
 
-**Turn Implicit Knowledge into Reproducible Agent Skills.**
-**An experimental AI code review framework that turns tacit knowledge into reusable Agent Skills.**
+**Codify your team's judgment into automated PR gates.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-available-blue)](https://river-reviewer.vercel.app/explanation/intro/)
@@ -11,15 +10,50 @@
 English edition. The primary Japanese README lives in `README.md`.
 [日本語の README はここ](./README.md)—the Japanese copy is the source of truth; English may lag.
 
-## License Overview
+River Reviewer is an OSS framework for turning review standards into versioned, repo-owned skills that can run across plans, diffs, tests, JUnit, and prior review artifacts.
 
-| Scope                                          | License   | Details                              |
-| ---------------------------------------------- | --------- | ------------------------------------ |
-| Source code (`src/`, `scripts/`, `tests/`)     | MIT       | [LICENSE-CODE](./LICENSE-CODE)       |
-| Documentation (`pages/`, `skills/`, `assets/`) | CC BY 4.0 | [LICENSE-CONTENT](./LICENSE-CONTENT) |
-| Configuration (`.github/`, `*.config.*`)       | MIT       | [LICENSE](./LICENSE)                 |
+It is built for teams using AI-assisted development (Claude Code, Codex, Cursor, and similar), where implementation can be generated quickly but **review judgment still needs to stay explicit, repeatable, and owned by the team**.
+
+River Reviewer helps you answer questions like:
+
+- Does this diff match the approved implementation plan?
+- Do the tests cover the boundary cases promised in the plan?
+- Does this PR violate the team's migration, security, accessibility, or dependency policy?
+- Did the implementation agent ignore feedback from a previous review?
+
+## Why River Reviewer?
+
+| Axis                | Existing AI review tools | River Reviewer                                   |
+| ------------------- | ------------------------ | ------------------------------------------------ |
+| Input               | Mostly the diff          | Plan, diff, tests, JUnit, prior review artifacts |
+| Judgment            | Vendor black box         | Versioned skills in your repository              |
+| Knowledge ownership | Provider-owned           | Repo-owned and reviewable                        |
+| Gates               | Usually PR-time only     | Design, implementation, and verification gates   |
+| Agent workflow      | Standalone reviewer      | **Audit layer for AI-assisted implementation**   |
+
+River Reviewer is not another prompt wrapper around a PR diff. It is a way to make your team's review judgment executable — an audit layer that checks AI-written code against your own rules.
+
+## Core Model
+
+**Skills define judgment.** A skill describes how a review decision should be made: security policy, accessibility, migration safety, dependency rules, plan conformance, and other team-specific standards.
+
+**Gates execute judgment.** Plan, exec, and verify gates run those skills at the right point in the delivery flow — not only after the PR is already complete.
+
+**Riverbed remembers judgment.** Review outcomes, decisions, and reusable context become part of the operating memory so future reviews stay consistent (see [`pages/guides/use-riverbed-memory.en.md`](pages/guides/use-riverbed-memory.en.md), with suppression of WontFix items and prior-decision recall).
+
+In AI-assisted workflows, River Reviewer acts as the **team-owned audit layer**: implementation agents can write code, but River Reviewer checks whether that work still follows the team's rules.
 
 ## Getting Started
+
+The shortest path is via GitHub Actions ([Quick start](#quick-start-github-actions)).
+
+Try it locally against the current diff:
+
+```bash
+npx river run . --dry-run
+```
+
+> npm distribution and the `npx river try` experience are on the roadmap (Epic 1 / [#800](https://github.com/s977043/river-reviewer/issues/800)).
 
 | Goal                    | Destination                                                                              |
 | ----------------------- | ---------------------------------------------------------------------------------------- |
@@ -29,11 +63,47 @@ English edition. The primary Japanese README lives in `README.md`.
 | Estimate run cost       | [Cost estimation guide](pages/guides/cost-estimation.en.md)                              |
 | Understand the design   | [Architecture docs](https://river-reviewer.vercel.app/explanation/river-architecture/)   |
 
-Philosophy: [Why we built it](#philosophy)
+License details are at the [bottom of this file](#license).
 
-Review that Flows With You. 流れに寄り添う AI レビューエージェント。
+## FAQ
 
-River Reviewer is a context engineering framework for AI code review. It is flow-based and metadata-driven, traveling the SDLC so design intent, implementation choices, and test coverage stay connected.
+### Why not just use ESLint, type checks, or SonarQube?
+
+Keep using them. River Reviewer is not a replacement for static analysis.
+
+Linters and static analyzers are best at deterministic checks inside code: syntax, types, unsafe APIs, style rules, complexity, duplication, and known security patterns.
+
+River Reviewer handles review judgment that **crosses artifacts**:
+
+- Does the implementation diff still match the approved plan?
+- Do the tests cover the boundary cases promised in the plan?
+- Does this migration follow the team's rollout policy?
+- Is this dependency acceptable under the repository's policy?
+- Did the PR address feedback already raised by another reviewer?
+
+These usually require context from plans, diffs, tests, prior comments, and team-specific standards. River Reviewer handles that layer with LLM-backed, structured, testable skills.
+
+### Where does our code and review data go?
+
+River Reviewer is designed around **repo-owned configuration** and **provider-agnostic execution**.
+
+Skills live in your repository. The review rules are versioned with your code, not hidden inside a vendor account. Runtime behavior depends on the provider (OpenAI / Anthropic / Google) and runner (GitHub Actions / CLI / Node API) you configure, so teams can choose the data boundary that matches their security requirements.
+
+For sensitive repositories, start with narrow inputs, explicit artifact contracts, and CI-controlled execution.
+
+### Is River Reviewer dependent on PlanGate?
+
+No. PlanGate is one useful workflow shape, but River Reviewer is not tied to a single planning methodology.
+
+The core contract is **artifact-based**: River Reviewer can evaluate plans, diffs, tests, JUnit output, prior review comments, or other structured inputs. A team can adopt only PR-time checks first, then add plan and verify gates later.
+
+### How do we control cost?
+
+Treat skills like CI jobs.
+
+Run cheap deterministic checks first. Run River Reviewer only on the artifacts and skills that matter for the change. Start with a small official skill pack, then add repository-specific skills where human review cost or regression risk is high.
+
+Good skills should include fixtures and golden outputs so teams can measure whether the review signal is worth the runtime cost. With the Anthropic provider, prompt caching is applied automatically, and `RIVER_USAGE_TELEMETRY=1` persists usage as JSONL.
 
 <a id="philosophy"></a>
 
@@ -210,9 +280,17 @@ We organize content into four types, mapped by directory under `pages/` and serv
 
 ## Roadmap
 
-- Phase-aware review expansion across upstream → midstream → downstream
-- Riverbed Memory to retain ADR links, WontFix decisions, and past findings
-- Evals/CI integration to keep the agent trustworthy over time
+Following the concept refresh (2026-05), the roadmap is organized into the following seven epics. Issues will be opened progressively.
+
+- **Epic 0**: Official Skill Pack and Minimal Registry (security / a11y / migration-safety / dependency-policy / plan-conformance)
+- **Epic 1**: First-Run Adoption (npm distribution, `npx river try`, 10-minute Quick Start, [#800](https://github.com/s977043/river-reviewer/issues/800))
+- **Epic 2**: SDLC Gates (stabilize `plan` / `exec` / `verify` CLI, artifact-input-contract v1, [#802](https://github.com/s977043/river-reviewer/issues/802))
+- **Epic 3**: Concept Refresh (README / vision / intro — landing with this PR)
+- **Epic 4**: Skill Authoring and Governance (`npx river create skill`, catalog, contribution policy)
+- **Epic 5**: Evaluation Observability (CI regression, skill badges, dashboard)
+- **Epic 6**: Docs IA and Onboarding (first-run / skill authoring / CI operation paths)
+
+Earlier pillars (phase-aware review, Riverbed Memory, Evals/CI integration) remain in scope and are absorbed by the epics above.
 
 Milestones and the repository Projects are the source of truth for progress (this README list is only a high-level overview).
 
