@@ -1,7 +1,7 @@
 # River Reviewer
 
-**Turn Implicit Knowledge into Reproducible Agent Skills.**
-**暗黙知を再現可能な「Agent Skills」に変える、AIコードレビューの実験的フレームワーク**
+**Codify your team's judgment into automated PR gates.**
+**チームのレビュー判断を、自動化された PR ゲートとしてコード化する。**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation](https://img.shields.io/badge/docs-available-blue)](https://river-reviewer.vercel.app/explanation/intro/)
@@ -10,15 +10,53 @@
 
 日本語版READMEです。[English README is available here.](./README.en.md)
 
-## ライセンス概要
+River Reviewer は、レビュー基準を **versioned / repo-owned な skill** として扱う OSS フレームワークです。plan / diff / tests / JUnit / 既存レビュー結果といった SDLC のアーティファクトをまたいで実行できます。
 
-| 対象                                          | ライセンス | 詳細                                 |
-| --------------------------------------------- | ---------- | ------------------------------------ |
-| ソースコード (`src/`, `scripts/`, `tests/`)   | MIT        | [LICENSE-CODE](./LICENSE-CODE)       |
-| ドキュメント (`pages/`, `skills/`, `assets/`) | CC BY 4.0  | [LICENSE-CONTENT](./LICENSE-CONTENT) |
-| 設定ファイル (`.github/`, `*.config.*`)       | MIT        | [LICENSE](./LICENSE)                 |
+AI 支援開発（Claude Code / Codex / Cursor 等）でコードは速く書けるようになりました。一方で、**レビュー判断は依然としてチームのもの**として、明示的・再現可能・所有可能に保つ必要があります。
 
-## はじめに
+River Reviewer は、こうした問いに答えるためのフレームワークです。
+
+- この差分は承認された実装プランと一致しているか？
+- テストは plan で約束された境界条件を満たしているか？
+- この PR はチームの migration / security / a11y / dependency ポリシーに違反していないか？
+- 実装エージェントは、過去レビューのフィードバックを無視していないか？
+
+## なぜ River Reviewer か
+
+| 軸               | 既存の AI レビューツール | River Reviewer                             |
+| ---------------- | ------------------------ | ------------------------------------------ |
+| 入力             | 主に diff のみ           | plan / diff / tests / JUnit / 既存レビュー |
+| 判断             | ベンダー black box       | リポジトリ内の versioned skill             |
+| 知識の所有       | provider-owned           | repo-owned / レビュー可能                  |
+| 実行ゲート       | 通常は PR 時点のみ       | 設計 / 実装 / 検証の 3 ゲート              |
+| エージェント連携 | スタンドアロンレビュアー | **AI 支援実装の監査レイヤー**              |
+
+River Reviewer は「PR diff にプロンプトを巻いただけのツール」ではなく、**チームのレビュー判断を実行可能にするフレームワーク**です。実装エージェントが書いたコードを、チーム所有のルールで検査するレイヤーとして機能します。
+
+## コアモデル
+
+**Skills define judgment.**
+skill は「どんなレビュー判断を行うか」を記述します。security / a11y / migration safety / dependency policy / plan conformance など、チーム固有の基準を載せます。
+
+**Gates execute judgment.**
+plan / exec / verify ゲートが、適切なタイミングで skill を実行します。PR 完成後だけでなく、設計時・実装中・検証段階のいずれでも動かせます。
+
+**Riverbed remembers judgment.**
+レビュー結果や決定、再利用可能なコンテキストは operating memory として残り、suppression や過去判断の再利用を通じて将来のレビューを一貫させます（[`pages/guides/use-riverbed-memory.md`](pages/guides/use-riverbed-memory.md)）。
+
+AI 支援ワークフローにおいて、River Reviewer は **チーム所有の監査レイヤー** として機能します。実装エージェントはコードを書けますが、それがチームのルールに従っているかを River Reviewer が検査します。
+
+## はじめる
+
+PR 上で River Reviewer を動かす最短手順は GitHub Actions 経由です（[クイックスタート](#クイックスタートgithub-actions)）。
+
+ローカル diff に対して試す:
+
+```bash
+npx river run . --dry-run
+```
+
+> npm パッケージとしての配布、`npx river try` 体験はロードマップ化されています（Epic 1 / [#800](https://github.com/s977043/river-reviewer/issues/800)）。
 
 | やりたいこと             | 行き先                                                                                             |
 | ------------------------ | -------------------------------------------------------------------------------------------------- |
@@ -28,13 +66,47 @@
 | コストを見積もる         | [コスト見積もりガイド](pages/guides/cost-estimation.md)                                            |
 | 設計思想を理解する       | [アーキテクチャ解説](https://river-reviewer.vercel.app/explanation/river-architecture/)            |
 
-Philosophy: [なぜ作ったのか](#philosophy)
+開発手順は [docs/runbook/dev.md](docs/runbook/dev.md) を参照してください。ライセンスは [本ファイル末尾](#ライセンス) に記載しています。
 
-開発手順は [docs/runbook/dev.md](docs/runbook/dev.md) を参照してください。
+## FAQ
 
-**River Reviewer は Context Engineering に基づく Skill Registry 中心のコードレビューフレームワークです。**
+### ESLint や型チェック、SonarQube ではダメか？
 
-チーム固有のレビュー知識を「スキル」として明示化・バージョン管理し、GitHub Actions/CLI/Node APIなど、あらゆる環境で再利用できます。スキルはテスト可能で、継続的に改善できる資産です。
+それらは引き続き使ってください。River Reviewer は静的解析の置き換えではありません。
+
+linter や静的解析は、コード内で完結する決定論的なチェック（構文、型、危険な API、スタイル、複雑度、重複、既知のセキュリティパターン）が得意です。
+
+River Reviewer が扱うのは、**アーティファクトを跨ぐレビュー判断**です。
+
+- 実装 diff が承認されたプランと意図を維持しているか？
+- テストは plan で約束された境界条件を満たすか？
+- この migration はチームのロールアウトポリシーに従っているか？
+- この依存追加はリポジトリのポリシー上許容されるか？
+- PR は別のレビュアーが既に指摘した観点に対応しているか？
+
+これらは plan / diff / tests / 既存コメント / チーム基準といった構造化された文脈を必要とします。ルールベース linter では書けない判断を、**LLM + 構造化されたアーティファクト + テスト可能な skill** で扱います。
+
+### コードやレビューデータはどこに送られるか？
+
+River Reviewer は **repo-owned な設定** と **provider-agnostic な実行** を前提に設計されています。
+
+skill はあなたのリポジトリに置きます。レビュールールはコードと一緒にバージョン管理され、ベンダーのアカウント内に隠れることはありません。実行時の振る舞いは、設定したプロバイダ（OpenAI / Anthropic / Google）と runner（GitHub Actions / CLI / Node API）に依存するため、チームは自分のセキュリティ要件に合わせてデータ境界を選べます。
+
+センシティブなリポジトリでは、入力を絞り、アーティファクト契約を明示し、CI 制御下で実行する運用から始めることを推奨します。
+
+### PlanGate に依存しているか？
+
+いいえ。PlanGate は有用なワークフロー形態の一つですが、River Reviewer が単一のプランニング手法に依存することはありません。
+
+コア契約は **artifact-based** です。plan / diff / tests / JUnit / 既存レビューコメントなど、構造化された入力を評価できます。チームはまず PR 時点のチェックだけ採用し、後から plan / verify ゲートを追加することができます。
+
+### コストはどう制御するか？
+
+skill を CI job のように扱ってください。
+
+安価で決定論的なチェックを先に走らせる、変更に関係するアーティファクトと skill にだけ River Reviewer を当てる、まずは小さな公式 skill pack から始めて、人間のレビューコストや回帰リスクが高い箇所にだけリポジトリ固有 skill を追加する、という運用が現実的です。
+
+良い skill には fixture と golden output を必ず付け、レビュー信号が実行コストに見合うかを測定できる状態にします。Anthropic provider 利用時は prompt caching が自動適用され、`RIVER_USAGE_TELEMETRY=1` で使用量を JSONL に永続化できます。
 
 <a id="philosophy"></a>
 
@@ -488,9 +560,17 @@ River Reviewer の技術ドキュメントは、[Diátaxis ドキュメントフ
 
 ## ロードマップ
 
-- 上流 → 中流 → 下流にわたるフェーズ別レビュー拡張
-- ADR などの履歴を保持する Riverbed Memory（WontFix や過去指摘も含む）
-- Evals / CI 連携による継続的な信頼性検証
+コンセプト刷新（2026-05）に伴い、Roadmap は以下の 7 Epic で構成する方針です。各 Epic の Issue は順次起票します。
+
+- **Epic 0**: 公式 Skill Pack と最小 Registry（security / a11y / migration-safety / dependency-policy / plan-conformance）
+- **Epic 1**: First-Run Adoption（npm 配布、`npx river try`、10 分 Quick Start、[#800](https://github.com/s977043/river-reviewer/issues/800)）
+- **Epic 2**: SDLC Gates（`plan` / `exec` / `verify` CLI 安定化、artifact-input-contract v1、[#802](https://github.com/s977043/river-reviewer/issues/802)）
+- **Epic 3**: Concept Refresh（README / vision / intro 刷新）
+- **Epic 4**: Skill Authoring and Governance（`npx river create skill`、catalog、contribution policy）
+- **Epic 5**: Evaluation Observability（CI 回帰、skill バッジ、dashboard）
+- **Epic 6**: Docs IA and Onboarding（first-run / skill authoring / CI operation の動線再設計）
+
+従来の柱（フェーズ別レビュー拡張、Riverbed Memory、Evals/CI 連携）は引き続き有効で、上記 Epic に吸収されます。
 
 進捗のソース・オブ・トゥルースは Milestones と Projects です（README の箇条書きは概観のみ）。
 
