@@ -441,6 +441,13 @@ function toSelectedView(skill) {
  * @param {Record<string,string>} [opts.cliArtifacts]
  * @param {string} [opts.artifactsDir]
  * @param {boolean} [opts.debug]
+ * @param {boolean} [opts.executionDeferred] When true, mark the artifact as
+ *   "plan-resolved, execution intentionally not performed yet" by adding
+ *   `debug.executionDeferred: true`. Used by `river review exec` (no flags)
+ *   until A2 wires the skill execution adapter (#802 Phase 3). Has no
+ *   effect on `selectedSkills`/`skippedSkills` — the plan path is identical
+ *   to `--dry-run`; this flag is the marker so consumers can distinguish
+ *   "deferred" from "really did nothing".
  * @param {() => string} [opts.now] - timestamp factory (ISO 8601)
  * @param {(repoRoot: string) => Promise<object>} [opts.loadConfigImpl]
  * @param {Function} [opts.resolveAllArtifactsImpl]
@@ -455,6 +462,7 @@ async function runReviewPlan({
   cliArtifacts = {},
   artifactsDir,
   debug = false,
+  executionDeferred = false,
   now = () => new Date().toISOString(),
   loadConfigImpl = loader/* loadConfig */.Z9,
   resolveAllArtifactsImpl = resolveAllArtifacts,
@@ -538,8 +546,10 @@ async function runReviewPlan({
     artifact.status = 'no-changes';
   }
 
-  if (debug) {
-    artifact.debug = { resolvedArtifacts: resolved };
+  if (debug || executionDeferred) {
+    artifact.debug = artifact.debug ?? {};
+    if (debug) artifact.debug.resolvedArtifacts = resolved;
+    if (executionDeferred) artifact.debug.executionDeferred = true;
   }
 
   return artifact;
