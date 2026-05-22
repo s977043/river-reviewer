@@ -920,3 +920,120 @@ index 1111111..2222222 100644
     assert.equal(received.reviewMode, undefined);
   });
 });
+
+describe('runReviewPlan riskAssessment propagation (#802 Phase 3 A2-fix-4)', () => {
+  const sampleDiff = `diff --git a/src/foo.ts b/src/foo.ts
+index 1111111..2222222 100644
+--- a/src/foo.ts
++++ b/src/foo.ts
+@@ -1,3 +1,4 @@
+ export function foo() {
++  console.log('debug');
+   return 42;
+ }
+`;
+  const resolveDiff = () => ({ diff: { exists: true, path: '/repo/diff.patch', source: 'cwd' } });
+
+  test('loads risk map and forwards it to buildExecutionPlan', async () => {
+    const sampleRiskMap = { version: 1, rules: [] };
+    let planArgs;
+    let loadedRoot;
+    await runReviewPlan({
+      planOnly: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      loadRiskMapImpl: async (root) => {
+        loadedRoot = root;
+        return sampleRiskMap;
+      },
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async (args) => {
+        planArgs = args;
+        return { selected: [], skipped: [] };
+      },
+    });
+    assert.ok(loadedRoot, 'loadRiskMap must receive the repo root');
+    assert.deepEqual(planArgs.riskMap, sampleRiskMap);
+  });
+
+  test('null risk map (missing file) preserves the backward-compatible undefined sentinel', async () => {
+    let planArgs;
+    await runReviewPlan({
+      planOnly: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      loadRiskMapImpl: async () => null,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async (args) => {
+        planArgs = args;
+        return { selected: [], skipped: [] };
+      },
+    });
+    assert.equal(planArgs.riskMap, null);
+  });
+
+  test('riskMap load failure surfaces as ReviewPlanError', async () => {
+    await assert.rejects(
+      () =>
+        runReviewPlan({
+          planOnly: true,
+          now: fixedNow,
+          loadConfigImpl: okConfig,
+          loadRiskMapImpl: async () => {
+            throw new Error('YAML parse boom');
+          },
+        }),
+      (e) => e instanceof ReviewPlanError && /Failed to load risk map/.test(e.message)
+    );
+  });
+
+  test('plan.riskAssessment is forwarded to generateReview when execution runs', async () => {
+    let received;
+    const riskAssessment = {
+      aggregateAction: 'escalate',
+      escalatedFiles: ['src/foo.ts'],
+      humanReviewFiles: [],
+      fileRisks: [{ file: 'src/foo.ts', action: 'escalate' }],
+    };
+    await runReviewPlan({
+      planOnly: true,
+      executeReview: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      loadRiskMapImpl: async () => ({ version: 1, rules: [] }),
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async () => ({
+        selected: [{ metadata: { id: 'rr-test-skill', name: 'Test', phase: 'midstream' } }],
+        skipped: [],
+        riskAssessment,
+      }),
+      generateReviewImpl: async (opts) => {
+        received = opts;
+        return { findings: [] };
+      },
+    });
+    assert.deepEqual(received.riskAssessment, riskAssessment);
+  });
+
+  test('riskAssessment stays undefined when buildExecutionPlan omits it', async () => {
+    let received;
+    await runReviewPlan({
+      planOnly: true,
+      executeReview: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      loadRiskMapImpl: async () => null,
+      resolveAllArtifactsImpl: resolveDiff,
+      readFileImpl: async () => sampleDiff,
+      buildExecutionPlanImpl: async () => ({ selected: [], skipped: [] }),
+      generateReviewImpl: async (opts) => {
+        received = opts;
+        return { findings: [] };
+      },
+    });
+    assert.equal(received.riskAssessment, undefined);
+  });
+});

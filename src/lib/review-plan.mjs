@@ -33,6 +33,7 @@ import { resolveAllArtifacts as defaultResolveAllArtifacts } from '../config/art
 import { parseUnifiedDiff } from './diff.mjs';
 import { buildExecutionPlan as defaultBuildExecutionPlan } from '../../runners/core/review-runner.mjs';
 import { generateReview as defaultGenerateReview } from './review-engine.mjs';
+import { loadRiskMap as defaultLoadRiskMap } from './risk-map.mjs';
 import { PHASES, PLANNER_MODES } from './planner-utils.mjs';
 import { resolveAvailableContexts, resolveAvailableDependencies } from './utils.mjs';
 
@@ -279,6 +280,10 @@ function toSelectedView(skill) {
  * @param {Function} [opts.buildExecutionPlanImpl]
  * @param {Function} [opts.generateReviewImpl] Injectable for tests so the
  *   adapter wiring can be verified without calling an external LLM.
+ * @param {(repoRoot: string) => Promise<object|null>} [opts.loadRiskMapImpl]
+ *   Injectable risk map loader. Returns `null` if no risk map is configured
+ *   (the default `.river/risk-map.yaml` path is missing), preserving the
+ *   backward-compatible "no risk-based action" behaviour.
  * @param {(p: string) => Promise<string>} [opts.readFileImpl]
  * @returns {Promise<object>} Review Artifact (schema version "1")
  */
@@ -298,6 +303,7 @@ export async function runReviewPlan({
   resolveAllArtifactsImpl = defaultResolveAllArtifacts,
   buildExecutionPlanImpl = defaultBuildExecutionPlan,
   generateReviewImpl = defaultGenerateReview,
+  loadRiskMapImpl = defaultLoadRiskMap,
   readFileImpl = (p) => readFile(p, 'utf8'),
 } = {}) {
   if (executeReview && executionDeferred) {
@@ -322,6 +328,18 @@ export async function runReviewPlan({
     config = await loadConfigImpl(cwd);
   } catch (err) {
     throw new ReviewPlanError(`Failed to load config: ${err.message}`);
+  }
+
+  // Risk map is optional (loadRiskMap returns null when .river/risk-map.yaml
+  // is missing). A malformed risk map is surfaced as a ReviewPlanError so
+  // the exec path fails loudly instead of silently dropping the risk
+  // signal — see Codex/Gemini multi-perspective review on the silent-skip
+  // cleanup epoch.
+  let riskMap = null;
+  try {
+    riskMap = await loadRiskMapImpl(cwd);
+  } catch (err) {
+    throw new ReviewPlanError(`Failed to load risk map: ${err.message}`);
   }
 
   const configArtifacts =
@@ -391,7 +409,7 @@ export async function runReviewPlan({
         dryRun: !executeReview,
         llmEnabled: executeReview,
         repoRoot: cwd,
-        riskMap: undefined,
+        riskMap,
         availableContexts: effectiveAvailableContexts,
         availableDependencies: effectiveAvailableDependencies,
       });
@@ -424,6 +442,7 @@ export async function runReviewPlan({
           fileTypes: plan.fileTypes ?? undefined,
           relatedADRs: plan.relatedADRs ?? undefined,
           reviewMode: plan.reviewMode ?? undefined,
+          riskAssessment: plan.riskAssessment ?? undefined,
         });
       } catch (err) {
         throw new ReviewPlanError(`Failed to execute review skills: ${err.message}`);
