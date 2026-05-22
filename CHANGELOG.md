@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.53.0](https://github.com/s977043/river-reviewer/compare/v0.52.0...v0.53.0) (2026-05-22)
+
+
+### Features
+
+* **skill:** add modern-web-performance community skill ([#868](https://github.com/s977043/river-reviewer/issues/868) Phase 1) ([#875](https://github.com/s977043/river-reviewer/issues/875)) ([9e2a24c](https://github.com/s977043/river-reviewer/commit/9e2a24c5357fab44ca2bcc624ef405b7d1749ce5))
+
+
+### Bug Fixes
+
+* **cli:** propagate riskAssessment on review exec path ([#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 A2-fix-4) ([#877](https://github.com/s977043/river-reviewer/issues/877)) ([f73e64e](https://github.com/s977043/river-reviewer/commit/f73e64ed3a38734508037cef8022c7d6a81df26b))
+
 ## [0.52.0](https://github.com/s977043/river-reviewer/compare/v0.51.1...v0.52.0) (2026-05-22)
 
 
