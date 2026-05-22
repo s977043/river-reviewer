@@ -191,6 +191,8 @@ var diff = __webpack_require__(4382);
 var review_runner = __webpack_require__(4584);
 // EXTERNAL MODULE: ./src/lib/review-engine.mjs
 var review_engine = __webpack_require__(2022);
+// EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
+var risk_map = __webpack_require__(572);
 // EXTERNAL MODULE: ./src/lib/planner-utils.mjs
 var planner_utils = __webpack_require__(1013);
 // EXTERNAL MODULE: ./src/lib/utils.mjs
@@ -222,6 +224,7 @@ var utils = __webpack_require__(9746);
  * Pure-ish module: config loader, resolver, buildExecutionPlan and the
  * diff reader are injectable for tests.
  */
+
 
 
 
@@ -477,6 +480,10 @@ function toSelectedView(skill) {
  * @param {Function} [opts.buildExecutionPlanImpl]
  * @param {Function} [opts.generateReviewImpl] Injectable for tests so the
  *   adapter wiring can be verified without calling an external LLM.
+ * @param {(repoRoot: string) => Promise<object|null>} [opts.loadRiskMapImpl]
+ *   Injectable risk map loader. Returns `null` if no risk map is configured
+ *   (the default `.river/risk-map.yaml` path is missing), preserving the
+ *   backward-compatible "no risk-based action" behaviour.
  * @param {(p: string) => Promise<string>} [opts.readFileImpl]
  * @returns {Promise<object>} Review Artifact (schema version "1")
  */
@@ -496,6 +503,7 @@ async function runReviewPlan({
   resolveAllArtifactsImpl = resolveAllArtifacts,
   buildExecutionPlanImpl = review_runner/* buildExecutionPlan */.kN,
   generateReviewImpl = review_engine/* generateReview */.G1,
+  loadRiskMapImpl = risk_map/* loadRiskMap */.E$,
   readFileImpl = (p) => (0,promises_.readFile)(p, 'utf8'),
 } = {}) {
   if (executeReview && executionDeferred) {
@@ -520,6 +528,18 @@ async function runReviewPlan({
     config = await loadConfigImpl(cwd);
   } catch (err) {
     throw new ReviewPlanError(`Failed to load config: ${err.message}`);
+  }
+
+  // Risk map is optional (loadRiskMap returns null when .river/risk-map.yaml
+  // is missing). A malformed risk map is surfaced as a ReviewPlanError so
+  // the exec path fails loudly instead of silently dropping the risk
+  // signal — see Codex/Gemini multi-perspective review on the silent-skip
+  // cleanup epoch.
+  let riskMap = null;
+  try {
+    riskMap = await loadRiskMapImpl(cwd);
+  } catch (err) {
+    throw new ReviewPlanError(`Failed to load risk map: ${err.message}`);
   }
 
   const configArtifacts =
@@ -589,7 +609,7 @@ async function runReviewPlan({
         dryRun: !executeReview,
         llmEnabled: executeReview,
         repoRoot: cwd,
-        riskMap: undefined,
+        riskMap,
         availableContexts: effectiveAvailableContexts,
         availableDependencies: effectiveAvailableDependencies,
       });
@@ -622,6 +642,7 @@ async function runReviewPlan({
           fileTypes: plan.fileTypes ?? undefined,
           relatedADRs: plan.relatedADRs ?? undefined,
           reviewMode: plan.reviewMode ?? undefined,
+          riskAssessment: plan.riskAssessment ?? undefined,
         });
       } catch (err) {
         throw new ReviewPlanError(`Failed to execute review skills: ${err.message}`);
