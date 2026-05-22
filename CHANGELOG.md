@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.52.0](https://github.com/s977043/river-reviewer/compare/v0.51.1...v0.52.0) (2026-05-22)
+
+
+### Features
+
+* **skill:** add modern-web-semantic community skill ([#868](https://github.com/s977043/river-reviewer/issues/868) Phase 1 MVP) ([#873](https://github.com/s977043/river-reviewer/issues/873)) ([cf1ed5b](https://github.com/s977043/river-reviewer/commit/cf1ed5b6aca6ec0934b79b570dd2cdc58e9aed74))
+
 ## [0.51.1](https://github.com/s977043/river-reviewer/compare/v0.51.0...v0.51.1) (2026-05-21)
 
 
