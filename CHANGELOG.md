@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.54.0](https://github.com/s977043/river-reviewer/compare/v0.53.0...v0.54.0) (2026-05-22)
+
+
+### Features
+
+* **skill:** add modern-web-browser-compat community skill ([#868](https://github.com/s977043/river-reviewer/issues/868) Phase 1) ([#881](https://github.com/s977043/river-reviewer/issues/881)) ([4c46142](https://github.com/s977043/river-reviewer/commit/4c46142006375123e8f1079f6f51869d334598d2))
+
 ## [0.53.0](https://github.com/s977043/river-reviewer/compare/v0.52.0...v0.53.0) (2026-05-22)
 
 
