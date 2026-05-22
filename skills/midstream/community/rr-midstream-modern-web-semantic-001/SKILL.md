@@ -10,6 +10,8 @@ applyTo:
   - 'app/**/*.{ts,tsx,js,jsx,html,css}'
   - 'components/**/*.{ts,tsx,js,jsx,html,css}'
   - 'pages/**/*.{ts,tsx,js,jsx,html,css}'
+  - 'styles/**/*.css'
+  - 'public/**/*.html'
 tags: [community, modern-web, semantic-html, accessibility, ui, midstream]
 severity: minor
 inputContext: [diff]
