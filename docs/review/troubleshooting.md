@@ -1,6 +1,6 @@
 # Troubleshooting: `river review exec`
 
-This page captures the silent-skip failure modes fixed across `v0.51.0` and `v0.51.1`, plus the one residual replay-side gap that is still open as #802 A2-3.
+This page captures the silent-skip failure modes fixed across `v0.51.0` and `v0.51.1`, plus the one residual replay-side gap that is still open as [#802](https://github.com/s977043/river-reviewer/issues/802) A2-3.
 
 ## `river review exec` returns no findings despite a non-empty diff
 
