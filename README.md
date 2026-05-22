@@ -560,15 +560,19 @@ River Reviewer の技術ドキュメントは、[Diátaxis ドキュメントフ
 
 ## ロードマップ
 
-コンセプト刷新（2026-05）に伴い、Roadmap は以下の 7 Epic で構成する方針です。各 Epic の Issue は順次起票します。
+コンセプト刷新（2026-05）に伴い、Roadmap は以下の 7 Epic で構成しています。状態列は v0.53.0 時点の実装到達点を示します。
 
-- **Epic 0**: 公式 Skill Pack と最小 Registry（security / a11y / migration-safety / dependency-policy / plan-conformance）
-- **Epic 1**: First-Run Adoption（npm 配布、`npx river try`、10 分 Quick Start、[#800](https://github.com/s977043/river-reviewer/issues/800)）
-- **Epic 2**: SDLC Gates（`plan` / `exec` / `verify` CLI 安定化、artifact-input-contract v1、[#802](https://github.com/s977043/river-reviewer/issues/802)）
-- **Epic 3**: Concept Refresh（README / vision / intro 刷新）
-- **Epic 4**: Skill Authoring and Governance（`npx river create skill`、catalog、contribution policy）
-- **Epic 5**: Evaluation Observability（CI 回帰、skill バッジ、dashboard）
-- **Epic 6**: Docs IA and Onboarding（first-run / skill authoring / CI operation の動線再設計）
+| Epic                                       | 内容                                                                                                         | 状態                                                                                                                                                                                                                                                   |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Epic 0**: Official Skill Pack            | 公式 Skill Pack と最小 Registry（security / a11y / migration-safety / dependency-policy / plan-conformance） | Partial — community tier で modern-web-semantic / modern-web-performance が landed ([#873](https://github.com/s977043/river-reviewer/pull/873) / [#875](https://github.com/s977043/river-reviewer/pull/875))。公式 Skill Pack の registry 整備は未着手 |
+| **Epic 1**: First-Run Adoption             | npm 配布、`npx river try`、10 分 Quick Start                                                                 | Planned — [#800](https://github.com/s977043/river-reviewer/issues/800) で追跡中、未着手                                                                                                                                                                |
+| **Epic 2**: SDLC Gates                     | `plan` / `exec` / `verify` CLI 安定化、artifact-input-contract v1                                            | Partial — `plan` / `exec` は v0.53.0 で安定（silent-skip 5/6 解消済み）。`exec --plan` replay execution は [#878](https://github.com/s977043/river-reviewer/issues/878) で追跡。`verify` 実行は未実装                                                  |
+| **Epic 3**: Concept Refresh                | README / vision / intro 刷新                                                                                 | Implemented — v0.51.0 でランディング ([#860](https://github.com/s977043/river-reviewer/pull/860))                                                                                                                                                      |
+| **Epic 4**: Skill Authoring and Governance | `npx river create skill`、catalog、contribution policy                                                       | Planned — registry.yaml 拡張と contribution policy が未着手                                                                                                                                                                                            |
+| **Epic 5**: Evaluation Observability       | CI 回帰、skill バッジ、dashboard                                                                             | Planned — promptfoo eval は per-skill 基盤あり、全体 dashboard 化は未着手                                                                                                                                                                              |
+| **Epic 6**: Docs IA and Onboarding         | first-run / skill authoring / CI operation の動線再設計                                                      | Partial — `docs/review/troubleshooting.md` 整備済み ([#866](https://github.com/s977043/river-reviewer/pull/866), [#872](https://github.com/s977043/river-reviewer/pull/872))。Quick Start / Skill authoring の動線は Epic 1 と並行                     |
+
+凡例: **Implemented** = 主要受け入れ条件を達成 / **Partial** = 一部到達、残スコープあり / **Planned** = 着手予定。
 
 従来の柱（フェーズ別レビュー拡張、Riverbed Memory、Evals/CI 連携）は引き続き有効で、上記 Epic に吸収されます。
 
