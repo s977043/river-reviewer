@@ -71,3 +71,9 @@ severity: 'info'
 
 - 仕様や意図が不明確で解釈が分かれる場合は質問として返す。
 - 影響範囲が広い設計判断やトレードオフは人間レビューへ返す。
+
+## レビュー姿勢（Standard of Code Review）
+
+- 設計フェーズでも完璧な設計を求めず、「この plan / ADR がコードベース全体の方向性を改善するか」を判断軸にする (`google/eng-practices` の "Improve the overall code health" 原則)。
+- 上流レビューは Design > Functionality > Complexity > Tests > Naming の順で重点を置く（`google/eng-practices` "What to look for in a code review"）。
+- nit / 好み相当の指摘は `severity: minor` 以下に留める。詳しい対応表は [`docs/development/google-eng-practices-mapping.md`](../../../docs/development/google-eng-practices-mapping.md) を参照する。
