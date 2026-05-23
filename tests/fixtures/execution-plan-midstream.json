@@ -29,6 +29,13 @@
       "dependencies": ["tracing", "code_search"]
     },
     {
+      "id": "rr-midstream-modern-web-a11y-interactive-001",
+      "phase": "midstream",
+      "modelHint": "balanced",
+      "outputKind": ["findings", "actions"],
+      "dependencies": []
+    },
+    {
       "id": "rr-midstream-modern-web-browser-compat-001",
       "phase": "midstream",
       "modelHint": "balanced",
