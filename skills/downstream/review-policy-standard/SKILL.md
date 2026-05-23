@@ -81,3 +81,9 @@ severity: 'info'
 
 - 仕様や意図が不明確で解釈が分かれる場合は質問として返す。
 - 影響範囲が広い設計判断やトレードオフは人間レビューへ返す。
+
+## レビュー姿勢（Standard of Code Review）
+
+- テスト / QA レビューでも完璧を求めず、「このテスト追加 / 修正が回帰検出と保守性を改善するか」を判断軸にする (`google/eng-practices` の "Improve the overall code health" 原則)。
+- テスト観点では「意味のある assertion」「flaky 回避」「適切な scope (unit / integration / e2e)」を最優先する。命名やフォーマットは nit 扱い。
+- nit / 好み相当の指摘は `severity: minor` 以下に留める。詳しい対応表は [`docs/development/google-eng-practices-mapping.md`](../../../docs/development/google-eng-practices-mapping.md) を参照する。

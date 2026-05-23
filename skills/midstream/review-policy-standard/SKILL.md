@@ -82,3 +82,9 @@ severity: 'info'
 
 - 仕様や意図が不明確で解釈が分かれる場合は質問として返す。
 - 影響範囲が広い設計判断やトレードオフは人間レビューへ返す。
+
+## レビュー姿勢（Standard of Code Review）
+
+- 完璧なコードを求めず、「PR を入れることでコードベース全体の健全性が改善するか」を判断軸にする (`google/eng-practices` の "Improve the overall code health" 原則)。
+- 完璧主義的な書き直し要求や、好みベースの reformat 要求はしない。
+- nit / 好み相当の指摘は `severity: minor` 以下に留め、`major` / `critical` は実害ベースの指摘に限定する。詳しい対応表は [`docs/development/google-eng-practices-mapping.md`](../../../docs/development/google-eng-practices-mapping.md) を参照する。
