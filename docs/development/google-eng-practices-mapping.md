@@ -1,6 +1,6 @@
 # `google/eng-practices` Mapping
 
-[`google/eng-practices`](https://google.github.io/eng-practices/) は Google が社内で長年運用してきたコードレビュー文化を公開したドキュメント集です。River Reviewer は別の組織で動く OSS なので **そのままコピーするのではなく、既存の `severity` 語彙 / skill registry / review policy にどう翻訳されるか** を整理します。
+[`google/eng-practices`](https://google.github.io/eng-practices/) は Google が社内で長年運用してきたコードレビュー文化を公開したドキュメント集です。River Reviewer は Google 以外の組織でも利用される汎用 OSS なので **そのままコピーするのではなく、既存の `severity` 語彙 / skill registry / review policy にどう翻訳されるか** を整理します。
 
 このページは River Reviewer 利用者と skill 作者向けで、Google の用語が出てきたときに River Reviewer のどの仕組みで等価のことが扱えるかを引きやすくするのが目的です。
 
@@ -38,13 +38,13 @@
 
 `google/eng-practices` のうち、River Reviewer の汎用 skill に直接持ち込むと scope が崩れるものは以下です。これらは別レイヤで扱います。
 
-| 要素                                              | 理由                                               | 該当レイヤ                                                   |
-| ------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------ |
-| Speed of Code Reviews（SLA）                      | diff から判断不能、組織 metric の領域              | DORA metrics / CI dashboard / 別 epic                        |
-| Reviewer role（Gatekeeper + Mentor）              | 役割定義であって per-PR 評価ではない               | onboarding doc / org culture                                 |
-| Readability approval 制度                         | Google 固有の認定制度。汎用化が困難                | スコープ外（必要な組織は独自 skill / policy で扱う）         |
-| Comment hierarchy を新 taxonomy として導入        | 既存 `severity` ladder と競合し、運用が二重化する  | 上の対応表で吸収するのみ                                     |
-| Design > Functionality > ... 絶対順の機械ルール化 | 個別 PR の重みは domain 依存。固定順は誤指摘を生む | 参考順位として skill prompt に存在、ただし強制ルールにしない |
+| 要素                                                                      | 理由                                               | 該当レイヤ                                                   |
+| ------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------ |
+| Speed of Code Reviews（SLA）                                              | diff から判断不能、組織 metric の領域              | DORA metrics / CI dashboard / 別 epic                        |
+| Reviewer role（Gatekeeper + Mentor）                                      | 役割定義であって per-PR 評価ではない               | onboarding doc / org culture                                 |
+| Readability approval 制度                                                 | Google 固有の認定制度。汎用化が困難                | スコープ外（必要な組織は独自 skill / policy で扱う）         |
+| Comment hierarchy を新 taxonomy として導入                                | 既存 `severity` ladder と競合し、運用が二重化する  | 上の対応表で吸収するのみ                                     |
+| Design > Functionality > Complexity > Tests > Naming 絶対順の機械ルール化 | 個別 PR の重みは domain 依存。固定順は誤指摘を生む | 参考順位として skill prompt に存在、ただし強制ルールにしない |
 
 ## PR size 警告（将来エピック）
 
