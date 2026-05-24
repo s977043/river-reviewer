@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.55.0](https://github.com/s977043/river-reviewer/compare/v0.54.0...v0.55.0) (2026-05-23)
+
+
+### Features
+
+* **skill:** add modern-web-a11y-interactive community skill ([#868](https://github.com/s977043/river-reviewer/issues/868) Phase 1) ([#884](https://github.com/s977043/river-reviewer/issues/884)) ([6283147](https://github.com/s977043/river-reviewer/commit/62831472160c0f6ba67f768ebcb8860b63eee46e))
+
 ## [0.54.0](https://github.com/s977043/river-reviewer/compare/v0.53.0...v0.54.0) (2026-05-22)
 
 
