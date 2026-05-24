@@ -19,7 +19,7 @@ Three `action` values are supported (see [`schemas/risk-map.schema.json`](../../
 1. Copy `examples/risk-map/risk-map.yaml` to `.river/risk-map.yaml` at your repo root.
 2. Edit the rules: add patterns that match your security-sensitive files; remove the example patterns that do not apply.
 3. Commit. The next `river review exec` run picks it up automatically via `runReviewPlan`'s `loadRiskMap` (#877 wired this through on the exec path).
-4. To verify the loaded map: run `river review exec --debug --output json --output-file /tmp/r.json`, then `jq '.plan.riskAssessment' /tmp/r.json` — the `aggregateAction` / `escalatedFiles` / `humanReviewFiles` reflect your rules.
+4. To verify the file parses cleanly, run any `river review` command — a malformed file surfaces as `ReviewPlanError: Failed to load risk map: ...` with exit code 3. When the file loads successfully, the rules become part of the LLM prompt context for severity-floor escalation and human-review gating; the per-rule classification is **not** echoed back on the artifact `plan` object (the schema's `plan` only carries `selectedSkills` / `skippedSkills` / `plannerMode`).
 
 ## Backward compatibility
 
