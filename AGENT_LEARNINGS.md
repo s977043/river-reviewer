@@ -41,3 +41,7 @@
 - `2026-05-03`: Root scripts assume Node.js `22.x`; running validations on older Node versions can fail before repo logic executes.
   - `Applies to`: local/CI execution of `npm run lint`, `npm test`, and validation scripts.
   - `Evidence`: `package.json` `engines.node` is pinned to `22.x`.
+
+- `2026-05-24`: release-please often leaves a PR in `mergeStateStatus: BLOCKED` because the required CI checks were not registered on the auto-generated branch (only `Vercel` appears). The fix is to kick CI with a single empty commit on the branch. When local `git push` is not available (e.g. macOS Full Disk Access has revoked the working tree), the same effect can be achieved via the gh REST API: `gh api repos/<owner>/<repo>/git/commits` with the existing tree SHA plus parent, then `gh api -X PATCH repos/<owner>/<repo>/git/refs/heads/<branch>` to fast-forward the ref. Once CI re-runs the required checks register and the PR transitions to CLEAN.
+  - `Applies to`: release-please workflow recovery, fs-loss / sandbox-restricted environments, any case where the branch head must advance without a local checkout.
+  - `Evidence`: validated on PR #876 (v0.53.0) during a session where the working tree was inaccessible; the BLOCKED → CLEAN → squash-merge → release-publish flow completed entirely via gh API.
