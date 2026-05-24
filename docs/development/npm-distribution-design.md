@@ -77,24 +77,20 @@ The two CLIs have **overlapping command names** (`review`, `eval`). When `river-
 +    "schemas/",
 +    "templates/",
 +    "scripts/",
-+    "README.md",
 +    "README.en.md",
-+    "LICENSE",
 +    "LICENSE-CODE",
-+    "LICENSE-CONTENT",
-+    "AGENT_LEARNINGS.md",
-+    "package.json"
++    "LICENSE-CONTENT"
 +  ],
-+  "engines": {
-+    "node": ">=20"
-+  },
 +  "publishConfig": {
 +    "access": "public",
 +    "registry": "https://registry.npmjs.org/"
 +  },
-   "engines": { "node": "22.x" }
+-  "engines": { "node": "22.x" }
++  "engines": { "node": ">=20" }
  }
 ```
+
+> `README.md`, `LICENSE`, `package.json` は npm が `files` 指定の有無に関わらず自動でパッケージに含めるため、明示列挙は不要 (npm-publish documentation の "Files included" 参照)。`AGENT_LEARNINGS.md` は contributor 向けの内部ドキュメントなので除外する。
 
 ### What is NOT included in `files`
 
