@@ -42,6 +42,24 @@
   - `Applies to`: local/CI execution of `npm run lint`, `npm test`, and validation scripts.
   - `Evidence`: `package.json` `engines.node` is pinned to `22.x`.
 
-- `2026-05-24`: release-please often leaves a PR in `mergeStateStatus: BLOCKED` because the required CI checks were not registered on the auto-generated branch (only `Vercel` appears). The fix is to kick CI with a single empty commit on the branch. When local `git push` is not available (e.g. macOS Full Disk Access has revoked the working tree), the same effect can be achieved via the gh REST API: `gh api repos/<owner>/<repo>/git/commits` with the existing tree SHA plus parent, then `gh api -X PATCH repos/<owner>/<repo>/git/refs/heads/<branch>` to fast-forward the ref. Once CI re-runs the required checks register and the PR transitions to CLEAN.
+- `2026-05-24`: release-please often leaves a PR in `mergeStateStatus: BLOCKED` because the required CI checks did not register on the auto-generated branch (only `Vercel` appears). Fix: advance the branch by one empty commit. When local `git push` is unavailable (e.g. macOS Full Disk Access revoked the working tree), do it entirely via the gh REST API:
+
+  ```bash
+  REPO=s977043/river-reviewer
+  BRANCH=release-please--branches--main--components--river-reviewer
+  PARENT=$(gh api repos/$REPO/git/refs/heads/$BRANCH --jq '.object.sha')
+  TREE=$(gh api repos/$REPO/git/commits/$PARENT --jq '.tree.sha')
+
+  NEW=$(gh api repos/$REPO/git/commits --method POST --input - <<EOF | jq -r .sha
+  { "message": "chore: trigger CI", "tree": "$TREE", "parents": ["$PARENT"] }
+  EOF
+  )
+
+  gh api -X PATCH repos/$REPO/git/refs/heads/$BRANCH --input - <<EOF
+  { "sha": "$NEW" }
+  EOF
+  ```
+
+  Once the ref advances, the required status checks re-register and the PR transitions BLOCKED → CLEAN.
   - `Applies to`: release-please workflow recovery, fs-loss / sandbox-restricted environments, any case where the branch head must advance without a local checkout.
   - `Evidence`: validated on PR #876 (v0.53.0) during a session where the working tree was inaccessible; the BLOCKED → CLEAN → squash-merge → release-publish flow completed entirely via gh API.
