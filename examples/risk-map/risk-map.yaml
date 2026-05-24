@@ -1,0 +1,63 @@
+# Example risk-map.yaml — copy to .river/risk-map.yaml in your repo.
+#
+# Rules are evaluated top-to-bottom; the first matching `pattern` wins.
+# Add the strictest / most sensitive patterns near the top.
+#
+# Schema:        https://github.com/s977043/river-reviewer/blob/main/schemas/risk-map.schema.json
+# User guide:    https://github.com/s977043/river-reviewer/blob/main/pages/guides/repo-wide-review.md
+# Adoption README (this directory): see ./README.md
+
+version: '1'
+
+rules:
+  # --- Always require human review ----------------------------------------
+
+  - pattern: 'src/lib/secret-redactor.mjs'
+    action: require_human_review
+    reason: 'Security-sensitive: changes here affect secret redaction policy.'
+
+  - pattern: '**/*.{key,pem,p12}'
+    action: require_human_review
+    reason: 'Credential material must never be committed; force a human gate.'
+
+  - pattern: '.github/workflows/**'
+    action: require_human_review
+    reason: 'CI / release pipeline changes affect every consumer downstream.'
+
+  # --- Escalate (still mergeable, but raise the severity floor) -----------
+
+  - pattern: 'src/lib/review-engine.mjs'
+    action: escalate
+    reason: 'Touches the LLM call path; LLM cost and prompt safety regressions hide here.'
+
+  - pattern: 'src/config/**'
+    action: escalate
+    reason: 'Config loader changes affect every downstream skill selection.'
+
+  - pattern: 'runners/github-action/dist/**'
+    action: escalate
+    reason: 'Bundled action JS — verify the source-side change is the actual diff.'
+
+  - pattern: 'package.json'
+    action: escalate
+    reason: 'Dependency / engines / bin changes ship to every adopter.'
+
+  # --- Comment-only (default, light gating) -------------------------------
+
+  - pattern: 'docs/**'
+    action: comment_only
+    reason: 'Internal developer docs — quality matters but no human gate needed.'
+
+  - pattern: 'pages/**'
+    action: comment_only
+    reason: 'Public Docusaurus site content.'
+
+  - pattern: 'tests/**'
+    action: comment_only
+    reason: 'Tests are reviewable but should not block the PR on a human reviewer.'
+
+defaults:
+  # Anything that does not match the rules above falls through to comment_only.
+  # Switch to `require_human_review` if your repo prefers an opt-in security
+  # posture (everything is reviewed unless an exception rule allows comment_only).
+  action: comment_only
