@@ -59,7 +59,7 @@
     "usage:summary": "node scripts/usage-summary.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.96.0",
+    "@anthropic-ai/sdk": "^0.98.0",
     "@google/generative-ai": "^0.24.1",
     "@inquirer/prompts": "^8.4.3",
     "@opentelemetry/api": "^1.9.1",
