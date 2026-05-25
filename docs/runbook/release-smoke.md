@@ -22,11 +22,12 @@ This was added as Codex's final-pass review item #3 (after the v0.51.0–v0.55.0
 
 ## Smoke sequence
 
-Run from a clean checkout of the tagged commit:
+Run from a clean checkout of the tagged commit. The tag is resolved from the upstream GitHub Release rather than the local `package.json` so a stale local `main` cannot point the smoke at the wrong commit:
 
 ```bash
 git fetch --tags origin
-git checkout "v$(node -p 'require("./package.json").version')"
+TAG=$(gh release view --json tagName --jq .tagName)
+git checkout "$TAG"
 npm ci
 npm run lint
 npm test
@@ -61,7 +62,7 @@ The `tagName` / `publishedAt` should be present (not `404 Not Found`). The relea
 - **`npm ci` errors**: lockfile drift. Re-run `npm install` on `main` and open a PR to commit the new `package-lock.json`. The release tag itself is fine—the consumer error is the lockfile.
 - **`Action dist freshness` mismatch (post-merge CI)**: someone forgot `npm run build:action` after editing `src/`. Open a small follow-up PR with the rebuilt `runners/github-action/dist/`. See `docs/development/dist-check-rebuild-guide.md`.
 - **`npm audit --omit=dev` returns vulnerabilities**: open `npm audit fix --omit=dev` PR (see PR #888 for the pattern).
-- **`gh release view` 404**: release-please workflow may have raced. Re-run `gh workflow run release-please.yml` against `main`, then re-check. See `feedback_release_please_workflow_race.md` memory if available.
+- **`gh release view` 404**: release-please workflow may have raced. Re-run `gh workflow run release-please.yml` against `main`, then re-check. If that fails, advance the `release-please--...` branch by one empty commit via the gh REST API (the pattern is documented in [`AGENT_LEARNINGS.md`](../../AGENT_LEARNINGS.md) under the 2026-05-24 entry).
 - **`river run` skill loader error**: a skill metadata change slipped past `npm run skills:validate` (rare). Bisect with the `metadata.id` mentioned in the error.
 
 ## Out of scope
