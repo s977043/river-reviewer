@@ -10,12 +10,17 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'release-please branch name'
+        description: 'release-please branch (blank = auto-detect from open PRs)'
         required: false
-        default: 'release-please--branches--main--components--river-reviewer'
+        default: ''
 
 permissions:
   contents: write
+  pull-requests: read
+
+concurrency:
+  group: release-please-kick
+  cancel-in-progress: false
 
 jobs:
   kick:
@@ -25,10 +30,20 @@ jobs:
       - name: Advance release-please branch by an empty commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: ${{ inputs.branch }}
+          BRANCH_INPUT: ${{ inputs.branch }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+          if [ -z "${BRANCH_INPUT}" ]; then
+            BRANCH=$(gh pr list --repo "${REPO}" --state open --search 'in:title "chore(main): release"' --json headRefName --jq '.[0].headRefName')
+            if [ -z "${BRANCH}" ] || [ "${BRANCH}" = "null" ]; then
+              echo "::error::No open release-please PR found. Pass the branch name explicitly."
+              exit 1
+            fi
+            echo "Auto-detected branch: ${BRANCH}"
+          else
+            BRANCH="${BRANCH_INPUT}"
+          fi
           PARENT=$(gh api "repos/${REPO}/git/refs/heads/${BRANCH}" --jq '.object.sha')
           TREE=$(gh api "repos/${REPO}/git/commits/${PARENT}" --jq '.tree.sha')
           NEW=$(gh api "repos/${REPO}/git/commits" --method POST \

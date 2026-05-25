@@ -14,7 +14,15 @@
 set -euo pipefail
 
 REPO="${REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}"
-BRANCH="${1:-release-please--branches--main--components--river-reviewer}"
+BRANCH="${1:-}"
+if [ -z "${BRANCH}" ]; then
+  BRANCH=$(gh pr list --repo "${REPO}" --state open --search 'in:title "chore(main): release"' --json headRefName --jq '.[0].headRefName')
+  if [ -z "${BRANCH}" ] || [ "${BRANCH}" = "null" ]; then
+    echo "error: no open release-please PR found. Pass the branch name explicitly." >&2
+    exit 1
+  fi
+  echo "Auto-detected branch: ${BRANCH}"
+fi
 
 PARENT=$(gh api "repos/${REPO}/git/refs/heads/${BRANCH}" --jq '.object.sha')
 TREE=$(gh api "repos/${REPO}/git/commits/${PARENT}" --jq '.tree.sha')
