@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.56.0](https://github.com/s977043/river-reviewer/compare/v0.55.0...v0.56.0) (2026-05-25)
+
+
+### Features
+
+* **registry:** add community section with recommended:false for 6 skills (S3) ([#899](https://github.com/s977043/river-reviewer/issues/899)) ([e67ec5b](https://github.com/s977043/river-reviewer/commit/e67ec5bde5ec7b252c97ef379754fdf0318d934b))
+
 ## [0.55.0](https://github.com/s977043/river-reviewer/compare/v0.54.0...v0.55.0) (2026-05-23)
 
 
