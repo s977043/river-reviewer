@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.57.0](https://github.com/s977043/river-reviewer/compare/v0.56.0...v0.57.0) (2026-05-25)
+
+
+### Features
+
+* **skills:** add fixtures + eval scaffolding for 2 community skills (S4 slice) ([#905](https://github.com/s977043/river-reviewer/issues/905)) ([96c1e29](https://github.com/s977043/river-reviewer/commit/96c1e29a10d085c38079905dca80754e1d7038c4))
+
+
+### Bug Fixes
+
+* **process:** harden kick automation + add Stop-rule reopen conditions ([#902](https://github.com/s977043/river-reviewer/issues/902)) ([06fcebe](https://github.com/s977043/river-reviewer/commit/06fcebe4869986f5e297e8af18e2fc494f7b40c7))
+
 ## [0.56.0](https://github.com/s977043/river-reviewer/compare/v0.55.0...v0.56.0) (2026-05-25)
 
 
