@@ -250,6 +250,82 @@ skills:
     recommended: true
     description: 'Meta-review skill: detects review findings that belong in CI/lint/formatter rather than human review'
 
+  # ------------------------------------------------------------------
+  # Community Skills (Experimental tier; recommended: false)
+  # ------------------------------------------------------------------
+  # These skills live under skills/midstream/community/ and are intentionally
+  # marked `recommended: false` so the catalog distinguishes "core / curated"
+  # from "experimental / not yet eval-backed". A community skill becomes a
+  # candidate for `recommended: true` when it gains good/bad fixtures and a
+  # golden output (the S1 convention from the 2026-05-21..25 retrospective).
+  # Until then, treat them as opt-in suggestions, not first-line gates.
+
+  - id: rr-midstream-a11y-accessible-name-001
+    version: '0.1.0'
+    name: 'a11y Accessible Name Basics'
+    path: skills/midstream/community/rr-midstream-a11y-accessible-name-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [community, accessibility, ui, midstream]
+    severity: minor
+    recommended: false
+    description: 'Checks images, buttons, and form controls for accessible names (alt / aria-label / label association).'
+
+  - id: rr-midstream-nextjs-app-router-boundary-001
+    version: '0.1.0'
+    name: 'Next.js App Router Boundary Guard'
+    path: skills/midstream/community/rr-midstream-nextjs-app-router-boundary-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [community, nextjs, app-router, ui, midstream]
+    severity: minor
+    recommended: false
+    description: 'Surfaces Next.js App Router boundary issues (server vs client component placement, "use client" misuse).'
+
+  - id: rr-midstream-modern-web-semantic-001
+    version: '0.1.0'
+    name: 'Modern Web Semantic + Platform-Native'
+    path: skills/midstream/community/rr-midstream-modern-web-semantic-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [community, modern-web, semantic-html, accessibility, ui, midstream]
+    severity: minor
+    recommended: false
+    description: 'Suggests semantic HTML / Web Platform Native APIs / modern CSS over legacy workarounds.'
+
+  - id: rr-midstream-modern-web-performance-001
+    version: '0.1.0'
+    name: 'Modern Web Performance + Core Web Vitals'
+    path: skills/midstream/community/rr-midstream-modern-web-performance-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [community, modern-web, performance, core-web-vitals, ui, midstream]
+    severity: minor
+    recommended: false
+    description: 'Surfaces LCP / INP / CLS / resource-cost implications of frontend diffs.'
+
+  - id: rr-midstream-modern-web-browser-compat-001
+    version: '0.1.0'
+    name: 'Modern Web Browser Compatibility + Baseline Awareness'
+    path: skills/midstream/community/rr-midstream-modern-web-browser-compat-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [community, modern-web, browser-compatibility, baseline, midstream]
+    severity: minor
+    recommended: false
+    description: 'Prompts Baseline status / feature detection / progressive enhancement for new Web APIs and CSS.'
+
+  - id: rr-midstream-modern-web-a11y-interactive-001
+    version: '0.1.0'
+    name: 'Modern Web Accessibility for Interactive UI'
+    path: skills/midstream/community/rr-midstream-modern-web-a11y-interactive-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [community, modern-web, accessibility, a11y, ui, midstream]
+    severity: minor
+    recommended: false
+    description: 'Keyboard operation / focus management / live regions / role-state semantics for interactive UI.'
+
   # Downstream Skills (Testing & Release)
   - id: agent-qa-regression
     version: '0.1.0'
