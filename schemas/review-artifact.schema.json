@@ -237,6 +237,27 @@
         "suggestion": {
           "type": "string",
           "description": "Optional fix or follow-up hint."
+        },
+        "sourceKind": {
+          "type": "string",
+          "description": "Provenance kind for synthesis layers (e.g. Independent Review Synthesis). Optional; absent for findings produced by core skills.",
+          "enum": ["ai-review", "human-review", "self-review"]
+        },
+        "agreement": {
+          "type": "array",
+          "description": "Auxiliary metadata listing reviewer identifiers that independently raised this finding (after dedup). Synthesis layers MUST NOT use this for majority-vote decisions; severity is decided on evidence quality.",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "validatedStatus": {
+          "type": "string",
+          "description": "Synthesis verdict for the finding. Distinct from `status` (which tracks lifecycle: open/suppressed/verified).",
+          "enum": [
+            "confirmed",
+            "dismissed-hallucination",
+            "dismissed-duplicate",
+            "needs-human-judgment"
+          ]
         }
       }
     }
