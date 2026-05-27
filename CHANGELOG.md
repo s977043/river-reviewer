@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.61.0](https://github.com/s977043/river-reviewer/compare/v0.60.0...v0.61.0) (2026-05-27)
+
+
+### Features
+
+* **cli:** --ensemble flag for synthesis ([#911](https://github.com/s977043/river-reviewer/issues/911) Phase 3 Slice B) ([#917](https://github.com/s977043/river-reviewer/issues/917)) ([8a72621](https://github.com/s977043/river-reviewer/commit/8a726211521793bf78b4e0718a2f61528a7584d4))
+
 ## [0.60.0](https://github.com/s977043/river-reviewer/compare/v0.59.0...v0.60.0) (2026-05-27)
 
 
