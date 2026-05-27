@@ -48,12 +48,13 @@ river review exec --max-cost 0.50
 
 ### 入力選択
 
-| オプション             | 型         | 既定値     | 説明                                                                                                                          |
-| ---------------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `--artifact <id=path>` | 繰り返し可 | （未指定） | [Artifact Input Contract](./artifact-input-contract.md) の ID を明示して入力ファイルを指定する。`id` は contract の表に従う。 |
-| `--config <path>`      | string     | 自動検出   | `river.config.*` を明示する。設定内 `artifacts` セクションで一括解決可。                                                      |
-| `--plan <path>`        | string     | （未指定） | 既存の plan JSON を入力として再生する。指定時は内部での plan 算出をスキップする。                                             |
-| `--target <path>`      | string     | `.`        | リポジトリルート。`pwd` と異なる場合に指定する。                                                                              |
+| オプション             | 型         | 既定値     | 説明                                                                                                                                                                                                                                                                                                                                                  |
+| ---------------------- | ---------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--artifact <id=path>` | 繰り返し可 | （未指定） | [Artifact Input Contract](./artifact-input-contract.md) の ID を明示して入力ファイルを指定する。`id` は contract の表に従う。                                                                                                                                                                                                                         |
+| `--ensemble <dir>`     | string     | （未指定） | `<dir>` 直下の `*.md` を昇順マージして `review-external` artifact として渡す sugar。複数 reviewer 結果を Independent Review Synthesis skill ([#911](https://github.com/s977043/river-reviewer/issues/911)) に流し込む用途。`--artifact review-external=...` が併用された場合は no-op + 警告。reviewer 名は CLI 引数ではなくファイル名で表現する設計。 |
+| `--config <path>`      | string     | 自動検出   | `river.config.*` を明示する。設定内 `artifacts` セクションで一括解決可。                                                                                                                                                                                                                                                                              |
+| `--plan <path>`        | string     | （未指定） | 既存の plan JSON を入力として再生する。指定時は内部での plan 算出をスキップする。                                                                                                                                                                                                                                                                     |
+| `--target <path>`      | string     | `.`        | リポジトリルート。`pwd` と異なる場合に指定する。                                                                                                                                                                                                                                                                                                      |
 
 `--artifact` / `--config` / カレントディレクトリ検出の優先順位は contract に従います（CLI > config > 検出）。
 

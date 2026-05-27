@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { realpathSync } from 'node:fs';
+import { realpathSync, readdirSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -276,6 +277,58 @@ function parseArgs(argv) {
         break;
       }
       parsed.cliArtifacts[value.slice(0, eq)] = value.slice(eq + 1);
+      continue;
+    }
+    if (arg === '--ensemble') {
+      // #911 Phase 3 Slice B. Sugar for "concatenate every *.md file under
+      // <dir> into a single review-external artifact". The synthesis skill
+      // (`rr-midstream-independent-review-synthesis-001`) consumes the merged
+      // file. We deliberately do NOT pin specific reviewer names (Claude /
+      // Codex / Cursor) in the flag — file names carry that information, so
+      // the CLI stays provider-agnostic.
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error(
+          'Error: --ensemble requires a directory path (e.g. --ensemble ./.river/reviews).'
+        );
+        parsed.command = 'help';
+        break;
+      }
+      if (parsed.cliArtifacts['review-external']) {
+        console.warn(
+          'Warning: --ensemble ignored because --artifact review-external=... is already set. Remove the --artifact flag or drop --ensemble.'
+        );
+        continue;
+      }
+      const dir = path.resolve(process.cwd(), value);
+      let files;
+      try {
+        files = readdirSync(dir)
+          .filter((f) => f.endsWith('.md'))
+          .sort();
+      } catch (err) {
+        console.error(`Error: --ensemble cannot read directory ${value}: ${err.message}`);
+        parsed.command = 'help';
+        break;
+      }
+      if (files.length === 0) {
+        console.error(`Error: --ensemble found no *.md files in ${value}.`);
+        parsed.command = 'help';
+        break;
+      }
+      const merged = files
+        .map((f) => `\n\n---\nFrom: ${f}\n---\n\n${readFileSync(path.join(dir, f), 'utf8')}`)
+        .join('');
+      const tmpPath = path.join(os.tmpdir(), `river-ensemble-${process.pid}-${Date.now()}.md`);
+      writeFileSync(tmpPath, merged);
+      process.on('exit', () => {
+        try {
+          unlinkSync(tmpPath);
+        } catch {
+          // ignore cleanup errors — OS will reclaim tmpdir
+        }
+      });
+      parsed.cliArtifacts['review-external'] = tmpPath;
       continue;
     }
     if (arg === '--phase') {
