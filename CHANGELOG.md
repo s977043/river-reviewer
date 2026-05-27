@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.63.0](https://github.com/s977043/river-reviewer/compare/v0.62.0...v0.63.0) (2026-05-27)
+
+
+### Features
+
+* **schemas:** debug.execution.snapshot carry-over field ([#878](https://github.com/s977043/river-reviewer/issues/878) A2-3-pre) ([#922](https://github.com/s977043/river-reviewer/issues/922)) ([7c7e1e5](https://github.com/s977043/river-reviewer/commit/7c7e1e592f832b092ed032ee363ddec89f6600d9))
+
 ## [0.62.0](https://github.com/s977043/river-reviewer/compare/v0.61.0...v0.62.0) (2026-05-27)
 
 
