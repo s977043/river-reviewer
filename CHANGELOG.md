@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.64.0](https://github.com/s977043/river-reviewer/compare/v0.63.0...v0.64.0) (2026-05-27)
+
+
+### Features
+
+* **actions:** promptfoo eval workflow + runbook for community skills ([#868](https://github.com/s977043/river-reviewer/issues/868) Phase 3) ([#924](https://github.com/s977043/river-reviewer/issues/924)) ([40009f2](https://github.com/s977043/river-reviewer/commit/40009f21e37fa76a05fa8242a2cc3aa997ca1e4b))
+
 ## [0.63.0](https://github.com/s977043/river-reviewer/compare/v0.62.0...v0.63.0) (2026-05-27)
 
 
