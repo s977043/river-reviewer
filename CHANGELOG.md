@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.65.0](https://github.com/s977043/river-reviewer/compare/v0.64.0...v0.65.0) (2026-05-27)
+
+
+### Features
+
+* **scripts:** local promptfoo eval helper + runbook reorientation ([#868](https://github.com/s977043/river-reviewer/issues/868)) ([#926](https://github.com/s977043/river-reviewer/issues/926)) ([62bc147](https://github.com/s977043/river-reviewer/commit/62bc147c0d3e8289f5163fd909703b60758a7c39))
+
 ## [0.64.0](https://github.com/s977043/river-reviewer/compare/v0.63.0...v0.64.0) (2026-05-27)
 
 
