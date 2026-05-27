@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.62.0](https://github.com/s977043/river-reviewer/compare/v0.61.0...v0.62.0) (2026-05-27)
+
+
+### Features
+
+* **skills:** community skill fixtures slice 3/3 ([#868](https://github.com/s977043/river-reviewer/issues/868) — a11y-interactive + nextjs) ([#919](https://github.com/s977043/river-reviewer/issues/919)) ([965324a](https://github.com/s977043/river-reviewer/commit/965324a8ec5c823f82c69b94ab58675921abe408))
+
 ## [0.61.0](https://github.com/s977043/river-reviewer/compare/v0.60.0...v0.61.0) (2026-05-27)
 
 
