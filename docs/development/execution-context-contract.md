@@ -184,6 +184,21 @@ When `--plan <path>` is passed **and** `executeReview` is requested, the replay 
 
 The current schema's `plan.selectedSkills` does not carry `fileTypes` / `relatedADRs` / `reviewMode` / `riskAssessment`. **A2-3 will need a schema bump (v2) or a `debug.execution.snapshot` extension** before the carry-over rule can be implemented honestly. Treat that as the first deliverable of A2-3.
 
+## Artifact ID vs `inputContext` naming convention
+
+Two surfaces describe reviewer-facing inputs, and they intentionally use different cases:
+
+| Surface                                                 | Format     | Examples                                          |
+| ------------------------------------------------------- | ---------- | ------------------------------------------------- |
+| Artifact ID (file lookup, CLI `--artifact <id>=<path>`) | kebab-case | `review-self`, `review-external`, `findings-pool` |
+| Skill `inputContext` enum (`schemas/skill.schema.json`) | camelCase  | `reviewSelf`, `reviewExternal`, `findingsPool`    |
+
+The pairs must stay in lockstep—adding one without the other leaves the synthesis class of skills (#911) unable to resolve their inputs at runtime. The contract is enforced by `tests/synthesis-artifact-context-sync.test.mjs`. When adding a new reviewer-facing artifact:
+
+1. Add the kebab-case entry to `CWD_DEFAULTS` in `src/config/artifact-resolver.mjs`.
+2. Add the camelCase counterpart to the `inputContext` enum in `schemas/skill.schema.json`.
+3. Extend `SYNTHESIS_PAIRS` (or a follow-up pair list) in the sync test.
+
 ## Naming conventions for future fields
 
 When adding a new forwarded field, follow this checklist:
