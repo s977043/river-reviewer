@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.58.0](https://github.com/s977043/river-reviewer/compare/v0.57.0...v0.58.0) (2026-05-27)
+
+
+### Features
+
+* **skills:** community skill fixtures slice 2/3 (browser-compat + performance) ([#909](https://github.com/s977043/river-reviewer/issues/909)) ([99ec9c3](https://github.com/s977043/river-reviewer/commit/99ec9c33cbf38cf8a46fceea5be5780c2cd949e7))
+
+
+### Bug Fixes
+
+* **ci:** kick workflow requires RELEASE_KICK_PAT + loud failure mode ([#906](https://github.com/s977043/river-reviewer/issues/906)) ([#907](https://github.com/s977043/river-reviewer/issues/907)) ([998a6b1](https://github.com/s977043/river-reviewer/commit/998a6b1f1ee39f8110b5d966055ba7d43cbc822d))
+
 ## [0.57.0](https://github.com/s977043/river-reviewer/compare/v0.56.0...v0.57.0) (2026-05-25)
 
 
