@@ -160,7 +160,42 @@
     "debug": {
       "type": "object",
       "additionalProperties": true,
-      "description": "Free-form debug information. Structure is not guaranteed across versions."
+      "description": "Free-form debug information. Structure is not guaranteed across versions.",
+      "properties": {
+        "execution": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Execution-stage diagnostics. Additive over time.",
+          "properties": {
+            "snapshot": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "Carry-over context written by buildExecutionPlan and consumed by --plan replay execution (#878 A2-3). Used to avoid context-snapshot drift between plan and replay time. Optional; absent on older artifacts.",
+              "properties": {
+                "fileTypes": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "File-type tags derived at plan creation time."
+                },
+                "relatedADRs": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Architecture Decision Records related to the change at plan creation time."
+                },
+                "reviewMode": {
+                  "type": "string",
+                  "description": "Review mode resolved at plan creation time."
+                },
+                "riskAssessment": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "description": "Risk-map evaluation result captured at plan creation time."
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "$defs": {
