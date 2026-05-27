@@ -326,6 +326,17 @@ skills:
     recommended: false
     description: 'Keyboard operation / focus management / live regions / role-state semantics for interactive UI.'
 
+  - id: rr-midstream-independent-review-synthesis-001
+    version: '0.1.0'
+    name: 'Independent Review Synthesis'
+    path: skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [community, review, synthesis, multi-agent, validation, hallucination-guard, midstream]
+    severity: major
+    recommended: false
+    description: 'Synthesizes multiple AI / human review results (review-self / review-external / findings-pool), dedups, verifies evidence, and emits a merge recommendation. No majority vote.'
+
   # Downstream Skills (Testing & Release)
   - id: agent-qa-regression
     version: '0.1.0'
