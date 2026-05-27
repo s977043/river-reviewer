@@ -33480,6 +33480,8 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: external "node:fs"
 var external_node_fs_ = __nccwpck_require__(3024);
+// EXTERNAL MODULE: external "node:os"
+var external_node_os_ = __nccwpck_require__(8161);
 // EXTERNAL MODULE: external "node:path"
 var external_node_path_ = __nccwpck_require__(6760);
 ;// CONCATENATED MODULE: external "node:process"
@@ -56717,6 +56719,7 @@ var finding_format = __nccwpck_require__(5942);
 
 
 
+
 const MAX_PROMPT_PREVIEW_LENGTH = 800;
 const MAX_DIFF_PREVIEW_LINES = 200;
 const COMMENT_MARKER = '<!-- river-reviewer -->';
@@ -56969,6 +56972,58 @@ function parseArgs(argv) {
         break;
       }
       parsed.cliArtifacts[value.slice(0, eq)] = value.slice(eq + 1);
+      continue;
+    }
+    if (arg === '--ensemble') {
+      // #911 Phase 3 Slice B. Sugar for "concatenate every *.md file under
+      // <dir> into a single review-external artifact". The synthesis skill
+      // (`rr-midstream-independent-review-synthesis-001`) consumes the merged
+      // file. We deliberately do NOT pin specific reviewer names (Claude /
+      // Codex / Cursor) in the flag — file names carry that information, so
+      // the CLI stays provider-agnostic.
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error(
+          'Error: --ensemble requires a directory path (e.g. --ensemble ./.river/reviews).'
+        );
+        parsed.command = 'help';
+        break;
+      }
+      if (parsed.cliArtifacts['review-external']) {
+        console.warn(
+          'Warning: --ensemble ignored because --artifact review-external=... is already set. Remove the --artifact flag or drop --ensemble.'
+        );
+        continue;
+      }
+      const dir = external_node_path_.resolve(external_node_process_namespaceObject.cwd(), value);
+      let files;
+      try {
+        files = (0,external_node_fs_.readdirSync)(dir)
+          .filter((f) => f.endsWith('.md'))
+          .sort();
+      } catch (err) {
+        console.error(`Error: --ensemble cannot read directory ${value}: ${err.message}`);
+        parsed.command = 'help';
+        break;
+      }
+      if (files.length === 0) {
+        console.error(`Error: --ensemble found no *.md files in ${value}.`);
+        parsed.command = 'help';
+        break;
+      }
+      const merged = files
+        .map((f) => `\n\n---\nFrom: ${f}\n---\n\n${(0,external_node_fs_.readFileSync)(external_node_path_.join(dir, f), 'utf8')}`)
+        .join('');
+      const tmpPath = external_node_path_.join(external_node_os_.tmpdir(), `river-ensemble-${external_node_process_namespaceObject.pid}-${Date.now()}.md`);
+      (0,external_node_fs_.writeFileSync)(tmpPath, merged);
+      external_node_process_namespaceObject.on('exit', () => {
+        try {
+          (0,external_node_fs_.unlinkSync)(tmpPath);
+        } catch {
+          // ignore cleanup errors — OS will reclaim tmpdir
+        }
+      });
+      parsed.cliArtifacts['review-external'] = tmpPath;
       continue;
     }
     if (arg === '--phase') {
