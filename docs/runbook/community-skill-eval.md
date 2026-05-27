@@ -4,26 +4,36 @@ Workflow to generate verified `golden/` outputs for community skills and
 promote them from `recommended: false` to `recommended: true` in
 `skills/registry.yaml`.
 
-## Setup (one-time): API key secrets
+## Project policy on API keys
 
-The eval needs at least one LLM provider key. Add as repo secrets:
+API keys are **not** stored as GitHub repo secrets. They live on the
+developer's local machine. The Actions workflow exists as an optional
+fallback for future use; the primary path is local execution.
 
-- `OPENAI_API_KEY`—enables the OpenAI provider tests
-- `ANTHROPIC_API_KEY`—enables the Anthropic provider tests
+## Preferred: local execution
 
-Either or both works. The workflow exits 1 if neither is set.
+Set at least one of `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` in your shell,
+then:
 
-Settings → Secrets and variables → Actions → New repository secret.
+```bash
+scripts/run-promptfoo-eval.sh                          # all community skills
+scripts/run-promptfoo-eval.sh modern-web-semantic      # egrep filter on path
+PROVIDER_FILTER=anthropic:claude-3-5-sonnet-20241022 \
+  scripts/run-promptfoo-eval.sh                        # limit provider/cost
+```
 
-## Run
+Outputs land in `./eval-output/<skill-id>.json` per evaluated skill.
 
-1. Go to **Actions → Promptfoo Eval (community skills) → Run workflow**.
-2. (Optional) `skill_filter`—egrep-style filter on the eval config path
-   (e.g. `modern-web-semantic` to target one skill).
-3. (Optional) `provider_filter`—comma-list of provider IDs to limit cost
-   (e.g. `anthropic:claude-3-5-sonnet-20241022`).
-4. Wait for the run to finish (≈5-15 min depending on filter).
-5. Download the `promptfoo-eval-output` artifact from the run.
+## Fallback: GitHub Actions workflow
+
+Only use this path if API keys are eventually added as repo secrets and
+contributors want the eval to run on shared infrastructure.
+
+1. Add `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY` under Settings → Secrets
+   and variables → Actions.
+2. Go to **Actions → Promptfoo Eval (community skills) → Run workflow**.
+3. (Optional) `skill_filter` / `provider_filter` inputs.
+4. Download the `promptfoo-eval-output` artifact from the run.
 
 ## Review and commit goldens
 
