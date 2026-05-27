@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.60.0](https://github.com/s977043/river-reviewer/compare/v0.59.0...v0.60.0) (2026-05-27)
+
+
+### Features
+
+* **schemas:** synthesis provenance fields + reviewer input contexts ([#911](https://github.com/s977043/river-reviewer/issues/911) Phase 2) ([#914](https://github.com/s977043/river-reviewer/issues/914)) ([28883e1](https://github.com/s977043/river-reviewer/commit/28883e10eff7c57732b04582bd370fbe397488f8))
+
 ## [0.59.0](https://github.com/s977043/river-reviewer/compare/v0.58.0...v0.59.0) (2026-05-27)
 
 
