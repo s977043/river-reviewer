@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.59.0](https://github.com/s977043/river-reviewer/compare/v0.58.0...v0.59.0) (2026-05-27)
+
+
+### Features
+
+* **skills:** independent review synthesis skill ([#911](https://github.com/s977043/river-reviewer/issues/911) Phase 1) ([#912](https://github.com/s977043/river-reviewer/issues/912)) ([543a73d](https://github.com/s977043/river-reviewer/commit/543a73d13e735038f616c4b6ef303f572e3400a8))
+
 ## [0.58.0](https://github.com/s977043/river-reviewer/compare/v0.57.0...v0.58.0) (2026-05-27)
 
 
