@@ -133,4 +133,64 @@ describe('review-artifact.schema.json', () => {
     );
     assert.equal(ok, true, JSON.stringify(validate.errors));
   });
+
+  describe('synthesis fields (#911 Phase 2 — additive)', () => {
+    test('finding without sourceKind / agreement / validatedStatus stays valid (backward compat)', () => {
+      const ok = validate(minimalArtifact({ findings: [validFinding()] }));
+      assert.equal(ok, true, JSON.stringify(validate.errors));
+    });
+
+    test('accepts finding with sourceKind enum values', () => {
+      for (const kind of ['ai-review', 'human-review', 'self-review']) {
+        const ok = validate(minimalArtifact({ findings: [validFinding({ sourceKind: kind })] }));
+        assert.equal(ok, true, `${kind}: ${JSON.stringify(validate.errors)}`);
+      }
+    });
+
+    test('rejects unknown sourceKind', () => {
+      const ok = validate(
+        minimalArtifact({ findings: [validFinding({ sourceKind: 'pinned-by-claude' })] })
+      );
+      assert.equal(ok, false);
+    });
+
+    test('accepts agreement array of reviewer ids', () => {
+      const ok = validate(
+        minimalArtifact({
+          findings: [
+            validFinding({ agreement: ['review-self', 'review-external', 'findings-pool#42'] }),
+          ],
+        })
+      );
+      assert.equal(ok, true, JSON.stringify(validate.errors));
+    });
+
+    test('rejects agreement with duplicate reviewer names', () => {
+      const ok = validate(
+        minimalArtifact({
+          findings: [validFinding({ agreement: ['a', 'a'] })],
+        })
+      );
+      assert.equal(ok, false);
+    });
+
+    test('accepts validatedStatus enum values', () => {
+      for (const v of [
+        'confirmed',
+        'dismissed-hallucination',
+        'dismissed-duplicate',
+        'needs-human-judgment',
+      ]) {
+        const ok = validate(minimalArtifact({ findings: [validFinding({ validatedStatus: v })] }));
+        assert.equal(ok, true, `${v}: ${JSON.stringify(validate.errors)}`);
+      }
+    });
+
+    test('rejects unknown validatedStatus', () => {
+      const ok = validate(
+        minimalArtifact({ findings: [validFinding({ validatedStatus: 'maybe' })] })
+      );
+      assert.equal(ok, false);
+    });
+  });
 });

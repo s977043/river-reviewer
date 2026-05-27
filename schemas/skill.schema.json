@@ -39,7 +39,17 @@
     },
     "inputContext": {
       "type": "string",
-      "enum": ["diff", "fullFile", "tests", "adr", "commitMessage", "repoConfig"]
+      "enum": [
+        "diff",
+        "fullFile",
+        "tests",
+        "adr",
+        "commitMessage",
+        "repoConfig",
+        "reviewSelf",
+        "reviewExternal",
+        "findingsPool"
+      ]
     },
     "outputKind": {
       "type": "string",

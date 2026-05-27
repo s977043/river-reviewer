@@ -19,6 +19,9 @@ severity: major
 inputContext:
   - diff
   - fullFile
+  - reviewSelf
+  - reviewExternal
+  - findingsPool
 outputKind:
   - findings
   - summary
