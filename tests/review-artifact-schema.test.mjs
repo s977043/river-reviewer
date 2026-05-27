@@ -193,4 +193,49 @@ describe('review-artifact.schema.json', () => {
       assert.equal(ok, false);
     });
   });
+
+  describe('debug.execution.snapshot (#878 A2-3-pre — additive carry-over)', () => {
+    test('artifact without debug.execution.snapshot stays valid (backward compat)', () => {
+      const ok = validate(minimalArtifact());
+      assert.equal(ok, true, JSON.stringify(validate.errors));
+    });
+
+    test('round-trips fileTypes / relatedADRs / reviewMode / riskAssessment', () => {
+      const ok = validate(
+        minimalArtifact({
+          debug: {
+            execution: {
+              snapshot: {
+                fileTypes: ['typescript', 'react'],
+                relatedADRs: ['adr-007-auth-boundary'],
+                reviewMode: 'standard',
+                riskAssessment: { action: 'require_human_review', reason: 'auth code' },
+              },
+            },
+          },
+        })
+      );
+      assert.equal(ok, true, JSON.stringify(validate.errors));
+    });
+
+    test('accepts partial snapshot (any subset of fields)', () => {
+      const ok = validate(
+        minimalArtifact({ debug: { execution: { snapshot: { reviewMode: 'lite' } } } })
+      );
+      assert.equal(ok, true, JSON.stringify(validate.errors));
+    });
+
+    test('accepts unrelated debug.* keys alongside execution (additionalProperties)', () => {
+      const ok = validate(
+        minimalArtifact({
+          debug: {
+            execution: { snapshot: { fileTypes: ['md'] } },
+            resolvedArtifacts: { diff: '/tmp/diff.patch' },
+            replay: { sourceTimestamp: '2026-05-25T03:48:53Z' },
+          },
+        })
+      );
+      assert.equal(ok, true, JSON.stringify(validate.errors));
+    });
+  });
 });
