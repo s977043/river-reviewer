@@ -1,0 +1,118 @@
+name: Promptfoo Eval (community skills)
+
+# Runs promptfoo eval across every community skill that has an eval/promptfoo.yaml.
+# Used to generate verified golden outputs for #868 Phase 3 / #911 Phase 1
+# promotion paths. Output is uploaded as an artifact; goldens are NOT
+# auto-committed — a human reviews and saves them to each skill's golden/.
+#
+# Triggers: workflow_dispatch only (manual). Requires repo secrets
+# OPENAI_API_KEY and/or ANTHROPIC_API_KEY. Without them the workflow exits 1.
+#
+# Background: docs/runbook/community-skill-eval.md, #868, #911.
+
+on:
+  workflow_dispatch:
+    inputs:
+      skill_filter:
+        description: 'Glob filter for skill id (default: all community skills)'
+        required: false
+        default: ''
+      provider_filter:
+        description: 'Comma-separated provider IDs (default: all in eval yaml)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promptfoo-eval
+  cancel-in-progress: false
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Verify API key presence
+        env:
+          HAS_OPENAI: ${{ secrets.OPENAI_API_KEY != '' }}
+          HAS_ANTHROPIC: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          set -euo pipefail
+          if [ "${HAS_OPENAI}" != "true" ] && [ "${HAS_ANTHROPIC}" != "true" ]; then
+            echo "::error::Neither OPENAI_API_KEY nor ANTHROPIC_API_KEY secret is set."
+            echo "::error::See docs/runbook/community-skill-eval.md for setup instructions."
+            exit 1
+          fi
+          if [ "${HAS_OPENAI}" = "true" ]; then echo "OpenAI provider: enabled"; fi
+          if [ "${HAS_ANTHROPIC}" = "true" ]; then echo "Anthropic provider: enabled"; fi
+
+      - name: Install promptfoo
+        run: npm install --no-save promptfoo
+
+      - name: Discover community skill eval configs
+        id: discover
+        env:
+          FILTER: ${{ inputs.skill_filter }}
+        run: |
+          set -euo pipefail
+          mapfile -t configs < <(find skills/midstream/community -name promptfoo.yaml -path '*/eval/*' | sort)
+          if [ -n "${FILTER}" ]; then
+            mapfile -t configs < <(printf '%s\n' "${configs[@]}" | grep -E "${FILTER}" || true)
+          fi
+          if [ "${#configs[@]}" -eq 0 ]; then
+            echo "::error::No community skill eval configs match filter '${FILTER}'."
+            exit 1
+          fi
+          printf '%s\n' "${configs[@]}" | tee eval-configs.txt
+          echo "count=${#configs[@]}" >> "${GITHUB_OUTPUT}"
+
+      - name: Run promptfoo eval per skill
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PROVIDER_FILTER: ${{ inputs.provider_filter }}
+        run: |
+          set -euo pipefail
+          mkdir -p eval-output
+          while IFS= read -r config; do
+            skill_dir="$(dirname "$(dirname "${config}")")"
+            skill_id="$(basename "${skill_dir}")"
+            out="eval-output/${skill_id}.json"
+            echo "::group::eval ${skill_id}"
+            if [ -n "${PROVIDER_FILTER}" ]; then
+              npx promptfoo eval \
+                --config "${config}" \
+                --output "${out}" \
+                --providers "${PROVIDER_FILTER}" || true
+            else
+              npx promptfoo eval \
+                --config "${config}" \
+                --output "${out}" || true
+            fi
+            echo "::endgroup::"
+          done < eval-configs.txt
+
+      - name: Upload eval output
+        uses: actions/upload-artifact@v4
+        with:
+          name: promptfoo-eval-output
+          path: eval-output/
+          retention-days: 14
+
+      - name: Summary
+        run: |
+          set -euo pipefail
+          echo "## Promptfoo Eval Summary" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "Configs evaluated: ${{ steps.discover.outputs.count }}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "Next step: download the **promptfoo-eval-output** artifact, review per-skill JSON outputs against the assertion rubrics in each \`eval/promptfoo.yaml\`, and commit accepted outputs to \`skills/midstream/community/<skill>/golden/\` to enable \`recommended: true\` promotion. See \`docs/runbook/community-skill-eval.md\`." >> "${GITHUB_STEP_SUMMARY}"
