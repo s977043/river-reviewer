@@ -57705,6 +57705,13 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
           artifact = await runReviewExecReplay({
             planFile: external_node_path_.resolve(parsed.planFile),
             debug: parsed.debug,
+            // #878 A2-3-impl: replay executes (not just echoes) unless --dry-run.
+            // The source plan stays the source of truth (no re-plan); the diff
+            // is resolved from the current working tree / --artifact.
+            executeReview: !parsed.dryRun,
+            cwd: external_node_path_.resolve(parsed.target),
+            cliArtifacts: parsed.cliArtifacts,
+            artifactsDir: parsed.artifactsDir,
           });
         } else {
           artifact = await runReviewPlan({
