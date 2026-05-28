@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.67.0](https://github.com/s977043/river-reviewer/compare/v0.66.0...v0.67.0) (2026-05-28)
+
+
+### Features
+
+* **runners:** buildExecutionPlan emits snapshot carry-over ([#878](https://github.com/s977043/river-reviewer/issues/878) A2-3-runners) ([#933](https://github.com/s977043/river-reviewer/issues/933)) ([34bf00c](https://github.com/s977043/river-reviewer/commit/34bf00c3fcc4833f28334f3ab78dc9db588758ec))
+
 ## [0.66.0](https://github.com/s977043/river-reviewer/compare/v0.65.0...v0.66.0) (2026-05-28)
 
 
