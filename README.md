@@ -205,7 +205,7 @@ jobs:
 
 <!-- x-release-please-start-version -->
 
-最新リリース: [v0.66.0](https://github.com/s977043/river-reviewer/releases/latest)
+最新リリース: [v0.67.0](https://github.com/s977043/river-reviewer/releases/latest)
 
 <!-- x-release-please-end -->
 
