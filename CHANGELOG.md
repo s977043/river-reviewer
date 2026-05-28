@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.66.0](https://github.com/s977043/river-reviewer/compare/v0.65.0...v0.66.0) (2026-05-28)
+
+
+### Features
+
+* **scripts:** offline promptfoo config validator ([#929](https://github.com/s977043/river-reviewer/issues/929) advance, no API key) ([#931](https://github.com/s977043/river-reviewer/issues/931)) ([c2c74ab](https://github.com/s977043/river-reviewer/commit/c2c74ab8308ed3bea3647c801bce27b2742fe071))
+
 ## [0.65.0](https://github.com/s977043/river-reviewer/compare/v0.64.0...v0.65.0) (2026-05-27)
 
 
