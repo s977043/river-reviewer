@@ -28474,14 +28474,25 @@ async function buildExecutionPlan(options) {
     dryRun,
     llmEnabled,
   });
-  if (selection.selected.length === 0) {
-    return { selected: [], skipped: selection.skipped };
-  }
-
   const impactTags = inferImpactTags(changedFiles, { diffText });
   const fileTypes = classifyChangedFiles(changedFiles);
   const riskAssessment = riskMap ? (0,risk_map/* evaluateRisk */.lm)(riskMap, changedFiles) : null;
-  const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), { changedFiles, keywords: impactTags });
+  if (selection.selected.length === 0) {
+    // #878 A2-3-runners: even when no skills are selected, expose the
+    // snapshot so consumers can attach it to the artifact for downstream
+    // diagnostics (drift detection, audit). Cheap to compute, cheap to drop.
+    return {
+      selected: [],
+      skipped: selection.skipped,
+      fileTypes,
+      riskAssessment,
+      snapshot: { fileTypes, relatedADRs: [], reviewMode: null, riskAssessment },
+    };
+  }
+  const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), {
+    changedFiles,
+    keywords: impactTags,
+  });
 
   const diffMeta = extractDiffMeta({ changedFiles, diffText });
   const reviewMode = (0,review_plan_generator/* determineReviewMode */.X)(diffMeta);
@@ -28518,6 +28529,14 @@ async function buildExecutionPlan(options) {
       fileTypes,
       relatedADRs,
       reviewMode,
+      // #877 silent-skip cleanup: riskAssessment was previously computed but
+      // never returned, so consumers received `undefined`. Top-level for
+      // back-compat; also nested in `snapshot` for the #878 A2-3 carry-over.
+      riskAssessment,
+      // #878 A2-3-runners: carry-over context for --plan replay execution.
+      // Consumers should propagate this to `artifact.debug.execution.snapshot`
+      // per docs/development/a2-3-replay-execution-design.md.
+      snapshot: { fileTypes, relatedADRs, reviewMode, riskAssessment },
     };
   }
 
@@ -28531,6 +28550,8 @@ async function buildExecutionPlan(options) {
     fileTypes,
     relatedADRs,
     reviewMode,
+    riskAssessment,
+    snapshot: { fileTypes, relatedADRs, reviewMode, riskAssessment },
   };
 }
 
