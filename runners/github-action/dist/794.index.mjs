@@ -276,6 +276,16 @@ async function runReviewExecReplay({
   debug = false,
   now = () => new Date().toISOString(),
   readFileImpl = (p) => (0,promises_.readFile)(p, 'utf8'),
+  // #878 A2-3-impl: execution params. When executeReview is true and a diff
+  // artifact resolves, the replay path invokes generateReview with the source
+  // plan's selectedSkills and the carried-over snapshot context (no re-plan).
+  executeReview = false,
+  cwd = process.cwd(),
+  cliArtifacts = {},
+  artifactsDir,
+  loadConfigImpl = loader/* loadConfig */.Z9,
+  resolveAllArtifactsImpl = resolveAllArtifacts,
+  generateReviewImpl = review_engine/* generateReview */.G1,
 } = {}) {
   if (!planFile || typeof planFile !== 'string') {
     throw new ReviewPlanError('--plan requires a file path.');
@@ -360,6 +370,19 @@ async function runReviewExecReplay({
 
   const phase = phaseFromArtifact ?? 'midstream';
 
+  // #878 A2-3-impl: read the carry-over snapshot the planner wrote (A2-3-runners
+  // #933). Contract: replay does NOT re-derive these — it trusts the values
+  // captured at plan-creation time, avoiding context-snapshot drift.
+  const sourceSnapshot =
+    parsed.debug &&
+    typeof parsed.debug === 'object' &&
+    parsed.debug.execution &&
+    typeof parsed.debug.execution === 'object' &&
+    parsed.debug.execution.snapshot &&
+    typeof parsed.debug.execution.snapshot === 'object'
+      ? parsed.debug.execution.snapshot
+      : null;
+
   const artifact = {
     version: '1',
     timestamp: now(),
@@ -369,14 +392,76 @@ async function runReviewExecReplay({
     plan: { plannerMode, selectedSkills, skippedSkills },
   };
 
-  if (debug) {
-    artifact.debug = {
-      replay: {
-        source: planFile,
-        sourcePhase: phaseFromArtifact,
-        sourceTimestamp: typeof parsed.timestamp === 'string' ? parsed.timestamp : null,
-      },
+  let executionTrace = null;
+  if (executeReview && selectedSkills.length > 0) {
+    // Resolve the diff from the CURRENT working tree (or --artifact), not from
+    // the plan. The plan does not snapshot diff bytes (design decision in
+    // docs/development/a2-3-replay-execution-design.md). Without a diff there
+    // is nothing to execute against, so we fall back to the echo contract.
+    let config = {};
+    try {
+      config = await loadConfigImpl(cwd);
+    } catch (err) {
+      throw new ReviewPlanError(`Failed to load config: ${err.message}`);
+    }
+    const configArtifacts =
+      config && typeof config.artifacts === 'object' && config.artifacts ? config.artifacts : {};
+    const detectionRoot = artifactsDir ? external_node_path_.resolve(cwd, artifactsDir) : cwd;
+    const resolved = await resolveAllArtifactsImpl({
+      cliArgs: cliArtifacts,
+      configArtifacts,
+      cwd: detectionRoot,
+    });
+    const diffRes = resolved?.diff;
+    if (diffRes?.exists && diffRes.path) {
+      let diffText;
+      try {
+        diffText = await readFileImpl(diffRes.path);
+      } catch (err) {
+        throw new ReviewPlanError(`Failed to read diff artifact: ${err.message}`);
+      }
+      const parsedDiff = (0,diff/* parseUnifiedDiff */.rj)(diffText);
+      let review;
+      try {
+        review = await generateReviewImpl({
+          diff: { diffText, files: parsedDiff.files ?? [] },
+          // Replay uses the source plan's selectedSkills verbatim — NO re-plan.
+          plan: { selected: selectedSkills },
+          phase,
+          dryRun: false,
+          config,
+          // Carry-over from the source plan's snapshot (#933). When the source
+          // predates A2-3-runners, these are undefined and generateReview uses
+          // its engine defaults — a graceful, not silent, degradation.
+          fileTypes: sourceSnapshot?.fileTypes ?? undefined,
+          relatedADRs: sourceSnapshot?.relatedADRs ?? undefined,
+          reviewMode: sourceSnapshot?.reviewMode ?? undefined,
+          riskAssessment: sourceSnapshot?.riskAssessment ?? undefined,
+        });
+      } catch (err) {
+        throw new ReviewPlanError(`Failed to execute replay review skills: ${err.message}`);
+      }
+      const rawFindings = Array.isArray(review?.findings) ? review.findings : [];
+      artifact.findings = rawFindings.map((f, i) => normalizeFindingForArtifact(f, i, phase));
+      executionTrace = {
+        skillsExecuted: selectedSkills.length,
+        findingsCount: artifact.findings.length,
+        llmUsed: review?.debug?.llmUsed === true,
+        llmSkipped: review?.debug?.llmSkipped ?? null,
+        heuristicsUsed: review?.debug?.heuristicsUsed === true,
+        replaySnapshotUsed: sourceSnapshot != null,
+      };
+    }
+  }
+
+  if (debug || executionTrace) {
+    artifact.debug = artifact.debug ?? {};
+    artifact.debug.replay = {
+      source: planFile,
+      sourcePhase: phaseFromArtifact,
+      sourceTimestamp: typeof parsed.timestamp === 'string' ? parsed.timestamp : null,
     };
+    if (executionTrace) artifact.debug.execution = executionTrace;
   }
 
   return artifact;
