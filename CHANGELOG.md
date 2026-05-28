@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.68.0](https://github.com/s977043/river-reviewer/compare/v0.67.0...v0.68.0) (2026-05-28)
+
+
+### Features
+
+* **cli:** --plan replay execution wires generateReview ([#878](https://github.com/s977043/river-reviewer/issues/878) A2-3-impl) ([#935](https://github.com/s977043/river-reviewer/issues/935)) ([f74fa0a](https://github.com/s977043/river-reviewer/commit/f74fa0add52e4bf07f1b6d81ba522c447227e927))
+
 ## [0.67.0](https://github.com/s977043/river-reviewer/compare/v0.66.0...v0.67.0) (2026-05-28)
 
 
