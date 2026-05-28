@@ -33,6 +33,7 @@
     "check:links:local": "lychee --config .lychee.toml --offline '**/*.md' --exclude-path node_modules --exclude-path '.claude/worktrees/' --exclude-path '(^|/)pages/index\\.md$' --exclude-path '(^|/)pages/index\\.en\\.md$'",
     "agents:validate": "node scripts/validate-agents.mjs",
     "skills:validate": "node scripts/validate-skills.mjs",
+    "skills:validate:promptfoo": "node scripts/validate-promptfoo-configs.mjs",
     "validate:skill-yaml": "node scripts/validate-skill-yaml.mjs",
     "agent-skills:validate": "node scripts/validate-agent-skills.mjs",
     "skills:catalog": "node scripts/generate-skill-catalog.mjs",
