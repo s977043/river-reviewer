@@ -15,7 +15,7 @@ npx river run . --output yaml
 ## GitHub Action
 
 ```yaml
-- uses: s977043/river-reviewer/runners/github-action@v0.33.0
+- uses: s977043/river-reviewer/runners/github-action@v0.68.0
   with:
     output_format: yaml
 ```

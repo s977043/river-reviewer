@@ -6,7 +6,8 @@
   "upstream-midstream-downstream": "上流、中流、下流",
   "skills": "Skills",
   "skill-lifecycle": "スキルのライフサイクル",
-  "riverbed-memory": "Riverbed Memory (ドラフト)",
+  "riverbed-memory": "Riverbed Memory",
   "embedding-code-index-research": "Embedding-based code index の検討（research note）",
-  "framework": "フレームワーク"
+  "framework": "フレームワーク",
+  "progressive-disclosure": "Progressive Disclosure（段階的開示）"
 }

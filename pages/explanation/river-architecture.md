@@ -1,12 +1,12 @@
 # River Reviewer のアーキテクチャ
 
-River Reviewer は、変更の流れに沿って「上流 → 中流 → 下流」の観点でレビューを組み立てます。
+River Reviewer は、変更の流れに沿って「上流 → 中流 → 下流」の観点でレビューを組み立てます（詳細は [上流・中流・下流フェーズ](./upstream-midstream-downstream.md) を参照）。
 
 - **上流（upstream）**: 要件、設計、ADR、脅威モデル、制約
 - **中流（midstream）**: 実装、リファクタ、CI 組み込み、品質
 - **下流（downstream）**: テスト、リリース、運用、失敗パス検知
 
-加えて、**Riverbed Memory** は意思決定や前提（ルール）を保持し、レビューの一貫性を高めるための層です。
+加えて、[**Riverbed Memory**](./riverbed-memory.md) は意思決定や前提（ルール）を保持し、レビューの一貫性を高めるための層です。
 
 River Reviewer は **context engineering framework** です。スキル・差分・メモリを体系的に選択・フィルタ・組み立てることで、限られたコンテキストウィンドウの中でレビュー品質を最大化します。スキルの段階的開示（Progressive Disclosure）により、必要なときに必要な詳細度だけをロードし、注意力の希薄化を防ぎます。
 
