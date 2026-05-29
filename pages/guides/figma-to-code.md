@@ -107,7 +107,7 @@ river-reviewer から以下の指摘が返されました：
 
 ## 関連ページ
 
-- [スキルを追加する（最短手順）](/guides/add-new-skill) — 独自のチェックスキルを追加する方法
-- [スキル作成ガイド（How-to）](/guides/write-a-skill) — スキルの詳細な書き方
-- [PR/品質レビュー向け Agent Skills カタログ](/guides/pr-review-agent-skills) — 利用可能なスキル一覧
-- [Skill Planner（LLM ベースのスキル選択）](/guides/skill-planner) — スキルが自動選択される仕組み
+- [スキルを追加する（最短手順）](./add-new-skill.md) — 独自のチェックスキルを追加する方法
+- [スキル作成ガイド（How-to）](./write-a-skill.md) — スキルの詳細な書き方
+- [PR/品質レビュー向け Agent Skills カタログ](./pr-review-agent-skills.md) — 利用可能なスキル一覧
+- [Skill Planner（LLM ベースのスキル選択）](./skill-planner.md) — スキルが自動選択される仕組み

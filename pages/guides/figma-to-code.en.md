@@ -107,7 +107,7 @@ After fixing, report the list of changed locations.
 
 ## Related Pages
 
-- [Adding a Skill (Quick Start)](/guides/add-new-skill) — How to add your own check skill
-- [Writing a Skill (How-to Guide)](/guides/write-a-skill) — Detailed guide on skill authoring
-- [Agent Skills Catalog for PR/Quality Review](/guides/pr-review-agent-skills) — Full list of available skills
-- [Skill Planner (LLM-based Skill Selection)](/guides/skill-planner) — How skills are selected automatically
+- [Adding a Skill (Quick Start)](./add-new-skill.md) — How to add your own check skill
+- [Writing a Skill (How-to Guide)](./write-a-skill.md) — Detailed guide on skill authoring
+- [Agent Skills Catalog for PR/Quality Review](./pr-review-agent-skills.md) — Full list of available skills
+- [Skill Planner (LLM-based Skill Selection)](./skill-planner.md) — How skills are selected automatically
