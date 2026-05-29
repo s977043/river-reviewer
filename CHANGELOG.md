@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.69.0](https://github.com/s977043/river-reviewer/compare/v0.68.0...v0.69.0) (2026-05-29)
+
+
+### Features
+
+* **dist:** add npm publish workflow and publishConfig for runner packages ([#800](https://github.com/s977043/river-reviewer/issues/800)) ([#942](https://github.com/s977043/river-reviewer/issues/942)) ([bb635b4](https://github.com/s977043/river-reviewer/commit/bb635b4cd0931f9603f564bc8097a96a0be16e90))
+* **skills:** promote 7 community skills to recommended:true ([#929](https://github.com/s977043/river-reviewer/issues/929)) ([#940](https://github.com/s977043/river-reviewer/issues/940)) ([09f5617](https://github.com/s977043/river-reviewer/commit/09f561744eaa1a391ce5cc113c075254579eee56))
+
 ## [0.68.0](https://github.com/s977043/river-reviewer/compare/v0.67.0...v0.68.0) (2026-05-28)
 
 
