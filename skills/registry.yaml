@@ -268,7 +268,7 @@ skills:
     phase: midstream
     tags: [community, accessibility, ui, midstream]
     severity: minor
-    recommended: false
+    recommended: true
     description: 'Checks images, buttons, and form controls for accessible names (alt / aria-label / label association).'
 
   - id: rr-midstream-nextjs-app-router-boundary-001
@@ -279,7 +279,7 @@ skills:
     phase: midstream
     tags: [community, nextjs, app-router, ui, midstream]
     severity: minor
-    recommended: false
+    recommended: true
     description: 'Surfaces Next.js App Router boundary issues (server vs client component placement, "use client" misuse).'
 
   - id: rr-midstream-modern-web-semantic-001
@@ -290,7 +290,7 @@ skills:
     phase: midstream
     tags: [community, modern-web, semantic-html, accessibility, ui, midstream]
     severity: minor
-    recommended: false
+    recommended: true
     description: 'Suggests semantic HTML / Web Platform Native APIs / modern CSS over legacy workarounds.'
 
   - id: rr-midstream-modern-web-performance-001
@@ -301,7 +301,7 @@ skills:
     phase: midstream
     tags: [community, modern-web, performance, core-web-vitals, ui, midstream]
     severity: minor
-    recommended: false
+    recommended: true
     description: 'Surfaces LCP / INP / CLS / resource-cost implications of frontend diffs.'
 
   - id: rr-midstream-modern-web-browser-compat-001
@@ -312,7 +312,7 @@ skills:
     phase: midstream
     tags: [community, modern-web, browser-compatibility, baseline, midstream]
     severity: minor
-    recommended: false
+    recommended: true
     description: 'Prompts Baseline status / feature detection / progressive enhancement for new Web APIs and CSS.'
 
   - id: rr-midstream-modern-web-a11y-interactive-001
@@ -323,7 +323,7 @@ skills:
     phase: midstream
     tags: [community, modern-web, accessibility, a11y, ui, midstream]
     severity: minor
-    recommended: false
+    recommended: true
     description: 'Keyboard operation / focus management / live regions / role-state semantics for interactive UI.'
 
   - id: rr-midstream-independent-review-synthesis-001
@@ -334,7 +334,7 @@ skills:
     phase: midstream
     tags: [community, review, synthesis, multi-agent, validation, hallucination-guard, midstream]
     severity: major
-    recommended: false
+    recommended: true
     description: 'Synthesizes multiple AI / human review results (review-self / review-external / findings-pool), dedups, verifies evidence, and emits a merge recommendation. No majority vote.'
 
   # Downstream Skills (Testing & Release)
