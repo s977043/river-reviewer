@@ -83,7 +83,7 @@ AI reviewers must avoid the following:
 
 ## 4. Phase-Specific Considerations
 
-River Reviewer adopts flow-based reviews, emphasizing the following in each phase:
+River Reviewer adopts flow-based reviews, emphasizing the following in each phase (see [Upstream / Midstream / Downstream phases](../explanation/upstream-midstream-downstream.md) for a conceptual overview):
 
 ### 4.1 Upstream (Design Phase)
 

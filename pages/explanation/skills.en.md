@@ -157,6 +157,8 @@ tests:
 
 ## Skill Lifecycle
 
+See also [Skill Lifecycle](./skill-lifecycle.md) for a deeper walkthrough.
+
 ### 1. Create
 
 ```bash

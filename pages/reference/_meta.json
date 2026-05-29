@@ -19,5 +19,9 @@
   "eval-keep-discard-policy": "評価ベースの採否基準",
   "cli-review-exec-spec": "CLI Spec — river review exec",
   "cli-review-verify-spec": "CLI Spec — river review verify",
-  "cli-gc-spec": "CLI Spec — river gc"
+  "cli-gc-spec": "CLI Spec — river gc",
+  "known-limitations": "既知の制限事項",
+  "output-format-yaml": "YAML 出力フォーマット (Scoring + Verdict)",
+  "plangate-cli-roadmap": "PlanGate CLI 安定化ロードマップ",
+  "review-policy": "レビューポリシー"
 }

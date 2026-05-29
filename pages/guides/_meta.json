@@ -12,10 +12,13 @@
   "planner-eval-dataset": "Planner評価セット（オフライン評価）",
   "skill-planner": "Skill Planner（LLM ベースのスキル選択）",
   "planner-evaluation": "Skill Planner の評価と最適化のためのミニガイド",
-  "use-riverbed-memory": "Riverbed Memory を使用する (ドラフト)",
+  "use-riverbed-memory": "Riverbed Memory を使用する",
   "tracing": "Tracing / Observability",
   "agent-skills-codex-cli": "Manifest-driven Skills ガイド",
   "pr-review-agent-skills": "PR/品質レビュー向け Agent Skills カタログ",
   "agents": "Agents - プロジェクト知識パックの追加",
-  "governance": "ガバナンス"
+  "governance": "ガバナンス",
+  "cost-estimation": "コスト見積もりと最適化ガイド",
+  "deploy-docs-vercel": "Vercel で Docs を安定公開する",
+  "use-independent-review-synthesis": "Independent Review Synthesis を使う"
 }
