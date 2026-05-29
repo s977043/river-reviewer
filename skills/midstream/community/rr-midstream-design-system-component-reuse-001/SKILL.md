@@ -1,5 +1,5 @@
 ---
-id: rr-midstream-figma-component-reuse-001
+id: rr-midstream-design-system-component-reuse-001
 name: Design System Component Reuse Guard
 description: 既存デザインシステムコンポーネント（Button / Input / Modal / Card 等）を再実装していないかを検出する。Figma→コード実装時に既存コンポーネントを無視した実装を防ぐ。
 version: 0.1.0
@@ -9,7 +9,7 @@ applyTo:
   - 'src/**/*.{ts,tsx,js,jsx}'
   - 'app/**/*.{ts,tsx,js,jsx}'
   - 'components/**/*.{ts,tsx,js,jsx}'
-tags: [community, figma, design-system, component-reuse, ui, midstream]
+tags: [community, design-system, component-reuse, ui, midstream]
 severity: major
 inputContext: [diff]
 outputKind: [findings, actions]

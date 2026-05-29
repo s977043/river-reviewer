@@ -1,4 +1,4 @@
-# rr-midstream-figma-component-reuse-001
+# rr-midstream-design-system-component-reuse-001
 
 ## Design System Component Reuse Guard
 

@@ -1,6 +1,6 @@
 ---
-id: rr-midstream-figma-design-drift-001
-name: Figma Design Drift Detector
+id: rr-midstream-design-token-enforcement-001
+name: Design Token Enforcement
 description: デザイントークンを使わずに直書きされた色・余白・フォントサイズ・角丸・シャドウを検出する。Figma Variables / Tailwind config / CSS custom properties のルールに違反する実装を指摘する。
 version: 0.1.0
 category: midstream
@@ -9,7 +9,7 @@ applyTo:
   - 'src/**/*.{ts,tsx,js,jsx,css,scss}'
   - 'app/**/*.{ts,tsx,js,jsx,css,scss}'
   - 'components/**/*.{ts,tsx,js,jsx,css,scss}'
-tags: [community, figma, design-system, tokens, ui, midstream]
+tags: [community, design-system, tokens, ui, midstream]
 severity: minor
 inputContext: [diff]
 outputKind: [findings, actions]

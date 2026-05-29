@@ -337,24 +337,24 @@ skills:
     recommended: true
     description: 'Synthesizes multiple AI / human review results (review-self / review-external / findings-pool), dedups, verifies evidence, and emits a merge recommendation. No majority vote.'
 
-  - id: rr-midstream-figma-design-drift-001
+  - id: rr-midstream-design-token-enforcement-001
     version: '0.1.0'
-    name: 'Figma Design Drift Detector'
-    path: skills/midstream/community/rr-midstream-figma-design-drift-001/SKILL.md
+    name: 'Design Token Enforcement'
+    path: skills/midstream/community/rr-midstream-design-token-enforcement-001/SKILL.md
     category: midstream
     phase: midstream
-    tags: [community, figma, design-system, tokens, ui, midstream]
+    tags: [community, design-system, tokens, ui, midstream]
     severity: minor
     recommended: false
-    description: 'デザイントークンを使わずに直書きされた色・余白・フォントサイズ・角丸・シャドウを検出する。'
+    description: 'デザイントークンを使わずに直書きされた色・余白・フォントサイズ・角丸・シャドウを検出する。デザインツールに依存しない汎用チェック。'
 
-  - id: rr-midstream-figma-component-reuse-001
+  - id: rr-midstream-design-system-component-reuse-001
     version: '0.1.0'
     name: 'Design System Component Reuse Guard'
-    path: skills/midstream/community/rr-midstream-figma-component-reuse-001/SKILL.md
+    path: skills/midstream/community/rr-midstream-design-system-component-reuse-001/SKILL.md
     category: midstream
     phase: midstream
-    tags: [community, figma, design-system, component-reuse, ui, midstream]
+    tags: [community, design-system, component-reuse, ui, midstream]
     severity: major
     recommended: false
     description: '既存デザインシステムコンポーネント（Button / Input / Modal / Card 等）を再実装していないかを検出する。'

@@ -17,11 +17,11 @@ Without these, the most common problems are hardcoded token values, reimplementi
 
 river-reviewer ships two midstream skills that handle Figma → code quality checks.
 
-### `rr-midstream-figma-design-drift-001`
+### `rr-midstream-design-token-enforcement-001`
 
 Detects **hardcoded** design token values. Issues a warning when colors, font sizes, spacing, or other values are embedded directly rather than referenced through design system variables.
 
-### `rr-midstream-figma-component-reuse-001`
+### `rr-midstream-design-system-component-reuse-001`
 
 Detects **reimplemented** components. Reports cases where an equivalent implementation already exists in the component library but has been redefined inline.
 
