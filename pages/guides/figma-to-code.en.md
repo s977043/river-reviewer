@@ -29,7 +29,7 @@ Both skills run automatically in the midstream phase (post-PR review). No explic
 
 ## Recommended Workflow
 
-````text
+```text
 Step 1: Read the design specification via Figma MCP
         - Use get_design_context to retrieve component and token information
         - Use get_screenshot to verify visuals
@@ -48,12 +48,12 @@ Step 4: Implement one component at a time
 
 Step 5: Review with river-reviewer (detect token violations and reimplementations)
         - Opening a PR triggers the midstream phase automatically
-        - Check results from `figma-design-drift` and `figma-component-reuse`
+        - Check results from design-token-enforcement and design-system-component-reuse
 
 Step 6: Fix the diff
         - Resolve all Critical / Major findings before requesting re-review
         - Track Minor findings in a follow-up issue for the next sprint
-```text
+```
 
 ## Example Agent Prompts
 
@@ -66,7 +66,7 @@ Read the design specification from Figma at <URL> and extract:
 3. A classification of which existing library components can be reused vs. newly created
 
 Do not implement anything yet. Output as a mapping table.
-```text
+```
 
 ### Implementation (Step 4)
 
@@ -80,7 +80,7 @@ Constraints:
 - Always use token variables for colors, fonts, and spacing
 - Reuse existing components whenever they are available
 - Implement only one component at a time
-```text
+```
 
 ### Fix (Step 6)
 
@@ -93,22 +93,21 @@ Fix each finding according to this policy:
 - Reimplementation → import and use the existing component instead
 
 After fixing, report the list of changed locations.
-```text
+```
 
 ## Common Failure Patterns
 
-| Cause | What happens | Mitigation |
-| --- | --- | --- |
-| Skipping Step 3 and jumping straight to code | Overall structure drifts without a plan | Never skip the planning phase |
-| Manually reading tokens instead of using Figma MCP | Typos and misread token names | Use `get_design_context` for accurate values |
-| Requesting multiple components in one prompt | Cross-component dependencies tangle and debugging becomes hard | Enforce one request = one component |
-| Ignoring review findings before merging | Token violations ship to production | Treat Critical / Major as merge blockers |
-| Not checking for existing components | Library bloats and consistency is lost | Always complete the mapping table in Step 2 |
+| Cause                                              | What happens                                                   | Mitigation                                   |
+| -------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------- |
+| Skipping Step 3 and jumping straight to code       | Overall structure drifts without a plan                        | Never skip the planning phase                |
+| Manually reading tokens instead of using Figma MCP | Typos and misread token names                                  | Use `get_design_context` for accurate values |
+| Requesting multiple components in one prompt       | Cross-component dependencies tangle and debugging becomes hard | Enforce one request = one component          |
+| Ignoring review findings before merging            | Token violations ship to production                            | Treat Critical / Major as merge blockers     |
+| Not checking for existing components               | Library bloats and consistency is lost                         | Always complete the mapping table in Step 2  |
 
 ## Related Pages
 
-- [Adding a Skill (Quick Start)](/guides/add-new-skill) — How to add your own Figma check skill
+- [Adding a Skill (Quick Start)](/guides/add-new-skill) — How to add your own check skill
 - [Writing a Skill (How-to Guide)](/guides/write-a-skill) — Detailed guide on skill authoring
 - [Agent Skills Catalog for PR/Quality Review](/guides/pr-review-agent-skills) — Full list of available skills
 - [Skill Planner (LLM-based Skill Selection)](/guides/skill-planner) — How skills are selected automatically
-````

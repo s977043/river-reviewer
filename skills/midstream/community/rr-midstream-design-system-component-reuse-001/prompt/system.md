@@ -48,7 +48,7 @@ arrow-function component) that:
 - Has ≥3 Tailwind/utility className tokens OR inline `style=` attribute, AND
 - The component name or file name matches a well-known UI primitive (Submit*,
   *Button*, *Input*, *Field*, *Modal*, *Dialog*, *Card*, *Badge*, *Tag*,
-  *Avatar*, *Tooltip*, *Dropdown*,*Tab\*…).
+  *Avatar*, *Tooltip*, *Dropdown*,*Tabs\*…).
 
 ## Output contract
 
