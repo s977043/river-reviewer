@@ -23,5 +23,13 @@
   },
   "engines": {
     "node": "22.x"
+  },
+  "files": [
+    "*.mjs",
+    "*.d.ts",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

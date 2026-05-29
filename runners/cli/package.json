@@ -13,9 +13,17 @@
   "dependencies": {
     "commander": "^12.1.0",
     "ora": "^9.0.0",
-    "@inquirer/prompts": "^9.0.0"
+    "@inquirer/prompts": "^8.0.0"
   },
   "engines": {
     "node": "22.x"
+  },
+  "files": [
+    "src",
+    "bin",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }
