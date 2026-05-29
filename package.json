@@ -2,6 +2,11 @@
   "name": "river-reviewer",
   "version": "0.68.0",
   "private": true,
+  "workspaces": [
+    "runners/node-api",
+    "runners/cli",
+    "runners/core"
+  ],
   "description": "River Reviewer docs, schemas, and validation utilities.",
   "license": "MIT",
   "engines": {

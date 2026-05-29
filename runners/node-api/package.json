@@ -36,5 +36,12 @@
     "ai-review",
     "skill-execution",
     "api"
-  ]
+  ],
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
