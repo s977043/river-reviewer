@@ -110,11 +110,11 @@ This is the current contract between `runReviewPlan` and `buildExecutionPlan` / 
 
 ---
 
-## Residual gap: `--plan` replay does not yet run skills
+## `--plan` replay now produces real findings (v0.68.0+)
 
-`river review exec --plan <path>` still echoes the source plan as a Review Artifact with `findings: []` and does not invoke the execution adapter. This is intentional in `v0.51.x`—it locks the "replay does not re-plan" contract from PR #861 (B')—and is tracked as the next slice ([#802](https://github.com/s977043/river-reviewer/issues/802) A2-3).
+As of PR #935 (v0.68.0), `river review exec --plan <path>` invokes the execution adapter (`generateReview`) and returns a Review Artifact with real findings. The earlier behavior—echoing the source plan with `findings: []`—was the intentional v0.51.x contract (PR #861 B') that locked "replay does not re-plan"; #935 (A2-3) completed the remaining slice.
 
-If you need findings, run `river review exec` without `--plan` so the internal plan path executes.
+If you are on v0.67.x or earlier and need findings, run `river review exec` without `--plan` so the internal plan path executes.
 
 ---
 

@@ -68,7 +68,7 @@ runs:
 
         # Validate output format
         output_fmt="${RIVER_OUTPUT_FORMAT}"
-        if [[ ! "${output_fmt}" =~ ^(text|markdown|json)$ ]]; then
+        if [[ ! "${output_fmt}" =~ ^(text|markdown|json|yaml)$ ]]; then
           echo "::error::Invalid output_format: ${output_fmt}"
           exit 1
         fi
