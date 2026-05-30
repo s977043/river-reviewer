@@ -86,7 +86,9 @@ river review exec --max-cost 0.50
 >
 > 実装状況（#802 Phase 3 PR-3、2026-05-18）: 現時点では **CLI 引数 / 出力契約の parser・dispatch foundation のみ実装**。`river review exec` は `--plan` / `--artifact <id=path>` / `--output` / `--format` / `--output-file` 等を受理し出力契約を検証するが、skill 実行・plan 再生・artifact 読み込み・LLM は未実装で exit 3 を返す。この parser 契約は [Artifact Input Contract](./artifact-input-contract.md) の artifact ID のみに依存し、**PlanGate には依存しない**（PlanGate は artifact 生成元の一例に過ぎない）。
 >
-> 追補（#802 Phase 3、2026-05-18）: **`river review exec --dry-run`（`--plan` 併用なし）は実装済み**。spec どおり外部 LLM・skill 実行を行わず、入力解決 + 決定論 plan のみを実行し、`status` は `ok` / `no-changes`、`findings` は `[]`、Review Artifact v1 を出力して exit 0（`runReviewPlan` を再利用、`river review plan --plan-only` と同一の非破壊経路）。通常 `exec`（非 dry-run）、`--plan` 再生、verify 実行は引き続き未実装で exit 3。
+> 追補（#802 Phase 3、2026-05-18）: **`river review exec --dry-run`（`--plan` 併用なし）は実装済み**。spec どおり外部 LLM・skill 実行を行わず、入力解決 + 決定論 plan のみを実行し、`status` は `ok` / `no-changes`、`findings` は `[]`、Review Artifact v1 を出力して exit 0（`runReviewPlan` を再利用、`river review plan --plan-only` と同一の非破壊経路）。
+>
+> 追補（[#935](https://github.com/s977043/river-reviewer/pull/935)、2026-05-29）: **`river review exec --plan <file>` は実装済み**。plan ファイルを読み込み `generateReview` 経由で skill を実行し Review Artifact を出力する。`--plan` なしの通常 `exec`（非 dry-run）は引き続き exit 3。`verify` 実行は未実装。
 
 ## 入力アーティファクト
 
