@@ -153,6 +153,8 @@ The findings then go through `normalizeFindingForArtifact` (private to `review-p
 
 PR #861 (B') established the replay contract: `--plan <path>` echoes the source plan as a schema-valid Review Artifact with `findings: []` and intentionally does **not** invoke Stage 2 or Stage 3.
 
+> **Updated by PR #935 (v0.68.0):** `--plan` now invokes Stage 3 (`generateReview`) and returns a Review Artifact with real findings. The `findings: []` behavior described below applied to v0.51.x–v0.67.x only.
+
 ### What replay currently preserves (v0.53.0)
 
 | Field            | Source                           | Notes                                                                   |
@@ -168,6 +170,8 @@ PR #861 (B') established the replay contract: `--plan <path>` echoes the source 
 - Does not re-resolve artifacts → no current diff
 - Does not re-run `buildExecutionPlan` → no fresh `impactTags / fileTypes / relatedADRs / reviewMode / riskAssessment`
 - Does not invoke `generateReview` → `findings: []` regardless of what the user wants
+
+> **Updated by PR #935 (v0.68.0):** This gap is resolved. `--plan` now invokes `generateReview` (Stage 3) and produces real findings.
 
 ### A2-3 contract proposal (to be ratified by the A2-3 implementation PR)
 

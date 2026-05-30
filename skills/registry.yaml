@@ -345,7 +345,7 @@ skills:
     phase: midstream
     tags: [community, design-system, tokens, ui, midstream]
     severity: minor
-    recommended: false
+    recommended: true
     description: 'デザイントークンを使わずに直書きされた色・余白・フォントサイズ・角丸・シャドウを検出する。デザインツールに依存しない汎用チェック。'
 
   - id: rr-midstream-design-system-component-reuse-001
@@ -356,7 +356,7 @@ skills:
     phase: midstream
     tags: [community, design-system, component-reuse, ui, midstream]
     severity: major
-    recommended: false
+    recommended: true
     description: '既存デザインシステムコンポーネント（Button / Input / Modal / Card 等）を再実装していないかを検出する。'
 
   # Downstream Skills (Testing & Release)
