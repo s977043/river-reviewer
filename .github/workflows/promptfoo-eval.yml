@@ -102,7 +102,7 @@ jobs:
           done < eval-configs.txt
 
       - name: Upload eval output
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: promptfoo-eval-output
           path: eval-output/
