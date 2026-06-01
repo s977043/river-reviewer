@@ -55,6 +55,8 @@ The input artifacts recognized by River Reviewer are listed below. See "Legend" 
 - **When absent**: Double-check (W-check) skills are skipped.
 - **Compatibility**: Content may follow the `issue` definition in [`schemas/output.schema.json`](../../schemas/output.schema.json), but this is not required.
 
+**See also**: [pages/guides/w-check.md](../guides/w-check.md) — W-check Practical Guide
+
 ### `findings-pool`
 
 - **Format**: UTF-8 JSON. An aggregation of `findings[]` collected from multiple Review Artifacts (execution history of `river review exec` / `river review verify`).
@@ -137,7 +139,12 @@ Artifacts not resolved by any channel are treated as "absent" and follow the per
 
 ### CI
 
-- GitHub Action inputs (see `runners/github-action/action.yml`) will expose artifact wiring (not yet implemented; tracked separately).
+> **⚠️ GitHub Action limitation (not yet implemented)**
+>
+> The `--artifact` and `--ensemble` flags are **not yet available as GitHub Action inputs**.
+> As a workaround, invoke the `dist/index.mjs` CLI directly. See the [W-check Practical Guide](../guides/w-check.md) for a concrete example.
+> A dedicated `artifact` input is planned (see `runners/github-action/action.yml`).
+
 - CI should decide failure from the Review Artifact `status` and the severity mix of `findings`.
 
 ## PlanGate Independence
