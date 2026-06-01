@@ -72,7 +72,8 @@ Options:
   --output <mode>   Output format: text|markdown|json|yaml. Default: text
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
-  --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap)
+  --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap).
+                    Use "auto" to select roles automatically based on diff content and risk signals.
   --baseline <path> Path to a previous review JSON (findings array) for regression comparison
   --save            Persist the review run to the project result store (.river/runs/)
 

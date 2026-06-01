@@ -3,7 +3,13 @@ import assert from 'node:assert/strict';
 
 // Stub generateReview before importing the orchestrator
 const generateReviewStub = mock.fn(async ({ projectRules }) => ({
-  comments: [{ file: 'src/foo.mjs', line: 1, message: `Finding: issue Evidence: found in ${projectRules?.slice(0, 20) ?? ''}` }],
+  comments: [
+    {
+      file: 'src/foo.mjs',
+      line: 1,
+      message: `Finding: issue Evidence: found in ${projectRules?.slice(0, 20) ?? ''}`,
+    },
+  ],
   findings: [
     {
       id: 'rr-1',
@@ -12,7 +18,8 @@ const generateReviewStub = mock.fn(async ({ projectRules }) => ({
       lineStart: 1,
       lineEnd: 1,
       title: 'test finding',
-      message: 'Finding: issue Evidence: found in diff Impact: medium Fix: fix it Severity: major Confidence: high',
+      message:
+        'Finding: issue Evidence: found in diff Impact: medium Fix: fix it Severity: major Confidence: high',
       severity: 'major',
       confidence: 'high',
       status: 'open',
@@ -27,12 +34,19 @@ const generateReviewStub = mock.fn(async ({ projectRules }) => ({
 }));
 
 // Patch the module before import via mock.module
-const { runReviewerOrchestration, REVIEWER_ROLES, DEFAULT_REVIEWERS, resolveReviewerRoles } =
-  await (() => {
-    // We can't easily mock ESM imports in node:test without a loader.
-    // Instead, import the real module and test its observable behaviour.
-    return import('../src/lib/reviewer-orchestrator.mjs');
-  })();
+const {
+  runReviewerOrchestration,
+  REVIEWER_ROLES,
+  DEFAULT_REVIEWERS,
+  resolveReviewerRoles,
+  selectRolesAuto,
+  splitDiffIntoChunks,
+  deduplicateFindings,
+} = await (() => {
+  // We can't easily mock ESM imports in node:test without a loader.
+  // Instead, import the real module and test its observable behaviour.
+  return import('../src/lib/reviewer-orchestrator.mjs');
+})();
 
 function makeDiff() {
   return { diffText: 'diff --git a/src/foo.mjs', files: [], filesForReview: [] };
@@ -170,5 +184,159 @@ describe('runReviewerOrchestration', () => {
     });
     assert.ok(typeof result.debug.succeededReviewers === 'number');
     assert.ok(typeof result.debug.failedReviewers === 'number');
+    assert.ok(typeof result.debug.deduplicatedCount === 'number');
+  });
+
+  it('auto mode expands roles based on fileTypes', async () => {
+    const result = await runReviewerOrchestration({
+      diff: makeDiff(),
+      dryRun: true,
+      reviewers: ['auto'],
+      fileTypes: {
+        test: ['foo.test.mjs'],
+        app: ['src/foo.mjs'],
+        config: [],
+        schema: [],
+        migration: [],
+        infra: [],
+      },
+      riskAssessment: { humanReviewFiles: [], escalatedFiles: [] },
+    });
+    assert.ok(result.autoSelectedRoles !== null, 'autoSelectedRoles should be set in auto mode');
+    assert.ok(result.autoSelectedRoles.includes('bug-hunter'));
+    assert.ok(result.autoSelectedRoles.includes('test-gap'), 'test files → test-gap');
+  });
+
+  it('auto mode adds security-scanner for risky files', async () => {
+    const result = await runReviewerOrchestration({
+      diff: makeDiff(),
+      dryRun: true,
+      reviewers: ['auto'],
+      fileTypes: {
+        test: [],
+        app: [],
+        config: ['config.json'],
+        schema: [],
+        migration: [],
+        infra: [],
+      },
+      riskAssessment: { humanReviewFiles: ['config.json'], escalatedFiles: [] },
+    });
+    assert.ok(result.autoSelectedRoles.includes('security-scanner'));
+  });
+});
+
+describe('selectRolesAuto', () => {
+  it('always includes bug-hunter', () => {
+    const roles = selectRolesAuto({}, null);
+    assert.ok(roles.includes('bug-hunter'));
+  });
+
+  it('adds test-gap when test files are present', () => {
+    const roles = selectRolesAuto(
+      { test: ['foo.test.ts'], app: [], config: [], schema: [], migration: [], infra: [] },
+      null
+    );
+    assert.ok(roles.includes('test-gap'));
+  });
+
+  it('adds test-gap when many app files changed', () => {
+    const roles = selectRolesAuto(
+      { test: [], app: ['a.ts', 'b.ts', 'c.ts'], config: [], schema: [], migration: [], infra: [] },
+      null
+    );
+    assert.ok(roles.includes('test-gap'));
+  });
+
+  it('adds security-scanner for config/schema changes', () => {
+    const roles = selectRolesAuto(
+      { test: [], app: [], config: ['app.config.ts'], schema: [], migration: [], infra: [] },
+      null
+    );
+    assert.ok(roles.includes('security-scanner'));
+  });
+
+  it('adds security-scanner for escalated risk files', () => {
+    const roles = selectRolesAuto({}, { humanReviewFiles: [], escalatedFiles: ['auth.ts'] });
+    assert.ok(roles.includes('security-scanner'));
+  });
+
+  it('returns only bug-hunter when no signals', () => {
+    const roles = selectRolesAuto(
+      { test: [], app: ['a.ts', 'b.ts'], config: [], schema: [], migration: [], infra: [] },
+      { humanReviewFiles: [], escalatedFiles: [] }
+    );
+    assert.deepEqual(roles, ['bug-hunter']);
+  });
+});
+
+describe('splitDiffIntoChunks', () => {
+  function makeFile(path, lines = 10) {
+    return { path, hunks: [{ header: '@@ -1 +1 @@', lines: Array(lines).fill('+line') }] };
+  }
+
+  it('returns null for small diffs', () => {
+    const diff = { files: [makeFile('src/a.ts'), makeFile('src/b.ts')] };
+    assert.equal(splitDiffIntoChunks(diff), null);
+  });
+
+  it('splits large diffs into chunks', () => {
+    // Use distinct top-level directories so grouping produces multiple chunks
+    const dirs = ['api', 'ui', 'lib', 'tests', 'config'];
+    const files = Array.from({ length: 15 }, (_, i) =>
+      makeFile(`${dirs[i % dirs.length]}/file${i}.ts`, 20)
+    );
+    const diff = { files, filesForReview: files, diffText: '' };
+    const chunks = splitDiffIntoChunks(diff);
+    assert.ok(chunks !== null);
+    assert.ok(chunks.length >= 2, `expected ≥2 chunks, got ${chunks?.length}`);
+    // All files must appear in exactly one chunk
+    const allPaths = chunks.flatMap((c) => c.files.map((f) => f.path));
+    assert.equal(allPaths.length, files.length);
+    assert.equal(new Set(allPaths).size, files.length, 'no duplicates');
+  });
+
+  it('chunks contain diffText', () => {
+    const files = Array.from({ length: 12 }, (_, i) => makeFile(`pkg${i % 4}/f${i}.ts`, 60));
+    const diff = { files, filesForReview: files, diffText: '' };
+    const chunks = splitDiffIntoChunks(diff);
+    assert.ok(chunks !== null);
+    for (const chunk of chunks) {
+      assert.ok(typeof chunk.diffText === 'string');
+    }
+  });
+});
+
+describe('deduplicateFindings', () => {
+  function makeF(file, line, message) {
+    return { file, lineStart: line, message, title: message };
+  }
+
+  it('keeps unique findings', () => {
+    const findings = [makeF('a.ts', 1, 'bug A'), makeF('b.ts', 5, 'bug B')];
+    assert.equal(deduplicateFindings(findings).length, 2);
+  });
+
+  it('removes exact duplicates', () => {
+    const f = makeF('a.ts', 1, 'null dereference on line 1 of function foo bar');
+    assert.equal(deduplicateFindings([f, { ...f }]).length, 1);
+  });
+
+  it('removes near-duplicates same file same line', () => {
+    const f1 = makeF('a.ts', 10, 'null pointer dereference in handleRequest');
+    const f2 = makeF('a.ts', 10, 'null pointer dereference in handleRequest func');
+    assert.equal(deduplicateFindings([f1, f2]).length, 1);
+  });
+
+  it('keeps findings on different lines', () => {
+    const f1 = makeF('a.ts', 10, 'null pointer');
+    const f2 = makeF('a.ts', 50, 'null pointer');
+    assert.equal(deduplicateFindings([f1, f2]).length, 2);
+  });
+
+  it('keeps findings on different files', () => {
+    const f1 = makeF('a.ts', 10, 'null pointer dereference on handleRequest');
+    const f2 = makeF('b.ts', 10, 'null pointer dereference on handleRequest');
+    assert.equal(deduplicateFindings([f1, f2]).length, 2);
   });
 });
