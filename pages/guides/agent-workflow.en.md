@@ -24,6 +24,23 @@ river run . --dry-run
 river run . --output json
 ```
 
+### How `--reviewers auto` works
+
+When `auto` is specified, River Reviewer analyzes the diff content and selects reviewer roles automatically. `bug-hunter` is always included; additional roles are added based on the following signals:
+
+| Signal                                                                           | Role added         |
+| -------------------------------------------------------------------------------- | ------------------ |
+| config / schema / migration / infra files changed, or risk-escalated files exist | `security-scanner` |
+| test files changed, or 3 or more app files changed                               | `test-gap`         |
+
+To see which roles were selected, check the `autoSelectedRoles` field in the JSON output:
+
+```json
+{
+  "autoSelectedRoles": ["bug-hunter", "security-scanner", "test-gap"]
+}
+```
+
 ---
 
 ## How to Invoke by Agent
@@ -64,11 +81,15 @@ Call it as a terminal command from Cursor's Agent mode:
 river run . --reviewers auto
 ```
 
+See `templates/agent-workflow/` for ready-to-use config templates.
+
 ### Codex CLI
 
 ```bash
 codex exec "river run . --reviewers auto"
 ```
+
+See `templates/agent-workflow/` for ready-to-use config templates.
 
 ### GitHub Copilot
 

@@ -25,7 +25,7 @@ async function hasReferencesDir(dirPath) {
 async function listSkillPackages(dirPath) {
   const entries = await fs.readdir(dirPath, { withFileTypes: true });
   const packageGroups = await Promise.all(
-    entries.map(async entry => {
+    entries.map(async (entry) => {
       if (!entry.isDirectory()) return [];
       const entryPath = path.join(dirPath, entry.name);
       const skillPath = path.join(entryPath, 'SKILL.md');
@@ -38,7 +38,7 @@ async function listSkillPackages(dirPath) {
         // Continue to nested directories.
       }
       return listSkillPackages(entryPath);
-    }),
+    })
   );
 
   return packageGroups.flat().sort();
@@ -83,6 +83,18 @@ async function validateSkill(skillPath) {
       console.error(`  - ${error}`);
     }
     return false;
+  }
+
+  // Warn about missing recommended fields (non-blocking).
+  const missingRecommended = [];
+  if (!metadata?.version) missingRecommended.push('version');
+  if (!metadata?.tags) missingRecommended.push('tags');
+  if (!metadata?.severity && !metadata?.outputKind)
+    missingRecommended.push('severity or outputKind');
+  if (missingRecommended.length) {
+    console.warn(
+      `⚠  ${relativePath} — missing recommended fields: ${missingRecommended.join(', ')}`
+    );
   }
 
   console.log(`✅ ${relativePath}`);
