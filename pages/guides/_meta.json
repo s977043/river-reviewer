@@ -1,7 +1,7 @@
 {
   "quickstart": "クイックスタート (River Reviewer)",
   "github-actions": "GitHub Actions で River Reviewer をセットアップする",
-  "claude-code-workflow": "Claude Code から River Reviewer を使う",
+  "agent-workflow": "AI エージェントから River Reviewer を使う",
   "w-check": "W チェック（二重レビュー）",
   "repo-wide-review": "リポジトリ全体を踏まえたレビューの導入とチューニング",
   "run-phase-specific-review": "フェーズ固有のレビューを実行する",
