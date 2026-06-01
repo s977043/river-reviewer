@@ -33529,6 +33529,7 @@ var finding_classifier = __nccwpck_require__(7440);
 
 
 
+
 const REVIEWER_ROLES = {
   'bug-hunter': {
     label: 'Bug Hunter',
@@ -33560,11 +33561,148 @@ Report only test coverage gaps. Do NOT report implementation bugs or style issue
 
 const DEFAULT_REVIEWERS = ['bug-hunter', 'security-scanner'];
 
-function resolveReviewerRoles(reviewers) {
+// Thresholds for diff splitting
+const SPLIT_FILE_THRESHOLD = 10;
+const SPLIT_LINE_THRESHOLD = 500;
+
+function resolveReviewerRoles(reviewers, { fileTypes, riskAssessment } = {}) {
+  // 'auto' keyword: derive roles from diff content
+  if (reviewers?.length === 1 && reviewers[0] === 'auto') {
+    return { valid: selectRolesAuto(fileTypes, riskAssessment), invalid: [] };
+  }
   const names = reviewers ?? DEFAULT_REVIEWERS;
   const valid = names.filter((n) => REVIEWER_ROLES[n]);
   const invalid = names.filter((n) => !REVIEWER_ROLES[n]);
   return { valid, invalid };
+}
+
+/**
+ * Automatically select reviewer roles based on diff content signals.
+ * Always includes bug-hunter; adds security-scanner and test-gap when relevant.
+ */
+function selectRolesAuto(fileTypes, riskAssessment) {
+  const roles = new Set(['bug-hunter']);
+
+  // Security: risky files or config/infra/schema changes
+  const riskyFiles =
+    (riskAssessment?.humanReviewFiles?.length ?? 0) + (riskAssessment?.escalatedFiles?.length ?? 0);
+  const infraFiles =
+    (fileTypes?.config?.length ?? 0) +
+    (fileTypes?.schema?.length ?? 0) +
+    (fileTypes?.migration?.length ?? 0) +
+    (fileTypes?.infra?.length ?? 0);
+  if (riskyFiles > 0 || infraFiles > 0) {
+    roles.add('security-scanner');
+  }
+
+  // Test gap: test files changed or new app files without accompanying tests
+  const testFiles = fileTypes?.test?.length ?? 0;
+  const appFiles = fileTypes?.app?.length ?? 0;
+  if (testFiles > 0 || appFiles > 2) {
+    roles.add('test-gap');
+  }
+
+  return [...roles];
+}
+
+/**
+ * Split diff files into groups for parallel chunk execution.
+ * Groups by directory prefix to keep related files together.
+ */
+function splitDiffIntoChunks(diff) {
+  const files = diff.files ?? [];
+  const totalLines = files.reduce(
+    (sum, f) => sum + (f.hunks ?? []).reduce((s, h) => s + (h.lines?.length ?? 0), 0),
+    0
+  );
+
+  if (files.length <= SPLIT_FILE_THRESHOLD && totalLines <= SPLIT_LINE_THRESHOLD) {
+    return null; // No split needed
+  }
+
+  // Group files by top-level directory
+  const groups = new Map();
+  for (const file of files) {
+    const dir = file.path.split('/')[0] ?? '_root';
+    if (!groups.has(dir)) groups.set(dir, []);
+    groups.get(dir).push(file);
+  }
+
+  // Merge small groups to avoid excessive chunks (target: 2–4 chunks)
+  const targetChunks = Math.min(4, Math.ceil(files.length / SPLIT_FILE_THRESHOLD));
+  const buckets = [];
+  for (const groupFiles of groups.values()) {
+    if (buckets.length < targetChunks) {
+      buckets.push([...groupFiles]);
+    } else {
+      // Append to smallest bucket
+      buckets.sort((a, b) => a.length - b.length);
+      buckets[0].push(...groupFiles);
+    }
+  }
+
+  return buckets
+    .filter((b) => b.length > 0)
+    .map((chunkFiles) => ({
+      ...diff,
+      files: chunkFiles,
+      filesForReview: chunkFiles,
+      diffText: (0,diff_optimizer/* renderDiffText */.p)(chunkFiles),
+      _chunkLabel: chunkFiles
+        .map((f) => f.path)
+        .join(', ')
+        .slice(0, 60),
+    }));
+}
+
+/**
+ * Deduplicate findings across parallel runs.
+ * Two findings are considered duplicates if they share the same file, overlapping
+ * line range (±2 lines), and the first 80 chars of their message are similar.
+ */
+function deduplicateFindings(findings) {
+  const seen = [];
+  const result = [];
+
+  for (const f of findings) {
+    const isDuplicate = seen.some((s) => {
+      if (s.file !== f.file) return false;
+      const lineOverlap =
+        Math.abs((s.lineStart ?? s.line ?? 0) - (f.lineStart ?? f.line ?? 0)) <= 2;
+      if (!lineOverlap) return false;
+      const msgA = (s.message ?? s.title ?? '').slice(0, 80).toLowerCase();
+      const msgB = (f.message ?? f.title ?? '').slice(0, 80).toLowerCase();
+      return editDistance(msgA, msgB) <= 10;
+    });
+
+    if (!isDuplicate) {
+      seen.push(f);
+      result.push(f);
+    }
+  }
+
+  return result;
+}
+
+function editDistance(a, b) {
+  if (a === b) return 0;
+  const m = a.length;
+  const n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  // Only compute if strings are similar enough to be worth comparing
+  if (Math.abs(m - n) > 15) return 99;
+  const dp = Array.from({ length: m + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] =
+        a[i - 1] === b[j - 1]
+          ? dp[i - 1][j - 1]
+          : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
 }
 
 async function runReviewerOrchestration({
@@ -33583,7 +33721,7 @@ async function runReviewerOrchestration({
   config,
   reviewers,
 } = {}) {
-  const { valid: roles, invalid } = resolveReviewerRoles(reviewers);
+  const { valid: roles, invalid } = resolveReviewerRoles(reviewers, { fileTypes, riskAssessment });
 
   if (!roles.length) {
     throw new Error(
@@ -33591,8 +33729,12 @@ async function runReviewerOrchestration({
     );
   }
 
+  // Attempt diff splitting for large PRs
+  const diffChunks = splitDiffIntoChunks(diff);
+  const chunked = diffChunks !== null;
+  const diffsToProcess = chunked ? diffChunks : [diff];
+
   const generateArgs = {
-    diff,
     plan,
     phase,
     dryRun,
@@ -33606,44 +33748,59 @@ async function runReviewerOrchestration({
     config,
   };
 
-  // Run each role in parallel; partial failure is tolerated
-  const settled = await Promise.allSettled(
-    roles.map((roleName) => {
+  // Fan out: each role × each diff chunk runs in parallel
+  const tasks = roles.flatMap((roleName) =>
+    diffsToProcess.map((chunkDiff, chunkIdx) => {
       const role = REVIEWER_ROLES[roleName];
       const roleRules = [role.focusInstructions, projectRules].filter(Boolean).join('\n\n');
-      return (0,review_engine/* generateReview */.G1)({ ...generateArgs, projectRules: roleRules }).then((result) => ({
-        ...result,
-        reviewerRole: roleName,
-      }));
+      return (0,review_engine/* generateReview */.G1)({ ...generateArgs, diff: chunkDiff, projectRules: roleRules }).then(
+        (result) => ({
+          ...result,
+          reviewerRole: roleName,
+          chunkIdx: chunked ? chunkIdx : null,
+          chunkLabel: chunked ? (chunkDiff._chunkLabel ?? `chunk-${chunkIdx}`) : null,
+        })
+      );
     })
   );
 
-  const succeeded = settled
-    .filter((r) => r.status === 'fulfilled')
-    .map((r) => r.value);
+  // Run each role in parallel; partial failure is tolerated
+  const settled = await Promise.allSettled(tasks);
+
+  const succeeded = settled.filter((r) => r.status === 'fulfilled').map((r) => r.value);
   const failed = settled.filter((r) => r.status === 'rejected');
 
-  // Merge findings with globally unique IDs and role tags
+  // Merge findings, deduplicate across chunks/roles, then assign stable IDs
   let nextId = 1;
-  const allFindings = succeeded.flatMap((r) =>
+  const rawFindings = succeeded.flatMap((r) =>
     (r.findings ?? []).map((f) => ({
       ...f,
-      id: `rr-${nextId++}`,
       reviewerRole: r.reviewerRole,
+      chunkLabel: r.chunkLabel ?? null,
     }))
   );
+  const deduped = deduplicateFindings(rawFindings);
+  const allFindings = deduped.map((f) => ({ ...f, id: `rr-${nextId++}` }));
 
   const allComments = succeeded.flatMap((r) => r.comments ?? []);
   const classified = (0,finding_classifier/* classifyFindings */.Z)(allFindings, { reviewMode: reviewMode ?? 'medium' });
 
-  const reviewerResults = roles.map((name, i) => ({
-    role: name,
-    label: REVIEWER_ROLES[name].label,
-    status: settled[i].status,
-    findingsCount:
-      settled[i].status === 'fulfilled' ? (settled[i].value.findings?.length ?? 0) : 0,
-    error: settled[i].status === 'rejected' ? String(settled[i].reason?.message ?? 'unknown') : null,
-  }));
+  // Summarise per-role results (aggregate across chunks)
+  const reviewerResults = roles.map((name) => {
+    const roleSettled = settled.filter(
+      (_, i) => tasks[i] && roles.flatMap((r) => diffsToProcess.map(() => r))[i] === name
+    );
+    const roleSucceeded = roleSettled.filter((r) => r.status === 'fulfilled');
+    return {
+      role: name,
+      label: REVIEWER_ROLES[name].label,
+      status: roleSucceeded.length > 0 ? 'fulfilled' : 'rejected',
+      findingsCount: roleSucceeded.reduce((sum, r) => sum + (r.value?.findings?.length ?? 0), 0),
+      chunksRun: chunked ? diffsToProcess.length : null,
+      error:
+        roleSucceeded.length === 0 ? String(roleSettled[0]?.reason?.message ?? 'unknown') : null,
+    };
+  });
 
   return {
     comments: allComments,
@@ -33651,12 +33808,16 @@ async function runReviewerOrchestration({
     classified,
     reviewerResults,
     invalidRoles: invalid,
+    autoSelectedRoles: reviewers?.length === 1 && reviewers[0] === 'auto' ? roles : null,
+    chunked,
+    chunkCount: chunked ? diffsToProcess.length : null,
     prompt: succeeded[0]?.prompt ?? null,
     promptTruncated: succeeded.some((r) => r.promptTruncated),
     llmModel: succeeded[0]?.llmModel ?? null,
     debug: {
       succeededReviewers: succeeded.length,
       failedReviewers: failed.length,
+      deduplicatedCount: rawFindings.length - allFindings.length,
     },
   };
 }
@@ -56788,7 +56949,8 @@ Options:
   --output <mode>   Output format: text|markdown|json|yaml. Default: text
   --context list    Comma-separated available contexts (e.g. diff,fullFile,tests). Overrides RIVER_AVAILABLE_CONTEXTS
   --dependency list Comma-separated available dependencies (e.g. code_search,test_runner). Overrides RIVER_AVAILABLE_DEPENDENCIES
-  --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap)
+  --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap).
+                    Use "auto" to select roles automatically based on diff content and risk signals.
   --baseline <path> Path to a previous review JSON (findings array) for regression comparison
   --save            Persist the review run to the project result store (.river/runs/)
 
