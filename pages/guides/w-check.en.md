@@ -85,10 +85,10 @@ The synthesis step of W-check is handled by the `rr-midstream-independent-review
 2. **Hallucination guard**: Each finding's `evidence` is checked against the actual diff and source files. Findings that reference non-existent code are classified as `dismissed-hallucination` and excluded from the final output.
 3. **Merge recommendation**: Based on the presence of confirmed critical / major findings, the skill emits one of `merge-ready`, `human-review`, or `block`.
 
-Full skill reference: [`skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md`](../../skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md)
+Full skill reference: [`skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md`](https://github.com/s977043/river-reviewer/blob/main/skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md)
 
 ## Related Pages
 
 - [Artifact Input Contract](../reference/artifact-input-contract.md) — full specification of `review-self` / `review-external`
-- [Independent Review Synthesis skill](../../skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md) — complete synthesis skill rules
+- [Independent Review Synthesis skill](https://github.com/s977043/river-reviewer/blob/main/skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md) — complete synthesis skill rules
 - [GitHub Actions Setup](./github-actions.md) — basic GitHub Actions configuration

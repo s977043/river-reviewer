@@ -85,10 +85,10 @@ W チェックの統合処理は `rr-midstream-independent-review-synthesis-001`
 2. **ハルシネーション検証 (Hallucination guard)**: 各 finding の `evidence` が参照するファイルパスとコードスニペットを実際の差分と照合し、実在しないコードを参照している指摘を `dismissed-hallucination` として除外する。
 3. **マージ推奨 (Merge recommendation)**: 確認済みの critical / major finding の有無に基づいて `merge-ready` / `human-review` / `block` のいずれかを出力する。
 
-skill の詳細: [`skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md`](../../skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md)
+skill の詳細: [`skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md`](https://github.com/s977043/river-reviewer/blob/main/skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md)
 
 ## 関連ページ
 
 - [Artifact Input Contract](../reference/artifact-input-contract.md) — `review-self` / `review-external` の仕様詳細
-- [Independent Review Synthesis skill](../../skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md) — synthesis skill の全ルール
+- [Independent Review Synthesis skill](https://github.com/s977043/river-reviewer/blob/main/skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md) — synthesis skill の全ルール
 - [GitHub Actions セットアップ](./github-actions.md) — 基本的な GitHub Actions 構成
