@@ -169,3 +169,4 @@ River Reviewer は以下の順でアーティファクトを解決します。
 - [Stable Interfaces](./stable-interfaces.md) — CLI / GitHub Actions の安定契約
 - [Runner CLI Reference](./runner-cli-reference.md) — Runner CLI の使い方
 - [Review Policy](./review-policy.md) — AI レビュー標準ポリシー
+- [W チェック実践ガイド](../guides/w-check.md) — `review-self` / `review-external` を使った二重レビューの手順
