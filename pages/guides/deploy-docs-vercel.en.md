@@ -31,7 +31,7 @@ When Next.js and Docusaurus share one Vercel project, routing conflicts can caus
 If you want `/docs/` as the base path, set `DOCS_BASE_URL=/docs/` and update redirects to point `/` -> `/docs/`.
 If you omit `DOCS_BASE_URL`, the build targets GitHub Pages at `/river-review/` as before.
 
-## App project (e.g., `<app-domain>` / `river-reviewer.vercel.app`)
+## App project (e.g., `<app-domain>` / `river-review.the3396.com`)
 
 Add rewrites in the app `vercel.json` to forward `/docs/*` to the docs domain (docs served at `/`):
 

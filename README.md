@@ -4,7 +4,7 @@
 **チームのレビュー判断を、自動化された PR ゲートとしてコード化する。**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Documentation](https://img.shields.io/badge/docs-available-blue)](https://river-reviewer.vercel.app/explanation/intro/)
+[![Documentation](https://img.shields.io/badge/docs-available-blue)](https://river-review.the3396.com/explanation/intro/)
 
 ![River Review logo](assets/logo/river-review-logo.svg)
 
@@ -58,13 +58,13 @@ npx river run . --dry-run
 
 > npm publish ワークフローと `publishConfig` は実装済みです（[#942](https://github.com/s977043/river-review/pull/942)）。`NPM_TOKEN` シークレットを設定すると `@river-review/core-runner`・`@river-review/node-api`・`@river-review/cli-runner` の公開が有効化されます（[#800](https://github.com/s977043/river-review/issues/800)）。`npx river try` 体験は別途対応予定です。
 
-| やりたいこと             | 行き先                                                                                             |
-| ------------------------ | -------------------------------------------------------------------------------------------------- |
-| 5分で試す                | [クイックスタート（GitHub Actions）](#クイックスタートgithub-actions)                              |
-| 既存リポジトリに導入する | [セットアップガイド](https://river-reviewer.vercel.app/guides/github-actions/)                     |
-| スキルを1個作る          | [スキル作成チュートリアル](https://river-reviewer.vercel.app/tutorials/creating-your-first-skill/) |
-| コストを見積もる         | [コスト見積もりガイド](pages/guides/cost-estimation.md)                                            |
-| 設計思想を理解する       | [アーキテクチャ解説](https://river-reviewer.vercel.app/explanation/river-architecture/)            |
+| やりたいこと             | 行き先                                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| 5分で試す                | [クイックスタート（GitHub Actions）](#クイックスタートgithub-actions)                             |
+| 既存リポジトリに導入する | [セットアップガイド](https://river-review.the3396.com/guides/github-actions/)                     |
+| スキルを1個作る          | [スキル作成チュートリアル](https://river-review.the3396.com/tutorials/creating-your-first-skill/) |
+| コストを見積もる         | [コスト見積もりガイド](pages/guides/cost-estimation.md)                                           |
+| 設計思想を理解する       | [アーキテクチャ解説](https://river-review.the3396.com/explanation/river-architecture/)            |
 
 開発手順は [docs/runbook/dev.md](docs/runbook/dev.md) を参照してください。ライセンスは [本ファイル末尾](#ライセンス) に記載しています。
 

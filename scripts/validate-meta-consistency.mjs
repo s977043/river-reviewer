@@ -80,9 +80,9 @@ export async function validateMeta() {
 
   // Check homepage URL
   const homepage = pkg.homepage || '';
-  if (!homepage.startsWith('https://river-reviewer.vercel.app')) {
+  if (!homepage.startsWith('https://river-review.the3396.com')) {
     errors.push(
-      `package.json: homepage "${homepage}" should point to https://river-reviewer.vercel.app`
+      `package.json: homepage "${homepage}" should point to https://river-review.the3396.com`
     );
   }
 

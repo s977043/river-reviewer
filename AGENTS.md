@@ -1,4 +1,4 @@
-# AGENTS.md—River Reviewer
+# AGENTS.md—River Review
 
 ## Scope
 
