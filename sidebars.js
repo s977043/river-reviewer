@@ -63,7 +63,7 @@ module.exports = {
       label: '解説',
       items: [
         'explanation/intro',
-        'explanation/what-is-river-reviewer',
+        'explanation/what-is-river-review',
         'explanation/river-architecture',
         'explanation/design-philosophy',
         'explanation/upstream-midstream-downstream',

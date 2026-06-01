@@ -6,9 +6,9 @@ id: embedding-code-index-research-en
 
 > Status: **Research / Decision pending → defer implementation; revisit once the limits of `heuristic + ripgrep` are clearly visible.**
 >
-> Related: [#691 research(context): consider an embedding-based code index](https://github.com/s977043/river-reviewer/issues/691) / parent Epic [#650](https://github.com/s977043/river-reviewer/issues/650)
+> Related: [#691 research(context): consider an embedding-based code index](https://github.com/s977043/river-review/issues/691) / parent Epic [#650](https://github.com/s977043/river-review/issues/650)
 
-This note is a research record used to decide whether River Reviewer's repo-wide review should adopt an embedding-based code index. It collects responses to the acceptance criteria of Issue #691 in a single file.
+This note is a research record used to decide whether River Review's repo-wide review should adopt an embedding-based code index. It collects responses to the acceptance criteria of Issue #691 in a single file.
 
 ## 1. Why consider this (the problem we are trying to solve)
 
@@ -78,7 +78,7 @@ To make a decision, we separate the **strengths** and the **limits** of the curr
 | determinism             | Embedding values may drift across provider updates for the same input.                    | Pin the model version; include the model name in the cache key.                                                 |
 | index freshness         | Index updates fall behind the speed of code change.                                       | Re-embed only the diff files on PR, on the fly.                                                                 |
 | extra dependencies      | A vector DB / model runtime enters CI dependencies.                                       | Stay within pure Node.js / WASM with Option A + ONNX, marked as an optional dependency.                         |
-| eval drift              | Swapping embeddings changes detection on the same PR.                                     | Add an embedding on/off axis to [#688 eval fixtures](https://github.com/s977043/river-reviewer/issues/688).     |
+| eval drift              | Swapping embeddings changes detection on the same PR.                                     | Add an embedding on/off axis to [#688 eval fixtures](https://github.com/s977043/river-review/issues/688).       |
 | LLM hallucination boost | Semantic retrieval pulls plausible-but-irrelevant chunks and amplifies LLM hallucination. | Use a retrieval-score threshold and **AND-combine** with ripgrep heuristics (embedding only feeds ranking).     |
 
 ## 5. Caching strategy in GitHub Actions
@@ -92,7 +92,7 @@ When Option A is adopted:
 
 ## 6. Monorepo support
 
-- Declare workspaces with `index.scopes: [packages/*]` in `.river-reviewer.yaml` (future addition).
+- Declare workspaces with `index.scopes: [packages/*]` in `.river-review.yaml` (future addition).
 - Carry `scope: 'packages/foo'` in chunk metadata; on retrieval, prefer the scope of the changed files when picking top-k.
 - If it grows too large, switch the discussion to Option B (remote vector DB).
 
@@ -121,7 +121,7 @@ This keeps the existing review output **backward compatible**.
 
 ## 9. Coexistence policy with ripgrep / heuristic
 
-- Add the embedding score as a **ranking signal** alongside `pathProximity` / `symbolUsage` etc. introduced for [#689 token budget](https://github.com/s977043/river-reviewer/issues/689) (weight 0.10–0.15).
+- Add the embedding score as a **ranking signal** alongside `pathProximity` / `symbolUsage` etc. introduced for [#689 token budget](https://github.com/s977043/river-review/issues/689) (weight 0.10–0.15).
 - Keep candidate **generation** in the heuristic path (using embedding as generator increases hallucination).
 - When heuristic and embedding results collide on the same file, the heuristic wins (per-file dedupe).
 
@@ -129,15 +129,15 @@ This keeps the existing review output **backward compatible**.
 
 **Decision: defer for now. Reconsider when one of the following happens.**
 
-1. [#688 eval fixtures](https://github.com/s977043/river-reviewer/issues/688) records **5 or more cases** where heuristic cannot detect but embedding can.
+1. [#688 eval fixtures](https://github.com/s977043/river-review/issues/688) records **5 or more cases** where heuristic cannot detect but embedding can.
 2. A consuming repository reaches the 50k-file scale and the operations team reports degraded S/N from symbol grep.
 3. A new use case — semantic alignment between ADRs / specs ↔ implementation — is formally promoted to an Epic.
 
 Reasons:
 
-- Today's River Reviewer skill set (upstream / midstream) concentrates on "changed files ± one hop," which heuristics already cover well.
+- Today's River Review skill set (upstream / midstream) concentrates on "changed files ± one hop," which heuristics already cover well.
 - Introducing embeddings adds **dependencies, cost, privacy risk, and eval drift** all at once; we should avoid it until the detection lift is quantified.
-- If the [#689 token budget + ranking](https://github.com/s977043/river-reviewer/issues/689) effect can be measured, ranking improvements alone are expected to handle most cases without embeddings.
+- If the [#689 token budget + ranking](https://github.com/s977043/river-review/issues/689) effect can be measured, ranking improvements alone are expected to handle most cases without embeddings.
 
 ## 11. Follow-up issue plan if we implement (for reference while deferred)
 
@@ -148,14 +148,14 @@ Suggested issue split when the decision flips to "implement":
 3. **local embedder backend (Option A)** — ONNX runtime + BGE-small; CLI: `river index build`.
 4. **review-time retrieval integration** — embedding ranker added to `repo-context.mjs`.
 5. **CI cache strategy** — `actions/cache` spec for `.river/index/`, incremental update.
-6. **eval drift guards** — add an embedding on/off axis to [#688](https://github.com/s977043/river-reviewer/issues/688).
+6. **eval drift guards** — add an embedding on/off axis to [#688](https://github.com/s977043/river-review/issues/688).
 7. **docs-only first step (Option C)** — minimum landing point if a phased introduction is desired.
 
 Each issue is sized to land as an independent PR; whether to group them under an Epic is reconsidered once the decision to introduce embeddings is made.
 
 ## Conclusion (summary)
 
-- For now, **heuristic + ripgrep + the [#689 token budget/ranking](https://github.com/s977043/river-reviewer/issues/689) improvements** are sufficient.
+- For now, **heuristic + ripgrep + the [#689 token budget/ranking](https://github.com/s977043/river-review/issues/689) improvements** are sufficient.
 - Embeddings carry large trade-offs in **dependencies, privacy, cost, and drift**, and should not be introduced without quantified value.
 - Option A (Local JSONL vector cache) is the leading candidate; Option C (docs-only) is a phased-introduction insurance.
 - Once any of the §10 trigger conditions is met, update this note and file the follow-up issues.

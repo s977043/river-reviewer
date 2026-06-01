@@ -1,8 +1,8 @@
-# Using River Reviewer from AI Agents
+# Using River Review from AI Agents
 
 ## Overview
 
-River Reviewer is a CLI-based tool, so it works with any AI agent — Claude Code, Cursor, Codex CLI, GitHub Copilot, and others. Regardless of which agent you use, all it takes is a call to `river run .`.
+River Review is a CLI-based tool, so it works with any AI agent — Claude Code, Cursor, Codex CLI, GitHub Copilot, and others. Regardless of which agent you use, all it takes is a call to `river run .`.
 
 ---
 
@@ -26,7 +26,7 @@ river run . --output json
 
 ### How `--reviewers auto` works
 
-When `auto` is specified, River Reviewer analyzes the diff content and selects reviewer roles automatically. `bug-hunter` is always included; additional roles are added based on the following signals:
+When `auto` is specified, River Review analyzes the diff content and selects reviewer roles automatically. `bug-hunter` is always included; additional roles are added based on the following signals:
 
 | Signal                                                                           | Role added         |
 | -------------------------------------------------------------------------------- | ------------------ |
@@ -45,13 +45,13 @@ To see which roles were selected, check the `autoSelectedRoles` field in the JSO
 
 ## How to Invoke by Agent
 
-| Agent          | How to Invoke                           | Dedicated Definition File                   |
-| -------------- | --------------------------------------- | ------------------------------------------- |
-| Claude Code    | Bash tool / `/review-local` / sub-agent | `.claude/agents/river-reviewer.md`          |
-| Cursor         | Terminal tab / `@terminal`              | —                                           |
-| Codex CLI      | `codex exec "river run ."`              | —                                           |
-| GitHub Copilot | Run directly in terminal                | `.github/agents/river-reviewer.agent.md`    |
-| Others         | `river run .` in any shell              | `agents/examples/river-reviewer.agent.yaml` |
+| Agent          | How to Invoke                           | Dedicated Definition File                 |
+| -------------- | --------------------------------------- | ----------------------------------------- |
+| Claude Code    | Bash tool / `/review-local` / sub-agent | `.claude/agents/river-review.md`          |
+| Cursor         | Terminal tab / `@terminal`              | —                                         |
+| Codex CLI      | `codex exec "river run ."`              | —                                         |
+| GitHub Copilot | Run directly in terminal                | `.github/agents/river-review.agent.md`    |
+| Others         | `river run .` in any shell              | `agents/examples/river-review.agent.yaml` |
 
 ### Claude Code
 
@@ -68,10 +68,10 @@ Slash commands and the sub-agent are also available:
 ```
 
 ```text
-Please ask river-reviewer to review the current diff
+Please ask river-review to review the current diff
 ```
 
-Dedicated definition: `.claude/agents/river-reviewer.md`
+Dedicated definition: `.claude/agents/river-review.md`
 
 ### Cursor
 
@@ -93,7 +93,7 @@ See `templates/agent-workflow/` for ready-to-use config templates.
 
 ### GitHub Copilot
 
-`.github/agents/river-reviewer.agent.md` is already defined. Run `river run .` in the terminal, or instruct Copilot to "run `river run .` and report the review results."
+`.github/agents/river-review.agent.md` is already defined. Run `river run .` in the terminal, or instruct Copilot to "run `river run .` and report the review results."
 
 ### Other Agents
 
@@ -105,14 +105,14 @@ Any environment that can execute shell commands can call `river run .` directly.
 
 `skills/agent-skills/` contains **agent-independent skill definitions** that can be passed to any agent.
 
-| Skill                         | Purpose                                                            |
-| ----------------------------- | ------------------------------------------------------------------ |
-| `river-reviewer`              | Main review (intent classification → routing to specialist skills) |
-| `river-reviewer-code`         | Code quality review                                                |
-| `river-reviewer-security`     | Security-focused review                                            |
-| `river-reviewer-testing`      | Test coverage review                                               |
-| `river-reviewer-architecture` | Architecture review                                                |
-| `adversarial-review`          | Adversarial review (challenge assumptions)                         |
+| Skill                       | Purpose                                                            |
+| --------------------------- | ------------------------------------------------------------------ |
+| `river-review`              | Main review (intent classification → routing to specialist skills) |
+| `river-review-code`         | Code quality review                                                |
+| `river-review-security`     | Security-focused review                                            |
+| `river-review-testing`      | Test coverage review                                               |
+| `river-review-architecture` | Architecture review                                                |
+| `adversarial-review`        | Adversarial review (challenge assumptions)                         |
 
 To use a skill with an agent, load `skills/agent-skills/<skill-name>/SKILL.md` into the agent's context.
 

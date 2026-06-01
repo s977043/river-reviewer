@@ -1,5 +1,5 @@
 ---
-description: River Reviewerのレビュー基準（ローカルレビュー時に自動適用）
+description: River Reviewのレビュー基準（ローカルレビュー時に自動適用）
 globs:
   - '**/*'
 ---

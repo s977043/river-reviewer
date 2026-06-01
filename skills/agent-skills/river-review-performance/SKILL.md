@@ -1,6 +1,6 @@
 ---
-id: river-reviewer-performance
-name: river-reviewer-performance
+id: river-review-performance
+name: river-review-performance
 description: |
   パフォーマンス観点のレビューエージェント。
   N+1クエリ、メモリ効率、キャッシュ戦略、可観測性の観点でコード変更を評価する。
@@ -104,10 +104,10 @@ license: MIT
 
 ## 他スキルとの関係
 
-| スキル                        | 関係 | 棲み分け                                                                |
-| ----------------------------- | ---- | ----------------------------------------------------------------------- |
-| `river-reviewer-architecture` | 補完 | performance は「実行時効率」、architecture は「構造的スケーラビリティ」 |
-| `river-reviewer-code`         | 補完 | performance は「速度・効率」、code は「可読性・保守性」                 |
+| スキル                      | 関係 | 棲み分け                                                                |
+| --------------------------- | ---- | ----------------------------------------------------------------------- |
+| `river-review-architecture` | 補完 | performance は「実行時効率」、architecture は「構造的スケーラビリティ」 |
+| `river-review-code`         | 補完 | performance は「速度・効率」、code は「可読性・保守性」                 |
 
 ## References
 

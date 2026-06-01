@@ -40,7 +40,7 @@
 | root cause            | 兆候                                                                                                             | 対処                                                                                                                                                                               |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **routing miss**      | 該当 skill が plan に入っていない（`plan.selected` に出ていない）                                                | `tests/fixtures/planner-dataset/cases.json` に対応する case を追加し、`npm run planner:eval:dataset` で再現させる。`applyTo` / `inputContext` / `availableContexts` の組合せを修正 |
-| **missing context**   | skill は plan に入ったが、レビュー時に必要な周辺情報（fullFile / tests / usages）が context に含まれていなかった | 該当 skill の `inputContext` を拡張、または `.river-reviewer.yaml` の `context.budget.perSectionCaps` を見直す                                                                     |
+| **missing context**   | skill は plan に入ったが、レビュー時に必要な周辺情報（fullFile / tests / usages）が context に含まれていなかった | 該当 skill の `inputContext` を拡張、または `.river-review.yaml` の `context.budget.perSectionCaps` を見直す                                                                       |
 | **weak instructions** | skill は plan に入り context も足りていたが、prompt が拾い方を教えていない                                       | skill の SKILL.md / `prompt/system.md` を更新し、happy-path fixture を追加して再現性を保証                                                                                         |
 
 3 つのうち 1 つだけが当てはまるとは限らない。例えば routing miss + missing context が同時に起きていることもあるので、**まず planner:eval で routing 単独を切り分けてから** context / instructions を順に検証する。
@@ -65,7 +65,7 @@
 
 ## 関連リソース
 
-- 親 Epic: [#743 River Reviewer Skill Improvement Loop](https://github.com/s977043/river-reviewer/issues/743)
+- 親 Epic: [#743 River Review Skill Improvement Loop](https://github.com/s977043/river-review/issues/743)
 - 検証フィルタ: [VERIFICATION.md](./VERIFICATION.md)
 - フィードバック taxonomy: [FEEDBACK.md](./FEEDBACK.md)
 - ループ全体像: [IMPROVEMENT_LOOP.md](./IMPROVEMENT_LOOP.md)

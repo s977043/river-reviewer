@@ -2,11 +2,11 @@
 slug: /
 ---
 
-# River Reviewer docs
+# River Review docs
 
 英語版は [index-en](/index-en) を参照してください（日本語がソース・オブ・トゥルースです）。
 
-River Reviewer のドキュメントは、日本語を基本言語として提供し、
+River Review のドキュメントは、日本語を基本言語として提供し、
 [Diátaxis ドキュメントフレームワーク](https://diataxis.fr/) に基づいて構成しています。
 同じ内容の英語版がある場合は `.en.md` を付けたファイル名で管理し、差分がある場合は日本語版を真実として扱います。
 

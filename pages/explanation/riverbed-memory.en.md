@@ -9,7 +9,7 @@ Riverbed Memory v1 is already implemented (#474, `src/lib/riverbed-memory.mjs`).
 
 ## Overview
 
-Riverbed Memory is the place where context settles—like how a riverbed holds the traces of past flows. It remembers architectural decisions, WontFix items, and prior review outcomes so River Reviewer can stay consistent across PRs and releases. Think of it as a lightweight, auditable memory layer that keeps the stream grounded.
+Riverbed Memory is the place where context settles—like how a riverbed holds the traces of past flows. It remembers architectural decisions, WontFix items, and prior review outcomes so River Review can stay consistent across PRs and releases. Think of it as a lightweight, auditable memory layer that keeps the stream grounded.
 
 For implementation and operations, see `pages/guides/use-riverbed-memory.md`. For storage details, see `pages/reference/riverbed-storage.md`.
 

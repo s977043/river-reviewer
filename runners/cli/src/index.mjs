@@ -18,7 +18,7 @@ const program = new Command();
 
 program
   .name('river')
-  .description('River Reviewer CLI - AI-powered code review tool')
+  .description('River Review CLI - AI-powered code review tool')
   .version(packageJson.version);
 
 // river review command

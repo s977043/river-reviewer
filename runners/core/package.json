@@ -1,7 +1,7 @@
 {
-  "name": "@river-reviewer/core-runner",
+  "name": "@river-review/core-runner",
   "version": "0.1.0",
-  "description": "Core skill execution components for River Reviewer",
+  "description": "Core skill execution components for River Review",
   "type": "module",
   "exports": {
     "./skill-loader": {

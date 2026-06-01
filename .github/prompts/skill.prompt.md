@@ -1,7 +1,7 @@
 ---
 name: skill
 description: 'skills/ から該当スキルを選び、手順に沿って実行計画（またはレビュー）を作る'
-agent: 'river-reviewer'
+agent: 'river-review'
 ---
 
 次のタスクを、リポジトリの `skills/` を使って進めてください。

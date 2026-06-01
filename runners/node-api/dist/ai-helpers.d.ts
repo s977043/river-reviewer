@@ -1,6 +1,6 @@
 /**
- * Pure AI provider helper functions for the River Reviewer Node API.
- * These helpers have no dependencies on @river-reviewer/core-runner
+ * Pure AI provider helper functions for the River Review Node API.
+ * These helpers have no dependencies on @river-review/core-runner
  * and can be tested in isolation.
  */
 import type { Finding } from './types.js';

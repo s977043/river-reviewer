@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/s977043/river-reviewer/schemas/suppression-context.schema.json",
+  "$id": "https://github.com/s977043/river-review/schemas/suppression-context.schema.json",
   "title": "Suppression Entry Context Schema",
   "description": "JSON Schema for the `context` payload of a Riverbed Memory entry whose `type` is `suppression`. The parent entry is validated by riverbed-entry.schema.json (which permits additional context properties); this schema constrains the suppression-specific shape so that auto-suppression and feedback typing remain consistent. See Issue #687 (Epic #650).",
   "type": "object",

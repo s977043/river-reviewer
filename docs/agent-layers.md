@@ -92,12 +92,12 @@ graph TB
 
 **役割:** 専門サブエージェントに分解して並行処理する層。大きい仕事を1本の長いチャットに全部流し込むより、役割分担した方が安定する。
 
-| エージェント   | Claude Code       | Copilot           | 役割                       |
-| -------------- | ----------------- | ----------------- | -------------------------- |
-| river-reviewer | `.claude/agents/` | `.github/agents/` | コードレビュー・リファクタ |
-| architect      | —                 | `.github/agents/` | アーキテクチャ設計         |
-| security       | —                 | `.github/agents/` | セキュリティレビュー       |
-| qa             | —                 | `.github/agents/` | QA・テスト                 |
+| エージェント | Claude Code       | Copilot           | 役割                       |
+| ------------ | ----------------- | ----------------- | -------------------------- |
+| river-review | `.claude/agents/` | `.github/agents/` | コードレビュー・リファクタ |
+| architect    | —                 | `.github/agents/` | アーキテクチャ設計         |
+| security     | —                 | `.github/agents/` | セキュリティレビュー       |
+| qa           | —                 | `.github/agents/` | QA・テスト                 |
 
 **設計原則:** 各ツールの frontmatter 形式が異なるため、エージェント定義はツール別に維持する。共通の役割・ワークフローはこの文書でマッピングし、ドリフトを防止する。
 

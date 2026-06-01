@@ -45,7 +45,7 @@ title: Roadmap & Project Board Guide
 
 ## Defined Task Template
 
-Refer to "Next Concrete Tasks" in [ROADMAP.md](https://github.com/s977043/river-reviewer/blob/main/ROADMAP.md) for concrete task ideas (List not maintained here to avoid duplication).
+Refer to "Next Concrete Tasks" in [ROADMAP.md](https://github.com/s977043/river-review/blob/main/ROADMAP.md) for concrete task ideas (List not maintained here to avoid duplication).
 
 ## Operation Tips
 

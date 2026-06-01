@@ -2,7 +2,7 @@
 title: Planner評価セット（オフライン評価）
 ---
 
-River Reviewer の v0.3（Smart Reviewer）に向けて、Planner の「スキル選択・順序付け」の品質を **オフラインで再現評価**するための評価セットです。
+River Review の v0.3（Smart Reviewer）に向けて、Planner の「スキル選択・順序付け」の品質を **オフラインで再現評価**するための評価セットです。
 
 ## 何を評価するか
 

@@ -51,7 +51,7 @@ function parseArgs(argv) {
 }
 
 /**
- * Evaluate River Reviewer JSON output against severity thresholds.
+ * Evaluate River Review JSON output against severity thresholds.
  * Conforms to schemas/output.schema.json.
  *
  * @param {{ input: string, failOnCritical: number, failOnMajor: number | null }} options
@@ -104,7 +104,7 @@ async function main() {
     console.log(`Usage: node scripts/evaluate-review-gate.mjs --input <json-path> [options]
 
 Options:
-  --input <path>          Path to River Reviewer JSON output (required)
+  --input <path>          Path to River Review JSON output (required)
   --fail-on-critical <N>  Fail if critical count >= N (default: 1)
   --fail-on-major <N>     Fail if major count >= N (default: off)
   -h, --help              Show this help message
@@ -117,17 +117,17 @@ Options:
     return 1;
   }
 
-  // Load gate config from .river-reviewer.json (CLI flags take precedence)
+  // Load gate config from .river-review.json (CLI flags take precedence)
   let configGate = {};
   try {
-    const configPath = path.resolve('.river-reviewer.json');
+    const configPath = path.resolve('.river-review.json');
     const configRaw = await fs.readFile(configPath, 'utf8');
     const config = JSON.parse(configRaw);
     configGate = config.gate ?? {};
   } catch (err) {
     // File not found is expected; warn on other errors (e.g. malformed JSON)
     if (err.code !== 'ENOENT') {
-      console.error(`Warning: failed to load .river-reviewer.json gate config: ${err.message}`);
+      console.error(`Warning: failed to load .river-review.json gate config: ${err.message}`);
     }
   }
 
@@ -149,7 +149,7 @@ Options:
   // Write GitHub Actions step summary if available
   const summaryPath = process.env.GITHUB_STEP_SUMMARY;
   if (summaryPath) {
-    const md = `## River Reviewer Gate\n\n**${result.pass ? 'PASSED' : 'FAILED'}**\n\n${result.table}\n`;
+    const md = `## River Review Gate\n\n**${result.pass ? 'PASSED' : 'FAILED'}**\n\n${result.table}\n`;
     await fs.appendFile(summaryPath, md);
   }
 

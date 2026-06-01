@@ -92,7 +92,7 @@ Why: plan/todo/test-cases を基準として差分を突き合わせる照合型
 
 ## Output / 出力
 
-- すべて日本語。コメントは River Reviewer の `<file>:<line>: <message>` 形式。
+- すべて日本語。コメントは River Review の `<file>:<line>: <message>` 形式。
 - severity は内部語彙 `blocker|warning|nit` を使用し、スキーマ側 `critical|major|minor|info` への変換は `review-core` ルールに委ねる。分類ガイド:
   - `blocker`: plan の明示的な方針に反する破壊的変更、todo 完了マーク済みだが未実装。
   - `warning`: 計画外の依存追加、test-cases 宣言分のテスト欠落、影響範囲外への意図外変更。

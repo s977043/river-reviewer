@@ -1,6 +1,6 @@
-# River Reviewer をはじめる
+# River Review をはじめる
 
-River Reviewer は、ソフトウェア開発ライフサイクルのためのフローベースの AI レビューエージェントです。上流（Upstream）の設計から中流（Midstream）の実装、下流（Downstream）の QA までをカバーします。
+River Review は、ソフトウェア開発ライフサイクルのためのフローベースの AI レビューエージェントです。上流（Upstream）の設計から中流（Midstream）の実装、下流（Downstream）の QA までをカバーします。
 
 このチュートリアルでは、GitHub Actions を使用して最初のレビューを実行する手順を説明します。
 
@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@v0.69.0
+      - uses: s977043/river-review/runners/github-action@v0.69.0
         with:
           phase: midstream
           dry_run: true # 外部 API を呼び出す場合は false に設定

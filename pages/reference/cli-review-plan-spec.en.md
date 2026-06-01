@@ -2,7 +2,7 @@
 title: river review plan CLI Spec
 ---
 
-`river review plan` is the River Reviewer CLI subcommand that **generates and runs a review plan** against upstream artifacts. This document defines the arguments, input artifacts, output formats, exit codes, severity buckets (fail / warn / advisory), and the machine-readable output policy.
+`river review plan` is the River Review CLI subcommand that **generates and runs a review plan** against upstream artifacts. This document defines the arguments, input artifacts, output formats, exit codes, severity buckets (fail / warn / advisory), and the machine-readable output policy.
 
 > Related issues: #517 (Task) / #509 (Capability) / #507 (Epic)
 > Prerequisite: input artifacts follow the [Artifact Input Contract](./artifact-input-contract.en.md).
@@ -139,7 +139,7 @@ When `--advisory-only` is set, fail/warn judgement is disabled and only internal
 - **Review Artifact**: persist `--output json --output-file <path>` via the CI artifact upload step.
 - **GitHub Action**: `runners/github-action/action.yml` will map inputs onto this CLI (not yet implemented; tracked separately).
 - **Riverbed Memory**: only the JSON output is canonical for ingestion (see [Riverbed Storage](./riverbed-storage.en.md)).
-- **PR comments**: idempotent updates via the `<!-- river-reviewer -->` marker follow [Stable Interfaces](./stable-interfaces.en.md).
+- **PR comments**: idempotent updates via the `<!-- river-review -->` marker follow [Stable Interfaces](./stable-interfaces.en.md).
 
 ## Compatibility Policy
 

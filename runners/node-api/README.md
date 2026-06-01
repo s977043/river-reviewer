@@ -1,15 +1,15 @@
 # Node.js API Runner
 
-Node.js API interface for programmatic usage of River Reviewer in custom applications.
+Node.js API interface for programmatic usage of River Review in custom applications.
 
 ## Overview
 
-The Node API runner provides a TypeScript/JavaScript API for integrating River Reviewer into your Node.js applications. It enables programmatic skill loading, file review, and execution planning without requiring the CLI.
+The Node API runner provides a TypeScript/JavaScript API for integrating River Review into your Node.js applications. It enables programmatic skill loading, file review, and execution planning without requiring the CLI.
 
 ## Installation
 
 ```bash
-npm install @river-reviewer/node-api
+npm install @river-review/node-api
 ```
 
 ## Important Notes
@@ -19,7 +19,7 @@ npm install @river-reviewer/node-api
 ## Quick Start
 
 ```typescript
-import { review, loadSkills, buildExecutionPlan } from '@river-reviewer/node-api';
+import { review, loadSkills, buildExecutionPlan } from '@river-review/node-api';
 
 // Build execution plan (note: does not execute AI review)
 const results = await review({
@@ -212,7 +212,7 @@ if (result.success) {
 
 #### `getDefaultPaths()`
 
-Get default paths for River Reviewer.
+Get default paths for River Review.
 
 **Returns:** `{ repoRoot: string, skillsDir: string, schemaPath: string }`
 
@@ -308,7 +308,7 @@ See [src/types.ts](./src/types.ts) for complete type definitions including:
 ### Basic File Review
 
 ```typescript
-import { review } from '@river-reviewer/node-api';
+import { review } from '@river-review/node-api';
 
 async function reviewChanges() {
   const result = await review({
@@ -327,7 +327,7 @@ async function reviewChanges() {
 ### Custom Skill Loading and Filtering
 
 ```typescript
-import { loadSkills, selectSkills } from '@river-reviewer/node-api';
+import { loadSkills, selectSkills } from '@river-review/node-api';
 
 async function customReview() {
   // Load all midstream skills
@@ -355,7 +355,7 @@ async function customReview() {
 ### Execution Planning with Impact Analysis
 
 ```typescript
-import { buildExecutionPlan } from '@river-reviewer/node-api';
+import { buildExecutionPlan } from '@river-review/node-api';
 import { execSync } from 'child_process';
 
 async function planReview() {
@@ -384,8 +384,8 @@ async function planReview() {
 ### Integration with Custom AI Provider
 
 ```typescript
-import { loadSkills, buildExecutionPlan } from '@river-reviewer/node-api';
-import type { SkillDefinition, Finding } from '@river-reviewer/node-api';
+import { loadSkills, buildExecutionPlan } from '@river-review/node-api';
+import type { SkillDefinition, Finding } from '@river-review/node-api';
 
 async function executeWithCustomProvider(
   skill: SkillDefinition,
@@ -418,11 +418,11 @@ async function customReviewWorkflow() {
 
 ## AI Provider Integration Guide
 
-This guide explains how to integrate AI providers (OpenAI, Anthropic, etc.) with the River Reviewer Node API to execute skills and generate code review findings.
+This guide explains how to integrate AI providers (OpenAI, Anthropic, etc.) with the River Review Node API to execute skills and generate code review findings.
 
 ### Execution Model
 
-The River Reviewer Node API provides **execution plans**, not AI execution. This means:
+The River Review Node API provides **execution plans**, not AI execution. This means:
 
 1. **`review()`** - Returns which skills should be executed and against which files
 2. **`buildExecutionPlan()`** - Creates an optimized execution plan with skill prioritization
@@ -466,8 +466,8 @@ interface Finding {
 
 ```typescript
 import OpenAI from 'openai';
-import { buildExecutionPlan, loadSkills } from '@river-reviewer/node-api';
-import type { SkillDefinition, Finding, Severity } from '@river-reviewer/node-api';
+import { buildExecutionPlan, loadSkills } from '@river-review/node-api';
+import type { SkillDefinition, Finding, Severity } from '@river-review/node-api';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 
@@ -628,8 +628,8 @@ console.log(`Found ${result.summary.totalFindings} findings`);
 
 ````typescript
 import Anthropic from '@anthropic-ai/sdk';
-import { buildExecutionPlan } from '@river-reviewer/node-api';
-import type { SkillDefinition, Finding, Severity } from '@river-reviewer/node-api';
+import { buildExecutionPlan } from '@river-review/node-api';
+import type { SkillDefinition, Finding, Severity } from '@river-review/node-api';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 
@@ -810,7 +810,7 @@ console.log(`Found ${result.summary.totalFindings} findings`);
 When integrating with AI providers, implement proper error handling and rate limiting:
 
 ```typescript
-import type { SkillDefinition, Finding } from '@river-reviewer/node-api';
+import type { SkillDefinition, Finding } from '@river-review/node-api';
 
 // Simple rate limiter
 class RateLimiter {
@@ -947,7 +947,7 @@ Remove the `dist/` directory.
 
 ## Architecture
 
-The Node API runner is a thin wrapper around the core runner (`@river-reviewer/core-runner`) that provides:
+The Node API runner is a thin wrapper around the core runner (`@river-review/core-runner`) that provides:
 
 1. **Type Safety**: Full TypeScript type definitions for all APIs
 2. **Simplified Interface**: Clean, promise-based API surface
@@ -956,7 +956,7 @@ The Node API runner is a thin wrapper around the core runner (`@river-reviewer/c
 
 ## Dependencies
 
-- `@river-reviewer/core-runner` - Core skill loading and execution planning
+- `@river-review/core-runner` - Core skill loading and execution planning
 - `js-yaml` - YAML parsing for skill definitions
 - `minimatch` - Glob pattern matching for file routing
 
@@ -970,7 +970,7 @@ The Node API runner is a thin wrapper around the core runner (`@river-reviewer/c
 ## Notes
 
 - The `review()` and `evaluateSkill()` functions currently return execution plans but do not execute skills with AI providers. Actual execution requires custom AI provider integration.
-- For CLI usage, see the main `river-reviewer` CLI tool.
+- For CLI usage, see the main `river-review` CLI tool.
 - This package uses ESM (ES Modules) format.
 
 ## License

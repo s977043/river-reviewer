@@ -1,7 +1,7 @@
-name: River Reviewer (upstream)
+name: River Review (upstream)
 
 concurrency:
-  group: river-reviewer-upstream-${{ github.workflow }}-${{ github.ref }}
+  group: river-review-upstream-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 on:
@@ -35,15 +35,15 @@ on:
       - 'pages/migration/**/*.md'
       - 'pages/migration/**/*.mdx'
       - 'skills/upstream/**/*.md'
-      - '.github/workflows/river-reviewer-upstream.yml'
-      - '.river-reviewer.json'
+      - '.github/workflows/river-review-upstream.yml'
+      - '.river-review.json'
 
 permissions:
   contents: read
   pull-requests: write
 
 jobs:
-  river-reviewer:
+  river-review:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Run River Reviewer (upstream)
+      - name: Run River Review (upstream)
         uses: ./runners/github-action
         with:
           phase: upstream

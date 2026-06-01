@@ -1,6 +1,6 @@
 # Skill Policy (Operation Rules)
 
-This document is the rule set for "nurturing skills as operations" in River Reviewer. For how to write skills for authors, refer to `pages/guides/write-a-skill.en.md`.
+This document is the rule set for "nurturing skills as operations" in River Review. For how to write skills for authors, refer to `pages/guides/write-a-skill.en.md`.
 
 ## Purpose
 

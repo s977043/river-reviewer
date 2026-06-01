@@ -1,12 +1,12 @@
 # Runners Architecture Migration Guide
 
-This guide helps you migrate from River Reviewer v0.1.x to v0.2.0+, which introduces the new runners architecture.
+This guide helps you migrate from River Review v0.1.x to v0.2.0+, which introduces the new runners architecture.
 
 > **Status (as of 2026-04):** The current release line is **v0.14.x**, distributed under `runners/github-action`. v0.1.x is a legacy frozen release that predates the runners architecture and receives no further updates. If you are still pinned to `@v0.1.x`, follow this guide to move to the latest release tag (see [README](../../README.md) for the current version).
 
 ## Overview
 
-River Reviewer v0.2.0 refactored the codebase to clearly separate skills (the product) from execution environments (adapters). This change aligns with the "Skills as First-Class Assets" philosophy established in Epic #225.
+River Review v0.2.0 refactored the codebase to clearly separate skills (the product) from execution environments (adapters). This change aligns with the "Skills as First-Class Assets" philosophy established in Epic #225.
 
 ## What Changed?
 
@@ -16,7 +16,7 @@ River Reviewer v0.2.0 refactored the codebase to clearly separate skills (the pr
 
 ```text
 .
-├── .github/actions/river-reviewer/  # GitHub Action
+├── .github/actions/river-review/  # GitHub Action
 ├── src/lib/                         # Skill loader + runner
 └── skills/                          # Skill definitions
 ```
@@ -36,7 +36,7 @@ River Reviewer v0.2.0 refactored the codebase to clearly separate skills (the pr
 
 ### Breaking Changes
 
-1. **GitHub Action Path:** `.github/actions/river-reviewer` → `runners/github-action`
+1. **GitHub Action Path:** `.github/actions/river-review` → `runners/github-action`
 2. **Core Module Imports:** `src/lib/skill-loader.mjs` → `runners/core/skill-loader.mjs`
 
 ## Migration Steps
@@ -49,7 +49,7 @@ Check your workflow files (`.github/workflows/*.yml`):
 
 ```yaml
 # Find this line in your workflows
-uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+uses: s977043/river-review/.github/actions/river-review@v0.1.1
 ```
 
 #### Step 2: Update the Action Path
@@ -57,7 +57,7 @@ uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
 **Before (v0.1.x):**
 
 ```yaml
-name: River Reviewer
+name: River Review
 on:
   pull_request:
     branches: [main]
@@ -73,7 +73,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+      - uses: s977043/river-review/.github/actions/river-review@v0.1.1
         with:
           phase: midstream
         env:
@@ -83,7 +83,7 @@ jobs:
 **After (v0.2.0+):**
 
 ```yaml
-name: River Reviewer
+name: River Review
 on:
   pull_request:
     branches: [main]
@@ -99,7 +99,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+      - uses: s977043/river-review/runners/github-action@v0.2.0
         with:
           phase: midstream
         env:
@@ -109,7 +109,7 @@ jobs:
 #### Step 3: Test the Migration
 
 1. Create a test PR or trigger your workflow
-2. Verify the River Reviewer action runs successfully
+2. Verify the River Review action runs successfully
 3. Check that PR comments are posted correctly
 
 ### For Local Development (Contributors)
@@ -161,7 +161,7 @@ All tests should pass. If you encounter import errors, check that all paths have
 The new `runners/node-api/` provides a programmatic interface. Example usage:
 
 ```javascript
-import { review, loadSkills } from '@river-reviewer/node-api';
+import { review, loadSkills } from '@river-review/node-api';
 
 // Load skills for a specific phase
 const skills = await loadSkills({ phase: 'midstream' });
@@ -180,18 +180,18 @@ console.log(result.findings);
 
 ### Scenario 1: External Repository Using Published Action
 
-**Task:** Update workflow in your project that uses River Reviewer
+**Task:** Update workflow in your project that uses River Review
 
 **Solution:**
 
 1. Locate `.github/workflows/` in your repository
-2. Find files using `s977043/river-reviewer/.github/actions/river-reviewer`
-3. Replace with `s977043/river-reviewer/runners/github-action@v0.2.0`
+2. Find files using `s977043/river-review/.github/actions/river-review`
+3. Replace with `s977043/river-review/runners/github-action@v0.2.0`
 4. Commit and push
 
 ### Scenario 2: Fork with Custom Modifications
 
-**Task:** Update a forked version of River Reviewer
+**Task:** Update a forked version of River Review
 
 **Solution:**
 
@@ -209,10 +209,10 @@ console.log(result.findings);
 
 ```bash
 # Find all workflows using the old path
-grep -r "s977043/river-reviewer/.github/actions/river-reviewer" .github/workflows/
+grep -r "s977043/river-review/.github/actions/river-review" .github/workflows/
 
 # Use sed to replace (macOS/Linux)
-find .github/workflows -name "*.yml" -exec sed -i 's|s977043/river-reviewer/.github/actions/river-reviewer|s977043/river-reviewer/runners/github-action|g' {} +
+find .github/workflows -name "*.yml" -exec sed -i 's|s977043/river-review/.github/actions/river-review|s977043/river-review/runners/github-action|g' {} +
 
 # Verify changes
 git diff .github/workflows/
@@ -231,7 +231,7 @@ If you encounter issues after migration:
 Pin to v0.1.1 with the old path until you can debug:
 
 ```yaml
-- uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+- uses: s977043/river-review/.github/actions/river-review@v0.1.1
   with:
     phase: midstream
 ```
@@ -240,12 +240,12 @@ Pin to v0.1.1 with the old path until you can debug:
 
 If migration causes problems:
 
-1. Open an issue: [New Issue](https://github.com/s977043/river-reviewer/issues/new)
+1. Open an issue: [New Issue](https://github.com/s977043/river-review/issues/new)
 2. Use label: `migration-help`
 3. Include:
    - Your workflow file
    - Error messages
-   - River Reviewer version (before/after)
+   - River Review version (before/after)
 
 ## FAQ
 
@@ -274,12 +274,12 @@ What you miss while staying on v0.1.x:
 
 **A:** Update your fork to:
 
-1. Move `.github/actions/river-reviewer/` to `runners/github-action/`
+1. Move `.github/actions/river-review/` to `runners/github-action/`
 2. Move `src/lib/skill-loader.mjs` and `src/lib/review-runner.mjs` to `runners/core/`
 3. Update all import paths in tests and source files
 4. Update documentation
 
-See [Epic #242](https://github.com/s977043/river-reviewer/issues/242) for implementation details.
+See [Epic #242](https://github.com/s977043/river-review/issues/242) for implementation details.
 
 ### Q: How do I know if migration succeeded?
 
@@ -305,7 +305,7 @@ All feature and fix development happens on the current release line. v0.1.x rece
 ## Additional Resources
 
 - **DEPRECATED.md:** [Full deprecation notice](../deprecated.md)
-- **Epic #242:** [Architecture Refactoring Details](https://github.com/s977043/river-reviewer/issues/242)
+- **Epic #242:** [Architecture Refactoring Details](https://github.com/s977043/river-review/issues/242)
 - **Architecture Docs:** [docs/architecture.md](../architecture.md)
 - **Skills Concepts:** [Skills](../../pages/explanation/skills.en.md)
 
@@ -314,11 +314,11 @@ All feature and fix development happens on the current release line. v0.1.x rece
 Still stuck? Here's how to get help:
 
 1. **Check Examples:**
-   - [examples/example-1-hello-skill](../../examples/example-1-hello-skill/.github/workflows/river-reviewer.yml)
-   - [examples/example-2-upstream-only](../../examples/example-2-upstream-only/.github/workflows/river-reviewer.yml)
+   - [examples/example-1-hello-skill](../../examples/example-1-hello-skill/.github/workflows/river-review.yml)
+   - [examples/example-2-upstream-only](../../examples/example-2-upstream-only/.github/workflows/river-review.yml)
 
 2. **Search Issues:**
-   - [Open Issues](https://github.com/s977043/river-reviewer/issues)
+   - [Open Issues](https://github.com/s977043/river-review/issues)
    - Filter by `migration-help` label
 
 3. **Create New Issue:**
@@ -326,7 +326,7 @@ Still stuck? Here's how to get help:
    - Include: workflow file, error logs, versions
 
 4. **Ask Questions:**
-   - [GitHub Issues](https://github.com/s977043/river-reviewer/issues)
+   - [GitHub Issues](https://github.com/s977043/river-review/issues)
    - Labels: `question`, `migration`
 
 We're here to help make your migration smooth! 🚀

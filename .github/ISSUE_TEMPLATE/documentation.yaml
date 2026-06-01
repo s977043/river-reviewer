@@ -1,11 +1,11 @@
 name: "\U0001F4D6 Documentation"
-description: 'Request or propose documentation updates for River Reviewer.'
+description: 'Request or propose documentation updates for River Review.'
 title: '[Docs] '
 labels: ['type:docs', 'status:triage']
 body:
   - type: markdown
     attributes:
-      value: 'Help keep River Reviewer docs aligned with the Upstream → Midstream → Downstream flow.'
+      value: 'Help keep River Review docs aligned with the Upstream → Midstream → Downstream flow.'
   - type: dropdown
     id: phase
     attributes:

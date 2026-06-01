@@ -1,6 +1,6 @@
 # ガバナンス (Governance)
 
-本ドキュメントは River Reviewer の運用・意思決定の方針をまとめたものです。
+本ドキュメントは River Review の運用・意思決定の方針をまとめたものです。
 
 ## メンテナ
 
@@ -126,7 +126,7 @@ gh api --paginate 'repos/:owner/:repo/pulls/<N>/comments?per_page=100' \
 
 #### 関連
 
-- River Reviewer 利用者（レビュー対象側）から見た対応フローは `skills/midstream/rr-midstream-gh-address-comments-001/SKILL.md` を参照してください。本セクションはリポジトリメンテナ視点のマージ前チェックリストです。
+- River Review 利用者（レビュー対象側）から見た対応フローは `skills/midstream/rr-midstream-gh-address-comments-001/SKILL.md` を参照してください。本セクションはリポジトリメンテナ視点のマージ前チェックリストです。
 
 ## Breaking change の扱い
 
@@ -140,5 +140,5 @@ gh api --paginate 'repos/:owner/:repo/pulls/<N>/comments?per_page=100' \
 - メンテナが以下の観点でラベル付け・優先度付けします
   - 優先度: `P0`（緊急）/ `P1`（高）/ `P2`（中）
   - フェーズ: `Phase 1` / `Phase 2` / `Phase 3`（または `Backlog`）—ロードマップ上の開発段階
-- ラベル一覧: [Labels](https://github.com/s977043/river-reviewer/labels)
-- Issue テンプレート: [Issue templates](https://github.com/s977043/river-reviewer/issues/new/choose)
+- ラベル一覧: [Labels](https://github.com/s977043/river-review/labels)
+- Issue テンプレート: [Issue templates](https://github.com/s977043/river-review/issues/new/choose)

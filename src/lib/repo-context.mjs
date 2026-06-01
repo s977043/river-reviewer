@@ -1,5 +1,5 @@
 /**
- * Repo-wide context collector for River Reviewer.
+ * Repo-wide context collector for River Review.
  * Gathers full file text, corresponding tests, symbol usages, and config
  * snippets relevant to the changed files, within a configurable token budget.
  */

@@ -37,7 +37,7 @@ exclude = [
   # Upstream openai/skills repository moves `.experimental` / `.curated`
   # subdirectories around; these references are documentation pointers
   # in Codex-installed agent skills (.codex/) and don't need to be
-  # perpetually live for river-reviewer functionality.
+  # perpetually live for river-review functionality.
   '^https?://github\.com/openai/skills/tree/.+/skills/\.',
 
   # openai.com/pricing returns 403 to bot user-agents (Cloudflare challenge);
@@ -72,7 +72,7 @@ include_fragments = true
 cache = true
 
 # User agent string
-user_agent = "Mozilla/5.0 (compatible; River-Reviewer-LinkChecker/1.0; +https://github.com/s977043/river-reviewer)"
+user_agent = "Mozilla/5.0 (compatible; River-Reviewer-LinkChecker/1.0; +https://github.com/s977043/river-review)"
 
 # Timeout per request (in seconds)
 timeout = 30

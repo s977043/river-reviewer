@@ -1,6 +1,6 @@
 # Review Output Examples
 
-River Reviewer が生成するレビュー出力の例です。Summary / Comments / Suggestions を含み、実際の AI レビューに近いトーンで記載しています。
+River Review が生成するレビュー出力の例です。Summary / Comments / Suggestions を含み、実際の AI レビューに近いトーンで記載しています。
 
 ## Upstream (設計フェーズ)
 

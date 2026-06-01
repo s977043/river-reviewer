@@ -11,7 +11,7 @@ goldens + promptfoo eval in CI.
 
 ## Phase context
 
-Phase 1 of [#911](https://github.com/s977043/river-reviewer/issues/911):
+Phase 1 of [#911](https://github.com/s977043/river-review/issues/911):
 skill body + fixtures + eval scaffolding only. Phase 2 will add artifact
 contract extensions (`findings[]` provenance fields, schema `inputContext`
 enum additions). Phase 3 will add CLI / Actions ensemble mode.

@@ -1,6 +1,6 @@
 # Runners Architecture Guide
 
-This guide provides a comprehensive overview of the new runners architecture introduced in River Reviewer v0.2.0, explaining the architectural decisions, component relationships, and how to work with each runner.
+This guide provides a comprehensive overview of the new runners architecture introduced in River Review v0.2.0, explaining the architectural decisions, component relationships, and how to work with each runner.
 
 ## Overview
 
@@ -33,7 +33,7 @@ The runners architecture is a modular system that separates **skill execution** 
 **Before (v0.1.x):**
 
 - Single monolithic CLI (`src/cli.mjs`) handling all execution contexts
-- GitHub Action embedded in `.github/actions/river-reviewer/`
+- GitHub Action embedded in `.github/actions/river-review/`
 - Core logic mixed with CLI argument parsing
 - No programmatic API for Node.js applications
 
@@ -62,7 +62,7 @@ The runners architecture is a modular system that separates **skill execution** 
 .
 ├── .github/
 │   └── actions/
-│       └── river-reviewer/    # GitHub Action (tightly coupled)
+│       └── river-review/    # GitHub Action (tightly coupled)
 │           ├── action.yml
 │           └── post-comment.cjs
 ├── src/
@@ -116,13 +116,13 @@ The runners architecture is a modular system that separates **skill execution** 
 
 ### Entry Point Mapping
 
-| Use Case           | Old (v0.1.x)                     | New (v0.2.0+)                    | Notes                                    |
-| ------------------ | -------------------------------- | -------------------------------- | ---------------------------------------- |
-| CLI local review   | `src/cli.mjs run`                | `runners/cli/` (`river review`)  | New commands: `review`, `eval`, `create` |
-| GitHub Action      | `.github/actions/river-reviewer` | `runners/github-action/`         | Path changed in workflow files           |
-| Skill loading      | `src/lib/skill-loader.mjs`       | `runners/core/skill-loader.mjs`  | Centralized in core                      |
-| Execution planning | `src/lib/review-runner.mjs`      | `runners/core/review-runner.mjs` | Centralized in core                      |
-| Programmatic API   | (none)                           | `runners/node-api/`              | New in v0.2.0                            |
+| Use Case           | Old (v0.1.x)                   | New (v0.2.0+)                    | Notes                                    |
+| ------------------ | ------------------------------ | -------------------------------- | ---------------------------------------- |
+| CLI local review   | `src/cli.mjs run`              | `runners/cli/` (`river review`)  | New commands: `review`, `eval`, `create` |
+| GitHub Action      | `.github/actions/river-review` | `runners/github-action/`         | Path changed in workflow files           |
+| Skill loading      | `src/lib/skill-loader.mjs`     | `runners/core/skill-loader.mjs`  | Centralized in core                      |
+| Execution planning | `src/lib/review-runner.mjs`    | `runners/core/review-runner.mjs` | Centralized in core                      |
+| Programmatic API   | (none)                         | `runners/node-api/`              | New in v0.2.0                            |
 
 ## Core Runner
 
@@ -232,7 +232,7 @@ function evaluateSkill(skill, options) {
 
 ## CLI Runner
 
-The CLI runner (`runners/cli/`) provides a modern command-line interface for River Reviewer.
+The CLI runner (`runners/cli/`) provides a modern command-line interface for River Review.
 
 ### Available Commands
 
@@ -323,7 +323,7 @@ The GitHub Action runner (`runners/github-action/`) provides CI/CD integration.
 ### Basic Usage
 
 ```yaml
-name: River Reviewer
+name: River Review
 
 on:
   pull_request:
@@ -339,7 +339,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+      - uses: s977043/river-review/runners/github-action@v0.2.0
         with:
           phase: midstream
           dry_run: false
@@ -371,7 +371,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+      - uses: s977043/river-review/runners/github-action@v0.2.0
         with:
           phase: upstream
         env:
@@ -382,7 +382,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@v0.2.0
+      - uses: s977043/river-review/runners/github-action@v0.2.0
         with:
           phase: midstream
         env:
@@ -396,13 +396,13 @@ The Node API runner (`runners/node-api/`) provides a programmatic TypeScript/Jav
 ### Installation
 
 ```bash
-npm install @river-reviewer/node-api
+npm install @river-review/node-api
 ```
 
 ### Quick Start
 
 ```typescript
-import { review, loadSkills, buildExecutionPlan } from '@river-reviewer/node-api';
+import { review, loadSkills, buildExecutionPlan } from '@river-review/node-api';
 
 // Build execution plan
 const result = await review({
@@ -481,13 +481,13 @@ See `runners/node-api/src/types.ts` for complete type definitions.
 **Before (v0.1.x):**
 
 ```yaml
-uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+uses: s977043/river-review/.github/actions/river-review@v0.1.1
 ```
 
 **After (v0.2.0+):**
 
 ```yaml
-uses: s977043/river-reviewer/runners/github-action@v0.2.0
+uses: s977043/river-review/runners/github-action@v0.2.0
 ```
 
 ### Core Module Imports
@@ -525,8 +525,8 @@ The new CLI adds commands that complement the legacy CLI:
 
    ```yaml
    # Find and replace in .github/workflows/*.yml
-   # Old: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.x
-   # New: s977043/river-reviewer/runners/github-action@v0.2.0
+   # Old: s977043/river-review/.github/actions/river-review@v0.1.x
+   # New: s977043/river-review/runners/github-action@v0.2.0
    ```
 
 2. **Test the migration:**
@@ -558,13 +558,13 @@ The new CLI adds commands that complement the legacy CLI:
 1. **Install the Node API:**
 
    ```bash
-   npm install @river-reviewer/node-api
+   npm install @river-review/node-api
    ```
 
 2. **Update imports:**
 
    ```typescript
-   import { loadSkills, buildExecutionPlan } from '@river-reviewer/node-api';
+   import { loadSkills, buildExecutionPlan } from '@river-review/node-api';
    ```
 
 ## Troubleshooting
@@ -638,7 +638,7 @@ plan.skipped.forEach(({ skill, reasons }) => {
 
 ## Getting Help
 
-1. **Check existing issues:** [GitHub Issues](https://github.com/s977043/river-reviewer/issues)
+1. **Check existing issues:** [GitHub Issues](https://github.com/s977043/river-review/issues)
 2. **Search with labels:** `migration-help`, `runners`
 3. **Create new issue:** Include workflow file, error logs, and versions
-4. **Reference Epic #242:** [Runners Architecture Refactoring](https://github.com/s977043/river-reviewer/issues/242)
+4. **Reference Epic #242:** [Runners Architecture Refactoring](https://github.com/s977043/river-review/issues/242)

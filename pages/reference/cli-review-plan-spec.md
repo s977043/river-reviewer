@@ -2,7 +2,7 @@
 title: river review plan CLI 仕様
 ---
 
-`river review plan` は River Reviewer が提供する CLI サブコマンドのうち、上流アーティファクトに対して **レビュー計画（plan）を生成・実行する** エントリポイントです。本ドキュメントは引数、入力アーティファクト、出力フォーマット、終了コード、severity 区分（fail / warn / advisory）、machine-readable 出力方針を定義します。
+`river review plan` は River Review が提供する CLI サブコマンドのうち、上流アーティファクトに対して **レビュー計画（plan）を生成・実行する** エントリポイントです。本ドキュメントは引数、入力アーティファクト、出力フォーマット、終了コード、severity 区分（fail / warn / advisory）、machine-readable 出力方針を定義します。
 
 > 関連 Issue: #517（Task）/ #509（Capability）/ #507（Epic）
 > 前提: 入力アーティファクトの契約は [Artifact Input Contract](./artifact-input-contract.md) に従う。
@@ -139,7 +139,7 @@ severity の内部語彙（`blocker` / `warning` / `nit`）と JSON スキーマ
 - **Review Artifact**: `--output json --output-file <path>` を CI の artifact upload で永続化することを推奨する。
 - **GitHub Action**: `runners/github-action/action.yml` の inputs から本 CLI へのマッピングを提供する（未実装、別途対応予定）。
 - **Riverbed Memory**: 取り込み入力としては JSON 出力のみを正とする（参考: [Riverbed Storage](./riverbed-storage.md)）。
-- **PR コメント**: idempotent 更新（`<!-- river-reviewer -->` marker）の方針は [Stable Interfaces](./stable-interfaces.md) を継承する。
+- **PR コメント**: idempotent 更新（`<!-- river-review -->` marker）の方針は [Stable Interfaces](./stable-interfaces.md) を継承する。
 
 ## 互換性ポリシー
 

@@ -1,10 +1,10 @@
 # Issue Management (Templates / Labels)
 
-River Reviewer uses templates and labels to facilitate Issue triage and prioritization.
+River Review uses templates and labels to facilitate Issue triage and prioritization.
 
 ## Issue Templates
 
-Create from `Issues -> New issue` (or [issues/new/choose](https://github.com/s977043/river-reviewer/issues/new/choose)).
+Create from `Issues -> New issue` (or [issues/new/choose](https://github.com/s977043/river-review/issues/new/choose)).
 
 ## Label Guidelines
 

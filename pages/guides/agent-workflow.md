@@ -1,8 +1,8 @@
-# AI エージェントから River Reviewer を使う
+# AI エージェントから River Review を使う
 
 ## 概要
 
-River Reviewer は CLI ベースのツールなので、Claude Code / Cursor / Codex CLI / GitHub Copilot などどの AI エージェントからも利用できます。エージェントの種類に関わらず、`river run .` コマンドを呼び出すだけで動きます。
+River Review は CLI ベースのツールなので、Claude Code / Cursor / Codex CLI / GitHub Copilot などどの AI エージェントからも利用できます。エージェントの種類に関わらず、`river run .` コマンドを呼び出すだけで動きます。
 
 ---
 
@@ -45,13 +45,13 @@ river run . --output json
 
 ## エージェント別の呼び出し方
 
-| エージェント   | 呼び出し方                                | 専用定義ファイル                            |
-| -------------- | ----------------------------------------- | ------------------------------------------- |
-| Claude Code    | Bash ツール / `/review-local` / sub-agent | `.claude/agents/river-reviewer.md`          |
-| Cursor         | Terminal タブ / `@terminal`               | —                                           |
-| Codex CLI      | `codex exec "river run ."`                | —                                           |
-| GitHub Copilot | ターミナルで直接実行                      | `.github/agents/river-reviewer.agent.md`    |
-| その他         | シェルで `river run .`                    | `agents/examples/river-reviewer.agent.yaml` |
+| エージェント   | 呼び出し方                                | 専用定義ファイル                          |
+| -------------- | ----------------------------------------- | ----------------------------------------- |
+| Claude Code    | Bash ツール / `/review-local` / sub-agent | `.claude/agents/river-review.md`          |
+| Cursor         | Terminal タブ / `@terminal`               | —                                         |
+| Codex CLI      | `codex exec "river run ."`                | —                                         |
+| GitHub Copilot | ターミナルで直接実行                      | `.github/agents/river-review.agent.md`    |
+| その他         | シェルで `river run .`                    | `agents/examples/river-review.agent.yaml` |
 
 ### Claude Code
 
@@ -68,10 +68,10 @@ river run . --reviewers auto
 ```
 
 ```text
-river-reviewer に現在の diff をレビューしてもらってください
+river-review に現在の diff をレビューしてもらってください
 ```
 
-専用定義: `.claude/agents/river-reviewer.md`
+専用定義: `.claude/agents/river-review.md`
 
 ### Cursor
 
@@ -93,7 +93,7 @@ codex exec "river run . --reviewers auto"
 
 ### GitHub Copilot
 
-`.github/agents/river-reviewer.agent.md` が定義済みです。ターミナルで `river run .` を実行するか、Copilot に「`river run .` を実行してレビュー結果を確認して」と指示してください。
+`.github/agents/river-review.agent.md` が定義済みです。ターミナルで `river run .` を実行するか、Copilot に「`river run .` を実行してレビュー結果を確認して」と指示してください。
 
 ### その他のエージェント
 
@@ -105,14 +105,14 @@ codex exec "river run . --reviewers auto"
 
 `skills/agent-skills/` に**エージェント非依存の skill 定義**があります。どのエージェントにも渡せます。
 
-| Skill                         | 用途                                                        |
-| ----------------------------- | ----------------------------------------------------------- |
-| `river-reviewer`              | メインレビュー（intent 分類 → 専門 skill へのルーティング） |
-| `river-reviewer-code`         | コードレビュー特化                                          |
-| `river-reviewer-security`     | セキュリティレビュー                                        |
-| `river-reviewer-testing`      | テストカバレッジ                                            |
-| `river-reviewer-architecture` | アーキテクチャレビュー                                      |
-| `adversarial-review`          | 逆張りレビュー（前提を疑う）                                |
+| Skill                       | 用途                                                        |
+| --------------------------- | ----------------------------------------------------------- |
+| `river-review`              | メインレビュー（intent 分類 → 専門 skill へのルーティング） |
+| `river-review-code`         | コードレビュー特化                                          |
+| `river-review-security`     | セキュリティレビュー                                        |
+| `river-review-testing`      | テストカバレッジ                                            |
+| `river-review-architecture` | アーキテクチャレビュー                                      |
+| `adversarial-review`        | 逆張りレビュー（前提を疑う）                                |
 
 エージェントに skill を渡す際は、`skills/agent-skills/<skill-name>/SKILL.md` を読み込ませてください。
 

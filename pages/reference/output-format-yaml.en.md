@@ -1,10 +1,10 @@
 ---
 id: output-format-yaml-en
 title: YAML Output Format (Scoring + Verdict)
-description: River Reviewer YAML output format with scoring and verdict model.
+description: River Review YAML output format with scoring and verdict model.
 ---
 
-River Reviewer emits a structured YAML block plus a human-readable summary when you pass `--output yaml` (CLI) or `output_format: yaml` (GitHub Action). This format targets external CI integrations and BI dashboards.
+River Review emits a structured YAML block plus a human-readable summary when you pass `--output yaml` (CLI) or `output_format: yaml` (GitHub Action). This format targets external CI integrations and BI dashboards.
 
 ## CLI
 
@@ -15,7 +15,7 @@ npx river run . --output yaml
 ## GitHub Action
 
 ```yaml
-- uses: s977043/river-reviewer/runners/github-action@v0.68.0
+- uses: s977043/river-review/runners/github-action@v0.68.0
   with:
     output_format: yaml
 ```
@@ -99,7 +99,7 @@ Each axis starts at 100 and is deducted per finding by severity.
 ## Important caveats
 
 - **`derived: true` flag**: The score is a deterministic, heuristic indicator—not an LLM-generated qualitative judgment. Do not use it as the sole merge criterion.
-- **`auto-approve` does not override HITL**: River Reviewer's policy assumes human review. The `auto-approve` verdict is an informational signal for automation tools, not a delegation of merge authority.
+- **`auto-approve` does not override HITL**: River Review's policy assumes human review. The `auto-approve` verdict is an informational signal for automation tools, not a delegation of merge authority.
 - **Rubric customization**: Currently hardcoded in `src/lib/scoring/rubric.mjs`. Per-project tuning via `config/scoring-rubric.json` is a future work item.
 
 ## References

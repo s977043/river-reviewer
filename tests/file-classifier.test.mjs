@@ -46,7 +46,7 @@ test('classifyChangedFiles: config patterns', () => {
     '.eslintrc.json',
     '.env.example',
     'jest.config.js',
-    '.river-reviewer.json',
+    '.river-review.json',
   ]);
   assert.equal(result.config.length, 5);
 });

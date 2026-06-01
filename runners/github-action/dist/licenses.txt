@@ -216,7 +216,7 @@ Apache-2.0
    limitations under the License.
 
 
-@river-reviewer/core-runner
+@river-review/core-runner
 
 @stablelib/base64
 MIT

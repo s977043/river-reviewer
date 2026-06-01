@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Regression evaluation runner for River Reviewer governance features.
+ * Regression evaluation runner for River Review governance features.
  * Usage: node scripts/evaluate-regression.mjs [--cases <path>] [--verbose]
  */
 import path from 'node:path';

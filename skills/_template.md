@@ -77,7 +77,7 @@ Why: このスキルがこのパターン構成を採る理由を1文で
 
 ## Output / 出力（短文版の推奨）
 
-River Reviewerのコメントは`<file>:<line>: <message>`形式です。`<message>`は短くても、次が伝わる形にします。
+River Reviewのコメントは`<file>:<line>: <message>`形式です。`<message>`は短くても、次が伝わる形にします。
 コメントは日本語で返す。
 
 - Finding: 何が問題か（1文）

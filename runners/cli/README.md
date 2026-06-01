@@ -1,10 +1,10 @@
-# River Reviewer CLI
+# River Review CLI
 
-Command-line interface for River Reviewer, providing direct access to code review functionality from the terminal.
+Command-line interface for River Review, providing direct access to code review functionality from the terminal.
 
 ## Installation
 
-The CLI is part of the River Reviewer monorepo. To use it:
+The CLI is part of the River Review monorepo. To use it:
 
 ```bash
 # From the repository root

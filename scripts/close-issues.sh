@@ -4,7 +4,7 @@ set -e
 # Issue クローズ用スクリプト
 # 使用方法: ./scripts/close-issues.sh [PR番号]
 
-REPO="s977043/river-reviewer"
+REPO="s977043/river-review"
 PR_NUMBER="${1:-}"
 
 if [ -z "$PR_NUMBER" ]; then
@@ -20,7 +20,7 @@ echo ""
 
 # Issue #198: リンクチェック失敗
 echo ">>> Issue #198 をクローズします..."
-gh issue close 198 --repo "$REPO" --comment "READMEのProjectsリンクを修正しました（\`https://github.com/users/s977043/projects/2\` → \`https://github.com/s977043/river-reviewer/projects\`）。
+gh issue close 198 --repo "$REPO" --comment "READMEのProjectsリンクを修正しました（\`https://github.com/users/s977043/projects/2\` → \`https://github.com/s977043/river-review/projects\`）。
 
 対応PR: #${PR_NUMBER}
 

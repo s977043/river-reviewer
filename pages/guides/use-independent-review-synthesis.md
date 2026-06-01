@@ -2,10 +2,10 @@
 
 複数の AI / 人間レビュー結果を統合し、merge 判断を支援するための skill。
 Nolan Lawson 氏の Triple Agent skill にインスパイアされつつ、ツール固定を避け、
-River Reviewer の artifact-driven 思想に合わせて再構成した「synthesis pattern」。
+River Review の artifact-driven 思想に合わせて再構成した「synthesis pattern」。
 
 - 該当 skill: `rr-midstream-independent-review-synthesis-001`
-- 関連 epic: [#911](https://github.com/s977043/river-reviewer/issues/911)
+- 関連 epic: [#911](https://github.com/s977043/river-review/issues/911)
 - ステータス: Phase 1 (community / `recommended: false`)。Phase 2 で artifact contract 拡張、Phase 3 で CLI ensemble mode を予定。
 
 ## いつ使うか

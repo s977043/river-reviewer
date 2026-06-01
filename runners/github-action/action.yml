@@ -1,5 +1,5 @@
-name: 'River Reviewer'
-description: 'Run River Reviewer CLI with phase-aware planning.'
+name: 'River Review'
+description: 'Run River Review CLI with phase-aware planning.'
 inputs:
   phase:
     description: 'Review phase (upstream|midstream|downstream).'
@@ -55,7 +55,7 @@ runs:
     - uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node_version }}
-    - name: Run River Reviewer
+    - name: Run River Review
       id: river
       shell: bash
       env:
@@ -94,12 +94,12 @@ runs:
         echo "Running: ${cmd[*]}"
 
         if [ "${output_fmt}" = "json" ]; then
-          json_out="${RUNNER_TEMP}/river-reviewer-output.json"
+          json_out="${RUNNER_TEMP}/river-review-output.json"
           "${cmd[@]}" > "${json_out}"
           echo "json_path=${json_out}" >> "${GITHUB_OUTPUT}"
           cat "${json_out}"
         else
-          out="${RUNNER_TEMP}/river-reviewer-comment.md"
+          out="${RUNNER_TEMP}/river-review-comment.md"
           "${cmd[@]}" | tee "${out}"
           echo "comment_path=${out}" >> "${GITHUB_OUTPUT}"
         fi

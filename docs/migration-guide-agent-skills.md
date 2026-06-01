@@ -1,16 +1,16 @@
 # Agent Skills 対応 移行ガイド (v0.8.0)
 
-River Reviewer v0.8.0 では、標準化されたレビュー体験を提供するため、Agent Skills 公式仕様への完全準拠を行いました。
+River Review v0.8.0 では、標準化されたレビュー体験を提供するため、Agent Skills 公式仕様への完全準拠を行いました。
 
 ## 主な変更点
 
 1. **ディレクトリ構造の変更**:
    - `skills/` 直下にフラットに置かれていたスキルファイル群に加え、標準化された `skills/agent-skills/` ディレクトリが導入されました。
-   - 一般ユーザーは `skills/agent-skills/river-reviewer/SKILL.md` を入口スキルとして使用することが推奨されます。
+   - 一般ユーザーは `skills/agent-skills/river-review/SKILL.md` を入口スキルとして使用することが推奨されます。
 
 2. **ルーティング機能の導入**:
-   - `river-reviewer` 入口スキルが導入され、レビュー依頼の内容に応じて専門スキルへ自動的にルーティングされます。
-   - 例: 「セキュリティ」という言葉が含まれる場合 → `river-reviewer-security` スキルへ
+   - `river-review` 入口スキルが導入され、レビュー依頼の内容に応じて専門スキルへ自動的にルーティングされます。
+   - 例: 「セキュリティ」という言葉が含まれる場合 → `river-review-security` スキルへ
 
 3. **バリデーションの厳格化**:
    - `npm run agent-skills:validate` コマンドが追加され、公式仕様（YAML Frontmatter, ファイル命名規則など）への準拠が CI/pre-commit でチェックされます。

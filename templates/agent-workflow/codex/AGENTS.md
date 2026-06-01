@@ -1,8 +1,8 @@
-# AGENTS.md — River Reviewer integration
+# AGENTS.md — River Review integration
 
 ## Code review
 
-Before finalizing any code change, run River Reviewer to catch issues:
+Before finalizing any code change, run River Review to catch issues:
 
 ```bash
 river run . --reviewers auto

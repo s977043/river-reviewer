@@ -1,13 +1,13 @@
 # Integrating with GitHub Actions
 
-Wire River Reviewer into your repository so every PR gets phase-aware feedback.
+Wire River Review into your repository so every PR gets phase-aware feedback.
 
 ## 1. Add the workflow
 
 Create `.github/workflows/river-review.yml`:
 
 ```yaml
-name: River Reviewer
+name: River Review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@v0.68.0
+      - uses: s977043/river-review/runners/github-action@v0.68.0
         with:
           phase: midstream
           dry_run: true
@@ -35,7 +35,7 @@ jobs:
 
 ## 2. Keep credentials out of the flow
 
-- By default, River Reviewer doesn't require credentials or API keys.
+- By default, River Review doesn't require credentials or API keys.
 - If the reviewer needs extra context or external API access, pass tokens via repository or organization secrets and document which secrets are needed.
 
 ## 3. Tune for phases

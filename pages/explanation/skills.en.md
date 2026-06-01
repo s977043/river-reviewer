@@ -2,7 +2,7 @@
 id: skills-en
 ---
 
-# Skills: The Heart of River Reviewer
+# Skills: The Heart of River Review
 
 ## What is a Skill?
 
@@ -647,4 +647,4 @@ npx promptfoo eval
 3. **Test with fixtures** - Add test cases and run `promptfoo eval`
 4. **Share with your team** - Skills are shareable across projects
 
-Skills are the heart of River Reviewer. By encoding team knowledge as reproducible, testable assets, you build a living library of code review expertise that grows with your team.
+Skills are the heart of River Review. By encoding team knowledge as reproducible, testable assets, you build a living library of code review expertise that grows with your team.

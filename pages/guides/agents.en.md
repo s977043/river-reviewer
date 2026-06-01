@@ -26,7 +26,7 @@ agents/
    - Copy existing examples and replace fields.
    - Do not include extra fields (Schema uses `additionalProperties: false`).
 
-3. Add/Update checklists under `.github/river-reviewer/checklists/`
+3. Add/Update checklists under `.github/river-review/checklists/`
    - Add necessary categories like `security.md`, `language/*.md`, `quality/*.md`.
    - Use the PocketEitan examples as a reference to write bullet points that AI agents can review.
 

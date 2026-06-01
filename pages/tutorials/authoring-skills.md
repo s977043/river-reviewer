@@ -1,6 +1,6 @@
 # スキルの作り方
 
-River Reviewer では、各フェーズ向けのチェックを「スキル」として追加します。スキルは YAML frontmatter + Markdown で定義し、`schemas/skill.schema.json` に準拠します。
+River Review では、各フェーズ向けのチェックを「スキル」として追加します。スキルは YAML frontmatter + Markdown で定義し、`schemas/skill.schema.json` に準拠します。
 
 ## 基本ルール
 

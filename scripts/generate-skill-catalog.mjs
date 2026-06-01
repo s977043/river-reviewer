@@ -94,7 +94,7 @@ async function main() {
     const lines = [
       '# Skills Catalog',
       '',
-      'River Reviewer に同梱されているスキル一覧です。フェーズ別に分類しています。',
+      'River Review に同梱されているスキル一覧です。フェーズ別に分類しています。',
       '',
     ];
 

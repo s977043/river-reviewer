@@ -29,17 +29,17 @@ jobs:
       - name: Build node-api
         run: npm run build --workspace runners/node-api
 
-      - name: Publish @river-reviewer/core-runner
+      - name: Publish @river-review/core-runner
         run: npm publish --workspace runners/core
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish @river-reviewer/node-api
+      - name: Publish @river-review/node-api
         run: npm publish --workspace runners/node-api
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish @river-reviewer/cli-runner
+      - name: Publish @river-review/cli-runner
         run: npm publish --workspace runners/cli
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

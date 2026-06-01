@@ -27,7 +27,7 @@ import { severityToPriority } from './lib/finding-format.mjs';
 
 const MAX_PROMPT_PREVIEW_LENGTH = 800;
 const MAX_DIFF_PREVIEW_LINES = 200;
-const COMMENT_MARKER = '<!-- river-reviewer -->';
+const COMMENT_MARKER = '<!-- river-review -->';
 
 function printHintLines(lines = []) {
   const hints = lines.filter(Boolean);
@@ -40,10 +40,10 @@ function printHelp() {
   console.log(`Usage: river <command> <path> [options]
 
 Commands:
-  run <path>            Run River Reviewer locally against the git repo at <path>
+  run <path>            Run River Review locally against the git repo at <path>
   skills <path>         Run the new Skill-based Reviewer architecture
-  skills import         Import Agent Skills (SKILL.md) into River Reviewer
-  skills export         Export River Reviewer skills to Agent Skills format
+  skills import         Import Agent Skills (SKILL.md) into River Review
+  skills export         Export River Review skills to Agent Skills format
   skills list           List all skills (RR and Agent Skills)
   doctor <path>         Check setup and print hints for common issues
   review plan           Resolve upstream artifacts and emit a Review Artifact
@@ -688,7 +688,7 @@ function formatRiskSummaryMarkdown(plan) {
 
 function printMarkdownReport(result, phase) {
   const header = `${COMMENT_MARKER}
-## River Reviewer
+## River Review
 
 - フェーズ: \`${phase}\`
 ${formatDebugSummaryMarkdown(result)}
@@ -1074,7 +1074,7 @@ async function main(argv = process.argv.slice(2)) {
         return renderDiffText([fileData]);
       };
 
-      console.log(`River Reviewer (Skills) - Target: ${targetPath}`);
+      console.log(`River Review (Skills) - Target: ${targetPath}`);
       const results = await dispatcher.run(
         repoDiff.changedFiles,
         getFileDiff,
@@ -1237,7 +1237,7 @@ async function main(argv = process.argv.slice(2)) {
 
       const apiKey = process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
 
-      console.log(`River Reviewer doctor
+      console.log(`River Review doctor
 Repo: ${result.repoRoot}
 Base branch: ${result.defaultBranch}
 Merge base: ${result.mergeBase}
@@ -1300,7 +1300,7 @@ Dependencies: ${
       parsed.output === 'markdown' || parsed.output === 'json' || parsed.output === 'yaml'
         ? console.error
         : console.log;
-    logRunHeader(`River Reviewer (local)
+    logRunHeader(`River Review (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}
 Base branch: ${context.defaultBranch}

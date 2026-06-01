@@ -67,7 +67,7 @@ export function buildReviewEntry(reviewResult, { phase, changedFiles, commit } =
     content: JSON.stringify({ commentCount, phase, changedFiles: changedFiles?.slice(0, 20) }),
     metadata: {
       createdAt: timestamp,
-      author: 'river-reviewer',
+      author: 'river-review',
       ...(phase ? { phase } : {}),
       tags: ['review', 'automated'],
       relatedFiles: changedFiles?.slice(0, 50) ?? [],

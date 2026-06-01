@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://river-reviewer.vercel.app/schemas/review-artifact.schema.json",
-  "title": "River Reviewer Review Artifact",
-  "description": "Structured output for a complete River Reviewer run, covering plan, context, findings, and debug info.",
+  "title": "River Review Review Artifact",
+  "description": "Structured output for a complete River Review run, covering plan, context, findings, and debug info.",
   "type": "object",
   "required": ["version", "timestamp", "phase", "status"],
   "additionalProperties": false,

@@ -2,7 +2,7 @@
 title: Planner Evaluation Dataset (Offline Evaluation)
 ---
 
-This is an evaluation set to **offline reproduce and evaluate** the quality of Planner's "skill selection & ordering" for River Reviewer v0.3 (Smart Reviewer).
+This is an evaluation set to **offline reproduce and evaluate** the quality of Planner's "skill selection & ordering" for River Review v0.3 (Smart Reviewer).
 
 ## What to Evaluate
 

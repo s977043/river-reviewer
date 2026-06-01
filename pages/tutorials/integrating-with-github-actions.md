@@ -1,13 +1,13 @@
 # GitHub Actions との連携
 
-River Reviewer をリポジトリへ組み込み、すべての PR でフェーズを意識したフィードバックが得られるようにする。
+River Review をリポジトリへ組み込み、すべての PR でフェーズを意識したフィードバックが得られるようにする。
 
 ## 1. ワークフローの追加
 
 `.github/workflows/river-review.yml` を作成します:
 
 ```yaml
-name: River Reviewer
+name: River Review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@v0.68.0
+      - uses: s977043/river-review/runners/github-action@v0.68.0
         with:
           phase: midstream
           dry_run: true
@@ -35,7 +35,7 @@ jobs:
 
 ## 2. クレデンシャルをフローから分離する
 
-- デフォルトでは、River Reviewer はクレデンシャルや API キーを必要としない。
+- デフォルトでは、River Review はクレデンシャルや API キーを必要としない。
 - レビューアが追加のコンテキストや外部 API アクセスを必要とする場合は、リポジトリまたは組織の Secrets 経由でトークンを渡し、必要な Secrets を文書化する。
 
 ## 3. フェーズごとの調整

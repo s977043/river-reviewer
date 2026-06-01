@@ -1,6 +1,6 @@
 # Runner CLI Reference
 
-Use the Runner CLI to validate River Reviewer agents and skills locally or in CI.
+Use the Runner CLI to validate River Review agents and skills locally or in CI.
 A lightweight Python runner outputs structured review results that follow `schemas/output.schema.json`.
 Install the required dependency with `pip install jsonschema` before running the Python example.
 
@@ -10,7 +10,7 @@ The `--reviewers` flag on `river run` accepts a comma-separated list of role nam
 
 ### `auto` keyword
 
-When `--reviewers auto` is specified, River Reviewer analyzes the diff content and selects reviewer roles automatically. `bug-hunter` is always included; additional roles are added based on the following signals:
+When `--reviewers auto` is specified, River Review analyzes the diff content and selects reviewer roles automatically. `bug-hunter` is always included; additional roles are added based on the following signals:
 
 | Signal                                                                           | Role added         |
 | -------------------------------------------------------------------------------- | ------------------ |

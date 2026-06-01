@@ -1,6 +1,6 @@
 # Skill Authoring Guide / How-to
 
-This guide summarizes "how to write" River Reviewer skills (`skills/**/*.md`) to reduce hesitation and maintain consistent quality when adding or updating them.
+This guide summarizes "how to write" River Review skills (`skills/**/*.md`) to reduce hesitation and maintain consistent quality when adding or updating them.
 
 ## Goals
 
@@ -88,7 +88,7 @@ If Confidence is low (mixed with speculation), write so the reader understands i
 
 ## Evidence Requirements (Mandatory)
 
-River Reviewer comments are posted in `<file>:<line>: <message>` format. Minimally satisfy:
+River Review comments are posted in `<file>:<line>: <message>` format. Minimally satisfy:
 
 - **Where is it based on?** (Linked to file and line)
 - **Do not assert speculation** (Write as "possibility" if uncertain)

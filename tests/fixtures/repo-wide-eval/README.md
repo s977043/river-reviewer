@@ -2,7 +2,7 @@
 
 Regression fixtures for repo-wide review. Tracks how often `collectRepoContext` improves detection on cross-file scenarios that the diff alone cannot expose.
 
-Issue: [#688](https://github.com/s977043/river-reviewer/issues/688)
+Issue: [#688](https://github.com/s977043/river-review/issues/688)
 
 ## Run
 
@@ -46,7 +46,7 @@ A real `.git` inside the fixture would conflict with the host repo's git operati
 
 ## Current fixture set
 
-PR-1 (#711) seeded the harness with one i18n case. PR-2 expands the set so all five canonical cross-context categories from the [#654 skills](https://github.com/s977043/river-reviewer/pull/654) are exercised:
+PR-1 (#711) seeded the harness with one i18n case. PR-2 expands the set so all five canonical cross-context categories from the [#654 skills](https://github.com/s977043/river-review/pull/654) are exercised:
 
 | Case                            | Category      | Cross-file signal the fixture exposes                                          |
 | ------------------------------- | ------------- | ------------------------------------------------------------------------------ |

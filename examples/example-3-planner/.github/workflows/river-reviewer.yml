@@ -1,9 +1,9 @@
-name: 'River Reviewer (example-3: planner)'
+name: 'River Review (example-3: planner)'
 on:
   pull_request:
 
 jobs:
-  river-reviewer:
+  river-review:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -13,8 +13,8 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Run River Reviewer (planner=order)
-        uses: s977043/river-reviewer/runners/github-action@main
+      - name: Run River Review (planner=order)
+        uses: s977043/river-review/runners/github-action@main
         with:
           phase: midstream
           planner: order # off|order|prune

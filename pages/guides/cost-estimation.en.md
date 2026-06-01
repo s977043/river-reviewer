@@ -1,6 +1,6 @@
 # Cost estimation and optimization guide
 
-This guide helps you (a) estimate the monthly cost of running river-reviewer for your team / project before adoption, and (b) verify those estimates with measured numbers once you start running it. It answers the requirements raised in Issue [#803](https://github.com/s977043/river-reviewer/issues/803).
+This guide helps you (a) estimate the monthly cost of running river-review for your team / project before adoption, and (b) verify those estimates with measured numbers once you start running it. It answers the requirements raised in Issue [#803](https://github.com/s977043/river-review/issues/803).
 
 > Pricing lives in `src/core/cost-estimator.mjs` under `MODEL_PRICES` (with a `PRICING_LAST_UPDATED` constant). Update that table whenever provider pricing changes.
 
@@ -104,7 +104,7 @@ Without pruning the same PR costs **~$0.64** (12 / 5 = 2.4x). Planner pruning is
 
 ### 3-1. Keep prompt caching on
 
-Anthropic ephemeral prompt caching (PR [#811](https://github.com/s977043/river-reviewer/pull/811)) reuses systemPrompt for 5 minutes with a ~90% input-token discount on hits. Global off switch: `RIVER_ANTHROPIC_PROMPT_CACHE=0`. Per-skill off switch: `skill.disableCache: true`. Default ON is the right choice in almost every case.
+Anthropic ephemeral prompt caching (PR [#811](https://github.com/s977043/river-review/pull/811)) reuses systemPrompt for 5 minutes with a ~90% input-token discount on hits. Global off switch: `RIVER_ANTHROPIC_PROMPT_CACHE=0`. Per-skill off switch: `skill.disableCache: true`. Default ON is the right choice in almost every case.
 
 ### 3-2. Use `planner=prune` on large diffs
 
@@ -205,5 +205,5 @@ Anthropic cache writes are billed at **+25% of input**; cache reads at **10%**. 
 
 - Implementation: `src/core/cost-estimator.mjs`, `src/lib/usage-persistence.mjs`
 - Script: `scripts/usage-summary.mjs`
-- Related PRs: [#811](https://github.com/s977043/river-reviewer/pull/811), [#813](https://github.com/s977043/river-reviewer/pull/813), [#814](https://github.com/s977043/river-reviewer/pull/814)
-- Related issue: [#803](https://github.com/s977043/river-reviewer/issues/803)
+- Related PRs: [#811](https://github.com/s977043/river-review/pull/811), [#813](https://github.com/s977043/river-review/pull/813), [#814](https://github.com/s977043/river-review/pull/814)
+- Related issue: [#803](https://github.com/s977043/river-review/issues/803)

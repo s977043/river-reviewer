@@ -1,22 +1,22 @@
 # Deprecated Paths and Features
 
-This document lists deprecated paths, features, and APIs in River Reviewer, along with their replacements and removal timelines.
+This document lists deprecated paths, features, and APIs in River Review, along with their replacements and removal timelines.
 
 ## Architecture Refactoring (v0.2.0)
 
-### `.github/actions/river-reviewer` → `runners/github-action`
+### `.github/actions/river-review` → `runners/github-action`
 
 **Deprecated in:** v0.2.0
 **Removed in:** v0.2.0 (Breaking Change)
 
-The GitHub Action has been moved from `.github/actions/river-reviewer/` to `runners/github-action/` to align with the "Skills as First-Class Assets" philosophy.
+The GitHub Action has been moved from `.github/actions/river-review/` to `runners/github-action/` to align with the "Skills as First-Class Assets" philosophy.
 
 #### Migration
 
 **Before (no longer works):**
 
 ```yaml
-- uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+- uses: s977043/river-review/.github/actions/river-review@v0.1.1
   with:
     phase: midstream
 ```
@@ -24,7 +24,7 @@ The GitHub Action has been moved from `.github/actions/river-reviewer/` to `runn
 **After (v0.2.0+):**
 
 ```yaml
-- uses: s977043/river-reviewer/runners/github-action@v0.2.0
+- uses: s977043/river-review/runners/github-action@v0.2.0
   with:
     phase: midstream
 ```
@@ -35,10 +35,10 @@ If you were using the action from external repositories with the old path:
 
 ```yaml
 # Old path (v0.1.x)
-uses: s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1
+uses: s977043/river-review/.github/actions/river-review@v0.1.1
 
 # New path (v0.2.0+)
-uses: s977043/river-reviewer/runners/github-action@v0.2.0
+uses: s977043/river-review/runners/github-action@v0.2.0
 ```
 
 **Note:** Version v0.1.1 and earlier will continue to work with the old path. To use v0.2.0 and later, update to the new path.
@@ -74,11 +74,11 @@ import { buildExecutionPlan } from '../runners/core/review-runner.mjs';
 
 ## Version Compatibility
 
-| Your Version | Action Path                                                    | Status      |
-| ------------ | -------------------------------------------------------------- | ----------- |
-| v0.1.0       | `s977043/river-reviewer/.github/actions/river-reviewer@v0.1.0` | ✅ Works    |
-| v0.1.1       | `s977043/river-reviewer/.github/actions/river-reviewer@v0.1.1` | ✅ Works    |
-| v0.2.0+      | `s977043/river-reviewer/runners/github-action@v0.2.0`          | ✅ Required |
+| Your Version | Action Path                                                | Status      |
+| ------------ | ---------------------------------------------------------- | ----------- |
+| v0.1.0       | `s977043/river-review/.github/actions/river-review@v0.1.0` | ✅ Works    |
+| v0.1.1       | `s977043/river-review/.github/actions/river-review@v0.1.1` | ✅ Works    |
+| v0.2.0+      | `s977043/river-review/runners/github-action@v0.2.0`        | ✅ Required |
 
 ## Support Timeline
 
@@ -90,7 +90,7 @@ import { buildExecutionPlan } from '../runners/core/review-runner.mjs';
 If you have questions about migration, please:
 
 1. Check the [Migration Guide](migration/runners-migration-guide.md)
-2. Review [Epic #242](https://github.com/s977043/river-reviewer/issues/242)
+2. Review [Epic #242](https://github.com/s977043/river-review/issues/242)
 3. Open an issue with the `migration-help` label
 
 ## Output artifact field `debug.executionDeferred` (v0.51.0)
@@ -152,4 +152,4 @@ new in v0.51.0.
 #### Related
 
 - [Troubleshooting: skill selection](review/troubleshooting.md)
-- Issue [#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 (A1 → A2-1 → A2-fix-1)
+- Issue [#802](https://github.com/s977043/river-review/issues/802) Phase 3 (A1 → A2-1 → A2-fix-1)

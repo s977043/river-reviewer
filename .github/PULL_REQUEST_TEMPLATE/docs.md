@@ -1,4 +1,4 @@
-# 🌊 River Reviewer Docs Update
+# 🌊 River Review Docs Update
 
 ## Summary
 

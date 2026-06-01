@@ -5,7 +5,7 @@
 
 ## Overview
 
-This guide provides standards and best practices for writing documentation for the River Reviewer project.
+This guide provides standards and best practices for writing documentation for the River Review project.
 
 ## Planned Content
 

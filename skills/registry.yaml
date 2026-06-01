@@ -1,8 +1,8 @@
-# River Reviewer Skills Registry
+# River Review Skills Registry
 # Version 1.0
 
 version: '1.0'
-description: 'Catalog of all River Reviewer skills organized by stream category and tags'
+description: 'Catalog of all River Review skills organized by stream category and tags'
 
 # Skill Catalog
 skills:

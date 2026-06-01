@@ -1,11 +1,11 @@
 /**
- * River Reviewer Node.js API
+ * River Review Node.js API
  *
- * Programmatic interface for using River Reviewer in custom Node.js applications.
+ * Programmatic interface for using River Review in custom Node.js applications.
  *
  * @example
  * ```typescript
- * import { review, loadSkills } from '@river-reviewer/node-api';
+ * import { review, loadSkills } from '@river-review/node-api';
  *
  * // Review files
  * const results = await review({
@@ -21,9 +21,9 @@
  * });
  * ```
  *
- * @module @river-reviewer/node-api
+ * @module @river-review/node-api
  */
-import { SkillLoaderError } from '@river-reviewer/core-runner/skill-loader';
+import { SkillLoaderError } from '@river-review/core-runner/skill-loader';
 export type { Phase, Severity, InputContext, OutputKind, ModelHint, Dependency, SkillMetadata, SkillDefinition, LoadSkillsOptions, ReviewOptions, SkillSelectionResult, Finding, ReviewSummary, ReviewMetadata, ReviewResult, EvaluateSkillOptions, EvaluationResult, } from './types.js';
 import type { LoadSkillsOptions, ReviewOptions, SkillSelectionResult, ReviewResult, EvaluateSkillOptions, EvaluationResult, SkillDefinition, Phase, InputContext, Dependency, ModelHint } from './types.js';
 export { parseProvider, parseFindings } from './ai-helpers.js';
@@ -180,7 +180,7 @@ export declare function buildExecutionPlan(options: {
     diffText?: string;
 }): Promise<SkillSelectionResult>;
 /**
- * Review files using River Reviewer skills.
+ * Review files using River Review skills.
  *
  * This is the main entry point for programmatic code review. It loads skills,
  * builds an execution plan, and returns a structured result.
@@ -228,7 +228,7 @@ export declare function review(options: ReviewOptions): Promise<ReviewResult>;
  */
 export declare function evaluateSkill(options: EvaluateSkillOptions): Promise<EvaluationResult>;
 /**
- * Get default paths used by River Reviewer.
+ * Get default paths used by River Review.
  *
  * @returns Object containing default paths for repository root, skills directory, and schema
  *

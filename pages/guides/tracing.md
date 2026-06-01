@@ -3,7 +3,7 @@ id: tracing
 title: Tracing / Observability
 ---
 
-このドキュメントでは、River Reviewer に簡易なトレースを導入し、ローカル環境や CI で実行する手順を説明する。
+このドキュメントでは、River Review に簡易なトレースを導入し、ローカル環境や CI で実行する手順を説明する。
 
 ## 概要
 
@@ -20,7 +20,7 @@ title: Tracing / Observability
 OTEL_ENABLED=1 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 node scripts/validate-agents.mjs
 ```
 
-- 既定のサービス名は `river-reviewer`。`OTEL_SERVICE_NAME` 環境変数で上書きできる。
+- 既定のサービス名は `river-review`。`OTEL_SERVICE_NAME` 環境変数で上書きできる。
 
 ## 実装のポイント
 

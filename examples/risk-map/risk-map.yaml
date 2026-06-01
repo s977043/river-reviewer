@@ -3,8 +3,8 @@
 # Rules are evaluated top-to-bottom; the first matching `pattern` wins.
 # Add the strictest / most sensitive patterns near the top.
 #
-# Schema:        https://github.com/s977043/river-reviewer/blob/main/schemas/risk-map.schema.json
-# User guide:    https://github.com/s977043/river-reviewer/blob/main/pages/guides/repo-wide-review.md
+# Schema:        https://github.com/s977043/river-review/blob/main/schemas/risk-map.schema.json
+# User guide:    https://github.com/s977043/river-review/blob/main/pages/guides/repo-wide-review.md
 # Adoption README (this directory): see ./README.md
 
 version: '1'

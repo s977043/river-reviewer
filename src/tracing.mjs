@@ -23,7 +23,7 @@ if (enabled) {
     const exporterEndpoint =
         process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318/v1/traces';
     const resource = resourceFromAttributes({
-        [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'river-reviewer',
+        [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'river-review',
     });
     const exporter = new OTLPTraceExporter({ url: exporterEndpoint });
 
@@ -35,7 +35,7 @@ if (enabled) {
 
     // Start the SDK
     sdk.start();
-    tracer = trace.getTracer('river-reviewer');
+    tracer = trace.getTracer('river-review');
 
     // Graceful shutdown
     const shutdown = async () => {
@@ -52,7 +52,7 @@ if (enabled) {
     process.once('SIGTERM', shutdown);
     process.once('SIGINT', shutdown);
 } else {
-    tracer = trace.getTracer('river-reviewer-disabled');
+    tracer = trace.getTracer('river-review-disabled');
 }
 
 export { tracer, enabled };

@@ -49,7 +49,7 @@ Avoid bare `'**/*.md'` for upstream skills—it matches `CHANGELOG.md`, `README.
 | TypeScript / JavaScript | `src/**/*.{ts,tsx}`, `app/**/*.{ts,tsx}`, `lib/**/*.{ts,tsx}`, `packages/**/*.{ts,tsx}` (mirror with `.{js,jsx,mjs,cjs}` if relevant) |
 | Frontend-only           | Add `**/*.tsx` / `**/*.jsx` only after the directory roots above                                                                      |
 | Backend route / API     | `src/**/api/**`, `app/**/api/**`, `pages/api/**`                                                                                      |
-| Config (in-tree)        | `*.config.{ts,js,mjs,cjs,json,yaml}`, `.river-reviewer.{yaml,yml,json}`                                                               |
+| Config (in-tree)        | `*.config.{ts,js,mjs,cjs,json,yaml}`, `.river-review.{yaml,yml,json}`                                                                 |
 
 Avoid bare `'**/*.ts'` for midstream skills—it pulls `tests/**/*.ts`, `*.test.ts`, `*.spec.ts`, `*.config.ts`, `node_modules/**` into the candidate set even though those have their own (test / config) review skills.
 
@@ -81,4 +81,4 @@ Downstream skills that need to also see source code (to assess "do tests cover t
 - `runners/core/review-runner.mjs`—`matchesApplyTo`, `evaluateSkill`, `selectSkills`
 - `tests/fixtures/planner-dataset/cases.json`—regression coverage for routing
 - `tests/planner-dataset-eval.test.mjs`—coverage / top1Match thresholds
-- Parent issue: [#762](https://github.com/s977043/river-reviewer/issues/762)
+- Parent issue: [#762](https://github.com/s977043/river-review/issues/762)

@@ -1,6 +1,6 @@
 # Upstream, Midstream, Downstream
 
-River Reviewer mirrors the natural flow of software delivery:
+River Review mirrors the natural flow of software delivery:
 
 - **Upstream**: ideas, requirements, and design decisions. Checks focus on clarity, traceability, and feasibility.
 - **Midstream**: implementation and refactoring. Checks focus on correctness, code health, and keeping changes consistent with the upstream plan.

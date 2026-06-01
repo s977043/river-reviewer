@@ -6,7 +6,7 @@ sidebar_label: Eval-based Keep / Discard Policy
 
 ## Overview
 
-Changes to River Reviewer's skill / planner / routing / output policy must be accepted or rejected based on evaluation results. We avoid "I think this improved it" by comparing baseline vs. candidate entries recorded in the ledger.
+Changes to River Review's skill / planner / routing / output policy must be accepted or rejected based on evaluation results. We avoid "I think this improved it" by comparing baseline vs. candidate entries recorded in the ledger.
 
 ## Evaluation metrics
 
@@ -57,5 +57,5 @@ A change is discarded when any of the following holds:
 
 ## References
 
-- Adapted from [autoagent](https://github.com/kevinrgu/autoagent)'s keep / discard rules and translated for River Reviewer.
+- Adapted from [autoagent](https://github.com/kevinrgu/autoagent)'s keep / discard rules and translated for River Review.
 - Multi-axis evaluation rather than single-metric (passed count) optimization.

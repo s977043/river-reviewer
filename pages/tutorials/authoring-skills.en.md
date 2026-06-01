@@ -1,6 +1,6 @@
 # How to Write Skills
 
-In River Reviewer, checks for each phase are added as "skills". Skills are defined using YAML frontmatter + Markdown and must comply with `schemas/skill.schema.json`.
+In River Review, checks for each phase are added as "skills". Skills are defined using YAML frontmatter + Markdown and must comply with `schemas/skill.schema.json`.
 
 ## Basic Rules
 

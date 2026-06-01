@@ -2,7 +2,7 @@
 title: 安定インターフェース（CLI / GitHub Actions）
 ---
 
-River Reviewer は OSS として成長中であり、内部実装は変更される可能性があります。一方で、利用者が安心して導入できるように **安定した契約（stable contract）** を定義します。
+River Review は OSS として成長中であり、内部実装は変更される可能性があります。一方で、利用者が安心して導入できるように **安定した契約（stable contract）** を定義します。
 
 破壊的変更（breaking change）は原則として **major version bump** が必要です。
 
@@ -12,7 +12,7 @@ River Reviewer は OSS として成長中であり、内部実装は変更され
 
 - スキル定義（`schemas/skill.schema.json`）と、その意味論（severity/confidence など）
 - GitHub Actions（`runners/github-action/action.yml`）のinputs / outputsと動作
-- CLI（`river` / `river-reviewer`）のコマンド/オプションと終了コード
+- CLI（`river` / `river-review`）のコマンド/オプションと終了コード
 - PR コメントの idempotent 更新方式（marker）
 
 ## コンポーネント安定性ラベル
@@ -58,7 +58,7 @@ River Reviewer は OSS として成長中であり、内部実装は変更され
 - `0`: 成功（レビュー/診断/見積もりが完了）
 - `1`: 失敗（入力不正、git 差分取得失敗、スキル検証失敗、`--max-cost` 超過など）
 
-## GitHub Actions（`river-reviewer`）リファレンス（最小）
+## GitHub Actions（`river-review`）リファレンス（最小）
 
 ### inputs（安定）
 
@@ -80,7 +80,7 @@ River Reviewer は OSS として成長中であり、内部実装は変更され
 
 ### PR コメントの契約（idempotent）
 
-- `<!-- river-reviewer -->` marker を含むコメントを **更新** し、なければ新規作成する。
+- `<!-- river-review -->` marker を含むコメントを **更新** し、なければ新規作成する。
 - コメント本文が長すぎる場合は末尾を切り詰める（上限あり）。
 
 ## バージョニング（破壊的変更の扱い）

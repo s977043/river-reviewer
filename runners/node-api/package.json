@@ -1,7 +1,7 @@
 {
-  "name": "@river-reviewer/node-api",
+  "name": "@river-review/node-api",
   "version": "0.1.0",
-  "description": "Node.js API interface for programmatic usage of River Reviewer",
+  "description": "Node.js API interface for programmatic usage of River Review",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,7 +17,7 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@river-reviewer/core-runner": "file:../core",
+    "@river-review/core-runner": "file:../core",
     "js-yaml": "^4.1.1",
     "minimatch": "^10.1.1"
   },
@@ -31,7 +31,7 @@
     "node": "22.x"
   },
   "keywords": [
-    "river-reviewer",
+    "river-review",
     "code-review",
     "ai-review",
     "skill-execution",

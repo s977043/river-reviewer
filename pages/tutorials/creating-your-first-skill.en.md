@@ -1,6 +1,6 @@
 # Creating Your First Skill
 
-Build a simple River Reviewer skill that follows the Upstream → Midstream → Downstream flow.
+Build a simple River Review skill that follows the Upstream → Midstream → Downstream flow.
 
 ## Prerequisites
 
@@ -45,4 +45,4 @@ If your skill is phase-specific, add a short test PR to confirm the reviewer loa
 
 ## 4. Iterate with reviews
 
-Commit the skill, open a PR, and use the River Reviewer PR templates to link related issues and prove validation passed.
+Commit the skill, open a PR, and use the River Review PR templates to link related issues and prove validation passed.

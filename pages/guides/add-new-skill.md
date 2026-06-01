@@ -2,7 +2,7 @@
 title: スキルを追加する（最短手順）
 ---
 
-River Reviewer に新しいスキル（`skills/**/*.md`）を追加して、検証し、ローカルで動かすまでの **最短パス** をまとめます。
+River Review に新しいスキル（`skills/**/*.md`）を追加して、検証し、ローカルで動かすまでの **最短パス** をまとめます。
 
 より詳しい書き方（アンチパターン、Evidence、Non-goals、誤検知ガードなど）は `pages/guides/write-a-skill.md` を参照してください。
 

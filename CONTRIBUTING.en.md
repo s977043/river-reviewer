@@ -1,4 +1,4 @@
-# Thank you for contributing to River Reviewer
+# Thank you for contributing to River Review
 
 Thank you for taking the time to make this project better. We welcome bug reports, feature ideas, and documentation improvements.
 The Japanese guide in `CONTRIBUTING.md` is the source of truth; this English copy is best-effort.
@@ -15,7 +15,7 @@ We aim for an open, welcoming community. Please follow our [Code of Conduct](COD
 - Check docs (`README.md` and `pages/`) for existing answers or policies
 - If this may be a security issue, do not open a public issue; follow `SECURITY.md` to report it privately
 
-Use the issue templates via `Issues → New issue` (or [issues/new/choose](https://github.com/s977043/river-reviewer/issues/new/choose)).
+Use the issue templates via `Issues → New issue` (or [issues/new/choose](https://github.com/s977043/river-review/issues/new/choose)).
 
 ### 🗂️ Issue types (rough guide)
 
@@ -79,25 +79,25 @@ Depending on what you change:
 
 ## 📚 Documentation contributions
 
-River Reviewer docs follow the [Diátaxis documentation framework](https://diataxis.fr/). Choose one type and write to that shape. Japanese (`.md`) is the source of truth; English copies use the same name with `.en.md` and are maintained on a best-effort basis. If content diverges, prefer the Japanese version.
+River Review docs follow the [Diátaxis documentation framework](https://diataxis.fr/). Choose one type and write to that shape. Japanese (`.md`) is the source of truth; English copies use the same name with `.en.md` and are maintained on a best-effort basis. If content diverges, prefer the Japanese version.
 
 - Tutorial—learning-oriented, step-by-step guides to get new users to a first success.  
-  Example: "First steps with River Reviewer on GitHub Actions"
+  Example: "First steps with River Review on GitHub Actions"
 
 - How-to guide—recipes for achieving a specific goal; the reader already knows the basics.  
-  Example: "Add a custom review skill" / "Run River Reviewer locally"
+  Example: "Add a custom review skill" / "Run River Review locally"
 
 - Reference—accurate, as-complete-as-possible lists of APIs, settings, and schemas.  
   Example: "GitHub Action inputs" / "skill YAML schema"
 
 - Explanation—background, design decisions, and concepts.  
-  Example: "Upstream/midstream/downstream model" / "Design principles of River Reviewer"
+  Example: "Upstream/midstream/downstream model" / "Design principles of River Review"
 
 To keep reviews smooth:
 
 - Place files under the right section (for example, `pages/tutorials/`, `pages/guides/`, `pages/reference/`, `pages/explanation/`). Add English copies in the same location with a `.en.md` suffix.
 - State the chosen Diátaxis type in the PR title or description, for example:
-  - Docs: Tutorial—Getting started with River Reviewer
+  - Docs: Tutorial—Getting started with River Review
   - Docs: How-to—Add a custom skill
   - Docs: Reference—GitHub Action inputs
   - Docs: Explanation—River flow model

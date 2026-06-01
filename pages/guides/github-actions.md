@@ -1,16 +1,16 @@
-# GitHub Actions で River Reviewer をセットアップする
+# GitHub Actions で River Review をセットアップする
 
-以下は River Reviewer を GitHub Actions で実行する最小ワークフロー例です。`.github/workflows/river-reviewer.yml` などのファイル名で配置してください。
+以下は River Review を GitHub Actions で実行する最小ワークフロー例です。`.github/workflows/river-review.yml` などのファイル名で配置してください。
 
 > **⚠️ 重要**: フォークされたリポジトリからの PR では、GitHub がセキュリティ上の理由でリポジトリの secrets を公開しません。外部コントリビューターの PR でレビューを実行する場合は、`pull_request_target` などのイベント選択と権限設定を検討してください。
 
 ```yaml
-name: River Reviewer
+name: River Review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 jobs:
-  river-reviewer:
+  river-review:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -20,8 +20,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.70.0
+      - name: Run River Review (midstream)
+        uses: s977043/river-review/runners/github-action@v0.70.0
         with:
           phase: midstream # upstream|midstream|downstream
           dry_run: true # 外部 API を呼ばずに PR コメントを投稿する（フォールバック）
@@ -35,11 +35,11 @@ PR へのコメント投稿には `issues: write` が必要です。権限不足
 
 ## Anthropic (Claude) を使う場合
 
-`.river-reviewer.json` で `claude-*` モデルを指定し、`ANTHROPIC_API_KEY` を渡します。
+`.river-review.json` で `claude-*` モデルを指定し、`ANTHROPIC_API_KEY` を渡します。
 
 ```yaml
-- name: Run River Reviewer (midstream, Claude)
-  uses: s977043/river-reviewer/runners/github-action@v0.70.0
+- name: Run River Review (midstream, Claude)
+  uses: s977043/river-review/runners/github-action@v0.70.0
   with:
     phase: midstream
   env:

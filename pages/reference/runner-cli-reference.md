@@ -1,6 +1,6 @@
 # Runner CLI リファレンス
 
-Runner CLI を使用して、River Reviewer のエージェントとスキルをローカルまたは CI で検証します。
+Runner CLI を使用して、River Review のエージェントとスキルをローカルまたは CI で検証します。
 軽量な Python ランナーが `schemas/output.schema.json` に従う構造化されたレビュー結果を出力します。
 Python の例を実行する前に、`pip install jsonschema` で必要な依存関係をインストールしてください。
 

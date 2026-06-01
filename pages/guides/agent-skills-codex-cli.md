@@ -2,7 +2,7 @@
 title: Manifest-driven Skills ガイド
 ---
 
-River Reviewer のスキルを「マニフェスト（YAML/Markdown）」で柔軟に記述し、複数フェーズやファイルグロブにまたがって適用するための実装ガイドです。`schemas/skill.schema.json` に沿ったサンプルと、検証・運用手順をまとめています。
+River Review のスキルを「マニフェスト（YAML/Markdown）」で柔軟に記述し、複数フェーズやファイルグロブにまたがって適用するための実装ガイドです。`schemas/skill.schema.json` に沿ったサンプルと、検証・運用手順をまとめています。
 
 ## 1. スキル定義フォーマット（Markdown / YAML）
 
@@ -74,7 +74,7 @@ instruction: |
 - `skills/core/` 既定で読み込むスキル群
 - `skills/<stream>/community/` 外部/ライブラリ特化のスキル（例: `skills/midstream/community/`）
 - `skills/private/` プロジェクト固有のスキル
-- `skills/agent-skills/` Agent Skills 仕様のパッケージ群（`SKILL.md` + `references/`、River Reviewer の検証対象外）
+- `skills/agent-skills/` Agent Skills 仕様のパッケージ群（`SKILL.md` + `references/`、River Review の検証対象外）
 - テスト用フィクスチャは `tests/fixtures/skills/` などに分離して管理
 
 ## 3. 検証フロー

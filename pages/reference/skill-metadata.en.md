@@ -1,6 +1,6 @@
 # Skill Metadata Specification (Issue #68 Design)
 
-River Reviewer skills hold metadata in YAML frontmatter, which loaders/runners use to select and execute them. This specification summarizes field definitions serving as the foundation for JSON Schema, TypeScript types, and runner implementation.
+River Review skills hold metadata in YAML frontmatter, which loaders/runners use to select and execute them. This specification summarizes field definitions serving as the foundation for JSON Schema, TypeScript types, and runner implementation.
 
 ## 1. Purpose
 

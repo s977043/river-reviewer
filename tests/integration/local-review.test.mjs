@@ -39,7 +39,7 @@ test('runs dry-run review with sample diff and project rules', async (t) => {
   const result = await runCliInProcess(['run', '.', '--dry-run', '--debug'], { cwd: dir });
 
   assert.strictEqual(result.code, 0, result.stderr);
-  assert.match(result.stdout, /River Reviewer/);
+  assert.match(result.stdout, /River Review/);
   assert.match(result.stdout, /Project rules: present/);
   assert.match(result.stdout, /src\/utils\/math.ts/);
   assert.match(result.stdout, /Review comments/);

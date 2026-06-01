@@ -4,7 +4,7 @@
 
 ## 概要
 
-River Reviewer v0.1.2 から、スキルは「Skills as First-Class Assets」アーキテクチャに移行しています：
+River Review v0.1.2 から、スキルは「Skills as First-Class Assets」アーキテクチャに移行しています：
 
 - **Legacy 形式**: 単一の Markdown ファイル（YAML frontmatter + 本文）
 - **Registry 形式**: ディレクトリベース（skill.yaml + prompt files + fixtures + golden + eval）

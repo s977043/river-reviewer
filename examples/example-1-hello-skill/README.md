@@ -4,7 +4,7 @@
 
 ## できること
 
-- GitHub Actions で River Reviewer を実行
+- GitHub Actions で River Review を実行
 - `dry_run: true` で外部APIを呼ばずにコメント投稿まで確認
 
 ## セットアップ

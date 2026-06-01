@@ -39,7 +39,7 @@ describe('river run - dry-run outputs', () => {
     const result = await runCliInProcess(['run', '.', '--dry-run', '--debug'], { cwd: dir });
 
     assert.strictEqual(result.code, 0, result.stderr);
-    assert.match(result.stdout, /River Reviewer/);
+    assert.match(result.stdout, /River Review/);
     assert.match(result.stdout, /Review comments/);
     assert.match(result.stdout, /src\/app.js:/);
     assert.match(result.stdout, /LLM:/);
@@ -52,7 +52,7 @@ describe('river run - dry-run outputs', () => {
 
     const result = await runCliInProcess(['run', '.', '--debug'], { cwd: dir });
     assert.strictEqual(result.code, 0, result.stderr);
-    assert.match(result.stdout, /River Reviewer/);
+    assert.match(result.stdout, /River Review/);
     assert.match(result.stdout, /LLM: OPENAI_API_KEY/i);
     assert.match(result.stdout, /Planner: off/i);
     assert.match(result.stdout, /Review comments/);
@@ -110,13 +110,13 @@ describe('river run - markdown output', () => {
       cwd: dir,
     });
     assert.strictEqual(result.code, 0, result.stderr);
-    assert.match(result.stdout, /^<!-- river-reviewer -->/);
-    assert.match(result.stdout, /## River Reviewer/);
+    assert.match(result.stdout, /^<!-- river-review -->/);
+    assert.match(result.stdout, /## River Review/);
     assert.match(result.stdout, /### 指摘/);
     // skill id はサニタイズでハイフンがエスケープされる
     assert.match(result.stdout, /#### 🔍 rr\\-midstream\\-logging\\-observability\\-001/);
     assert.doesNotMatch(result.stdout, /--- diff preview ---/);
-    assert.match(result.stderr, /River Reviewer \(local\)/);
+    assert.match(result.stderr, /River Review \(local\)/);
   });
 
   test('writes debug output to stderr when markdown output is selected', async (t) => {
@@ -142,7 +142,7 @@ describe('river run - guards & error paths', () => {
     const { dir, cleanup } = await createRepoWithSilentCatchChange();
     t.after(cleanup);
 
-    const configPath = join(dir, '.river-reviewer.json');
+    const configPath = join(dir, '.river-review.json');
     writeFileSync(
       configPath,
       JSON.stringify({ exclude: { prLabelsToIgnore: ['skip-review'] } }, null, 2),
@@ -220,7 +220,7 @@ describe('river doctor', () => {
 
     const result = await runCliInProcess(['doctor', '.', '--debug'], { cwd: dir });
     assert.strictEqual(result.code, 0, result.stderr);
-    assert.match(result.stdout, /River Reviewer doctor/);
+    assert.match(result.stdout, /River Review doctor/);
     assert.match(result.stdout, /Skills loaded:/);
     assert.match(result.stdout, /Merge base:/);
     assert.match(result.stdout, /--- diff preview ---/);

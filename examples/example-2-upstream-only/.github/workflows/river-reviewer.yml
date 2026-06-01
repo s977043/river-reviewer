@@ -1,9 +1,9 @@
-name: 'River Reviewer (example-2: upstream only)'
+name: 'River Review (example-2: upstream only)'
 on:
   pull_request:
 
 jobs:
-  river-reviewer:
+  river-review:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -13,8 +13,8 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Run River Reviewer (upstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.1.1
+      - name: Run River Review (upstream)
+        uses: s977043/river-review/runners/github-action@v0.1.1
         with:
           phase: upstream
           dry_run: true

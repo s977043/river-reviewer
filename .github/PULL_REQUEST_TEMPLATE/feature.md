@@ -1,4 +1,4 @@
-# 🌊 River Reviewer Feature
+# 🌊 River Review Feature
 
 ## Summary
 

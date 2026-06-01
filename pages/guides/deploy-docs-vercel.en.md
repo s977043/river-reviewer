@@ -13,10 +13,10 @@ When Next.js and Docusaurus share one Vercel project, routing conflicts can caus
 
 ## Docs project (Vercel)
 
-1. Add this repo as a separate Vercel project (e.g., `river-reviewer-docs`).
+1. Add this repo as a separate Vercel project (e.g., `river-review-docs`).
 2. Build Command: `npm run build`; Output Directory: `build`.
 3. Add env vars:
-   - `DOCS_SITE_URL=https://<docs-domain>` (e.g., `https://river-reviewer-docs.vercel.app`)
+   - `DOCS_SITE_URL=https://<docs-domain>` (e.g., `https://river-review-docs.vercel.app`)
    - `DOCS_BASE_URL=/` (optional; default is `/`)
    - `DOCS_ROUTE_BASE_PATH=/` (optional; default is `/`)
 4. If you want `/docs/` to redirect to root, keep `vercel.json` as below:
@@ -29,7 +29,7 @@ When Next.js and Docusaurus share one Vercel project, routing conflicts can caus
 ```
 
 If you want `/docs/` as the base path, set `DOCS_BASE_URL=/docs/` and update redirects to point `/` -> `/docs/`.
-If you omit `DOCS_BASE_URL`, the build targets GitHub Pages at `/river-reviewer/` as before.
+If you omit `DOCS_BASE_URL`, the build targets GitHub Pages at `/river-review/` as before.
 
 ## App project (e.g., `<app-domain>` / `river-reviewer.vercel.app`)
 

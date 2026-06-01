@@ -1,13 +1,13 @@
 # Agent Workflow Templates
 
-Ready-to-use config files for integrating River Reviewer into AI agent workflows.
+Ready-to-use config files for integrating River Review into AI agent workflows.
 
 ## Templates
 
-| Directory | File           | Purpose                                               |
-| --------- | -------------- | ----------------------------------------------------- |
-| `cursor/` | `.cursorrules` | Tells Cursor when and how to invoke River Reviewer    |
-| `codex/`  | `AGENTS.md`    | Tells Codex CLI when and how to invoke River Reviewer |
+| Directory | File           | Purpose                                             |
+| --------- | -------------- | --------------------------------------------------- |
+| `cursor/` | `.cursorrules` | Tells Cursor when and how to invoke River Review    |
+| `codex/`  | `AGENTS.md`    | Tells Codex CLI when and how to invoke River Review |
 
 ## Usage
 
@@ -21,7 +21,7 @@ cp templates/agent-workflow/cursor/.cursorrules /your-project/.cursorrules
 cp templates/agent-workflow/codex/AGENTS.md /your-project/AGENTS.md
 ```
 
-If your project already has a `.cursorrules` or `AGENTS.md`, append the River Reviewer section to it.
+If your project already has a `.cursorrules` or `AGENTS.md`, append the River Review section to it.
 
 ## Further reading
 

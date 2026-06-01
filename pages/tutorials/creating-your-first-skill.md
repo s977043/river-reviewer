@@ -1,6 +1,6 @@
 # 最初のスキルを作成する
 
-Upstream → Midstream → Downstream のフローに従うシンプルな River Reviewer スキルを作成します。
+Upstream → Midstream → Downstream のフローに従うシンプルな River Review スキルを作成します。
 
 ## 前提条件
 
@@ -45,4 +45,4 @@ npm run skills:validate
 
 ## 4. レビューによる改善
 
-スキルをコミットし、PR を開き、River Reviewer の PR テンプレートを使用して関連する Issue をリンクし、検証が通過したことを証明してください。
+スキルをコミットし、PR を開き、River Review の PR テンプレートを使用して関連する Issue をリンクし、検証が通過したことを証明してください。

@@ -1,4 +1,4 @@
-# 🌊 River Reviewer Bugfix
+# 🌊 River Review Bugfix
 
 ## Summary
 

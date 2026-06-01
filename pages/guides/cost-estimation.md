@@ -1,12 +1,12 @@
 # コスト見積もりと最適化ガイド
 
-このガイドは、river-reviewer を導入する前に **チーム・プロジェクト単位の月額コスト** を試算し、運用開始後に **実測値で検証** するための手順をまとめたものです。`--estimate` と `--max-cost` の運用や、Issue [#803](https://github.com/s977043/river-reviewer/issues/803) で議論された見積もり要求への回答にあたります。
+このガイドは、river-review を導入する前に **チーム・プロジェクト単位の月額コスト** を試算し、運用開始後に **実測値で検証** するための手順をまとめたものです。`--estimate` と `--max-cost` の運用や、Issue [#803](https://github.com/s977043/river-review/issues/803) で議論された見積もり要求への回答にあたります。
 
 > 価格は `src/core/cost-estimator.mjs` の `MODEL_PRICES` テーブルが正本（`PRICING_LAST_UPDATED` で最終更新日を確認できます）。プロバイダーの公式価格が変わったら同テーブルを更新してください。
 
 ## 1. コスト構造の概要
 
-river-reviewer の 1 回のレビューは「**スキル × 対象ファイル**」ごとに 1 度ずつ LLM API を呼び出します。コストは次の要素の合算です。
+river-review の 1 回のレビューは「**スキル × 対象ファイル**」ごとに 1 度ずつ LLM API を呼び出します。コストは次の要素の合算です。
 
 | 要素                  | 単価例（claude-sonnet-4-6）  | 説明                                                               |
 | --------------------- | ---------------------------- | ------------------------------------------------------------------ |
@@ -212,5 +212,5 @@ Anthropic の cache write は `inputPer1k` の **+25% 課金**、cache read は 
 
 - 実装: `src/core/cost-estimator.mjs` / `src/lib/usage-persistence.mjs`
 - スクリプト: `scripts/usage-summary.mjs`
-- 関連 PR: [#811 (prompt caching)](https://github.com/s977043/river-reviewer/pull/811) / [#813 (Phase 1 telemetry)](https://github.com/s977043/river-reviewer/pull/813) / [#814 (Phase 2 telemetry)](https://github.com/s977043/river-reviewer/pull/814)
-- 関連 Issue: [#803](https://github.com/s977043/river-reviewer/issues/803)
+- 関連 PR: [#811 (prompt caching)](https://github.com/s977043/river-review/pull/811) / [#813 (Phase 1 telemetry)](https://github.com/s977043/river-review/pull/813) / [#814 (Phase 2 telemetry)](https://github.com/s977043/river-review/pull/814)
+- 関連 Issue: [#803](https://github.com/s977043/river-review/issues/803)

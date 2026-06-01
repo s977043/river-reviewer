@@ -12,7 +12,7 @@ In LLM-based review, loading all skills in full up front causes:
 
 ## Three-Stage Model
 
-River Reviewer loads skill context in three stages:
+River Review loads skill context in three stages:
 
 ### Stage 1: Metadata (always loaded)
 

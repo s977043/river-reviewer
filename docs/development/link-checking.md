@@ -1,6 +1,6 @@
 # Link Checking Guide
 
-このガイドでは、River Reviewerプロジェクトでのリンクチェックの使い方を説明します。
+このガイドでは、River Reviewプロジェクトでのリンクチェックの使い方を説明します。
 
 ## 概要
 
@@ -334,4 +334,4 @@ lychee --config .lychee.toml '**/*.md'
 
 リンクチェックに関する質問や問題は、以下の方法で報告してください:
 
-- [GitHub Issues](https://github.com/s977043/river-reviewer/issues) - `question`ラベルを付けて投稿
+- [GitHub Issues](https://github.com/s977043/river-review/issues) - `question`ラベルを付けて投稿

@@ -1,7 +1,7 @@
 {
-  "name": "@river-reviewer/cli-runner",
+  "name": "@river-review/cli-runner",
   "version": "0.1.0",
-  "description": "CLI interface for River Reviewer",
+  "description": "CLI interface for River Review",
   "type": "module",
   "main": "./src/index.mjs",
   "bin": {

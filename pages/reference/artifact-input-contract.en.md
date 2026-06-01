@@ -2,20 +2,20 @@
 title: Artifact Input Contract
 ---
 
-River Reviewer is a review agent that consumes artifacts produced by upstream workflows such as PlanGate as **external inputs** and performs review, QA, and double-check operations. This document defines the input contract that River Reviewer can read stably.
+River Review is a review agent that consumes artifacts produced by upstream workflows such as PlanGate as **external inputs** and performs review, QA, and double-check operations. This document defines the input contract that River Review can read stably.
 
 > Related issues: #516 (Task) / #508 (Capability) / #507 (Epic)
 
 ## Policy
 
-- River Reviewer operates **artifact-driven** and does not depend on PlanGate-internal commands or on a specific directory layout.
+- River Review operates **artifact-driven** and does not depend on PlanGate-internal commands or on a specific directory layout.
 - Inputs are consumed on a **file path basis**; only the content format (Markdown / JSON / XML / plain) is contracted.
 - Behavior when a file is missing (skip / degrade / error) is defined per artifact.
 - When adding a new artifact, update this document and preserve backward compatibility.
 
 ## Artifact Catalog
 
-The input artifacts recognized by River Reviewer are listed below. See "Legend" at the end for column semantics.
+The input artifacts recognized by River Review are listed below. See "Legend" at the end for column semantics.
 
 | ID                | Example filename     | Format       | Required        | Schema / reference                                  | Role                                                           |
 | ----------------- | -------------------- | ------------ | --------------- | --------------------------------------------------- | -------------------------------------------------------------- |
@@ -35,7 +35,7 @@ The input artifacts recognized by River Reviewer are listed below. See "Legend" 
 ### Legend
 
 - **Required**
-  - `Required`: Without this input River Reviewer aborts.
+  - `Required`: Without this input River Review aborts.
   - `Required (alt.)`: If absent, an alternative (e.g. `git diff`) is used automatically.
   - `Optional`: Missing files are tolerated; related skills are skipped or degraded.
   - `Optional (rec.)`: Missing is allowed, but review quality drops meaningfully.
@@ -46,12 +46,12 @@ The input artifacts recognized by River Reviewer are listed below. See "Legend" 
 ### `pbi-input` / `plan` / `todo` / `test-cases`
 
 - **Format**: UTF-8 Markdown. Heading structure and bullets are unconstrained.
-- **Size guideline**: 100 KB or less per file recommended. Beyond that, River Reviewer may apply diff optimization (summarization / trimming).
+- **Size guideline**: 100 KB or less per file recommended. Beyond that, River Review may apply diff optimization (summarization / trimming).
 - **When absent**: Skills referencing the artifact skip their observation and record it in `skippedSkills`.
 
 ### `review-self` / `review-external`
 
-- **Format**: UTF-8 Markdown. Existing AI reviewer (including River Reviewer itself) or human review output may be stored verbatim.
+- **Format**: UTF-8 Markdown. Existing AI reviewer (including River Review itself) or human review output may be stored verbatim.
 - **When absent**: Double-check (W-check) skills are skipped.
 - **Compatibility**: Content may follow the `issue` definition in [`schemas/output.schema.json`](../../schemas/output.schema.json), but this is not required.
 
@@ -96,7 +96,7 @@ The input artifacts recognized by River Reviewer are listed below. See "Legend" 
 ### `diff`
 
 - **Format**: unified diff (`git diff` compatible). Binary diffs are ignored.
-- **Requirement**: A diff must be supplied by **some channel**. When no artifact is specified, River Reviewer internally runs `git diff <mergeBase>..HEAD` and uses the result as the diff.
+- **Requirement**: A diff must be supplied by **some channel**. When no artifact is specified, River Review internally runs `git diff <mergeBase>..HEAD` and uses the result as the diff.
 - **When the resulting diff is empty**: If the supplied diff (explicit or fallback) is empty, `status` is set to `no-changes` and review skills are not executed.
 
 ### `junit`
@@ -117,7 +117,7 @@ The input artifacts recognized by River Reviewer are listed below. See "Legend" 
 
 ## Input Channels
 
-River Reviewer resolves artifacts in this order:
+River Review resolves artifacts in this order:
 
 1. **CLI / GitHub Action arguments** (defined in `river review plan` / `river review exec` CLI spec). Example: `--artifact pbi-input=./path/to/pbi-input.md`
 2. **Configuration file** (defined in `river review plan` / `river review exec` CLI spec). `artifacts` section in `river.config.*`.
@@ -153,9 +153,9 @@ This contract treats PlanGate as **one of several possible producers** and delib
 
 - Hard-coding PlanGate-specific directory layouts (e.g. `plangate/<phase>/`) as default paths.
 - Adopting artifact names tied to PlanGate-internal commands or execution models.
-- Assuming PlanGate versions and River Reviewer skill versions are co-released.
+- Assuming PlanGate versions and River Review skill versions are co-released.
 
-This keeps River Reviewer usable for workflows other than PlanGate or for artifacts generated manually.
+This keeps River Review usable for workflows other than PlanGate or for artifacts generated manually.
 
 ## Versioning
 

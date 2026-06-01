@@ -1,5 +1,5 @@
 /**
- * YAML output formatter for river-reviewer.
+ * YAML output formatter for river-review.
  *
  * Emits a structured YAML block compatible with the unilabo/site-management-system
  * review output format. Fields (`category`, `summary`, `highRiskReasons`,

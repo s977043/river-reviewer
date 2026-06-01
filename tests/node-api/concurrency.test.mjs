@@ -3,7 +3,7 @@
  *
  * These tests validate the chunk-based batching algorithm in isolation,
  * avoiding a direct import of dist/index.js (which depends on
- * @river-reviewer/core-runner, not installed in the root node_modules).
+ * @river-review/core-runner, not installed in the root node_modules).
  *
  * The chunk loop is extracted verbatim from runners/node-api/src/index.ts
  * and exercised with a mock executeSkillWithAI that records concurrency.

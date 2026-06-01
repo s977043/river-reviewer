@@ -24,18 +24,18 @@ skills/
 ```text
 skills/
 ├── agent-skills/                    # Agent Skills 公式仕様準拠
-│   ├── river-reviewer/              # 入口スキル（ルーター）
+│   ├── river-review/              # 入口スキル（ルーター）
 │   │   ├── SKILL.md
 │   │   └── references/
-│   ├── river-reviewer-security/
+│   ├── river-review-security/
 │   │   ├── SKILL.md
 │   │   └── references/
-│   ├── river-reviewer-architecture/
+│   ├── river-review-architecture/
 │   │   ├── SKILL.md
 │   │   └── references/
-│   ├── river-reviewer-code/
-│   ├── river-reviewer-performance/
-│   ├── river-reviewer-testing/
+│   ├── river-review-code/
+│   ├── river-review-performance/
+│   ├── river-review-testing/
 │   └── adversarial-review/
 ├── upstream/                        # 従来形式（移行元）
 ├── midstream/                       # 従来形式（移行元）
@@ -57,7 +57,7 @@ skills/
 ```yaml
 ---
 name: river-review
-description: River Reviewer のメインエントリポイント。レビュー依頼を適切な専門スキルへルーティングする。
+description: River Review のメインエントリポイント。レビュー依頼を適切な専門スキルへルーティングする。
 ---
 ```
 
@@ -117,7 +117,7 @@ river-review-<domain>
 
 ## 移行方針
 
-1. **Phase 1**: 入口スキル `river-reviewer` を作成（**完了**）
+1. **Phase 1**: 入口スキル `river-review` を作成（**完了**）
 2. **Phase 2**: 高優先度の専門スキルを作成（security, architecture, code, performance, testing, adversarial-review）（**完了**）
 3. **Phase 3**: 従来スキルの内容を専門スキルへ統合
 4. **Phase 4**: 従来スキルを deprecated 化
@@ -134,7 +134,7 @@ river-review-<domain>
 ## 次のアクション
 
 - [x] `skills/agent-skills/` ディレクトリを作成
-- [x] 入口スキル `river-reviewer` を作成
+- [x] 入口スキル `river-review` を作成
 - [x] テンプレート（#311）を使用して専門スキルを追加（Issue #310, #311 CLOSED）
 
 ---

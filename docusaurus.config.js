@@ -1,13 +1,13 @@
 /** @type {import('@docusaurus/types').Config} */
 const organizationName = 's977043';
-const projectName = 'river-reviewer';
+const projectName = 'river-review';
 const isVercel = Boolean(process.env.VERCEL);
 const normalizeSiteUrl = (url) => url.replace(/\/+$/, '');
 const ensureLeadingAndTrailingSlash = (value) => {
   const withLeading = value.startsWith('/') ? value : `/${value}`;
   return withLeading.endsWith('/') ? withLeading : `${withLeading}/`;
 };
-const resolveBaseUrl = () => process.env.DOCS_BASE_URL || (isVercel ? '/' : '/river-reviewer/');
+const resolveBaseUrl = () => process.env.DOCS_BASE_URL || (isVercel ? '/' : '/river-review/');
 const resolveSiteUrl = () => {
   if (process.env.DOCS_SITE_URL) return process.env.DOCS_SITE_URL;
   if (isVercel) {
@@ -23,7 +23,7 @@ const baseUrl = ensureLeadingAndTrailingSlash(resolveBaseUrl());
 const docsRouteBasePath = process.env.DOCS_ROUTE_BASE_PATH ?? '/';
 
 module.exports = {
-  title: 'River Reviewer',
+  title: 'River Review',
   url: siteUrl,
   baseUrl: baseUrl,
   organizationName,
@@ -48,12 +48,12 @@ module.exports = {
   ],
   themeConfig: {
     navbar: {
-      title: 'River Reviewer',
+      title: 'River Review',
       items: [],
     },
     footer: {
       style: 'dark',
-      copyright: `© ${new Date().getFullYear()} River Reviewer`,
+      copyright: `© ${new Date().getFullYear()} River Review`,
     },
   },
   markdown: { mermaid: true, hooks: { onBrokenMarkdownLinks: 'throw' } },

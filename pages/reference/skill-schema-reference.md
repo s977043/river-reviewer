@@ -1,6 +1,6 @@
 # スキルスキーマ・リファレンス
 
-River Reviewer のすべてのスキルは、以下の JSON スキーマに準拠する必要があります:
+River Review のすべてのスキルは、以下の JSON スキーマに準拠する必要があります:
 
 ```text
 /schemas/skill.schema.json

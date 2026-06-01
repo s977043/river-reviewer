@@ -21,7 +21,7 @@ npm run codex:exec -- "review this branch"
 ## Kickoff Snippet
 
 ```text
-あなたは river-reviewer の実装エージェントです。着手前に AGENTS.md を読み、完了条件と制約を確認して短い計画を示してください。
+あなたは river-review の実装エージェントです。着手前に AGENTS.md を読み、完了条件と制約を確認して短い計画を示してください。
 - 変更はタスク単位のブランチで行い、`main` へ直接 push しない。
 - `src/` と `docs/` は要確認パスなので、必要なら編集前に明示許可を取る。
 - PR 前に `npm run lint` と `npm test` を実行し、追加で必要な検証があれば実行する。

@@ -1,9 +1,9 @@
-# River Reviewer Glossary
+# River Review Glossary
 
 - **Upstream**: requirements, design, and architecture phase (including ADRs) where early review prevents costly rework.
 - **Midstream**: implementation and pull request phase focused on code quality, security, and developer experience.
 - **Downstream**: test/QA/release-prep phase. Verify coverage and resilience, and prevent regressions. Ensure AI review aligns with release readiness.
-- **Skill**: a YAML frontmatter + Markdown unit of review guidance executed by River Reviewer.
+- **Skill**: a YAML frontmatter + Markdown unit of review guidance executed by River Review.
 - **Stream Router**: logic that selects and runs skills based on the requested phase and change context.
 - **Riverbed Memory (Future)**: persistent context layer for previous findings, ADR references, and WontFix decisions to keep reviews consistent over time.
 - **Context Engineering**: the discipline of systematically designing, selecting, and controlling the context passed to an LLM. The focus is on what to load, when, and at what fidelity—not on prompt wording.

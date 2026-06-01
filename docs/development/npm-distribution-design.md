@@ -1,20 +1,20 @@
 # npm Distribution Design (#800 B1)
 
-This doc captures the design decisions and the `npm pack --dry-run` audit findings for [#800 npm 公開またはインストール可能な配布手段の提供](https://github.com/s977043/river-reviewer/issues/800). It is the B1 deliverable: **design + audit only, no implementation**. Implementation (B2) is a separate slice.
+This doc captures the design decisions and the `npm pack --dry-run` audit findings for [#800 npm 公開またはインストール可能な配布手段の提供](https://github.com/s977043/river-review/issues/800). It is the B1 deliverable: **design + audit only, no implementation**. Implementation (B2) is a separate slice.
 
 ## Audit (v0.55.0, `npm pack --dry-run`)
 
-| Metric                             | Current                                                                                          | Concern                                                       |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| `package.json#private`             | `true`                                                                                           | Blocks publish; must be removed (or set to `false`) before B2 |
-| `package.json#files`               | unset                                                                                            | Without `files`, npm includes the entire repo                 |
-| `package.json#exports`             | unset                                                                                            | No public Node API surface; consumers can only use the CLI    |
-| `package.json#main`                | unset                                                                                            | OK for CLI-only; if Node API is desired, must be set          |
-| Tarball size                       | **1.9 MB** (compressed) / **8.3 MB unpacked**                                                    | Heavy. Most of the weight is `pages/` / `tests/` / `docs/`    |
-| Total files                        | **969**                                                                                          | Far too many for a CLI distribution                           |
-| Top contributors                   | `skills/` (227) / `tests/` (193) / `pages/` (158) / `src/` (75) / `runners/` (61) / `docs/` (31) | Several categories should be excluded                         |
-| `bin.river` / `bin.river-reviewer` | `./src/cli.mjs`                                                                                  | OK                                                            |
-| `engines.node`                     | `22.x`                                                                                           | Strict; consumers on Node 20 LTS will fail install            |
+| Metric                           | Current                                                                                          | Concern                                                       |
+| -------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| `package.json#private`           | `true`                                                                                           | Blocks publish; must be removed (or set to `false`) before B2 |
+| `package.json#files`             | unset                                                                                            | Without `files`, npm includes the entire repo                 |
+| `package.json#exports`           | unset                                                                                            | No public Node API surface; consumers can only use the CLI    |
+| `package.json#main`              | unset                                                                                            | OK for CLI-only; if Node API is desired, must be set          |
+| Tarball size                     | **1.9 MB** (compressed) / **8.3 MB unpacked**                                                    | Heavy. Most of the weight is `pages/` / `tests/` / `docs/`    |
+| Total files                      | **969**                                                                                          | Far too many for a CLI distribution                           |
+| Top contributors                 | `skills/` (227) / `tests/` (193) / `pages/` (158) / `src/` (75) / `runners/` (61) / `docs/` (31) | Several categories should be excluded                         |
+| `bin.river` / `bin.river-review` | `./src/cli.mjs`                                                                                  | OK                                                            |
+| `engines.node`                   | `22.x`                                                                                           | Strict; consumers on Node 20 LTS will fail install            |
 
 ### What goes in the tarball today (categories that are concerning)
 
@@ -30,14 +30,14 @@ This doc captures the design decisions and the `npm pack --dry-run` audit findin
 
 Two CLIs exist in the repo:
 
-| CLI                              | `package.json#name`          | `bin`                      | Subcommands                                                                                            |
-| -------------------------------- | ---------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Main (`src/cli.mjs`)             | `river-reviewer` (root)      | `river` / `river-reviewer` | `run` / `skills` / `doctor` / `review plan` / `review exec` / `review verify` / `eval` / `suppression` |
-| Runner (`runners/cli/bin/river`) | `@river-reviewer/cli-runner` | `river` (workspace-local)  | `review` / `eval` / `create skill`                                                                     |
+| CLI                              | `package.json#name`        | `bin`                     | Subcommands                                                                                            |
+| -------------------------------- | -------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Main (`src/cli.mjs`)             | `river-review` (root)      | `river` / `river-review`  | `run` / `skills` / `doctor` / `review plan` / `review exec` / `review verify` / `eval` / `suppression` |
+| Runner (`runners/cli/bin/river`) | `@river-review/cli-runner` | `river` (workspace-local) | `review` / `eval` / `create skill`                                                                     |
 
-The two CLIs have **overlapping command names** (`review`, `eval`). When `river-reviewer` is published to npm and a user runs `npx river-reviewer review …`, it routes to the **main CLI's `river review plan|exec|verify`**, not the Runner CLI's `review`. This is the correct behaviour for the v0.55.0 / Phase 3 use case, but adopters expecting the Runner CLI's `river review [files...]` will be surprised.
+The two CLIs have **overlapping command names** (`review`, `eval`). When `river-review` is published to npm and a user runs `npx river-review review …`, it routes to the **main CLI's `river review plan|exec|verify`**, not the Runner CLI's `review`. This is the correct behaviour for the v0.55.0 / Phase 3 use case, but adopters expecting the Runner CLI's `river review [files...]` will be surprised.
 
-**Decision**: Publish only the main CLI as `river-reviewer`. Document the Runner CLI as a contributor-only tool in `runners/cli/README.md`. Do not publish `@river-reviewer/cli-runner` to npm.
+**Decision**: Publish only the main CLI as `river-review`. Document the Runner CLI as a contributor-only tool in `runners/cli/README.md`. Do not publish `@river-review/cli-runner` to npm.
 
 ### 2. Node 22 strict requirement
 
@@ -61,13 +61,13 @@ The two CLIs have **overlapping command names** (`review`, `eval`). When `river-
 
 ```diff
  {
-   "name": "river-reviewer",
+   "name": "river-review",
    "version": "0.55.0",
 -  "private": true,
 +  "private": false,
    "bin": {
      "river": "./src/cli.mjs",
-     "river-reviewer": "./src/cli.mjs"
+     "river-review": "./src/cli.mjs"
    },
 +  "files": [
 +    "src/",
@@ -114,7 +114,7 @@ These are estimates; exact numbers should come from `npm pack --dry-run` in B2.
 
 - `npx river try` quick-start command (separate slice C3)
 - Sample skill pack curation for the npm tarball
-- npm scoped package strategy (`@river-reviewer/*`)
+- npm scoped package strategy (`@river-review/*`)
 - Automated publish workflow (release-please-action integration)
 - Cross-platform install testing (Node 20 / 22 on macOS / Linux / Windows)
 
@@ -132,7 +132,7 @@ These should be sequenced after B2 lands.
 
 ## References
 
-- [#800](https://github.com/s977043/river-reviewer/issues/800)—npm 配布 parent issue
+- [#800](https://github.com/s977043/river-review/issues/800)—npm 配布 parent issue
 - [`pages/reference/stable-interfaces.md`](../../pages/reference/stable-interfaces.md)—public API surface
 - [`runners/cli/README.md`](../../runners/cli/README.md)—Runner CLI documentation
 - [`docs/development/execution-context-contract.md`](./execution-context-contract.md)—runtime contract

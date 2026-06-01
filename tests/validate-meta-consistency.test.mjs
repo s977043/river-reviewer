@@ -8,8 +8,8 @@ import {
 
 test('extractActionTags finds versioned tags', () => {
   const text = `
-    uses: s977043/river-reviewer/runners/github-action@v0.10.0
-    uses: s977043/river-reviewer/runners/github-action@v0.10.0
+    uses: s977043/river-review/runners/github-action@v0.10.0
+    uses: s977043/river-review/runners/github-action@v0.10.0
   `;
   const tags = extractActionTags(text);
   assert.deepEqual(tags, ['v0.10.0']);
@@ -17,8 +17,8 @@ test('extractActionTags finds versioned tags', () => {
 
 test('extractActionTags finds multiple different tags', () => {
   const text = `
-    uses: s977043/river-reviewer/runners/github-action@v0.10.0
-    uses: s977043/river-reviewer/runners/github-action@v0.5.0
+    uses: s977043/river-review/runners/github-action@v0.10.0
+    uses: s977043/river-review/runners/github-action@v0.5.0
   `;
   const tags = extractActionTags(text);
   assert.equal(tags.length, 2);

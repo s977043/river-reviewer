@@ -1,10 +1,10 @@
 # Core Runner
 
-Core skill execution components for River Reviewer.
+Core skill execution components for River Review.
 
 ## Overview
 
-The core runner provides the foundational skill loading and execution planning functionality for River Reviewer. It handles:
+The core runner provides the foundational skill loading and execution planning functionality for River Review. It handles:
 
 - Loading and validating skills from the skills registry
 - Routing changed files to appropriate skills based on phase, file patterns, and context

@@ -1,6 +1,6 @@
 # Execution Context Contract (`river review exec`)
 
-This document fixes the contract between `runReviewPlan`, `buildExecutionPlan`, and `generateReview` on the `river review exec` path, as of v0.53.0. It exists primarily as a prerequisite for [#878 (A2-3 `--plan` replay execution)](https://github.com/s977043/river-reviewer/issues/878): Codex and Gemini both warned that A2-3 will silently re-introduce "context snapshot drift" bugs unless the `ExecutionContext` boundary is named and stable.
+This document fixes the contract between `runReviewPlan`, `buildExecutionPlan`, and `generateReview` on the `river review exec` path, as of v0.53.0. It exists primarily as a prerequisite for [#878 (A2-3 `--plan` replay execution)](https://github.com/s977043/river-review/issues/878): Codex and Gemini both warned that A2-3 will silently re-introduce "context snapshot drift" bugs unless the `ExecutionContext` boundary is named and stable.
 
 It is not user-facing reference. For end-user diagnosis, see [`docs/review/troubleshooting.md`](../review/troubleshooting.md).
 
@@ -219,8 +219,8 @@ When adding a new forwarded field, follow this checklist:
 
 ## References
 
-- [#802](https://github.com/s977043/river-reviewer/issues/802) Phase 3 parent issue
-- [#878](https://github.com/s977043/river-reviewer/issues/878) A2-3 tracker (this doc's primary consumer)
+- [#802](https://github.com/s977043/river-review/issues/802) Phase 3 parent issue
+- [#878](https://github.com/s977043/river-review/issues/878) A2-3 tracker (this doc's primary consumer)
 - [Spec: CLI review exec](../../pages/reference/cli-review-exec-spec.md)
 - [Spec: Artifact Input Contract](../../pages/reference/artifact-input-contract.md)
 - [Spec: Review Artifact](../../pages/reference/review-artifact.md)

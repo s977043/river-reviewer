@@ -14,7 +14,7 @@ If isolation is difficult, run `river doctor .` first to check for "missing conf
 
 - Symptom (Example):
   - `LLM: OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set`
-  - `River Reviewer doctor` shows `OpenAI (review): not set`
+  - `River Review doctor` shows `OpenAI (review): not set`
 - Action:
   - Set `OPENAI_API_KEY` or `RIVER_OPENAI_API_KEY` in environment variables.
   - Use `--dry-run` to avoid external requests.

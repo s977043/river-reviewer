@@ -87,7 +87,7 @@ Resolution priority (CLI > config > directory detection) follows the contract.
 >
 > Addendum (#802 Phase 3, 2026-05-18): **`river review exec --dry-run` (without `--plan`) is implemented.** Per spec, dry-run makes no external LLM / skill execution — it only resolves inputs and produces a deterministic plan, emitting a v1 Review Artifact with `status` `ok`/`no-changes` and `findings: []`, exit 0 (it reuses `runReviewPlan`, the same non-breaking path as `river review plan --plan-only`).
 >
-> Addendum ([#935](https://github.com/s977043/river-reviewer/pull/935), 2026-05-29): **`river review exec --plan <file>` is now implemented.** It reads the plan file, executes skills via `generateReview`, and produces a Review Artifact. Non-dry-run `exec` without `--plan` still returns exit 3. `verify` execution remains unimplemented.
+> Addendum ([#935](https://github.com/s977043/river-review/pull/935), 2026-05-29): **`river review exec --plan <file>` is now implemented.** It reads the plan file, executes skills via `generateReview`, and produces a Review Artifact. Non-dry-run `exec` without `--plan` still returns exit 3. `verify` execution remains unimplemented.
 
 ## Input artifacts
 
