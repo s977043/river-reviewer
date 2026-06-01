@@ -79,11 +79,11 @@ river review exec \
 
 ## synthesis skill の動作
 
-W チェックの統合処理は `rr-midstream-independent-review-synthesis-001` skill（`recommended: true`）が担います。この skill は以下の 3 つの主要ステップで動作します:
+W チェックの統合処理は `rr-midstream-independent-review-synthesis-001` skill（`recommended: true`）が担います。この skill は以下の 3 つの主要ステップで動作します。
 
-1. **重複排除 (Deduplicate)**: 複数のレビュアーが同じ箇所を指摘した場合、file path・行範囲・evidence テキストに基づいて同一 finding として統合します。
-2. **ハルシネーション検証 (Hallucination guard)**: 各 finding の `evidence` が参照するファイルパスとコードスニペットを実際の差分と照合し、実在しないコードを参照している指摘を `dismissed-hallucination` として除外します。
-3. **マージ推奨 (Merge recommendation)**: 確認済みの critical / major finding の有無に基づいて `merge-ready` / `human-review` / `block` のいずれかを出力します。
+1. **重複排除 (Deduplicate)**: 複数のレビュアーが同じ箇所を指摘した場合、file path・行範囲・evidence テキストに基づいて同一 finding として統合する。
+2. **ハルシネーション検証 (Hallucination guard)**: 各 finding の `evidence` が参照するファイルパスとコードスニペットを実際の差分と照合し、実在しないコードを参照している指摘を `dismissed-hallucination` として除外する。
+3. **マージ推奨 (Merge recommendation)**: 確認済みの critical / major finding の有無に基づいて `merge-ready` / `human-review` / `block` のいずれかを出力する。
 
 skill の詳細: [`skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md`](../../skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md)
 
