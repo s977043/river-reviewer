@@ -1,6 +1,6 @@
 {
   "name": "river-reviewer",
-  "version": "0.69.0",
+  "version": "0.70.0",
   "private": true,
   "workspaces": [
     "runners/node-api",

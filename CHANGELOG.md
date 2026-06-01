@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.70.0](https://github.com/s977043/river-reviewer/compare/v0.69.0...v0.70.0) (2026-06-01)
+
+
+### Features
+
+* **docs+skills:** --reviewers auto docs, agent templates, skill version fixes ([#964](https://github.com/s977043/river-reviewer/issues/964)) ([78c5566](https://github.com/s977043/river-reviewer/commit/78c55662d3f2d04b5b378bd52372e5813b19b230))
+* **skills:** add Figma design drift and component reuse guard skills ([#944](https://github.com/s977043/river-reviewer/issues/944)) ([baa14bf](https://github.com/s977043/river-reviewer/commit/baa14bf3a5ff53afd9e69a46ec890541e2912f2c))
+
+
+### Bug Fixes
+
+* update stale docs, action yaml validation, and promote design skills ([#950](https://github.com/s977043/river-reviewer/issues/950)) ([ae49569](https://github.com/s977043/river-reviewer/commit/ae49569b4f0b0fe8cc088d526bdb435d4629e832))
+
 ## [0.69.0](https://github.com/s977043/river-reviewer/compare/v0.68.0...v0.69.0) (2026-05-29)
 
 
