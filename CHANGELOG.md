@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.0.0](https://github.com/s977043/river-review/compare/v0.69.0...v1.0.0) (2026-06-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* config file renamed from .river-reviewer.json to .river-review.json; agent skill IDs changed from river-reviewer* to river-review*.
+
+### Features
+
+* **docs+skills:** --reviewers auto docs, agent templates, skill version fixes ([#964](https://github.com/s977043/river-review/issues/964)) ([78c5566](https://github.com/s977043/river-review/commit/78c55662d3f2d04b5b378bd52372e5813b19b230))
+* rename River Reviewer → River Review across entire codebase ([#967](https://github.com/s977043/river-review/issues/967)) ([050794c](https://github.com/s977043/river-review/commit/050794c68f33103effbc57d4961a031033bd0a9b))
+* **skills:** add Figma design drift and component reuse guard skills ([#944](https://github.com/s977043/river-review/issues/944)) ([baa14bf](https://github.com/s977043/river-review/commit/baa14bf3a5ff53afd9e69a46ec890541e2912f2c))
+
+
+### Bug Fixes
+
+* post-rename cleanup and update public URL ([#969](https://github.com/s977043/river-review/issues/969)) ([8e8c81c](https://github.com/s977043/river-review/commit/8e8c81cbbbeebd9b61b295063799046faf559519))
+* rename example workflow files and fix lychee user-agent ([#970](https://github.com/s977043/river-review/issues/970)) ([a639de7](https://github.com/s977043/river-review/commit/a639de70bb9568566c0ff82582d1210e16fb96b5))
+* update stale docs, action yaml validation, and promote design skills ([#950](https://github.com/s977043/river-review/issues/950)) ([ae49569](https://github.com/s977043/river-review/commit/ae49569b4f0b0fe8cc088d526bdb435d4629e832))
+
 ## [0.69.0](https://github.com/s977043/river-reviewer/compare/v0.68.0...v0.69.0) (2026-05-29)
 
 
