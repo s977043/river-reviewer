@@ -17,6 +17,7 @@ applyTo:
 inputContext: [diff, fullFile]
 outputKind: [findings, questions, actions]
 tags: [adversarial, pre-mortem, war-game, logic-torturing, cognitive-bias, entry, routing]
+version: '0.1.0'
 license: MIT
 ---
 

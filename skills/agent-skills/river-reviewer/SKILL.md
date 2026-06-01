@@ -10,6 +10,7 @@ phase: [upstream, midstream, downstream]
 severity: minor
 applyTo: ['**/*']
 tags: [entry, routing, orchestrator, improvement-loop]
+version: '0.1.0'
 license: MIT
 ---
 

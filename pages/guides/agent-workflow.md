@@ -24,6 +24,23 @@ river run . --dry-run
 river run . --output json
 ```
 
+### `--reviewers auto` の仕組み
+
+`auto` を指定すると、diff の内容を解析してレビュアーロールを自動選択します。常に `bug-hunter` が含まれ、以下のシグナルに基づいて追加ロールが加わります。
+
+| シグナル                                                                                             | 追加されるロール   |
+| ---------------------------------------------------------------------------------------------------- | ------------------ |
+| config / schema / migration / infra ファイルが変更されている、またはリスク評価済みファイルが存在する | `security-scanner` |
+| test ファイルが変更されている、または app ファイルが 3 件以上ある                                    | `test-gap`         |
+
+どのロールが選択されたかは、JSON 出力の `autoSelectedRoles` フィールドで確認できます。
+
+```json
+{
+  "autoSelectedRoles": ["bug-hunter", "security-scanner", "test-gap"]
+}
+```
+
 ---
 
 ## エージェント別の呼び出し方
@@ -64,11 +81,15 @@ Cursor の Agent モードからターミナルコマンドとして呼び出せ
 river run . --reviewers auto
 ```
 
+設定テンプレートは `templates/agent-workflow/` を参照してください。
+
 ### Codex CLI
 
 ```bash
 codex exec "river run . --reviewers auto"
 ```
+
+設定テンプレートは `templates/agent-workflow/` を参照してください。
 
 ### GitHub Copilot
 

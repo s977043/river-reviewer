@@ -1,0 +1,24 @@
+# River Reviewer — Cursor Agent Rules
+
+## When to run River Reviewer
+
+- Before committing: run a code review on staged changes.
+- When the user asks to "review", "check", or "audit" the current diff or a file.
+
+## Command
+
+```bash
+river run . --reviewers auto
+```
+
+If no API key is configured, use dry-run mode to validate the setup without making API calls:
+
+```bash
+river run . --dry-run
+```
+
+## Interpreting results
+
+- **Critical / Major**: Block the commit or merge. Explain the issue to the user and suggest a fix.
+- **Minor**: Advisory. Surface to the user but do not block.
+- **Info**: Informational only.
