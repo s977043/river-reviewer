@@ -72,7 +72,7 @@ include_fragments = true
 cache = true
 
 # User agent string
-user_agent = "Mozilla/5.0 (compatible; River-Reviewer-LinkChecker/1.0; +https://github.com/s977043/river-review)"
+user_agent = "Mozilla/5.0 (compatible; River-Review-LinkChecker/1.0; +https://github.com/s977043/river-review)"
 
 # Timeout per request (in seconds)
 timeout = 30
