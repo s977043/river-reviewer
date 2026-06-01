@@ -1,6 +1,6 @@
 # Release Smoke Runbook
 
-Minimal post-publish checks to run after every River Reviewer release. This is **not** a release runbook (release-please handles tagging and the GitHub Release itself); it is the **smoke test that confirms the released artifacts behave for an adopter**.
+Minimal post-publish checks to run after every River Review release. This is **not** a release runbook (release-please handles tagging and the GitHub Release itself); it is the **smoke test that confirms the released artifacts behave for an adopter**.
 
 This was added as Codex's final-pass review item #3 (after the v0.51.0–v0.55.0 sprint, 2026-05-24). The goal is for the next person to run, not to read.
 
@@ -52,7 +52,7 @@ After the smoke sequence is green, confirm the GitHub Release artifacts:
 ```bash
 TAG="v$(node -p 'require("./package.json").version')"
 gh release view "$TAG" --json tagName,name,publishedAt,assets
-gh api repos/s977043/river-reviewer/releases/tags/"$TAG" --jq '.body | .[0:400]'
+gh api repos/s977043/river-review/releases/tags/"$TAG" --jq '.body | .[0:400]'
 ```
 
 The `tagName` / `publishedAt` should be present (not `404 Not Found`). The release body should include the changelog block release-please assembled.

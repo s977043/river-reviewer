@@ -2,9 +2,9 @@
 title: PlanGate CLI 安定化ロードマップ
 ---
 
-`river review plan` / `river review exec` / `river review verify` は、PlanGate をはじめとする上流ワークフローが生成した artifact を入力として、レビュー計画・実行・再監査を行う CLI サブコマンド群です。これらは River Reviewer の最大の差別化要素ですが、**仕様（spec）と実装・CI・配布の間にドリフトがあり**、導入側が安定的に利用できる状態にありません。
+`river review plan` / `river review exec` / `river review verify` は、PlanGate をはじめとする上流ワークフローが生成した artifact を入力として、レビュー計画・実行・再監査を行う CLI サブコマンド群です。これらは River Review の最大の差別化要素ですが、**仕様（spec）と実装・CI・配布の間にドリフトがあり**、導入側が安定的に利用できる状態にありません。
 
-本ドキュメントは [Issue #802](https://github.com/s977043/river-reviewer/issues/802) に対応し、(1) 現状の契約ドリフトの棚卸し、(2) 公開エントリポイントの方針確定、(3) 安定化目標バージョンのロードマップ、(4) 解消すべき仕様不整合と推奨統一契約を定義します。
+本ドキュメントは [Issue #802](https://github.com/s977043/river-review/issues/802) に対応し、(1) 現状の契約ドリフトの棚卸し、(2) 公開エントリポイントの方針確定、(3) 安定化目標バージョンのロードマップ、(4) 解消すべき仕様不整合と推奨統一契約を定義します。
 
 > 関連: [Artifact Input Contract](./artifact-input-contract.md) / [Stable Interfaces](./stable-interfaces.md) / [`river review plan` 仕様](./cli-review-plan-spec.md) / [`river review exec` 仕様](./cli-review-exec-spec.md) / [`river review verify` 仕様](./cli-review-verify-spec.md) / `docs/CLI-architecture.md`
 
@@ -24,13 +24,13 @@ title: PlanGate CLI 安定化ロードマップ
 
 ## 公開エントリポイントの方針（確定）
 
-**`river review plan` / `river review exec` / `river review verify` の安定版公開エントリポイントは、メイン CLI（`src/cli.mjs`、`package.json#bin` の `river` / `river-reviewer`）に実装する。**
+**`river review plan` / `river review exec` / `river review verify` の安定版公開エントリポイントは、メイン CLI（`src/cli.mjs`、`package.json#bin` の `river` / `river-review`）に実装する。**
 
 理由:
 
 - メイン CLI は npm `bin` に登録され、GitHub Action 本番経路（`runners/github-action` → `src/cli.mjs`）でも使われる唯一の安定動線である。
 - Runner CLI（`runners/cli/`）は npm 未公開・スキル開発者向け実験的インターフェースであり、`docs/CLI-architecture.md` でも置き換え計画は無いと明記されている。Runner CLI 側の `review` は **簡易確認用** の位置づけを維持し、安定 CI 契約は担わない。
-- この方針により、[Issue #801](https://github.com/s977043/river-reviewer/issues/801)（レビューエンジンとドキュメントサイトのパッケージ分離）が分離境界を設計する際の **public API の所在が一意に固定**される。#801 はこの境界（`src/cli.mjs` 上の `review` サブコマンドと、それが依存する `src/lib/*` の import 境界）を壊してはならない。
+- この方針により、[Issue #801](https://github.com/s977043/river-review/issues/801)（レビューエンジンとドキュメントサイトのパッケージ分離）が分離境界を設計する際の **public API の所在が一意に固定**される。#801 はこの境界（`src/cli.mjs` 上の `review` サブコマンドと、それが依存する `src/lib/*` の import 境界）を壊してはならない。
 
 > このエントリポイント決定は #802 のスコープ内で「決定」のみを行う。実装（メイン CLI への `review` サブコマンド追加）は後続フェーズ（下記 Phase 3）で設計承認のうえ着手する。
 

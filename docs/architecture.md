@@ -1,10 +1,10 @@
-# River Reviewer Architecture
+# River Review Architecture
 
 > **Note:** 公開版のアーキテクチャ解説は [`pages/explanation/river-architecture.md`](../pages/explanation/river-architecture.md) を参照してください。本ファイルは実装詳細の内部補足資料です。
 
 ## Overview
 
-River Reviewer is a **context engineering framework for AI code review**, built around a Skill Registry that transforms implicit team knowledge into reproducible, version-controlled agent skills.
+River Review is a **context engineering framework for AI code review**, built around a Skill Registry that transforms implicit team knowledge into reproducible, version-controlled agent skills.
 
 The core philosophy: **"Skills are the main feature."** Everything else—GitHub Actions, CLI, Node API—are just interfaces to execute these skills.
 

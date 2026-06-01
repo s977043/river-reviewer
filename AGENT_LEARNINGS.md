@@ -1,4 +1,4 @@
-# AGENT_LEARNINGS.md — River Reviewer
+# AGENT_LEARNINGS.md — River Review
 
 ## Purpose
 
@@ -45,8 +45,8 @@
 - `2026-05-24`: release-please often leaves a PR in `mergeStateStatus: BLOCKED` because the required CI checks did not register on the auto-generated branch (only `Vercel` appears). Fix: advance the branch by one empty commit. When local `git push` is unavailable (e.g. macOS Full Disk Access revoked the working tree), do it entirely via the gh REST API:
 
   ```bash
-  REPO=s977043/river-reviewer
-  BRANCH=release-please--branches--main--components--river-reviewer
+  REPO=s977043/river-review
+  BRANCH=release-please--branches--main--components--river-review
   PARENT=$(gh api repos/$REPO/git/refs/heads/$BRANCH --jq '.object.sha')
   TREE=$(gh api repos/$REPO/git/commits/$PARENT --jq '.tree.sha')
 

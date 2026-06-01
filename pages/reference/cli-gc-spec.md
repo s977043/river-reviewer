@@ -2,7 +2,7 @@
 title: CLI Spec — `river gc`
 ---
 
-`river gc` は River Reviewer の **決定論的ガベージコレクション** エントリポイントです。レビューパイプラインの外側で動くメンテナンス CLI であり、`.river/memory/`・`artifacts/evals/`・`artifacts/review-artifact*.json`・一時ファイルなどの古い成果物を、再現可能なルールで削除（または候補としてフラグ）します。`river review *` とは責務が分かれますが、CI から安定して呼び出せるよう CLI エルゴノミクスだけは揃えています。
+`river gc` は River Review の **決定論的ガベージコレクション** エントリポイントです。レビューパイプラインの外側で動くメンテナンス CLI であり、`.river/memory/`・`artifacts/evals/`・`artifacts/review-artifact*.json`・一時ファイルなどの古い成果物を、再現可能なルールで削除（または候補としてフラグ）します。`river review *` とは責務が分かれますが、CI から安定して呼び出せるよう CLI エルゴノミクスだけは揃えています。
 
 > 関連 Issue: #576（Task）/ #509（Capability）/ #507（Epic）
 > 関連 workflow: `.github/workflows/weekly-gc.yml`

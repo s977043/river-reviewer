@@ -1,6 +1,6 @@
 # Skill Schema Reference
 
-All skills in River Reviewer must conform to JSON schema located at:
+All skills in River Review must conform to JSON schema located at:
 
 ```text
 /schemas/skill.schema.json

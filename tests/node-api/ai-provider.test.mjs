@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-// Import pure AI helpers (no @river-reviewer/core-runner dependency)
+// Import pure AI helpers (no @river-review/core-runner dependency)
 import { parseProvider, parseFindings } from '../../runners/node-api/dist/ai-helpers.js';
 
 describe('parseProvider', () => {

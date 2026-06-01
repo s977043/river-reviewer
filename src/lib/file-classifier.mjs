@@ -11,7 +11,7 @@ const RE_DOCKER_COMPOSE = /^docker-compose/;
 
 const CONFIG_NAMES = new Set([
   'package.json',
-  '.river-reviewer.json',
+  '.river-review.json',
   '.lychee.toml',
   '.markdownlint.json',
   '.markdownlint-cli2.yaml',

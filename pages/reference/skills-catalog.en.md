@@ -1,6 +1,6 @@
 # Skills Catalog
 
-List of skills bundled with River Reviewer, categorized by phase.
+List of skills bundled with River Review, categorized by phase.
 
 ## upstream
 

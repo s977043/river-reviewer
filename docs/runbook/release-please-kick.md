@@ -31,7 +31,7 @@ workflows (no-recursion safety), so the default token cannot do this job (#906).
 ```bash
 scripts/release-please-kick.sh
 # or with explicit branch:
-scripts/release-please-kick.sh release-please--branches--main--components--river-reviewer
+scripts/release-please-kick.sh release-please--branches--main--components--river-review
 ```
 
 The script uses `gh api` to create an empty commit via the REST API

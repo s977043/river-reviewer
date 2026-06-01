@@ -28066,7 +28066,7 @@ const RE_DOCKER_COMPOSE = /^docker-compose/;
 
 const CONFIG_NAMES = new Set([
   'package.json',
-  '.river-reviewer.json',
+  '.river-review.json',
   '.lychee.toml',
   '.markdownlint.json',
   '.markdownlint-cli2.yaml',
@@ -29409,7 +29409,7 @@ class ConfigLoaderError extends Error {
 class ConfigLoader {
   constructor({
     baseConfig = config_default/* defaultConfig */.s,
-    fileNames = ['.river-reviewer.json', '.river-reviewer.yaml', '.river-reviewer.yml'],
+    fileNames = ['.river-review.json', '.river-review.yaml', '.river-review.yml'],
     fsImpl = promises_,
   } = {}) {
     this.baseConfig = baseConfig;
@@ -31022,7 +31022,7 @@ const _PRESETS = (/* unused pure expression or super */ null && (PRESETS));
 
 ;// CONCATENATED MODULE: ./src/lib/repo-context.mjs
 /**
- * Repo-wide context collector for River Reviewer.
+ * Repo-wide context collector for River Review.
  * Gathers full file text, corresponding tests, symbol usages, and config
  * snippets relevant to the changed files, within a configurable token budget.
  */
@@ -31470,8 +31470,8 @@ function sanitizeSkillName(name) {
 
 function buildSystemMessage(language) {
   return language === 'en'
-    ? 'You are River Reviewer, an expert code review assistant. Respond in English. You excel at spotting risky changes and explaining them briefly.'
-    : 'You are River Reviewer, an expert code review assistant. Respond in Japanese. You excel at spotting risky changes and explaining them briefly.';
+    ? 'You are River Review, an expert code review assistant. Respond in English. You excel at spotting risky changes and explaining them briefly.'
+    : 'You are River Review, an expert code review assistant. Respond in Japanese. You excel at spotting risky changes and explaining them briefly.';
 }
 
 function buildLanguageInstruction(language) {
@@ -31598,7 +31598,7 @@ function buildPrompt({
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
   const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_8__/* .getReviewDepthConfig */ .i)(reviewMode ?? 'medium');
-  const prompt = `You are River Reviewer, an AI code review agent.
+  const prompt = `You are River Review, an AI code review agent.
 Phase: ${phase}
 
 Changed files:
@@ -32589,7 +32589,7 @@ function computeFindingBreakdown(finding) {
  *
  * Deterministic (no AI): derives axis scores, overall score, and verdict from
  * structured findings. Inspired by unilabo/site-management-system's scoring
- * rubric, adapted to river-reviewer's HITL-first posture.
+ * rubric, adapted to river-review's HITL-first posture.
  *
  * The output is always flagged `derived: true` to signal that this is a
  * heuristic indicator, not an authoritative quality metric.
@@ -32753,7 +32753,7 @@ function normalizeSeverity(severity) {
  * Default scoring rubric for deterministic review scoring.
  *
  * Derived from unilabo/site-management-system's review-prompt.md, adapted to
- * river-reviewer's skill taxonomy. Scores are **derived from finding severity
+ * river-review's skill taxonomy. Scores are **derived from finding severity
  * and axis**, not AI-generated. See docs/review/scoring-model.md for rationale.
  */
 
@@ -32820,7 +32820,7 @@ const DEFAULT_DEDUCTIONS = {
  * Verdict thresholds (display only; HITL-respecting).
  *
  * `auto-approve` is a recommendation for automation (e.g. CI bot), NOT a policy
- * to merge without human review. river-reviewer remains HITL-first.
+ * to merge without human review. river-review remains HITL-first.
  */
 const VERDICT_THRESHOLDS = {
   autoApprove: {
@@ -33867,7 +33867,7 @@ function buildPlannerPrompt({ skills, context }) {
     .map((s) => `- ${s.id}: ${s.name} (${s.phase}) — ${s.description}`)
     .join('\n');
 
-  return `You are River Reviewer, an AI skill planner.
+  return `You are River Review, an AI skill planner.
 
 Goal: pick the most relevant review skills for this PR diff, and order them by priority.
 
@@ -33905,7 +33905,7 @@ async function callOpenAI({ prompt, apiKey, model, endpoint, timeoutMs }) {
         {
           role: 'system',
           content:
-            'You are River Reviewer, an expert code review skill planner. Return valid JSON only; do not wrap in Markdown.',
+            'You are River Review, an expert code review skill planner. Return valid JSON only; do not wrap in Markdown.',
         },
         { role: 'user', content: prompt },
       ],
@@ -34085,7 +34085,7 @@ function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
     content: JSON.stringify({ commentCount, phase, changedFiles: changedFiles?.slice(0, 20) }),
     metadata: {
       createdAt: timestamp,
-      author: 'river-reviewer',
+      author: 'river-review',
       ...(phase ? { phase } : {}),
       tags: ['review', 'automated'],
       relatedFiles: changedFiles?.slice(0, 50) ?? [],
@@ -56568,7 +56568,7 @@ ${rule.anti_patterns ? rule.anti_patterns.map((p) => `\`\`\`\n${p}\n\`\`\``).joi
       : '(No specific rules or body were defined for this skill. Perform a general, best-practice code review focusing on security, readability, maintainability, and performance, and only report materially important issues.)';
   }
 
-  const name = skill.name || 'River Reviewer';
+  const name = skill.name || 'River Review';
 
   if (isJa) {
     return `
@@ -56904,7 +56904,7 @@ var finding_format = __nccwpck_require__(5942);
 
 const MAX_PROMPT_PREVIEW_LENGTH = 800;
 const MAX_DIFF_PREVIEW_LINES = 200;
-const COMMENT_MARKER = '<!-- river-reviewer -->';
+const COMMENT_MARKER = '<!-- river-review -->';
 
 function printHintLines(lines = []) {
   const hints = lines.filter(Boolean);
@@ -56917,10 +56917,10 @@ function printHelp() {
   console.log(`Usage: river <command> <path> [options]
 
 Commands:
-  run <path>            Run River Reviewer locally against the git repo at <path>
+  run <path>            Run River Review locally against the git repo at <path>
   skills <path>         Run the new Skill-based Reviewer architecture
-  skills import         Import Agent Skills (SKILL.md) into River Reviewer
-  skills export         Export River Reviewer skills to Agent Skills format
+  skills import         Import Agent Skills (SKILL.md) into River Review
+  skills export         Export River Review skills to Agent Skills format
   skills list           List all skills (RR and Agent Skills)
   doctor <path>         Check setup and print hints for common issues
   review plan           Resolve upstream artifacts and emit a Review Artifact
@@ -57565,7 +57565,7 @@ function formatRiskSummaryMarkdown(plan) {
 
 function printMarkdownReport(result, phase) {
   const header = `${COMMENT_MARKER}
-## River Reviewer
+## River Review
 
 - フェーズ: \`${phase}\`
 ${formatDebugSummaryMarkdown(result)}
@@ -57951,7 +57951,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
         return (0,diff_optimizer/* renderDiffText */.p)([fileData]);
       };
 
-      console.log(`River Reviewer (Skills) - Target: ${targetPath}`);
+      console.log(`River Review (Skills) - Target: ${targetPath}`);
       const results = await dispatcher.run(
         repoDiff.changedFiles,
         getFileDiff,
@@ -58114,7 +58114,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
 
       const apiKey = external_node_process_namespaceObject.env.RIVER_OPENAI_API_KEY || external_node_process_namespaceObject.env.OPENAI_API_KEY;
 
-      console.log(`River Reviewer doctor
+      console.log(`River Review doctor
 Repo: ${result.repoRoot}
 Base branch: ${result.defaultBranch}
 Merge base: ${result.mergeBase}
@@ -58177,7 +58177,7 @@ Dependencies: ${
       parsed.output === 'markdown' || parsed.output === 'json' || parsed.output === 'yaml'
         ? console.error
         : console.log;
-    logRunHeader(`River Reviewer (local)
+    logRunHeader(`River Review (local)
 Phase: ${parsed.phase}
 Repo: ${context.repoRoot}
 Base branch: ${context.defaultBranch}

@@ -1,6 +1,6 @@
 # Skill Evaluation KPI
 
-River Reviewer の skill / planner / review pipeline がどれだけ「使える」状態かを測定する KPI 集。本 doc は **既に実装されているメトリクスを codify する** ことが目的で、新規メトリクスの追加は別 PR で扱う。
+River Review の skill / planner / review pipeline がどれだけ「使える」状態かを測定する KPI 集。本 doc は **既に実装されているメトリクスを codify する** ことが目的で、新規メトリクスの追加は別 PR で扱う。
 
 ## 計測レイヤ
 

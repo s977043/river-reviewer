@@ -148,8 +148,8 @@ Per `AGENTS.md` Self-Review Checklist:
 
 ## References
 
-- [#878](https://github.com/s977043/river-reviewer/issues/878) A2-3 tracker
-- [#880](https://github.com/s977043/river-reviewer/pull/880) ExecutionContext doc
+- [#878](https://github.com/s977043/river-review/issues/878) A2-3 tracker
+- [#880](https://github.com/s977043/river-review/pull/880) ExecutionContext doc
 - [`execution-context-contract.md`](./execution-context-contract.md)
 - `src/lib/review-plan.mjs` (`runReviewExecReplay`)
 - `schemas/review-artifact.schema.json`

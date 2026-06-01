@@ -1,8 +1,8 @@
-# River Reviewer—Issue / Project 運用ルール
+# River Review—Issue / Project 運用ルール
 
 ## 🌟 目的
 
-River Reviewer プロジェクトでは、機能開発・スキル設計・エージェント基盤拡張を持続的に進めるため、**Issue と GitHub Projects を一貫したフォーマット・フローで運用する**ことを定めています。
+River Review プロジェクトでは、機能開発・スキル設計・エージェント基盤拡張を持続的に進めるため、**Issue と GitHub Projects を一貫したフォーマット・フローで運用する**ことを定めています。
 
 この文書は、Issue 作成者・レビュアー・メンテナーが同じ前提で進められるようにするための運用ルールをまとめたものです。
 

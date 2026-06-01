@@ -3,7 +3,7 @@
  *
  * Deterministic (no AI): derives axis scores, overall score, and verdict from
  * structured findings. Inspired by unilabo/site-management-system's scoring
- * rubric, adapted to river-reviewer's HITL-first posture.
+ * rubric, adapted to river-review's HITL-first posture.
  *
  * The output is always flagged `derived: true` to signal that this is a
  * heuristic indicator, not an authoritative quality metric.

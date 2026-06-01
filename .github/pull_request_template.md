@@ -1,4 +1,4 @@
-# 🌊 River Reviewer Pull Request
+# 🌊 River Review Pull Request
 
 Flow your changes from Upstream to Midstream to Downstream with clear validation.
 

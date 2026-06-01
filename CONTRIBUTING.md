@@ -1,4 +1,4 @@
-# River Reviewer への貢献に感謝します
+# River Review への貢献に感謝します
 
 このプロジェクトをより良くするために時間を割いていただき、ありがとうございます。バグ報告、機能提案、ドキュメントの改善など、あらゆる形の貢献を歓迎します。
 英語版は `CONTRIBUTING.en.md` を参照してください（英語はベストエフォートの翻訳です）。
@@ -17,7 +17,7 @@
 - ドキュメント（`README.md` / `pages/`）に既に答えや方針がないか確認してください
 - 脆弱性の可能性がある場合は公開 Issue を作らず、`SECURITY.md` に従って非公開で報告してください
 
-Issue テンプレートは `Issues → New issue` から利用できます（または [issues/new/choose](https://github.com/s977043/river-reviewer/issues/new/choose)）。
+Issue テンプレートは `Issues → New issue` から利用できます（または [issues/new/choose](https://github.com/s977043/river-review/issues/new/choose)）。
 
 ### 🗂️ Issue の使い分け（目安）
 
@@ -98,16 +98,16 @@ npm run lint
 
 ## 📚 Documentation contributions
 
-River Reviewer のドキュメントは [Diátaxis documentation framework](https://diataxis.fr/) に従っています。ドキュメントを追加・更新する際は、どのタイプに当てはまるかを決め、型に沿って書いてください。
+River Review のドキュメントは [Diátaxis documentation framework](https://diataxis.fr/) に従っています。ドキュメントを追加・更新する際は、どのタイプに当てはまるかを決め、型に沿って書いてください。
 日本語版（`.md`）をソース・オブ・トゥルースとし、英語版は同名の `.en.md` をベストエフォートで維持します。差分がある場合は日本語版を優先してください。
 
 - Tutorial（チュートリアル）  
-  学習指向のステップバイステップで、新しいユーザーが River Reviewer で最初の成功体験を得られるようにするもの。  
-  例: "First steps with River Reviewer on GitHub Actions"
+  学習指向のステップバイステップで、新しいユーザーが River Review で最初の成功体験を得られるようにするもの。  
+  例: "First steps with River Review on GitHub Actions"
 
 - How-to guide（ガイド）  
   具体的なゴール達成のためのレシピ。読者は基本を理解済みです。  
-  例: "Add a custom review skill" / "Run River Reviewer locally"
+  例: "Add a custom review skill" / "Run River Review locally"
 
 - Reference（リファレンス）  
   API、設定、スキーマなどを正確かつ可能な限り網羅的に説明するもの。  
@@ -115,13 +115,13 @@ River Reviewer のドキュメントは [Diátaxis documentation framework](http
 
 - Explanation（背景解説）  
   背景、設計判断、概念を説明するもの。  
-  例: "Upstream/midstream/downstream model" / "Design principles of River Reviewer"
+  例: "Upstream/midstream/downstream model" / "Design principles of River Review"
 
 レビューを円滑にするため、以下もお願いします。
 
 - ファイルは該当するセクションに配置してください（例: `pages/tutorials/`, `pages/guides/`, `pages/reference/`, `pages/explanation/`）。英語版を追加する場合は、同じ場所に `.en.md` を付けたファイル名で配置してください。
 - 選んだタイプを PR のタイトルまたは説明に明記してください（例:
-  - Docs: Tutorial—Getting started with River Reviewer
+  - Docs: Tutorial—Getting started with River Review
   - Docs: How-to—Add a custom skill
   - Docs: Reference—GitHub Action inputs
   - Docs: Explanation—River flow model）

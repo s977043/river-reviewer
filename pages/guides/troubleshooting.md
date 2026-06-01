@@ -14,7 +14,7 @@
 
 - 症状（例）:
   - `LLM: OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set`
-  - `River Reviewer doctor` の `OpenAI (review): not set`
+  - `River Review doctor` の `OpenAI (review): not set`
 - 対応:
   - `OPENAI_API_KEY` または `RIVER_OPENAI_API_KEY` を環境変数で設定すること
   - 外部送信を避けたい場合は `--dry-run` を利用すること

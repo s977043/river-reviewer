@@ -2,7 +2,7 @@
 title: Adding a Skill (Shortest Path)
 ---
 
-This guide summarizes the **shortest path** to add a new skill (`skills/**/*.md`) to River Reviewer, validate it, and run it locally.
+This guide summarizes the **shortest path** to add a new skill (`skills/**/*.md`) to River Review, validate it, and run it locally.
 
 For detailed writing guidelines (Anti-patterns, Evidence, Non-goals, False positive guards, etc.), refer to `pages/guides/write-a-skill.en.md`.
 

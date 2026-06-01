@@ -41,7 +41,7 @@ export class ConfigLoaderError extends Error {
 export class ConfigLoader {
   constructor({
     baseConfig = defaultConfig,
-    fileNames = ['.river-reviewer.json', '.river-reviewer.yaml', '.river-reviewer.yml'],
+    fileNames = ['.river-review.json', '.river-review.yaml', '.river-review.yml'],
     fsImpl = fs,
   } = {}) {
     this.baseConfig = baseConfig;

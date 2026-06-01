@@ -107,6 +107,6 @@ open a PR referencing the eval artifact URL in the description.
   `.github/workflows/nightly-eval.yml`,
   `.github/workflows/skill-eval.yml`
 - Skill READMEs document the per-skill workflow.
-- Issues: [#868](https://github.com/s977043/river-reviewer/issues/868),
-  [#911](https://github.com/s977043/river-reviewer/issues/911).
+- Issues: [#868](https://github.com/s977043/river-review/issues/868),
+  [#911](https://github.com/s977043/river-review/issues/911).
 - Promptfoo docs: <https://www.promptfoo.dev/docs/configuration/guide>

@@ -1,6 +1,6 @@
 # Finding Verification / 指摘の自己検証
 
-River Reviewer が出した finding を確定させる前に、必ずこのチェックを通す。
+River Review が出した finding を確定させる前に、必ずこのチェックを通す。
 失敗した finding は出力しない（または `severity: info` に下げる）。
 
 ## 必須条件 / Hard requirements

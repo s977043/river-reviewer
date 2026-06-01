@@ -1,6 +1,6 @@
 # AI レビュー標準ポリシー
 
-River Reviewer の AI レビュアーが従うべき標準ポリシーを定義します。このポリシーは、レビューの品質と再現性を一定水準に保ち、開発者にとって有益で建設的なフィードバックを提供することを目的としています。
+River Review の AI レビュアーが従うべき標準ポリシーを定義します。このポリシーは、レビューの品質と再現性を一定水準に保ち、開発者にとって有益で建設的なフィードバックを提供することを目的としています。
 
 ## 1. 評価方針
 
@@ -83,7 +83,7 @@ AI レビュアーは以下の行為を避けなければなりません。
 
 ## 4. フェーズ別の考慮事項
 
-River Reviewer はフロー型レビューを採用しており、各フェーズで以下の点を重視します（フェーズの概念については [上流・中流・下流フェーズ](../explanation/upstream-midstream-downstream.md) を参照）。
+River Review はフロー型レビューを採用しており、各フェーズで以下の点を重視します（フェーズの概念については [上流・中流・下流フェーズ](../explanation/upstream-midstream-downstream.md) を参照）。
 
 ### 4.1 Upstream（上流・設計フェーズ）
 
@@ -149,5 +149,5 @@ AI レビューは以下の品質基準を満たす必要があります。
 ## 関連ドキュメント
 
 - [Skill Metadata](./metadata-fields.md)：スキルメタデータの仕様
-- [Design Philosophy](../explanation/design-philosophy.md)：River Reviewer の設計思想
+- [Design Philosophy](../explanation/design-philosophy.md)：River Review の設計思想
 - [River Architecture](../explanation/river-architecture.md)：全体アーキテクチャ

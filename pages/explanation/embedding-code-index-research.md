@@ -6,9 +6,9 @@ id: embedding-code-index-research
 
 > Status: **Research / Decision pending → 実装は当面見送り、`heuristic + ripgrep` の限界が明示された段階で再検討**
 >
-> 関連: [#691 research(context): embedding-based code indexを検討する](https://github.com/s977043/river-reviewer/issues/691) / 親 Epic [#650](https://github.com/s977043/river-reviewer/issues/650)
+> 関連: [#691 research(context): embedding-based code indexを検討する](https://github.com/s977043/river-review/issues/691) / 親 Epic [#650](https://github.com/s977043/river-review/issues/650)
 
-このノートは、River Reviewer の repo-wide review に embedding-based code index を導入する価値があるかを判断するための調査記録です。Issue #691 の Acceptance Criteria に対する回答を 1 ファイルにまとめます。
+このノートは、River Review の repo-wide review に embedding-based code index を導入する価値があるかを判断するための調査記録です。Issue #691 の Acceptance Criteria に対する回答を 1 ファイルにまとめます。
 
 ## 1. なぜ検討するか（解こうとしている問題）
 
@@ -78,7 +78,7 @@ id: embedding-code-index-research
 | determinism            | 同じ入力でも embedding 値が provider 側更新で変わる                               | model version pin、cache key に model name を含める                                                        |
 | index 鮮度             | コードが進む速度に index 更新が追いつかない                                       | PR 時に変更 file 分のみ on-the-fly re-embed                                                                |
 | dependency 増          | vector DB / model runtime の依存が CI に入る                                      | 案 A + ONNX で純 Node.js / WASM の範囲に収める、optional dependency                                        |
-| eval drift             | embedding 入替で同じ PR の検出結果が変わる                                        | [#688 eval fixtures](https://github.com/s977043/river-reviewer/issues/688) に embedding on/off 軸を追加    |
+| eval drift             | embedding 入替で同じ PR の検出結果が変わる                                        | [#688 eval fixtures](https://github.com/s977043/river-review/issues/688) に embedding on/off 軸を追加      |
 | LLM hallucination 補強 | semantic retrieval で「もっともらしい無関係 chunk」を引いて LLM の幻覚を増やす    | retrieval スコア閾値、ripgrep heuristic との **and 結合**（embedding は ranking のみに使う）               |
 
 ## 5. GitHub Actions でのキャッシュ戦略
@@ -92,7 +92,7 @@ id: embedding-code-index-research
 
 ## 6. monorepo 対応
 
-- workspace 配列を `.river-reviewer.yaml` の `index.scopes: [packages/*]` で宣言（将来追加）
+- workspace 配列を `.river-review.yaml` の `index.scopes: [packages/*]` で宣言（将来追加）
 - chunk metadata に `scope: 'packages/foo'` を持たせ、retrieval 時に変更ファイルが属する scope 優先で top-k 取得
 - 巨大化したら案 B（remote vector DB）の検討に切替
 
@@ -121,7 +121,7 @@ id: embedding-code-index-research
 
 ## 9. ripgrep / heuristic との併用方針
 
-- **ranking signal** として embedding score を [#689 token budget](https://github.com/s977043/river-reviewer/issues/689) の `pathProximity` / `symbolUsage` 等と並列に追加（重み 0.10〜0.15）
+- **ranking signal** として embedding score を [#689 token budget](https://github.com/s977043/river-review/issues/689) の `pathProximity` / `symbolUsage` 等と並列に追加（重み 0.10〜0.15）
 - 候補集合の **生成** は引き続き heuristic（embedding を生成器に使うと幻覚が増える）
 - 同一ファイルの heuristic 結果と embedding 結果が衝突したら heuristic 優先（ファイル単位 dedupe）
 
@@ -129,15 +129,15 @@ id: embedding-code-index-research
 
 **判断: 当面見送り。次のいずれかが起きた段階で再検討する。**
 
-1. [#688 eval fixtures](https://github.com/s977043/river-reviewer/issues/688) で **heuristic では検出できないが embedding なら検出できる** ケースが 5 件以上記録される
+1. [#688 eval fixtures](https://github.com/s977043/river-review/issues/688) で **heuristic では検出できないが embedding なら検出できる** ケースが 5 件以上記録される
 2. 利用リポジトリが 50k file 規模に達し、symbol grep の S/N が悪化したという運用報告が出る
 3. ADR / 仕様書 ↔ 実装の整合性チェックという新ユースケースが正式に Epic 化される
 
 理由:
 
-- 現時点の River Reviewer は upstream / midstream の skill 群が「変更ファイル ± 1 hop」に集中しており、heuristic で十分カバーできる
+- 現時点の River Review は upstream / midstream の skill 群が「変更ファイル ± 1 hop」に集中しており、heuristic で十分カバーできる
 - embedding 導入は **依存・コスト・privacy リスク・eval drift** を一度に増やすため、得られる検出力 lift が定量化できるまでは回避すべき
-- [#689 token budget + ranking](https://github.com/s977043/river-reviewer/issues/689) の効果が測定できれば、embedding なしでも ranking 改善で多くのケースが解決する見込み
+- [#689 token budget + ranking](https://github.com/s977043/river-review/issues/689) の効果が測定できれば、embedding なしでも ranking 改善で多くのケースが解決する見込み
 
 ## 11. 実装する場合の後続 Issue 案（先送り中の参考）
 
@@ -148,14 +148,14 @@ id: embedding-code-index-research
 3. **local embedder backend (案 A)** — ONNX runtime + BGE-small、CLI: `river index build`
 4. **review-time retrieval integration** — `repo-context.mjs` への embedding ranker 追加
 5. **CI cache strategy** — `.river/index/` の actions/cache 仕様、incremental update
-6. **eval drift guards** — [#688](https://github.com/s977043/river-reviewer/issues/688) に embedding on/off 軸を追加
+6. **eval drift guards** — [#688](https://github.com/s977043/river-review/issues/688) に embedding on/off 軸を追加
 7. **docs-only first step (案 C)** — 段階導入したい場合の最小着地点
 
 各 Issue は独立した PR で完結する単位を想定し、Epic として grouping するかは導入を決める時点で再判断します。
 
 ## 結論（要約）
 
-- 現状は **heuristic + ripgrep + [#689 token budget/ranking](https://github.com/s977043/river-reviewer/issues/689) の改善** で十分
+- 現状は **heuristic + ripgrep + [#689 token budget/ranking](https://github.com/s977043/river-review/issues/689) の改善** で十分
 - embedding は **依存・privacy・cost・drift** のトレードオフが大きく、効果の定量化なしに導入すべきではない
 - 案 A（Local JSONL vector cache）が最有力、案 C（docs-only）が段階導入の保険
 - 上記 §10 の trigger 条件のいずれかが満たされた段階で本ノートを更新し、後続 Issue を起票する

@@ -1,6 +1,6 @@
 # Improvement Loop / 継続改善ループ
 
-River Reviewer を「レビューを実行するだけ」のエージェントから
+River Review を「レビューを実行するだけ」のエージェントから
 「レビュー結果の検証・フィードバック分類・skill への還元」を担う運用単位に進化させるための loop。
 
 1 件のフィードバックを **fixture / reference / suppression / routing** のいずれかに必ず降ろす。
@@ -24,8 +24,8 @@ ad hoc な prompt 修正で終わらせない。
 
 ### 1. Route
 
-- `skills/agent-skills/river-reviewer/SKILL.md` の Routing 表と `references/ROUTING.md` の優先度規則に従う。
-- 該当 skill が無ければ `river-reviewer-code` にフォールバック。
+- `skills/agent-skills/river-review/SKILL.md` の Routing 表と `references/ROUTING.md` の優先度規則に従う。
+- 該当 skill が無ければ `river-review-code` にフォールバック。
 - 同点なら併用実行。
 
 ### 2. Review

@@ -42,7 +42,7 @@ function buildPlannerPrompt({ skills, context }) {
     .map((s) => `- ${s.id}: ${s.name} (${s.phase}) — ${s.description}`)
     .join('\n');
 
-  return `You are River Reviewer, an AI skill planner.
+  return `You are River Review, an AI skill planner.
 
 Goal: pick the most relevant review skills for this PR diff, and order them by priority.
 
@@ -80,7 +80,7 @@ async function callOpenAI({ prompt, apiKey, model, endpoint, timeoutMs }) {
         {
           role: 'system',
           content:
-            'You are River Reviewer, an expert code review skill planner. Return valid JSON only; do not wrap in Markdown.',
+            'You are River Review, an expert code review skill planner. Return valid JSON only; do not wrap in Markdown.',
         },
         { role: 'user', content: prompt },
       ],

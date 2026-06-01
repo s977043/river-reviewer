@@ -47,7 +47,7 @@ test('findRelatedADRs returns empty with no options', () => {
 
 test('findRelatedADRs scans pages/explanation directory', () => {
   // pages/explanation/ has design-philosophy.md etc.
-  const results = findRelatedADRs(ROOT, { keywords: ['river reviewer'] });
+  const results = findRelatedADRs(ROOT, { keywords: ['river review'] });
   const fromExplanation = results.find((r) => r.path.startsWith('pages/explanation/'));
   assert.ok(fromExplanation, 'should find at least one doc in pages/explanation/');
 });

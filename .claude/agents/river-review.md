@@ -1,5 +1,5 @@
 ---
-name: river-reviewer
+name: river-review
 description: Code review and refactor suggestions for this repo. Use proactively after diffs. Enforce skills/ usage.
 tools: Read, Grep, Glob, Bash
 model: inherit

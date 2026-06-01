@@ -2,7 +2,7 @@
 title: CLI Spec — `river gc`
 ---
 
-`river gc` is River Reviewer's **deterministic garbage-collection** entrypoint. It is a maintenance CLI that runs outside the review pipeline and deletes (or flags) stale artifacts under `.river/memory/`, `artifacts/evals/`, `artifacts/review-artifact*.json`, and temp files left behind by previous CLI runs. It is NOT a review CLI — it shares CLI ergonomics with `river review *` only for consistency, so CI can call it with familiar flags.
+`river gc` is River Review's **deterministic garbage-collection** entrypoint. It is a maintenance CLI that runs outside the review pipeline and deletes (or flags) stale artifacts under `.river/memory/`, `artifacts/evals/`, `artifacts/review-artifact*.json`, and temp files left behind by previous CLI runs. It is NOT a review CLI — it shares CLI ergonomics with `river review *` only for consistency, so CI can call it with familiar flags.
 
 > Related issues: #576 (Task) / #509 (Capability) / #507 (Epic)
 > Related workflow: `.github/workflows/weekly-gc.yml`

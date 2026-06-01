@@ -1,6 +1,6 @@
 # 評価ルーブリック（多次元スコアリング）
 
-River Reviewer の評価フレームワークは、レビュー品質を多次元で定量化するルーブリックを提供します。各次元は独立したスコアを持ち、加重合計により総合スコアを算出します。
+River Review の評価フレームワークは、レビュー品質を多次元で定量化するルーブリックを提供します。各次元は独立したスコアを持ち、加重合計により総合スコアを算出します。
 
 > **Status**: 本書は仕様であり、ランタイム統合（`scripts/evaluate-review-fixtures.mjs` / `src/lib/review-fixtures-eval.mjs` への `dimensionScores` 生成ロジックの組み込み）は（別途追跡中）。現時点ではスキーマ・ルーブリック定義と整合性テスト（`tests/eval-rubric.test.mjs`）のみが実装済みです。
 

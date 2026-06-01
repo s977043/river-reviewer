@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: Masatake3/river-reviewer/runners/github-action@main
+      - uses: Masatake3/river-review/runners/github-action@main
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:

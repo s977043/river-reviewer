@@ -2,7 +2,7 @@
  * Default scoring rubric for deterministic review scoring.
  *
  * Derived from unilabo/site-management-system's review-prompt.md, adapted to
- * river-reviewer's skill taxonomy. Scores are **derived from finding severity
+ * river-review's skill taxonomy. Scores are **derived from finding severity
  * and axis**, not AI-generated. See docs/review/scoring-model.md for rationale.
  */
 
@@ -69,7 +69,7 @@ export const DEFAULT_DEDUCTIONS = {
  * Verdict thresholds (display only; HITL-respecting).
  *
  * `auto-approve` is a recommendation for automation (e.g. CI bot), NOT a policy
- * to merge without human review. river-reviewer remains HITL-first.
+ * to merge without human review. river-review remains HITL-first.
  */
 export const VERDICT_THRESHOLDS = {
   autoApprove: {

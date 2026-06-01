@@ -195,7 +195,7 @@ test('buildReviewEntry returns valid entry structure', () => {
   );
   assert.equal(entry.type, 'review');
   assert.ok(entry.id.startsWith('review-abc123-'));
-  assert.equal(entry.metadata.author, 'river-reviewer');
+  assert.equal(entry.metadata.author, 'river-review');
   assert.equal(entry.metadata.phase, 'midstream');
   assert.deepEqual(entry.metadata.relatedFiles, ['a.ts']);
 });

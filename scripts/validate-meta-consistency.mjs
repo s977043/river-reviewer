@@ -17,7 +17,7 @@ async function readText(filePath) {
  * Extract all @vX.Y.Z action tag references from text.
  */
 export function extractActionTags(text) {
-  const matches = text.match(/river-reviewer\/runners\/github-action@v[\d.]+/g) || [];
+  const matches = text.match(/river-review\/runners\/github-action@v[\d.]+/g) || [];
   return [...new Set(matches.map((m) => m.split('@')[1]))];
 }
 

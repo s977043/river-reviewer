@@ -26,7 +26,7 @@ ${rule.anti_patterns ? rule.anti_patterns.map((p) => `\`\`\`\n${p}\n\`\`\``).joi
       : '(No specific rules or body were defined for this skill. Perform a general, best-practice code review focusing on security, readability, maintainability, and performance, and only report materially important issues.)';
   }
 
-  const name = skill.name || 'River Reviewer';
+  const name = skill.name || 'River Review';
 
   if (isJa) {
     return `

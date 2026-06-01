@@ -1,5 +1,5 @@
 {
-  "name": "river-reviewer",
+  "name": "river-review",
   "version": "0.69.0",
   "private": true,
   "workspaces": [
@@ -7,21 +7,21 @@
     "runners/cli",
     "runners/core"
   ],
-  "description": "River Reviewer docs, schemas, and validation utilities.",
+  "description": "River Review docs, schemas, and validation utilities.",
   "license": "MIT",
   "engines": {
     "node": "22.x"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/s977043/river-reviewer.git"
+    "url": "https://github.com/s977043/river-review.git"
   },
   "bin": {
     "river": "./src/cli.mjs",
-    "river-reviewer": "./src/cli.mjs"
+    "river-review": "./src/cli.mjs"
   },
   "homepage": "https://river-reviewer.vercel.app/",
-  "bugs": "https://github.com/s977043/river-reviewer/issues",
+  "bugs": "https://github.com/s977043/river-review/issues",
   "scripts": {
     "dev": "docusaurus start",
     "build": "docusaurus build",

@@ -1,24 +1,24 @@
-# River Reviewer GitHub Action
+# River Review GitHub Action
 
-GitHub Action runner for River Reviewer - a phase-aware code review tool with intelligent skill matching.
+GitHub Action runner for River Review - a phase-aware code review tool with intelligent skill matching.
 
 ## Overview
 
-This GitHub Action allows you to run River Reviewer as part of your CI/CD workflow. It integrates with GitHub pull requests to provide automated code reviews across three phases: upstream (requirements/specs), midstream (implementation), and downstream (testing/deployment).
+This GitHub Action allows you to run River Review as part of your CI/CD workflow. It integrates with GitHub pull requests to provide automated code reviews across three phases: upstream (requirements/specs), midstream (implementation), and downstream (testing/deployment).
 
 ## Usage
 
 ### Basic Example
 
 ```yaml
-name: River Reviewer
+name: River Review
 
 on:
   pull_request:
     branches: [main]
 
 jobs:
-  river-reviewer:
+  river-review:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -27,8 +27,8 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Run River Reviewer
-        uses: s977043/river-reviewer/runners/github-action@main
+      - name: Run River Review
+        uses: s977043/river-review/runners/github-action@main
         with:
           phase: midstream
           dry_run: false
@@ -38,10 +38,10 @@ jobs:
 
 ### Using in the Same Repository
 
-If you're using this action within the River Reviewer repository itself:
+If you're using this action within the River Review repository itself:
 
 ```yaml
-- name: Run River Reviewer
+- name: Run River Review
   uses: ./runners/github-action
   with:
     phase: midstream
@@ -63,7 +63,7 @@ If you're using this action within the River Reviewer repository itself:
 
 ## Phases
 
-River Reviewer operates in three distinct phases:
+River Review operates in three distinct phases:
 
 - **upstream**: Reviews requirements, specifications, API definitions, and ADRs
 - **midstream**: Reviews implementation code changes
@@ -80,8 +80,8 @@ River Reviewer operates in three distinct phases:
 ### Upstream Review (Requirements/Specs)
 
 ```yaml
-- name: Run River Reviewer (upstream)
-  uses: s977043/river-reviewer/runners/github-action@main
+- name: Run River Review (upstream)
+  uses: s977043/river-review/runners/github-action@main
   with:
     phase: upstream
     dry_run: false
@@ -94,7 +94,7 @@ River Reviewer operates in three distinct phases:
 
 ```yaml
 - name: Estimate Review Cost
-  uses: s977043/river-reviewer/runners/github-action@main
+  uses: s977043/river-review/runners/github-action@main
   with:
     phase: midstream
     estimate: true
@@ -106,8 +106,8 @@ River Reviewer operates in three distinct phases:
 ### Review with Planner (Order Files)
 
 ```yaml
-- name: Run River Reviewer with Planner
-  uses: s977043/river-reviewer/runners/github-action@main
+- name: Run River Review with Planner
+  uses: s977043/river-review/runners/github-action@main
   with:
     phase: midstream
     planner: order
@@ -127,7 +127,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@main
+      - uses: s977043/river-review/runners/github-action@main
         with:
           phase: upstream
         env:
@@ -139,7 +139,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-reviewer/runners/github-action@main
+      - uses: s977043/river-review/runners/github-action@main
         with:
           phase: midstream
         env:
@@ -148,7 +148,7 @@ jobs:
 
 ## Environment Variables
 
-The action requires API credentials to function. Pass at least one of the following, matching the `modelName` configured in `.river-reviewer.json`:
+The action requires API credentials to function. Pass at least one of the following, matching the `modelName` configured in `.river-review.json`:
 
 - `OPENAI_API_KEY` (or `RIVER_OPENAI_API_KEY`): for `gpt-*` / `o1-*` models
 - `GOOGLE_API_KEY`: for `gemini-*` models
@@ -156,7 +156,7 @@ The action requires API credentials to function. Pass at least one of the follow
 
 Set these as GitHub secrets in your repository settings.
 
-For provider-specific `.river-reviewer.json` snippets (Anthropic / OpenAI / Gemini), see the [main README](../../README.md) and the [GitHub Actions guide](../../pages/guides/github-actions.md).
+For provider-specific `.river-review.json` snippets (Anthropic / OpenAI / Gemini), see the [main README](../../README.md) and the [GitHub Actions guide](../../pages/guides/github-actions.md).
 
 ## Permissions
 
@@ -170,7 +170,7 @@ permissions:
 
 ## Architecture
 
-This action is part of the River Reviewer runners architecture:
+This action is part of the River Review runners architecture:
 
 ```text
 runners/
@@ -228,7 +228,7 @@ with:
 
 ## Development
 
-This action is part of the River Reviewer monorepo. For local development:
+This action is part of the River Review monorepo. For local development:
 
 ```bash
 # Install dependencies
@@ -243,8 +243,8 @@ npm run lint
 
 ## License
 
-See the [main repository](https://github.com/s977043/river-reviewer) for license information.
+See the [main repository](https://github.com/s977043/river-review) for license information.
 
 ## Support
 
-For issues, questions, or contributions, please visit the [River Reviewer repository](https://github.com/s977043/river-reviewer).
+For issues, questions, or contributions, please visit the [River Review repository](https://github.com/s977043/river-review).

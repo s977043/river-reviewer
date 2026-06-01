@@ -1,6 +1,6 @@
 # Skill Schema
 
-River Reviewer skills use YAML frontmatter for metadata and Markdown for guidance. The metadata fields are validated by `schemas/skill.schema.json`.
+River Review skills use YAML frontmatter for metadata and Markdown for guidance. The metadata fields are validated by `schemas/skill.schema.json`.
 
 ## Fields
 

@@ -1,18 +1,18 @@
 # Adopting and tuning repo-wide review
 
-This guide walks you through evolving River Reviewer from "review the PR diff only" to "review with the surrounding repository context in mind." Japanese is the source of truth; this English version follows behind.
+This guide walks you through evolving River Review from "review the PR diff only" to "review with the surrounding repository context in mind." Japanese is the source of truth; this English version follows behind.
 
 Related:
 
-- Parent Epic: [#650 Greptile-inspired repo-wide review capabilities](https://github.com/s977043/river-reviewer/issues/650)
+- Parent Epic: [#650 Greptile-inspired repo-wide review capabilities](https://github.com/s977043/river-review/issues/650)
 - Existing guides: [Quickstart](./quickstart.en.md) / [GitHub Actions setup](./github-actions.en.md) / [Troubleshooting](./troubleshooting.en.md)
 - See also: [Skill authoring guide](./write-a-skill.en.md) / [Review policy](../reference/review-policy.en.md)
 
 ## Intended audience
 
-- Teams who already use River Reviewer and want to go beyond diff-only review
+- Teams who already use River Review and want to go beyond diff-only review
 - Engineers who need to catch cross-file inconsistencies that a single changed file cannot reveal — leftover locale entries, normalization drift, API compatibility breaks, missing tests, and so on
-- Operators who want to organize how `.river-reviewer.yaml` and `.river/rules.md` are governed
+- Operators who want to organize how `.river-review.yaml` and `.river/rules.md` are governed
 
 ## Problems repo-wide review solves
 
@@ -27,22 +27,22 @@ repo-wide review automatically gathers "related files," "tests," "symbol usages,
 
 ## Minimal adoption steps
 
-1. Place `.river-reviewer.yaml` at the repo root (see the example below).
+1. Place `.river-review.yaml` at the repo root (see the example below).
 2. Create `.river/rules.md` (`cp` from `.river/rules.template.md`).
 3. Optionally add `.river/risk-map.yaml` (omittable; the default action is `comment_only`).
-4. Add a GitHub Actions workflow at `.github/workflows/river-reviewer.yml`.
+4. Add a GitHub Actions workflow at `.github/workflows/river-review.yml`.
 5. Register model keys such as `OPENAI_API_KEY` as repository Secrets.
 6. Open a PR and verify findings are posted as comments.
 
 ### Minimal GitHub Actions workflow
 
 ```yaml
-name: River Reviewer (repo-wide)
+name: River Review (repo-wide)
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 jobs:
-  river-reviewer:
+  river-review:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -52,8 +52,8 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0 # required so the repo-wide context collector can read surrounding commit history
-      - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.68.0
+      - name: Run River Review (midstream)
+        uses: s977043/river-review/runners/github-action@v0.68.0
         with:
           phase: midstream
           dry_run: false
@@ -67,7 +67,7 @@ jobs:
 
 ## Configuration files
 
-### `.river-reviewer.yaml`
+### `.river-review.yaml`
 
 This is the legacy configuration that maps to `riverReviewerConfigSchema` in `src/config/schema.mjs`. Example:
 
@@ -166,16 +166,16 @@ It gathers four sections from the changed files (implementation: `src/lib/repo-c
 | `usages`   | Usage sites of exported symbols, grepped via `rg` | about 1500 chars |
 | `config`   | Sibling config files (`.json` / `.yaml`)          | about 500 chars  |
 
-The total cap defaults to 8000 chars (override with the `context.budget` key in `.river-reviewer.yaml`, or with the `maxChars` argument of `collectRepoContext`). Each section is truncated from the tail with `// ...[truncated]`.
+The total cap defaults to 8000 chars (override with the `context.budget` key in `.river-review.yaml`, or with the `maxChars` argument of `collectRepoContext`). Each section is truncated from the tail with `// ...[truncated]`.
 
 In environments without `rg` (ripgrep) the `usages` section becomes best-effort empty. Make sure ripgrep is installed on the CI runner (the standard GitHub Actions Ubuntu image already ships it).
 
 ### Tuning the context budget / ranking
 
-The configuration keys introduced in `#689` let you tune the token-unit budget, the `reviewMode` preset, and the ranking score from `.river-reviewer.yaml`. See `src/config/schema.mjs` for the full schema.
+The configuration keys introduced in `#689` let you tune the token-unit budget, the `reviewMode` preset, and the ranking score from `.river-review.yaml`. See `src/config/schema.mjs` for the full schema.
 
 ```yaml
-# .river-reviewer.yaml
+# .river-review.yaml
 context:
   reviewMode: medium # tiny | medium | large. Omit budget to apply the preset
   budget:
@@ -205,11 +205,11 @@ Default `maxTokens` for `reviewMode` presets (`src/lib/context-presets.mjs`):
 
 Ranking is composed of `pathProximity` / `symbolUsage` / `siblingTest` / `commitRecency` in `src/lib/context-ranker.mjs`, narrowing candidates by "closeness" to the changed files. The score breakdown is available at `reviewDebug.repoContextRanking`.
 
-If you still feel the noise is high, the existing knobs continue to apply — strengthen `exclude.files` in `.river-reviewer.yaml`, or apply `action: comment_only` to docs in `risk-map.yaml` to remove gating without dropping findings.
+If you still feel the noise is high, the existing knobs continue to apply — strengthen `exclude.files` in `.river-review.yaml`, or apply `action: comment_only` to docs in `risk-map.yaml` to remove gating without dropping findings.
 
 ## Secret redaction and safe defaults
 
-Files read by the repo-wide context collector and any string injected into the prompt are **redacted in multiple stages** before being sent to the LLM ([Issue #692](https://github.com/s977043/river-reviewer/issues/692)).
+Files read by the repo-wide context collector and any string injected into the prompt are **redacted in multiple stages** before being sent to the LLM ([Issue #692](https://github.com/s977043/river-review/issues/692)).
 
 The implementation centers on `src/lib/secret-redactor.mjs` and is wired into three places: `src/lib/repo-context.mjs`, `src/lib/local-runner.mjs`, and `src/lib/review-engine.mjs`.
 
@@ -235,7 +235,7 @@ Replacements use a length-independent `<REDACTED:category>` form, so suppression
 ### Narrow the behavior via config
 
 ```yaml
-# .river-reviewer.yaml
+# .river-review.yaml
 security:
   redact:
     enabled: true # default
@@ -258,7 +258,7 @@ The `prompt` and `debug.promptPreview` flowing into debug output / artifacts / t
 
 ## Adding cross-context skills
 
-Cross-context skills bundle patterns that are hard to detect from a single changed file. The following are already shipped under `skills/midstream/rr-midstream-*-001/` (completed via [Issue #654](https://github.com/s977043/river-reviewer/issues/654)).
+Cross-context skills bundle patterns that are hard to detect from a single changed file. The following are already shipped under `skills/midstream/rr-midstream-*-001/` (completed via [Issue #654](https://github.com/s977043/river-review/issues/654)).
 
 - `rr-midstream-i18n-unused-key-001` — translation key removal vs. locale entry consistency
 - `rr-midstream-normalization-consistency-001` — normalization drift in domain values (ID format, lowercasing, …)
@@ -284,11 +284,11 @@ The severity emitted by the LLM (`critical` / `major` / `minor` / `info`) is map
 | P3      | `minor`    | Small bug, readability concern, minor optimization opportunity     |
 | P4      | `info`     | Suggestion, reference information, additional considerations       |
 
-The summary at the top of the PR comment highlights the P1 / P2 counts. Paths matched by `require_human_review` in `risk-map.yaml` are explicitly flagged as "human review required" in the PR ([Issue #652](https://github.com/s977043/river-reviewer/issues/652)).
+The summary at the top of the PR comment highlights the P1 / P2 counts. Paths matched by `require_human_review` in `risk-map.yaml` are explicitly flagged as "human review required" in the PR ([Issue #652](https://github.com/s977043/river-review/issues/652)).
 
 ## False positive suppression memory
 
-A mechanism that accumulates feedback such as "this was a false positive" or "accepted as risk" and prevents findings with the same fingerprint from recurring ([Issue #687](https://github.com/s977043/river-reviewer/issues/687)).
+A mechanism that accumulates feedback such as "this was a false positive" or "accepted as risk" and prevents findings with the same fingerprint from recurring ([Issue #687](https://github.com/s977043/river-review/issues/687)).
 
 ### How it works
 
@@ -317,7 +317,7 @@ Pick the fingerprint from the `--debug` output or `reviewDebug.suppressionsAppli
 ### Temporarily disabling suppression via config
 
 ```yaml
-# .river-reviewer.yaml
+# .river-review.yaml
 memory:
   suppressionEnabled: false # default true. false bypasses every suppression (emergency debugging)
 ```
@@ -336,7 +336,7 @@ Bypassing keeps the Riverbed Memory entries intact. Switching back to `true` re-
 
 ## Running eval fixtures
 
-Regression fixtures that "measure detection difference with vs. without context" are prepared in [Issue #688](https://github.com/s977043/river-reviewer/issues/688) (fully landed in v0.28.0).
+Regression fixtures that "measure detection difference with vs. without context" are prepared in [Issue #688](https://github.com/s977043/river-review/issues/688) (fully landed in v0.28.0).
 
 ```bash
 npm run eval:repo-context        # run repo-wide eval alone
@@ -390,7 +390,7 @@ The summary returned by `evaluateRepoWideFixtures` includes:
 
 ### Too many or too few findings
 
-- Toggle `review.severity` between `strict` / `relaxed` in `.river-reviewer.yaml`.
+- Toggle `review.severity` between `strict` / `relaxed` in `.river-review.yaml`.
 - Add noisy paths (generated artifacts, vendor) to `exclude.files`.
 - Conversely, lift "I want this watched strictly" paths via `risk-map.yaml` `action: escalate`.
 
@@ -402,7 +402,7 @@ The summary returned by `evaluateRepoWideFixtures` includes:
 ### Configuration is not picked up
 
 - Run `river run . --dry-run --debug` to confirm load logs (useful for verifying `.river/rules.md` recognition).
-- YAML syntax errors in `.river-reviewer.yaml` surface as loader warnings (refer to the message when zod validation fails).
+- YAML syntax errors in `.river-review.yaml` surface as loader warnings (refer to the message when zod validation fails).
 
 ## Further reading
 

@@ -1,8 +1,8 @@
-# River Reviewer—Issue / Project Operation Rules
+# River Review—Issue / Project Operation Rules
 
 ## 🌟 Purpose
 
-To sustainably proceed with feature development, skill design, and agent foundation expansion in River Reviewer, we define **consistent formats and flows for Issues and GitHub Projects**.
+To sustainably proceed with feature development, skill design, and agent foundation expansion in River Review, we define **consistent formats and flows for Issues and GitHub Projects**.
 
 This document summarizes operation rules so that Issue creators, reviewers, and maintainers can proceed with the same premises.
 

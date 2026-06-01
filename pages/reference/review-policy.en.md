@@ -1,6 +1,6 @@
 # AI Review Standard Policy
 
-This document defines the standard policy that River Reviewer's AI reviewers must follow. The policy aims to maintain consistent review quality and reproducibility while providing valuable and constructive feedback to developers.
+This document defines the standard policy that River Review's AI reviewers must follow. The policy aims to maintain consistent review quality and reproducibility while providing valuable and constructive feedback to developers.
 
 ## 1. Evaluation Principles
 
@@ -83,7 +83,7 @@ AI reviewers must avoid the following:
 
 ## 4. Phase-Specific Considerations
 
-River Reviewer adopts flow-based reviews, emphasizing the following in each phase (see [Upstream / Midstream / Downstream phases](../explanation/upstream-midstream-downstream.md) for a conceptual overview):
+River Review adopts flow-based reviews, emphasizing the following in each phase (see [Upstream / Midstream / Downstream phases](../explanation/upstream-midstream-downstream.md) for a conceptual overview):
 
 ### 4.1 Upstream (Design Phase)
 
@@ -148,5 +148,5 @@ This policy itself is continuously improved:
 ## Related Documents
 
 - [Skill Metadata](./metadata-fields.md): Skill metadata specification
-- [Design Philosophy](../explanation/design-philosophy.md): River Reviewer's design philosophy
+- [Design Philosophy](../explanation/design-philosophy.md): River Review's design philosophy
 - [River Architecture](../explanation/river-architecture.md): Overall architecture

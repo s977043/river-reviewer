@@ -41,8 +41,8 @@ jobs:
           TAG="${{ steps.release.outputs.tag_name }}"
 
           # Expect plain tag format like "v0.14.0".
-          # Defensive: reject component-prefixed tags (e.g. "river-reviewer-v0.14.0")
-          # to avoid generating garbled alias names like "vriver-reviewer-v0".
+          # Defensive: reject component-prefixed tags (e.g. "river-review-v0.14.0")
+          # to avoid generating garbled alias names like "vriver-review-v0".
           # See #597 for the original bug.
           if [[ ! "${TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::Unexpected tag format: ${TAG}. Expected plain vX.Y.Z."

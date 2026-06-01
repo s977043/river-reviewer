@@ -1,16 +1,16 @@
-# Setting up River Reviewer with GitHub Actions
+# Setting up River Review with GitHub Actions
 
-Here is a minimal workflow example to run River Reviewer on GitHub Actions. Place it as `.github/workflows/river-reviewer.yml`.
+Here is a minimal workflow example to run River Review on GitHub Actions. Place it as `.github/workflows/river-review.yml`.
 
 > **⚠️ IMPORTANT**: For PRs from forked repositories, GitHub does not expose repository secrets for security reasons. If you want to run reviews on external contributor PRs, consider event selection like `pull_request_target` and permission settings.
 
 ```yaml
-name: River Reviewer
+name: River Review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 jobs:
-  river-reviewer:
+  river-review:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -20,8 +20,8 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.68.0
+      - name: Run River Review (midstream)
+        uses: s977043/river-review/runners/github-action@v0.68.0
         with:
           phase: midstream # upstream|midstream|downstream
           dry_run: true # Post PR comments without calling external APIs (fallback)
@@ -35,11 +35,11 @@ jobs:
 
 ## Using Anthropic (Claude)
 
-Specify a `claude-*` model in `.river-reviewer.json` and pass `ANTHROPIC_API_KEY`.
+Specify a `claude-*` model in `.river-review.json` and pass `ANTHROPIC_API_KEY`.
 
 ```yaml
-- name: Run River Reviewer (midstream, Claude)
-  uses: s977043/river-reviewer/runners/github-action@v0.68.0
+- name: Run River Review (midstream, Claude)
+  uses: s977043/river-review/runners/github-action@v0.68.0
   with:
     phase: midstream
   env:

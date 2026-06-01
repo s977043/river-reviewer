@@ -15,7 +15,7 @@ Riverbed Memory v1 は既に実装されています (#474, `src/lib/riverbed-me
 
 ## 概要
 
-Riverbed Memory は、コンテキストを保持するためのレイヤーです。川底が過去の流れの痕跡を保持するように、アーキテクチャ上の決定、WontFix 項目、過去のレビュー結果を記憶し、River Reviewer が PR やリリース間で一貫性を保てるようにします。流れを安定させる軽量で監査可能な記憶層と捉えてください。
+Riverbed Memory は、コンテキストを保持するためのレイヤーです。川底が過去の流れの痕跡を保持するように、アーキテクチャ上の決定、WontFix 項目、過去のレビュー結果を記憶し、River Review が PR やリリース間で一貫性を保てるようにします。流れを安定させる軽量で監査可能な記憶層と捉えてください。
 
 実装と運用手順は `pages/guides/use-riverbed-memory.md`、ストレージ詳細は `pages/reference/riverbed-storage.md` を参照してください。
 

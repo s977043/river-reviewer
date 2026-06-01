@@ -1,6 +1,6 @@
 # スキルスキーマ概要
 
-River Reviewer のスキルは、メタデータに YAML frontmatter を使用し、ガイダンスに Markdown を使用します。メタデータフィールドは `schemas/skill.schema.json` によって検証されます。
+River Review のスキルは、メタデータに YAML frontmatter を使用し、ガイダンスに Markdown を使用します。メタデータフィールドは `schemas/skill.schema.json` によって検証されます。
 
 ## フィールド
 

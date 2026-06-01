@@ -65,7 +65,7 @@ function createSuppression({
   expiresAt,
   prNumber,
   sourceCommentId,
-  author = 'river-reviewer',
+  author = 'river-review',
 }) {
   if (!rationale) throw new Error('Suppression requires a rationale');
 
@@ -122,7 +122,7 @@ function createSuppression({
 function revokeSuppression(
   indexPath,
   suppressionId,
-  { author = 'river-reviewer', reason = 'revoked' } = {}
+  { author = 'river-review', reason = 'revoked' } = {}
 ) {
   const entry = {
     id: 'resurface-' + suppressionId + '-' + Date.now(),

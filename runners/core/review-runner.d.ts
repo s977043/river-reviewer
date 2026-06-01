@@ -1,5 +1,5 @@
 /**
- * Type declarations for @river-reviewer/core-runner/review-runner
+ * Type declarations for @river-review/core-runner/review-runner
  */
 
 export type Phase = 'upstream' | 'midstream' | 'downstream';

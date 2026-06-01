@@ -1,6 +1,6 @@
 # `risk-map.yaml` Example
 
-Copy `risk-map.yaml` from this directory to `.river/risk-map.yaml` in your repository to give River Reviewer a per-path risk classification.
+Copy `risk-map.yaml` from this directory to `.river/risk-map.yaml` in your repository to give River Review a per-path risk classification.
 
 ## What it does
 
@@ -30,4 +30,4 @@ The risk-map file is **optional**. When `.river/risk-map.yaml` is missing, `load
 - [Schema](../../schemas/risk-map.schema.json)
 - [User guide: `.river/risk-map.yaml`](../../pages/guides/repo-wide-review.md)
 - [Execution context contract](../../docs/development/execution-context-contract.md) — where the plan layer reads the risk map.
-- PR [#877](https://github.com/s977043/river-reviewer/pull/877) — `riskAssessment` propagation on the exec path.
+- PR [#877](https://github.com/s977043/river-review/pull/877) — `riskAssessment` propagation on the exec path.

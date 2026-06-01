@@ -1,10 +1,10 @@
-# River Reviewer のビジョン
+# River Review のビジョン
 
 > **内部資料:** 設計思想の SSoT です。公開向けの導入は [`pages/explanation/intro.md`](../pages/explanation/intro.md) を、運用ガイドは [`pages/guides/`](../pages/guides/) を参照してください。
 
-River Reviewer は、**チームのレビュー判断を skill として明示化・バージョン管理し、SDLC の各ゲートで実行する基盤** である。
+River Review は、**チームのレビュー判断を skill として明示化・バージョン管理し、SDLC の各ゲートで実行する基盤** である。
 
-「AI に PR を読ませる SaaS」ではなく、「**レビュー職務を skill として定義・評価・運用するための基盤**」と位置付ける。AI 支援開発（Claude Code / Codex / Cursor 等）が普及した今、コードは速く書けるようになったが、判断基準は依然としてチームが所有する必要がある。River Reviewer はその所有を実行可能にする。
+「AI に PR を読ませる SaaS」ではなく、「**レビュー職務を skill として定義・評価・運用するための基盤**」と位置付ける。AI 支援開発（Claude Code / Codex / Cursor 等）が普及した今、コードは速く書けるようになったが、判断基準は依然としてチームが所有する必要がある。River Review はその所有を実行可能にする。
 
 ## 最終像
 
@@ -33,13 +33,13 @@ Riverbed remembers judgment.  suppression / WontFix / 過去判断 = operating m
 ## 既存ツールとの差分
 
 - **CodeRabbit / Copilot Review / Gemini Code Assist**: diff を入力に PR コメントを返す SaaS。判断ロジックはプロバイダ側に閉じる。
-- **Claude Code / Codex / Cursor**: 実装を行うエージェント IDE/CLI。レビューは付帯機能。River Reviewer はこれらの**横で動く検査ゲート**として設計されている。
-- **Anthropic Agent Skills**: 業務マニュアル付きの道具箱（能力単位）。River Reviewer の skill は「**レビュー職務単位**」で、アーティファクト契約と評価可能性をもつ。
-- **ESLint / SonarQube などの静的解析**: 1 ファイル内で完結する決定論的チェック。River Reviewer は **アーティファクトを跨ぐ判断**（plan と diff の乖離、テストと境界条件の整合、過去レビューとの一貫性）を扱う。
+- **Claude Code / Codex / Cursor**: 実装を行うエージェント IDE/CLI。レビューは付帯機能。River Review はこれらの**横で動く検査ゲート**として設計されている。
+- **Anthropic Agent Skills**: 業務マニュアル付きの道具箱（能力単位）。River Review の skill は「**レビュー職務単位**」で、アーティファクト契約と評価可能性をもつ。
+- **ESLint / SonarQube などの静的解析**: 1 ファイル内で完結する決定論的チェック。River Review は **アーティファクトを跨ぐ判断**（plan と diff の乖離、テストと境界条件の整合、過去レビューとの一貫性）を扱う。
 
 ## 持続的な差別化軸
 
-River Reviewer の持続的な差別化は "AI" ではなく **判断基準の所有権**にある。Claude Code / Cursor / Codex といった実装エージェントが変わっても、repo-owned skills と gates は残る。したがって主張順は次の通り構成する。
+River Review の持続的な差別化は "AI" ではなく **判断基準の所有権**にある。Claude Code / Cursor / Codex といった実装エージェントが変わっても、repo-owned skills と gates は残る。したがって主張順は次の通り構成する。
 
 1. チームの判断基準をコード化する（持続的差別化）
 2. plan / diff / tests をまたいで gate する（持続的差別化）

@@ -1,7 +1,7 @@
 ---
 name: pr
 description: '変更差分からPR本文のドラフトを作る'
-agent: 'river-reviewer'
+agent: 'river-review'
 ---
 
 次の変更差分をもとに、PR本文のドラフトを日本語で作成してください。

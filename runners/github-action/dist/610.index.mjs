@@ -11,7 +11,7 @@ export const modules = {
 /* harmony import */ var _scoring_engine_mjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9487);
 /* harmony import */ var _scoring_rubric_mjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5034);
 /**
- * YAML output formatter for river-reviewer.
+ * YAML output formatter for river-review.
  *
  * Emits a structured YAML block compatible with the unilabo/site-management-system
  * review output format. Fields (`category`, `summary`, `highRiskReasons`,

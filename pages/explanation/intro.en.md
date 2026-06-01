@@ -1,9 +1,9 @@
 ---
 id: intro-en
-title: Welcome to River Reviewer
+title: Welcome to River Review
 ---
 
-River Reviewer (RR) is an OSS framework that **turns your team's review judgment into versioned, repo-owned skills and runs them across SDLC gates**. It operates over artifacts such as plan, diff, test-cases, JUnit, and prior review outputs, acting as the **team-owned audit layer** for AI-assisted development.
+River Review (RR) is an OSS framework that **turns your team's review judgment into versioned, repo-owned skills and runs them across SDLC gates**. It operates over artifacts such as plan, diff, test-cases, JUnit, and prior review outputs, acting as the **team-owned audit layer** for AI-assisted development.
 
 ## Core Model
 
@@ -18,4 +18,4 @@ This documentation covers:
 - **How-to**: Practical guides for GitHub Actions integration, tracing, etc.
 - **Reference**: Schema definitions and CLI references.
 
-Start with [What is River Reviewer](./what-is-river-reviewer.en.md) for the concept overview, then explore tutorials or references as needed. The SSoT for the full vision lives at [`docs/vision.md`](https://github.com/s977043/river-reviewer/blob/main/docs/vision.md) in the repository root.
+Start with [What is River Review](./what-is-river-review.en.md) for the concept overview, then explore tutorials or references as needed. The SSoT for the full vision lives at [`docs/vision.md`](https://github.com/s977043/river-review/blob/main/docs/vision.md) in the repository root.

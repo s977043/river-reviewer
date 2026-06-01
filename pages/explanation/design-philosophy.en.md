@@ -1,6 +1,6 @@
 # Design Philosophy
 
-River Reviewer is built to deliver timely, phase-aware feedback without slowing teams down.
+River Review is built to deliver timely, phase-aware feedback without slowing teams down.
 
 - **Flow-first**: every check should state which phase it belongs to and why.
 - **Small, testable steps**: prefer narrowly scoped skills with clear acceptance signals.
@@ -11,7 +11,7 @@ River Reviewer is built to deliver timely, phase-aware feedback without slowing 
 
 ## Non-Goals
 
-River Reviewer does **not** aim to be:
+River Review does **not** aim to be:
 
 - **A general-purpose AI agent framework**: it is a context engineering framework specialized for code review, not a generic task execution platform.
 - **A replacement for human review judgment**: AI assists by surfacing review perspectives and evidence, but final decisions are made by humans.

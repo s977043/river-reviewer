@@ -3,7 +3,7 @@ id: tracing-en
 title: Tracing / Observability
 ---
 
-This document describes steps to introduce simple tracing to River Reviewer and run it in local/CI environments.
+This document describes steps to introduce simple tracing to River Review and run it in local/CI environments.
 
 ## Overview
 
@@ -20,7 +20,7 @@ This document describes steps to introduce simple tracing to River Reviewer and 
 OTEL_ENABLED=1 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 node scripts/validate-agents.mjs
 ```
 
-- Default service name is `river-reviewer`. Can be overridden with `OTEL_SERVICE_NAME`.
+- Default service name is `river-review`. Can be overridden with `OTEL_SERVICE_NAME`.
 
 ## Implementation Points
 

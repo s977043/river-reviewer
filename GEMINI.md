@@ -1,4 +1,4 @@
-# Gemini instructions (river-reviewer)
+# Gemini instructions (river-review)
 
 > **Single source:** 必ず [AGENTS.md](./AGENTS.md) を読み、共通ルールと完了条件に従ってください。本ファイルは Gemini 向けの薄いラッパーです。
 

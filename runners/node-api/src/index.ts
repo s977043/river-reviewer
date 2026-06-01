@@ -1,11 +1,11 @@
 /**
- * River Reviewer Node.js API
+ * River Review Node.js API
  *
- * Programmatic interface for using River Reviewer in custom Node.js applications.
+ * Programmatic interface for using River Review in custom Node.js applications.
  *
  * @example
  * ```typescript
- * import { review, loadSkills } from '@river-reviewer/node-api';
+ * import { review, loadSkills } from '@river-review/node-api';
  *
  * // Review files
  * const results = await review({
@@ -21,7 +21,7 @@
  * });
  * ```
  *
- * @module @river-reviewer/node-api
+ * @module @river-review/node-api
  */
 
 import {
@@ -31,14 +31,14 @@ import {
   loadAllSkillMetadata as coreLoadAllSkillMetadata,
   defaultPaths,
   SkillLoaderError,
-} from '@river-reviewer/core-runner/skill-loader';
+} from '@river-review/core-runner/skill-loader';
 import {
   buildExecutionPlan as coreBuildExecutionPlan,
   selectSkills as coreSelectSkills,
   matchesPhase as coreMatchesPhase,
   rankByModelHint as coreRankByModelHint,
   summarizeSkill as coreSummarizeSkill,
-} from '@river-reviewer/core-runner/review-runner';
+} from '@river-review/core-runner/review-runner';
 
 // Re-export all types
 export type {
@@ -355,7 +355,7 @@ export async function buildExecutionPlan(options: {
 }
 
 /**
- * Review files using River Reviewer skills.
+ * Review files using River Review skills.
  *
  * This is the main entry point for programmatic code review. It loads skills,
  * builds an execution plan, and returns a structured result.
@@ -513,7 +513,7 @@ export async function evaluateSkill(options: EvaluateSkillOptions): Promise<Eval
 }
 
 /**
- * Get default paths used by River Reviewer.
+ * Get default paths used by River Review.
  *
  * @returns Object containing default paths for repository root, skills directory, and schema
  *

@@ -2,7 +2,7 @@
 title: Stable Interfaces (CLI / GitHub Actions)
 ---
 
-River Reviewer is growing as an OSS project, and internal implementations may change. However, we define **stable contracts** so users can adopt it with confidence.
+River Review is growing as an OSS project, and internal implementations may change. However, we define **stable contracts** so users can adopt it with confidence.
 
 Breaking changes generally require a **major version bump**.
 
@@ -12,7 +12,7 @@ The following elements are treated as "public interfaces":
 
 - Skill definitions (`schemas/skill.schema.json`) and their semantics (severity/confidence, etc.)
 - GitHub Actions (`runners/github-action/action.yml`) inputs / outputs and behavior
-- CLI (`river` / `river-reviewer`) commands/options and exit codes
+- CLI (`river` / `river-review`) commands/options and exit codes
 - Idempotent update method for PR comments (marker)
 
 ## Component Stability Labels
@@ -58,7 +58,7 @@ Current stability level for each surface.
 - `0`: Success (Review/Diagnosis/Estimation completed)
 - `1`: Failure (Invalid input, git diff failure, skill validation failure, `--max-cost` exceeded, etc.)
 
-## GitHub Actions (`river-reviewer`) Reference (Minimal)
+## GitHub Actions (`river-review`) Reference (Minimal)
 
 ### inputs (Stable)
 
@@ -80,7 +80,7 @@ See `runners/github-action/action.yml` for definition.
 
 ### PR Comment Contract (Idempotent)
 
-- **Updates** comment containing `<!-- river-reviewer -->` marker; creates new if missing.
+- **Updates** comment containing `<!-- river-review -->` marker; creates new if missing.
 - Truncates tail if comment body is too long (limit exists).
 
 ## Versioning (Handling Breaking Changes)

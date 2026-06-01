@@ -14,11 +14,11 @@ mkdir -p "$ROOT/scripts" "$ROOT/docs" "$ROOT/docs/tutorials" "$ROOT/docs/how-to"
 
 write_readme() {
   cat <<'EORD' > "$ROOT/README.md"
-# River Reviewer
+# River Review
 
-![River Reviewer logo](assets/logo/river-reviewer-logo.svg)
+![River Review logo](assets/logo/river-review-logo.svg)
 
-RR (River Reviewer) is a flow-aware review assistant that moves with your delivery stream.
+RR (River Review) is a flow-aware review assistant that moves with your delivery stream.
 
 ## Flow at a glance
 
@@ -36,15 +36,15 @@ schemas/          # JSON Schema for skills and outputs
 skills/           # upstream/midstream/downstream skills (Markdown + frontmatter)
 scripts/          # setup and skill refactor utilities
 docs/             # tutorials, how-to, reference, explanation
-.github/river-reviewer/ # River Reviewer checklists shared with CI/agents
+.github/river-review/ # River Review checklists shared with CI/agents
 ```
 
 ## Quick start (GitHub Actions)
 
-Minimal workflow to run River Reviewer in the midstream phase:
+Minimal workflow to run River Review in the midstream phase:
 
 ```yaml
-name: River Reviewer
+name: River Review
 on:
   pull_request:
     branches: [main]
@@ -53,8 +53,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer@v1
+      - name: Run River Review (midstream)
+        uses: s977043/river-review@v1
         with:
           phase: midstream
 ```
@@ -89,7 +89,7 @@ severity: major
 
 ## Contributing
 
-See `CONTRIBUTING.md` for guidance. Issues and PRs are welcome as we expand River Reviewer.
+See `CONTRIBUTING.md` for guidance. Issues and PRs are welcome as we expand River Review.
 
 ## License
 
@@ -101,21 +101,21 @@ EORD
 
 if [[ ! -f "$ROOT/README.md" ]]; then
   write_readme
-  echo "README.md created with River Reviewer content."
+  echo "README.md created with River Review content."
 elif [[ "$FORCE" -eq 1 ]]; then
   write_readme
-  echo "README.md refreshed with River Reviewer content (force mode)."
+  echo "README.md refreshed with River Review content (force mode)."
 else
   echo "README.md exists; use --force to overwrite. Skipping README update."
 fi
 
 cat <<'EOG' > "$ROOT/docs/glossary.md"
-# River Reviewer Glossary
+# River Review Glossary
 
 - **Upstream**: requirements, design, and architecture phase (including ADRs) where early review prevents costly rework.
 - **Midstream**: implementation and pull request phase focused on code quality, security, and developer experience.
 - **Downstream**: test, QA, and release-prep phase to verify coverage, resilience, and regression protection.
-- **Skill**: a YAML frontmatter + Markdown unit of review guidance executed by River Reviewer.
+- **Skill**: a YAML frontmatter + Markdown unit of review guidance executed by River Review.
 - **Stream Router**: logic that selects and runs skills based on the requested phase and change context.
 - **Riverbed Memory (Future)**: persistent context layer for previous findings, ADR references, and WontFix decisions to keep reviews consistent over time.
 EOG
@@ -123,7 +123,7 @@ EOG
 cat <<'EOS' > "$ROOT/docs/skill-schema.md"
 # Skill Schema
 
-River Reviewer skills use YAML frontmatter for metadata and Markdown for guidance. The metadata fields are validated by `schemas/skill.schema.json`.
+River Review skills use YAML frontmatter for metadata and Markdown for guidance. The metadata fields are validated by `schemas/skill.schema.json`.
 
 ## Fields
 
@@ -159,7 +159,7 @@ EOS
 cat <<'EOJ' > "$ROOT/schemas/skill.schema.json"
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "River Reviewer Skill Metadata Schema",
+  "title": "River Review Skill Metadata Schema",
   "type": "object",
   "required": ["id", "name", "phase", "applyTo", "description"],
   "additionalProperties": false,
@@ -202,8 +202,8 @@ cat <<'EOJ' > "$ROOT/schemas/skill.schema.json"
 }
 EOJ
 
-cat <<'EOW' > "$ROOT/.github/workflows/river-reviewer.yml"
-name: River Reviewer (placeholder)
+cat <<'EOW' > "$ROOT/.github/workflows/river-review.yml"
+name: River Review (placeholder)
 
 on:
   workflow_dispatch:
@@ -211,15 +211,15 @@ on:
     branches: [ main ]
 
 jobs:
-  river-reviewer:
+  river-review:
     runs-on: ubuntu-latest
     env:
       RR_PHASE: midstream
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Run River Reviewer
-        run: echo "River Reviewer placeholder run for phase=${RR_PHASE:-midstream}"
+      - name: Run River Review
+        run: echo "River Review placeholder run for phase=${RR_PHASE:-midstream}"
 EOW
 
 # Ensure placeholder markers so empty directories are tracked when needed
@@ -228,4 +228,4 @@ for dir in "$ROOT/skills" "$ROOT/skills/upstream" "$ROOT/skills/midstream" "$ROO
   touch "$dir/.gitkeep"
 done
 
-echo "[DONE] River Reviewer bootstrap completed."
+echo "[DONE] River Review bootstrap completed."

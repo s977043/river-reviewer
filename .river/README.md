@@ -1,6 +1,6 @@
 # .river ディレクトリについて
 
-- `.river/rules.md`: プロジェクト固有のレビュールールを記載すると、River Reviewer のプロンプトに自動注入されます。
+- `.river/rules.md`: プロジェクト固有のレビュールールを記載すると、River Review のプロンプトに自動注入されます。
 - `.river/rules.template.md`: ルール記述用のテンプレート。必要なセクションを参考に `rules.md` を作成してください。
 
 ## 使い方

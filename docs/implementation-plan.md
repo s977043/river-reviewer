@@ -7,7 +7,7 @@
 - 「機能を増やす」より先に、**入力 → 判断 → 出力 → 通知**の流れを “細くても確実に通す”。
 - v0.1 は「使って壊れない・説明できる・再現できる」。
 - v0.2 は「使い始めの摩擦を減らす」。
-- v0.3 は「River Reviewer っぽい賢さを 1 点突破」。
+- v0.3 は「River Review っぽい賢さを 1 点突破」。
 
 ## Milestone ラベル運用（自動割当）
 
@@ -70,7 +70,7 @@
 
 - Labels: `type:task`, `P0`, `m1-public`
 - 受け入れ条件:
-  - 外部リポで `uses: s977043/river-reviewer/runners/github-action@v0.x` が動く
+  - 外部リポで `uses: s977043/river-review/runners/github-action@v0.x` が動く
   - `target` が外部リポ（`github.workspace`）を指すときに差分取得できる
   - 失敗時に「次の行動」がログ/エラーで分かる（例: permissions, fetch-depth, token）
   - `npm test` が落ちない（回帰なし）

@@ -1,9 +1,9 @@
 # Contribution Guide
 
-> **For the full contribution guide, see [`CONTRIBUTING.md`](https://github.com/s977043/river-reviewer/blob/main/CONTRIBUTING.md) in the repository root.**
+> **For the full contribution guide, see [`CONTRIBUTING.md`](https://github.com/s977043/river-review/blob/main/CONTRIBUTING.md) in the repository root.**
 > This page is a summary for the documentation site.
 
-Thank you for your interest in River Reviewer. We accept Pull Requests and Issues according to the following policies.
+Thank you for your interest in River Review. We accept Pull Requests and Issues according to the following policies.
 
 ## PR Basic Policy
 
@@ -23,7 +23,7 @@ Thank you for your interest in River Reviewer. We accept Pull Requests and Issue
 - Register bug reports and feature requests as Issues.
 - Specifically write reproduction steps, expected results, and actual results.
 
-Create Issues from templates (`Issues -> New issue`, or [issues/new/choose](https://github.com/s977043/river-reviewer/issues/new/choose)).
+Create Issues from templates (`Issues -> New issue`, or [issues/new/choose](https://github.com/s977043/river-review/issues/new/choose)).
 
 Refer to `pages/guides/governance/issue-management.md` for label guidelines and triage policy.
 

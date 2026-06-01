@@ -1,6 +1,6 @@
 # Troubleshooting: `river review exec`
 
-This page captures the silent-skip failure modes fixed across `v0.51.0` and `v0.51.1`, plus the one residual replay-side gap that is still open as [#802](https://github.com/s977043/river-reviewer/issues/802) A2-3.
+This page captures the silent-skip failure modes fixed across `v0.51.0` and `v0.51.1`, plus the one residual replay-side gap that is still open as [#802](https://github.com/s977043/river-review/issues/802) A2-3.
 
 ## `river review exec` returns no findings despite a non-empty diff
 
@@ -63,7 +63,7 @@ A skill declares `inputContext: ['<X>']` but `<X>` is not in the effective `avai
 
 A skill declares `dependencies: ['<X>']` (for example `code_search`, `test_runner`, `coverage_report`) but `<X>` is not in the effective `availableDependencies`.
 
-**Fixed in:** `v0.51.1` ([#869](https://github.com/s977043/river-reviewer/pull/869))
+**Fixed in:** `v0.51.1` ([#869](https://github.com/s977043/river-review/pull/869))
 
 Prior to `v0.51.1`, `river review exec` never forwarded `availableDependencies` to the plan layer at all, so dependency-based skip was effectively disabled on exec. The fix wires the same flow that `river run` has always used.
 
@@ -82,7 +82,7 @@ The CLI's default is `null` (= dependency-based skipping disabled), preserving t
 
 **Symptom:** Findings appear, but ADR cross-references that worked on `river run` are missing, or phase-mismatch checks behave differently than `river run`.
 
-**Fixed in:** `v0.51.1` ([#871](https://github.com/s977043/river-reviewer/pull/871))
+**Fixed in:** `v0.51.1` ([#871](https://github.com/s977043/river-review/pull/871))
 
 Prior to `v0.51.1`, `river review exec` did not read the derived analysis context (`fileTypes`, `relatedADRs`, `reviewMode`) that `buildExecutionPlan` had already computed, and it did not pass them to the LLM call. Three effects were silent rather than failing:
 
@@ -106,7 +106,7 @@ This is the current contract between `runReviewPlan` and `buildExecutionPlan` / 
 | Derived by `buildExecutionPlan`                                                | `relatedADRs` (from impact tags + ADR index) | `v0.51.1` (#871) |
 | Derived by `buildExecutionPlan`                                                | `reviewMode` (from diff size)                | `v0.51.1` (#871) |
 
-`config` (loaded from `.river-reviewer.{json,yaml}`) is already forwarded to `generateReview` since `v0.51.0`.
+`config` (loaded from `.river-review.{json,yaml}`) is already forwarded to `generateReview` since `v0.51.0`.
 
 ---
 

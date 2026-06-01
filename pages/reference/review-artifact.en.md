@@ -1,6 +1,6 @@
 # Review Artifact
 
-A structured JSON output schema for River Reviewer run results. It bundles the execution plan, repository context, findings, and debug information into a single artifact that can be consumed by audit, memory ingestion, and evaluation pipelines.
+A structured JSON output schema for River Review run results. It bundles the execution plan, repository context, findings, and debug information into a single artifact that can be consumed by audit, memory ingestion, and evaluation pipelines.
 
 ## Overview
 

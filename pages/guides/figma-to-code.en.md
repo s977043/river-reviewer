@@ -13,9 +13,9 @@ Translating Figma designs into code faithfully requires more than just a prompt.
 
 Without these, the most common problems are hardcoded token values, reimplementing existing components, and drift from the design specification.
 
-## Integration with river-reviewer
+## Integration with river-review
 
-river-reviewer ships two midstream skills that handle Figma → code quality checks.
+river-review ships two midstream skills that handle Figma → code quality checks.
 
 ### `rr-midstream-design-token-enforcement-001`
 
@@ -46,7 +46,7 @@ Step 4: Implement one component at a time
         - Follow the mapping table for imports, props, and styles
         - Always reference design tokens through variables/constants
 
-Step 5: Review with river-reviewer (detect token violations and reimplementations)
+Step 5: Review with river-review (detect token violations and reimplementations)
         - Opening a PR triggers the midstream phase automatically
         - Check results from design-token-enforcement and design-system-component-reuse
 
@@ -85,7 +85,7 @@ Constraints:
 ### Fix (Step 6)
 
 ```text
-river-reviewer returned the following findings:
+river-review returned the following findings:
 <paste findings here>
 
 Fix each finding according to this policy:

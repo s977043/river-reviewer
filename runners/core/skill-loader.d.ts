@@ -1,5 +1,5 @@
 /**
- * Type declarations for @river-reviewer/core-runner/skill-loader
+ * Type declarations for @river-review/core-runner/skill-loader
  */
 
 export type Phase = 'upstream' | 'midstream' | 'downstream';

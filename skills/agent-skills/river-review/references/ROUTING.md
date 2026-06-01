@@ -1,27 +1,27 @@
 # ルーティングルール
 
-River Reviewer のルーティングロジックの詳細です。
+River Review のルーティングロジックの詳細です。
 
 ## キーワードマッチング
 
 以下のキーワードに基づいて専門スキルを選択します：
 
-### 設計・アーキテクチャ (river-reviewer-architecture)
+### 設計・アーキテクチャ (river-review-architecture)
 
 - 日本語: 設計, アーキテクチャ, ADR, 構成, モジュール, 依存関係
 - 英語: design, architecture, ADR, structure, module, dependency
 
-### セキュリティ (river-reviewer-security)
+### セキュリティ (river-review-security)
 
 - 日本語: セキュリティ, 脆弱性, 認証, 認可, 暗号化
 - 英語: security, vulnerability, auth, authorization, encryption
 
-### パフォーマンス (river-reviewer-performance)
+### パフォーマンス (river-review-performance)
 
 - 日本語: パフォーマンス, 最適化, 高速化, メモリ, キャッシュ
 - 英語: performance, optimization, speed, memory, cache
 
-### テスト (river-reviewer-testing)
+### テスト (river-review-testing)
 
 - 日本語: テスト, カバレッジ, 単体テスト, 結合テスト
 - 英語: test, coverage, unit test, integration test
@@ -31,7 +31,7 @@ River Reviewer のルーティングロジックの詳細です。
 - 日本語: 敵対的, 壁打ち, プレモーテム, 失敗分析, 攻撃, ウォーゲーム, 論理検証, バイアス
 - 英語: adversarial, challenge, pre-mortem, war-game, logic, bias, devil's advocate
 
-### 一般コード (river-reviewer-code) - デフォルト
+### 一般コード (river-review-code) - デフォルト
 
 上記のいずれにも該当しない場合、一般コードレビューを実行します。
 
@@ -57,14 +57,14 @@ River Reviewer のルーティングロジックの詳細です。
 
 ### 3. フォールバック
 
-上記いずれにも該当しない場合 → `river-reviewer-code`（一般コードレビュー）。
+上記いずれにも該当しない場合 → `river-review-code`（一般コードレビュー）。
 
 ### 4. ルーティング通知
 
 ルーティング結果をユーザーに1行で通知する:
 
 ```text
-→ [river-reviewer-security] にルーティングしました（理由: 「脆弱性」キーワード検出）
+→ [river-review-security] にルーティングしました（理由: 「脆弱性」キーワード検出）
 ```
 
 ユーザーが修正を求めた場合は即座にリルートする。

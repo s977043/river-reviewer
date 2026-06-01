@@ -2,9 +2,9 @@
 title: PlanGate CLI Stabilization Roadmap
 ---
 
-`river review plan` / `river review exec` / `river review verify` are the CLI subcommands that take artifacts produced by upstream workflows such as PlanGate and run review planning, execution, and re-audit. They are River Reviewer's biggest differentiator, but **there is drift between the spec and the implementation, CI, and distribution**, so adopters cannot use them in a stable manner.
+`river review plan` / `river review exec` / `river review verify` are the CLI subcommands that take artifacts produced by upstream workflows such as PlanGate and run review planning, execution, and re-audit. They are River Review's biggest differentiator, but **there is drift between the spec and the implementation, CI, and distribution**, so adopters cannot use them in a stable manner.
 
-This document addresses [Issue #802](https://github.com/s977043/river-reviewer/issues/802) and defines (1) an inventory of the current contract drift, (2) the decision on the public entrypoint, (3) the stabilization target-version roadmap, and (4) the spec inconsistencies to resolve and the recommended unified contract.
+This document addresses [Issue #802](https://github.com/s977043/river-review/issues/802) and defines (1) an inventory of the current contract drift, (2) the decision on the public entrypoint, (3) the stabilization target-version roadmap, and (4) the spec inconsistencies to resolve and the recommended unified contract.
 
 > Related: [Artifact Input Contract](./artifact-input-contract.en.md) / [Stable Interfaces](./stable-interfaces.en.md) / [`river review plan` spec](./cli-review-plan-spec.en.md) / [`river review exec` spec](./cli-review-exec-spec.en.md) / [`river review verify` spec](./cli-review-verify-spec.en.md) / `docs/CLI-architecture.md`
 
@@ -24,13 +24,13 @@ The following is the gap between the contract the specs declare and the reality 
 
 ## Public entrypoint decision (fixed)
 
-**The stable public entrypoint for `river review plan` / `river review exec` / `river review verify` will be implemented on the main CLI (`src/cli.mjs`, the `river` / `river-reviewer` `package.json#bin`).**
+**The stable public entrypoint for `river review plan` / `river review exec` / `river review verify` will be implemented on the main CLI (`src/cli.mjs`, the `river` / `river-review` `package.json#bin`).**
 
 Rationale:
 
 - The main CLI is the only stable path registered in the npm `bin` and used in the GitHub Action production path (`runners/github-action` → `src/cli.mjs`).
 - The Runner CLI (`runners/cli/`) is npm-unpublished, an experimental interface for skill developers, and `docs/CLI-architecture.md` explicitly states there is no replacement plan. The Runner CLI's `review` keeps its **quick-check** positioning and does not bear the stable CI contract.
-- This decision **uniquely fixes the location of the public API** when [Issue #801](https://github.com/s977043/river-reviewer/issues/801) (separating the review engine and docs site into packages) designs the separation boundary. #801 must not break this boundary (the `review` subcommand on `src/cli.mjs` and the import boundary of the `src/lib/*` it depends on).
+- This decision **uniquely fixes the location of the public API** when [Issue #801](https://github.com/s977043/river-review/issues/801) (separating the review engine and docs site into packages) designs the separation boundary. #801 must not break this boundary (the `review` subcommand on `src/cli.mjs` and the import boundary of the `src/lib/*` it depends on).
 
 > This entrypoint decision only makes the "decision" within the scope of #802. The implementation (adding the `review` subcommand to the main CLI) is done in a later phase (Phase 3 below) with design approval.
 

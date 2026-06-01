@@ -1,14 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "River Reviewer Output Schema",
-  "description": "Structured output for River Reviewer findings, aggregated per run.",
+  "title": "River Review Output Schema",
+  "description": "Structured output for River Review findings, aggregated per run.",
   "type": "object",
   "required": ["issues", "summary"],
   "additionalProperties": false,
   "properties": {
     "issues": {
       "type": "array",
-      "description": "List of individual review issues raised by River Reviewer.",
+      "description": "List of individual review issues raised by River Review.",
       "items": { "$ref": "#/$defs/issue" }
     },
     "summary": {

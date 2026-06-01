@@ -1,9 +1,9 @@
 ---
 id: intro
-title: River Reviewer へようこそ
+title: River Review へようこそ
 ---
 
-River Reviewer (RR) は、**チームのレビュー判断を skill として明示化・バージョン管理し、SDLC の各ゲートで実行する OSS フレームワーク**です。plan / diff / tests / JUnit / 既存レビュー結果といったアーティファクトをまたいで動作し、AI 支援開発における **チーム所有の監査レイヤー** として機能します。
+River Review (RR) は、**チームのレビュー判断を skill として明示化・バージョン管理し、SDLC の各ゲートで実行する OSS フレームワーク**です。plan / diff / tests / JUnit / 既存レビュー結果といったアーティファクトをまたいで動作し、AI 支援開発における **チーム所有の監査レイヤー** として機能します。
 
 ## コアモデル
 
@@ -13,9 +13,9 @@ River Reviewer (RR) は、**チームのレビュー判断を skill として明
 
 このドキュメントでは以下をカバーします。
 
-- **Explanation**: River Reviewer の設計思想と 3 層モデルの詳細
+- **Explanation**: River Review の設計思想と 3 層モデルの詳細
 - **Tutorials**: skill 作成など手を動かす手順
 - **How-to**: GitHub Actions 連携やトレーシングなどの実践ガイド
 - **Reference**: スキーマや設定のリファレンス
 
-まずは [River Reviewer とは](./what-is-river-reviewer.md) でコンセプトを把握し、必要に応じてチュートリアルやリファレンスを参照してください。コンセプト全体の SSoT は repo root の [`docs/vision.md`](https://github.com/s977043/river-reviewer/blob/main/docs/vision.md) です。
+まずは [River Review とは](./what-is-river-review.md) でコンセプトを把握し、必要に応じてチュートリアルやリファレンスを参照してください。コンセプト全体の SSoT は repo root の [`docs/vision.md`](https://github.com/s977043/river-review/blob/main/docs/vision.md) です。

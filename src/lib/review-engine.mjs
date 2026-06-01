@@ -30,8 +30,8 @@ function sanitizeSkillName(name) {
 
 function buildSystemMessage(language) {
   return language === 'en'
-    ? 'You are River Reviewer, an expert code review assistant. Respond in English. You excel at spotting risky changes and explaining them briefly.'
-    : 'You are River Reviewer, an expert code review assistant. Respond in Japanese. You excel at spotting risky changes and explaining them briefly.';
+    ? 'You are River Review, an expert code review assistant. Respond in English. You excel at spotting risky changes and explaining them briefly.'
+    : 'You are River Review, an expert code review assistant. Respond in Japanese. You excel at spotting risky changes and explaining them briefly.';
 }
 
 function buildLanguageInstruction(language) {
@@ -158,7 +158,7 @@ export function buildPrompt({
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
   const depthConfig = getReviewDepthConfig(reviewMode ?? 'medium');
-  const prompt = `You are River Reviewer, an AI code review agent.
+  const prompt = `You are River Review, an AI code review agent.
 Phase: ${phase}
 
 Changed files:

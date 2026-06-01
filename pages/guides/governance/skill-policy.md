@@ -1,6 +1,6 @@
 # Skill Policy（運用ルール）
 
-この文書は、River Reviewer のスキルを「運用として育てる」ためのルールです。スキル作者向けの書き方は `pages/guides/write-a-skill.md` を参照してください。
+この文書は、River Review のスキルを「運用として育てる」ためのルールです。スキル作者向けの書き方は `pages/guides/write-a-skill.md` を参照してください。
 
 ## 目的
 

@@ -2,7 +2,7 @@
 title: Manifest-driven Skills Guide
 ---
 
-This is an implementation guide for describing River Reviewer skills flexibly in "manifest (YAML/Markdown)" format and applying them across multiple phases or file globs. It summarizes samples following `schemas/skill.schema.json` along with validation and operational procedures.
+This is an implementation guide for describing River Review skills flexibly in "manifest (YAML/Markdown)" format and applying them across multiple phases or file globs. It summarizes samples following `schemas/skill.schema.json` along with validation and operational procedures.
 
 ## 1. Skill Definition Format (Markdown / YAML)
 
@@ -74,7 +74,7 @@ Points:
 - `skills/core/`: Default loaded skills
 - `skills/<stream>/community/`: External/Library-specific skills (e.g., `skills/midstream/community/`)
 - `skills/private/`: Project-specific skills
-- `skills/agent-skills/`: Packages following Agent Skills spec (`SKILL.md` + `references/`, not validated by River Reviewer core)
+- `skills/agent-skills/`: Packages following Agent Skills spec (`SKILL.md` + `references/`, not validated by River Review core)
 - Test fixtures should be separated in `tests/fixtures/skills/` etc.
 
 ## 3. Validation Flow

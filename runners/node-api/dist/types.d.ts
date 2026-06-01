@@ -1,6 +1,6 @@
 /**
- * River Reviewer Node API Type Definitions
- * @module @river-reviewer/node-api
+ * River Review Node API Type Definitions
+ * @module @river-review/node-api
  */
 /**
  * Review phase in the SDLC

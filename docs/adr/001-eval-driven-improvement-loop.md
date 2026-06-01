@@ -6,13 +6,13 @@ Accepted
 
 ## Context
 
-River Reviewer は phase-aware な review framework として、Upstream / Midstream / Downstream の流れ、schema-driven な skill 管理、evidence-based なフィードバックを重視している。現在の repo には planner:eval、eval:fixtures、agent-skills:validate、Agent Skills runtime loading、SKILL.md bridge、routing skills、review severity gate evaluator、meta-consistency validation が存在し、改善のための構成要素は揃っている。
+River Review は phase-aware な review framework として、Upstream / Midstream / Downstream の流れ、schema-driven な skill 管理、evidence-based なフィードバックを重視している。現在の repo には planner:eval、eval:fixtures、agent-skills:validate、Agent Skills runtime loading、SKILL.md bridge、routing skills、review severity gate evaluator、meta-consistency validation が存在し、改善のための構成要素は揃っている。
 
-一方で、改善の採否を一貫して記録し、baseline と比較し、keep/discard を判断する統一ループはまだ前面化されていない。[autoagent](https://github.com/kevinrgu/autoagent) は baseline-first、ledger、failure grouping、specialized tools、verification sub-agent、keep/discard rule を明示しており、この運用原理は River Reviewer の改善プロセスに転用できる。
+一方で、改善の採否を一貫して記録し、baseline と比較し、keep/discard を判断する統一ループはまだ前面化されていない。[autoagent](https://github.com/kevinrgu/autoagent) は baseline-first、ledger、failure grouping、specialized tools、verification sub-agent、keep/discard rule を明示しており、この運用原理は River Review の改善プロセスに転用できる。
 
 ## Decision
 
-River Reviewer に、production runtime の自己改変ではなく、review framework 自体の改善運用としての Evaluation-Driven Improvement Loop を導入する。
+River Review に、production runtime の自己改変ではなく、review framework 自体の改善運用としての Evaluation-Driven Improvement Loop を導入する。
 
 導入範囲:
 

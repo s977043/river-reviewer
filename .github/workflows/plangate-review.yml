@@ -1,6 +1,6 @@
 name: PlanGate Review (PR)
 
-# PR で PlanGate アーティファクトに対する River Reviewer を実行し、
+# PR で PlanGate アーティファクトに対する River Review を実行し、
 # severity ごとの fail / warn / comment ポリシーを適用するワークフロー。
 #
 # - spec: pages/reference/cli-review-plan-spec.md (Issue #517)

@@ -1,13 +1,13 @@
 # コンフィグ / スキーマ概要
 
-## `.river-reviewer.json`（実行時コンフィグ）
+## `.river-review.json`（実行時コンフィグ）
 
-リポジトリ直下に置く `.river-reviewer.json` で、レビュー時のモデル設定や除外条件をカスタマイズできる。`src/config/schema.mjs` の Zod スキーマで検証し、存在しない場合は `src/config/default.mjs` のデフォルト値を使用する。
+リポジトリ直下に置く `.river-review.json` で、レビュー時のモデル設定や除外条件をカスタマイズできる。`src/config/schema.mjs` の Zod スキーマで検証し、存在しない場合は `src/config/default.mjs` のデフォルト値を使用する。
 
 ### サポート項目とデフォルト
 
 - `model`
-  - `provider`: `openai`（デフォルト）/ `google` / `anthropic`。`modelName` の prefix で実体クライアントが自動選択される（`gpt|o1` → OpenAI, `gemini` → Gemini, `claude` → Anthropic）。Anthropic 対応は [#804](https://github.com/s977043/river-reviewer/issues/804) で追加。
+  - `provider`: `openai`（デフォルト）/ `google` / `anthropic`。`modelName` の prefix で実体クライアントが自動選択される（`gpt|o1` → OpenAI, `gemini` → Gemini, `claude` → Anthropic）。Anthropic 対応は [#804](https://github.com/s977043/river-review/issues/804) で追加。
   - `modelName`: `gpt-4o-mini`（デフォルト）。例: `claude-sonnet-4-6`, `gemini-2.0-flash`。
   - `temperature`: `0`
   - `maxTokens`: `600`（OpenAI/Gemini 向け。Anthropic クライアントは内部で `max_tokens=4096` を固定使用する）
@@ -18,7 +18,7 @@
 - `exclude`
   - `files`: 変更差分から除外する glob パターン。
   - `prLabelsToIgnore`: Pull Request ラベル名に対象キーワードが含まれていればスキップする設定。`RIVER_PR_LABELS`（カンマ区切り）または GitHub Actions の `GITHUB_EVENT_PATH` から取得したラベルと照合し、大文字小文字を無視した部分一致で判定する。
-- `security`（[#692](https://github.com/s977043/river-reviewer/issues/692)）
+- `security`（[#692](https://github.com/s977043/river-review/issues/692)）
   - `redact.enabled`: `true`（デフォルト）。LLM へ送る前段で repo-wide context とプロンプトの secret を伏字化する。
   - `redact.categories`: カテゴリ単位で個別 ON/OFF。キーは以下。
     - 鍵類: `githubToken` / `openaiKey` / `anthropicKey` / `googleApiKey` / `awsAccessKey` / `awsSecretKey` / `privateKey`
@@ -29,7 +29,7 @@
   - `redact.denyFiles`: コンテキスト収集の前段で読み飛ばす glob 追加分（既定の `.env*` / `*.pem` / `*.key` / `secrets.*` 等に上乗せ）。
   - `redact.entropyThreshold`: `3.0`〜`6.0`（既定 `4.5`）。Shannon entropy を使った fallback 検出の閾値。
   - `redact.entropyMinLength`: 既定 `24`。fallback 検出の対象とする最小文字数。
-- `memory`（[#687](https://github.com/s977043/river-reviewer/issues/687)）
+- `memory`（[#687](https://github.com/s977043/river-review/issues/687)）
   - `suppressionEnabled`: `true`（デフォルト）。Riverbed Memory に登録された suppression entry を反映する。`false` で gate を完全バイパス（緊急対応用）。
   - **suppression entry の `feedbackType`** (`schemas/suppression-context.schema.json`):
     - `accepted_risk`: リスクを認識した上で残すと決めた指摘。**HIGH_SEVERITY guard を通過できる唯一の値**で、`major` / `critical` の自動抑止にはこの値が必須（`src/lib/suppression-apply.mjs` の HIGH_SEVERITY guard）。
@@ -40,7 +40,7 @@
   - CLI: `river suppression add` で対話的に登録できる。
     - 必須フラグ: `--fingerprint <fp>` / `--feedback <type>` / `--rationale <text>`
     - 任意フラグ: `--scope <pattern>` / `--severity <level>` / `--files <glob>` / `--expires <date>` / `--pr <num>`
-- `context`（[#689](https://github.com/s977043/river-reviewer/issues/689)）
+- `context`（[#689](https://github.com/s977043/river-review/issues/689)）
   - `reviewMode`: `tiny` / `medium` / `large`。budget を省略すると `src/lib/context-presets.mjs` のプリセットを適用する。`budget` を明示するとプリセットより優先される。
   - `budget.maxTokens`: `256`〜`64000`。
   - `budget.maxChars`: `1024`〜`200000`。char 上限と token 上限の両方が同時に効く。
@@ -73,7 +73,7 @@
 
 ## JSON Schema（スキル／出力）
 
-River Reviewer では、スキルや出力を JSON Schema で定義する。スキルは YAML frontmatter、出力は JSON を想定している。
+River Review では、スキルや出力を JSON Schema で定義する。スキルは YAML frontmatter、出力は JSON を想定している。
 
 - `schemas/skill.schema.json`
   - 必須: `id` / `name` / `description` / `category` （加えて `phase` / `category` / `trigger` のいずれか、`applyTo` / `files` / `path_patterns` / `trigger` のいずれかが必要）

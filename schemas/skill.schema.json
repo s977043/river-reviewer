@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "River Reviewer Skill Schema",
+  "title": "River Review Skill Schema",
   "type": "object",
   "required": ["id", "name", "description", "category"],
   "allOf": [
@@ -159,7 +159,7 @@
     },
     "license": {
       "type": "string",
-      "description": "SPDX license identifier (e.g. MIT). Optional. Aligns with the Agent Skills standard frontmatter (agentskills.io / Warp / Oz / Claude Code) so river-reviewer skill files can be discovered by external tooling."
+      "description": "SPDX license identifier (e.g. MIT). Optional. Aligns with the Agent Skills standard frontmatter (agentskills.io / Warp / Oz / Claude Code) so river-review skill files can be discovered by external tooling."
     },
     "dependencies": {
       "type": "array",

@@ -1,4 +1,4 @@
-# Copilot instructions (river-reviewer)
+# Copilot instructions (river-review)
 
 > **Single source:** 必ずリポジトリルートの [AGENTS.md](../AGENTS.md) を先に読み、そこで定義された手順・完了条件に従ってください。本ファイルは Copilot 向けの最小差分です。
 
@@ -12,7 +12,7 @@
 ## 参照ポイント
 
 - 指示ファイル: `.github/instructions/*.instructions.md`
-- カスタムエージェント: `@river-reviewer` (`.github/agents/` 内)
+- カスタムエージェント: `@river-review` (`.github/agents/` 内)
 - プロンプト: `/skill`, `/review`, `/pr` (`.github/prompts/` 内)
 - Docs: 日本語を正とし、`.en.md` は翻訳版とします。
 
@@ -28,5 +28,5 @@
 | Layer                       | 用途                                       | 例                                       |
 | --------------------------- | ------------------------------------------ | ---------------------------------------- |
 | prompt (`.github/prompts/`) | 手動実行の単機能タスク                     | `/select_review`, `/pr`                  |
-| agent (`.github/agents/`)   | 役割ベースの委譲、ツール制限付き           | `river-reviewer`, `security`             |
+| agent (`.github/agents/`)   | 役割ベースの委譲、ツール制限付き           | `river-review`, `security`               |
 | skill (`skills/`)           | 再利用可能なレビューロジック、フェーズ対応 | `upstream/`, `midstream/`, `downstream/` |

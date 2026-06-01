@@ -1,6 +1,6 @@
 ---
-id: river-reviewer-architecture
-name: river-reviewer-architecture
+id: river-review-architecture
+name: river-review-architecture
 description: |
   設計・アーキテクチャ観点のレビューエージェント。
   依存関係、境界設計、データモデル、API設計等の個別スキルへルーティングする。
@@ -100,11 +100,11 @@ license: MIT
 
 ## 他スキルとの関係
 
-| スキル                    | 関係 | 棲み分け                                                      |
-| ------------------------- | ---- | ------------------------------------------------------------- |
-| `adversarial-review`      | 補完 | architecture は「設計の正しさ」、adversarial は「設計の盲点」 |
-| `river-reviewer-security` | 補完 | architecture は「構造」、security は「脆弱性」                |
-| `river-reviewer-code`     | 補完 | architecture は「マクロ設計」、code は「ミクロ品質」          |
+| スキル                  | 関係 | 棲み分け                                                      |
+| ----------------------- | ---- | ------------------------------------------------------------- |
+| `adversarial-review`    | 補完 | architecture は「設計の正しさ」、adversarial は「設計の盲点」 |
+| `river-review-security` | 補完 | architecture は「構造」、security は「脆弱性」                |
+| `river-review-code`     | 補完 | architecture は「マクロ設計」、code は「ミクロ品質」          |
 
 ## References
 

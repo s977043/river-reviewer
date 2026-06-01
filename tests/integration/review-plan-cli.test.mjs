@@ -37,8 +37,8 @@ function setupRepo(t, { withConfig = false } = {}) {
   }
   if (withConfig) {
     copyFileSync(
-      join(FIXTURE, 'config', '.river-reviewer.json'),
-      join(dir, '.river-reviewer.json')
+      join(FIXTURE, 'config', '.river-review.json'),
+      join(dir, '.river-review.json')
     );
   }
   return dir;

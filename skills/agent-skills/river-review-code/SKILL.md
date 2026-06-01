@@ -1,6 +1,6 @@
 ---
-id: river-reviewer-code
-name: river-reviewer-code
+id: river-review-code
+name: river-review-code
 description: |
   一般コード品質のレビューエージェント。デフォルトのフォールバック先。
   可読性、保守性、型安全性、ロギング等の個別スキルへルーティングする。
@@ -110,11 +110,11 @@ license: MIT
 
 ## 他スキルとの関係
 
-| スキル                        | 関係 | 棲み分け                                                    |
-| ----------------------------- | ---- | ----------------------------------------------------------- |
-| `river-reviewer-architecture` | 補完 | code は「ミクロ品質」、architecture は「マクロ設計」        |
-| `river-reviewer-testing`      | 補完 | code は「プロダクションコード」、testing は「テストコード」 |
-| `river-reviewer-performance`  | 補完 | code は「可読性」、performance は「実行効率」               |
+| スキル                      | 関係 | 棲み分け                                                    |
+| --------------------------- | ---- | ----------------------------------------------------------- |
+| `river-review-architecture` | 補完 | code は「ミクロ品質」、architecture は「マクロ設計」        |
+| `river-review-testing`      | 補完 | code は「プロダクションコード」、testing は「テストコード」 |
+| `river-review-performance`  | 補完 | code は「可読性」、performance は「実行効率」               |
 
 ## References
 

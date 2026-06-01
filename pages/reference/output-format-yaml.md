@@ -1,10 +1,10 @@
 ---
 id: output-format-yaml
 title: YAML 出力フォーマット (Scoring + Verdict)
-description: River Reviewer の YAML 出力形式とスコアリング・判定モデル。
+description: River Review の YAML 出力形式とスコアリング・判定モデル。
 ---
 
-River Reviewer は `--output yaml` / `output_format: yaml` で構造化 YAML + 人間向けサマリーを出力する。外部 CI との連携や BI ダッシュボードへの投入に使う。
+River Review は `--output yaml` / `output_format: yaml` で構造化 YAML + 人間向けサマリーを出力する。外部 CI との連携や BI ダッシュボードへの投入に使う。
 
 ## CLI
 
@@ -15,7 +15,7 @@ npx river run . --output yaml
 ## GitHub Action
 
 ```yaml
-- uses: s977043/river-reviewer/runners/github-action@v0.68.0
+- uses: s977043/river-review/runners/github-action@v0.68.0
   with:
     output_format: yaml
 ```
@@ -99,7 +99,7 @@ overall は 5 axis の平均値。
 ## 重要な注意事項
 
 - **`derived: true` フラグ**: score は決定論的に算出された**参考値**であり、LLM による質的判断ではない。単独でマージ可否を判断しない。
-- **`auto-approve` は HITL を上書きしない**: policy レベルで river-reviewer は人間レビューを前提とする。`auto-approve` verdict は自動化ツールへの情報提供であって、merge 権限を委譲するものではない。
+- **`auto-approve` は HITL を上書きしない**: policy レベルで river-review は人間レビューを前提とする。`auto-approve` verdict は自動化ツールへの情報提供であって、merge 権限を委譲するものではない。
 - **rubric のカスタマイズ**: 現行は `src/lib/scoring/rubric.mjs` 固定。プロジェクト別のチューニングは将来 `config/scoring-rubric.json` で外部化予定。
 
 ## 関連

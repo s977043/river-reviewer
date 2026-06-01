@@ -1,6 +1,6 @@
 ---
-id: river-reviewer-testing
-name: river-reviewer-testing
+id: river-review-testing
+name: river-review-testing
 description: |
   テスト観点のレビューエージェント。
   テスト網羅性、命名規則、フレーキーテスト、カバレッジギャップの個別スキルへルーティングする。
@@ -76,10 +76,10 @@ license: MIT
 
 ## 他スキルとの関係
 
-| スキル                    | 関係 | 棲み分け                                                          |
-| ------------------------- | ---- | ----------------------------------------------------------------- |
-| `river-reviewer-code`     | 補完 | testing は「テストの品質」、code は「プロダクションコードの品質」 |
-| `river-reviewer-security` | 補完 | testing は「テスト網羅性」、security は「セキュリティ脆弱性」     |
+| スキル                  | 関係 | 棲み分け                                                          |
+| ----------------------- | ---- | ----------------------------------------------------------------- |
+| `river-review-code`     | 補完 | testing は「テストの品質」、code は「プロダクションコードの品質」 |
+| `river-review-security` | 補完 | testing は「テスト網羅性」、security は「セキュリティ脆弱性」     |
 
 ## References
 

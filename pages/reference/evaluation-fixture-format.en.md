@@ -1,6 +1,6 @@
 # Evaluation Fixture Format (fixtures-based eval)
 
-River Reviewer supports evaluation using fixtures (input and expectation) to continuously check the quality of review output against diffs. This page defines the fixture format and usage of the evaluation runner.
+River Review supports evaluation using fixtures (input and expectation) to continuously check the quality of review output against diffs. This page defines the fixture format and usage of the evaluation runner.
 
 ## Purpose
 

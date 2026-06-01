@@ -1,9 +1,9 @@
 # コントリビューションガイド
 
-> **正式な貢献ガイドはリポジトリルートの [`CONTRIBUTING.md`](https://github.com/s977043/river-reviewer/blob/main/CONTRIBUTING.md) を参照してください。**
+> **正式な貢献ガイドはリポジトリルートの [`CONTRIBUTING.md`](https://github.com/s977043/river-review/blob/main/CONTRIBUTING.md) を参照してください。**
 > このページはドキュメントサイト向けの要約版です。
 
-River Reviewerへの参加ありがとうございます。このプロジェクトでは以下の方針に沿ってプルリクエストやIssueを受け付けています。
+River Reviewへの参加ありがとうございます。このプロジェクトでは以下の方針に沿ってプルリクエストやIssueを受け付けています。
 
 ## PRの基本方針
 
@@ -28,7 +28,7 @@ River Reviewerへの参加ありがとうございます。このプロジェク
 
 - 再現手順や望ましい結果、実際の結果を具体的に書くこと。
 
-Issue はテンプレートから作成してください（`Issues → New issue`、または [issues/new/choose](https://github.com/s977043/river-reviewer/issues/new/choose)）。
+Issue はテンプレートから作成してください（`Issues → New issue`、または [issues/new/choose](https://github.com/s977043/river-review/issues/new/choose)）。
 
 ラベルの目安やトリアージ方針は `pages/guides/governance/issue-management.md` を参照してください。
 

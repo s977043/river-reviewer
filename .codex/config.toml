@@ -1,4 +1,4 @@
-# Project-local Codex defaults for river-reviewer
+# Project-local Codex defaults for river-review
 # Opt in explicitly:
 #   REPO_ROOT=$(git rev-parse --show-toplevel)
 #   CODEX_HOME="$REPO_ROOT/.codex" codex -C "$REPO_ROOT"

@@ -1,6 +1,6 @@
 ---
-id: river-reviewer-security
-name: river-reviewer-security
+id: river-review-security
+name: river-review-security
 description: |
   セキュリティ観点のレビューエージェント。
   基本的なセキュリティチェック、認証・認可設計、プライバシー設計の個別スキルへルーティングする。
@@ -75,7 +75,7 @@ license: MIT
 | スキル                          | 関係 | 棲み分け                                                   |
 | ------------------------------- | ---- | ---------------------------------------------------------- |
 | `adversarial-review` (War Game) | 補完 | security は既知パターン検出、War Game は未知の攻撃経路発見 |
-| `river-reviewer-architecture`   | 補完 | security は「脆弱性」、architecture は「構造的安全性」     |
+| `river-review-architecture`     | 補完 | security は「脆弱性」、architecture は「構造的安全性」     |
 
 ## References
 

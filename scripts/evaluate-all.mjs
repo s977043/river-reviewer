@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Unified evaluation runner for River Reviewer.
+ * Unified evaluation runner for River Review.
  *
  * Bundles planner:eval, eval:fixtures, severity gate, and meta-consistency
  * into a single invocation. Outputs a JSON envelope and optionally appends
@@ -10,7 +10,7 @@
  *   node scripts/evaluate-all.mjs [options]
  *
  * Options:
- *   --gate-input <path>    Path to River Reviewer JSON output for gate eval
+ *   --gate-input <path>    Path to River Review JSON output for gate eval
  *   --append-ledger        Append result to artifacts/evals/results.jsonl
  *   --description <text>   Optional description for ledger entry
  *   --json                 Print result as JSON instead of human-readable
@@ -293,7 +293,7 @@ async function main() {
     console.log(`Usage: node scripts/evaluate-all.mjs [options]
 
 Options:
-  --gate-input <path>    Path to River Reviewer JSON output for gate eval
+  --gate-input <path>    Path to River Review JSON output for gate eval
   --append-ledger        Append result to artifacts/evals/results.jsonl
   --description <text>   Optional description for ledger entry
   --json                 Print result as JSON
@@ -415,7 +415,7 @@ Options:
   if (parsed.json) {
     console.log(JSON.stringify(envelope, null, 2));
   } else {
-    console.log(`\n=== River Reviewer Unified Evaluation ===`);
+    console.log(`\n=== River Review Unified Evaluation ===`);
     console.log(`Commit: ${envelope.commit} (${envelope.branch})`);
     console.log(`Time:   ${envelope.timestamp}`);
     console.log(`Status: ${envelope.status.toUpperCase()}\n`);

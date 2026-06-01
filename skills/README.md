@@ -1,6 +1,6 @@
-# River Reviewer Skills
+# River Review Skills
 
-This directory contains River Reviewer skills - reusable code review patterns organized by stream category (core/upstream/midstream/downstream).
+This directory contains River Review skills - reusable code review patterns organized by stream category (core/upstream/midstream/downstream).
 
 ## What are Skills?
 
@@ -171,4 +171,4 @@ See [registry.yaml](./registry.yaml) for the complete catalog.
 - [Skill Metadata](../pages/reference/skill-metadata.md)
 - [Skill Template](./_template.md)
 - [promptfoo Documentation](https://www.promptfoo.dev/)
-- [River Reviewer Documentation](../DOCUMENTATION.md)
+- [River Review Documentation](../DOCUMENTATION.md)

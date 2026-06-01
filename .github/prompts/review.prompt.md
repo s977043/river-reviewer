@@ -1,7 +1,7 @@
 ---
 name: review
 description: 'coding-review-checklist + skills でレビューする'
-agent: 'river-reviewer'
+agent: 'river-review'
 ---
 
 この変更をレビューしてください。レビューは日本語で、指摘は「重要度（Critical/Major/Minor/Info）」付きで書いてください。

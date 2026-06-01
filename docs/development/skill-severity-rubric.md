@@ -84,7 +84,7 @@ A skill's `severity` is decided by the **worst case finding it is allowed to emi
 | midstream  | 57%   | 34%   | 7%   | -        |
 | downstream | 77%   | 11%   | 11%  | -        |
 
-`major` が dominant な分布は、River Reviewer のレビュー対象が「設計・実装・テスト不備」を主軸にしている以上自然。ただし以下のような **再検討候補** が含まれる:
+`major` が dominant な分布は、River Review のレビュー対象が「設計・実装・テスト不備」を主軸にしている以上自然。ただし以下のような **再検討候補** が含まれる:
 
 - 全 stream で、命名・formatting 系のスキルが `major` になっていないか（ある場合は `minor` 化を検討）
 - agent-\* skill 群で、汎用レビュースキルが `major` 過剰になっていないか（ある場合は `minor` 化を検討）
@@ -128,5 +128,5 @@ A skill's `severity` is decided by the **worst case finding it is allowed to emi
 
 - 出力スキーマ: `docs/review/output-format.md`
 - 重要度語彙マッピング: `.claude/rules/review-core.md`
-- HIGH_SEVERITY guard: `skills/agent-skills/river-reviewer/references/FEEDBACK_TO_FIXTURE.md`
+- HIGH_SEVERITY guard: `skills/agent-skills/river-review/references/FEEDBACK_TO_FIXTURE.md`
 - planner-eval の使い方: `tests/fixtures/planner-dataset/README.md`

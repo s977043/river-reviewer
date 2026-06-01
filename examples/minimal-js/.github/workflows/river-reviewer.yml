@@ -1,4 +1,4 @@
-name: River Reviewer (example)
+name: River Review (example)
 
 on:
   pull_request:
@@ -14,8 +14,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0
+      - name: Run River Review (midstream)
+        uses: s977043/river-review/runners/github-action@v0
         with:
           phase: midstream
         env:

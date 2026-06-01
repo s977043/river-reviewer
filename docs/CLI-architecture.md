@@ -1,13 +1,13 @@
 # CLI Architecture
 
-> 内部資料: River Reviewer リポジトリには 2 系統の CLI が並立している。本ドキュメントはコントリビュータ向けに、各系統の責務・対象ユーザー・サブコマンドの境界を整理する。
+> 内部資料: River Review リポジトリには 2 系統の CLI が並立している。本ドキュメントはコントリビュータ向けに、各系統の責務・対象ユーザー・サブコマンドの境界を整理する。
 
 ## 2 系統の CLI
 
-| 系統           | 実体                                                       | npm bin                                             | サブコマンド                                                 | 対象ユーザー                                               |
-| -------------- | ---------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------- |
-| **メイン CLI** | `src/cli.mjs`                                              | `river` / `river-reviewer` (`package.json#bin`)     | `run`, `skills` (`import`/`export`/`list`), `doctor`, `eval` | エンドユーザー、GitHub Action runner                       |
-| **Runner CLI** | `runners/cli/src/index.mjs` (`@river-reviewer/cli-runner`) | パッケージ内 `bin/river` のみ (private、npm 未公開) | `review`, `eval`, `create`                                   | リポジトリ内ツール、スキル開発者向け実験的インターフェース |
+| 系統           | 実体                                                     | npm bin                                             | サブコマンド                                                 | 対象ユーザー                                               |
+| -------------- | -------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------- |
+| **メイン CLI** | `src/cli.mjs`                                            | `river` / `river-review` (`package.json#bin`)       | `run`, `skills` (`import`/`export`/`list`), `doctor`, `eval` | エンドユーザー、GitHub Action runner                       |
+| **Runner CLI** | `runners/cli/src/index.mjs` (`@river-review/cli-runner`) | パッケージ内 `bin/river` のみ (private、npm 未公開) | `review`, `eval`, `create`                                   | リポジトリ内ツール、スキル開発者向け実験的インターフェース |
 
 `runners/cli/package.json` は `"private": true` ではないが、`runners/` 配下の独立 npm package として `commander` ベースで実装されており、ルートの `package.json#bin` からは引き出されていない。実行は `node runners/cli/bin/river …` で行う。
 
