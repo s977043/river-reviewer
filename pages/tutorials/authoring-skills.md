@@ -27,4 +27,4 @@ tags: [architecture, decision-record]
 - 影響範囲やリスクが明記されているかをチェックする。
 ```
 
-保存後、`scripts/rr_validate_skills.py --phase upstream` を実行するとスキーマ検証やフェーズ別の読み込みを行えます。
+保存後、`npm run skills:validate` を実行するとスキーマ検証を行えます。フェーズ別の検証が必要な場合は `scripts/rr_validate_skills.py --phase upstream` を直接実行してください。

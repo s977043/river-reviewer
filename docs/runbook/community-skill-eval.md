@@ -24,6 +24,43 @@ PROVIDER_FILTER=anthropic:claude-3-5-sonnet-20241022 \
 
 Outputs land in `./eval-output/<skill-id>.json` per evaluated skill.
 
+## Agent-based / unified eval path
+
+The repo also ships a unified evaluation runner and two associated CI
+workflows that cover community skills with a different purpose from the
+promptfoo path.
+
+### Local unified eval
+
+```bash
+node scripts/evaluate-all.mjs          # evaluate all skills
+```
+
+Requires the same API key env vars as the promptfoo path. Results are
+written per-skill under `./eval-output/`.
+
+### Scheduled regression tracking (nightly-eval.yml)
+
+`.github/workflows/nightly-eval.yml` runs `evaluate-all.mjs` on a
+daily schedule (04:00 JST) against all skills. Use this workflow to
+track regressions across the full skill set over time without manual
+intervention.
+
+### CI validation on skill changes (skill-eval.yml)
+
+`.github/workflows/skill-eval.yml` triggers automatically on PR/push
+whenever skill eval, prompt, fixture, or golden files change. It
+validates that the modified skill still passes its eval assertions
+before merge.
+
+### When to use which path
+
+| Goal                                                          | Path                                                            |
+| ------------------------------------------------------------- | --------------------------------------------------------------- |
+| Generate or iterate on per-skill fixtures and promote goldens | promptfoo path (`run-promptfoo-eval.sh` / `promptfoo-eval.yml`) |
+| Continuous regression tracking across all skills              | `evaluate-all.mjs` / `nightly-eval.yml`                         |
+| CI validation when a skill's files change                     | `skill-eval.yml` (automatic)                                    |
+
 ## Fallback: GitHub Actions workflow
 
 Only use this path if API keys are eventually added as repo secrets and
@@ -66,7 +103,9 @@ open a PR referencing the eval artifact URL in the description.
 
 ## References
 
-- Workflow: `.github/workflows/promptfoo-eval.yml`
+- Workflows: `.github/workflows/promptfoo-eval.yml`,
+  `.github/workflows/nightly-eval.yml`,
+  `.github/workflows/skill-eval.yml`
 - Skill READMEs document the per-skill workflow.
 - Issues: [#868](https://github.com/s977043/river-reviewer/issues/868),
   [#911](https://github.com/s977043/river-reviewer/issues/911).

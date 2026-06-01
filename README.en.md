@@ -53,7 +53,7 @@ Try it locally against the current diff:
 npx river run . --dry-run
 ```
 
-> npm distribution and the `npx river try` experience are on the roadmap (Epic 1 / [#800](https://github.com/s977043/river-reviewer/issues/800)).
+> npm publish workflow and `publishConfig` are implemented ([#942](https://github.com/s977043/river-reviewer/pull/942)). Setting the `NPM_TOKEN` secret enables publishing of `@river-reviewer/core-runner`, `@river-reviewer/node-api`, and `@river-reviewer/cli-runner` ([#800](https://github.com/s977043/river-reviewer/issues/800)). The `npx river try` experience is planned separately.
 
 | Goal                    | Destination                                                                              |
 | ----------------------- | ---------------------------------------------------------------------------------------- |
@@ -134,14 +134,14 @@ The primary integration today is with **PlanGate v6**: River Reviewer receives `
 
 ### Four use cases
 
-> **Note**: The `river review plan` / `river review exec` / `river review verify` CLI commands are under development (tracked in Issue #509). Until the implementation is complete, the workflow steps run as placeholders.
+> **Note**: The `river review plan` and `river review exec` CLI commands are stable as of v0.53.0. `river review exec --plan` replay execution shipped in v0.68.0 (#935). The `river review verify` command is not yet implemented (placeholder only).
 
 - **Design review**: pass `pbi-input` / `plan` to check plan integrity and completeness with upstream skills (e.g. `skills/upstream/rr-upstream-plangate-plan-integrity-001/`).
 - **Implementation review**: pass `plan` + `diff` to check that the code change matches the plan (e.g. `skills/upstream/rr-upstream-plangate-exec-conformance-001/`).
 - **QA review**: pass `test-cases` / `junit` / `coverage` so downstream skills can surface coverage gaps and failure paths.
 - **Double-check (W-check)**: pass existing AI or human review output as `review-self` / `review-external` to review the review itself.
 
-### CLI examples (under development)
+### CLI examples
 
 See [`river review plan` CLI spec](pages/reference/cli-review-plan-spec.en.md) and [`river review exec` CLI spec](pages/reference/cli-review-exec-spec.en.md) for full details.
 
@@ -182,14 +182,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Reviewer (midstream)
-        uses: s977043/river-reviewer/runners/github-action@v0.42.0
+        uses: s977043/river-reviewer/runners/github-action@v0.70.0
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-Pin to a release tag such as `@v0.42.0` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
+Pin to a release tag such as `@v0.70.0` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
 
 <!-- x-release-please-start-version -->
 
@@ -280,17 +280,17 @@ We organize content into four types, mapped by directory under `pages/` and serv
 
 ## Roadmap
 
-Following the concept refresh (2026-05), the roadmap is organized into the following seven epics. The Status column reflects v0.53.0 implementation reality.
+Following the concept refresh (2026-05), the roadmap is organized into the following seven epics. The Status column reflects v0.70.0 implementation reality.
 
-| Epic                                       | Description                                                                                                          | Status                                                                                                                                                                                                                                                        |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Epic 0**: Official Skill Pack            | Official skill pack and minimal registry (security / a11y / migration-safety / dependency-policy / plan-conformance) | Partial — community-tier modern-web-semantic / modern-web-performance landed ([#873](https://github.com/s977043/river-reviewer/pull/873) / [#875](https://github.com/s977043/river-reviewer/pull/875)). Official-tier registry not yet wired                  |
-| **Epic 1**: First-Run Adoption             | npm distribution, `npx river try`, 10-minute Quick Start                                                             | Partial — B1 design + dry-run packaging audit landed ([#886](https://github.com/s977043/river-reviewer/pull/886)). B2 (`package.json` implementation + publish verification) not yet ([#800](https://github.com/s977043/river-reviewer/issues/800))           |
-| **Epic 2**: SDLC Gates                     | Stabilize `plan` / `exec` / `verify` CLI, artifact-input-contract v1                                                 | Partial — `plan` / `exec` stable as of v0.53.0 (silent-skip 5/6 closed). `exec --plan` replay execution tracked at [#878](https://github.com/s977043/river-reviewer/issues/878). `verify` execution not implemented                                           |
-| **Epic 3**: Concept Refresh                | README / vision / intro overhaul                                                                                     | Implemented — landed in v0.51.0 ([#860](https://github.com/s977043/river-reviewer/pull/860))                                                                                                                                                                  |
-| **Epic 4**: Skill Authoring and Governance | `npx river create skill`, catalog, contribution policy                                                               | Planned — registry.yaml extensions and contribution policy untouched                                                                                                                                                                                          |
-| **Epic 5**: Evaluation Observability       | CI regression, skill badges, dashboard                                                                               | Planned — per-skill promptfoo eval scaffold in place, dashboard / aggregation not yet                                                                                                                                                                         |
-| **Epic 6**: Docs IA and Onboarding         | First-run / skill authoring / CI operation onboarding paths                                                          | Partial — `docs/review/troubleshooting.md` covers silent-skip diagnosis ([#866](https://github.com/s977043/river-reviewer/pull/866), [#872](https://github.com/s977043/river-reviewer/pull/872)). Quick Start / skill-authoring onboarding tracks with Epic 1 |
+| Epic                                       | Description                                                                                                          | Status                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Epic 0**: Official Skill Pack            | Official skill pack and minimal registry (security / a11y / migration-safety / dependency-policy / plan-conformance) | Partial — community-tier modern-web-semantic / modern-web-performance landed ([#873](https://github.com/s977043/river-reviewer/pull/873) / [#875](https://github.com/s977043/river-reviewer/pull/875)). Official-tier registry not yet wired                                                                                                                                         |
+| **Epic 1**: First-Run Adoption             | npm distribution, `npx river try`, 10-minute Quick Start                                                             | Partial — B1 design + dry-run packaging audit landed ([#886](https://github.com/s977043/river-reviewer/pull/886)). publish workflow + `publishConfig` shipped ([#942](https://github.com/s977043/river-reviewer/pull/942)); activate by setting `NPM_TOKEN` secret ([#800](https://github.com/s977043/river-reviewer/issues/800)). `npx river try` experience is planned separately. |
+| **Epic 2**: SDLC Gates                     | Stabilize `plan` / `exec` / `verify` CLI, artifact-input-contract v1                                                 | Partial — `plan` / `exec` stable as of v0.53.0. `exec --plan` replay execution shipped in v0.68.0 ([#935](https://github.com/s977043/river-reviewer/pull/935)). `verify` execution not implemented                                                                                                                                                                                   |
+| **Epic 3**: Concept Refresh                | README / vision / intro overhaul                                                                                     | Implemented — landed in v0.51.0 ([#860](https://github.com/s977043/river-reviewer/pull/860))                                                                                                                                                                                                                                                                                         |
+| **Epic 4**: Skill Authoring and Governance | `npx river create skill`, catalog, contribution policy                                                               | Planned — registry.yaml extensions and contribution policy untouched                                                                                                                                                                                                                                                                                                                 |
+| **Epic 5**: Evaluation Observability       | CI regression, skill badges, dashboard                                                                               | Planned — per-skill promptfoo eval scaffold in place, dashboard / aggregation not yet                                                                                                                                                                                                                                                                                                |
+| **Epic 6**: Docs IA and Onboarding         | First-run / skill authoring / CI operation onboarding paths                                                          | Partial — `docs/review/troubleshooting.md` covers silent-skip diagnosis ([#866](https://github.com/s977043/river-reviewer/pull/866), [#872](https://github.com/s977043/river-reviewer/pull/872)). Quick Start / skill-authoring onboarding tracks with Epic 1                                                                                                                        |
 
 Legend: **Implemented** = primary acceptance criteria met / **Partial** = some scope landed, more remaining / **Planned** = not yet started.
 
