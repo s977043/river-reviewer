@@ -1,4 +1,9 @@
-# Runner CLI リファレンス
+# `--reviewers` フラグリファレンス
+
+> **スコープ注意**: このページは `river run` の `--reviewers` フラグと検証コマンドのみを扱います。
+>
+> - `river run` の全フラグ（`--phase` / `--planner` / `--dry-run` / `--output` / `--max-cost` / `--debug` / `--estimate` など）は **[stable-interfaces.md](./stable-interfaces.md)** を参照してください。
+> - W-check で使用する `river review exec` のフラグ（`--artifact`, `--ensemble`, `--phase`）は **[W-check ガイド](../guides/w-check.md)** および **[cli-review-exec-spec.md](./cli-review-exec-spec.md)** を参照してください。
 
 Runner CLI を使用して、River Review のエージェントとスキルをローカルまたは CI で検証します。
 軽量な Python ランナーが `schemas/output.schema.json` に従う構造化されたレビュー結果を出力します。

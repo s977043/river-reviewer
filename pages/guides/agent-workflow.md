@@ -1,5 +1,8 @@
 # AI エージェントから River Review を使う
 
+> **どのエントリポイントを使うか**
+> Use `river run .` from any shell (including non-Claude environments); use `/review-local` when you want River Review orchestrated by Claude Code with automatic context passing from the current session; use the sub-agent (`.claude/agents/river-review.md`) for delegated, headless review tasks within a Claude Code session where you want the review to run as a background step.
+
 ## 概要
 
 River Review は CLI ベースのツールなので、Claude Code / Cursor / Codex CLI / GitHub Copilot などどの AI エージェントからも利用できます。エージェントの種類に関わらず、`river run .` コマンドを呼び出すだけで動きます。
@@ -45,13 +48,13 @@ river run . --output json
 
 ## エージェント別の呼び出し方
 
-| エージェント   | 呼び出し方                                | 専用定義ファイル                          |
-| -------------- | ----------------------------------------- | ----------------------------------------- |
-| Claude Code    | Bash ツール / `/review-local` / sub-agent | `.claude/agents/river-review.md`          |
-| Cursor         | Terminal タブ / `@terminal`               | —                                         |
-| Codex CLI      | `codex exec "river run ."`                | —                                         |
-| GitHub Copilot | ターミナルで直接実行                      | `.github/agents/river-review.agent.md`    |
-| その他         | シェルで `river run .`                    | `agents/examples/river-review.agent.yaml` |
+| エージェント   | 呼び出し方                                | 専用定義ファイル                           |
+| -------------- | ----------------------------------------- | ------------------------------------------ |
+| Claude Code    | Bash ツール / `/review-local` / sub-agent | `.claude/agents/river-review.md`           |
+| Cursor         | Terminal タブ / `@terminal`               | —                                          |
+| Codex CLI      | `codex exec "river run ."`                | `templates/agent-workflow/codex/AGENTS.md` |
+| GitHub Copilot | ターミナルで直接実行                      | `.github/agents/river-review.agent.md`     |
+| その他         | シェルで `river run .`                    | `agents/examples/river-review.agent.yaml`  |
 
 ### Claude Code
 
@@ -81,7 +84,11 @@ Cursor の Agent モードからターミナルコマンドとして呼び出せ
 river run . --reviewers auto
 ```
 
-設定テンプレートは `templates/agent-workflow/` を参照してください。
+プロジェクトルートに `.cursorrules` をコピーしてください。
+
+```bash
+cp templates/agent-workflow/cursor/.cursorrules .cursorrules
+```
 
 ### Codex CLI
 
@@ -89,7 +96,7 @@ river run . --reviewers auto
 codex exec "river run . --reviewers auto"
 ```
 
-設定テンプレートは `templates/agent-workflow/` を参照してください。
+専用定義: `templates/agent-workflow/codex/AGENTS.md` — プロジェクトの `AGENTS.md` にこのファイルの内容をマージまたは追記してください。これにより、コミット前に River Review が自動実行されます。
 
 ### GitHub Copilot
 

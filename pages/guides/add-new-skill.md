@@ -11,10 +11,39 @@ River Review に新しいスキル（`skills/**/*.md`）を追加して、検証
 - Node.js（このリポは `node --test` を使用する）
 - 依存を入れていない場合は `npm ci` を実行する
 
-## 1) ひな形からスキルを作る
+## 1) 配置ディレクトリを選ぶ
 
-1. `skills/_template.md` をコピーして、対象カテゴリ配下に配置する。
-   - 例: `skills/midstream/rr-midstream-my-skill-001.md`
+スキルを置く場所は **category × first-party / community** の 2 軸で決まります。
+
+### Category（`core` / `upstream` / `midstream` / `downstream`）
+
+スキルの `category` フィールドと同名のディレクトリに置きます（例: `category: midstream` → `skills/midstream/`）。
+
+### First-party vs Community
+
+| 配置                          | 対象                                                                                                                        |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `skills/midstream/` (直下)    | コアメンテナーが管理・評価した第一級スキル。`recommended: true` が基本                                                      |
+| `skills/midstream/community/` | 外部コントリビューター由来、またはサードパーティのライブラリ・フレームワーク固有のスキル。`recommended: false` がデフォルト |
+
+**community/ に置く目安（いずれか 1 つでも該当すれば community）:**
+
+- 特定の外部ライブラリ / フレームワークを対象にしている（例: Next.js、Tailwind、Prisma）
+- コアメンテナー以外から提供されたスキル
+- good/bad フィクスチャとゴールデン出力がまだ整備されていない実験的スキル
+
+community スキルはフィクスチャと golden output を揃えると `recommended: true` 昇格の候補になります（詳細: `pages/guides/governance/skill-policy.md`）。
+
+**決定例:**
+
+- 「TypeScript の型安全チェック」→ 言語レベルの汎用スキル → `skills/midstream/` 直下
+- 「Next.js App Router の境界チェック」→ フレームワーク固有 → `skills/midstream/community/`
+
+## 2) ひな形からスキルを作る
+
+1. `skills/_template.md` をコピーして、選んだディレクトリに配置する。
+   - 例 (first-party): `skills/midstream/rr-midstream-my-skill-001.md`
+   - 例 (community): `skills/midstream/community/rr-midstream-nextjs-my-skill-001/SKILL.md`
 2. YAML frontmatter を最低限埋める（必須フィールドは `schemas/skill.schema.json` を参照する）。
    - `id`: 一意な ID（例: `rr-midstream-my-skill-001`）
    - `name`: スキル名
@@ -25,7 +54,7 @@ River Review に新しいスキル（`skills/**/*.md`）を追加して、検証
 
 メタデータの詳細定義は `pages/reference/metadata-fields.md` を参照してください。
 
-## 2) スキーマ検証を通す
+## 3) スキーマ検証を通す
 
 ```bash
 npm run skills:validate
