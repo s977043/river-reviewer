@@ -3,7 +3,7 @@ id: what-is-river-review
 title: River Review とは
 ---
 
-River Review は **Context Engineering に基づく Skill Registry 中心のコードレビューフレームワーク**です。[上流 (upstream)、中流 (midstream)、下流 (downstream)](./upstream-midstream-downstream.md) の 3 フェーズに沿って、レビュー観点を「Agent Skills」として運び続けるフロー型のエージェントです。
+River Review は、**チーム固有の判断基準をバージョン管理可能・リポジトリ所有可能な「Agent Skills」として扱う**コードレビューフレームワークです。このアプローチは _Context Engineering_（レビュー判断に必要な文脈を構造化して LLM へ渡す設計手法）とも呼ばれ、その中核となる Skills の登録・管理の仕組みを _Skill Registry_ と呼びます。[上流 (upstream)、中流 (midstream)、下流 (downstream)](./upstream-midstream-downstream.md) の 3 フェーズに沿って、レビュー観点をこれらの Skills として運び続けるフロー型のエージェントです。
 
 チーム固有の判断基準・手順といった暗黙知を、バージョン管理可能な「Agent Skills」として定義することで、レビューの再現性と運用コストを両立します。
 

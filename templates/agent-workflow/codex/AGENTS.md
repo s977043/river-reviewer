@@ -8,7 +8,7 @@ Before finalizing any code change, run River Review to catch issues:
 river run . --reviewers auto
 ```
 
-If the `ANTHROPIC_API_KEY` environment variable is not set, use dry-run mode:
+If neither the `ANTHROPIC_API_KEY` nor the `OPENAI_API_KEY` environment variable is set, use dry-run mode:
 
 ```bash
 river run . --dry-run

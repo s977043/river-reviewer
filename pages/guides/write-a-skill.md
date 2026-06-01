@@ -147,13 +147,49 @@ River Review のコメントは `<file>:<line>: <message>` 形式で投稿され
 - `npm test`
 - 可能なら “誤検知ガード/Non-goals” の確認観点（何を言わないか）
 
+## Fixtures と評価ワークフロー
+
+各スキルには `fixtures/`（入力 diff サンプル）と `golden/`（期待出力）という兄弟ディレクトリを用意できます。これらは Minimum Acceptance Bar を客観的に検証するための評価セットです。
+
+### ディレクトリ構造
+
+```text
+skills/<phase>/<skill-id>/
+├── SKILL.md
+├── fixtures/
+│   ├── 01-true-positive-<説明>.md   # 指摘すべきケース
+│   └── 02-false-positive-<説明>.md  # 指摘しないべきケース
+├── golden/
+│   ├── 01-true-positive-<説明>.md   # 期待される出力
+│   └── 02-false-positive-<説明>.md  # 期待される出力（指摘なし）
+└── eval/
+    └── promptfoo.yaml               # promptfoo 設定（任意）
+```
+
+- ファイル名は `<数字プレフィックス>-<種別>-<説明>.md` の形式にします（例: `01-true-positive-undocumented-dependency.md`）。
+- `fixtures/` と `golden/` のファイル名は完全一致させます（ペアで評価するため）。
+- `true-positive` ケースでは、スキルが少なくとも1件の指摘を返すことを確認する。
+- `false-positive` ケースでは、スキルが指摘を返さないこと（または無関係な指摘を返さないこと）を確認する。
+
+### 評価の実行
+
+```bash
+npm run eval:fixtures
+```
+
+promptfoo を直接使う場合は `npx promptfoo eval` でも実行できます。eval の詳細なセットアップは `pages/guides/repo-wide-review.md` を参照してください。
+
+### なぜ fixtures が重要か
+
+fixtures がないと、スキルが「本当に指摘すべき差分を検知できるか」「誤検知ガードが機能しているか」を人手でしか確認できません。Minimum Acceptance Bar（下記）の検証は fixtures があって初めて再現可能になります。
+
 ## スキル追加・変更時のチェックリスト
 
 - [ ] 指摘が 1 観点に絞られている
 - [ ] Evidence（ファイル/行、diff の事実）が明確である
 - [ ] 誤検知ガード（抑制条件）がある
 - [ ] Non-goals（扱わないこと）が書かれている
-- [ ] 可能なら fixtures または最小再現手順がある
+- [ ] `fixtures/` と `golden/` に true-positive / false-positive ケースがある（Minimum Acceptance Bar の検証に必須）
 
 ## Minimum Acceptance Bar（最低合格ライン）
 

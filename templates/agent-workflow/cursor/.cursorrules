@@ -1,5 +1,11 @@
 # River Reviewer — Cursor Agent Rules
 
+# Prerequisites: river CLI must be installed globally and available in Cursor's terminal PATH.
+#   npm i -g @s977043/river-review
+#   Verify: river --version
+# If 'command not found' occurs, install via the command above or follow the quickstart guide:
+#   https://river-reviewer.s977043.dev/docs/quickstart
+
 ## When to run River Reviewer
 
 - Before committing: run a code review on staged changes.

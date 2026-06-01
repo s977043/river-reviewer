@@ -23,11 +23,20 @@ jobs:
       - name: Run River Review (midstream)
         uses: s977043/river-review/runners/github-action@v0.70.0
         with:
-          phase: midstream # upstream|midstream|downstream
-          dry_run: true # 外部 API を呼ばずに PR コメントを投稿する（フォールバック）
+          phase: midstream # upstream|midstream|downstream を参照
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
+
+## phase の選び方
+
+| phase        | タイミング                                 | 代表的なトリガー                                       | 用途                                                  |
+| ------------ | ------------------------------------------ | ------------------------------------------------------ | ----------------------------------------------------- |
+| `upstream`   | マージ前ゲート（ドラフト／レビュー依頼時） | `pull_request: types: [ready_for_review]`              | 品質チェックをドラフト段階で実施したい場合            |
+| `midstream`  | PR オープン・同期時のレビュー（**推奨**）  | `pull_request: types: [opened, synchronize, reopened]` | PR が更新されるたびにレビューを実行する一般的なケース |
+| `downstream` | マージ後の分析                             | `push` / `workflow_run`                                | マージ済みコードの品質集計やレトロスペクティブ用途    |
+
+ほとんどのチームは **`midstream`** を選んでください。PR が開かれたタイミングと差分が更新されるたびにレビューが実行されます。
 
 PR へのコメント投稿には `issues: write` が必要です。権限不足の場合は workflow の `permissions` を見直してください。
 

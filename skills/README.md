@@ -26,7 +26,7 @@ skills/
 │   └── agent-*.md                  # Upstream agent skills
 ├── midstream/                      # Implementation skills
 │   ├── rr-midstream-*.md           # Midstream skill definitions (frontmatter + Markdown)
-│   ├── community/                  # Community midstream skills
+│   ├── community/                  # Community midstream skills — externally contributed or library/framework-specific skills not bundled in the core distribution; recommended: false by default
 │   └── agent-*.md                  # Midstream agent skills
 ├── downstream/                     # Testing & Release skills
 │   └── rr-downstream-*.md          # Downstream skill definitions (frontmatter + Markdown)
