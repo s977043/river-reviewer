@@ -22,7 +22,7 @@ flowchart LR
   Filter -->|selected| Planner[Skill planner\n(optional)]
   Filter -->|skipped + reasons| Skipped[Skipped list]
   Planner --> Runner[Review runner]
-  Runner --> Output[Output schema\nissues[] + summary]
+  Runner --> Output[Output schema\nfindings[] + summary]
 ```
 
 ## Representative flow (GitHub Actions)
@@ -39,12 +39,12 @@ sequenceDiagram
   River->>Repo: compute merge-base / diff
   River->>River: select skills (selected/skipped)
   alt dry-run / missing API key
-    River->>River: fallback comments
+    River->>River: fallback findings
   else LLM enabled
     River->>LLM: prompt (skills + context)
     LLM-->>River: review output
   end
-  River-->>GH: comments / summary
+  River-->>GH: findings / summary
 ```
 
 ## Representative flow (local)
@@ -58,5 +58,5 @@ sequenceDiagram
   Dev->>River: river run . (--debug/--dry-run)
   River->>Repo: diff/merge-base
   River->>River: select skills (selected/skipped)
-  River-->>Dev: plan + comments (+ debug)
+  River-->>Dev: plan + findings (+ debug)
 ```

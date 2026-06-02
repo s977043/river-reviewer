@@ -1,5 +1,8 @@
 # Using River Review from AI Agents
 
+> **Which entry point should I use?**
+> Use `river run .` from any shell (including non-Claude environments); use `/review-local` when you want River Review orchestrated by Claude Code with automatic context passing from the current session; use the sub-agent (`.claude/agents/river-review.md`) for delegated, headless review tasks within a Claude Code session where you want the review to run as a background step.
+
 ## Overview
 
 River Review is a CLI-based tool, so it works with any AI agent — Claude Code, Cursor, Codex CLI, GitHub Copilot, and others. Regardless of which agent you use, all it takes is a call to `river run .`.
@@ -45,13 +48,13 @@ To see which roles were selected, check the `autoSelectedRoles` field in the JSO
 
 ## How to Invoke by Agent
 
-| Agent          | How to Invoke                           | Dedicated Definition File                 |
-| -------------- | --------------------------------------- | ----------------------------------------- |
-| Claude Code    | Bash tool / `/review-local` / sub-agent | `.claude/agents/river-review.md`          |
-| Cursor         | Terminal tab / `@terminal`              | —                                         |
-| Codex CLI      | `codex exec "river run ."`              | —                                         |
-| GitHub Copilot | Run directly in terminal                | `.github/agents/river-review.agent.md`    |
-| Others         | `river run .` in any shell              | `agents/examples/river-review.agent.yaml` |
+| Agent          | How to Invoke                           | Dedicated Definition File                  |
+| -------------- | --------------------------------------- | ------------------------------------------ |
+| Claude Code    | Bash tool / `/review-local` / sub-agent | `.claude/agents/river-review.md`           |
+| Cursor         | Terminal tab / `@terminal`              | —                                          |
+| Codex CLI      | `codex exec "river run ."`              | `templates/agent-workflow/codex/AGENTS.md` |
+| GitHub Copilot | Run directly in terminal                | `.github/agents/river-review.agent.md`     |
+| Others         | `river run .` in any shell              | `agents/examples/river-review.agent.yaml`  |
 
 ### Claude Code
 
@@ -89,7 +92,7 @@ See `templates/agent-workflow/` for ready-to-use config templates.
 codex exec "river run . --reviewers auto"
 ```
 
-See `templates/agent-workflow/` for ready-to-use config templates.
+Dedicated definition: `templates/agent-workflow/codex/AGENTS.md` — merge or append the contents of this file into your project's `AGENTS.md`. This enables River Review to run automatically before commits.
 
 ### GitHub Copilot
 

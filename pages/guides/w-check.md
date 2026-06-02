@@ -109,7 +109,7 @@ river review exec \
   --phase midstream
 ```
 
-`--artifact review-external` と `--ensemble` を同時に指定した場合は `--ensemble` が優先されます。
+`--artifact review-external` と `--ensemble` を同時に指定した場合は `--artifact review-external` が優先されます（`--ensemble` は無視され警告が出力されます）。
 
 ## GitHub Actions での設定方法
 
@@ -140,6 +140,9 @@ jobs:
   w-check:
     needs: ai-reviews
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -156,6 +159,7 @@ jobs:
             --ensemble .river/reviews/
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 > **注意**: `runners/github-action/dist/index.mjs` のパスはリポジトリのチェックアウトパスを前提としています。`github.action_path` は composite action の内部でのみ有効なため、呼び出し元ワークフローから直接使用することはできません。River Review を Action として `uses: s977043/river-review@vX.Y.Z` で呼び出す形式が整備された際は、そちらに移行してください。

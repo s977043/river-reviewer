@@ -1,8 +1,8 @@
 {
+  "explanation": "解説",
   "tutorials": "チュートリアル",
   "guides": "ガイド",
-  "contributing": "コントリビューション",
   "reference": "リファレンス",
-  "explanation": "解説",
+  "contributing": "コントリビューション",
   "dashboard": "ダッシュボード"
 }

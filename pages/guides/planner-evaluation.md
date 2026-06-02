@@ -20,6 +20,44 @@
    `tests/fixtures/planner-eval-cases.json` に、`skills` / `context` / `plan` / `expectedOrder` を記述する。  
    ※ `plan` が未指定なら `expectedOrder` をそのまま LLM 応答として使う（オフライン評価用）。
 
+   フィクスチャの記述例（最小構成）:
+
+   ```json
+   [
+     {
+       "name": "midstream diff heavy",
+       "context": {
+         "phase": "midstream",
+         "changedFiles": ["src/foo.js"],
+         "availableContexts": ["diff", "fullFile"]
+       },
+       "skills": [
+         {
+           "id": "code-quality",
+           "name": "Code quality",
+           "phase": "midstream",
+           "applyTo": ["src/**/*.js"],
+           "inputContext": ["diff"],
+           "modelHint": "balanced"
+         },
+         {
+           "id": "tests",
+           "name": "Test suggestions",
+           "phase": "midstream",
+           "applyTo": ["src/**/*.js"],
+           "inputContext": ["diff", "tests"],
+           "modelHint": "high-accuracy"
+         }
+       ],
+       "plan": [
+         { "id": "code-quality", "reason": "diff size moderate" },
+         { "id": "tests", "reason": "touching logic needs tests" }
+       ],
+       "expectedOrder": ["code-quality", "tests"]
+     }
+   ]
+   ```
+
 2. 評価を実行
 
    ```bash
@@ -30,6 +68,21 @@
 
 3. 出力
    - サマリ（件数、exactMatch/top1/coverage/MRR）と各ケースの詳細を標準出力する。
+
+   出力例:
+
+   ```text
+   Planner evaluation summary:
+   - cases: 2
+   - exactMatch: 50.0%
+   - top1Match: 100.0%
+   - coverage: 100.0%
+   - MRR: 1.000
+
+   Details:
+   * midstream diff heavy: expected=code-quality,tests planned=code-quality,tests top1=true coverage=1.00
+   * missing tests context fallback: expected=code-quality planned=code-quality,tests top1=true coverage=1.00
+   ```
 
 ## 実装メモ
 

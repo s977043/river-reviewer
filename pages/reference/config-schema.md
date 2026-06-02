@@ -66,6 +66,85 @@
 }
 ```
 
+### 詳細設定例
+
+`security` / `memory` / `context` など複雑なセクションを使う場合の設定例:
+
+```json
+{
+  "security": {
+    "redact": {
+      "enabled": true,
+      "extraPatterns": [
+        {
+          "id": "my-api-key",
+          "pattern": "MYAPP_[A-Z0-9]{32}",
+          "replacement": "[REDACTED_MYAPP_KEY]"
+        }
+      ],
+      "allowlist": ["test_token_placeholder"],
+      "denyFiles": ["config/secrets/**", "**/*.vault"],
+      "entropyThreshold": 4.5
+    }
+  },
+  "memory": {
+    "suppressionEnabled": true
+  },
+  "context": {
+    "reviewMode": "medium",
+    "budget": {
+      "maxTokens": 16000,
+      "perSectionCaps": {
+        "fullFile": 4000,
+        "tests": 2000,
+        "usages": 2000,
+        "config": 1000
+      }
+    },
+    "ranking": {
+      "enabled": true,
+      "weights": {
+        "pathProximity": 0.4,
+        "symbolUsage": 0.3,
+        "siblingTest": 0.2,
+        "commitRecency": 0.1
+      }
+    }
+  }
+}
+```
+
+`river suppression add` コマンド呼び出し例:
+
+```bash
+river suppression add \
+  --fingerprint abc123def456 \
+  --feedback accepted_risk \
+  --rationale "Intentional use of high-entropy token in test fixture" \
+  --scope "src/auth/**" \
+  --severity major
+```
+
+期待される出力例:
+
+```text
+Suppression entry added.
+  fingerprint : abc123def456
+  feedback    : accepted_risk
+  scope       : src/auth/**
+  severity    : major
+```
+
+### バリデーションエラーの例
+
+`src/config/schema.mjs` の Zod スキーマによる検証が失敗した場合、以下のようなエラーが出力される。
+
+| エラーメッセージ例                                                                 | 原因と修正方法                                                                                            |
+| ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `Invalid enum value. Expected 'google' \| 'openai' \| 'anthropic', received 'xyz'` | `model.provider` に未サポートの値を指定している。`google` / `openai` / `anthropic` のいずれかに修正する。 |
+| `Number must be less than or equal to 6` (`security.redact.entropyThreshold`)      | `entropyThreshold` の範囲は `3.0`〜`6.0`。範囲内の値に修正する。                                          |
+| `Unrecognized key(s) in object: 'unknownKey'` (`security.redact`)                  | スキーマに存在しないキーを追加している。キー名のタイポを確認し、不要なキーを削除する。                    |
+
 ### 運用のヒント
 
 - CI でスキップさせたいラベルを `prLabelsToIgnore` に記載し、`RIVER_PR_LABELS`（例: `RIVER_PR_LABELS=no-review,wip`）または GitHub のイベントペイロードから読み取れるようにしておくと安全である。

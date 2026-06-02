@@ -48,7 +48,94 @@ review:
       suggestion: 'Use with()'
 ```
 
-YAML ブロックの後に、人間向けの日本語サマリー（結果/判定/内訳/指摘件数）が付く。
+YAML ブロックの後に、人間向けの日本語サマリー（結果/判定/内訳/指摘件数）が付く。出力例（上記 YAML に対応）:
+
+```text
+結果: human-review-recommended
+判定: overall 86/100 — security ≥95 だが major 指摘が 1 件あるため自動承認不可。
+内訳: readability=100 / extensibility=100 / performance=80 / security=100 / maintainability=90
+指摘件数: 2 件（major: 1 / minor: 1）
+```
+
+### auto-approve の例
+
+overall ≥90 / security ≥95 / critical=0 / major=0 の場合:
+
+```yaml
+review:
+  phase: midstream
+  timestamp: '2026-04-20T09:00:00Z'
+  verdict: auto-approve
+  scores:
+    overall: 97
+    readability: 100
+    extensibility: 100
+    performance: 100
+    security: 100
+    maintainability: 90
+  derived: true
+  high_risk_reasons: []
+  summary: '1 finding: 1 minor. Overall score 97/100 (auto-approve).'
+  findings:
+    - severity: minor
+      category: readability
+      file: 'src/utils/format.ts'
+      line: 42
+      title: 'Variable name too short'
+      detail: '`x` is ambiguous in this context'
+      suggestion: 'Rename to `offsetX`'
+```
+
+```text
+結果: auto-approve
+判定: overall 97/100 — 全条件を満たすため自動承認推奨。ただし実マージは人間判断。
+内訳: readability=100 / extensibility=100 / performance=100 / security=100 / maintainability=90
+指摘件数: 1 件（minor: 1）
+```
+
+### human-review-required の例
+
+critical ≥1 または overall &lt;70 の場合:
+
+```yaml
+review:
+  phase: midstream
+  timestamp: '2026-04-20T10:00:00Z'
+  verdict: human-review-required
+  scores:
+    overall: 65
+    readability: 90
+    extensibility: 80
+    performance: 80
+    security: 50
+    maintainability: 80
+  derived: true
+  high_risk_reasons:
+    - security
+  summary: '2 findings: 1 critical / 1 minor. Overall score 65/100 (human-review-required).'
+  findings:
+    - severity: critical
+      category: security
+      file: 'src/auth/login.ts'
+      line: 87
+      title: 'SQL injection risk'
+      detail: 'User input concatenated directly into query string'
+      suggestion: 'Use parameterized queries'
+    - severity: minor
+      category: readability
+      file: 'src/auth/login.ts'
+      line: 12
+      title: 'Magic number'
+      detail: '`3600` should be a named constant'
+      suggestion: 'Extract to `SESSION_TTL_SECONDS`'
+```
+
+```text
+結果: human-review-required
+判定: overall 65/100 — critical 指摘が 1 件あり人間レビュー必須。
+内訳: readability=90 / extensibility=80 / performance=80 / security=50 / maintainability=80
+指摘件数: 2 件（critical: 1 / minor: 1）
+```
 
 ## Scoring モデル
 
