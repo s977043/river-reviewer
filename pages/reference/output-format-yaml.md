@@ -95,7 +95,7 @@ review:
 
 ### human-review-required の例
 
-critical ≥1 または overall <70 の場合:
+critical ≥1 または overall &lt;70 の場合:
 
 ```yaml
 review:
