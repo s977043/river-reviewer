@@ -131,7 +131,28 @@ PR #811 で導入された Anthropic ephemeral prompt caching は **5 分 TTL** 
 node src/cli.mjs run --estimate --max-cost 1.50
 ```
 
-`--max-cost` を超える試算が出た場合は実行を中断します。CI のコスト暴走防止に有効です。
+**予算内の場合**（見積もりを表示して exit 0）:
+
+```text
+Cost Estimate:
+Model: claude-sonnet-4-6
+Estimated cost: $0.0435 USD
+Tokens: 7000 (input) + 1500 (output)
+Pricing last updated: 2026-05-14
+```
+
+**予算超過の場合**（同じブロックを表示後、stderr にエラーを出して exit 1）:
+
+```text
+Cost Estimate:
+Model: claude-sonnet-4-6
+Estimated cost: $1.8320 USD
+Tokens: 105600 (input) + 14400 (output)
+Pricing last updated: 2026-05-14
+Estimated cost $1.8320 exceeds max-cost 1.5. Aborting.
+```
+
+CI スクリプトでは `$?` で exit code を確認し、1 の場合にパイプラインを止められます。`--max-cost` を超える試算が出た場合は実行を中断します。CI のコスト暴走防止に有効です。
 
 ## 4. 実測値の収集
 

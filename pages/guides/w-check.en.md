@@ -10,6 +10,52 @@ Typical use cases:
 - Cross-check a human reviewer's findings against an AI review to remove hallucinated references
 - Triage results from multiple AI tools run in parallel into a single, consolidated output
 
+## Quick Start
+
+This section walks through the minimal steps to run a W-check from scratch.
+
+### Step 1: Save your AI review outputs as Markdown files
+
+After running each AI reviewer (Codex, Gemini, etc.), save the output as a Markdown file:
+
+```bash
+# Example: save outputs from two AI reviewers
+codex review > codex-review.md
+# (or copy/paste the output manually)
+```
+
+### Step 2: Place the files in `.river/reviews/`
+
+```bash
+mkdir -p .river/reviews
+cp codex-review.md   .river/reviews/codex.md
+cp gemini-review.md  .river/reviews/gemini.md
+# Optionally add your own self-review
+cp self-review.md    .river/reviews/self.md
+```
+
+### Step 3: Run `river review exec`
+
+```bash
+river review exec \
+  --ensemble .river/reviews/ \
+  --phase midstream
+```
+
+Use `--artifact review-self=<path>` if your self-review is stored separately and should be tracked with the `self-review` provenance label.
+
+### Step 4: Interpret the verdict
+
+The synthesis skill emits one of three verdicts in `summary.notes`:
+
+| Verdict        | Meaning                                                                      |
+| -------------- | ---------------------------------------------------------------------------- |
+| `merge-ready`  | No confirmed critical or major findings. Safe to merge.                      |
+| `human-review` | One or more major findings confirmed. Human review recommended before merge. |
+| `block`        | One or more critical findings confirmed. Merge blocked until resolved.       |
+
+> **Degraded mode**: W-check runs even if only one artifact is provided (e.g., `--ensemble` only, with no `--artifact review-self`). Synthesis accuracy is lower because cross-validation between reviewer types is skipped.
+
 ## Artifact Specification
 
 W-check accepts two artifact types as input: `review-self` and `review-external`.
@@ -54,28 +100,53 @@ If both `--artifact review-external` and `--ensemble` are specified, `--ensemble
 
 ## Setting Up in GitHub Actions
 
-GitHub Actions `inputs` do not yet have a built-in field for `review-self` / `review-external` (planned for a future release). As a workaround, you can call `dist/index.mjs` directly to achieve equivalent behavior.
+GitHub Actions `inputs` do not yet have a built-in field for `review-self` / `review-external` (planned for a future release). As a workaround, you can call `runners/github-action/dist/index.mjs` directly to achieve equivalent behavior.
+
+> **Warning**: Do not pass review content through environment variables (e.g., `echo "$REVIEW" > file.md`). GitHub Actions environment variables have a **48 KB silent truncation limit** — large review outputs will be silently cut off without any error, producing incomplete results.
+> **Note**: `github.action_path` is only valid inside a composite action. Do not use it directly from a caller workflow — it will resolve incorrectly.
+
+Use the `upload-artifact` / `download-artifact` pattern to safely transfer review files between jobs:
 
 ```yaml
-- name: Collect external reviews
-  run: |
-    mkdir -p .river/reviews
-    echo "$CODEX_REVIEW" > .river/reviews/codex.md
-    echo "$HUMAN_REVIEW" > .river/reviews/human.md
-  env:
-    CODEX_REVIEW: ${{ vars.CODEX_REVIEW_OUTPUT }}
-    HUMAN_REVIEW: ${{ vars.HUMAN_REVIEW_OUTPUT }}
+jobs:
+  ai-reviews:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-- name: Run W-check
-  run: |
-    node ${{ github.action_path }}/dist/index.mjs run . \
-      --phase midstream \
-      --ensemble .river/reviews/
-  env:
-    ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - name: Run AI reviews
+        run: |
+          mkdir -p .river/reviews
+          # Run each AI reviewer and save output to .river/reviews/
+          # e.g., codex review > .river/reviews/codex.md
+          #        gemini review > .river/reviews/gemini.md
+
+      - name: Upload review artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-reviews
+          path: .river/reviews/
+
+  w-check:
+    runs-on: ubuntu-latest
+    needs: ai-reviews
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download review artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ai-reviews
+          path: .river/reviews/
+
+      - name: Run W-check
+        run: |
+          node runners/github-action/dist/index.mjs run . \
+            --phase midstream \
+            --ensemble .river/reviews/
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
-
-> **Note**: The `github.action_path` reference is illustrative. Adjust it to the actual Action path referenced in your workflow (e.g., `$GITHUB_WORKSPACE/runners/github-action`).
 
 ## How the Synthesis Skill Works
 
@@ -84,6 +155,48 @@ The synthesis step of W-check is handled by the `rr-midstream-independent-review
 1. **Deduplicate**: When multiple reviewers flag the same location, findings are merged into a single entry based on file path, line range, and evidence text similarity.
 2. **Hallucination guard**: Each finding's `evidence` is checked against the actual diff and source files. Findings that reference non-existent code are classified as `dismissed-hallucination` and excluded from the final output.
 3. **Merge recommendation**: Based on the presence of confirmed critical / major findings, the skill emits one of `merge-ready`, `human-review`, or `block`.
+
+### Output Example
+
+The following is an example of the JSON structure emitted by the synthesis skill (field names are defined in [`schemas/output.schema.json`](../../schemas/output.schema.json)):
+
+```json
+{
+  "summary": {
+    "issueCountBySeverity": { "critical": 1, "major": 0, "minor": 1, "info": 0 },
+    "issueCountByPhase": { "upstream": 0, "midstream": 2, "downstream": 0 },
+    "notes": "verdict: block — confirmed critical finding present"
+  },
+  "issues": [
+    {
+      "id": "w-001",
+      "ruleId": "rr-midstream-independent-review-synthesis-001",
+      "title": "Possible SQL injection",
+      "message": "User input is interpolated directly into the query. Switch to parameterized binding.",
+      "severity": "critical",
+      "phase": "midstream",
+      "file": "src/db/query.ts",
+      "line": 42,
+      "status": "verified",
+      "evidence": ["+ const sql = `SELECT * FROM users WHERE id = ${userInput}`"]
+    },
+    {
+      "id": "w-002",
+      "ruleId": "rr-midstream-independent-review-synthesis-001",
+      "title": "Reference to non-existent function",
+      "message": "The validateInput() function cited by the reviewer does not appear in the diff and has been excluded.",
+      "severity": "minor",
+      "phase": "midstream",
+      "file": "src/utils/validate.ts",
+      "line": 10,
+      "status": "suppressed",
+      "evidence": []
+    }
+  ]
+}
+```
+
+`status: "verified"` means the finding was confirmed against the actual diff. `status: "suppressed"` means the finding was excluded (e.g., hallucinated reference). The verdict (`merge-ready` / `human-review` / `block`) is recorded in `summary.notes`. For the complete output schema, see [`schemas/output.schema.json`](../../schemas/output.schema.json).
 
 Full skill reference: [`skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md`](https://github.com/s977043/river-review/blob/main/skills/midstream/community/rr-midstream-independent-review-synthesis-001/SKILL.md)
 

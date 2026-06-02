@@ -1,18 +1,30 @@
 {
+  "-- Setup": {
+    "type": "separator",
+    "title": "Setup"
+  },
   "quickstart": "クイックスタート (River Review)",
   "github-actions": "GitHub Actions で River Review をセットアップする",
-  "agent-workflow": "AI エージェントから River Review を使う",
-  "w-check": "W チェック（二重レビュー）",
-  "repo-wide-review": "リポジトリ全体を踏まえたレビューの導入とチューニング",
-  "run-phase-specific-review": "フェーズ固有のレビューを実行する",
   "troubleshooting": "トラブルシューティング",
   "faq": "FAQ（よくある失敗）",
+  "-- Skills": {
+    "type": "separator",
+    "title": "Skills"
+  },
   "add-new-skill": "スキルを追加する（最短手順）",
   "write-a-skill": "スキル作成ガイド（How-to）",
   "validate-skill-schema": "スキルスキーマを検証する",
   "debug-skill-routing": "スキルルーティングのデバッグ",
-  "planner-eval-dataset": "Planner評価セット（オフライン評価）",
+  "agent-workflow": "AI エージェントから River Review を使う",
+  "w-check": "W チェック（二重レビュー）",
+  "repo-wide-review": "リポジトリ全体を踏まえたレビューの導入とチューニング",
+  "run-phase-specific-review": "フェーズ固有のレビューを実行する",
+  "-- Advanced": {
+    "type": "separator",
+    "title": "Advanced"
+  },
   "skill-planner": "Skill Planner（LLM ベースのスキル選択）",
+  "planner-eval-dataset": "Planner評価セット（オフライン評価）",
   "planner-evaluation": "Skill Planner の評価と最適化のためのミニガイド",
   "use-riverbed-memory": "Riverbed Memory を使用する",
   "tracing": "Tracing / Observability",
@@ -20,8 +32,12 @@
   "pr-review-agent-skills": "PR/品質レビュー向け Agent Skills カタログ",
   "figma-to-code": "Figma → Code Workflow",
   "agents": "Agents - プロジェクト知識パックの追加",
-  "governance": "ガバナンス",
+  "use-independent-review-synthesis": "Independent Review Synthesis を使う",
   "cost-estimation": "コスト見積もりと最適化ガイド",
-  "deploy-docs-vercel": "Vercel で Docs を安定公開する",
-  "use-independent-review-synthesis": "Independent Review Synthesis を使う"
+  "-- Governance & Ops": {
+    "type": "separator",
+    "title": "Governance & Ops"
+  },
+  "governance": "ガバナンス",
+  "deploy-docs-vercel": "Vercel で Docs を安定公開する"
 }
