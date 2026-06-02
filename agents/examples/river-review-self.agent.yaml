@@ -1,0 +1,190 @@
+version: v1.0.0
+metadata:
+  id: river-review-self
+  name: River Review (self-review)
+  owner: s977043
+  description: 'River Reviewがそれ自身のPRをレビューする自己参照的な設定例。TypeScript/ESM・スキーマ検証・CLIテストを重点観点とする。'
+  repository: s977043/river-reviewer
+  license: Apache-2.0
+  tags:
+    - 'code-review'
+    - 'ai-agents'
+    - 'self-referential'
+    - 'typescript'
+    - 'esm'
+  updatedAt: '2026-06-02T00:00:00.000Z'
+  contacts: []
+guidelines:
+  principles:
+    - '差分にないコードへの推測的指摘は禁止'
+    - '一般論だけのレビュー（具体的な差分への言及なし）は禁止'
+    - 'PRの目的と無関係な指摘は禁止'
+    - 'Blocker のみマージ条件にし、Major はフォローアップ Issue で追跡する'
+  communication:
+    - '指摘は docs/review/output-format.md の severity 語彙（critical/major/minor/info）で分類する'
+    - '説明と提案は日本語で記述し、コードスニペットは英語のまま保つ'
+  prohibited:
+    - 'CHANGELOG.md を直接編集しない（release-please が管理する）'
+    - 'main ブランチへの force-push は禁止'
+    - '`dist/` 以下の生成物を手動で編集しない'
+    - '`agents/spec/agent.schema.json` のスキーマを承認なしに変更しない'
+  developmentProcess:
+    - title: レビュー前確認
+      steps:
+        - 'AGENTS.md と docs/review/viewpoints.md で観点を確認する'
+        - '差分のみを対象とし、差分外コードへの言及を避ける'
+    - title: 重大度判定
+      steps:
+        - 'blocker → critical: 動作破壊・セキュリティ欠陥・型エラー'
+        - 'warning → major: テスト未カバー・スキーマ逸脱・API契約違反'
+        - 'nit → minor: 命名・フォーマット・可読性'
+    - title: フォローアップ
+      steps:
+        - 'Major 以上の指摘はフォローアップ Issue を作成して追跡する'
+        - 'dist rebuild が必要な変更は docs/development/dist-check-rebuild-guide.md を参照する'
+  documentation:
+    - 'スキーマ変更時は agents/spec/agent.schema.json と docs を同時更新する'
+    - 'パイプライン関数のシグネチャ変更時は docs/development/pipeline-params-checklist.md を確認する'
+  security:
+    - '秘匿情報（APIキー・トークン）をプロンプトや履歴に含めない'
+    - '依存バンプ時は npm install --dry-run で peer dep 競合を確認する'
+tooling:
+  packageManager: npm
+  languages:
+    - 'TypeScript (strict)'
+    - 'JavaScript (ESM)'
+  frameworks:
+    - 'Node.js (ESM modules)'
+    - 'node:test'
+  commands:
+    - name: Install dependencies
+      category: setup
+      run: npm ci
+      description: 'ロックファイルに忠実に依存を導入する'
+    - name: Lint
+      category: quality
+      run: npm run lint
+      description: 'ESLint による静的解析'
+      expectation: '警告ゼロでパスすること'
+    - name: Type check
+      category: quality
+      run: npm run typecheck
+      description: 'TypeScript strict モードの型検査'
+    - name: Unit tests
+      category: quality
+      run: npm test
+      description: 'node:test によるユニットテスト'
+    - name: Agent schema validation
+      category: quality
+      run: npm run agents:validate
+      description: 'AJV で agents/examples/*.agent.yaml をスキーマ検証する'
+      expectation: '新規 .agent.yaml ファイルはすべてパスすること'
+    - name: Build action dist
+      category: build
+      run: npm run build:action
+      description: 'GitHub Action 用 dist をビルドする (.nvmrc の Node バージョンで実行)'
+  qualityGates:
+    - title: PR必須チェック
+      items:
+        - 'npm run lint'
+        - 'npm test'
+        - 'npm run agents:validate'
+  definitionOfDone:
+    - title: 実装完了条件
+      items:
+        - 'TypeScript strict / ESLint / テストがすべて Green'
+        - 'agents/examples/*.agent.yaml がスキーマ検証をパス'
+        - 'dist/ の再ビルドが必要な変更では build:action を実行済み'
+        - 'CHANGELOG.md は release-please に委ねる（手動編集禁止）'
+agents:
+  - id: river-reviewer
+    name: River Review Agent
+    type: review
+    description: 'Claude Code サブエージェントとして PR 差分を読み、severity 付き findings を JSON で返す自動コードレビュー担当'
+    model:
+      provider: anthropic
+      name: claude-sonnet-4-6
+    focus:
+      - 'ESM import パス（.js 拡張子・import.meta.url ガード）の正確性を確認する'
+      - 'スキーマ変更時に required/enum を既存 YAML と対比して検証する'
+      - 'パイプライン関数（generateReview / verifyFinding / buildExecutionPlan）のシグネチャ変更時に全 call site を確認する'
+      - 'node:test 内で process.stdout.write を差し替えるとテストが silently drop されることに注意する'
+      - 'dist/ の変更が build:action 再実行によるものかを確認する'
+    entryPoints:
+      - path: .claude/agents/river-reviewer.md
+        kind: guide
+        summary: 'Claude Code サブエージェントの定義（ツール権限・レビュー手順）'
+    instructionFiles:
+      - path: .claude/agents/river-reviewer.md
+        kind: prompt
+        summary: 'River Review サブエージェントプロンプト'
+      - path: docs/review/viewpoints.md
+        kind: checklist
+        summary: 'レビュー観点マスターリスト'
+      - path: docs/review/output-format.md
+        kind: guide
+        summary: 'severity ラベルと JSON 出力フォーマット'
+    reviewChecklists:
+      - path: pages/reference/review-policy.md
+        kind: checklist
+        summary: 'レビューポリシー全体の SSoT'
+    workflows:
+      - title: PR レビューフロー
+        steps:
+          - 'AGENTS.md と docs/review/viewpoints.md で観点を確認する'
+          - 'gh pr diff で差分を取得し、差分外コードへの言及を避ける'
+          - 'findings を docs/review/output-format.md の JSON スキーマで出力する'
+          - 'Blocker が存在する場合はマージをブロックし、Major はフォローアップ Issue を作成する'
+resources:
+  documents:
+    - path: AGENTS.md
+      kind: guide
+      summary: '全エージェント共通ガイドライン（編集可否・安全ルール）'
+      tags:
+        - 'ai'
+        - 'process'
+    - path: CLAUDE.md
+      kind: guide
+      summary: 'Claude Code 固有のワークポリシー'
+      tags:
+        - 'claude'
+        - 'policy'
+    - path: docs/review/viewpoints.md
+      kind: checklist
+      summary: 'レビュー観点チェックリスト'
+    - path: docs/review/output-format.md
+      kind: guide
+      summary: 'レビュー出力フォーマットと severity 定義'
+    - path: docs/development/pipeline-params-checklist.md
+      kind: checklist
+      summary: 'パイプライン関数パラメータ追加時の call site 確認リスト'
+    - path: docs/development/dist-check-rebuild-guide.md
+      kind: guide
+      summary: 'dist 再ビルドが必要なケースとトラブルシューティング'
+  checklists:
+    - path: pages/reference/review-policy.md
+      kind: checklist
+      summary: 'レビューポリシー全体 SSoT'
+    - path: docs/governance.md
+      kind: checklist
+      summary: 'マージ前チェックリスト（CI・レビューコメント・preflight）'
+automation:
+  ciWorkflows:
+    - name: Validate Agent Specs
+      path: .github/workflows/validate-agents.yml
+      description: 'AJV で agents/examples/*.agent.yaml をスキーマ検証する'
+      triggers:
+        - 'pull_request (agents/ 配下の変更)'
+        - 'push (main)'
+      enforces:
+        - 'npm run agents:validate'
+    - name: CI
+      path: .github/workflows/ci.yml
+      description: 'lint / typecheck / test を実行する主要 CI'
+      triggers:
+        - 'pull_request (opened, synchronize, reopened)'
+        - 'push (main)'
+      enforces:
+        - 'npm run lint'
+        - 'npm run typecheck'
+        - 'npm test'
