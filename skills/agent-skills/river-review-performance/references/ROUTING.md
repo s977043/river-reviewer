@@ -26,6 +26,12 @@
 - 英語: SLO, latency, throughput, operability
 - → `rr-upstream-operability-slo-001`
 
+### Core Web Vitals・Modern Web パフォーマンス
+
+- 日本語: Core Web Vitals, LCP, INP, CLS, リソースコスト, loading, fetchpriority
+- 英語: Core Web Vitals, LCP, INP, CLS, resource cost, loading lazy, fetchpriority
+- → `rr-midstream-modern-web-performance-001`
+
 ## ヒューリスティクス（キーワードなしの場合）
 
 1. ループ内の I/O パターン → N+1 クエリ検出を重点チェック
