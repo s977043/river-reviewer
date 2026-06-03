@@ -43,3 +43,18 @@ The Codex integration is versioned by git only; there is no auto-update. Re-copy
 ## Further reading
 
 See [pages/guides/agent-workflow.md](../../pages/guides/agent-workflow.md) for the full agent integration guide.
+
+### One-command setup (Codex)
+
+Instead of copying files by hand, run the setup script from your project root.
+It vendors the River Review `AGENTS.md` guidance and agent-skills into your
+project — the Codex equivalent of `/plugin install` in Claude Code:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/s977043/river-review/main/scripts/setup-codex.sh | bash
+```
+
+The script is idempotent: re-running it refreshes the vendored skills and the
+`AGENTS.md` River Review section (delimited by `<!-- river-review:begin -->` /
+`<!-- river-review:end -->`) without duplicating content. Pin a tag for
+reproducibility by exporting `RIVER_REVIEW_REF=v1.0.0` before running.
