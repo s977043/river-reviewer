@@ -193,6 +193,26 @@ Next steps:
   6. Test: npx promptfoo eval (if configured)
 ```
 
+## Exit Codes
+
+すべてのコマンド（`review`・`eval`・`create skill`）は以下の終了コードを返す。
+
+| コード | 意味                           |
+| ------ | ------------------------------ |
+| `0`    | 正常終了                       |
+| `1`    | エラーまたはバリデーション失敗 |
+
+シェルスクリプトや CI ジョブでの利用例:
+
+```bash
+river eval --all || echo "Skill validation failed"
+```
+
+## 構造化出力（スクリプト連携）
+
+`--output` フラグは現時点では実装されていません。
+JSON などの構造化出力をプログラムから取得する場合は、CLI ではなく Node API（`runners/core/`）を直接使用してください。
+
 ## Architecture
 
 The CLI is built on top of the core runner components:
@@ -231,6 +251,7 @@ runners/cli/
 - [Skills Directory](../../skills/) - Skill definitions
 - [Skill Schema](../../schemas/skill.schema.json) - Skill metadata schema
 - [Project README](../../README.md) - Main documentation
+- [Runner CLI Reference](../../pages/reference/runner-cli-reference.md) - Exit codes and `--reviewers` flag reference
 
 ## Integration with Existing CLI
 

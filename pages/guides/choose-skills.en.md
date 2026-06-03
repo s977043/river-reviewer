@@ -1,0 +1,66 @@
+# Choosing and Combining Skills
+
+The skills catalog offers many options. This guide explains how to decide which skills to enable and how to combine them effectively.
+
+> **See also**: For the full skill list see [Skills Catalog](../reference/skills-catalog.md). If a skill isn't triggering, see [Debug Skill Routing](./debug-skill-routing.md).
+
+## 1. Filter by phase first
+
+Every skill belongs to `upstream`, `midstream`, or `downstream`. Identifying the phase of your change narrows candidates significantly.
+
+- Design docs / ADR changes → choose `upstream` skills
+- Application code changes → choose `midstream` skills
+- Test / QA config changes → choose `downstream` skills
+
+## 2. Detect overlap using tags
+
+Skills with the same tags may cover overlapping concerns. Check tags before combining.
+
+| Tag combination             | Overlap risk                                                                                                                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `typescript / type-safety`  | `rr-midstream-typescript-nullcheck-001` and `rr-midstream-typescript-strict-001` share identical `applyTo` globs — enabling both produces duplicate findings on the same files |
+| `community / modern-web`    | The four skills `semantic-001`, `performance-001`, `browser-compat-001`, `a11y-interactive-001` share the same globs — start with one or two that match your goal              |
+| `community / design-system` | `design-token-enforcement-001` (hardcoded values) and `design-system-component-reuse-001` (reimplemented components) cover different axes — enabling both has low overlap      |
+
+## 3. Prioritize by severity
+
+When multiple skills match the same file, prefer enabling higher-severity skills first.
+
+- `critical` / `major` — can block merges; enable these first
+- `minor` — improvement suggestions; add based on team capacity
+- `info` — policy confirmation only; safe to enable at all times
+
+## 4. Recommended starter sets by stack
+
+### TypeScript frontend (Next.js / React)
+
+- `rr-midstream-typescript-strict-001` — type-safety baseline
+- `rr-midstream-security-basic-001` — XSS and secret leaks
+- `rr-midstream-nextjs-app-router-boundary-001` (if using Next.js App Router)
+- `rr-midstream-modern-web-a11y-interactive-001` — interactive UI accessibility
+- `rr-midstream-design-token-enforcement-001` (if a design system is in use)
+
+### Python API
+
+- `rr-midstream-security-basic-001`
+- `rr-midstream-logging-observability-001`
+- `rr-downstream-coverage-gap-001`
+
+### Design / documentation focus
+
+- `rr-upstream-adr-decision-quality-001`
+- `rr-upstream-architecture-boundaries-001`
+- `rr-upstream-security-privacy-design-001`
+
+### Multi-agent / AI review integration
+
+- Run `rr-midstream-independent-review-synthesis-001` last to consolidate multiple review results.
+
+## 5. Choosing between TypeScript nullcheck and strict
+
+`rr-midstream-typescript-nullcheck-001` and `rr-midstream-typescript-strict-001` target the same globs.
+
+- `strict-001` covers `any` types, unsafe assertions, and null handling broadly.
+- `nullcheck-001` specializes in null/undefined safety with deeper checks.
+
+For projects without `strictNullChecks` enabled, start with `nullcheck-001`. Once strict mode is in place, migrate to `strict-001` or enable both.

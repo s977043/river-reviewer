@@ -52,6 +52,29 @@ For new checklist items or agent ideas, open an issue with:
 
 Smaller, focused PRs are ideal.
 
+### Commit message convention
+
+This repository uses [Conventional Commits](https://www.conventionalcommits.org/), enforced by `commitlint` (config: [`commitlint.config.js`](./commitlint.config.js)). The release automation (release-please) uses commit types to generate changelogs, so following the convention matters.
+
+Common commit types with examples:
+
+```text
+feat: add YAML output option to review results
+fix: handle missing Vale config file gracefully
+docs: document GitHub Action input parameters in README
+chore: upgrade eslint to v9
+```
+
+### What to expect after opening a PR
+
+- **Review turnaround**: A maintainer will look at your PR within 7 days. If you hear nothing, feel free to leave a comment to ask for a status update.
+- **Required approvals**: At least 1 maintainer approval is required to merge.
+- **CI gates**: All of the following must pass before merging:
+  - `npm test` (unit tests)
+  - `npm run lint` (Prettier / ESLint / commitlint)
+  - Vale prose lint (when docs are changed)
+- **When a PR may be closed without merge**: PRs with no author response for 30 days, changes out of scope, or work that duplicates an existing effort may be closed. We will always leave a comment explaining the reason before closing.
+
 ### ✅ Local checks (recommended)
 
 ```bash

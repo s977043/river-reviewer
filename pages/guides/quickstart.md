@@ -2,7 +2,27 @@
 
 River Review を最小構成で動かすための流れです。
 
-1. リポジトリに `skills/{upstream,midstream,downstream}` を用意し、スキルを Markdown + YAML frontmatter で作成する（`schemas/skill.schema.json` を参照）。各フェーズの意味については [上流・中流・下流フェーズ](../explanation/upstream-midstream-downstream.md) を参照してください。スキルの最小サンプルは [はじめてのスキル作成](../tutorials/creating-your-first-skill.md) を参照してください。
+1. リポジトリに `skills/{upstream,midstream,downstream}` を用意し、スキルを Markdown + YAML frontmatter で作成する。最小構成の例を以下に示す。
+
+   ```yaml
+   ---
+   id: rr-midstream-my-check-001
+   name: My Check
+   description: サンプルのコード品質チェック
+   category: midstream
+   phase: midstream
+   applyTo:
+     - 'src/**/*.ts'
+   severity: minor
+   inputContext:
+     - diff
+   outputKind:
+     - findings
+   ---
+   ```
+
+   ファイルは `skills/midstream/rr-midstream-my-check-001.md` のように配置する。必須フィールドの詳細は `schemas/skill.schema.json` を、フェーズの意味は [上流・中流・下流フェーズ](../explanation/upstream-midstream-downstream.md) を参照すること。作成手順を順を追って確認したい場合は [はじめてのスキル作成](../tutorials/creating-your-first-skill.md) を参照すること。
+
 2. `.github/workflows/river-review.yml` などに GitHub Actions ワークフローを追加する（詳細は [GitHub Actions ガイド](./github-actions.md) を参照）。
 3. 認証情報は、既定の GitHub Action では `OPENAI_API_KEY` をリポジトリ Secrets に設定する。追加のトークンが必要になるのは、独自の連携や拡張を行う場合のみ。
 4. PR を作成し、指定フェーズのスキルが実行されることを確認する。
