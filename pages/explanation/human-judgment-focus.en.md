@@ -22,9 +22,9 @@ River Review lowers this burden while letting humans concentrate on high-risk ju
 
 The goal of River Review is not to **replace** human judgment, but to **focus** it on high-risk areas.
 
-| Category                          | Content                                                                                                              |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| What River Review reduces         | Indiscriminate human sync / shallow diff-only review / reviewer-specific tacit knowledge / re-reading context from zero |
+| Category                           | Content                                                                                                                     |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| What River Review reduces          | Indiscriminate human sync / shallow diff-only review / reviewer-specific tacit knowledge / re-reading context from zero     |
 | What River Review does not replace | Final accountability / design decisions / business validity / critical security judgment / approval of irreversible changes |
 
 River Review is a mechanism for increasing the evidence available for a decision — not for delegating responsibility. Final approval and accountability always rest with the human reviewer.
@@ -33,10 +33,10 @@ River Review is a mechanism for increasing the evidence available for a decision
 
 Weight your review effort according to the risk of the change. Lean low-risk changes onto River Review skills, and apply heavier human judgment as risk increases.
 
-| Risk   | Lean onto River Review                                                       | Humans focus on                |
-| ------ | --------------------------------------------------------------------------- | ------------------------------ |
-| Low    | lint / format / naming / docs / simple refactors                            | Exceptions only                |
-| Medium | plan-diff conformance / tests / migration policy / API contract             | Design intent, blast radius    |
+| Risk   | Lean onto River Review                                                                   | Humans focus on                         |
+| ------ | ---------------------------------------------------------------------------------------- | --------------------------------------- |
+| Low    | lint / format / naming / docs / simple refactors                                         | Exceptions only                         |
+| Medium | plan-diff conformance / tests / migration policy / API contract                          | Design intent, blast radius             |
 | High   | detection of auth / payment / personal data / security boundary / irreversible migration | Final judgment and accountable approval |
 
 In high-risk areas, River Review handles detection and presents the evidence; the final "pass / block" decision is made by humans.
