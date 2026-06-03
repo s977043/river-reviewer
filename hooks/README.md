@@ -5,9 +5,15 @@
 
 ## スクリプト一覧
 
-| スクリプト  | 用途                         | 呼び出し元                |
-| ----------- | ---------------------------- | ------------------------- |
-| `format.sh` | 変更ファイルにPrettierを実行 | `.claude/hooks/format.sh` |
+| スクリプト              | 用途                                   | 呼び出し元                              |
+| ----------------------- | -------------------------------------- | --------------------------------------- |
+| `format.sh`             | 変更ファイルにPrettierを実行           | `.claude/hooks/format.sh`               |
+| `hooks.json`            | プラグイン配布用 PostToolUse hook 定義 | プラグインインストール先（Claude Code） |
+| `plugin-format-hook.sh` | プラグイン同梱の自己完結フォーマッター | `hooks.json`（`${CLAUDE_PLUGIN_ROOT}`） |
+
+### `plugin-format-hook.sh` の defer 挙動
+
+`plugin-format-hook.sh` は、インストール先プロジェクトに `.claude/hooks/format.sh` が存在する場合、二重整形を避けるために何もせず exit 0 で抜けます（river-review リポジトリ自身を開発する際の二重実行を防ぐための条件）。そのため、インストール先が独自に `.claude/hooks/format.sh` を持つ場合、プラグイン同梱のフォーマッターは意図的に no-op になります（プロジェクト側のフォーマッターが優先されます）。
 
 ## 各ツールでの強制方法
 
