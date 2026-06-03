@@ -182,14 +182,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Review (midstream)
-        uses: s977043/river-review/runners/github-action@v0.70.0
+        uses: s977043/river-review/runners/github-action@v1.0.0
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-Pin to a release tag such as `@v0.70.0` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
+Pin to a release tag such as `@v1.0.0` for stability. Optionally, you can maintain a floating alias tag like `@v0`.
 
 <!-- x-release-please-start-version -->
 
@@ -280,7 +280,7 @@ We organize content into four types, mapped by directory under `pages/` and serv
 
 ## Roadmap
 
-Following the concept refresh (2026-05), the roadmap is organized into the following seven epics. The Status column reflects v0.70.0 implementation reality.
+Following the concept refresh (2026-05), the roadmap is organized into the following seven epics. The Status column reflects v1.0.0 implementation reality.
 
 | Epic                                       | Description                                                                                                          | Status                                                                                                                                                                                                                                                                                                                                                                         |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

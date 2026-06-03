@@ -44,7 +44,7 @@ Most teams should use **`midstream`**. It runs a review when the PR is opened an
 
 ## Using Anthropic (Claude)
 
-Specify a `claude-*` model in `.river-review.json` and pass `ANTHROPIC_API_KEY`.
+Specify a `claude-*` model in `.river-review.json` (placed in the repository root) and pass `ANTHROPIC_API_KEY`. For all available fields, see the [Config Schema Reference](/reference/config-schema).
 
 ```yaml
 - name: Run River Review (midstream, Claude)

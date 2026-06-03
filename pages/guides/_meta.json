@@ -14,6 +14,7 @@
   "add-new-skill": "スキルを追加する（最短手順）",
   "write-a-skill": "スキル作成ガイド（How-to）",
   "validate-skill-schema": "スキルスキーマを検証する",
+  "choose-skills": "スキルの選択と組み合わせ",
   "debug-skill-routing": "スキルルーティングのデバッグ",
   "agent-workflow": "AI エージェントから River Review を使う",
   "w-check": "W チェック（二重レビュー）",
