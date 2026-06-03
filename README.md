@@ -368,6 +368,66 @@ GitHub Actions では:
 
 詳細は [`pages/guides/repo-wide-review.md`](pages/guides/repo-wide-review.md) および [`pages/reference/config-schema.md`](pages/reference/config-schema.md) を参照。
 
+## river-review プラグインの導入
+
+### Claude Code
+
+river-review は同一リポジトリ内のマーケットプレイスから Claude Code プラグインとして配布されます。
+
+1. マーケットプレイスを追加（GitHub ショートハンド）:
+
+   ```text
+   /plugin marketplace add s977043/river-review
+   ```
+
+   再現可能なインストールが必要ならタグを固定: `/plugin marketplace add s977043/river-review@v1.0.0`。
+
+2. プラグインをインストール:
+
+   ```text
+   /plugin install river-review@river-review-marketplace
+   ```
+
+3. 再起動せずに有効化:
+
+   ```text
+   /reload-plugins
+   ```
+
+得られるもの（プラグイン名で名前空間化されます）:
+
+- コマンド: `/river-review:review-local`, `/river-review:challenge`, `/river-review:skill`, `/river-review:check`, `/river-review:pr`
+- エージェント: `river-review`（スキルルーティング型のコードレビュー・オーケストレーター）
+- スキル: オーケストレーターに加えて `river-review-code`, `river-review-security`, `river-review-performance`, `river-review-architecture`, `river-review-testing`, `adversarial-review`—`/river-review:<skill-name>` で呼び出せます
+
+管理: `/plugin enable|disable|uninstall river-review@river-review-marketplace`。
+
+インストールせずにローカルで開発・テストする場合:
+
+```text
+claude --plugin-dir .
+```
+
+### Codex
+
+Codex にはプラグインマーケットプレイスがないため、連携はコピーインで行います。
+
+1. Codex 連携テンプレートをプロジェクトにコピー:
+
+   ```text
+   cp templates/agent-workflow/codex/AGENTS.md ./AGENTS.md
+   ```
+
+2. レビュースキルを Codex から利用できるよう、スキルディレクトリをプロジェクトにコピー（または本リポジトリのチェックアウトを Codex に参照させる）:
+
+   ```text
+   cp -R skills/agent-skills ./skills
+   ```
+
+3. `AGENTS.md` からスキルを参照し、自分用の `.codex/config.toml`（`approval_policy`, `sandbox`）を追加します—本リポジトリの `.codex/` 設定は環境依存のためテンプレートとしては配布されません。
+
+Codex（および Cursor）の完全なセットアップは `templates/agent-workflow/README.md` を参照してください。Codex 側は git のみでバージョン管理されるため、アップグレード時は再コピーが必要です。
+
 ## AI エージェント運用
 
 - ルートの `AGENTS.md` が AI コーディングエージェント向けの SSOT です。
