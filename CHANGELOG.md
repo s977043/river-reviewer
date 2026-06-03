@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/s977043/river-review/compare/v1.1.0...v1.2.0) (2026-06-03)
+
+
+### Features
+
+* **plugin:** add Codex-native plugin manifest (.codex-plugin/plugin.json) ([#991](https://github.com/s977043/river-review/issues/991)) ([36364b6](https://github.com/s977043/river-review/commit/36364b618b6d7958e5fd14de4ea01467e45dab1e)), closes [#966](https://github.com/s977043/river-review/issues/966)
+
+
+### Bug Fixes
+
+* **codex:** vendor full agent-skills (with references/) in setup fallback ([#992](https://github.com/s977043/river-review/issues/992)) ([9ea121d](https://github.com/s977043/river-review/commit/9ea121d162f0576fb14e42c61dd46301958e1334)), closes [#966](https://github.com/s977043/river-review/issues/966)
+
 ## [1.1.0](https://github.com/s977043/river-review/compare/v1.0.0...v1.1.0) (2026-06-03)
 
 

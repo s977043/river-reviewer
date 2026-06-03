@@ -195,7 +195,7 @@ Pin to a release tag such as `@v1.0.0` for stability. Optionally, you can mainta
 
 <!-- x-release-please-start-version -->
 
-Latest release: [v1.1.0](https://github.com/s977043/river-review/releases/latest)
+Latest release: [v1.2.0](https://github.com/s977043/river-review/releases/latest)
 
 <!-- x-release-please-end -->
 
