@@ -18,4 +18,4 @@ This documentation covers:
 - **How-to**: Practical guides for GitHub Actions integration, tracing, etc.
 - **Reference**: Schema definitions and CLI references.
 
-Start with [What is River Review](./what-is-river-review.en.md) for the concept overview, then explore tutorials or references as needed. The SSoT for the full vision lives at [`docs/vision.md`](https://github.com/s977043/river-review/blob/main/docs/vision.md) in the repository root.
+Start with [What is River Review](./what-is-river-review.en.md) for the concept overview, then explore tutorials or references as needed. For why River Review does **not** replace human review, see [Human Judgment Focus](./human-judgment-focus.en.md). The SSoT for the full vision lives at [`docs/vision.md`](https://github.com/s977043/river-review/blob/main/docs/vision.md) in the repository root.

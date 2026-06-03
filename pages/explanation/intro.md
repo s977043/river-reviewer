@@ -32,4 +32,4 @@ River Review は、PR の差分だけを見るツールではありません。A
 - **How-to**: GitHub Actions 連携やトレーシングなどの実践ガイド
 - **Reference**: スキーマや設定のリファレンス
 
-まずは [River Review とは](./what-is-river-review.md) でコンセプトを把握してください。レビュー対象の整理は [レビュー対象と使いどころ](./review-scope.md) にまとめています。コンセプト全体の SSoT は repo root の [`docs/vision.md`](https://github.com/s977043/river-review/blob/main/docs/vision.md) です。
+まずは [River Review とは](./what-is-river-review.md) でコンセプトを把握してください。レビュー対象の整理は [レビュー対象と使いどころ](./review-scope.md) にまとめています。River Review が「人間のレビューを置き換えない」という立ち位置については [Human Judgment Focus](./human-judgment-focus.md) を参照してください。コンセプト全体の SSoT は repo root の [`docs/vision.md`](https://github.com/s977043/river-review/blob/main/docs/vision.md) です。
