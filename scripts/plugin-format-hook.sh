@@ -16,6 +16,13 @@ set -euo pipefail
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 cd "$PROJECT_DIR" || exit 0
 
+# Avoid double-formatting: if the host project already ships its own
+# repo-internal format hook (e.g. developing the river-review repo itself,
+# where .claude/settings.json wires .claude/hooks/format.sh), defer to it.
+if [ -f .claude/hooks/format.sh ]; then
+  exit 0
+fi
+
 if ! command -v npm >/dev/null 2>&1; then
   echo "[river-review:format] npm not found, skipping"
   exit 0
