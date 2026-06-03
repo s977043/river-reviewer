@@ -65,4 +65,4 @@ Skipped skills (2): rr-upstream-arch-001 [glob no match], rr-downstream-release-
 
 一時的にグロブを既知の単一パスに絞り込んでから、ワークフローを再実行することも有効です。
 
-スキルの選択基準や推奨スターターセットについては [スキルの選択と組み合わせ](choose-skills) を参照してください。
+スキルの選択基準や推奨スターターセットについては [スキルの選択と組み合わせ](./choose-skills.md) を参照してください。

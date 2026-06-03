@@ -2,7 +2,7 @@
 
 The skills catalog offers many options. This guide explains how to decide which skills to enable and how to combine them effectively.
 
-> **See also**: For the full skill list see [Skills Catalog](../reference/skills-catalog). If a skill isn't triggering, see [Debug Skill Routing](debug-skill-routing).
+> **See also**: For the full skill list see [Skills Catalog](../reference/skills-catalog.md). If a skill isn't triggering, see [Debug Skill Routing](./debug-skill-routing.md).
 
 ## 1. Filter by phase first
 

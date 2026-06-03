@@ -14,4 +14,4 @@ When a skill doesn't trigger (or triggers too often), walk through these checks.
 
 Open a draft PR that modifies a file matching the skill's `applyTo` glob. If no findings appear, add debug logging or temporarily narrow the glob to a single known path, then re-run the workflow.
 
-For guidance on selecting skills and building starter sets, see [Choosing and Combining Skills](choose-skills).
+For guidance on selecting skills and building starter sets, see [Choosing and Combining Skills](./choose-skills.md).
