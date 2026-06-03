@@ -52,3 +52,10 @@ CI でも `.github/workflows/validate-agents.yml` により同じ検証が実行
 - `guidelines.security` にはプロジェクト固有のリスクと対策を明記する
 - `automation.ciWorkflows` にはCI名、パス、トリガー、品質ゲートを記録する
 - 変更後は `npm run lint && npm test` に加え `npm run agents:validate` を必ず実行する
+
+## プログラマティック利用
+
+YAML ナレッジパックではなく、スクリプトや自動化パイプラインから River Review を呼び出す場合は以下を参照してください。
+
+- **Node.js API** — `runners/node-api/README.md`: JavaScript/TypeScript から River Review を直接呼び出す方法
+- **CLI** — `runners/cli/README.md`: シェルスクリプトや CI ステップから実行する方法

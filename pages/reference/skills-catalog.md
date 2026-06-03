@@ -2,6 +2,8 @@
 
 River Review に同梱されているスキル一覧です。フェーズ別に分類しています。
 
+どのスキルを有効にするか、複数スキルの組み合わせ方に迷う場合は [スキルの選択と組み合わせ](../guides/choose-skills) を参照してください。
+
 ## upstream
 
 ### `rr-upstream-adr-decision-quality-001`
@@ -774,6 +776,135 @@ across services.`
   - `components/**/*.{ts,tsx,js,jsx}`
 - 重要度: major
 - タグ: community / nextjs / midstream / react
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / actions
+
+### `rr-midstream-modern-web-semantic-001`
+
+- 名前: `Modern Web Semantic + Platform-Native`
+- 概要: `Suggests semantic HTML / Web Platform Native APIs / modern CSS over legacy workarounds.`
+- 対象:
+  - `src/**/*.{ts,tsx,js,jsx,html,css}`
+  - `app/**/*.{ts,tsx,js,jsx,html,css}`
+  - `components/**/*.{ts,tsx,js,jsx,html,css}`
+  - `pages/**/*.{ts,tsx,js,jsx,html,css}`
+  - `styles/**/*.css`
+  - `public/**/*.html`
+- 重要度: minor
+- タグ: community / modern-web / semantic-html / accessibility / ui / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / actions
+
+### `rr-midstream-modern-web-performance-001`
+
+- 名前: `Modern Web Performance + Core Web Vitals`
+- 概要: `Surfaces LCP / INP / CLS / resource-cost implications of frontend diffs.`
+- 対象:
+  - `src/**/*.{ts,tsx,js,jsx,html,css}`
+  - `app/**/*.{ts,tsx,js,jsx,html,css}`
+  - `components/**/*.{ts,tsx,js,jsx,html,css}`
+  - `pages/**/*.{ts,tsx,js,jsx,html,css}`
+  - `styles/**/*.css`
+  - `public/**/*.html`
+- 重要度: minor
+- タグ: community / modern-web / performance / core-web-vitals / ui / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / actions
+
+### `rr-midstream-modern-web-browser-compat-001`
+
+- 名前: `Modern Web Browser Compatibility + Baseline Awareness`
+- 概要: `Prompts Baseline status / feature detection / progressive enhancement for new Web APIs and CSS.`
+- 対象:
+  - `src/**/*.{ts,tsx,js,jsx,html,css}`
+  - `app/**/*.{ts,tsx,js,jsx,html,css}`
+  - `components/**/*.{ts,tsx,js,jsx,html,css}`
+  - `pages/**/*.{ts,tsx,js,jsx,html,css}`
+  - `styles/**/*.css`
+  - `public/**/*.html`
+- 重要度: minor
+- タグ: community / modern-web / browser-compatibility / baseline / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / actions
+
+### `rr-midstream-modern-web-a11y-interactive-001`
+
+- 名前: `Modern Web Accessibility for Interactive UI`
+- 概要: `Keyboard operation / focus management / live regions / role-state semantics for interactive UI.`
+- 対象:
+  - `src/**/*.{ts,tsx,js,jsx,html,css}`
+  - `app/**/*.{ts,tsx,js,jsx,html,css}`
+  - `components/**/*.{ts,tsx,js,jsx,html,css}`
+  - `pages/**/*.{ts,tsx,js,jsx,html,css}`
+  - `styles/**/*.css`
+  - `public/**/*.html`
+- 重要度: minor
+- タグ: community / modern-web / accessibility / a11y / ui / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / actions
+
+### `rr-midstream-independent-review-synthesis-001`
+
+- 名前: `Independent Review Synthesis`
+- 概要: `Synthesizes multiple AI / human review results, dedups, verifies evidence, and emits a merge recommendation. No majority vote.`
+- 対象:
+  - `**/*`
+- 重要度: major
+- タグ: community / review / synthesis / multi-agent / validation / hallucination-guard / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff / fullFile / reviewSelf
+
+チェック項目の例:
+
+- findings / summary / actions
+
+### `rr-midstream-design-token-enforcement-001`
+
+- 名前: `Design Token Enforcement`
+- 概要: `デザイントークンを使わずに直書きされた色・余白・フォントサイズ・角丸・シャドウを検出する。デザインツールに依存しない汎用チェック。`
+- 対象:
+  - `src/**/*.{ts,tsx,js,jsx,css,scss}`
+  - `app/**/*.{ts,tsx,js,jsx,css,scss}`
+  - `components/**/*.{ts,tsx,js,jsx,css,scss}`
+- 重要度: minor
+- タグ: community / design-system / tokens / ui / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / actions
+
+### `rr-midstream-design-system-component-reuse-001`
+
+- 名前: `Design System Component Reuse Guard`
+- 概要: `既存デザインシステムコンポーネント（Button / Input / Modal / Card 等）を再実装していないかを検出する。`
+- 対象:
+  - `src/**/*.{ts,tsx,js,jsx}`
+  - `app/**/*.{ts,tsx,js,jsx}`
+  - `components/**/*.{ts,tsx,js,jsx}`
+- 重要度: major
+- タグ: community / design-system / component-reuse / ui / midstream
 - 依存関係: none
 - 適用条件: phase=midstream, inputContext=diff
 

@@ -64,3 +64,5 @@ Skipped skills (2): rr-upstream-arch-001 [glob no match], rr-downstream-release-
 **ゼロトリガーの症状例**: `phase` に `release` など有効でない値を指定すると、validate は失敗し、スキルは一切トリガーされない。`npm run skills:validate` でエラーを確認してから再実行してください。
 
 一時的にグロブを既知の単一パスに絞り込んでから、ワークフローを再実行することも有効です。
+
+スキルの選択基準や推奨スターターセットについては [スキルの選択と組み合わせ](choose-skills) を参照してください。

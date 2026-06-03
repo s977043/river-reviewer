@@ -6,6 +6,13 @@ Node.js API interface for programmatic usage of River Review in custom applicati
 
 The Node API runner provides a TypeScript/JavaScript API for integrating River Review into your Node.js applications. It enables programmatic skill loading, file review, and execution planning without requiring the CLI.
 
+## Package
+
+|         | `@river-review/node-api`                                                                         | `@river-review/core-runner`                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| npm     | [npmjs.com/package/@river-review/node-api](https://www.npmjs.com/package/@river-review/node-api) | [npmjs.com/package/@river-review/core-runner](https://www.npmjs.com/package/@river-review/core-runner) |
+| Version | see [package.json](./package.json)                                                               | see [core package.json](../core/package.json)                                                          |
+
 ## Installation
 
 ```bash
@@ -318,6 +325,8 @@ async function reviewChanges() {
   });
 
   console.log(`Review complete:`);
+  // NOTE: totalFindings is always 0 here — review() returns a plan only, not AI findings.
+  // Wire an AI provider (see "Integration with Custom AI Provider" below) for real findings.
   console.log(`- Total findings: ${result.summary.totalFindings}`);
   console.log(`- Skills executed: ${result.summary.skillsExecuted}`);
   console.log(`- Files reviewed: ${result.summary.filesReviewed}`);
