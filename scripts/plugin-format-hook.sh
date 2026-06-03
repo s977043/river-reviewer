@@ -23,12 +23,12 @@ if [ -f .claude/hooks/format.sh ]; then
   exit 0
 fi
 
-if ! command -v npm >/dev/null 2>&1; then
-  echo "[river-review:format] npm not found, skipping"
+if ! command -v npx >/dev/null 2>&1; then
+  echo "[river-review:format] npx not found, skipping"
   exit 0
 fi
 
-if [ ! -d .git ]; then
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "[river-review:format] not a git repository, skipping"
   exit 0
 fi
@@ -38,7 +38,7 @@ if [ -z "$CHANGED_FILES" ]; then
   exit 0
 fi
 
-FILES_TO_FORMAT=$(echo "$CHANGED_FILES" | grep -E '\.(js|jsx|ts|tsx|json|md|yml|yaml|mjs)$' || true)
+FILES_TO_FORMAT=$(echo "$CHANGED_FILES" | grep -E '\.(js|jsx|ts|tsx|cjs|mjs|json|md|yml|yaml)$' || true)
 if [ -z "$FILES_TO_FORMAT" ]; then
   exit 0
 fi
