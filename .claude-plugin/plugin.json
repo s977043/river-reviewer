@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "river-review",
+  "displayName": "River Review",
+  "version": "1.0.0",
+  "description": "Skill-routed code review for Claude Code: an orchestrator agent plus specialist skills (code, security, performance, architecture, testing) and an adversarial pre-mortem/war-game pass. Classifies review intent, routes to the right specialist, and verifies findings.",
+  "author": {
+    "name": "river-review maintainers",
+    "url": "https://github.com/s977043/river-review"
+  },
+  "homepage": "https://github.com/s977043/river-review",
+  "repository": "https://github.com/s977043/river-review",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "security-review",
+    "performance",
+    "architecture",
+    "testing",
+    "adversarial-review",
+    "skills"
+  ],
+  "commands": [
+    "./.claude/commands/review-local.md",
+    "./.claude/commands/challenge.md",
+    "./.claude/commands/skill.md",
+    "./.claude/commands/check.md",
+    "./.claude/commands/pr.md"
+  ],
+  "agents": "./.claude/agents/river-review.md",
+  "skills": "./skills/agent-skills/"
+}

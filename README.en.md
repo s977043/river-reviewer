@@ -256,6 +256,66 @@ severity: minor
 - Known limitations: `pages/reference/known-limitations.md`
 - Troubleshooting: `pages/guides/troubleshooting.md`
 
+## Installing the river-review plugin
+
+### Claude Code
+
+river-review ships as a Claude Code plugin from a same-repo marketplace.
+
+1. Add the marketplace (GitHub shorthand):
+
+   ```text
+   /plugin marketplace add s977043/river-review
+   ```
+
+   Pin to a tag if you want reproducible installs: `/plugin marketplace add s977043/river-review@v1.0.0`.
+
+2. Install the plugin:
+
+   ```text
+   /plugin install river-review@river-review-marketplace
+   ```
+
+3. Activate without restarting:
+
+   ```text
+   /reload-plugins
+   ```
+
+What you get (namespaced by plugin name):
+
+- Commands: `/river-review:review-local`, `/river-review:challenge`, `/river-review:skill`, `/river-review:check`, `/river-review:pr`
+- Agent: `river-review` (skill-routed code-review orchestrator)
+- Skills: the orchestrator plus `river-review-code`, `river-review-security`, `river-review-performance`, `river-review-architecture`, `river-review-testing`, and `adversarial-review` — addressable as `/river-review:<skill-name>`
+
+Manage: `/plugin enable|disable|uninstall river-review@river-review-marketplace`.
+
+Local development / testing without installing:
+
+```text
+claude --plugin-dir .
+```
+
+### Codex
+
+Codex has no plugin marketplace; integration is copy-in.
+
+1. Copy the Codex integration template into your project:
+
+   ```text
+   cp templates/agent-workflow/codex/AGENTS.md ./AGENTS.md
+   ```
+
+2. Make the review skills available to Codex by copying the skills directory into your project (or pointing Codex at a checkout of this repo):
+
+   ```text
+   cp -R skills/agent-skills ./skills
+   ```
+
+3. Reference the skills from your `AGENTS.md` and add your own `.codex/config.toml` (`approval_policy`, `sandbox`) to taste — the repo's `.codex/` config is environment-specific and not shipped as a template.
+
+See `templates/agent-workflow/README.md` for the full Codex (and Cursor) setup. The Codex side is versioned by git only; re-copy on upgrade.
+
 ## AI Review Standard Policy
 
 River Review follows a standard review policy to maintain consistent quality and reproducibility. The policy defines evaluation principles, output format, and prohibited actions to ensure constructive and specific feedback.
