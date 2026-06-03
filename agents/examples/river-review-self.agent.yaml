@@ -64,7 +64,7 @@ tooling:
     - name: Lint
       category: quality
       run: npm run lint
-      description: 'ESLint による静的解析'
+      description: 'Prettier format check / markdownlint / textlint による静的解析'
       expectation: '警告ゼロでパスすること'
     - name: Unit tests
       category: quality
@@ -88,7 +88,7 @@ tooling:
   definitionOfDone:
     - title: 実装完了条件
       items:
-        - 'TypeScript strict / ESLint / テストがすべて Green'
+        - 'lint（format / dash / markdownlint / textlint）/ テストがすべて Green'
         - 'agents/examples/*.agent.yaml がスキーマ検証をパス'
         - 'dist/ の再ビルドが必要な変更では build:action を実行済み'
         - 'CHANGELOG.md は release-please に委ねる（手動編集禁止）'

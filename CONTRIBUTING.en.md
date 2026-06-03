@@ -88,6 +88,7 @@ npm run lint
 Depending on what you change:
 
 - If you changed skills (`skills/`): `npm run skills:validate`
+- If you changed Agent Skills (`skills/agent-skills/`): `npm run agent-skills:validate`
 - If you changed agent definitions: `npm run agents:validate`
 - If you changed tracing functionality: `npm run trace:validate` (when OpenTelemetry validation is needed)
 
