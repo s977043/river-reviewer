@@ -62,20 +62,22 @@
 
 ### 昇格条件
 
-1. **フィクスチャカバレッジ**: `good/` と `bad/` の両サイドにそれぞれ 2 件以上のフィクスチャがあること
-2. **ゴールデン出力**: 各フィクスチャに対応する `.golden.json` が存在し、`npm test` でパスすること（形式は `schemas/finding.schema.json` に準拠すること）
+1. **フィクスチャカバレッジ**: `fixtures/` に happy-path と false-positive の両方を含む `.md` フィクスチャがあること（例: `01-icon-button-happy.md`, `02-decorative-img-false-positive.md`）
+2. **ゴールデン出力**: 各フィクスチャに対応する `golden/<name>.md`（`Finding:` / `Evidence:` 形式の散文ゴールデン出力）が存在し、eval（`eval/promptfoo.yaml` のアサーション）がパスすること
 3. **誤検知ガード / Non-goals**: スキル本文に黙る条件と対象外ケースが明記されていること
-4. **メンテナーレビュー**: コアメンテナー **2 名** の Approve が揃っていること
+4. **メンテナーレビュー**: 少なくとも 1 名のメンテナー（`CODEOWNERS` 記載者）の Approve があること。複数メンテナーによる相互レビューが望ましいが、現状の `CODEOWNERS` は単独オーナー（`@s977043`）のため努力目標として扱う
+
+> eval の実行手順とゴールデン生成の詳細は `docs/runbook/community-skill-eval.md` を参照してください。
 
 ### 昇格を申請する手順
 
 1. 上記条件が整ったら、PR のタイトルに `[promotion-request]` プレフィックスを付ける。
 2. PR 本文に次を記載する。
    - フィクスチャ一覧（ファイルパスと件数）
-   - `npm test` の出力（パス確認）
+   - eval 出力（`scripts/run-promptfoo-eval.sh` などのパス確認）
    - 誤検知ガードと Non-goals の箇条書き
-3. レビュアーを `CODEOWNERS` に記載されたコアメンテナーから 2 名以上アサインする。
-4. 2 名の Approve 取得後、スキルファイルの `recommended: true` を設定して PR をマージする。
+3. レビュアーを `CODEOWNERS` に記載されたメンテナーからアサインする。
+4. メンテナーの Approve 取得後、`skills/registry.yaml` で当該スキルの `recommended: false → true` を設定して PR をマージする。
 
 > **タイムライン目安**: 条件を満たした PR は通常 2 週間以内にレビューが入ります。長期間応答がない場合は Issue でメンテナーに ping してください。
 

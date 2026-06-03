@@ -44,12 +44,6 @@
 - 英語: a11y, accessibility, screen reader, aria
 - → `rr-midstream-a11y-accessible-name-001`
 
-### Next.js App Router
-
-- 日本語: Next.js, App Router, サーバーコンポーネント
-- 英語: Next.js, App Router, Server Component, use client
-- → `rr-midstream-nextjs-app-router-boundary-001`
-
 ### アクセシビリティ（アクセシブルネーム）
 
 - 日本語: alt属性, aria-label, アクセシブルネーム, ボタンラベル, フォームラベル

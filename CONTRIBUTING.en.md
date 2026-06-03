@@ -69,10 +69,13 @@ chore: upgrade eslint to v9
 
 - **Review turnaround**: A maintainer will look at your PR within 7 days. If you hear nothing, feel free to leave a comment to ask for a status update.
 - **Required approvals**: At least 1 maintainer approval is required to merge.
-- **CI gates**: All of the following must pass before merging:
-  - `npm test` (unit tests)
-  - `npm run lint` (Prettier / ESLint / commitlint)
-  - Vale prose lint (when docs are changed)
+- **CI gates**: All of the following required checks must pass before merging:
+  - Lint (`npm run lint` = Prettier format check / dash check / markdownlint / textlint)
+  - Unit tests (20.x) / Unit tests (22.x)
+  - Skill schema validation
+  - Meta consistency
+  - Action dist freshness
+  - Integration (CLI)
 - **When a PR may be closed without merge**: PRs with no author response for 30 days, changes out of scope, or work that duplicates an existing effort may be closed. We will always leave a comment explaining the reason before closing.
 
 ### ✅ Local checks (recommended)
