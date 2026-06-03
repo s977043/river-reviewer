@@ -92,7 +92,13 @@ See `templates/agent-workflow/` for ready-to-use config templates.
 codex exec "river run . --reviewers auto"
 ```
 
-Dedicated definition: `templates/agent-workflow/codex/AGENTS.md` — merge or append the contents of this file into your project's `AGENTS.md`. This enables River Review to run automatically before commits.
+Codex supports the same plugin marketplace as Claude Code (both share the same `.claude-plugin/marketplace.json`). The recommended installation method is to add the marketplace:
+
+```bash
+codex plugin marketplace add s977043/river-review
+```
+
+As a fallback when the marketplace is not used, take the dedicated definition `templates/agent-workflow/codex/AGENTS.md` and merge or append its contents into your project's `AGENTS.md`. This enables River Review to run automatically before commits.
 
 ### GitHub Copilot
 
