@@ -21,6 +21,8 @@ River Review helps you answer questions like:
 - Does this PR violate the team's migration, security, accessibility, or dependency policy?
 - Did the implementation agent ignore feedback from a previous review?
 
+> River Review does not replace human review with AI. By executing your team's review criteria as versioned skills, it lets human reviewers focus on the high-risk judgment that truly needs them ([Human Judgment Focus](https://river-review.the3396.com/explanation/human-judgment-focus/)).
+
 ## Why River Review?
 
 | Axis                | Existing AI review tools | River Review                                     |
