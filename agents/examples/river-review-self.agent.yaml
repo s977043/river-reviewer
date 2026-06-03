@@ -66,10 +66,6 @@ tooling:
       run: npm run lint
       description: 'ESLint による静的解析'
       expectation: '警告ゼロでパスすること'
-    - name: Type check
-      category: quality
-      run: npm run typecheck
-      description: 'TypeScript strict モードの型検査'
     - name: Unit tests
       category: quality
       run: npm test
@@ -97,7 +93,7 @@ tooling:
         - 'dist/ の再ビルドが必要な変更では build:action を実行済み'
         - 'CHANGELOG.md は release-please に委ねる（手動編集禁止）'
 agents:
-  - id: river-reviewer
+  - id: river-review
     name: River Review Agent
     type: review
     description: 'Claude Code サブエージェントとして PR 差分を読み、severity 付き findings を JSON で返す自動コードレビュー担当'
@@ -111,11 +107,11 @@ agents:
       - 'node:test 内で process.stdout.write を差し替えるとテストが silently drop されることに注意する'
       - 'dist/ の変更が build:action 再実行によるものかを確認する'
     entryPoints:
-      - path: .claude/agents/river-reviewer.md
+      - path: .claude/agents/river-review.md
         kind: guide
         summary: 'Claude Code サブエージェントの定義（ツール権限・レビュー手順）'
     instructionFiles:
-      - path: .claude/agents/river-reviewer.md
+      - path: .claude/agents/river-review.md
         kind: prompt
         summary: 'River Review サブエージェントプロンプト'
       - path: docs/review/viewpoints.md
@@ -179,12 +175,11 @@ automation:
       enforces:
         - 'npm run agents:validate'
     - name: CI
-      path: .github/workflows/ci.yml
-      description: 'lint / typecheck / test を実行する主要 CI'
+      path: .github/workflows/test.yml
+      description: 'lint / test を実行する主要 CI'
       triggers:
         - 'pull_request (opened, synchronize, reopened)'
         - 'push (main)'
       enforces:
         - 'npm run lint'
-        - 'npm run typecheck'
         - 'npm test'

@@ -75,10 +75,13 @@ chore: eslint を v9 にアップグレード
 
 - **レビュー開始の目安**: 提出から 7 日以内にメンテナーが確認します（返答がない場合はコメントで催促してください）。
 - **マージに必要な承認**: メンテナー 1 名以上の Approve が必要です。
-- **CI ゲート**: 以下がすべて green にならないとマージできません。
-  - `npm test`（ユニットテスト）
-  - `npm run lint`（Prettier / ESLint / commitlint）
-  - Vale prose lint（ドキュメント変更がある場合）
+- **CI ゲート**: 以下の必須チェックがすべて green にならないとマージできません。
+  - Lint（`npm run lint` = Prettier フォーマットチェック / dash チェック / markdownlint / textlint）
+  - Unit tests (20.x) / Unit tests (22.x)
+  - Skill schema validation
+  - Meta consistency
+  - Action dist freshness
+  - Integration (CLI)
 - **PR がクローズされる条件（マージなし）**: 著者から 30 日以上応答がない場合、スコープ外の変更が含まれる場合、または既存の作業と重複する場合はクローズすることがあります。クローズ前には理由をコメントで通知します。
 
 ### ✅ ローカルでのチェック（推奨）
