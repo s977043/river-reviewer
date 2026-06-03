@@ -1,5 +1,12 @@
 # AGENTS.md — River Review integration
 
+## Prerequisite: the `river` CLI
+
+The commands below invoke the `river` CLI. Make sure it is available on `PATH`
+first — install it (`npm install -g river-review`) or run it via `npx river ...`.
+If the CLI is not installed, use the agent-skills under `skills/agent-skills/`
+directly instead of the CLI commands.
+
 ## Code review
 
 Before finalizing any code change, run River Review to catch issues:
