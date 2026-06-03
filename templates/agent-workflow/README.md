@@ -25,7 +25,18 @@ If your project already has a `.cursorrules` or `AGENTS.md`, append the River Re
 
 ### Making the review skills available to Codex
 
-Codex has no plugin marketplace, so the river-review skills are vendored as plain
+Codex supports the same plugin marketplace as Claude Code — both read the same
+`.claude-plugin/marketplace.json`. The primary method is to add the marketplace:
+
+```bash
+codex plugin marketplace add s977043/river-review
+```
+
+Pin a tag for reproducibility: `codex plugin marketplace add s977043/river-review@v1.0.0`.
+
+#### Alternative: manual vendoring (fallback)
+
+For environments without the marketplace, vendor the river-review skills as plain
 skill docs that Codex reads. Copy the skills directory into your project (or point
 Codex at a checkout of this repo via `CODEX_HOME`):
 
@@ -37,18 +48,18 @@ Then reference the skills from your `AGENTS.md`. Add your own `.codex/config.tom
 (`approval_policy`, `sandbox`) to taste — the repo's `.codex/` config is
 environment-specific and is intentionally not shipped as a template.
 
-The Codex integration is versioned by git only; there is no auto-update. Re-copy
-`AGENTS.md` and `skills/agent-skills/` when you upgrade.
+With manual vendoring, the Codex integration is versioned by git only; there is no
+auto-update. Re-copy `AGENTS.md` and `skills/agent-skills/` when you upgrade.
 
 ## Further reading
 
 See [pages/guides/agent-workflow.md](../../pages/guides/agent-workflow.md) for the full agent integration guide.
 
-### One-command setup (Codex)
+### One-command setup (Codex) — vendoring fallback
 
-Instead of copying files by hand, run the setup script from your project root.
-It vendors the River Review `AGENTS.md` guidance and agent-skills into your
-project — the Codex equivalent of `/plugin install` in Claude Code:
+If you are not using the marketplace, run the setup script from your project root
+instead of copying files by hand. It vendors the River Review `AGENTS.md` guidance
+and agent-skills into your project:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/s977043/river-review/main/scripts/setup-codex.sh | bash

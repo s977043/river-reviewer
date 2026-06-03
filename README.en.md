@@ -298,7 +298,17 @@ claude --plugin-dir .
 
 ### Codex
 
-Codex has no plugin marketplace; integration is copy-in.
+Codex also supports the same plugin marketplace. Both tools share the same `.claude-plugin/marketplace.json`, so installation uses the same flow as Claude Code:
+
+```text
+codex plugin marketplace add s977043/river-review
+```
+
+Pin to a tag if you want reproducible installs: `codex plugin marketplace add s977043/river-review@v1.0.0`.
+
+#### Alternative: manual copy-in (fallback)
+
+For environments without the marketplace, you can copy the template and skills in by hand.
 
 1. Copy the Codex integration template into your project:
 
@@ -314,7 +324,7 @@ Codex has no plugin marketplace; integration is copy-in.
 
 3. Reference the skills from your `AGENTS.md` and add your own `.codex/config.toml` (`approval_policy`, `sandbox`) to taste — the repo's `.codex/` config is environment-specific and not shipped as a template.
 
-See `templates/agent-workflow/README.md` for the full Codex (and Cursor) setup. The Codex side is versioned by git only; re-copy on upgrade.
+See `templates/agent-workflow/README.md` for the full Codex (and Cursor) setup. With manual copy-in, the Codex side is versioned by git only; re-copy on upgrade.
 
 ## AI Review Standard Policy
 

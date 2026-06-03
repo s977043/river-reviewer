@@ -96,7 +96,13 @@ cp templates/agent-workflow/cursor/.cursorrules .cursorrules
 codex exec "river run . --reviewers auto"
 ```
 
-専用定義: `templates/agent-workflow/codex/AGENTS.md` — プロジェクトの `AGENTS.md` にこのファイルの内容をマージまたは追記してください。これにより、コミット前に River Review が自動実行されます。
+Codex は Claude Code と同じプラグインマーケットプレイスに対応しています（両者は同一の `.claude-plugin/marketplace.json` を共有します）。推奨の導入方法はマーケットプレイスの追加です。
+
+```bash
+codex plugin marketplace add s977043/river-review
+```
+
+マーケットプレイスを使わない場合のフォールバックとして、専用定義 `templates/agent-workflow/codex/AGENTS.md` をプロジェクトの `AGENTS.md` にマージまたは追記してください。これにより、コミット前に River Review が自動実行されます。
 
 ### GitHub Copilot
 
