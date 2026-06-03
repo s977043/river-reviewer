@@ -28,5 +28,6 @@
     "./.claude/commands/pr.md"
   ],
   "agents": "./.claude/agents/river-review.md",
-  "skills": "./skills/agent-skills/"
+  "skills": "./skills/agent-skills/",
+  "hooks": "./hooks/hooks.json"
 }
