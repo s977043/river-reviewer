@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.0](https://github.com/s977043/river-review/compare/v1.0.0...v1.1.0) (2026-06-03)
+
+
+### Features
+
+* **agents:** wire community skills to routing, enrich agent defs, add self-example ([#973](https://github.com/s977043/river-review/issues/973)) ([cf54710](https://github.com/s977043/river-review/commit/cf547106faca1499e375d0b9615d4373f2fb709b))
+* **codex:** one-command setup script (curl|bash installer) ([#984](https://github.com/s977043/river-review/issues/984)) ([b3b0e43](https://github.com/s977043/river-review/commit/b3b0e43b6ed4d63359e91fc6d01d2a7bb7ea9352))
+* **plugin:** add self-contained format hook (official CLAUDE_PLUGIN_ROOT pattern) ([#982](https://github.com/s977043/river-review/issues/982)) ([1abcbd0](https://github.com/s977043/river-review/commit/1abcbd0f76636dca96feb752cb0377bf5f01171a))
+* **plugin:** package river-review as a Claude Code plugin + Codex setup ([#981](https://github.com/s977043/river-review/issues/981)) ([e459e09](https://github.com/s977043/river-review/commit/e459e097245e4556038f05129884ef7bcd9a1135))
+
+
+### Bug Fixes
+
+* **docs:** correct doc/agent inaccuracies found in 3-perspective review ([#979](https://github.com/s977043/river-review/issues/979)) ([c21f566](https://github.com/s977043/river-review/commit/c21f5667c150c1bd8b2c26f8a315834f089f3b72))
+* **docs:** correct ESLint refs in agent yaml and add agent-skills:validate to EN ([#980](https://github.com/s977043/river-review/issues/980)) ([0c13a41](https://github.com/s977043/river-review/commit/0c13a410a9854c53e5d6045117eb10500a55d8ea))
+
 ## [1.0.0](https://github.com/s977043/river-review/compare/v0.69.0...v1.0.0) (2026-06-01)
 
 
