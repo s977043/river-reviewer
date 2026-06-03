@@ -2,15 +2,21 @@
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "river-review-marketplace",
   "owner": {
-    "name": "s977043",
-    "email": "masatake.komine@proni.co.jp"
+    "name": "river-review maintainers",
+    "url": "https://github.com/s977043/river-review"
   },
-  "description": "Marketplace distributing the river-review code-review plugin for Claude Code.",
+  "description": "Marketplace distributing the river-review code-review plugin for Claude Code and Codex.",
   "plugins": [
     {
       "name": "river-review",
       "source": "./",
       "description": "Skill-routed code review: orchestrator agent + specialist review skills + adversarial pass.",
+      "author": {
+        "name": "river-review maintainers",
+        "url": "https://github.com/s977043/river-review"
+      },
+      "homepage": "https://river-review.the3396.com/",
+      "license": "MIT",
       "category": "code-review",
       "tags": ["code-review", "security", "performance", "architecture", "testing"]
     }

@@ -17,3 +17,9 @@ dist/
 .vale/
 .lychee.toml
 CHANGELOG.md
+
+# Version-managed by release-please (its JSON serializer expands short arrays,
+# which conflicts with prettier's inline formatting and breaks Lint on every
+# release that bumps the version).
+.claude-plugin/plugin.json
+.codex-plugin/plugin.json

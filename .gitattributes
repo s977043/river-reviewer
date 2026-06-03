@@ -9,3 +9,8 @@
 runners/github-action/dist/*.mjs text eol=lf
 runners/github-action/dist/*.map text eol=lf
 runners/github-action/dist/*.cjs text eol=lf
+
+# The plugin ships scripts/plugin-format-hook.sh and hooks/format.sh, which are
+# executed by bash on the consumer's machine. Pin LF so a Windows checkout with
+# autocrlf=true cannot corrupt the shebang / line endings and break execution.
+*.sh text eol=lf

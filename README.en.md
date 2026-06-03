@@ -57,13 +57,17 @@ npx river run . --dry-run
 
 > npm publish workflow and `publishConfig` are implemented ([#942](https://github.com/s977043/river-review/pull/942)). Setting the `NPM_TOKEN` secret enables publishing of `@river-review/core-runner`, `@river-review/node-api`, and `@river-review/cli-runner` ([#800](https://github.com/s977043/river-review/issues/800)). The `npx river try` experience is planned separately.
 
-| Goal                    | Destination                                                                             |
-| ----------------------- | --------------------------------------------------------------------------------------- |
-| Try it in 5 minutes     | [Quick start (GitHub Actions)](#quick-start-github-actions)                             |
-| Add to an existing repo | [Setup guide](https://river-review.the3396.com/guides/github-actions/)                  |
-| Create your first skill | [Skill tutorial](https://river-review.the3396.com/tutorials/creating-your-first-skill/) |
-| Estimate run cost       | [Cost estimation guide](pages/guides/cost-estimation.en.md)                             |
-| Understand the design   | [Architecture docs](https://river-review.the3396.com/explanation/river-architecture/)   |
+| Goal                                    | Destination                                                                             |
+| --------------------------------------- | --------------------------------------------------------------------------------------- |
+| Try it in 5 minutes                     | [Quick start (GitHub Actions)](#quick-start-github-actions)                             |
+| Install as a Claude Code / Codex plugin | [Installing the plugin](#installing-the-river-review-plugin)                            |
+| Add to an existing repo                 | [Setup guide](https://river-review.the3396.com/guides/github-actions/)                  |
+| Create your first skill                 | [Skill tutorial](https://river-review.the3396.com/tutorials/creating-your-first-skill/) |
+| Estimate run cost                       | [Cost estimation guide](pages/guides/cost-estimation.en.md)                             |
+| Use W-check (double review)             | [W-check guide](pages/guides/w-check.en.md)                                             |
+| Use from an AI agent                    | [Agent workflow guide](pages/guides/agent-workflow.en.md)                               |
+| Repo-wide aware review                  | [Repo-wide review guide](pages/guides/repo-wide-review.en.md)                           |
+| Understand the design                   | [Architecture docs](https://river-review.the3396.com/explanation/river-architecture/)   |
 
 See [docs/runbook/dev.md](docs/runbook/dev.md) for the development runbook. License details are at the [bottom of this file](#license).
 
