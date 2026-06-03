@@ -13,6 +13,11 @@
         {
           "type": "generic",
           "path": "README.en.md"
+        },
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
         }
       ]
     }
