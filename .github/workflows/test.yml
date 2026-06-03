@@ -77,6 +77,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node-deps
       - run: npm run meta:validate
+      - run: npm run plugin:validate
 
   dist-check:
     name: Action dist freshness
