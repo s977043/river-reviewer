@@ -310,7 +310,9 @@ Codex also supports the same plugin marketplace. Both tools share the same `.cla
 codex plugin marketplace add s977043/river-review
 ```
 
-Pin to a tag if you want reproducible installs: `codex plugin marketplace add s977043/river-review@v1.0.0`.
+Pin to a tag if you want reproducible installs: `codex plugin marketplace add s977043/river-review@v1.2.1`.
+
+Codex reads its skills and interface metadata from the repo's `.codex-plugin/plugin.json` (the Codex-native manifest). Adding the marketplace natively registers the specialist review skills (`river-review-code` / `-security` / `-performance` / `-architecture` / `-testing` / `adversarial-review`).
 
 #### Alternative: manual copy-in (fallback)
 

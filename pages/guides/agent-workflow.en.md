@@ -98,7 +98,9 @@ Codex supports the same plugin marketplace as Claude Code (both share the same `
 codex plugin marketplace add s977043/river-review
 ```
 
-As a fallback when the marketplace is not used, take the dedicated definition `templates/agent-workflow/codex/AGENTS.md` and merge or append its contents into your project's `AGENTS.md`. This enables River Review to run automatically before commits.
+Codex reads its skills and interface metadata from the repo's `.codex-plugin/plugin.json` (the Codex-native manifest), so adding the marketplace natively registers the specialist review skills with no extra setup.
+
+As a fallback when the marketplace is not used, run `scripts/setup-codex.sh` (it vendors the `AGENTS.md` guidance and the full `skills/agent-skills/` tree, including references/, idempotently) or take the dedicated definition `templates/agent-workflow/codex/AGENTS.md` and merge or append its contents into your project's `AGENTS.md`. This enables River Review to run automatically before commits.
 
 ### GitHub Copilot
 
@@ -119,6 +121,7 @@ Any environment that can execute shell commands can call `river run .` directly.
 | `river-review`              | Main review (intent classification → routing to specialist skills) |
 | `river-review-code`         | Code quality review                                                |
 | `river-review-security`     | Security-focused review                                            |
+| `river-review-performance`  | Performance review (N+1 / optimization)                            |
 | `river-review-testing`      | Test coverage review                                               |
 | `river-review-architecture` | Architecture review                                                |
 | `adversarial-review`        | Adversarial review (challenge assumptions)                         |
