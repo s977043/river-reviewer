@@ -73,8 +73,10 @@ export async function validatePluginManifest() {
     );
   }
 
-  // --- Codex manifest (optional but, if present, must be consistent) ---
-  if (await pathExists('.codex-plugin/plugin.json')) {
+  // --- Codex manifest (required: official distribution ships Codex too) ---
+  if (!(await pathExists('.codex-plugin/plugin.json'))) {
+    errors.push('.codex-plugin/plugin.json: missing (required for Codex plugin distribution)');
+  } else {
     const codexManifest = await readJson('.codex-plugin/plugin.json');
     if (codexManifest.version !== pkg.version) {
       errors.push(
@@ -86,12 +88,35 @@ export async function validatePluginManifest() {
         `.codex-plugin/plugin.json: name "${codexManifest.name}" !== .claude-plugin name "${ccManifest.name}"`
       );
     }
-    if (typeof codexManifest.skills === 'string') {
+    if (typeof codexManifest.skills !== 'string') {
+      errors.push('.codex-plugin/plugin.json: "skills" path is missing or not a string');
+    } else {
       const rel = normalizeRef(codexManifest.skills);
       if (!(await pathExists(rel))) {
         errors.push(
           `.codex-plugin/plugin.json: skills path does not exist: ${codexManifest.skills}`
         );
+      }
+    }
+    // The Codex plugin UI requires an interface block with these fields.
+    const iface = codexManifest.interface;
+    if (!iface || typeof iface !== 'object') {
+      errors.push('.codex-plugin/plugin.json: "interface" block is missing');
+    } else {
+      const requiredInterfaceFields = [
+        'displayName',
+        'shortDescription',
+        'longDescription',
+        'category',
+        'capabilities',
+      ];
+      for (const field of requiredInterfaceFields) {
+        if (iface[field] === undefined || iface[field] === null || iface[field] === '') {
+          errors.push(`.codex-plugin/plugin.json: interface.${field} is missing or empty`);
+        }
+      }
+      if (iface.capabilities !== undefined && !Array.isArray(iface.capabilities)) {
+        errors.push('.codex-plugin/plugin.json: interface.capabilities must be an array');
       }
     }
   }
