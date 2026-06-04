@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/s977043/river-review/compare/v1.2.0...v1.2.1) (2026-06-04)
+
+
+### Bug Fixes
+
+* **plugin:** address Codex review of the distribution work ([#999](https://github.com/s977043/river-review/issues/999)) ([26171a6](https://github.com/s977043/river-review/commit/26171a6e628387fa50bac679e96726bd2cf3bae0)), closes [#966](https://github.com/s977043/river-review/issues/966)
+
 ## [1.2.0](https://github.com/s977043/river-review/compare/v1.1.0...v1.2.0) (2026-06-03)
 
 
