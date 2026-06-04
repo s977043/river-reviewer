@@ -65,6 +65,46 @@ export async function validatePluginManifest() {
     }
   }
 
+  // --- Hooks: parse hooks.json and verify each command's script target exists ---
+  if (typeof ccManifest.hooks === 'string') {
+    const hooksRel = normalizeRef(ccManifest.hooks);
+    if (await pathExists(hooksRel)) {
+      let hooksDef;
+      try {
+        hooksDef = await readJson(hooksRel);
+      } catch {
+        errors.push(`${ccManifest.hooks}: not valid JSON`);
+      }
+      if (hooksDef && (!hooksDef.hooks || typeof hooksDef.hooks !== 'object')) {
+        errors.push(`${ccManifest.hooks}: "hooks" field is missing or not an object`);
+      }
+      if (hooksDef && hooksDef.hooks && typeof hooksDef.hooks === 'object') {
+        const commands = [];
+        for (const matchers of Object.values(hooksDef.hooks)) {
+          if (!Array.isArray(matchers)) continue;
+          for (const matcher of matchers) {
+            if (!matcher || !Array.isArray(matcher.hooks)) continue;
+            for (const hook of matcher.hooks) {
+              if (hook && hook.type === 'command' && typeof hook.command === 'string') {
+                commands.push(hook.command);
+              }
+            }
+          }
+        }
+        // Extract ${CLAUDE_PLUGIN_ROOT}/<path> targets and verify they exist.
+        for (const command of commands) {
+          const matches = command.match(/\$\{CLAUDE_PLUGIN_ROOT\}\/([^\s"']+)/g) || [];
+          for (const m of matches) {
+            const scriptRel = m.replace(/\$\{CLAUDE_PLUGIN_ROOT\}\//, '');
+            if (!(await pathExists(scriptRel))) {
+              errors.push(`${ccManifest.hooks}: hook command target does not exist: ${scriptRel}`);
+            }
+          }
+        }
+      }
+    }
+  }
+
   // --- Marketplace: plugins[].name matches manifest name ---
   const entry = (marketplace.plugins || []).find((p) => p.name === ccManifest.name);
   if (!entry) {
