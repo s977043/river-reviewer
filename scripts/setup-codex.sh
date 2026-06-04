@@ -81,10 +81,11 @@ NEW_NAMES="$(find "$SRC_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \
 if [ -f "$MARKER_FILE" ]; then
   while IFS= read -r old_name; do
     [ -z "$old_name" ] && continue
-    # Only a plain directory name (no path separators, no leading dot) is a valid
-    # skill name; reject anything else to avoid an rm -rf path-traversal.
+    # Only a plain directory name (no path separators, no leading dot, no leading
+    # dash) is a valid skill name; reject anything else to avoid an rm -rf
+    # path-traversal or a leading-dash being treated as a grep/rm option.
     case "$old_name" in
-      */* | .*) continue ;;
+      */* | .* | -*) continue ;;
     esac
     if ! printf '%s\n' "$NEW_NAMES" | grep -qxF "$old_name"; then
       rm -rf "skills/agent-skills/${old_name}"

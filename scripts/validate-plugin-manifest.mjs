@@ -75,6 +75,9 @@ export async function validatePluginManifest() {
       } catch {
         errors.push(`${ccManifest.hooks}: not valid JSON`);
       }
+      if (hooksDef && (!hooksDef.hooks || typeof hooksDef.hooks !== 'object')) {
+        errors.push(`${ccManifest.hooks}: "hooks" field is missing or not an object`);
+      }
       if (hooksDef && hooksDef.hooks && typeof hooksDef.hooks === 'object') {
         const commands = [];
         for (const matchers of Object.values(hooksDef.hooks)) {
