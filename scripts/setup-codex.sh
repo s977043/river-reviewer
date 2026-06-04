@@ -81,6 +81,11 @@ NEW_NAMES="$(find "$SRC_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \
 if [ -f "$MARKER_FILE" ]; then
   while IFS= read -r old_name; do
     [ -z "$old_name" ] && continue
+    # Only a plain directory name (no path separators, no leading dot) is a valid
+    # skill name; reject anything else to avoid an rm -rf path-traversal.
+    case "$old_name" in
+      */* | .*) continue ;;
+    esac
     if ! printf '%s\n' "$NEW_NAMES" | grep -qxF "$old_name"; then
       rm -rf "skills/agent-skills/${old_name}"
       log "removed stale vendored skill: ${old_name}"
@@ -90,7 +95,7 @@ fi
 
 VENDORED=0
 while IFS= read -r skill_dir; do
-  name="$(basename "$skill_dir")"
+  name="${skill_dir##*/}"
   rm -rf "skills/agent-skills/${name}"
   cp -R "$skill_dir" "skills/agent-skills/${name}"
   VENDORED=$((VENDORED + 1))
@@ -108,9 +113,12 @@ ${MARKER_END}"
 if [ ! -f AGENTS.md ]; then
   printf '%s\n' "$WRAPPED" > AGENTS.md
   log "created AGENTS.md"
-elif grep -qF "$MARKER_BEGIN" AGENTS.md; then
-  # Replace the existing river-review block in place. Uses awk (always available
-  # where bash runs) so there is no python3 dependency that could leave AGENTS.md
+elif grep -qF "$MARKER_BEGIN" AGENTS.md && grep -qF "$MARKER_END" AGENTS.md; then
+  # Replace the existing river-review block in place. Requires BOTH markers: if
+  # only the begin marker survived (e.g. a manual edit removed the end marker),
+  # the awk skip-until-end would silently drop the rest of the file, so we fall
+  # through to the safe append branch instead. Uses awk (always available where
+  # bash runs) so there is no python3 dependency that could leave AGENTS.md
   # un-refreshed after the skills were already vendored.
   printf '%s\n' "$WRAPPED" > "$TMP/block.md"
   awk -v blockfile="$TMP/block.md" '

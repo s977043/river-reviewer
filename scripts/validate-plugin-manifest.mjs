@@ -75,12 +75,14 @@ export async function validatePluginManifest() {
       } catch {
         errors.push(`${ccManifest.hooks}: not valid JSON`);
       }
-      if (hooksDef && hooksDef.hooks) {
+      if (hooksDef && hooksDef.hooks && typeof hooksDef.hooks === 'object') {
         const commands = [];
         for (const matchers of Object.values(hooksDef.hooks)) {
-          for (const matcher of matchers || []) {
-            for (const hook of matcher.hooks || []) {
-              if (hook.type === 'command' && typeof hook.command === 'string') {
+          if (!Array.isArray(matchers)) continue;
+          for (const matcher of matchers) {
+            if (!matcher || !Array.isArray(matcher.hooks)) continue;
+            for (const hook of matcher.hooks) {
+              if (hook && hook.type === 'command' && typeof hook.command === 'string') {
                 commands.push(hook.command);
               }
             }
