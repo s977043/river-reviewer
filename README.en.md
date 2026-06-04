@@ -188,7 +188,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Review (midstream)
-        uses: s977043/river-review/runners/github-action@v1.0.0
+        uses: s977043/river-review/runners/github-action@v1.2.1
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
