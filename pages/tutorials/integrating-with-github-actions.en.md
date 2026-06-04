@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-review/runners/github-action@v0.68.0
+      - uses: s977043/river-review/runners/github-action@v1.2.1
         with:
           phase: midstream
           dry_run: true

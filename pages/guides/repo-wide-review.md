@@ -53,7 +53,7 @@ jobs:
         with:
           fetch-depth: 0 # repo-wide context collector が周辺コミット履歴を読むため必須
       - name: Run River Review (midstream)
-        uses: s977043/river-review/runners/github-action@v0.69.0
+        uses: s977043/river-review/runners/github-action@v1.2.1
         with:
           phase: midstream
           dry_run: false

@@ -53,7 +53,7 @@ jobs:
         with:
           fetch-depth: 0 # required so the repo-wide context collector can read surrounding commit history
       - name: Run River Review (midstream)
-        uses: s977043/river-review/runners/github-action@v0.68.0
+        uses: s977043/river-review/runners/github-action@v1.2.1
         with:
           phase: midstream
           dry_run: false

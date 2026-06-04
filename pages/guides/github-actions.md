@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Review (midstream)
-        uses: s977043/river-review/runners/github-action@v0.70.0
+        uses: s977043/river-review/runners/github-action@v1.2.1
         with:
           phase: midstream # upstream|midstream|downstream を参照
         env:
@@ -48,7 +48,7 @@ PR へのコメント投稿には `issues: write` が必要です。権限不足
 
 ```yaml
 - name: Run River Review (midstream, Claude)
-  uses: s977043/river-review/runners/github-action@v0.70.0
+  uses: s977043/river-review/runners/github-action@v1.2.1
   with:
     phase: midstream
   env:
