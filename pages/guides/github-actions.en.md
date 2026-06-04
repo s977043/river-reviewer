@@ -40,7 +40,7 @@ Most teams should use **`midstream`**. It runs a review when the PR is opened an
 
 `issues: write` is required to post comments on PRs. Review workflow `permissions` if you encounter permission errors.
 
-> The example pins to `@v0.70.0`. Replace it with a newer tag once one is released. Pinning to a release tag is recommended for stability.
+> The example pins to `@v1.2.1`. Replace it with a newer tag once one is released. Pinning to a release tag is recommended for stability.
 
 ## Using Anthropic (Claude)
 

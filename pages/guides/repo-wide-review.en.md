@@ -61,7 +61,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-> The example pins `@v0.68.0`. Replace it with the latest release tag when one ships.
+> The example pins `@v1.2.1`. Replace it with the latest release tag when one ships.
 >
 > `fetch-depth: 0` is required so the repo-wide context collector can read commit history and related files around the changed files. A shallow clone degrades the collector.
 

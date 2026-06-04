@@ -32,7 +32,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-> Pin to a release tag such as `@v0.69.0` for stability.
+> Pin to a release tag such as `@v1.2.1` for stability.
 
 ## 2. Run the review
 

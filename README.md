@@ -198,7 +198,7 @@ jobs:
         with:
           fetch-depth: 0 # merge-base を安定取得
       - name: Run River Review (midstream)
-        uses: s977043/river-review/runners/github-action@v1.0.0
+        uses: s977043/river-review/runners/github-action@v1.2.1
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
@@ -226,7 +226,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-review/runners/github-action@v1.0.0
+      - uses: s977043/river-review/runners/github-action@v1.2.1
         with: { phase: upstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -235,7 +235,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-review/runners/github-action@v1.0.0
+      - uses: s977043/river-review/runners/github-action@v1.2.1
         with: { phase: midstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 
@@ -244,7 +244,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-review/runners/github-action@v1.0.0
+      - uses: s977043/river-review/runners/github-action@v1.2.1
         with: { phase: downstream }
         env: { OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} }
 ```
@@ -258,7 +258,7 @@ review:
   steps:
     - uses: actions/checkout@v6
       with: { fetch-depth: 0 }
-    - uses: s977043/river-review/runners/github-action@v1.0.0
+    - uses: s977043/river-review/runners/github-action@v1.2.1
       with:
         phase: midstream
         estimate: true # コスト見積もりのみ
@@ -276,7 +276,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-review/runners/github-action@v1.0.0
+      - uses: s977043/river-review/runners/github-action@v1.2.1
         with:
           phase: midstream
           dry_run: true            # Draft はドライランでプロンプト確認のみ
@@ -289,7 +289,7 @@ review:
     steps:
       - uses: actions/checkout@v6
         with: { fetch-depth: 0 }
-      - uses: s977043/river-review/runners/github-action@v1.0.0
+      - uses: s977043/river-review/runners/github-action@v1.2.1
         with:
           phase: midstream
           dry_run: false           # Ready ではフルレビュー
@@ -339,7 +339,7 @@ exclude:
 GitHub Actions では:
 
 ```yaml
-- uses: s977043/river-review/runners/github-action@v1.0.0
+- uses: s977043/river-review/runners/github-action@v1.2.1
   with:
     phase: midstream
   env:

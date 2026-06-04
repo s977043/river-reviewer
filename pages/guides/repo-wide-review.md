@@ -61,7 +61,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-> 例では `@v0.69.0` に固定しています。最新リリースが出た場合はそのタグへ置き換えてください。
+> 例では `@v1.2.1` に固定しています。最新リリースが出た場合はそのタグへ置き換えてください。
 >
 > `fetch-depth: 0` は repo-wide context collector が変更ファイル周辺のコミット履歴・関連ファイルを参照するために必要です。shallow clone のままだと collector が劣化します。
 
