@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.2](https://github.com/s977043/river-review/compare/v1.2.1...v1.2.2) (2026-06-04)
+
+
+### Bug Fixes
+
+* **plugin:** address gemini-code-assist review of [#1004](https://github.com/s977043/river-review/issues/1004) ([#1006](https://github.com/s977043/river-review/issues/1006)) ([1e766c2](https://github.com/s977043/river-review/commit/1e766c26a1b192609088f63228894ae96baf26e0))
+* **plugin:** make the distributed plugin CLI-independent and self-contained ([#1004](https://github.com/s977043/river-review/issues/1004)) ([a5f8ff3](https://github.com/s977043/river-review/commit/a5f8ff349aab313e7bf8e70b8a473fd6da3f96d2))
+
 ## [1.2.1](https://github.com/s977043/river-review/compare/v1.2.0...v1.2.1) (2026-06-04)
 
 
