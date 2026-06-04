@@ -20,6 +20,7 @@ cd "$PROJECT_DIR" || exit 0
 # repo-internal format hook (e.g. developing the river-review repo itself,
 # where .claude/settings.json wires .claude/hooks/format.sh), defer to it.
 if [ -f .claude/hooks/format.sh ]; then
+  echo "[river-review:format] project has its own .claude/hooks/format.sh, deferring to it"
   exit 0
 fi
 

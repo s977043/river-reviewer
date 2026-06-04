@@ -391,7 +391,7 @@ river-review は同一リポジトリ内のマーケットプレイスから Cla
    /plugin marketplace add s977043/river-review
    ```
 
-   再現可能なインストールが必要ならタグを固定: `/plugin marketplace add s977043/river-review@v1.0.0`。
+   再現可能なインストールが必要ならタグを固定: `/plugin marketplace add s977043/river-review@v1.2.1`。
 
 2. プラグインをインストール:
 

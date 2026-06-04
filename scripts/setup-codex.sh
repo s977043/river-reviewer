@@ -14,7 +14,7 @@
 #   curl -fsSL https://raw.githubusercontent.com/s977043/river-review/main/scripts/setup-codex.sh | bash
 #
 # Pin a branch, tag, or commit with RIVER_REVIEW_REF (default: main):
-#   RIVER_REVIEW_REF=v1.2.0 bash scripts/setup-codex.sh [target-project-dir]
+#   RIVER_REVIEW_REF=v1.2.1 bash scripts/setup-codex.sh [target-project-dir]
 #
 # Idempotent: re-running refreshes the vendored skills and the AGENTS.md
 # River Review section without duplicating it.
@@ -67,11 +67,27 @@ if [ -z "$SRC_DIR" ] || [ -z "$(find "$SRC_DIR" -name SKILL.md -print -quit)" ];
 fi
 
 # --- 2. Vendor the full agent-skills directory (including references/) ------
-# Replace each vendored skill directory atomically so a rename/removal upstream
-# does not leave stale skill dirs behind. Only the skills present in the tarball
-# are touched; unrelated skills the consumer added are left intact.
+# Replace each vendored skill directory atomically. A marker file records which
+# skills we vendored last time, so skills that were renamed or removed upstream
+# are cleaned up on re-run. Unrelated skills the consumer added are left intact.
 log "vendoring river-review agent-skills (full directories)..."
 mkdir -p skills/agent-skills
+MARKER_FILE="skills/agent-skills/.river-review-vendored"
+
+# Skills present in the freshly downloaded tarball.
+NEW_NAMES="$(find "$SRC_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort)"
+
+# Remove previously-vendored skills that no longer exist upstream.
+if [ -f "$MARKER_FILE" ]; then
+  while IFS= read -r old_name; do
+    [ -z "$old_name" ] && continue
+    if ! printf '%s\n' "$NEW_NAMES" | grep -qxF "$old_name"; then
+      rm -rf "skills/agent-skills/${old_name}"
+      log "removed stale vendored skill: ${old_name}"
+    fi
+  done < "$MARKER_FILE"
+fi
+
 VENDORED=0
 while IFS= read -r skill_dir; do
   name="$(basename "$skill_dir")"
@@ -79,6 +95,9 @@ while IFS= read -r skill_dir; do
   cp -R "$skill_dir" "skills/agent-skills/${name}"
   VENDORED=$((VENDORED + 1))
 done < <(find "$SRC_DIR" -maxdepth 1 -mindepth 1 -type d)
+
+# Record the vendored set for the next upgrade's stale-skill cleanup.
+printf '%s\n' "$NEW_NAMES" > "$MARKER_FILE"
 log "vendored ${VENDORED} skill(s) with references/ into skills/agent-skills/"
 
 # --- 3. Install / merge AGENTS.md (last, after skills are in place) ---------
@@ -90,18 +109,17 @@ if [ ! -f AGENTS.md ]; then
   printf '%s\n' "$WRAPPED" > AGENTS.md
   log "created AGENTS.md"
 elif grep -qF "$MARKER_BEGIN" AGENTS.md; then
-  # Replace the existing river-review block in place.
-  python3 - "$AGENTS_SECTION" <<'PY'
-import re, sys
-section = sys.argv[1]
-begin, end = "<!-- river-review:begin -->", "<!-- river-review:end -->"
-block = f"{begin}\n{section}\n{end}"
-with open("AGENTS.md") as f:
-    text = f.read()
-text = re.sub(re.escape(begin) + r".*?" + re.escape(end), block, text, flags=re.DOTALL)
-with open("AGENTS.md", "w") as f:
-    f.write(text)
-PY
+  # Replace the existing river-review block in place. Uses awk (always available
+  # where bash runs) so there is no python3 dependency that could leave AGENTS.md
+  # un-refreshed after the skills were already vendored.
+  printf '%s\n' "$WRAPPED" > "$TMP/block.md"
+  awk -v blockfile="$TMP/block.md" '
+    BEGIN { block = ""; while ((getline line < blockfile) > 0) block = block line "\n" }
+    index($0, "<!-- river-review:begin -->") { printf "%s", block; skip = 1; next }
+    index($0, "<!-- river-review:end -->")   { skip = 0; next }
+    !skip { print }
+  ' AGENTS.md > "$TMP/AGENTS.md.new"
+  mv "$TMP/AGENTS.md.new" AGENTS.md
   log "refreshed River Review section in existing AGENTS.md"
 else
   printf '\n\n%s\n' "$WRAPPED" >> AGENTS.md
