@@ -14,10 +14,11 @@ The review skills under `skills/agent-skills/` are self-contained and require no
 external tooling. Drive the review with them:
 
 1. Read the current diff (`git diff` via the Bash tool, or the diff provided in context).
-2. Load `skills/agent-skills/river-review/SKILL.md` (the orchestrator) and route to the
-   relevant specialist skills (`river-review-code`, `-security`, `-performance`,
-   `-architecture`, `-testing`, `adversarial-review`) based on the diff content. When
-   installed as a plugin, the skills live under `${CLAUDE_PLUGIN_ROOT}/skills/agent-skills/`.
+2. Load `${CLAUDE_PLUGIN_ROOT:-.}/skills/agent-skills/river-review/SKILL.md` (the
+   orchestrator) and route to the relevant specialist skills (`river-review-code`,
+   `-security`, `-performance`, `-architecture`, `-testing`, `adversarial-review`)
+   based on the diff content. `${CLAUDE_PLUGIN_ROOT}` is set when installed as a
+   plugin; it falls back to the repo root (`.`) when run inside river-review itself.
 3. Produce findings with `severity` (`critical` → `major` → `minor` → `info`), `file`,
    `line`, and `message`.
 
