@@ -5,11 +5,11 @@
 
 ## スクリプト一覧
 
-| スクリプト              | 用途                                   | 呼び出し元                              |
-| ----------------------- | -------------------------------------- | --------------------------------------- |
-| `format.sh`             | 変更ファイルにPrettierを実行           | `.claude/hooks/format.sh`               |
-| `hooks.json`            | プラグイン配布用 PostToolUse hook 定義 | プラグインインストール先（Claude Code） |
-| `plugin-format-hook.sh` | プラグイン同梱の自己完結フォーマッター | `hooks.json`（`${CLAUDE_PLUGIN_ROOT}`） |
+| スクリプト                      | 用途                                                                                       | 呼び出し元                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `format.sh`                     | 変更ファイルにPrettierを実行                                                               | `.claude/hooks/format.sh`                                             |
+| `hooks.json`                    | プラグイン配布用 PostToolUse hook 定義                                                     | プラグインインストール先（Claude Code）                               |
+| `scripts/plugin-format-hook.sh` | プラグイン同梱の自己完結フォーマッター（リポジトリ上は `hooks/` ではなく `scripts/` 配下） | `hooks.json`（`${CLAUDE_PLUGIN_ROOT}/scripts/plugin-format-hook.sh`） |
 
 ### `plugin-format-hook.sh` の defer 挙動
 

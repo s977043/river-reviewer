@@ -274,7 +274,7 @@ river-review ships as a Claude Code plugin from a same-repo marketplace.
    /plugin marketplace add s977043/river-review
    ```
 
-   Pin to a tag if you want reproducible installs: `/plugin marketplace add s977043/river-review@v1.0.0`.
+   Pin to a tag if you want reproducible installs: `/plugin marketplace add s977043/river-review@v1.2.1`.
 
 2. Install the plugin:
 

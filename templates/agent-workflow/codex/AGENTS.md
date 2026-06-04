@@ -1,25 +1,30 @@
 # AGENTS.md — River Review integration
 
-## Prerequisite: the `river` CLI
+## Code review (primary: skill-driven, no CLI required)
 
-The commands below invoke the `river` CLI. Make sure it is available on `PATH`
-first — install it (`npm install -g river-review`) or run it via `npx river ...`.
-If the CLI is not installed, use the agent-skills under `skills/agent-skills/`
-directly instead of the CLI commands.
+Before finalizing any code change, review the diff using the bundled review skills
+under `skills/agent-skills/` — they are self-contained and need no external tooling.
+Load `skills/agent-skills/river-review/SKILL.md` (the orchestrator) and route to the
+relevant specialist skills (`river-review-code`, `-security`, `-performance`,
+`-architecture`, `-testing`, `adversarial-review`) based on the diff content.
 
-## Code review
+### Optional accelerator — the `river` CLI
 
-Before finalizing any code change, run River Review to catch issues:
+If the `river` CLI is available on `PATH`, you may use it to bootstrap structured
+findings. It is **optional**, not required:
 
 ```bash
 river run . --reviewers auto
 ```
 
-If neither the `ANTHROPIC_API_KEY` nor the `OPENAI_API_KEY` environment variable is set, use dry-run mode:
+If neither `ANTHROPIC_API_KEY` nor `OPENAI_API_KEY` is set, use dry-run mode:
 
 ```bash
 river run . --dry-run
 ```
+
+The CLI is distributed separately from this skill set; if it is not installed, rely on
+the skills above.
 
 ## When to invoke
 
