@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: s977043/river-review/runners/github-action@v1.2.1
+      - uses: s977043/river-review/runners/github-action@v1.2.2
         with:
           phase: midstream
           dry_run: true # 外部 API を呼び出す場合は false に設定
@@ -45,7 +45,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-> 安定性のために `@v1.2.1` のようなリリースタグを指定してください。
+> 安定性のために `@v1.2.2` のようなリリースタグを指定してください。
 
 ## スキルの準備
 
