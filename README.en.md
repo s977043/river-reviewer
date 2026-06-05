@@ -222,7 +222,9 @@ See [`pages/guides/repo-wide-review.md`](pages/guides/repo-wide-review.md) and [
 
 ### Local review run (river run .)
 
-- After installation, run `npx river run . --dry-run` to print skill selection and placeholder review comments for the current diff without sending anything externally (local mode is currently planning/preview only)
+> **Note**: the `river` CLI is [not yet published to npm](#getting-started), so `npx river` becomes available only after publishing. Inside the repo, run it with `npm run river -- ...`. The plugin review path is CLI-independent ([Installing the plugin](#installing-the-river-review-plugin)).
+
+- Inside the repo, run `npm run river -- run . --dry-run` (after the CLI is published: `npx river run . --dry-run`) to print skill selection and placeholder review comments for the current diff without sending anything externally (local mode is currently planning/preview only)
 - Add `--debug` to show merge base, changed files, token estimate, and a diff preview
 - Specify phase via `--phase upstream|midstream|downstream`; defaults to `RIVER_PHASE` env or `midstream`
 - Control contexts/dependencies (optional): set `RIVER_AVAILABLE_CONTEXTS=diff,tests` or `RIVER_AVAILABLE_DEPENDENCIES=code_search,test_runner` to skip skills that require unavailable inputs; if unset, dependency checks are bypassed for backward compatibility.
@@ -352,7 +354,7 @@ We organize content into four types, mapped by directory under `pages/` and serv
 
 ## Roadmap
 
-Following the concept refresh (2026-05), the roadmap is organized into the following seven epics. The Status column reflects v1.0.0 implementation reality.
+Following the concept refresh (2026-05), the roadmap is organized into the following seven epics. The Status column reflects the latest stable release.
 
 | Epic                                       | Description                                                                                                          | Status                                                                                                                                                                                                                                                                                                                                                                         |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
