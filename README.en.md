@@ -352,7 +352,7 @@ We organize content into four types, mapped by directory under `pages/` and serv
 
 ## Roadmap
 
-Following the concept refresh (2026-05), the roadmap is organized into the following seven epics. The Status column reflects v1.0.0 implementation reality.
+Following the concept refresh (2026-05), the roadmap is organized into the following seven epics. The Status column reflects the latest stable release.
 
 | Epic                                       | Description                                                                                                          | Status                                                                                                                                                                                                                                                                                                                                                                         |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

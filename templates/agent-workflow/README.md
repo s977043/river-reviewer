@@ -32,7 +32,7 @@ Codex supports the same plugin marketplace as Claude Code — both read the same
 codex plugin marketplace add s977043/river-review
 ```
 
-Pin a tag for reproducibility: `codex plugin marketplace add s977043/river-review@v1.2.1`.
+Pin a tag for reproducibility: `codex plugin marketplace add s977043/river-review@v1.2.2`.
 
 Codex reads its skills and interface metadata from the repo's `.codex-plugin/plugin.json`
 (the Codex-native manifest), so adding the marketplace natively registers the
@@ -72,4 +72,4 @@ curl -fsSL https://raw.githubusercontent.com/s977043/river-review/main/scripts/s
 The script is idempotent: re-running it refreshes the vendored skills and the
 `AGENTS.md` River Review section (delimited by `<!-- river-review:begin -->` /
 `<!-- river-review:end -->`) without duplicating content. Pin a tag for
-reproducibility by exporting `RIVER_REVIEW_REF=v1.2.1` before running.
+reproducibility by exporting `RIVER_REVIEW_REF=v1.2.2` before running.
