@@ -24,15 +24,15 @@ restructured to fit River Review's artifact-driven philosophy — a "synthesis p
 
 Following the repository convention (`.river/` etc.), pass the following artifacts:
 
-| artifact ID       | Format       | Role                                                       |
-| ----------------- | ------------ | ---------------------------------------------------------- |
-| `diff`            | patch / diff | Required. The diff of the PR                               |
-| `review-self`     | Markdown     | Optional. The implementer's self-review                    |
-| `review-external` | Markdown     | Optional. External AI / human review                       |
+| artifact ID       | Format       | Role                                                             |
+| ----------------- | ------------ | ---------------------------------------------------------------- |
+| `diff`            | patch / diff | Required. The diff of the PR                                     |
+| `review-self`     | Markdown     | Optional. The implementer's self-review                          |
+| `review-external` | Markdown     | Optional. External AI / human review                             |
 | `findings-pool`   | JSON         | Optional. Findings history aggregated from past Review Artifacts |
-| `fullFile`        | source       | Optional. Improves accuracy in the verification step       |
+| `fullFile`        | source       | Optional. Improves accuracy in the verification step             |
 
-For artifact definitions, see [`pages/reference/artifact-input-contract.md`](../reference/artifact-input-contract.md).
+For artifact definitions, see [Artifact Input Contract](../reference/artifact-input-contract.md).
 
 ## Output
 

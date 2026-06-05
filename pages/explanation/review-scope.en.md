@@ -21,13 +21,13 @@ The conceptual breakdown below remains valid; note that some targets do not map 
 
 ## Review targets
 
-| Target       | Timing        | What River Review checks                                                             | Typical inputs                              |
-| ------------ | ------------- | ----------------------------------------------------------------------------------- | ------------------------------------------- |
-| Requirements | Pre-execution | Whether goal, success criteria, scope, out-of-scope, and open questions are clear   | Issue, PBI, user request, acceptance criteria |
-| Design       | Pre-execution | Whether it is consistent with existing design, has proper separation, not over-built | ADR, design memo, architecture direction    |
-| Plan         | Pre-execution | Whether work breakdown, blast radius, risks, and test policy are in place           | Plan, Work Packet, verification policy       |
-| Diff         | Post-execution | Whether the implementation is consistent with requirements / design / plan          | PR diff, changed files, test diff           |
-| Report       | Post-execution | Whether rationale, verification results, open items, and evidence remain            | Final report, review results, verification logs |
+| Target       | Timing         | What River Review checks                                                             | Typical inputs                                  |
+| ------------ | -------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| Requirements | Pre-execution  | Whether goal, success criteria, scope, out-of-scope, and open questions are clear    | Issue, PBI, user request, acceptance criteria   |
+| Design       | Pre-execution  | Whether it is consistent with existing design, has proper separation, not over-built | ADR, design memo, architecture direction        |
+| Plan         | Pre-execution  | Whether work breakdown, blast radius, risks, and test policy are in place            | Plan, Work Packet, verification policy          |
+| Diff         | Post-execution | Whether the implementation is consistent with requirements / design / plan           | PR diff, changed files, test diff               |
+| Report       | Post-execution | Whether rationale, verification results, open items, and evidence remain             | Final report, review results, verification logs |
 
 ## Pre-execution review
 
@@ -97,10 +97,10 @@ Key viewpoints:
 
 River Review and PlanGate do not compete; they have different roles.
 
-| Tool         | Role                                                                                              |
-| ------------ | ------------------------------------------------------------------------------------------------- |
+| Tool         | Role                                                                                                |
+| ------------ | --------------------------------------------------------------------------------------------------- |
 | River Review | Reviews requirements / design / plan / diff / report and points out issues, risks, and missing info |
-| PlanGate     | Based on River Review results and plan info, decides go/no-go such as GO / NO-GO / NEEDS_REVISION |
+| PlanGate     | Based on River Review results and plan info, decides go/no-go such as GO / NO-GO / NEEDS_REVISION   |
 
 In other words, River Review **reviews**; PlanGate **blocks / passes**.
 
@@ -108,12 +108,12 @@ Even when PlanGate owns the pre-implementation gate, River Review can provide th
 
 ## Examples of when to use each
 
-| What you want to do                                                  | Review to use       |
-| -------------------------------------------------------------------- | ------------------- |
-| Check whether an Issue is at an implementable granularity            | Requirements Review |
-| Check whether the design direction conflicts with the architecture  | Design Review       |
-| Check whether a plan handed to an AI agent is sufficient             | Plan Review         |
-| Check whether the PR diff deviates from the plan                     | Diff Review         |
+| What you want to do                                                    | Review to use       |
+| ---------------------------------------------------------------------- | ------------------- |
+| Check whether an Issue is at an implementable granularity              | Requirements Review |
+| Check whether the design direction conflicts with the architecture     | Design Review       |
+| Check whether a plan handed to an AI agent is sufficient               | Plan Review         |
+| Check whether the PR diff deviates from the plan                       | Diff Review         |
 | Check whether the completion report retains verification and rationale | Report Review       |
 
 ## Important premise
