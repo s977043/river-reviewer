@@ -1,17 +1,19 @@
 # Using River Review from AI Agents
 
 > **Which entry point should I use?**
-> Use `river run .` from any shell (including non-Claude environments); use `/review-local` when you want River Review orchestrated by Claude Code with automatic context passing from the current session; use the sub-agent (`.claude/agents/river-review.md`) for delegated, headless review tasks within a Claude Code session where you want the review to run as a background step.
+> The primary, no-install entry point is the bundled **skill-routed review** — install the plugin and ask the `river-review` agent (or load the skills) to review your diff. Use `/review-local` when you want River Review orchestrated by Claude Code with automatic context passing from the current session; use the sub-agent (`.claude/agents/river-review.md`) for delegated, headless review tasks. The `river` CLI (`river run .`) is an **optional accelerator**, distributed separately and not yet published to npm.
 
 ## Overview
 
-River Review is a CLI-based tool, so it works with any AI agent — Claude Code, Cursor, Codex CLI, GitHub Copilot, and others. Regardless of which agent you use, all it takes is a call to `river run .`.
+River Review ships as a **Claude Code / Codex plugin**. The primary entry point is the bundled **skill-routed review** — the `river-review` orchestrator agent plus the specialist skills under `skills/agent-skills/` — which needs no external tooling. It works with any AI agent that can read the skills (Claude Code, Cursor, Codex CLI, GitHub Copilot, and others).
+
+The `river` CLI is an **optional accelerator** for producing structured findings. It is distributed separately from the plugin and is **not yet published to npm**, so it is not a required step.
 
 ---
 
-## Common Commands (Agent-Independent)
+## Optional: the `river` CLI
 
-The following commands work the same way regardless of which agent you use.
+If the `river` CLI is available on your `PATH`, these commands accelerate a review. They are optional — the skill-routed review above does not require them.
 
 ```bash
 # Review the local diff
