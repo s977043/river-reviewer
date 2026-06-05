@@ -3,10 +3,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { loadSkills } from '../runners/core/skill-loader.mjs';
 
-const OUTPUT_PATHS = [
-  path.resolve('docs/skills-catalog.md'),
-  path.resolve('pages/reference/skills-catalog.md'),
-];
+// docs/skills-catalog.md was removed as a duplicate; the canonical catalog lives
+// under pages/reference/ (rendered on the docs site).
+const OUTPUT_PATHS = [path.resolve('pages/reference/skills-catalog.md')];
 
 function formatJoined(items, { separator }) {
   if (!items?.length) return '';
