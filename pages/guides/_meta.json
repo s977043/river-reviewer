@@ -16,6 +16,7 @@
   "validate-skill-schema": "スキルスキーマを検証する",
   "choose-skills": "スキルの選択と組み合わせ",
   "debug-skill-routing": "スキルルーティングのデバッグ",
+  "manage-skills-cli": "スキルを import / export / list する（CLI）",
   "agent-workflow": "AI エージェントから River Review を使う",
   "w-check": "W チェック（二重レビュー）",
   "repo-wide-review": "リポジトリ全体を踏まえたレビューの導入とチューニング",
