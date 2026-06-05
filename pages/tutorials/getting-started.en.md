@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: s977043/river-review/runners/github-action@v1.2.1
+      - uses: s977043/river-review/runners/github-action@v1.2.2
         with:
           phase: midstream
           dry_run: true # set false to call external APIs
@@ -32,7 +32,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
 
-> Pin to a release tag such as `@v1.2.1` for stability.
+> Pin to a release tag such as `@v1.2.2` for stability.
 
 ## 2. Run the review
 

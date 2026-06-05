@@ -182,7 +182,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run River Review (midstream)
-        uses: s977043/river-review/runners/github-action@v1.2.1
+        uses: s977043/river-review/runners/github-action@v1.2.2
         with:
           phase: midstream # upstream|midstream|downstream|all (future-ready)
         env:
@@ -268,7 +268,7 @@ river-review ships as a Claude Code plugin from a same-repo marketplace.
    /plugin marketplace add s977043/river-review
    ```
 
-   Pin to a tag if you want reproducible installs: `/plugin marketplace add s977043/river-review@v1.2.1`.
+   Pin to a tag if you want reproducible installs: `/plugin marketplace add s977043/river-review@v1.2.2`.
 
 2. Install the plugin:
 
@@ -304,7 +304,7 @@ Codex also supports the same plugin marketplace. Both tools share the same `.cla
 codex plugin marketplace add s977043/river-review
 ```
 
-Pin to a tag if you want reproducible installs: `codex plugin marketplace add s977043/river-review@v1.2.1`.
+Pin to a tag if you want reproducible installs: `codex plugin marketplace add s977043/river-review@v1.2.2`.
 
 Codex reads its skills and interface metadata from the repo's `.codex-plugin/plugin.json` (the Codex-native manifest). Adding the marketplace natively registers the specialist review skills (`river-review-code` / `-security` / `-performance` / `-architecture` / `-testing` / `adversarial-review`).
 
