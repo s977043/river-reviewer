@@ -403,7 +403,7 @@ river-review は同一リポジトリ内のマーケットプレイスから Cla
 
 - コマンド: `/river-review:review-local`, `/river-review:challenge`, `/river-review:skill`, `/river-review:check`, `/river-review:pr`
 - エージェント: `river-review`（スキルルーティング型のコードレビュー・オーケストレーター）
-- スキル: オーケストレーターに加えて `river-review-code`, `river-review-security`, `river-review-performance`, `river-review-architecture`, `river-review-testing`, `adversarial-review`—`/river-review:<skill-name>` で呼び出せます
+- スキル: オーケストレーターに加えて `river-review-code`, `river-review-security`, `river-review-performance`, `river-review-architecture`, `river-review-testing`, `adversarial-review`, `river-review-docs`—`/river-review:<skill-name>` で呼び出せます
 
 管理: `/plugin enable|disable|uninstall river-review@river-review-marketplace`。
 
@@ -423,7 +423,7 @@ codex plugin marketplace add s977043/river-review
 
 再現可能なインストールが必要ならタグを固定します: `codex plugin marketplace add s977043/river-review@v1.2.2`。
 
-Codex は skills と interface メタデータをリポジトリ同梱の `.codex-plugin/plugin.json`（Codex ネイティブ manifest）から読み込みます。マーケットプレイス追加時に、専門レビュー skill（`river-review-code` / `-security` / `-performance` / `-architecture` / `-testing` / `adversarial-review`）がネイティブに登録されます。
+Codex は skills と interface メタデータをリポジトリ同梱の `.codex-plugin/plugin.json`（Codex ネイティブ manifest）から読み込みます。マーケットプレイス追加時に、専門レビュー skill（`river-review-code` / `-security` / `-performance` / `-architecture` / `-testing` / `adversarial-review` / `-docs`）がネイティブに登録されます。
 
 #### 代替手段: 手動コピーイン（フォールバック）
 
