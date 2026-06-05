@@ -48,7 +48,7 @@ Run saved: 2026-06-06T08-30-00-000Z-a1b2c3 → /path/to/repo/.river/runs/2026-06
 - `findings`（指摘）/ `suppressedFindings`（抑制された指摘）
 - `finalSummary`: `findingsCount` / `suppressedCount` / `overviewCount` / `changedFilesCount` / `tokenEstimate`
 
-## 2. 保存済み実行の一覧（`river runs list`)
+## 2. 保存済み実行の一覧（`river runs list`）
 
 Run store に保存された実行を新しい順で表示します。
 
@@ -65,7 +65,7 @@ Stored runs (/path/to/repo/.river/runs):
 
 保存済み実行がない場合は `No stored runs found in ...` と表示されます。
 
-## 3. 2 つの実行を比較する（`river runs diff`)
+## 3. 2 つの実行を比較する（`river runs diff`）
 
 保存済みの 2 実行を `runId` で指定し、指摘の回帰を比較します。
 
@@ -85,9 +85,9 @@ river runs diff 2026-06-05T17-10-00-000Z-d4e5f6 2026-06-06T08-30-00-000Z-a1b2c3
 
 New / Resolved / Score changes の各セクションには、対象ファイルと指摘内容が一覧表示されます。
 
-> 指摘の同一性は fingerprint で判定されます。ファイル位置やルールが同じ指摘は同一とみなされます。
+> 指摘の同一性は fingerprint で判定されます。ファイルパス・ルール・指摘内容（メッセージ要旨）が同じ指摘は同一とみなされ、行番号のズレは無視されます。
 
-## 4. 集計ダッシュボード（`river runs summary`)
+## 4. 集計ダッシュボード（`river runs summary`）
 
 Run store 全体を集計した Markdown ダッシュボードを表示します。
 
@@ -109,7 +109,7 @@ river runs summary
 
 加えて、Severity / Confidence の分布表が出力されます。複数実行を横断した品質トレンドの把握に使います。
 
-## 5. 任意の baseline と比較する（`--baseline`)
+## 5. 任意の baseline と比較する（`--baseline`）
 
 `runs diff` が「保存済み 2 実行の比較」なのに対し、`--baseline` は **新しく実行した結果を、任意の過去レビュー JSON と比較**します。`main` ブランチ等で生成した基準（baseline）をファイルとして持っておき、PR ブランチで回帰チェックする用途に向きます。
 
@@ -143,7 +143,7 @@ river run . --baseline ./baseline-findings.json
 PR で指摘が純増したら気付けるようにする最小例です。
 
 ```bash
-# 基準（main の findings）を成果物として持っている前提
+# 基準（main の指摘）を成果物として持っている前提
 river run . --baseline ./baseline-findings.json --save
 ```
 

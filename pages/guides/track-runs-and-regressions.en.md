@@ -85,7 +85,7 @@ It prints a `## Regression Review Summary` Markdown block.
 
 The New / Resolved / Score changes sections list the affected file and the finding content.
 
-> Finding identity is determined by a fingerprint. Findings with the same file location and rule are treated as identical.
+> Finding identity is determined by a fingerprint. Findings with the same file path, rule, and message gist are treated as identical; line-number shifts are ignored.
 
 ## 4. Aggregate dashboard (`river runs summary`)
 
