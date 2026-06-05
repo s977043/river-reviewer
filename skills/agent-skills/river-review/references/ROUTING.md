@@ -31,6 +31,11 @@ River Review のルーティングロジックの詳細です。
 - 日本語: 敵対的, 壁打ち, プレモーテム, 失敗分析, 攻撃, ウォーゲーム, 論理検証, バイアス
 - 英語: adversarial, challenge, pre-mortem, war-game, logic, bias, devil's advocate
 
+### ドキュメント (river-review-docs)
+
+- 日本語: ドキュメント, ドキュメンテーション, README, 翻訳, i18n, 用語, 整合性, 使い方
+- 英語: docs, documentation, README, translation, i18n, terminology, consistency, usage
+
 ### 一般コード (river-review-code) - デフォルト
 
 上記のいずれにも該当しない場合、一般コードレビューを実行します。

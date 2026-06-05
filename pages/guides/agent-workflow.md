@@ -131,6 +131,7 @@ Codex は skills と interface メタデータをリポジトリ同梱の `.code
 | `river-review-testing`      | テストカバレッジ                                            |
 | `river-review-architecture` | アーキテクチャレビュー                                      |
 | `adversarial-review`        | 逆張りレビュー（前提を疑う）                                |
+| `river-review-docs`         | ドキュメント整合性レビュー（README / 翻訳 / 用語）          |
 
 エージェントに skill を渡す際は、`skills/agent-skills/<skill-name>/SKILL.md` を読み込ませてください。
 

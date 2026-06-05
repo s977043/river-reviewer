@@ -127,6 +127,7 @@ Any environment that can execute shell commands can call `river run .` directly.
 | `river-review-testing`      | Test coverage review                                               |
 | `river-review-architecture` | Architecture review                                                |
 | `adversarial-review`        | Adversarial review (challenge assumptions)                         |
+| `river-review-docs`         | Documentation consistency review (README / i18n / terminology)     |
 
 To use a skill with an agent, load `skills/agent-skills/<skill-name>/SKILL.md` into the agent's context.
 

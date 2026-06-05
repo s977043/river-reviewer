@@ -288,7 +288,7 @@ What you get (namespaced by plugin name):
 
 - Commands: `/river-review:review-local`, `/river-review:challenge`, `/river-review:skill`, `/river-review:check`, `/river-review:pr`
 - Agent: `river-review` (skill-routed code-review orchestrator)
-- Skills: the orchestrator plus `river-review-code`, `river-review-security`, `river-review-performance`, `river-review-architecture`, `river-review-testing`, and `adversarial-review` — addressable as `/river-review:<skill-name>`
+- Skills: the orchestrator plus `river-review-code`, `river-review-security`, `river-review-performance`, `river-review-architecture`, `river-review-testing`, `adversarial-review`, and `river-review-docs` — addressable as `/river-review:<skill-name>`
 
 Manage: `/plugin enable|disable|uninstall river-review@river-review-marketplace`.
 
@@ -308,7 +308,7 @@ codex plugin marketplace add s977043/river-review
 
 Pin to a tag if you want reproducible installs: `codex plugin marketplace add s977043/river-review@v1.2.2`.
 
-Codex reads its skills and interface metadata from the repo's `.codex-plugin/plugin.json` (the Codex-native manifest). Adding the marketplace natively registers the specialist review skills (`river-review-code` / `-security` / `-performance` / `-architecture` / `-testing` / `adversarial-review`).
+Codex reads its skills and interface metadata from the repo's `.codex-plugin/plugin.json` (the Codex-native manifest). Adding the marketplace natively registers the specialist review skills (`river-review-code` / `-security` / `-performance` / `-architecture` / `-testing` / `adversarial-review` / `-docs`).
 
 #### Alternative: manual copy-in (fallback)
 
