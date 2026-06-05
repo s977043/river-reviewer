@@ -27,6 +27,10 @@ The selected roles are reported in the `autoSelectedRoles` field of the JSON out
 }
 ```
 
+### Large-diff chunking and finding deduplication
+
+When reviewing with multiple roles (including `auto`), large diffs are automatically split into chunks and run in parallel as role × chunk. Findings from each run are deduplicated across chunks and roles before final IDs are assigned (implemented in `src/lib/reviewer-orchestrator.mjs` as `splitDiffIntoChunks` / `deduplicateFindings`), so duplicate findings on the same location are collapsed into one.
+
 ## Commands
 
 - Agents: `npm run agents:validate` (or `node scripts/validate-agents.mjs`)
