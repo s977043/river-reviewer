@@ -41,7 +41,7 @@ Place `.river-review.json` in the repository root to customize review model sett
   - `tokenizer`: Only `heuristic` is accepted (reserved for future expansion).
 - `artifacts`
   - Declares paths to input artifacts. Accepts these 12 IDs: `pbi-input` / `plan` / `todo` / `test-cases` / `review-self` / `review-external` / `diff` / `junit` / `coverage` / `lint` / `typecheck` / `findings-pool`.
-  - Each value is a string path, or an object `{ "path": "...", "optional": true }`.
+  - Each value is a string path, or an object `{ "path": "...", "optional": <boolean> }` (`optional` is a boolean).
   - Unknown keys are accepted for forward compatibility (catchall). See the [Artifact Input Contract](./artifact-input-contract.md) for the resolution order and per-artifact contract.
 
 ### Configuration Example

@@ -101,7 +101,7 @@ river runs summary
 
 ### `--baseline`: 過去のレビューと回帰比較する
 
-`--baseline <path>` に過去のレビュー JSON（`findings` 配列）を渡すと、通常の出力の前に回帰サマリ（new / fixed findings）を表示します。
+`--baseline <path>` に過去のレビュー JSON を渡すと、通常の出力の前に回帰サマリ（new / fixed findings）を表示します。JSON は `findings` 配列そのもの、または `findings`（あるいは `issues`）キーを持つオブジェクト（例: `river run . --output json` の出力）のいずれでも受け付けます。
 
 ```bash
 # 1. 基準となるレビューを JSON で保存する
