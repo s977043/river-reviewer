@@ -4,7 +4,7 @@ title: Import / export / list skills (CLI)
 
 River Review can convert between Agent Skills (`SKILL.md` packages) and River Review-format skills, and list them. The `river skills import|export|list` subcommands let you bring in external Agent Skills, write your own skills out in Agent Skills format, and inspect which skills are currently recognized.
 
-> For the skill definition format itself, see the [Manifest-driven Skills guide](./agent-skills-codex-cli.en.md); for validation, see [Validate the skill schema](./validate-skill-schema.en.md). This page focuses only on the import / export / list CLI.
+> For the skill definition format itself, see the [Manifest-driven Skills guide](./agent-skills-codex-cli.md); for validation, see [Validate the skill schema](./validate-skill-schema.md). This page focuses only on the import / export / list CLI.
 
 ## 1. Inspect the skill list (`skills list`)
 
@@ -108,6 +108,6 @@ On completion, the counts of "exported / failed" are printed. If `failed` is one
 
 ## Related pages
 
-- [Manifest-driven Skills guide](./agent-skills-codex-cli.en.md) — skill definition format (Markdown / YAML)
-- [Add a new skill (quickest path)](./add-new-skill.en.md)
-- [Validate the skill schema](./validate-skill-schema.en.md)
+- [Manifest-driven Skills guide](./agent-skills-codex-cli.md) — skill definition format (Markdown / YAML)
+- [Add a new skill (quickest path)](./add-new-skill.md)
+- [Validate the skill schema](./validate-skill-schema.md)
