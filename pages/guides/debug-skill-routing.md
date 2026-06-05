@@ -12,7 +12,7 @@
    ✔ skills/midstream/rr-midstream-security-001/SKILL.md — OK
    ✔ skills/midstream/rr-midstream-perf-001/SKILL.md — OK
    ... (省略)
-   All 42 skills passed validation.
+   All N skills passed validation.
 
    # 失敗時の出力例（未知の phase 値）
    $ npm run skills:validate
