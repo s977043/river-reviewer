@@ -74,6 +74,43 @@ jobs:
 
 前回のアーティファクトを自動ダウンロードし、更新後にアップロードします（90 日 retention）。メモリが見つからない場合も正常動作します（stateless fallback）。
 
+## レビュー実行を保存して比較する（result store）
+
+レビュー実行を保存し、過去の実行と回帰比較できます。result store はメモリ（`.river/memory/`）とは別の `.river/runs/` に保存されます。
+
+### `--save`: 実行を保存する
+
+`river run` に `--save` を付けると、その実行を result store（`.river/runs/`）に保存します。
+
+```bash
+river run . --reviewers auto --save
+```
+
+### `river runs`: 保存済み実行を確認する
+
+```bash
+# 保存済み実行の一覧（runId / phase / findings 数など）
+river runs list
+
+# 2 つの実行の差分（new / fixed findings）
+river runs diff <run-id-1> <run-id-2>
+
+# 集計（ダッシュボード相当のメトリクス）
+river runs summary
+```
+
+### `--baseline`: 過去のレビューと回帰比較する
+
+`--baseline <path>` に過去のレビュー JSON（`findings` 配列）を渡すと、通常の出力の前に回帰サマリ（new / fixed findings）を表示します。
+
+```bash
+# 1. 基準となるレビューを JSON で保存する
+river run . --output json > baseline.json
+
+# 2. 現在の差分を基準と比較する
+river run . --baseline baseline.json
+```
+
 ## レコード型
 
 | type          | 用途                                          |

@@ -32,6 +32,10 @@ JSON 出力の `autoSelectedRoles` フィールドで選択されたロールを
 }
 ```
 
+### 大きな diff の分割と findings の重複排除
+
+複数のロール（`auto` を含む）でレビューする場合、大きな diff は自動的にチャンクに分割され、ロール × チャンクで並列実行されます。各実行から得られた findings は、最終 ID を割り当てる前にチャンク・ロール間で重複排除されます（実装: `src/lib/reviewer-orchestrator.mjs` の `splitDiffIntoChunks` / `deduplicateFindings`）。このため、同一箇所の重複指摘は 1 件に統合されます。
+
 ## コマンド
 
 - Agents: `npm run agents:validate` (または `node scripts/validate-agents.mjs`)

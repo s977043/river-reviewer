@@ -74,6 +74,43 @@ jobs:
 
 It automatically downloads the previous artifact and uploads the updated version (90-day retention). If no memory is found, the system operates normally (stateless fallback).
 
+## Save and compare review runs (result store)
+
+You can persist review runs and compare them against earlier runs for regression. The result store lives in `.river/runs/`, separate from memory (`.river/memory/`).
+
+### `--save`: persist a run
+
+Add `--save` to `river run` to persist the run to the result store (`.river/runs/`).
+
+```bash
+river run . --reviewers auto --save
+```
+
+### `river runs`: inspect stored runs
+
+```bash
+# List stored runs (runId / phase / findings count, etc.)
+river runs list
+
+# Diff two runs (new / fixed findings)
+river runs diff <run-id-1> <run-id-2>
+
+# Aggregate metrics (dashboard-equivalent)
+river runs summary
+```
+
+### `--baseline`: regression-compare against a previous review
+
+Pass a previous review JSON (a `findings` array) to `--baseline <path>` to print a regression summary (new / fixed findings) before the normal output.
+
+```bash
+# 1. Save a baseline review as JSON
+river run . --output json > baseline.json
+
+# 2. Compare the current diff against the baseline
+river run . --baseline baseline.json
+```
+
 ## Record Types
 
 | type          | Purpose                                                       |

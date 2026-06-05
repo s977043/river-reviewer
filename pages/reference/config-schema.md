@@ -48,6 +48,10 @@
   - `ranking.enabled`: `true` で変更ファイルへの近接度に基づいた候補並び替えを有効化する。
   - `ranking.weights`: `pathProximity` / `symbolUsage` / `siblingTest` / `commitRecency` を `0.0`〜`1.0` で指定する。省略時は等重みを使用する。
   - `tokenizer`: `heuristic` のみ受理する（将来拡張用）。
+- `artifacts`
+  - 入力アーティファクトのパスを宣言するセクション。次の 12 ID を受け付ける: `pbi-input` / `plan` / `todo` / `test-cases` / `review-self` / `review-external` / `diff` / `junit` / `coverage` / `lint` / `typecheck` / `findings-pool`。
+  - 各値は文字列パス、または `{ "path": "...", "optional": true }` のオブジェクトで指定する。
+  - 未知のキーは将来互換のため受理される（catchall）。解決順序と各アーティファクトの契約は [Artifact Input Contract](./artifact-input-contract.md) を参照。
 
 ### 設定例
 
