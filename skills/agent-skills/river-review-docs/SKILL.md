@@ -17,7 +17,7 @@ applyTo:
   - 'pages/**/*'
 inputContext: [diff, fullFile]
 outputKind: [findings, actions]
-tags: [docs, documentation, i18n, entry, routing]
+tags: [docs, documentation, i18n]
 version: 0.1.0
 license: MIT
 ---
@@ -43,9 +43,15 @@ license: MIT
 
 ## Output / 出力
 
-- 各指摘は `severity` / `file` / `line` / `message` を含む finding として出力する。
-- ドキュメントと実装の不一致は、対応する実装側の根拠（ファイル・行）を evidence として示す。
-- 差分に存在しない箇所への推測に基づく指摘は行わない。
+他の専門スキルと同じ finding 契約に従って出力する。各 finding には以下を含める。
+
+- `severity`（`critical` / `major` / `minor` / `info`）/ `file` / `line` / `message`（Finding 本文）
+- `impact`: そのドキュメント不整合が読者・利用者に与える影響
+- `fix`: 推奨する修正（どのドキュメントをどう直すか）
+- `evidence`: ドキュメントと実装の不一致では、対応する実装側の根拠（ファイル・行・該当記述）
+- `confidence`: 確信度（推測が含まれる場合は明示する）
+
+差分に存在しない箇所への推測に基づく指摘は行わない。
 
 ## Notes / 注意
 
