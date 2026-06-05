@@ -1,17 +1,19 @@
 # AI エージェントから River Review を使う
 
 > **どのエントリポイントを使うか**
-> Use `river run .` from any shell (including non-Claude environments); use `/review-local` when you want River Review orchestrated by Claude Code with automatic context passing from the current session; use the sub-agent (`.claude/agents/river-review.md`) for delegated, headless review tasks within a Claude Code session where you want the review to run as a background step.
+> 第一の（インストール不要の）エントリポイントは、同梱の **skill ルーティングレビュー** です。プラグインを導入し、`river-review` エージェントに diff のレビューを依頼する（または skill を読み込ませる）だけで動きます。Claude Code のセッションコンテキストを自動で渡したい場合は `/review-local`、ヘッドレスな委譲レビューには sub-agent（`.claude/agents/river-review.md`）を使ってください。`river` CLI（`river run .`）は **任意の高速化手段** で、プラグインとは別配布、かつ現時点では npm 未公開です。
 
 ## 概要
 
-River Review は CLI ベースのツールなので、Claude Code / Cursor / Codex CLI / GitHub Copilot などどの AI エージェントからも利用できます。エージェントの種類に関わらず、`river run .` コマンドを呼び出すだけで動きます。
+River Review は **Claude Code / Codex プラグイン** として配布されます。第一のエントリポイントは、同梱の **skill ルーティングレビュー**（`river-review` オーケストレーターエージェント + `skills/agent-skills/` 配下の専門 skill）で、外部ツールを必要としません。skill を読み込める AI エージェント（Claude Code / Cursor / Codex CLI / GitHub Copilot ほか）であれば利用できます。
+
+`river` CLI は構造化された findings を得るための **任意の高速化手段** です。プラグインとは別配布で、**現時点では npm 未公開**のため、必須の手順ではありません。
 
 ---
 
-## 共通の基本操作
+## 任意: `river` CLI
 
-以下のコマンドは**エージェントの種類に依存しない**共通操作です。
+`river` CLI が `PATH` 上にある場合、以下のコマンドでレビューを高速化できます。これらは任意で、上記の skill ルーティングレビューには不要です。
 
 ```bash
 # ローカルの diff をレビュー
