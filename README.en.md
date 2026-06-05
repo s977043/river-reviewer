@@ -49,7 +49,7 @@ In AI-assisted workflows, River Review acts as the **team-owned audit layer**: i
 
 The shortest no-install path is the bundled plugin: add the marketplace and ask the `river-review` agent to review the current diff — see [Installing the river-review plugin](#installing-the-river-review-plugin). For CI, use GitHub Actions ([Quick start](#quick-start-github-actions)).
 
-> **Once the `river` CLI is published** you will also be able to try it locally with `npx river run . --dry-run`. The npm publish workflow and `publishConfig` are implemented ([#942](https://github.com/s977043/river-review/pull/942)); the package is **not yet on npm** — publishing is enabled by setting the `NPM_TOKEN` secret ([#800](https://github.com/s977043/river-review/issues/800)). Until then, use the plugin or GitHub Actions paths above.
+> **Once the `river` CLI is published**, you will also be able to try it locally with `npx river run . --dry-run`. The npm publish workflow and `publishConfig` are implemented ([#942](https://github.com/s977043/river-review/pull/942)); the package is **not yet on npm** — publishing is enabled by setting the `NPM_TOKEN` secret ([#800](https://github.com/s977043/river-review/issues/800)). Until then, use the plugin or GitHub Actions paths above.
 
 | Goal                                    | Destination                                                                             |
 | --------------------------------------- | --------------------------------------------------------------------------------------- |

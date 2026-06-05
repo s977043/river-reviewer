@@ -1,7 +1,7 @@
 # AI エージェントから River Review を使う
 
 > **どのエントリポイントを使うか**
-> 第一の（インストール不要の）エントリポイントは、同梱の **skill ルーティングレビュー** です。プラグインを導入し、`river-review` エージェントに diff のレビューを依頼する（または skill を読み込ませる）だけで動きます。Claude Code のセッションコンテキストを自動で渡したい場合は `/review-local`、ヘッドレスな委譲レビューには sub-agent（`.claude/agents/river-review.md`）を使ってください。`river` CLI（`river run .`）は **任意の高速化手段** で、プラグインとは別配布、かつ現時点では npm 未公開です。
+> 第一の（インストール不要の）エントリポイントは、同梱の **skill ルーティングレビュー** です。プラグインを導入し、`river-review` エージェントに diff のレビューを依頼する（または skill を読み込ませる）だけで動きます。Claude Code のセッションコンテキストを自動で渡したい場合は `/review-local`、ヘッドレスな委譲レビューにはサブエージェント（`.claude/agents/river-review.md`）を使ってください。`river` CLI（`river run .`）は **任意の高速化手段** で、プラグインとは別配布、かつ現時点では npm 未公開です。
 
 ## 概要
 
