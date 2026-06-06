@@ -96,6 +96,50 @@ export function createSkillValidator(schema) {
   return ajv.compile(schema);
 }
 
+/**
+ * Read the named skill bundles declared under `recommendations:` in
+ * skills/registry.yaml. These are maintainer-curated sets (basic, typescript,
+ * comprehensive, ...) that `--skill-set <name>` exposes for selective runs.
+ *
+ * @param {{ skillsDir?: string }} [options]
+ * @returns {Promise<Record<string, { description?: string, skills: string[] }>>}
+ */
+export async function loadRecommendationSets({ skillsDir = defaultSkillsDir } = {}) {
+  const registryPath = path.join(skillsDir, 'registry.yaml');
+  let raw;
+  try {
+    raw = await fs.readFile(registryPath, 'utf8');
+  } catch {
+    return {};
+  }
+  let parsed;
+  try {
+    parsed = yaml.load(raw) ?? {};
+  } catch (err) {
+    throw new SkillLoaderError(`Failed to parse skill registry at ${registryPath}: ${err.message}`);
+  }
+  const recommendations = parsed?.recommendations;
+  return recommendations && typeof recommendations === 'object' ? recommendations : {};
+}
+
+/**
+ * Resolve a recommendation set name to its skill id list.
+ *
+ * @param {string} name
+ * @param {{ skillsDir?: string }} [options]
+ * @returns {Promise<string[]>} skill ids in the set
+ * @throws {SkillLoaderError} when the name is not a known recommendation set
+ */
+export async function resolveRecommendationSet(name, { skillsDir = defaultSkillsDir } = {}) {
+  const sets = await loadRecommendationSets({ skillsDir });
+  const entry = sets[name];
+  if (!entry || !Array.isArray(entry.skills)) {
+    const available = Object.keys(sets).sort().join(', ') || '(none)';
+    throw new SkillLoaderError(`Unknown skill set "${name}". Available sets: ${available}.`);
+  }
+  return entry.skills.filter((id) => typeof id === 'string' && id.length > 0);
+}
+
 export async function listSkillFiles(dir = defaultSkillsDir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = [];

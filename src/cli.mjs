@@ -12,7 +12,7 @@ import {
   findMergeBase,
 } from './lib/git.mjs';
 import { doctorLocalReview, planLocalReview, runLocalReview } from './lib/local-runner.mjs';
-import { SkillLoaderError } from '../runners/core/skill-loader.mjs';
+import { SkillLoaderError, resolveRecommendationSet } from '../runners/core/skill-loader.mjs';
 import { collectRepoDiff } from './lib/diff.mjs';
 import { renderDiffText } from './lib/diff-optimizer.mjs';
 import CostEstimator from './core/cost-estimator.mjs';
@@ -76,6 +76,8 @@ Options:
                     Use "auto" to select roles automatically based on diff content and risk signals.
   --baseline <path> Path to a previous review JSON (findings array) for regression comparison
   --base <ref>      Branch or ref to diff against (e.g. main). Default: auto-detected default branch
+  --skill-set <name> Restrict review to a named skill set from skills/registry.yaml
+                    (e.g. basic, typescript, comprehensive). Default: all applicable skills
   --save            Persist the review run to the project result store (.river/runs/)
 
 Commands:
@@ -111,6 +113,7 @@ function parseArgs(argv) {
     reviewers: null,
     baseline: null,
     base: null,
+    skillSet: null,
     save: false,
     // runs subcommand fields
     runsSubcommand: null,
@@ -465,6 +468,18 @@ function parseArgs(argv) {
         break;
       }
       parsed.base = value;
+      continue;
+    }
+    if (arg === '--skill-set') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error(
+          'Error: --skill-set option requires a name (e.g. --skill-set comprehensive).'
+        );
+        parsed.command = 'help';
+        break;
+      }
+      parsed.skillSet = value;
       continue;
     }
     if (arg === '--save') {
@@ -1290,6 +1305,21 @@ Dependencies: ${
       return 0;
     }
 
+    // Resolve --skill-set to its skill ids up front so an unknown name fails
+    // fast with a clear message before any review work begins.
+    let skillIds = null;
+    if (parsed.skillSet) {
+      try {
+        skillIds = await resolveRecommendationSet(parsed.skillSet);
+      } catch (err) {
+        if (err instanceof SkillLoaderError) {
+          console.error(`Error: ${err.message}`);
+          return 1;
+        }
+        throw err;
+      }
+    }
+
     const context = await planLocalReview({
       cwd: targetPath,
       phase: parsed.phase,
@@ -1299,6 +1329,7 @@ Dependencies: ${
       availableDependencies: parsed.availableDependencies,
       plannerMode: parsed.plannerMode,
       baseRef: parsed.base,
+      skillIds,
     });
 
     const estimator = new CostEstimator(
@@ -1374,6 +1405,7 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
       reviewers: parsed.reviewers,
       baseRef: parsed.base,
+      skillIds,
     });
 
     // Persist run to result store when --save is provided
