@@ -110,6 +110,37 @@ test('buildPrompt injects project rules when provided', () => {
   assert.match(prompt, /Use App Router/);
 });
 
+test('buildPrompt injects PR Description section when prBody provided', () => {
+  const { prompt } = buildPrompt({
+    diffText,
+    diffFiles: diff.files,
+    plan,
+    phase: 'midstream',
+    prBody: '## Why\nFix the login bug\n## What\nGuard null user',
+  });
+  assert.match(prompt, /PR Description/);
+  assert.match(prompt, /Fix the login bug/);
+  assert.match(prompt, /PR-DESCRIPTION:0/);
+});
+
+test('buildPrompt omits PR Description section when prBody is absent or blank', () => {
+  const withoutBody = buildPrompt({
+    diffText,
+    diffFiles: diff.files,
+    plan,
+    phase: 'midstream',
+  }).prompt;
+  const blankBody = buildPrompt({
+    diffText,
+    diffFiles: diff.files,
+    plan,
+    phase: 'midstream',
+    prBody: '   \n  ',
+  }).prompt;
+  assert.doesNotMatch(withoutBody, /PR Description/);
+  assert.doesNotMatch(blankBody, /PR Description/);
+});
+
 test('generateReview: verifier stats exist in debug output', async () => {
   const result = await generateReview({
     diff: { diffText: '+const x = 1;', files: [], changedFiles: [] },

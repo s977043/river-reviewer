@@ -104,6 +104,17 @@ function buildProjectRulesSection(rulesText) {
   return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
 }
 
+const MAX_PR_BODY_CHARS = 4000;
+
+function buildPrDescriptionSection(prBody) {
+  if (typeof prBody !== 'string' || !prBody.trim()) return '';
+  const body =
+    prBody.length > MAX_PR_BODY_CHARS
+      ? `${prBody.slice(0, MAX_PR_BODY_CHARS)}\n...[truncated]`
+      : prBody;
+  return `\n### PR Description\n\n以下はこの変更の PR 本文です。差分そのものに加えて、PR 本文がレビュー可能な状態かを確認してください。\n\n- Why（変更理由）と What（変更内容）が書かれているか\n- 本文の説明が差分と一致しているか（説明にあるが差分に無い／差分にあるが説明に無い）\n- 影響範囲が書かれているか\n- テスト方針・確認方法が書かれているか\n- 関連 Issue / 仕様 / 設計へのリンクがあるか\n\nPR 本文に関する指摘は、対象を \`PR-DESCRIPTION:0\` として出力してください。\n\n---\n${body}\n---\n`;
+}
+
 function buildADRContextSection(relatedADRs) {
   if (!relatedADRs?.length) return '';
   const lines = ['\n### Related ADRs/Specs\n'];
@@ -148,6 +159,7 @@ export function buildPrompt({
   relatedADRs,
   reviewMode,
   repoContext,
+  prBody,
   maxChars = MAX_PROMPT_CHARS,
   config = defaultConfig,
 }) {
@@ -167,7 +179,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${buildRepoContextSection(repoContext)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${buildRepoContextSection(repoContext)}${buildPrDescriptionSection(prBody)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -463,6 +475,7 @@ export async function generateReview({
   riskAssessment,
   reviewMode,
   repoContext,
+  prBody,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -477,6 +490,7 @@ export async function generateReview({
     riskAssessment,
     reviewMode,
     repoContext,
+    prBody,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });
