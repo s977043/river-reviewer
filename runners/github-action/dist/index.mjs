@@ -31597,6 +31597,17 @@ function buildProjectRulesSection(rulesText) {
   return `\n### Project-specific review rules\n\n以下は、このリポジトリ専用のレビューガイドラインです。必ず考慮してください。\n\n---\n${rulesText}\n---\n`;
 }
 
+const MAX_PR_BODY_CHARS = 4000;
+
+function buildPrDescriptionSection(prBody) {
+  if (!prBody || !prBody.trim()) return '';
+  const body =
+    prBody.length > MAX_PR_BODY_CHARS
+      ? `${prBody.slice(0, MAX_PR_BODY_CHARS)}\n...[truncated]`
+      : prBody;
+  return `\n### PR Description\n\n以下はこの変更の PR 本文です。差分そのものに加えて、PR 本文がレビュー可能な状態かを確認してください。\n\n- Why（変更理由）と What（変更内容）が書かれているか\n- 本文の説明が差分と一致しているか（説明にあるが差分に無い／差分にあるが説明に無い）\n- 影響範囲が書かれているか\n- テスト方針・確認方法が書かれているか\n- 関連 Issue / 仕様 / 設計へのリンクがあるか\n\nPR 本文に関する指摘は、対象を \`PR-DESCRIPTION:0\` として出力してください。\n\n---\n${body}\n---\n`;
+}
+
 function buildADRContextSection(relatedADRs) {
   if (!relatedADRs?.length) return '';
   const lines = ['\n### Related ADRs/Specs\n'];
@@ -31641,6 +31652,7 @@ function buildPrompt({
   relatedADRs,
   reviewMode,
   repoContext,
+  prBody,
   maxChars = MAX_PROMPT_CHARS,
   config = _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s,
 }) {
@@ -31660,7 +31672,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${(0,_repo_context_mjs__WEBPACK_IMPORTED_MODULE_7__/* .buildRepoContextSection */ .l)(repoContext)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${(0,_repo_context_mjs__WEBPACK_IMPORTED_MODULE_7__/* .buildRepoContextSection */ .l)(repoContext)}${buildPrDescriptionSection(prBody)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -31956,6 +31968,7 @@ async function generateReview({
   riskAssessment,
   reviewMode,
   repoContext,
+  prBody,
   maxPromptChars = MAX_PROMPT_CHARS,
   config,
 }) {
@@ -31970,6 +31983,7 @@ async function generateReview({
     riskAssessment,
     reviewMode,
     repoContext,
+    prBody,
     maxChars: maxPromptChars,
     config: effectiveConfig,
   });
@@ -33810,6 +33824,7 @@ async function runReviewerOrchestration({
   reviewMode,
   config,
   reviewers,
+  prBody,
 } = {}) {
   const { valid: roles, invalid } = resolveReviewerRoles(reviewers, { fileTypes, riskAssessment });
 
@@ -33836,6 +33851,7 @@ async function runReviewerOrchestration({
     relatedADRs,
     reviewMode,
     config,
+    prBody,
   };
 
   // Fan out: each role × each diff chunk runs in parallel
@@ -34465,6 +34481,24 @@ async function resolvePullRequestLabels() {
   }
 }
 
+async function resolvePullRequestBody() {
+  // Explicit env wins (works for any runner / non-Action use).
+  const envBody = process.env.RIVER_PR_BODY;
+  if (envBody && envBody.trim()) return envBody;
+
+  const eventPath = process.env.GITHUB_EVENT_PATH;
+  if (!eventPath) return null;
+
+  try {
+    const raw = await promises_.readFile(eventPath, 'utf8');
+    const event = JSON.parse(raw);
+    const body = event?.pull_request?.body;
+    return body && String(body).trim() ? String(body) : null;
+  } catch {
+    return null;
+  }
+}
+
 function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
   if (!prLabels.length || !ignorePatterns.length) return { matched: [], shouldSkip: false };
   const normalizedLabels = prLabels.map((label) => label.toLowerCase());
@@ -34479,7 +34513,8 @@ function shouldSkipByLabel(prLabels = [], ignorePatterns = []) {
 // module continues to call `resolveAvailableContexts(...)` unchanged.
 // The single source of truth now lives in src/lib/utils.mjs and is also
 // used by src/lib/review-plan.mjs (#802 Phase 3 A2-fix-1).
-const resolveAvailableContexts = (inputContexts) => (0,utils/* resolveAvailableContexts */.ud)(inputContexts);
+const resolveAvailableContexts = (inputContexts, options = {}) =>
+  (0,utils/* resolveAvailableContexts */.ud)(inputContexts, options);
 
 // The helper now lives in src/lib/utils.mjs; this thin wrapper preserves
 // the legacy call sites inside this module unchanged.
@@ -34497,6 +34532,7 @@ async function collectLocalContext({
   const repoRoot = await (0,git/* ensureGitRepo */.NC)(cwd);
   const { config, path: configPath, source: configSource } = await configLoader.load(repoRoot);
   const prLabels = await resolvePullRequestLabels();
+  const prBody = await resolvePullRequestBody();
   const { rulesText: projectRules } = await loadProjectRules(repoRoot);
   const riskMap = await (0,risk_map/* loadRiskMap */.E$)(repoRoot);
   // When --base is provided, compare against the explicit ref instead of the
@@ -34506,7 +34542,11 @@ async function collectLocalContext({
   const rawDiff = await (0,lib_diff/* collectRepoDiff */.KD)(repoRoot, mergeBase, { contextLines });
   const diff = applyFileExclusions(rawDiff, config.exclude?.files ?? []);
   const reviewFiles = diff.filesForReview?.map((file) => file.path) ?? diff.changedFiles;
-  const contexts = resolveAvailableContexts(availableContexts);
+  // Expose `prDescription` as an available input context only when a PR body is
+  // present, so the pr-description skill activates exactly when it has input.
+  const contexts = resolveAvailableContexts(availableContexts, {
+    alwaysInclude: prBody ? ['prDescription'] : [],
+  });
   const dependencies = resolveAvailableDependencies(availableDependencies);
 
   return {
@@ -34523,6 +34563,7 @@ async function collectLocalContext({
     availableContexts: contexts,
     availableDependencies: dependencies,
     prLabels,
+    prBody,
     debug,
   };
 }
@@ -34565,6 +34606,7 @@ async function planLocalReview({
     configPath,
     configSource,
     prLabels,
+    prBody,
   } = base;
   const requestedPlannerMode = (0,planner_utils/* normalizePlannerMode */.p$)(plannerMode ?? process.env.RIVER_PLANNER_MODE, {
     defaultMode: 'off',
@@ -34662,6 +34704,7 @@ async function planLocalReview({
     availableContexts: contexts,
     availableDependencies: dependencies,
     prLabels,
+    prBody,
     config,
     configPath,
     configSource,
@@ -34756,6 +34799,7 @@ async function runLocalReview({
     relatedADRs: context.plan?.relatedADRs,
     reviewMode: context.plan?.reviewMode,
     repoContext,
+    prBody: context.prBody,
     config: context.config,
   };
 

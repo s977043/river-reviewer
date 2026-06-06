@@ -192,6 +192,7 @@ export async function runReviewerOrchestration({
   reviewMode,
   config,
   reviewers,
+  prBody,
 } = {}) {
   const { valid: roles, invalid } = resolveReviewerRoles(reviewers, { fileTypes, riskAssessment });
 
@@ -218,6 +219,7 @@ export async function runReviewerOrchestration({
     relatedADRs,
     reviewMode,
     config,
+    prBody,
   };
 
   // Fan out: each role × each diff chunk runs in parallel

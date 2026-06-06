@@ -162,6 +162,17 @@ skills:
     recommended: true
     description: 'Reviews logging and observability practices'
 
+  - id: rr-midstream-pr-description-001
+    version: '0.1.0'
+    name: 'PR Description Review'
+    path: skills/midstream/rr-midstream-pr-description-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [pr-description, consistency, midstream]
+    severity: minor
+    recommended: false
+    description: 'Reviews whether the PR description is review-ready and consistent with the diff'
+
   - id: rr-midstream-typescript-strict-001
     version: '0.1.0'
     name: 'TypeScript Strict Mode'

@@ -48,7 +48,8 @@
         "repoConfig",
         "reviewSelf",
         "reviewExternal",
-        "findingsPool"
+        "findingsPool",
+        "prDescription"
       ]
     },
     "outputKind": {
