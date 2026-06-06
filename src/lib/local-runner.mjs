@@ -113,13 +113,16 @@ async function collectLocalContext({
   contextLines = 3,
   availableContexts,
   availableDependencies,
+  baseRef = null,
 } = {}) {
   const repoRoot = await ensureGitRepo(cwd);
   const { config, path: configPath, source: configSource } = await configLoader.load(repoRoot);
   const prLabels = await resolvePullRequestLabels();
   const { rulesText: projectRules } = await loadProjectRules(repoRoot);
   const riskMap = await loadRiskMap(repoRoot);
-  const defaultBranch = await detectDefaultBranch(repoRoot);
+  // When --base is provided, compare against the explicit ref instead of the
+  // auto-detected default branch. Falls back to detection when unset.
+  const defaultBranch = baseRef ?? (await detectDefaultBranch(repoRoot));
   const mergeBase = await findMergeBase(repoRoot, defaultBranch);
   const rawDiff = await collectRepoDiff(repoRoot, mergeBase, { contextLines });
   const diff = applyFileExclusions(rawDiff, config.exclude?.files ?? []);
@@ -163,6 +166,7 @@ export async function planLocalReview({
   availableContexts,
   availableDependencies,
   plannerMode,
+  baseRef = null,
 } = {}) {
   const base = await collectLocalContext({
     cwd,
@@ -170,6 +174,7 @@ export async function planLocalReview({
     contextLines: debug ? 10 : 3,
     availableContexts,
     availableDependencies,
+    baseRef,
   });
   const {
     repoRoot,
@@ -299,6 +304,7 @@ export async function runLocalReview({
   availableDependencies,
   plannerMode,
   reviewers,
+  baseRef = null,
 } = {}) {
   const context =
     providedContext ??
@@ -311,6 +317,7 @@ export async function runLocalReview({
       availableContexts,
       availableDependencies,
       plannerMode,
+      baseRef,
     }));
   if (context.status === 'no-changes') {
     return {
