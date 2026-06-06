@@ -12,6 +12,9 @@ export const reviewConfigSchema = z.object({
   language: z.enum(['ja', 'en']).optional(),
   severity: z.enum(['strict', 'normal', 'relaxed']).optional(),
   additionalInstructions: z.array(z.string().min(1)).optional(),
+  // Extra spec/ADR directories (relative to repo root) scanned when linking
+  // changed files to related design docs. Merged with the built-in defaults.
+  specDirs: z.array(z.string().min(1)).optional(),
 });
 
 export const excludeConfigSchema = z.object({

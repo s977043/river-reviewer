@@ -1,15 +1,22 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+const DEFAULT_ADR_DIRS = ['docs/adr', 'pages/explanation', 'specs'];
+
 /**
  * Scan known ADR/spec directories and find documents relevant to changed files.
  *
  * @param {string} repoRoot - Repository root path
- * @param {{ changedFiles?: string[], keywords?: string[] }} options
+ * @param {{ changedFiles?: string[], keywords?: string[], extraDirs?: string[] }} options
+ *   extraDirs: additional spec/ADR directories from project config
+ *   (review.specDirs), merged with the defaults and de-duplicated.
  * @returns {{ path: string, title: string, matchReason: string }[]}
  */
-export function findRelatedADRs(repoRoot, { changedFiles = [], keywords = [] } = {}) {
-  const adrDirs = ['docs/adr', 'pages/explanation', 'specs'];
+export function findRelatedADRs(
+  repoRoot,
+  { changedFiles = [], keywords = [], extraDirs = [] } = {}
+) {
+  const adrDirs = [...new Set([...DEFAULT_ADR_DIRS, ...extraDirs.filter(Boolean)])];
   const results = [];
 
   for (const dir of adrDirs) {

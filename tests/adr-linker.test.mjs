@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { findRelatedADRs } from '../src/lib/adr-linker.mjs';
+import { withTempDir } from './helpers/temp-dir.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -50,4 +52,31 @@ test('findRelatedADRs scans pages/explanation directory', () => {
   const results = findRelatedADRs(ROOT, { keywords: ['river review'] });
   const fromExplanation = results.find((r) => r.path.startsWith('pages/explanation/'));
   assert.ok(fromExplanation, 'should find at least one doc in pages/explanation/');
+});
+
+test('findRelatedADRs scans extraDirs (review.specDirs) beyond the defaults', async () => {
+  await withTempDir(
+    async (dir) => {
+      const specDir = path.join(dir, 'docs', 'product-specs');
+      mkdirSync(specDir, { recursive: true });
+      writeFileSync(
+        path.join(specDir, 'billing.md'),
+        '# Billing Spec\n\nGoverns app/Services/Billing/Charge.ts behavior.'
+      );
+
+      // Without extraDirs the custom dir is not scanned.
+      const none = findRelatedADRs(dir, { changedFiles: ['app/Services/Billing/Charge.ts'] });
+      assert.equal(none.length, 0);
+
+      // With extraDirs the spec is linked by file reference.
+      const found = findRelatedADRs(dir, {
+        changedFiles: ['app/Services/Billing/Charge.ts'],
+        extraDirs: ['docs/product-specs'],
+      });
+      const spec = found.find((r) => r.path === 'docs/product-specs/billing.md');
+      assert.ok(spec, 'custom spec dir should be scanned via extraDirs');
+      assert.match(spec.matchReason, /references:/);
+    },
+    { prefix: 'adr-linker-' }
+  );
 });

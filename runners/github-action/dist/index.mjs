@@ -28170,15 +28170,22 @@ var external_node_path_ = __nccwpck_require__(6760);
 
 
 
+const DEFAULT_ADR_DIRS = ['docs/adr', 'pages/explanation', 'specs'];
+
 /**
  * Scan known ADR/spec directories and find documents relevant to changed files.
  *
  * @param {string} repoRoot - Repository root path
- * @param {{ changedFiles?: string[], keywords?: string[] }} options
+ * @param {{ changedFiles?: string[], keywords?: string[], extraDirs?: string[] }} options
+ *   extraDirs: additional spec/ADR directories from project config
+ *   (review.specDirs), merged with the defaults and de-duplicated.
  * @returns {{ path: string, title: string, matchReason: string }[]}
  */
-function findRelatedADRs(repoRoot, { changedFiles = [], keywords = [] } = {}) {
-  const adrDirs = ['docs/adr', 'pages/explanation', 'specs'];
+function findRelatedADRs(
+  repoRoot,
+  { changedFiles = [], keywords = [], extraDirs = [] } = {}
+) {
+  const adrDirs = [...new Set([...DEFAULT_ADR_DIRS, ...extraDirs.filter(Boolean)])];
   const results = [];
 
   for (const dir of adrDirs) {
@@ -28465,6 +28472,7 @@ async function buildExecutionPlan(options) {
     riskMap,
     skillIds = null,
     manualReviewMode = null,
+    specDirs = [],
   } = options;
 
   const loadedSkills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
@@ -28500,6 +28508,7 @@ async function buildExecutionPlan(options) {
   const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), {
     changedFiles,
     keywords: impactTags,
+    extraDirs: specDirs,
   });
 
   const diffMeta = extractDiffMeta({ changedFiles, diffText });
@@ -29177,6 +29186,9 @@ const reviewConfigSchema = schemas/* object */.Ik({
   language: schemas/* enum */.k5(['ja', 'en']).optional(),
   severity: schemas/* enum */.k5(['strict', 'normal', 'relaxed']).optional(),
   additionalInstructions: schemas/* array */.YO(schemas/* string */.Yj().min(1)).optional(),
+  // Extra spec/ADR directories (relative to repo root) scanned when linking
+  // changed files to related design docs. Merged with the built-in defaults.
+  specDirs: schemas/* array */.YO(schemas/* string */.Yj().min(1)).optional(),
 });
 
 const excludeConfigSchema = schemas/* object */.Ik({
@@ -34681,6 +34693,7 @@ async function planLocalReview({
     riskMap,
     skillIds,
     manualReviewMode,
+    specDirs: config.review?.specDirs ?? [],
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
