@@ -194,6 +194,7 @@ export async function buildExecutionPlan(options) {
     repoRoot,
     riskMap,
     skillIds = null,
+    manualReviewMode = null,
   } = options;
 
   const loadedSkills = providedSkills ?? (await loadSkills());
@@ -232,7 +233,7 @@ export async function buildExecutionPlan(options) {
   });
 
   const diffMeta = extractDiffMeta({ changedFiles, diffText });
-  const reviewMode = determineReviewMode(diffMeta);
+  const reviewMode = determineReviewMode(diffMeta, { manualMode: manualReviewMode });
 
   // If planner is provided, try LLM-based planning, fallback to deterministic rank
   const effectivePlannerMode = planner

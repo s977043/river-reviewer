@@ -28464,6 +28464,7 @@ async function buildExecutionPlan(options) {
     repoRoot,
     riskMap,
     skillIds = null,
+    manualReviewMode = null,
   } = options;
 
   const loadedSkills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
@@ -28502,7 +28503,7 @@ async function buildExecutionPlan(options) {
   });
 
   const diffMeta = extractDiffMeta({ changedFiles, diffText });
-  const reviewMode = (0,review_plan_generator/* determineReviewMode */.X)(diffMeta);
+  const reviewMode = (0,review_plan_generator/* determineReviewMode */.Xf)(diffMeta, { manualMode: manualReviewMode });
 
   // If planner is provided, try LLM-based planning, fallback to deterministic rank
   const effectivePlannerMode = planner
@@ -31492,9 +31493,9 @@ async function searchSymbolUsages({ symbols, repoRoot, excludeFiles, maxChars })
 /* harmony import */ var _runners_core_review_runner_mjs__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(4584);
 /* harmony import */ var _heuristic_review_mjs__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(2294);
 /* harmony import */ var _finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(5942);
-/* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(8069);
-/* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(8601);
-/* harmony import */ var _secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(12);
+/* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(8069);
+/* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(8601);
+/* harmony import */ var _secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(12);
 
 
 
@@ -31649,7 +31650,7 @@ function buildPrompt({
   const severity = reviewConfig.severity ?? _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__/* .defaultConfig */ .s.review.severity;
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
-  const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_8__/* .getReviewDepthConfig */ .i)(reviewMode ?? 'medium');
+  const depthConfig = (0,_review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_6__/* .getReviewDepthConfig */ .i3)(reviewMode ?? 'medium');
   const prompt = `You are River Review, an AI code review agent.
 Phase: ${phase}
 
@@ -31659,7 +31660,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${(0,_repo_context_mjs__WEBPACK_IMPORTED_MODULE_6__/* .buildRepoContextSection */ .l)(repoContext)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${(0,_repo_context_mjs__WEBPACK_IMPORTED_MODULE_7__/* .buildRepoContextSection */ .l)(repoContext)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
@@ -31983,7 +31984,7 @@ async function generateReview({
   // otherwise leave process memory (debug.promptPreview, returned
   // `prompt`, downstream artifact writes). The LLM call still uses the
   // original `promptInfo.prompt` because it must.
-  const safePrompt = (0,_secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_7__/* .redactText */ .Rd)(promptInfo.prompt, {
+  const safePrompt = (0,_secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_8__/* .redactText */ .Rd)(promptInfo.prompt, {
     allowlist: effectiveConfig.security?.redact?.allowlist ?? [],
     ...(effectiveConfig.security?.redact?.entropyThreshold != null
       ? { entropyThreshold: effectiveConfig.security.redact.entropyThreshold }
@@ -32175,17 +32176,47 @@ async function generateReview({
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   X: () => (/* binding */ determineReviewMode),
-/* harmony export */   i: () => (/* binding */ getReviewDepthConfig)
+/* harmony export */   To: () => (/* binding */ DEPTH_TO_REVIEW_MODE),
+/* harmony export */   Xf: () => (/* binding */ determineReviewMode),
+/* harmony export */   c8: () => (/* binding */ resolveDepthToReviewMode),
+/* harmony export */   i3: () => (/* binding */ getReviewDepthConfig)
 /* harmony export */ });
+const REVIEW_MODES = new Set(['tiny', 'medium', 'large']);
+
+/**
+ * Agent-agnostic depth vocabulary mapped onto the existing review modes.
+ * Lets users force a depth without introducing a parallel sizing system.
+ */
+const DEPTH_TO_REVIEW_MODE = Object.freeze({
+  quick: 'tiny',
+  standard: 'medium',
+  thorough: 'large',
+});
+
+/**
+ * Resolve a user-facing depth name to a review mode, or null when unset.
+ *
+ * @param {string|null|undefined} depth
+ * @returns {'tiny' | 'medium' | 'large' | null}
+ */
+function resolveDepthToReviewMode(depth) {
+  if (!depth) return null;
+  return DEPTH_TO_REVIEW_MODE[depth] ?? null;
+}
+
 /**
  * Determine review mode based on diff metadata.
  *
  * @param {{ fileCount: number, changedLines: number, hasMigrations: boolean, hasSchemas: boolean }} diffMeta
- * @param {object} [options]
+ * @param {{ manualMode?: 'tiny' | 'medium' | 'large' | null }} [options]
  * @returns {'tiny' | 'medium' | 'large'}
  */
 function determineReviewMode(diffMeta, options = {}) {
+  // An explicit manual mode overrides diff-size auto-detection.
+  if (options.manualMode && REVIEW_MODES.has(options.manualMode)) {
+    return options.manualMode;
+  }
+
   const { fileCount, changedLines, hasMigrations, hasSchemas } = diffMeta;
 
   let mode;
@@ -32213,9 +32244,15 @@ function determineReviewMode(diffMeta, options = {}) {
  */
 function getReviewDepthConfig(reviewMode) {
   const configs = {
-    tiny: { maxFindings: 3, focusHint: 'This is a small PR. Focus on the most critical issues only.' },
+    tiny: {
+      maxFindings: 3,
+      focusHint: 'This is a small PR. Focus on the most critical issues only.',
+    },
     medium: { maxFindings: 8, focusHint: 'Provide a balanced review covering important issues.' },
-    large: { maxFindings: 15, focusHint: 'This is a large PR. Prioritize high-severity issues over minor style concerns.' },
+    large: {
+      maxFindings: 15,
+      focusHint: 'This is a large PR. Prioritize high-severity issues over minor style concerns.',
+    },
   };
   return configs[reviewMode] ?? configs.medium;
 }
@@ -34445,6 +34482,7 @@ async function planLocalReview({
   plannerMode,
   baseRef = null,
   skillIds = null,
+  manualReviewMode = null,
 } = {}) {
   const base = await collectLocalContext({
     cwd,
@@ -34541,6 +34579,7 @@ async function planLocalReview({
     repoRoot,
     riskMap,
     skillIds,
+    manualReviewMode,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -34585,6 +34624,7 @@ async function runLocalReview({
   reviewers,
   baseRef = null,
   skillIds = null,
+  manualReviewMode = null,
 } = {}) {
   const context =
     providedContext ??
@@ -34599,6 +34639,7 @@ async function runLocalReview({
       plannerMode,
       baseRef,
       skillIds,
+      manualReviewMode,
     }));
   if (context.status === 'no-changes') {
     return {
@@ -56938,6 +56979,8 @@ class SkillDispatcher {
 
 }
 
+// EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs
+var review_plan_generator = __nccwpck_require__(8069);
 // EXTERNAL MODULE: ./src/lib/scoring/engine.mjs
 var engine = __nccwpck_require__(9487);
 // EXTERNAL MODULE: ./src/lib/scoring/rubric.mjs
@@ -56945,6 +56988,7 @@ var rubric = __nccwpck_require__(5034);
 // EXTERNAL MODULE: ./src/lib/finding-format.mjs
 var finding_format = __nccwpck_require__(5942);
 ;// CONCATENATED MODULE: ./src/cli.mjs
+
 
 
 
@@ -57018,6 +57062,7 @@ Options:
   --base <ref>      Branch or ref to diff against (e.g. main). Default: auto-detected default branch
   --skill-set <name> Restrict review to a named skill set from skills/registry.yaml
                     (e.g. basic, typescript, comprehensive). Default: all applicable skills
+  --depth <name>    Force review depth: quick|standard|thorough. Default: auto-detected from diff size
   --save            Persist the review run to the project result store (.river/runs/)
 
 Commands:
@@ -57054,6 +57099,7 @@ function parseArgs(argv) {
     baseline: null,
     base: null,
     skillSet: null,
+    depth: null,
     save: false,
     // runs subcommand fields
     runsSubcommand: null,
@@ -57420,6 +57466,17 @@ function parseArgs(argv) {
         break;
       }
       parsed.skillSet = value;
+      continue;
+    }
+    if (arg === '--depth') {
+      const value = args.shift();
+      const valid = Object.keys(review_plan_generator/* DEPTH_TO_REVIEW_MODE */.To);
+      if (!value || !valid.includes(value)) {
+        console.error(`Error: --depth must be one of: ${valid.join(', ')} (got "${value ?? ''}").`);
+        parsed.command = 'help';
+        break;
+      }
+      parsed.depth = value;
       continue;
     }
     if (arg === '--save') {
@@ -58260,6 +58317,8 @@ Dependencies: ${
       }
     }
 
+    const manualReviewMode = (0,review_plan_generator/* resolveDepthToReviewMode */.c8)(parsed.depth);
+
     const context = await planLocalReview({
       cwd: targetPath,
       phase: parsed.phase,
@@ -58270,6 +58329,7 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
       baseRef: parsed.base,
       skillIds,
+      manualReviewMode,
     });
 
     const estimator = new cost_estimator(
@@ -58346,6 +58406,7 @@ Dependencies: ${
       reviewers: parsed.reviewers,
       baseRef: parsed.base,
       skillIds,
+      manualReviewMode,
     });
 
     // Persist run to result store when --save is provided

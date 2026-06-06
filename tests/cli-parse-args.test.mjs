@@ -208,6 +208,21 @@ test('parseArgs: --skill-set without value falls back to help', () => {
   assert.equal(parsed.command, 'help');
 });
 
+test('parseArgs: --depth accepts a valid level', () => {
+  const parsed = parseArgs(['run', '.', '--depth', 'thorough']);
+  assert.equal(parsed.depth, 'thorough');
+});
+
+test('parseArgs: --depth defaults to null when unset', () => {
+  const parsed = parseArgs(['run', '.']);
+  assert.equal(parsed.depth, null);
+});
+
+test('parseArgs: --depth rejects an unknown level', () => {
+  const parsed = parseArgs(['run', '.', '--depth', 'nope']);
+  assert.equal(parsed.command, 'help');
+});
+
 // -----------------------------------------------------------------------------
 // skills import options
 // -----------------------------------------------------------------------------
