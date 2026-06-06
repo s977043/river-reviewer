@@ -45,7 +45,7 @@ Why: 可読性と保守性を中心に、コード品質の基本的な劣化を
 
 - Check names and boundaries keep responsibilities clear; flatten deep nesting with guard clauses.
 - Flag names too broad to convey intent (`data`, `info`, `manager`, `handler`, `util`, `current`), unshared abbreviations, and the same concept named differently (or different concepts sharing a name).
-- Flag encapsulation leaks: code that reaches deep into an object's internals (`a.b.c.type === 'x'`), pulls a primitive out of a value object to branch on it externally, or exposes internal state through getters. Prefer Tell-Don't-Ask (e.g. `user.subscription.isPremium()` over `user.subscription.plan.type === 'premium'`).
+- Flag encapsulation leaks: code that reaches deep into an object's internals (`a.b.c.type === 'x'`), pulls a primitive out of a value object to branch on it externally, or exposes internal state through getters. Prefer Tell-Don't-Ask (e.g. `user.isPremium()` over `user.subscription.plan.type === 'premium'`), which also hides the `subscription` structure from the caller (Law of Demeter).
 - Spot duplicated logic or unclear error handling/logging that harms readability.
 - Recommend small refactors that improve clarity without changing behaviour.
 - Prefer consistency with surrounding patterns instead of new conventions.
