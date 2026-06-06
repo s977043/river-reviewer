@@ -814,6 +814,28 @@ skills:
     recommended: false
     description: 'pbi-input, plan, todo, test-cases 間の整合性をチェックし、実装着手前の仕様漏れを検知する'
 
+  - id: rr-upstream-plangate-exec-conformance-001
+    version: '0.1.0'
+    name: 'PlanGate Exec Conformance Guard'
+    path: skills/upstream/rr-upstream-plangate-exec-conformance-001/SKILL.md
+    category: upstream
+    phase: upstream
+    tags: [plangate, conformance, exec, plan, todo, upstream]
+    severity: major
+    recommended: false
+    description: '実装差分が plan / todo / test-cases アーティファクトの方針と一致しているかを検査し、逸脱・漏れ・意図外変更を検知する'
+
+  - id: rr-upstream-plangate-verification-audit-001
+    version: '0.1.0'
+    name: 'PlanGate 検証監査 (W チェック)'
+    path: skills/upstream/rr-upstream-plangate-verification-audit-001/SKILL.md
+    category: upstream
+    phase: upstream
+    tags: [plangate, verification, w-check, audit, upstream]
+    severity: major
+    recommended: false
+    description: '既存のレビュー結果 (review-self / review-external) を再点検し、漏れ・誤検知・ハルシネーション・根拠欠落を検出する W チェック skill'
+
 # Recommended skill sets
 recommendations:
   basic:
