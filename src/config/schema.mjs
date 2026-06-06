@@ -15,6 +15,10 @@ export const reviewConfigSchema = z.object({
   // Extra spec/ADR directories (relative to repo root) scanned when linking
   // changed files to related design docs. Merged with the built-in defaults.
   specDirs: z.array(z.string().min(1)).optional(),
+  // Opt-in output enhancements. When true, the prompt asks the model to also
+  // emit a per-file walkthrough / a provider-agnostic agent-handoff section.
+  walkthrough: z.boolean().optional(),
+  agentHandoff: z.boolean().optional(),
 });
 
 export const excludeConfigSchema = z.object({

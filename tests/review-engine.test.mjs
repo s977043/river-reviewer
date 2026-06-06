@@ -141,6 +141,22 @@ test('buildPrompt omits PR Description section when prBody is absent or blank', 
   assert.doesNotMatch(blankBody, /PR Description/);
 });
 
+test('buildPrompt adds walkthrough/handoff sections only when enabled in config', () => {
+  const off = buildPrompt({ diffText, diffFiles: diff.files, plan, phase: 'midstream' }).prompt;
+  assert.doesNotMatch(off, /File Walkthrough/);
+  assert.doesNotMatch(off, /Agent Handoff/);
+
+  const on = buildPrompt({
+    diffText,
+    diffFiles: diff.files,
+    plan,
+    phase: 'midstream',
+    config: { review: { walkthrough: true, agentHandoff: true } },
+  }).prompt;
+  assert.match(on, /## File Walkthrough/);
+  assert.match(on, /## Agent Handoff/);
+});
+
 test('generateReview: verifier stats exist in debug output', async () => {
   const result = await generateReview({
     diff: { diffText: '+const x = 1;', files: [], changedFiles: [] },

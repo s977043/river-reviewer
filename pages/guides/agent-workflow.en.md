@@ -46,6 +46,10 @@ To see which roles were selected, check the `autoSelectedRoles` field in the JSO
 }
 ```
 
+### Chunk splitting and deduplication
+
+When reviewing with multiple roles (including `auto`), a large diff is automatically split into chunks and run in parallel across role × chunk. The findings from each run are deduplicated across chunks and roles before final IDs are assigned, so duplicate findings at the same location are merged into one (implementation: `splitDiffIntoChunks` / `deduplicateFindings` in `src/lib/reviewer-orchestrator.mjs`).
+
 ---
 
 ## How to Invoke by Agent

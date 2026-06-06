@@ -16,6 +16,8 @@
   - `severity`: `normal`（デフォルト）/`strict`/`relaxed`
   - `additionalInstructions`: 追加のレビューポリシー（配列）。プロンプト末尾に列挙される。
   - `specDirs`: 変更ファイルと関連する設計文書をリンクする際に追加で走査する spec/ADR ディレクトリ（リポジトリ相対パスの配列）。組み込みの既定（`docs/adr` / `pages/explanation` / `specs`）にマージされる。
+  - `walkthrough`: `true` で、レビュー出力に変更ファイルごとの walkthrough（要約・リスク・推奨読み順）セクションを追加するようプロンプトに依頼する（既定 `false`）。
+  - `agentHandoff`: `true` で、blocking 指摘を別 AI エージェントが修正できる provider 非依存の Agent Handoff セクション（目的/対象/制約/手順/テスト/完了条件）を出力するようプロンプトに依頼する（既定 `false`）。
 - `exclude`
   - `files`: 変更差分から除外する glob パターン。
   - `prLabelsToIgnore`: Pull Request ラベル名に対象キーワードが含まれていればスキップする設定。`RIVER_PR_LABELS`（カンマ区切り）または GitHub Actions の `GITHUB_EVENT_PATH` から取得したラベルと照合し、大文字小文字を無視した部分一致で判定する。

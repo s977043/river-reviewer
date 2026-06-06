@@ -16,6 +16,8 @@ Place `.river-review.json` in the repository root to customize review model sett
   - `severity`: `normal` (Default) / `strict` / `relaxed`
   - `additionalInstructions`: Additional review policies (array). Listed at the end of the prompt.
   - `specDirs`: Extra spec/ADR directories (repo-relative paths, array) scanned when linking changed files to related design docs. Merged with the built-in defaults (`docs/adr` / `pages/explanation` / `specs`).
+  - `walkthrough`: When `true`, asks the prompt to add a per-file walkthrough section (summary, risk, suggested reading order) to the review output (default `false`).
+  - `agentHandoff`: When `true`, asks the prompt to emit a provider-agnostic Agent Handoff section (goal / target files / constraints / steps / tests / done criteria) so another AI agent can act on blocking findings (default `false`).
 - `exclude`
   - `files`: Glob patterns to exclude from change diffs.
   - `prLabelsToIgnore`: Skips review if Pull Request label contains target keywords. Matches partial case-insensitive against `RIVER_PR_LABELS` (comma separated) or GitHub Actions `GITHUB_EVENT_PATH`.
