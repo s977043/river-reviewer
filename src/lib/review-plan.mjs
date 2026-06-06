@@ -64,8 +64,9 @@ export class ReviewPlanError extends Error {
 export function computeReplayDrift(currentFiles, sourceSnapshot) {
   const fileTypes = sourceSnapshot?.fileTypes;
   if (!fileTypes || typeof fileTypes !== 'object') return null;
-  const sourceFiles = [...new Set(Object.values(fileTypes).flat().filter(Boolean))];
-  const cur = [...new Set((currentFiles ?? []).filter(Boolean))];
+  const notSentinel = (p) => p && p !== '/dev/null';
+  const sourceFiles = [...new Set(Object.values(fileTypes).flat().filter(notSentinel))];
+  const cur = [...new Set((currentFiles ?? []).filter(notSentinel))];
   const srcSet = new Set(sourceFiles);
   const curSet = new Set(cur);
   const filesAdded = cur.filter((f) => !srcSet.has(f)).sort();
@@ -253,7 +254,10 @@ export async function runReviewExecReplay({
       // #936: report (non-blocking) membership drift between the replay-time
       // diff and the source plan's snapshot. Null when the snapshot predates A2-3.
       replayDrift = computeReplayDrift(
-        (parsedDiff.files ?? []).map((f) => f?.path).filter(Boolean),
+        // Exclude /dev/null (deletion/creation sentinel) so deleted/created
+        // files are not reported as literal drift paths, matching the
+        // changed-files extraction used elsewhere.
+        (parsedDiff.files ?? []).map((f) => f?.path).filter((p) => p && p !== '/dev/null'),
         sourceSnapshot
       );
       let review;

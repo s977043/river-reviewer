@@ -29,6 +29,15 @@ test('computeReplayDrift reports added/removed files', () => {
   assert.match(drift.summary, /content-level changes not detectable/);
 });
 
+test('computeReplayDrift ignores the /dev/null deletion sentinel', () => {
+  // A deleted file surfaces as /dev/null in unified diffs; it must not be
+  // reported as an added/removed path.
+  const drift = computeReplayDrift(['src/a.ts', '/dev/null'], snapshot(['src/a.ts']));
+  assert.deepEqual(drift.filesAdded, []);
+  assert.deepEqual(drift.filesRemoved, []);
+  assert.match(drift.summary, /no membership drift/);
+});
+
 test('computeReplayDrift unions all fileType categories and dedupes', () => {
   const src = { fileTypes: { app: ['src/a.ts'], test: ['src/a.test.ts'], config: ['src/a.ts'] } };
   const drift = computeReplayDrift(['src/a.ts'], src);
