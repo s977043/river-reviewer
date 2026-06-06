@@ -34076,15 +34076,20 @@ class ProjectRulesError extends Error {
 
 /**
  * Read a single rules file. Missing or empty files yield null (no error).
+ *
+ * @param {string} filePath
+ * @param {{ tolerateDirectory?: boolean }} [options] When true, a path that is
+ *   actually a directory (EISDIR) yields null instead of throwing. Used for the
+ *   rules.d/ scan, where a stray `*.md` sub-directory should be skipped — but
+ *   NOT for the base rules.md, where a directory is a misconfiguration to surface.
  */
-async function readRulesFile(filePath) {
+async function readRulesFile(filePath, { tolerateDirectory = false } = {}) {
   try {
     const raw = await promises_.readFile(filePath, 'utf8');
     return raw.trim() || null;
   } catch (error) {
-    // ENOENT: file absent. EISDIR: a directory named like a rule file (e.g. a
-    // nested `*.md` folder under rules.d/) — treat both as "no rules", not a crash.
-    if (error.code === 'ENOENT' || error.code === 'EISDIR') return null;
+    if (error.code === 'ENOENT') return null;
+    if (error.code === 'EISDIR' && tolerateDirectory) return null;
     throw new ProjectRulesError(`Failed to read project rules at ${filePath}: ${error.message}`);
   }
 }
@@ -34136,7 +34141,7 @@ async function loadProjectRules(repoRoot, options = {}) {
       entries.map(async (name) => ({
         name,
         filePath: external_node_path_.join(rulesDir, name),
-        text: await readRulesFile(external_node_path_.join(rulesDir, name)),
+        text: await readRulesFile(external_node_path_.join(rulesDir, name), { tolerateDirectory: true }),
       }))
     );
     for (const { name, filePath, text } of loaded) {
