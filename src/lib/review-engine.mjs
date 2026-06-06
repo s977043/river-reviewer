@@ -115,6 +115,21 @@ function buildPrDescriptionSection(prBody) {
   return `\n### PR Description\n\n以下はこの変更の PR 本文です。差分そのものに加えて、PR 本文がレビュー可能な状態かを確認してください。\n\n- Why（変更理由）と What（変更内容）が書かれているか\n- 本文の説明が差分と一致しているか（説明にあるが差分に無い／差分にあるが説明に無い）\n- 影響範囲が書かれているか\n- テスト方針・確認方法が書かれているか\n- 関連 Issue / 仕様 / 設計へのリンクがあるか\n\nPR 本文に関する指摘は、対象を \`PR-DESCRIPTION:0\` として出力してください。\n\n---\n${body}\n---\n`;
 }
 
+// Opt-in (review.walkthrough). Asks the model to prepend a per-file walkthrough
+// to its output so reviewers see what changed, the risk, and a reading order.
+function buildWalkthroughSection(enabled) {
+  if (!enabled) return '';
+  return `\n### File Walkthrough (output request)\n\nFindings の前に "## File Walkthrough" セクションを出力してください。変更ファイルごとに 1 行で:\n- 何がどう変わったか（要約）\n- 変更リスク（high/medium/low）\n- 読むべき順番（依存や影響の大きい順）\nを示してください。差分に無いファイルは含めないでください。\n`;
+}
+
+// Opt-in (review.agentHandoff). Asks the model to append provider-agnostic
+// fix instructions another AI agent can act on. Distinct from per-finding
+// `suggestion` (a human hint); this is an executable instruction set.
+function buildHandoffSection(enabled) {
+  if (!enabled) return '';
+  return `\n### Agent Handoff (output request)\n\nFindings の後に "## Agent Handoff" セクションを出力してください。blocking な指摘を別の AI エージェントが修正できるよう、特定のツール名・CLI 名を含めずに以下を記述してください:\n- 修正の目的\n- 対象ファイル\n- 制約（壊してはいけない挙動・後方互換）\n- 実装手順\n- テスト手順\n- 完了条件\n`;
+}
+
 function buildADRContextSection(relatedADRs) {
   if (!relatedADRs?.length) return '';
   const lines = ['\n### Related ADRs/Specs\n'];
@@ -167,6 +182,8 @@ export function buildPrompt({
   const reviewConfig = effectiveConfig.review ?? defaultConfig.review;
   const language = reviewConfig.language ?? defaultConfig.review.language;
   const severity = reviewConfig.severity ?? defaultConfig.review.severity;
+  const wantWalkthrough = reviewConfig.walkthrough ?? false;
+  const wantHandoff = reviewConfig.agentHandoff ?? false;
   const truncated = diffText.length > maxChars;
   const diffBody = truncated ? `${diffText.slice(0, maxChars)}\n...[truncated]` : diffText;
   const depthConfig = getReviewDepthConfig(reviewMode ?? 'medium');
@@ -179,7 +196,7 @@ ${buildFileSummary(diffFiles)}
 Relevant skills:
 ${buildSkillSummary(plan)}
 
-${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${buildRepoContextSection(repoContext)}${buildPrDescriptionSection(prBody)}Review the unified git diff below and produce concise findings.
+${buildProjectRulesSection(projectRules)}${buildRiskAssessmentSection(riskAssessment)}${buildADRContextSection(relatedADRs)}${buildRepoContextSection(repoContext)}${buildPrDescriptionSection(prBody)}${buildWalkthroughSection(wantWalkthrough)}${buildHandoffSection(wantHandoff)}Review the unified git diff below and produce concise findings.
 ${buildLanguageInstruction(language)}
 - Output each finding on its own line using the format "<file>:<line>: <message>".
 - In <message>, include short labels: "Finding:", "Evidence:", "Impact:", "Fix:", "Severity:", "Confidence:".
