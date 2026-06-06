@@ -8,6 +8,28 @@ function computeEvidenceStrength(finding) {
   return 1.0;
 }
 
+// Mirrors (and refines) verifier's actionability heuristic: a Fix/Suggestion
+// with >=10 chars of substance, in the message body or the suggestion field.
+// `\b` avoids matching Prefix:/Suffix:; `[\s\S]` lets the fix span newlines.
+const ACTIONABLE_RE = /\b(?:Fix|Suggestion):\s*([\s\S]{10,})/;
+
+/**
+ * How clear/actionable the fix is. Derived from the presence of a concrete
+ * Fix/Suggestion. Intentionally NOT folded into `composite` (it is an
+ * independent axis, surfaced for prioritization without double-counting).
+ *
+ * @param {object} finding
+ * @returns {number} 0.0 (no actionable fix) | 0.5 (brief) | 1.0 (substantive)
+ */
+function computeActionability(finding) {
+  const suggestion = String(finding?.suggestion ?? '').trim();
+  if (suggestion.length >= 10) return 1.0;
+  const message = String(finding?.message ?? '');
+  if (ACTIONABLE_RE.test(message)) return 1.0;
+  if (suggestion.length > 0) return 0.5;
+  return 0.0;
+}
+
 function computeReproducibility(finding) {
   const confidence = finding.confidence ?? 'medium';
   const severity = finding.severity ?? 'info';
@@ -59,6 +81,7 @@ function computeReviewerAgreement(finding) {
  *   reproducibility: number,
  *   blastRadius: number,
  *   reviewerAgreement: number,
+ *   actionability: number,
  *   composite: number,
  * }}
  */
@@ -67,10 +90,17 @@ export function computeFindingBreakdown(finding) {
   const reproducibility = computeReproducibility(finding);
   const blastRadius = computeBlastRadius(finding);
   const reviewerAgreement = computeReviewerAgreement(finding);
+  const actionability = computeActionability(finding);
+  // `composite` intentionally excludes `actionability` to avoid double-counting
+  // and to keep existing composite values stable; it is reported as a separate axis.
   const composite =
-    evidenceStrength * 0.3 +
-    reproducibility * 0.25 +
-    blastRadius * 0.3 +
-    reviewerAgreement * 0.15;
-  return { evidenceStrength, reproducibility, blastRadius, reviewerAgreement, composite };
+    evidenceStrength * 0.3 + reproducibility * 0.25 + blastRadius * 0.3 + reviewerAgreement * 0.15;
+  return {
+    evidenceStrength,
+    reproducibility,
+    blastRadius,
+    reviewerAgreement,
+    actionability,
+    composite,
+  };
 }

@@ -89,6 +89,12 @@
         "suggestion": {
           "type": "string",
           "description": "Optional fix or follow-up hint."
+        },
+        "actionability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Optional 0-1 score of how clear/actionable the fix is (derived from the suggestion). Independent of the composite score."
         }
       }
     },
