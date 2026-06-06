@@ -31600,7 +31600,7 @@ function buildProjectRulesSection(rulesText) {
 const MAX_PR_BODY_CHARS = 4000;
 
 function buildPrDescriptionSection(prBody) {
-  if (!prBody || !prBody.trim()) return '';
+  if (typeof prBody !== 'string' || !prBody.trim()) return '';
   const body =
     prBody.length > MAX_PR_BODY_CHARS
       ? `${prBody.slice(0, MAX_PR_BODY_CHARS)}\n...[truncated]`
