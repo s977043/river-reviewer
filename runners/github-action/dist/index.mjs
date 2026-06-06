@@ -34027,6 +34027,7 @@ var review_runner = __nccwpck_require__(4584);
 
 
 const DEFAULT_RULES_PATH = external_node_path_.join('.river', 'rules.md');
+const DEFAULT_RULES_DIR = external_node_path_.join('.river', 'rules.d');
 
 class ProjectRulesError extends Error {
   constructor(message) {
@@ -34036,8 +34037,27 @@ class ProjectRulesError extends Error {
 }
 
 /**
- * Load project-specific review rules from .river/rules.md (or a custom path).
- * Missing or empty files are treated as "no rules" without error.
+ * Read a single rules file. Missing or empty files yield null (no error).
+ */
+async function readRulesFile(filePath) {
+  try {
+    const raw = await promises_.readFile(filePath, 'utf8');
+    return raw.trim() || null;
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw new ProjectRulesError(`Failed to read project rules at ${filePath}: ${error.message}`);
+  }
+}
+
+/**
+ * Load project-specific review rules.
+ *
+ * Reads `.river/rules.md` (or a custom path via `options.rulesPath`). When the
+ * default path is used, additional `*.md` files under `.river/rules.d/` are
+ * read in alphabetical order and appended (each prefixed with a `## <file>`
+ * header), so teams can split domain / incidents / glossary rules across files.
+ * Missing or empty files are treated as "no rules" without error; with no base
+ * file and no rules.d entries the result is identical to the single-file case.
  */
 async function loadProjectRules(repoRoot, options = {}) {
   const repoRootAbs = external_node_path_.resolve(repoRoot);
@@ -34045,22 +34065,46 @@ async function loadProjectRules(repoRoot, options = {}) {
   const rulesPath = external_node_path_.resolve(repoRootAbs, relativeRulesPath);
 
   if (!rulesPath.startsWith(repoRootAbs + external_node_path_.sep) && rulesPath !== repoRootAbs) {
-    throw new ProjectRulesError(`Project rules path is outside of the repository: ${relativeRulesPath}`);
+    throw new ProjectRulesError(
+      `Project rules path is outside of the repository: ${relativeRulesPath}`
+    );
   }
 
-  try {
-    const raw = await promises_.readFile(rulesPath, 'utf8');
-    const trimmed = raw.trim();
-    return {
-      rulesText: trimmed || null,
-      path: rulesPath,
-    };
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return { rulesText: null, path: rulesPath };
+  const sections = [];
+  const extraPaths = [];
+
+  const base = await readRulesFile(rulesPath);
+  if (base) sections.push(base);
+
+  // Only the default path activates the rules.d/ split; custom rulesPath callers
+  // keep the exact single-file behavior.
+  if (!options.rulesPath) {
+    const rulesDir = external_node_path_.resolve(repoRootAbs, DEFAULT_RULES_DIR);
+    let entries = [];
+    try {
+      entries = (await promises_.readdir(rulesDir)).filter((name) => name.endsWith('.md')).sort();
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw new ProjectRulesError(
+          `Failed to read project rules directory at ${rulesDir}: ${error.message}`
+        );
+      }
     }
-    throw new ProjectRulesError(`Failed to read project rules at ${rulesPath}: ${error.message}`);
+    for (const name of entries) {
+      const filePath = external_node_path_.join(rulesDir, name);
+      const text = await readRulesFile(filePath);
+      if (text) {
+        sections.push(`## ${name}\n\n${text}`);
+        extraPaths.push(filePath);
+      }
+    }
   }
+
+  return {
+    rulesText: sections.length ? sections.join('\n\n') : null,
+    path: rulesPath,
+    extraPaths,
+  };
 }
 
 // EXTERNAL MODULE: ./src/lib/risk-map.mjs + 1 modules
