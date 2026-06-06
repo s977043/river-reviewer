@@ -19,7 +19,9 @@ async function readRulesFile(filePath) {
     const raw = await fs.readFile(filePath, 'utf8');
     return raw.trim() || null;
   } catch (error) {
-    if (error.code === 'ENOENT') return null;
+    // ENOENT: file absent. EISDIR: a directory named like a rule file (e.g. a
+    // nested `*.md` folder under rules.d/) — treat both as "no rules", not a crash.
+    if (error.code === 'ENOENT' || error.code === 'EISDIR') return null;
     throw new ProjectRulesError(`Failed to read project rules at ${filePath}: ${error.message}`);
   }
 }
@@ -51,9 +53,10 @@ export async function loadProjectRules(repoRoot, options = {}) {
   const base = await readRulesFile(rulesPath);
   if (base) sections.push(base);
 
-  // Only the default path activates the rules.d/ split; custom rulesPath callers
-  // keep the exact single-file behavior.
-  if (!options.rulesPath) {
+  // Only the default rules path activates the rules.d/ split; custom rulesPath
+  // callers keep the exact single-file behavior. Compare the resolved relative
+  // path so an explicit `rulesPath: '.river/rules.md'` still scans rules.d/.
+  if (relativeRulesPath === DEFAULT_RULES_PATH) {
     const rulesDir = path.resolve(repoRootAbs, DEFAULT_RULES_DIR);
     let entries = [];
     try {
@@ -65,9 +68,15 @@ export async function loadProjectRules(repoRoot, options = {}) {
         );
       }
     }
-    for (const name of entries) {
-      const filePath = path.join(rulesDir, name);
-      const text = await readRulesFile(filePath);
+    // Files are independent; read them in parallel but keep alphabetical order.
+    const loaded = await Promise.all(
+      entries.map(async (name) => ({
+        name,
+        filePath: path.join(rulesDir, name),
+        text: await readRulesFile(path.join(rulesDir, name)),
+      }))
+    );
+    for (const { name, filePath, text } of loaded) {
       if (text) {
         sections.push(`## ${name}\n\n${text}`);
         extraPaths.push(filePath);

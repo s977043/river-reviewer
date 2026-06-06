@@ -70,6 +70,35 @@ test('loadProjectRules appends .river/rules.d/*.md in alphabetical order', async
   );
 });
 
+test('loadProjectRules skips a directory named like a rule file (EISDIR) without crashing', async () => {
+  await withTempDir(
+    async (dir) => {
+      const rulesDDir = path.join(dir, '.river', 'rules.d');
+      await mkdir(path.join(rulesDDir, 'nested.md'), { recursive: true }); // a dir ending in .md
+      writeFileSync(path.join(rulesDDir, 'real.md'), '- real rule');
+
+      const { rulesText } = await loadProjectRules(dir);
+      assert.match(rulesText, /- real rule/);
+      assert.doesNotMatch(rulesText, /nested\.md/);
+    },
+    { prefix: 'river-rules-' }
+  );
+});
+
+test('loadProjectRules scans rules.d when the default path is passed explicitly', async () => {
+  await withTempDir(
+    async (dir) => {
+      const rulesDDir = path.join(dir, '.river', 'rules.d');
+      await mkdir(rulesDDir, { recursive: true });
+      writeFileSync(path.join(rulesDDir, 'domain.md'), '- domain rule');
+
+      const { rulesText } = await loadProjectRules(dir, { rulesPath: '.river/rules.md' });
+      assert.match(rulesText, /- domain rule/);
+    },
+    { prefix: 'river-rules-' }
+  );
+});
+
 test('loadProjectRules uses rules.d even when base rules.md is absent', async () => {
   await withTempDir(
     async (dir) => {
