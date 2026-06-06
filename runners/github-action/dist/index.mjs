@@ -34344,13 +34344,16 @@ async function collectLocalContext({
   contextLines = 3,
   availableContexts,
   availableDependencies,
+  baseRef = null,
 } = {}) {
   const repoRoot = await (0,git/* ensureGitRepo */.NC)(cwd);
   const { config, path: configPath, source: configSource } = await configLoader.load(repoRoot);
   const prLabels = await resolvePullRequestLabels();
   const { rulesText: projectRules } = await loadProjectRules(repoRoot);
   const riskMap = await (0,risk_map/* loadRiskMap */.E$)(repoRoot);
-  const defaultBranch = await (0,git/* detectDefaultBranch */.Rd)(repoRoot);
+  // When --base is provided, compare against the explicit ref instead of the
+  // auto-detected default branch. Falls back to detection when unset.
+  const defaultBranch = baseRef ?? (await (0,git/* detectDefaultBranch */.Rd)(repoRoot));
   const mergeBase = await (0,git/* findMergeBase */.fe)(repoRoot, defaultBranch);
   const rawDiff = await (0,lib_diff/* collectRepoDiff */.KD)(repoRoot, mergeBase, { contextLines });
   const diff = applyFileExclusions(rawDiff, config.exclude?.files ?? []);
@@ -34388,6 +34391,7 @@ async function planLocalReview({
   availableContexts,
   availableDependencies,
   plannerMode,
+  baseRef = null,
 } = {}) {
   const base = await collectLocalContext({
     cwd,
@@ -34395,6 +34399,7 @@ async function planLocalReview({
     contextLines: debug ? 10 : 3,
     availableContexts,
     availableDependencies,
+    baseRef,
   });
   const {
     repoRoot,
@@ -34524,6 +34529,7 @@ async function runLocalReview({
   availableDependencies,
   plannerMode,
   reviewers,
+  baseRef = null,
 } = {}) {
   const context =
     providedContext ??
@@ -34536,6 +34542,7 @@ async function runLocalReview({
       availableContexts,
       availableDependencies,
       plannerMode,
+      baseRef,
     }));
   if (context.status === 'no-changes') {
     return {
@@ -56952,6 +56959,7 @@ Options:
   --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap).
                     Use "auto" to select roles automatically based on diff content and risk signals.
   --baseline <path> Path to a previous review JSON (findings array) for regression comparison
+  --base <ref>      Branch or ref to diff against (e.g. main). Default: auto-detected default branch
   --save            Persist the review run to the project result store (.river/runs/)
 
 Commands:
@@ -56986,6 +56994,7 @@ function parseArgs(argv) {
     availableDependencies: null,
     reviewers: null,
     baseline: null,
+    base: null,
     save: false,
     // runs subcommand fields
     runsSubcommand: null,
@@ -57330,6 +57339,16 @@ function parseArgs(argv) {
         break;
       }
       parsed.baseline = value;
+      continue;
+    }
+    if (arg === '--base') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --base option requires a branch or ref (e.g. --base main).');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.base = value;
       continue;
     }
     if (arg === '--save') {
@@ -58163,6 +58182,7 @@ Dependencies: ${
       availableContexts: parsed.availableContexts,
       availableDependencies: parsed.availableDependencies,
       plannerMode: parsed.plannerMode,
+      baseRef: parsed.base,
     });
 
     const estimator = new cost_estimator(
@@ -58237,6 +58257,7 @@ Dependencies: ${
       availableDependencies: parsed.availableDependencies,
       plannerMode: parsed.plannerMode,
       reviewers: parsed.reviewers,
+      baseRef: parsed.base,
     });
 
     // Persist run to result store when --save is provided
