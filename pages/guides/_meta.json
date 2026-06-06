@@ -21,6 +21,7 @@
   "w-check": "W チェック（二重レビュー）",
   "repo-wide-review": "リポジトリ全体を踏まえたレビューの導入とチューニング",
   "run-phase-specific-review": "フェーズ固有のレビューを実行する",
+  "two-stage-review-gate": "2 段構えレビューゲート（PR 前 + PR 後）",
   "-- Advanced": {
     "type": "separator",
     "title": "Advanced"
