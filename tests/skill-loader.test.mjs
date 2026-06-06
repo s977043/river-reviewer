@@ -10,6 +10,9 @@ import {
   loadSkills,
   loadSkillMetadata,
   loadAllSkillMetadata,
+  loadRecommendationSets,
+  resolveRecommendationSet,
+  SkillLoaderError,
 } from '../runners/core/skill-loader.mjs';
 import { withTempDir, createTempDirAsync } from './helpers/temp-dir.mjs';
 
@@ -479,4 +482,41 @@ Body
     assert.ok(!('body' in singleFirst));
     assert.ok(!('body' in singleSecond));
   });
+});
+
+test('loadRecommendationSets exposes named bundles from the registry', async () => {
+  const sets = await loadRecommendationSets();
+  assert.ok(sets.basic, 'basic set must exist');
+  assert.ok(Array.isArray(sets.basic.skills));
+  assert.ok(sets.basic.skills.includes('rr-midstream-security-basic-001'));
+});
+
+test('resolveRecommendationSet returns the skill ids for a known set', async () => {
+  const ids = await resolveRecommendationSet('basic');
+  assert.deepEqual(ids, [
+    'rr-midstream-security-basic-001',
+    'rr-midstream-logging-observability-001',
+  ]);
+});
+
+test('resolveRecommendationSet throws SkillLoaderError for an unknown set', async () => {
+  await assert.rejects(
+    () => resolveRecommendationSet('does-not-exist'),
+    (err) => {
+      assert.ok(err instanceof SkillLoaderError);
+      assert.match(err.message, /Unknown skill set "does-not-exist"/);
+      assert.match(err.message, /Available sets:/);
+      return true;
+    }
+  );
+});
+
+test('loadRecommendationSets returns {} when registry is absent', async () => {
+  await withTempDir(
+    async (tmpDir) => {
+      const sets = await loadRecommendationSets({ skillsDir: tmpDir });
+      assert.deepEqual(sets, {});
+    },
+    { prefix: TMP_PREFIX }
+  );
 });

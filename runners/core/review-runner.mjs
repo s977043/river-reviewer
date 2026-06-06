@@ -193,9 +193,16 @@ export async function buildExecutionPlan(options) {
     llmEnabled = true,
     repoRoot,
     riskMap,
+    skillIds = null,
   } = options;
 
-  const skills = providedSkills ?? (await loadSkills());
+  const loadedSkills = providedSkills ?? (await loadSkills());
+  // When a skill set is requested (--skill-set), narrow the candidate skills to
+  // the set's ids before phase/applyTo selection. Default (null) keeps all skills.
+  const skills =
+    Array.isArray(skillIds) && skillIds.length > 0
+      ? loadedSkills.filter((skill) => skillIds.includes(skill.metadata?.id ?? skill.id))
+      : loadedSkills;
   const selection = selectSkills(skills, {
     phase,
     changedFiles,

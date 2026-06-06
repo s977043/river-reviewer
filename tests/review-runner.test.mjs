@@ -121,6 +121,38 @@ test('buildExecutionPlan returns ordered selection and skipped list', async () =
   assert.ok(Array.isArray(plan.skipped));
 });
 
+test('buildExecutionPlan narrows candidates to skillIds when provided', async () => {
+  const providedSkills = [
+    { metadata: { id: 'a', phase: 'midstream', applyTo: ['src/**'], modelHint: 'balanced' } },
+    { metadata: { id: 'b', phase: 'midstream', applyTo: ['src/**'], modelHint: 'balanced' } },
+    { metadata: { id: 'c', phase: 'midstream', applyTo: ['src/**'], modelHint: 'balanced' } },
+  ];
+  const plan = await buildExecutionPlan({
+    phase: 'midstream',
+    changedFiles: ['src/app.ts'],
+    availableContexts: ['diff'],
+    skills: providedSkills,
+    skillIds: ['a', 'c'],
+  });
+  const ids = plan.selected.map((s) => s.metadata.id).sort();
+  assert.deepEqual(ids, ['a', 'c']);
+});
+
+test('buildExecutionPlan ignores empty skillIds (keeps all candidates)', async () => {
+  const providedSkills = [
+    { metadata: { id: 'a', phase: 'midstream', applyTo: ['src/**'], modelHint: 'balanced' } },
+    { metadata: { id: 'b', phase: 'midstream', applyTo: ['src/**'], modelHint: 'balanced' } },
+  ];
+  const plan = await buildExecutionPlan({
+    phase: 'midstream',
+    changedFiles: ['src/app.ts'],
+    availableContexts: ['diff'],
+    skills: providedSkills,
+    skillIds: [],
+  });
+  assert.equal(plan.selected.length, 2);
+});
+
 test('buildExecutionPlan can use planner when provided', async () => {
   const providedSkills = [
     { metadata: { id: 'a', phase: 'midstream', applyTo: ['src/**'], modelHint: 'cheap' } },

@@ -193,6 +193,21 @@ test('parseArgs: --base without value falls back to help', () => {
   assert.equal(parsed.command, 'help');
 });
 
+test('parseArgs: --skill-set captures the set name', () => {
+  const parsed = parseArgs(['run', '.', '--skill-set', 'comprehensive']);
+  assert.equal(parsed.skillSet, 'comprehensive');
+});
+
+test('parseArgs: --skill-set defaults to null when unset', () => {
+  const parsed = parseArgs(['run', '.']);
+  assert.equal(parsed.skillSet, null);
+});
+
+test('parseArgs: --skill-set without value falls back to help', () => {
+  const parsed = parseArgs(['run', '.', '--skill-set']);
+  assert.equal(parsed.command, 'help');
+});
+
 // -----------------------------------------------------------------------------
 // skills import options
 // -----------------------------------------------------------------------------
