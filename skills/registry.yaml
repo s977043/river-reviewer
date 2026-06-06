@@ -820,7 +820,7 @@ skills:
     path: skills/upstream/rr-upstream-plangate-exec-conformance-001/SKILL.md
     category: upstream
     phase: upstream
-    tags: [plangate, conformance, exec, plan, todo, upstream]
+    tags: [plangate, conformance, exec, plan, todo, test-cases, upstream]
     severity: major
     recommended: false
     description: '実装差分が plan / todo / test-cases アーティファクトの方針と一致しているかを検査し、逸脱・漏れ・意図外変更を検知する'
