@@ -72,7 +72,12 @@ findings would be plausibly wrong on stale plans.
 Even with carry-over, the **diff** itself comes from the current artifact
 resolution (the source plan does not snapshot the diff bytes). This is
 intentional—snapshotting raw diff bytes blows up artifact size for little
-gain in correctness. The drift signal lives in `debug.replay.drift`:
+gain in correctness. The drift signal lives in `debug.replay.drift`
+(shipped in #936). Because the source plan snapshots only file **membership**
+(via `debug.execution.snapshot.fileTypes`), drift is membership-only:
+`filesAdded` / `filesRemoved` against the source set. Content-level
+`filesModified` is **not derivable** (no diff bytes are stored) and is
+therefore omitted rather than reported inaccurately:
 
 ```json
 {
@@ -80,18 +85,19 @@ gain in correctness. The drift signal lives in `debug.replay.drift`:
     "replay": {
       "sourceTimestamp": "2026-05-25T03:48:53Z",
       "drift": {
-        "filesAdded": ["..."],
-        "filesRemoved": ["..."],
-        "filesModified": ["..."],
-        "summary": "3 changed files vs. 2 in source plan"
+        "filesAdded": ["src/new.ts"],
+        "filesRemoved": ["src/gone.ts"],
+        "summary": "3 changed file(s) at replay vs 2 in source plan (+1/-1); content-level changes not detectable (plan does not snapshot diff bytes)"
       }
     }
   }
 }
 ```
 
-Drift is **reported, not blocking**. A future skill can consume the drift
-report to decide whether to re-plan.
+Drift is **reported, not blocking**. The block is omitted entirely when the
+source plan predates the snapshot (pre-A2-3). A future skill can consume the
+drift report to decide whether to re-plan. See `computeReplayDrift` in
+`src/lib/review-plan.mjs`.
 
 ## Failing test specification
 

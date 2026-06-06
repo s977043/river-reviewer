@@ -50,6 +50,35 @@ export class ReviewPlanError extends Error {
 }
 
 /**
+ * Compute membership drift between the replay-time changed files and the
+ * files implied by the source plan's snapshot (#936). The source plan does
+ * NOT snapshot diff bytes (a2-3-replay design), so only membership drift
+ * (files added/removed) is detectable — content-level "modified" cannot be
+ * derived and is intentionally omitted. Returns null when the source plan
+ * predates the snapshot (pre-A2-3) so callers can skip the drift block.
+ *
+ * @param {string[]} currentFiles changed file paths at replay time
+ * @param {object|null} sourceSnapshot the carried-over plan snapshot
+ * @returns {{ filesAdded: string[], filesRemoved: string[], summary: string }|null}
+ */
+export function computeReplayDrift(currentFiles, sourceSnapshot) {
+  const fileTypes = sourceSnapshot?.fileTypes;
+  if (!fileTypes || typeof fileTypes !== 'object') return null;
+  const notSentinel = (p) => p && p !== '/dev/null';
+  const sourceFiles = [...new Set(Object.values(fileTypes).flat().filter(notSentinel))];
+  const cur = [...new Set((currentFiles ?? []).filter(notSentinel))];
+  const srcSet = new Set(sourceFiles);
+  const curSet = new Set(cur);
+  const filesAdded = cur.filter((f) => !srcSet.has(f)).sort();
+  const filesRemoved = sourceFiles.filter((f) => !curSet.has(f)).sort();
+  const drifted = filesAdded.length > 0 || filesRemoved.length > 0;
+  const summary = drifted
+    ? `${cur.length} changed file(s) at replay vs ${sourceFiles.length} in source plan (+${filesAdded.length}/-${filesRemoved.length}); content-level changes not detectable (plan does not snapshot diff bytes)`
+    : `no membership drift (${cur.length} changed file(s), same set as source plan)`;
+  return { filesAdded, filesRemoved, summary };
+}
+
+/**
  * Replay a previously emitted plan as a Review Artifact (`--plan <path>`).
  *
  * Contract (#802 Phase 3 — replay foundation):
@@ -193,6 +222,7 @@ export async function runReviewExecReplay({
   };
 
   let executionTrace = null;
+  let replayDrift = null;
   if (executeReview && selectedSkills.length > 0) {
     // Resolve the diff from the CURRENT working tree (or --artifact), not from
     // the plan. The plan does not snapshot diff bytes (design decision in
@@ -221,6 +251,15 @@ export async function runReviewExecReplay({
         throw new ReviewPlanError(`Failed to read diff artifact: ${err.message}`);
       }
       const parsedDiff = parseUnifiedDiff(diffText);
+      // #936: report (non-blocking) membership drift between the replay-time
+      // diff and the source plan's snapshot. Null when the snapshot predates A2-3.
+      replayDrift = computeReplayDrift(
+        // Exclude /dev/null (deletion/creation sentinel) so deleted/created
+        // files are not reported as literal drift paths, matching the
+        // changed-files extraction used elsewhere.
+        (parsedDiff.files ?? []).map((f) => f?.path).filter((p) => p && p !== '/dev/null'),
+        sourceSnapshot
+      );
       let review;
       try {
         review = await generateReviewImpl({
@@ -260,6 +299,7 @@ export async function runReviewExecReplay({
       source: planFile,
       sourcePhase: phaseFromArtifact,
       sourceTimestamp: typeof parsed.timestamp === 'string' ? parsed.timestamp : null,
+      ...(replayDrift ? { drift: replayDrift } : {}),
     };
     if (executionTrace) artifact.debug.execution = executionTrace;
   }
