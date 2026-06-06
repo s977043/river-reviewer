@@ -30,7 +30,8 @@ export function resolveDepthToReviewMode(depth) {
  */
 export function determineReviewMode(diffMeta, options = {}) {
   // An explicit manual mode overrides diff-size auto-detection.
-  if (options.manualMode && REVIEW_MODES.has(options.manualMode)) {
+  // Optional chaining guards against an explicit `null` options argument.
+  if (options?.manualMode && REVIEW_MODES.has(options.manualMode)) {
     return options.manualMode;
   }
 
