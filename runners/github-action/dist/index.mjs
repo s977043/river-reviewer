@@ -28185,13 +28185,40 @@ function findRelatedADRs(
   repoRoot,
   { changedFiles = [], keywords = [], extraDirs = [] } = {}
 ) {
-  const adrDirs = [...new Set([...DEFAULT_ADR_DIRS, ...extraDirs.filter(Boolean)])];
+  // Resolve and validate scan directories. extraDirs come from user config
+  // (review.specDirs); on shared/fork CI a traversal like '../../etc' must not
+  // escape the repo. Keep only in-repo, existing directories; de-dupe by path.
+  const candidateDirs = [
+    ...DEFAULT_ADR_DIRS,
+    ...(Array.isArray(extraDirs) ? extraDirs.filter(Boolean) : []),
+  ];
+  const adrDirs = [];
+  const seen = new Set();
+  for (const dir of candidateDirs) {
+    const fullDir = external_node_path_.resolve(repoRoot, dir);
+    const relative = external_node_path_.relative(repoRoot, fullDir);
+    // Reject the repo root itself, path traversal, absolute escapes, duplicates.
+    if (
+      relative === '' ||
+      relative.startsWith('..') ||
+      external_node_path_.isAbsolute(relative) ||
+      seen.has(relative)
+    ) {
+      continue;
+    }
+    try {
+      if (external_node_fs_.statSync(fullDir).isDirectory()) {
+        seen.add(relative);
+        adrDirs.push(relative);
+      }
+    } catch {
+      // missing or inaccessible → skip
+    }
+  }
   const results = [];
 
   for (const dir of adrDirs) {
     const fullDir = external_node_path_.join(repoRoot, dir);
-    if (!external_node_fs_.existsSync(fullDir)) continue;
-
     const files = external_node_fs_.readdirSync(fullDir).filter((f) => f.endsWith('.md'));
     for (const file of files) {
       const filePath = external_node_path_.join(dir, file);

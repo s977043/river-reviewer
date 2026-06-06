@@ -80,3 +80,31 @@ test('findRelatedADRs scans extraDirs (review.specDirs) beyond the defaults', as
     { prefix: 'adr-linker-' }
   );
 });
+
+test('findRelatedADRs ignores extraDirs that escape the repo root (path traversal)', async () => {
+  await withTempDir(
+    async (dir) => {
+      const results = findRelatedADRs(dir, {
+        changedFiles: ['app/x.ts'],
+        extraDirs: ['../', '../../', '/etc'],
+      });
+      assert.deepEqual(results, []);
+    },
+    { prefix: 'adr-linker-' }
+  );
+});
+
+test('findRelatedADRs skips a configured path that is a file, not a directory', async () => {
+  await withTempDir(
+    async (dir) => {
+      mkdirSync(path.join(dir, 'docs'), { recursive: true });
+      writeFileSync(path.join(dir, 'docs', 'notes.md'), 'plain file, not a dir');
+      const results = findRelatedADRs(dir, {
+        changedFiles: ['app/x.ts'],
+        extraDirs: ['docs/notes.md'],
+      });
+      assert.deepEqual(results, []);
+    },
+    { prefix: 'adr-linker-' }
+  );
+});

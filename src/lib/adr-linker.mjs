@@ -16,13 +16,40 @@ export function findRelatedADRs(
   repoRoot,
   { changedFiles = [], keywords = [], extraDirs = [] } = {}
 ) {
-  const adrDirs = [...new Set([...DEFAULT_ADR_DIRS, ...extraDirs.filter(Boolean)])];
+  // Resolve and validate scan directories. extraDirs come from user config
+  // (review.specDirs); on shared/fork CI a traversal like '../../etc' must not
+  // escape the repo. Keep only in-repo, existing directories; de-dupe by path.
+  const candidateDirs = [
+    ...DEFAULT_ADR_DIRS,
+    ...(Array.isArray(extraDirs) ? extraDirs.filter(Boolean) : []),
+  ];
+  const adrDirs = [];
+  const seen = new Set();
+  for (const dir of candidateDirs) {
+    const fullDir = path.resolve(repoRoot, dir);
+    const relative = path.relative(repoRoot, fullDir);
+    // Reject the repo root itself, path traversal, absolute escapes, duplicates.
+    if (
+      relative === '' ||
+      relative.startsWith('..') ||
+      path.isAbsolute(relative) ||
+      seen.has(relative)
+    ) {
+      continue;
+    }
+    try {
+      if (fs.statSync(fullDir).isDirectory()) {
+        seen.add(relative);
+        adrDirs.push(relative);
+      }
+    } catch {
+      // missing or inaccessible → skip
+    }
+  }
   const results = [];
 
   for (const dir of adrDirs) {
     const fullDir = path.join(repoRoot, dir);
-    if (!fs.existsSync(fullDir)) continue;
-
     const files = fs.readdirSync(fullDir).filter((f) => f.endsWith('.md'));
     for (const file of files) {
       const filePath = path.join(dir, file);
