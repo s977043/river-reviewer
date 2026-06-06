@@ -499,6 +499,15 @@ test('resolveRecommendationSet returns the skill ids for a known set', async () 
   ]);
 });
 
+test('resolveRecommendationSet resolves the pre-exec gate set (#976)', async () => {
+  const ids = await resolveRecommendationSet('pre-exec');
+  assert.deepEqual(ids, [
+    'rr-upstream-requirements-acceptance-001',
+    'rr-upstream-architecture-validation-plan-001',
+    'rr-upstream-plangate-plan-integrity-001',
+  ]);
+});
+
 test('resolveRecommendationSet throws SkillLoaderError for an unknown set', async () => {
   await assert.rejects(
     () => resolveRecommendationSet('does-not-exist'),
