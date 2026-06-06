@@ -293,6 +293,7 @@ export async function planLocalReview({
     riskMap,
     skillIds,
     manualReviewMode,
+    specDirs: config.review?.specDirs ?? [],
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;

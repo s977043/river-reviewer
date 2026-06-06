@@ -15,6 +15,7 @@
   - `language`: `ja`（日本語）/`en`（英語）。プロンプトの本文と出力言語を切り替える。
   - `severity`: `normal`（デフォルト）/`strict`/`relaxed`
   - `additionalInstructions`: 追加のレビューポリシー（配列）。プロンプト末尾に列挙される。
+  - `specDirs`: 変更ファイルと関連する設計文書をリンクする際に追加で走査する spec/ADR ディレクトリ（リポジトリ相対パスの配列）。組み込みの既定（`docs/adr` / `pages/explanation` / `specs`）にマージされる。
 - `exclude`
   - `files`: 変更差分から除外する glob パターン。
   - `prLabelsToIgnore`: Pull Request ラベル名に対象キーワードが含まれていればスキップする設定。`RIVER_PR_LABELS`（カンマ区切り）または GitHub Actions の `GITHUB_EVENT_PATH` から取得したラベルと照合し、大文字小文字を無視した部分一致で判定する。
