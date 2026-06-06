@@ -28463,9 +28463,16 @@ async function buildExecutionPlan(options) {
     llmEnabled = true,
     repoRoot,
     riskMap,
+    skillIds = null,
   } = options;
 
-  const skills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
+  const loadedSkills = providedSkills ?? (await (0,skill_loader/* loadSkills */.l1)());
+  // When a skill set is requested (--skill-set), narrow the candidate skills to
+  // the set's ids before phase/applyTo selection. Default (null) keeps all skills.
+  const skills =
+    Array.isArray(skillIds) && skillIds.length > 0
+      ? loadedSkills.filter((skill) => skillIds.includes(skill.metadata?.id ?? skill.id))
+      : loadedSkills;
   const selection = selectSkills(skills, {
     phase,
     changedFiles,
@@ -28572,10 +28579,11 @@ __nccwpck_require__.d(__webpack_exports__, {
   KJ: () => (/* binding */ defaultPaths),
   e$: () => (/* binding */ loadSchema),
   l1: () => (/* binding */ loadSkills),
-  eJ: () => (/* binding */ parseFrontMatter)
+  eJ: () => (/* binding */ parseFrontMatter),
+  mm: () => (/* binding */ resolveRecommendationSet)
 });
 
-// UNUSED EXPORTS: listSkillFiles, loadAllSkillMetadata, loadSkillFile, loadSkillMetadata, parseSkillFile
+// UNUSED EXPORTS: listSkillFiles, loadAllSkillMetadata, loadRecommendationSets, loadSkillFile, loadSkillMetadata, parseSkillFile
 
 // EXTERNAL MODULE: external "fs"
 var external_fs_ = __nccwpck_require__(9896);
@@ -28687,6 +28695,50 @@ function createSkillValidator(schema) {
   const ajv = new _2020({ allErrors: true, strict: false, useDefaults: true });
   dist(ajv);
   return ajv.compile(schema);
+}
+
+/**
+ * Read the named skill bundles declared under `recommendations:` in
+ * skills/registry.yaml. These are maintainer-curated sets (basic, typescript,
+ * comprehensive, ...) that `--skill-set <name>` exposes for selective runs.
+ *
+ * @param {{ skillsDir?: string }} [options]
+ * @returns {Promise<Record<string, { description?: string, skills: string[] }>>}
+ */
+async function loadRecommendationSets({ skillsDir = defaultSkillsDir } = {}) {
+  const registryPath = external_path_namespaceObject.join(skillsDir, 'registry.yaml');
+  let raw;
+  try {
+    raw = await external_fs_.promises.readFile(registryPath, 'utf8');
+  } catch {
+    return {};
+  }
+  let parsed;
+  try {
+    parsed = js_yaml/* default.load */.Ay.load(raw) ?? {};
+  } catch (err) {
+    throw new SkillLoaderError(`Failed to parse skill registry at ${registryPath}: ${err.message}`);
+  }
+  const recommendations = parsed?.recommendations;
+  return recommendations && typeof recommendations === 'object' ? recommendations : {};
+}
+
+/**
+ * Resolve a recommendation set name to its skill id list.
+ *
+ * @param {string} name
+ * @param {{ skillsDir?: string }} [options]
+ * @returns {Promise<string[]>} skill ids in the set
+ * @throws {SkillLoaderError} when the name is not a known recommendation set
+ */
+async function resolveRecommendationSet(name, { skillsDir = defaultSkillsDir } = {}) {
+  const sets = await loadRecommendationSets({ skillsDir });
+  const entry = sets[name];
+  if (!entry || !Array.isArray(entry.skills)) {
+    const available = Object.keys(sets).sort().join(', ') || '(none)';
+    throw new SkillLoaderError(`Unknown skill set "${name}". Available sets: ${available}.`);
+  }
+  return entry.skills.filter((id) => typeof id === 'string' && id.length > 0);
 }
 
 async function listSkillFiles(dir = defaultSkillsDir) {
@@ -34392,6 +34444,7 @@ async function planLocalReview({
   availableDependencies,
   plannerMode,
   baseRef = null,
+  skillIds = null,
 } = {}) {
   const base = await collectLocalContext({
     cwd,
@@ -34487,6 +34540,7 @@ async function planLocalReview({
     llmEnabled,
     repoRoot,
     riskMap,
+    skillIds,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -34530,6 +34584,7 @@ async function runLocalReview({
   plannerMode,
   reviewers,
   baseRef = null,
+  skillIds = null,
 } = {}) {
   const context =
     providedContext ??
@@ -34543,6 +34598,7 @@ async function runLocalReview({
       availableDependencies,
       plannerMode,
       baseRef,
+      skillIds,
     }));
   if (context.status === 'no-changes') {
     return {
@@ -56960,6 +57016,8 @@ Options:
                     Use "auto" to select roles automatically based on diff content and risk signals.
   --baseline <path> Path to a previous review JSON (findings array) for regression comparison
   --base <ref>      Branch or ref to diff against (e.g. main). Default: auto-detected default branch
+  --skill-set <name> Restrict review to a named skill set from skills/registry.yaml
+                    (e.g. basic, typescript, comprehensive). Default: all applicable skills
   --save            Persist the review run to the project result store (.river/runs/)
 
 Commands:
@@ -56995,6 +57053,7 @@ function parseArgs(argv) {
     reviewers: null,
     baseline: null,
     base: null,
+    skillSet: null,
     save: false,
     // runs subcommand fields
     runsSubcommand: null,
@@ -57349,6 +57408,18 @@ function parseArgs(argv) {
         break;
       }
       parsed.base = value;
+      continue;
+    }
+    if (arg === '--skill-set') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error(
+          'Error: --skill-set option requires a name (e.g. --skill-set comprehensive).'
+        );
+        parsed.command = 'help';
+        break;
+      }
+      parsed.skillSet = value;
       continue;
     }
     if (arg === '--save') {
@@ -58174,6 +58245,21 @@ Dependencies: ${
       return 0;
     }
 
+    // Resolve --skill-set to its skill ids up front so an unknown name fails
+    // fast with a clear message before any review work begins.
+    let skillIds = null;
+    if (parsed.skillSet) {
+      try {
+        skillIds = await (0,skill_loader/* resolveRecommendationSet */.mm)(parsed.skillSet);
+      } catch (err) {
+        if (err instanceof skill_loader/* SkillLoaderError */.vN) {
+          console.error(`Error: ${err.message}`);
+          return 1;
+        }
+        throw err;
+      }
+    }
+
     const context = await planLocalReview({
       cwd: targetPath,
       phase: parsed.phase,
@@ -58183,6 +58269,7 @@ Dependencies: ${
       availableDependencies: parsed.availableDependencies,
       plannerMode: parsed.plannerMode,
       baseRef: parsed.base,
+      skillIds,
     });
 
     const estimator = new cost_estimator(
@@ -58258,6 +58345,7 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
       reviewers: parsed.reviewers,
       baseRef: parsed.base,
+      skillIds,
     });
 
     // Persist run to result store when --save is provided
