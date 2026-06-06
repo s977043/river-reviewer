@@ -16,7 +16,7 @@ this doc records what to reuse, what is a genuine gap, and what not to adopt.**
   consistent with the project's "no new top-level command / no new routing
   config" stance (Epic #1024).
 - **Do not adopt `codex-dynamic-workflows` directly** (unofficial, unclear
-  safety/reproducibility/ownership). Extract only the *pattern*: gate the work
+  safety/reproducibility/ownership). Extract only the _pattern_: gate the work
   by review stage, emit evidence, and stop/escalate via a verdict.
 - **Ship now (this issue): a `pre-exec` recommended skill set** bundling the
   existing upstream review skills, so `river review plan --skill-set pre-exec`
@@ -26,31 +26,31 @@ this doc records what to reuse, what is a genuine gap, and what not to adopt.**
 
 ## What already exists (vision → implementation map)
 
-| #976 review target | Status | Existing implementation |
-| --- | --- | --- |
-| Requirements Review | covered | `rr-upstream-requirements-acceptance-001` (skill) |
-| Design Review | covered | `rr-upstream-architecture-validation-plan-001`, `rr-upstream-architecture-boundaries-001` |
-| Plan Review | covered | `rr-upstream-plangate-plan-integrity-001` (plan/pbi-input/todo/test-cases integrity) |
-| Diff Review | covered | `river run` / `river review exec` + midstream skills; conformance via `rr-upstream-plangate-exec-conformance-001` |
-| Evidence/Report Review | partial | `rr-upstream-plangate-verification-audit-001` (W-check / META findings); `verify` gate runtime is a stub |
-| GO / NO-GO verdict | covered | `deriveVerdict` (`auto-approve` / `human-review-recommended` / `human-review-required`) |
-| Input contract | covered | artifact-resolver: `pbi-input` / `plan` / `todo` / `test-cases` / `adr` / `diff` / `review-self` / `review-external` |
-| Concept docs | covered | `pages/explanation/review-scope.md` documents pre-execution Requirements/Design/Plan review and the River↔PlanGate split |
+| #976 review target     | Status  | Existing implementation                                                                                                  |
+| ---------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Requirements Review    | covered | `rr-upstream-requirements-acceptance-001` (skill)                                                                        |
+| Design Review          | covered | `rr-upstream-architecture-validation-plan-001`, `rr-upstream-architecture-boundaries-001`                                |
+| Plan Review            | covered | `rr-upstream-plangate-plan-integrity-001` (plan/pbi-input/todo/test-cases integrity)                                     |
+| Diff Review            | covered | `river run` / `river review exec` + midstream skills; conformance via `rr-upstream-plangate-exec-conformance-001`        |
+| Evidence/Report Review | partial | `rr-upstream-plangate-verification-audit-001` (W-check / META findings); `verify` gate runtime is a stub                 |
+| GO / NO-GO verdict     | covered | `deriveVerdict` (`auto-approve` / `human-review-recommended` / `human-review-required`)                                  |
+| Input contract         | covered | artifact-resolver: `pbi-input` / `plan` / `todo` / `test-cases` / `adr` / `diff` / `review-self` / `review-external`     |
+| Concept docs           | covered | `pages/explanation/review-scope.md` documents pre-execution Requirements/Design/Plan review and the River↔PlanGate split |
 
 ## CLI naming decision
 
 `river review <subcommand>` already maps onto #976's stages:
 
-| #976 stage | River command + selection |
-| --- | --- |
+| #976 stage                                     | River command + selection                                                            |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Requirements / Design / Plan review (pre-exec) | `river review plan --skill-set pre-exec` with `pbi-input` / `plan` / `adr` artifacts |
-| Diff review | `river run .` or `river review exec` |
-| Evidence / report review | `river review verify` (W-check; runtime still a stub — see gaps) |
+| Diff review                                    | `river run .` or `river review exec`                                                 |
+| Evidence / report review                       | `river review verify` (W-check; runtime still a stub — see gaps)                     |
 
 The proposed `river-review-requirements` / `river-review-design` style is
 **rejected**: it would add five top-level commands, conflicting with
 single-command naming and the existing subcommand model. Stage selection is a
-*skill-set / artifact* concern, not a command concern.
+_skill-set / artifact_ concern, not a command concern.
 
 ## The `pre-exec` skill set (shipped with this issue)
 
@@ -88,7 +88,7 @@ phase + skill set + artifacts. It is responsible for:
 - selecting the right review skills for the stage (skill `applyTo` / phase /
   `--skill-set`),
 - producing findings with severity + evidence,
-- emitting a verdict (`deriveVerdict`) as *advice*.
+- emitting a verdict (`deriveVerdict`) as _advice_.
 
 It is **not** responsible for blocking—that is PlanGate's role (GO / NO-GO).
 There is intentionally no separate `review-gates/` config directory or
@@ -112,5 +112,5 @@ These are independent, additive, and each splittable into its own issue.
 
 - `codex-dynamic-workflows` as a dependency or imported Skill (unofficial;
   ownership/safety/reproducibility concerns). Only the staged-gate + evidence +
-  verdict *pattern* is reflected, and it was already largely present.
+  verdict _pattern_ is reflected, and it was already largely present.
 - A new `review-gates/` config surface or `river-review-*` command family.

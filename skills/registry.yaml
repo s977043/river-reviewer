@@ -863,7 +863,7 @@ recommendations:
       - rr-midstream-security-basic-001
 
   pre-exec:
-    description: 'Pre-execution review gate: requirements / design / plan checks before implementation (river review plan --skill-set pre-exec)'
+    description: 'Pre-execution review gate: requirements / design / plan checks before implementation'
     skills:
       - rr-upstream-requirements-acceptance-001
       - rr-upstream-architecture-validation-plan-001
