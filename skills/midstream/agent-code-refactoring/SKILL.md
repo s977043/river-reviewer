@@ -48,12 +48,15 @@ Why: 挙動を変えずに設計を整えるためのリファクタリング手
 
 - Plan safety nets (tests/smoke) before refactors; keep steps small and reversible.
 - Extract focused functions/constants to reduce nesting and magic values without changing behaviour.
+- Flag over-abstraction (the reverse of duplication): premature DRY that couples code with different reasons to change, unnecessary layers/indirection/delegation, and interfaces/generics introduced for a single current caller. Distinguish "same concept duplicated" from "coincidentally similar".
+- Flag over-classification: a class/type where a function or plain data would be clearer, and speculative extensibility ("future-proofing") not needed by the current diff.
 - Align error handling/logging with neighbours and rerun tests after each step.
 - Call out areas needing tests before deeper refactors.
 
 ## Non-goals
 
 - ビジネス仕様を変える提案や大規模再設計の押し付けは避ける。
+- 概念モデリング・型設計は `rr-midstream-type-driven-design-001`、テスト安定性（I/O・日時・乱数依存）は `rr-downstream-flaky-test-001` に委譲する。
 
 ## False-positive guards
 

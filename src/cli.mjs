@@ -21,6 +21,7 @@ import { ProjectRulesError } from './lib/rules.mjs';
 import { RiskMapError } from './lib/risk-map.mjs';
 import { parseList } from './lib/utils.mjs';
 import { PLANNER_MODES } from './lib/planner-utils.mjs';
+import { DEPTH_TO_REVIEW_MODE, resolveDepthToReviewMode } from './lib/review-plan-generator.mjs';
 import { scoreReview } from './lib/scoring/engine.mjs';
 import { AXES, AXIS_LABELS_JA } from './lib/scoring/rubric.mjs';
 import { severityToPriority } from './lib/finding-format.mjs';
@@ -78,6 +79,7 @@ Options:
   --base <ref>      Branch or ref to diff against (e.g. main). Default: auto-detected default branch
   --skill-set <name> Restrict review to a named skill set from skills/registry.yaml
                     (e.g. basic, typescript, comprehensive). Default: all applicable skills
+  --depth <name>    Force review depth: quick|standard|thorough. Default: auto-detected from diff size
   --save            Persist the review run to the project result store (.river/runs/)
 
 Commands:
@@ -114,6 +116,7 @@ function parseArgs(argv) {
     baseline: null,
     base: null,
     skillSet: null,
+    depth: null,
     save: false,
     // runs subcommand fields
     runsSubcommand: null,
@@ -480,6 +483,17 @@ function parseArgs(argv) {
         break;
       }
       parsed.skillSet = value;
+      continue;
+    }
+    if (arg === '--depth') {
+      const value = args.shift();
+      const valid = Object.keys(DEPTH_TO_REVIEW_MODE);
+      if (!value || !valid.includes(value)) {
+        console.error(`Error: --depth must be one of: ${valid.join(', ')} (got "${value ?? ''}").`);
+        parsed.command = 'help';
+        break;
+      }
+      parsed.depth = value;
       continue;
     }
     if (arg === '--save') {
@@ -1320,6 +1334,8 @@ Dependencies: ${
       }
     }
 
+    const manualReviewMode = resolveDepthToReviewMode(parsed.depth);
+
     const context = await planLocalReview({
       cwd: targetPath,
       phase: parsed.phase,
@@ -1330,6 +1346,7 @@ Dependencies: ${
       plannerMode: parsed.plannerMode,
       baseRef: parsed.base,
       skillIds,
+      manualReviewMode,
     });
 
     const estimator = new CostEstimator(
@@ -1406,6 +1423,7 @@ Dependencies: ${
       reviewers: parsed.reviewers,
       baseRef: parsed.base,
       skillIds,
+      manualReviewMode,
     });
 
     // Persist run to result store when --save is provided
