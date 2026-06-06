@@ -168,6 +168,7 @@ export async function planLocalReview({
   plannerMode,
   baseRef = null,
   skillIds = null,
+  manualReviewMode = null,
 } = {}) {
   const base = await collectLocalContext({
     cwd,
@@ -264,6 +265,7 @@ export async function planLocalReview({
     repoRoot,
     riskMap,
     skillIds,
+    manualReviewMode,
   });
 
   const plannerUsed = planner ? !plan.plannerFallback : false;
@@ -308,6 +310,7 @@ export async function runLocalReview({
   reviewers,
   baseRef = null,
   skillIds = null,
+  manualReviewMode = null,
 } = {}) {
   const context =
     providedContext ??
@@ -322,6 +325,7 @@ export async function runLocalReview({
       plannerMode,
       baseRef,
       skillIds,
+      manualReviewMode,
     }));
   if (context.status === 'no-changes') {
     return {
