@@ -4,7 +4,7 @@ River Review works best when you combine a pre-PR local self-review with a post-
 
 ## Overview
 
-```
+```text
 implement
   ↓  pre-PR (local, noise removal)
 river run .              ← self-review the diff for quality & risk
