@@ -46,6 +46,10 @@ river run . --output json
 }
 ```
 
+### チャンク分割と重複排除
+
+複数のロール（`auto` を含む）でレビューする場合、大きな diff は自動的にチャンクに分割され、ロール × チャンクで並列実行されます。各実行から得られた findings は、最終 ID を割り当てる前にチャンク・ロール間で重複排除されます。このため、同一箇所の重複指摘は 1 件に統合されます（実装: `src/lib/reviewer-orchestrator.mjs` の `splitDiffIntoChunks` / `deduplicateFindings`）。
+
 ---
 
 ## エージェント別の呼び出し方
