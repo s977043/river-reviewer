@@ -32608,9 +32608,10 @@ function computeEvidenceStrength(finding) {
   return 1.0;
 }
 
-// Matches verifier's actionability heuristic: a Fix/Suggestion with >=10 chars
-// of substance, in the message body or the dedicated suggestion field.
-const ACTIONABLE_RE = /(?:Fix|Suggestion):\s*(.{10,})/;
+// Mirrors (and refines) verifier's actionability heuristic: a Fix/Suggestion
+// with >=10 chars of substance, in the message body or the suggestion field.
+// `\b` avoids matching Prefix:/Suffix:; `[\s\S]` lets the fix span newlines.
+const ACTIONABLE_RE = /\b(?:Fix|Suggestion):\s*([\s\S]{10,})/;
 
 /**
  * How clear/actionable the fix is. Derived from the presence of a concrete

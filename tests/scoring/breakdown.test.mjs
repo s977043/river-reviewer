@@ -29,6 +29,16 @@ describe('computeFindingBreakdown', () => {
     );
     assert.equal(computeFindingBreakdown({ suggestion: 'tweak' }).actionability, 0.5);
     assert.equal(computeFindingBreakdown({}).actionability, 0.0);
+    // Fix spanning a newline still matches ([\s\S]); a word like Prefix: does not.
+    assert.equal(
+      computeFindingBreakdown({ message: 'Finding: x.\nFix:\n- wrap in a guard clause' })
+        .actionability,
+      1.0
+    );
+    assert.equal(
+      computeFindingBreakdown({ message: 'Prefix: not a real fix here' }).actionability,
+      0.0
+    );
   });
 
   it('actionability does not change the composite score', () => {
