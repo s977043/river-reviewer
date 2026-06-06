@@ -178,6 +178,21 @@ test('parseArgs: --cases path for eval', () => {
   assert.equal(parsed.fixturesCasesPath, 'custom-cases.json');
 });
 
+test('parseArgs: --base captures the diff ref', () => {
+  const parsed = parseArgs(['run', '.', '--base', 'develop']);
+  assert.equal(parsed.base, 'develop');
+});
+
+test('parseArgs: --base defaults to null when unset', () => {
+  const parsed = parseArgs(['run', '.']);
+  assert.equal(parsed.base, null);
+});
+
+test('parseArgs: --base without value falls back to help', () => {
+  const parsed = parseArgs(['run', '.', '--base']);
+  assert.equal(parsed.command, 'help');
+});
+
 // -----------------------------------------------------------------------------
 // skills import options
 // -----------------------------------------------------------------------------

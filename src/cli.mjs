@@ -75,6 +75,7 @@ Options:
   --reviewers list  Comma-separated reviewer roles for parallel orchestration (e.g. bug-hunter,security-scanner,test-gap).
                     Use "auto" to select roles automatically based on diff content and risk signals.
   --baseline <path> Path to a previous review JSON (findings array) for regression comparison
+  --base <ref>      Branch or ref to diff against (e.g. main). Default: auto-detected default branch
   --save            Persist the review run to the project result store (.river/runs/)
 
 Commands:
@@ -109,6 +110,7 @@ function parseArgs(argv) {
     availableDependencies: null,
     reviewers: null,
     baseline: null,
+    base: null,
     save: false,
     // runs subcommand fields
     runsSubcommand: null,
@@ -453,6 +455,16 @@ function parseArgs(argv) {
         break;
       }
       parsed.baseline = value;
+      continue;
+    }
+    if (arg === '--base') {
+      const value = args.shift();
+      if (!value || value.startsWith('-')) {
+        console.error('Error: --base option requires a branch or ref (e.g. --base main).');
+        parsed.command = 'help';
+        break;
+      }
+      parsed.base = value;
       continue;
     }
     if (arg === '--save') {
@@ -1286,6 +1298,7 @@ Dependencies: ${
       availableContexts: parsed.availableContexts,
       availableDependencies: parsed.availableDependencies,
       plannerMode: parsed.plannerMode,
+      baseRef: parsed.base,
     });
 
     const estimator = new CostEstimator(
@@ -1360,6 +1373,7 @@ Dependencies: ${
       availableDependencies: parsed.availableDependencies,
       plannerMode: parsed.plannerMode,
       reviewers: parsed.reviewers,
+      baseRef: parsed.base,
     });
 
     // Persist run to result store when --save is provided
