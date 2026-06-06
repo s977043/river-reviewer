@@ -15,6 +15,7 @@ Place `.river-review.json` in the repository root to customize review model sett
   - `language`: `ja` (Japanese) / `en` (English). Switches prompt body and output language.
   - `severity`: `normal` (Default) / `strict` / `relaxed`
   - `additionalInstructions`: Additional review policies (array). Listed at the end of the prompt.
+  - `specDirs`: Extra spec/ADR directories (repo-relative paths, array) scanned when linking changed files to related design docs. Merged with the built-in defaults (`docs/adr` / `pages/explanation` / `specs`).
 - `exclude`
   - `files`: Glob patterns to exclude from change diffs.
   - `prLabelsToIgnore`: Skips review if Pull Request label contains target keywords. Matches partial case-insensitive against `RIVER_PR_LABELS` (comma separated) or GitHub Actions `GITHUB_EVENT_PATH`.

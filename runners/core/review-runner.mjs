@@ -195,6 +195,7 @@ export async function buildExecutionPlan(options) {
     riskMap,
     skillIds = null,
     manualReviewMode = null,
+    specDirs = [],
   } = options;
 
   const loadedSkills = providedSkills ?? (await loadSkills());
@@ -230,6 +231,7 @@ export async function buildExecutionPlan(options) {
   const relatedADRs = findRelatedADRs(repoRoot ?? process.cwd(), {
     changedFiles,
     keywords: impactTags,
+    extraDirs: specDirs,
   });
 
   const diffMeta = extractDiffMeta({ changedFiles, diffText });
