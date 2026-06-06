@@ -26,15 +26,15 @@ river run . --depth thorough     # レビュー深度を明示（quick|standard|
 river run . --skill-set typescript  # 観点セットを限定（registry の recommendations）
 ```
 
-- `.river/rules.md` と `.river/rules.d/*.md` のプロジェクト固有ルールが自動注入されます（[リポジトリ全体レビュー](./repo-wide-review.md) 参照）。
-- `--dry-run` で API を呼ばずに計画と対象スキルだけを確認できます。
+- `.river/rules.md` と `.river/rules.d/*.md` のプロジェクト固有ルールが自動注入される（[リポジトリ全体レビュー](./repo-wide-review.md) 参照）。
+- `--dry-run` で API を呼ばずに計画と対象スキルだけを確認できる。
 
 ## PR 後: GitHub Actions 自動レビュー
 
 PR の作成・更新時に自動でレビューし、結果を PR コメントへ投稿します。セットアップは [GitHub Actions で River Review をセットアップする](./github-actions.md) を参照してください。
 
-- フェーズ（`upstream` / `midstream` / `downstream`）を指定して実行できます。
-- ラベルによる実行制御（`prLabelsToIgnore`）でノイズや無駄なコストを抑えられます。
+- フェーズ（`upstream` / `midstream` / `downstream`）を指定して実行できる。
+- ラベルによる実行制御（`prLabelsToIgnore`）でノイズや無駄なコストを抑えられる。
 
 ## 仕様整合: plan / exec ゲート
 
@@ -49,8 +49,8 @@ river review exec   # 計画に沿ってレビューを実行
 
 ## ポイント
 
-- **AI レビューは判断材料**であり、採用判断は人間が行います。指摘は重要度（critical / major / minor / info）付きで出力されます。
-- まずは「PR 前ローカル + PR 後ラベル付き自動実行」から始め、慣れてきたら対象を広げるのが安全です。
+- **AI レビューは判断材料**であり、採用判断は人間が行う。指摘は重要度（critical / major / minor / info）付きで出力される。
+- まずは「PR 前ローカル + PR 後ラベル付き自動実行」から始め、慣れてきたら対象を広げるのが安全。
 
 ## 関連
 
