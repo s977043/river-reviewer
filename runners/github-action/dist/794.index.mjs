@@ -515,14 +515,14 @@ async function runReviewExecReplay({
  *
  * Contract (per cli-review-plan-spec / plangate-cli-roadmap): canonical
  * is `--output <format>`; `--format` is a compat alias. The unified
- * format set is text|markdown|json. Until text/markdown rendering is
- * implemented, only `json` is honored; when neither flag is given the
- * format falls back to `json` for backward compatibility with the
- * slice-1/B-1/B-2 behavior (and the plangate-review workflow).
+ * format set is text|markdown|json. `json` (default) and `markdown`
+ * (#976) are honored; `text` is not yet implemented. When neither flag is
+ * given the format falls back to `json` for backward compatibility with
+ * the slice-1/B-1/B-2 behavior (and the plangate-review workflow).
  *
  * @param {{output?:string, outputExplicit?:boolean, format?:string|null,
  *   formatExplicit?:boolean}} parsed
- * @returns {'json'}
+ * @returns {'json'|'markdown'}
  * @throws {ReviewPlanError} on an unsupported or conflicting combination
  */
 function resolveReviewOutputFormat({
@@ -542,13 +542,14 @@ function resolveReviewOutputFormat({
   else if (outputExplicit) effective = output;
   else effective = 'json'; // backward-compatible default
   if (effective === 'json') return 'json';
-  if (effective === 'text' || effective === 'markdown') {
+  if (effective === 'markdown') return 'markdown'; // #976: human-readable artifact rendering
+  if (effective === 'text') {
     throw new ReviewPlanError(
-      `Output format "${effective}" is not implemented yet for river review; only "json" is supported.`
+      `Output format "text" is not implemented yet for river review; use "json" or "markdown".`
     );
   }
   throw new ReviewPlanError(
-    `Unsupported output format "${effective}" for river review. Expected: json (text/markdown not yet implemented).`
+    `Unsupported output format "${effective}" for river review. Expected: json | markdown (text not yet implemented).`
   );
 }
 
