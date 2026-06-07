@@ -60,3 +60,27 @@ sequenceDiagram
   River->>River: select skills (selected/skipped)
   River-->>Dev: plan + findings (+ debug)
 ```
+
+## CLI-first execution surface and resolution order
+
+The **canonical execution surface of River Review is the CLI**. GitHub Action / Claude Code command / Codex skill / MCP / shell are designed as thin wrappers that call this CLI (e.g. the GitHub Action is a thin adapter: `runners/github-action/src/index.mjs` merely imports `src/cli.mjs`). Review judgement, skill resolution, and gate decisions live in the CLI, not in each surface.
+
+- **Command name**: both `river` and `river-review` bins point to `src/cli.mjs`. In agent-facing docs and examples, prefer `river-review` to avoid ambiguity.
+- **Subcommands**: `river-review run <path>` (local diff review), `river-review review plan|exec|verify` (artifact-driven gate), `river-review skills <subcommand>`.
+- **JSON is the first-class output**: the Review Artifact conforming to `schemas/review-artifact.schema.json` (`version: "1"`) is the machine-readable contract. PR inline comments / Checks / Markdown summary / dashboard / agent handoff are adapters that transform this JSON (`--output markdown` is a human-facing derived view).
+
+### skill / gate / config resolution order
+
+Which skills / gates / rules are ultimately selected is resolved deterministically and can be inspected via `--debug` output (`plan.selectedSkills` / `skippedSkills` with reasons). Precedence (highest first):
+
+1. **CLI explicit options** — `--config` / `--skill-set` / `--context` / `--dependency`, etc.
+2. **Repository local** — `.river-review.{json,yaml,yml}` (`src/config/loader.mjs`), `.river/rules.md` + `.river/rules.d/*.md`, `skills/registry.yaml`
+3. **Built-in** — bundled skills and defaults
+
+> A user-global tier (`~/.river-review/`) is not implemented yet ([#1045](https://github.com/s977043/river-review/issues/1045) follow-up). When added, it slots between "Repository local" and "Built-in".
+
+### No auto-update
+
+The CLI / Action ship no auto-update mechanism. Consumers pin and update versions explicitly (GitHub Action version pinning, npm lockfiles). This is a deliberate choice favoring deterministic execution and auditability.
+
+See also: gate responsibilities in [Review Gates Design](../../docs/development/review-gates-design.md), and config options in [config-schema](../reference/config-schema.en.md).

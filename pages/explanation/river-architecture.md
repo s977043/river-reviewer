@@ -58,3 +58,27 @@ sequenceDiagram
   River->>River: select skills (selected/skipped)
   River-->>Dev: plan + findings (+ debug)
 ```
+
+## CLI-first 実行面と解決順序
+
+River Review の**正規実行面は CLI** です。GitHub Action / Claude Code command / Codex skill / MCP / shell は、原則としてこの CLI を呼ぶ薄い wrapper として設計します。たとえば GitHub Action は `runners/github-action/src/index.mjs` が `src/cli.mjs` を import するだけの thin adapter です。レビュー判断・skill 解決・gate 判定は CLI 側に集約し、各 surface には持たせません。
+
+- **コマンド名**: bin は `river` と `river-review` の両方が `src/cli.mjs` を指す。agent 向けの説明・examples では、曖昧さを避けるため `river-review` を第一候補とする。
+- **サブコマンド**: `river-review run <path>`（ローカル diff レビュー）、`river-review review plan|exec|verify`（artifact-driven gate）、`river-review skills <subcommand>`。
+- **JSON が一次成果物**: `schemas/review-artifact.schema.json`（`version: "1"`）に準拠した Review Artifact が machine-readable 契約である。PR inline comment / Check / Markdown summary / dashboard / agent handoff は、この JSON を変換する adapter として扱う（`--output markdown` は人間向け派生表示）。
+
+### skill / gate / config の解決順序
+
+最終的にどの skill / gate / rule が採用されたかは決定論的に解決され、`--debug` 出力の `plan.selectedSkills` / `skippedSkills`（理由付き）で確認できます。優先順位は次のとおり（上が優先）:
+
+1. **CLI 明示指定** — `--config` / `--skill-set` / `--context` / `--dependency` など
+2. **リポジトリローカル** — `.river-review.{json,yaml,yml}`（`src/config/loader.mjs`）、`.river/rules.md` + `.river/rules.d/*.md`、`skills/registry.yaml`
+3. **ビルトイン** — 同梱 skill と既定値
+
+> ユーザーグローバル tier（`~/.river-review/`）は現時点では未実装です（[#1045](https://github.com/s977043/river-review/issues/1045) のフォローアップ）。導入時は「リポジトリローカル」と「ビルトイン」の間に挿入します。
+
+### auto-update は導入しない
+
+CLI / Action は自動アップデート機構を持ちません。バージョンは利用側が明示的に固定・更新します（GitHub Action のバージョンピン、npm の lockfile など）。これは決定論的な実行と監査可能性を優先する設計判断です。
+
+関連: review gate の責務分担は [Review Gates Design](../../docs/development/review-gates-design.md)、設定項目は [config-schema](../reference/config-schema.md) を参照。
