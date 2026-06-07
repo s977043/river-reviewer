@@ -51,12 +51,12 @@ When a retrospective identifies a recurring mistake or missing guardrail, follow
 
 ## Tooling
 
-| Component   | Location                         | Behavior                                                       |
-| ----------- | -------------------------------- | -------------------------------------------------------------- |
-| Permissions | `.claude/settings.json`          | Defines allow/ask/deny command lists                           |
-| Rules       | `.claude/rules/`                 | Auto-loaded by glob pattern in frontmatter (e.g., `**/*`)      |
-| Hooks       | `.claude/hooks/format.sh`        | PostToolUse: auto-runs prettier on all changed files (vs HEAD) |
-| Sub-agent   | `.claude/agents/river-review.md` | Code review delegation; uses Read, Grep, Glob, Bash            |
+| Component   | Location                  | Behavior                                                              |
+| ----------- | ------------------------- | --------------------------------------------------------------------- |
+| Permissions | `.claude/settings.json`   | Defines allow/ask/deny command lists                                  |
+| Rules       | `.claude/rules/`          | Auto-loaded by glob pattern in frontmatter (e.g., `**/*`)             |
+| Hooks       | `.claude/hooks/format.sh` | PostToolUse: auto-runs prettier on all changed files (vs HEAD)        |
+| Sub-agent   | `agents/river-review.md`  | Distributed plugin agent (top-level per #996); Read, Grep, Glob, Bash |
 
 ## Custom Commands
 
@@ -71,4 +71,4 @@ When a retrospective identifies a recurring mistake or missing guardrail, follow
 | `/plan-merge-order` | Plan merge order for multiple PRs to minimize rebase cost |
 | `/preflight`        | Verify tasks are not obsolete or in parallel before work  |
 
-Details: `.claude/commands/`
+Details: distributed commands (`/check` `/pr` `/skill` `/review-local` `/challenge`) live in top-level `commands/` (plugin surface, per #996); repo-dev commands (`/propose-issue` `/plan-merge-order` `/preflight`) stay in `.claude/commands/`.

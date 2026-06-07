@@ -21,13 +21,13 @@
     "skills"
   ],
   "commands": [
-    "./.claude/commands/review-local.md",
-    "./.claude/commands/challenge.md",
-    "./.claude/commands/skill.md",
-    "./.claude/commands/check.md",
-    "./.claude/commands/pr.md"
+    "./commands/review-local.md",
+    "./commands/challenge.md",
+    "./commands/skill.md",
+    "./commands/check.md",
+    "./commands/pr.md"
   ],
-  "agents": "./.claude/agents/river-review.md",
+  "agents": "./agents/river-review.md",
   "skills": "./skills/agent-skills/",
   "hooks": "./hooks/hooks.json"
 }
