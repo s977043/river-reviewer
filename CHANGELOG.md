@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.3.0](https://github.com/s977043/river-review/compare/v1.2.2...v1.3.0) (2026-06-07)
+
+
+### Features
+
+* **976:** pre-exec review-gate skill set + design doc ([#1042](https://github.com/s977043/river-review/issues/1042)) ([d16cc53](https://github.com/s977043/river-review/commit/d16cc53d775581f11f5b0c6542da880f30ed1e0c))
+* **cli:** add --base &lt;ref&gt; to river run for explicit diff base ([#1022](https://github.com/s977043/river-review/issues/1022)) ([#1028](https://github.com/s977043/river-review/issues/1028)) ([d1542d1](https://github.com/s977043/river-review/commit/d1542d1ad3a2260f0d75ddecfc7b66cc7fa55539))
+* **cli:** add --depth to river run to force review depth ([#1025](https://github.com/s977043/river-review/issues/1025)) ([#1033](https://github.com/s977043/river-review/issues/1033)) ([d0baa09](https://github.com/s977043/river-review/commit/d0baa092b0734e71b384449155061e5aa7065ec3))
+* **cli:** add --skill-set &lt;name&gt; to river run ([#1027](https://github.com/s977043/river-review/issues/1027)) ([#1030](https://github.com/s977043/river-review/issues/1030)) ([4d682d4](https://github.com/s977043/river-review/commit/4d682d43b0b22da0bb3fc6c4099bfec36e0dc49d))
+* **review:** implement --output markdown for river review ([#976](https://github.com/s977043/river-review/issues/976) gap) ([#1046](https://github.com/s977043/river-review/issues/1046)) ([0c172e5](https://github.com/s977043/river-review/commit/0c172e55adb6e8a3552aceabac84aa4f954bdb35))
+* **review:** opt-in --fail-on/--warn-on/--advisory-only gate ([#976](https://github.com/s977043/river-review/issues/976) gap) ([#1047](https://github.com/s977043/river-review/issues/1047)) ([5a33ec2](https://github.com/s977043/river-review/commit/5a33ec2ab4bbed1c01b2e5a9459e5814188ba80e))
+* **review:** opt-in walkthrough & agent-handoff sections ([#1023](https://github.com/s977043/river-review/issues/1023)) ([#1040](https://github.com/s977043/river-review/issues/1040)) ([62fb10f](https://github.com/s977043/river-review/commit/62fb10f09fe5f20b7e9a5925afcebb380f8e42d2))
+* **review:** report replay drift in debug.replay.drift ([#936](https://github.com/s977043/river-review/issues/936)) ([#1041](https://github.com/s977043/river-review/issues/1041)) ([20ea917](https://github.com/s977043/river-review/commit/20ea917e5f5f671a51490a974fcff0429239b030))
+* **review:** review the PR description ([#1023](https://github.com/s977043/river-review/issues/1023) pr-description) ([#1037](https://github.com/s977043/river-review/issues/1037)) ([7250064](https://github.com/s977043/river-review/commit/7250064de0d32c9cc734b4ce17952db90748aee0))
+* **rules:** load split rule files from .river/rules.d/*.md ([#1025](https://github.com/s977043/river-review/issues/1025)) ([#1032](https://github.com/s977043/river-review/issues/1032)) ([65b99e5](https://github.com/s977043/river-review/commit/65b99e55cc7c618beafb3269ab9fcbc84ff15004))
+* **scoring:** add actionability axis to finding breakdown ([#1027](https://github.com/s977043/river-review/issues/1027)) ([#1039](https://github.com/s977043/river-review/issues/1039)) ([4210b75](https://github.com/s977043/river-review/commit/4210b75946c9f2e905040c0891f8e4d4eb69f34e))
+* **skill:** add river-review-docs documentation review skill ([#990](https://github.com/s977043/river-review/issues/990)) ([#1014](https://github.com/s977043/river-review/issues/1014)) ([c4901a9](https://github.com/s977043/river-review/commit/c4901a94f2582a0e39fc769e42e7d537ca71134f))
+* **skills:** add encapsulation/naming and over-abstraction guidance ([#1031](https://github.com/s977043/river-review/issues/1031)) ([1aa209b](https://github.com/s977043/river-review/commit/1aa209b919d32905f9e77745d46175c338ec9a71))
+* **spec-link:** configurable spec/ADR dirs via review.specDirs ([#1022](https://github.com/s977043/river-review/issues/1022)) ([#1038](https://github.com/s977043/river-review/issues/1038)) ([1935411](https://github.com/s977043/river-review/commit/19354112ed658f401e578dbc8d17058a73f241b6))
+
 ## [1.2.2](https://github.com/s977043/river-review/compare/v1.2.1...v1.2.2) (2026-06-04)
 
 
