@@ -1,16 +1,13 @@
-# .claude/commands/
+# .claude/commands/ (repo-dev commands)
 
-Custom slash commands for Claude Code.
+Repo-development slash commands (NOT part of the distributed plugin surface).
 
 | Command             | File                  | Purpose                                                   |
 | ------------------- | --------------------- | --------------------------------------------------------- |
-| `/check`            | `check.md`            | Run quality checks (lint + test)                          |
-| `/pr`               | `pr.md`               | Draft PR description                                      |
-| `/skill`            | `skill.md`            | Find or create skill definition                           |
-| `/review-local`     | `review-local.md`     | Self-review current diff                                  |
-| `/challenge`        | `challenge.md`        | Adversarial review (pre-mortem, war game)                 |
 | `/propose-issue`    | `propose-issue.md`    | Research codebase before creating an issue                |
 | `/plan-merge-order` | `plan-merge-order.md` | Plan merge order for multiple PRs to minimize rebase cost |
 | `/preflight`        | `preflight.md`        | Verify tasks are not obsolete or in parallel before work  |
 
-> **整合性**: CLAUDE.md `Custom Commands` 表と本表は同期必須。コマンド追加時は両方を更新すること。
+> **配布対象のコマンド** (`/check` `/pr` `/skill` `/review-local` `/challenge`) は #996 で top-level [`commands/`](../../commands/) へ分離し、`.claude-plugin/plugin.json` がそこを参照します。本ディレクトリには repo-dev 専用コマンドのみが残ります。
+>
+> **整合性**: コマンド追加時は配布対象か repo-dev かを判断して正しい場所に置き、CLAUDE.md の `Custom Commands` 表を更新すること。配布対象コマンドの場合はさらに `.claude-plugin/plugin.json` の `commands` にも追加する必要があります。
