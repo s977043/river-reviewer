@@ -10,4 +10,4 @@ Repo-development slash commands (NOT part of the distributed plugin surface).
 
 > **配布対象のコマンド** (`/check` `/pr` `/skill` `/review-local` `/challenge`) は #996 で top-level [`commands/`](../../commands/) へ分離し、`.claude-plugin/plugin.json` がそこを参照します。本ディレクトリには repo-dev 専用コマンドのみが残ります。
 >
-> **整合性**: CLAUDE.md `Custom Commands` 表とこれら2箇所（`commands/` と `.claude/commands/`）は同期必須。コマンド追加時は配布対象か repo-dev かを判断して正しい場所に置くこと。
+> **整合性**: コマンド追加時は配布対象か repo-dev かを判断して正しい場所に置き、CLAUDE.md の `Custom Commands` 表を更新すること。配布対象コマンドの場合はさらに `.claude-plugin/plugin.json` の `commands` にも追加する必要があります。
