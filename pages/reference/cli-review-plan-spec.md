@@ -134,6 +134,8 @@ severity の内部語彙（`blocker` / `warning` / `nit`）と JSON スキーマ
 
 `--advisory-only` を指定した場合、`fail` / `warn` 判定は無効化され、内部エラー（artifact 欠損・実行エラー）以外は常に exit `0`。
 
+> 実装現況（#976）: gate 判定は **opt-in** で、`--fail-on` / `--warn-on` / `--advisory-only` のいずれかを明示したときのみ exit `1` / `2` を返す。いずれも未指定なら従来どおり成功時 exit `0`（既存呼び出し・plangate-review workflow は非破壊）。フラグを与えたときの既定値は `--fail-on critical` / `--warn-on major`。判定は artifact の `findings[].severity` の最大値に基づく。
+
 ## CI / 後続システムとの接続
 
 - **Review Artifact**: `--output json --output-file <path>` を CI の artifact upload で永続化することを推奨する。

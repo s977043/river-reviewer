@@ -57258,6 +57258,9 @@ Options:
                     (e.g. basic, typescript, comprehensive). Default: all applicable skills
   --depth <name>    Force review depth: quick|standard|thorough. Default: auto-detected from diff size
   --save            Persist the review run to the project result store (.river/runs/)
+  --fail-on <sev>   (review) Exit 1 if a finding >= severity exists. Opt-in; default critical when set
+  --warn-on <sev>   (review) Exit 2 if a finding >= severity exists (below --fail-on). Default major when set
+  --advisory-only   (review) Report findings but always exit 0 (disables --fail-on/--warn-on gating)
 
 Commands:
   river runs list           List stored review runs
@@ -57320,6 +57323,9 @@ function parseArgs(argv) {
     // review subcommand fields (#802 Phase 3)
     reviewSubcommand: null,
     planOnly: false,
+    failOn: null,
+    warnOn: null,
+    advisoryOnly: false,
     outputFile: null,
     summaryFile: null,
     quiet: false,
@@ -57408,6 +57414,24 @@ function parseArgs(argv) {
     }
     if (arg === '--plan-only') {
       parsed.planOnly = true;
+      continue;
+    }
+    if (arg === '--fail-on' || arg === '--warn-on') {
+      const value = args.shift();
+      const sev = value ? value.toLowerCase() : '';
+      if (!['info', 'minor', 'major', 'critical'].includes(sev)) {
+        console.error(
+          `Error: ${arg} must be one of: info, minor, major, critical (got "${value ?? ''}").`
+        );
+        parsed.command = 'help';
+        break;
+      }
+      if (arg === '--fail-on') parsed.failOn = sev;
+      else parsed.warnOn = sev;
+      continue;
+    }
+    if (arg === '--advisory-only') {
+      parsed.advisoryOnly = true;
       continue;
     }
     if (arg === '--plan') {
@@ -58270,6 +58294,23 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       if (summaryFilePath) {
         const { formatReviewPlanSummaryMarkdown } = await __nccwpck_require__.e(/* import() */ 466).then(__nccwpck_require__.bind(__nccwpck_require__, 7466));
         await writeFile(summaryFilePath, formatReviewPlanSummaryMarkdown(artifact) + '\n', 'utf8');
+      }
+      // #976: opt-in review gate. Only when --fail-on / --warn-on / --advisory-only
+      // is given do we translate findings into a CI exit code; otherwise exit 0
+      // (non-breaking for existing callers / the plangate-review workflow).
+      if (parsed.failOn || parsed.warnOn || parsed.advisoryOnly) {
+        const { evaluateReviewGate } = await __nccwpck_require__.e(/* import() */ 794).then(__nccwpck_require__.bind(__nccwpck_require__, 2794));
+        const gate = evaluateReviewGate(artifact, {
+          failOn: parsed.failOn ?? 'critical',
+          warnOn: parsed.warnOn ?? 'major',
+          advisoryOnly: parsed.advisoryOnly,
+        });
+        if (gate.level === 'fail') {
+          console.error(`Review gate: FAIL (max severity: ${gate.maxSeverity}).`);
+        } else if (gate.level === 'warn') {
+          console.error(`Review gate: WARN (max severity: ${gate.maxSeverity}).`);
+        }
+        return gate.code;
       }
       return 0;
     } catch (err) {
