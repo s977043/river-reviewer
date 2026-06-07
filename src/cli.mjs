@@ -1016,8 +1016,9 @@ async function main(argv = process.argv.slice(2)) {
     try {
       const { runReviewPlan, runReviewExecReplay, ReviewPlanError, resolveReviewOutputFormat } =
         await import('./lib/review-plan.mjs');
+      let reviewFormat;
       try {
-        resolveReviewOutputFormat(parsed);
+        reviewFormat = resolveReviewOutputFormat(parsed);
       } catch (err) {
         if (err instanceof ReviewPlanError) {
           console.error(`Error: ${err.message}`);
@@ -1072,13 +1073,21 @@ async function main(argv = process.argv.slice(2)) {
         console.error('Error: --output-file and --summary-file must not point to the same path.');
         return 3;
       }
-      const serialized = JSON.stringify(artifact, null, 2);
       const { writeFile } = await import('node:fs/promises');
+      let serialized;
+      if (reviewFormat === 'markdown') {
+        // #976: human-readable Markdown rendering of the artifact (findings +
+        // plan). The JSON artifact stays the machine-readable contract.
+        const { formatReviewPlanSummaryMarkdown } = await import('./lib/review-plan-summary.mjs');
+        serialized = formatReviewPlanSummaryMarkdown(artifact);
+      } else {
+        serialized = JSON.stringify(artifact, null, 2);
+      }
       if (outputFilePath) {
         await writeFile(outputFilePath, serialized + '\n', 'utf8');
       } else {
-        // JSON is the machine-readable artifact, not a progress log:
-        // --quiet does not suppress it.
+        // The artifact (JSON or Markdown) is the requested output, not a
+        // progress log: --quiet does not suppress it.
         process.stdout.write(serialized + '\n');
       }
       if (summaryFilePath) {

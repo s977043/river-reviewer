@@ -11,12 +11,21 @@ export const modules = {
 /**
  * Human-readable Markdown summary for a `river review plan` Review
  * Artifact (#802 Phase 3). Pure formatter — no I/O. The CLI writes the
- * result to `--summary-file`; the JSON Review Artifact remains the
+ * result to `--summary-file` and to stdout/`--output-file` for
+ * `--output markdown` (#976 gap). The JSON Review Artifact remains the
  * machine-readable contract and is unaffected.
  */
 
 function bullet(line) {
   return `- ${line}`;
+}
+
+function findingLine(f) {
+  const sev = f?.severity ?? 'info';
+  const loc = f?.line ? `${f.file ?? '?'}:${f.line}` : (f?.file ?? '?');
+  const title = f?.title || f?.message || '';
+  const oneLine = String(title).replace(/\s+/g, ' ').trim().slice(0, 200);
+  return bullet(`[${sev}] \`${loc}\` — ${oneLine}`);
 }
 
 /**
@@ -37,9 +46,7 @@ function formatReviewPlanSummaryMarkdown(artifact) {
     '',
     `## Selected skills (${selected.length})`,
     '',
-    ...(selected.length
-      ? selected.map((s) => bullet(`\`${s.id}\` — ${s.name}`))
-      : ['_None._']),
+    ...(selected.length ? selected.map((s) => bullet(`\`${s.id}\` — ${s.name}`)) : ['_None._']),
     '',
     `## Skipped skills (${skipped.length})`,
     '',
@@ -48,6 +55,12 @@ function formatReviewPlanSummaryMarkdown(artifact) {
       : ['_None._']),
     '',
   ];
+
+  const findings = Array.isArray(artifact?.findings) ? artifact.findings : [];
+  if (findings.length) {
+    lines.push(`## Findings (${findings.length})`, '', ...findings.map(findingLine), '');
+  }
+
   return lines.join('\n');
 }
 

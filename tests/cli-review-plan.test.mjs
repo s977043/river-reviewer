@@ -48,14 +48,21 @@ describe('resolveReviewOutputFormat (#802 Phase 3 PR-2)', () => {
     );
   });
 
-  test('explicit text/markdown → ReviewPlanError (not implemented)', () => {
+  test('explicit text → ReviewPlanError (not implemented)', () => {
     assert.throws(
       () => resolveReviewOutputFormat({ output: 'text', outputExplicit: true }),
       (e) => e instanceof ReviewPlanError && /not implemented/.test(e.message)
     );
-    assert.throws(
-      () => resolveReviewOutputFormat({ format: 'markdown', formatExplicit: true }),
-      ReviewPlanError
+  });
+
+  test('explicit --output markdown / --format markdown → markdown (#976)', () => {
+    assert.equal(
+      resolveReviewOutputFormat({ output: 'markdown', outputExplicit: true }),
+      'markdown'
+    );
+    assert.equal(
+      resolveReviewOutputFormat({ format: 'markdown', formatExplicit: true }),
+      'markdown'
     );
   });
 

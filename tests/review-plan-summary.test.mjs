@@ -30,4 +30,24 @@ describe('formatReviewPlanSummaryMarkdown (#802 Phase 3)', () => {
     assert.match(md, /## Selected skills \(0\)/);
     assert.match(md, /_None\._/);
   });
+
+  test('renders a Findings section when findings are present (#976)', () => {
+    const md = formatReviewPlanSummaryMarkdown({
+      status: 'ok',
+      phase: 'midstream',
+      plan: { plannerMode: 'off', selectedSkills: [], skippedSkills: [] },
+      findings: [
+        { severity: 'major', file: 'src/a.ts', line: 12, title: 'Null deref risk' },
+        { severity: 'minor', file: 'src/b.ts', message: 'Unused import' },
+      ],
+    });
+    assert.match(md, /## Findings \(2\)/);
+    assert.match(md, /\[major\] `src\/a\.ts:12` — Null deref risk/);
+    assert.match(md, /\[minor\] `src\/b\.ts` — Unused import/);
+  });
+
+  test('omits the Findings section when there are no findings', () => {
+    const md = formatReviewPlanSummaryMarkdown({ status: 'ok', phase: 'midstream', findings: [] });
+    assert.doesNotMatch(md, /## Findings/);
+  });
 });
