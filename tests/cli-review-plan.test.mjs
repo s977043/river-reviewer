@@ -7,10 +7,48 @@ import {
   runReviewExecReplay,
   ReviewPlanError,
   resolveReviewOutputFormat,
+  evaluateReviewGate,
 } from '../src/lib/review-plan.mjs';
 import { compileReviewArtifactValidator } from './helpers/schema-validator.mjs';
 
 const validate = compileReviewArtifactValidator();
+
+describe('evaluateReviewGate (#976)', () => {
+  const art = (sevs) => ({ findings: sevs.map((s, i) => ({ id: `f${i}`, severity: s })) });
+
+  test('no findings → pass / exit 0', () => {
+    const g = evaluateReviewGate(art([]), { failOn: 'critical', warnOn: 'major' });
+    assert.deepEqual([g.code, g.level], [0, 'pass']);
+  });
+
+  test('critical finding with --fail-on critical → fail / exit 1', () => {
+    const g = evaluateReviewGate(art(['minor', 'critical']), {
+      failOn: 'critical',
+      warnOn: 'major',
+    });
+    assert.deepEqual([g.code, g.level, g.maxSeverity], [1, 'fail', 'critical']);
+  });
+
+  test('major finding below fail-on but at warn-on → warn / exit 2', () => {
+    const g = evaluateReviewGate(art(['minor', 'major']), { failOn: 'critical', warnOn: 'major' });
+    assert.deepEqual([g.code, g.level], [2, 'warn']);
+  });
+
+  test('only minor findings with defaults → pass / exit 0', () => {
+    const g = evaluateReviewGate(art(['info', 'minor']), { failOn: 'critical', warnOn: 'major' });
+    assert.deepEqual([g.code, g.level], [0, 'pass']);
+  });
+
+  test('--advisory-only forces exit 0 even with critical findings', () => {
+    const g = evaluateReviewGate(art(['critical']), { failOn: 'critical', advisoryOnly: true });
+    assert.deepEqual([g.code, g.level], [0, 'pass']);
+  });
+
+  test('lower --fail-on (major) makes a major finding fail', () => {
+    const g = evaluateReviewGate(art(['major']), { failOn: 'major', warnOn: 'minor' });
+    assert.equal(g.code, 1);
+  });
+});
 
 describe('resolveReviewOutputFormat (#802 Phase 3 PR-2)', () => {
   test('no flags → json (backward compatible)', () => {

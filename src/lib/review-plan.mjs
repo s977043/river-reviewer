@@ -351,6 +351,44 @@ export function resolveReviewOutputFormat({
   );
 }
 
+export const REVIEW_GATE_SEVERITIES = ['info', 'minor', 'major', 'critical'];
+const SEVERITY_RANK = { info: 0, minor: 1, major: 2, critical: 3 };
+
+/**
+ * Evaluate the review gate exit code from an artifact's findings (#976).
+ *
+ * Opt-in: gating is only meaningful when `--fail-on` / `--warn-on` are
+ * provided by the caller; the CLI keeps exit 0 otherwise (non-breaking).
+ * `--advisory-only` forces exit 0 regardless of findings (report-only).
+ *
+ * @param {object} artifact Review Artifact (schema "1")
+ * @param {{ failOn?: string, warnOn?: string, advisoryOnly?: boolean }} [opts]
+ * @returns {{ code: 0|1|2, level: 'pass'|'warn'|'fail', maxSeverity: string|null }}
+ */
+export function evaluateReviewGate(
+  artifact,
+  { failOn = 'critical', warnOn = 'major', advisoryOnly = false } = {}
+) {
+  const findings = Array.isArray(artifact?.findings) ? artifact.findings : [];
+  let maxRank = -1;
+  let maxSeverity = null;
+  for (const f of findings) {
+    const rank = SEVERITY_RANK[f?.severity];
+    if (rank !== undefined && rank > maxRank) {
+      maxRank = rank;
+      maxSeverity = f.severity;
+    }
+  }
+  if (advisoryOnly || maxRank < 0) {
+    return { code: 0, level: 'pass', maxSeverity };
+  }
+  const failRank = SEVERITY_RANK[failOn] ?? SEVERITY_RANK.critical;
+  const warnRank = SEVERITY_RANK[warnOn] ?? SEVERITY_RANK.major;
+  if (maxRank >= failRank) return { code: 1, level: 'fail', maxSeverity };
+  if (maxRank >= warnRank) return { code: 2, level: 'warn', maxSeverity };
+  return { code: 0, level: 'pass', maxSeverity };
+}
+
 /** skill objects carry their fields under `.metadata` (or inline). */
 function meta(skill) {
   return skill?.metadata ?? skill ?? {};

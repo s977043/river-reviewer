@@ -208,6 +208,33 @@ test('parseArgs: --skill-set without value falls back to help', () => {
   assert.equal(parsed.command, 'help');
 });
 
+test('parseArgs: --fail-on / --warn-on capture severities; --advisory-only sets flag', () => {
+  const parsed = parseArgs([
+    'review',
+    'exec',
+    '--fail-on',
+    'major',
+    '--warn-on',
+    'minor',
+    '--advisory-only',
+  ]);
+  assert.equal(parsed.failOn, 'major');
+  assert.equal(parsed.warnOn, 'minor');
+  assert.equal(parsed.advisoryOnly, true);
+});
+
+test('parseArgs: --fail-on defaults null; --advisory-only defaults false', () => {
+  const parsed = parseArgs(['review', 'plan']);
+  assert.equal(parsed.failOn, null);
+  assert.equal(parsed.warnOn, null);
+  assert.equal(parsed.advisoryOnly, false);
+});
+
+test('parseArgs: --fail-on rejects an unknown severity', () => {
+  const parsed = parseArgs(['review', 'exec', '--fail-on', 'nope']);
+  assert.equal(parsed.command, 'help');
+});
+
 test('parseArgs: --depth accepts a valid level', () => {
   const parsed = parseArgs(['run', '.', '--depth', 'thorough']);
   assert.equal(parsed.depth, 'thorough');

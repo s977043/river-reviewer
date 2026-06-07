@@ -134,6 +134,8 @@ The mapping between internal severity tokens (`blocker` / `warning` / `nit`) and
 
 When `--advisory-only` is set, fail/warn judgement is disabled and only internal errors (missing artifacts, execution errors) yield non-zero exit.
 
+> Current implementation (#976): the gate is **opt-in** — exit `1` / `2` are returned only when `--fail-on` / `--warn-on` / `--advisory-only` is explicitly passed. With none of them, success stays exit `0` (non-breaking for existing callers / the plangate-review workflow). When a flag is given, defaults are `--fail-on critical` / `--warn-on major`. The judgement is based on the maximum `findings[].severity` in the artifact.
+
 ## CI / Downstream Integration
 
 - **Review Artifact**: persist `--output json --output-file <path>` via the CI artifact upload step.
