@@ -71,7 +71,7 @@ River Review の**正規実行面は CLI** です。GitHub Action / Claude Code 
 
 最終的にどの skill / gate / rule が採用されたかは決定論的に解決され、`--debug` 出力の `plan.selectedSkills` / `skippedSkills`（理由付き）で確認できます。優先順位は次のとおり（上が優先）:
 
-1. **CLI 明示指定** — `--config` / `--skill-set` / `--context` / `--dependency` など
+1. **CLI 明示指定** — `--skill-set` / `--context` / `--dependency` など（設定ファイルは `--config` フラグではなくリポジトリ直下から自動検出する。下記参照）
 2. **リポジトリローカル** — `.river-review.{json,yaml,yml}`（`src/config/loader.mjs`）、`.river/rules.md` + `.river/rules.d/*.md`、`skills/registry.yaml`
 3. **ビルトイン** — 同梱 skill と既定値
 

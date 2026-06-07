@@ -73,7 +73,7 @@ The **canonical execution surface of River Review is the CLI**. GitHub Action / 
 
 Which skills / gates / rules are ultimately selected is resolved deterministically and can be inspected via `--debug` output (`plan.selectedSkills` / `skippedSkills` with reasons). Precedence (highest first):
 
-1. **CLI explicit options** — `--config` / `--skill-set` / `--context` / `--dependency`, etc.
+1. **CLI explicit options** — `--skill-set` / `--context` / `--dependency`, etc. (the config file is auto-detected from the repo root, not via a `--config` flag; see below)
 2. **Repository local** — `.river-review.{json,yaml,yml}` (`src/config/loader.mjs`), `.river/rules.md` + `.river/rules.d/*.md`, `skills/registry.yaml`
 3. **Built-in** — bundled skills and defaults
 
