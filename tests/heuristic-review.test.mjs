@@ -143,6 +143,85 @@ index 1111111..2222222 100644
   assert.ok(comments.find((c) => c.kind === 'merge-conflict'));
 });
 
+test('buildHeuristicComments detects weak hash (md5/sha1) for security skill (no LLM)', () => {
+  const diffText = `diff --git a/src/auth/token.ts b/src/auth/token.ts
+--- a/src/auth/token.ts
++++ b/src/auth/token.ts
+@@ -1,1 +1,2 @@
+ import crypto from 'crypto';
++const h = crypto.createHash('md5').update(x).digest('hex');
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.ok(comments.find((c) => c.kind === 'weak-hash'));
+});
+
+test('buildHeuristicComments detects command injection via template literal (no LLM)', () => {
+  const inj = `diff --git a/src/api/run.ts b/src/api/run.ts
+--- a/src/api/run.ts
++++ b/src/api/run.ts
+@@ -1,1 +1,2 @@
+ import { execSync } from 'child_process';
++execSync(\`ls \${userInput}\`);
+`;
+  const safe = `diff --git a/src/api/run.ts b/src/api/run.ts
+--- a/src/api/run.ts
++++ b/src/api/run.ts
+@@ -1,1 +1,2 @@
+ import { execFile } from 'child_process';
++execFile('ls', [userInput]);
+`;
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const injComments = buildHeuristicComments({
+    diff: { files: parseUnifiedDiff(inj).files },
+    plan,
+  });
+  const safeComments = buildHeuristicComments({
+    diff: { files: parseUnifiedDiff(safe).files },
+    plan,
+  });
+  assert.ok(injComments.find((c) => c.kind === 'command-injection'));
+  assert.equal(
+    safeComments.find((c) => c.kind === 'command-injection'),
+    undefined
+  );
+});
+
+test('buildHeuristicComments does not flag weak hash in a trailing comment (#1084 review)', () => {
+  const diffText = `diff --git a/src/auth/token.ts b/src/auth/token.ts
+--- a/src/auth/token.ts
++++ b/src/auth/token.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++const h = strong(); // do not use createHash('md5')
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.equal(
+    comments.find((c) => c.kind === 'weak-hash'),
+    undefined
+  );
+});
+
+test('buildHeuristicComments does not flag regex.exec as command injection (#1084 review)', () => {
+  const diffText = `diff --git a/src/api/run.ts b/src/api/run.ts
+--- a/src/api/run.ts
++++ b/src/api/run.ts
+@@ -1,1 +1,2 @@
+ const re = /x/;
++const m = re.exec(\`value \${userInput}\`);
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.equal(
+    comments.find((c) => c.kind === 'command-injection'),
+    undefined
+  );
+});
+
 test('buildHeuristicComments detects disabled tests (.skip / xit) (no LLM)', () => {
   const diffText = `diff --git a/tests/foo.test.mjs b/tests/foo.test.mjs
 index 1111111..2222222 100644
