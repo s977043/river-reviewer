@@ -12,7 +12,7 @@
 
 ## 1. コメント行・文字列の扱い（最頻出の FP/FN 源）
 
-- [ ] **matcher 内で 2 段構えにする**（既存 `matchesDangerousEval` を参照）。① 先頭がコメントの行は早期 return（`startsWith('//')` 等）。② 残りは `stripTrailingLineComment(trimmed).trim()` で行末コメントを除去してから判定する。①のみだと行末コメント FP が再発する（gemini が毎 PR 指摘した class）。
+- [ ] **matcher 内で 2 段構えにする**（既存 `matchesDangerousEval` を参照）。① 先頭がコメントの行は早期 return（`trimmed.startsWith('//')` 等）。② 残りは `stripTrailingLineComment(trimmed).trim()` で行末コメントを除去してから判定する。①のみだと行末コメント FP が再発する（gemini が毎 PR 指摘した class）。
 - [ ] **行末コメント除去は quote-aware な共有ヘルパー `stripTrailingLineComment(code)` を使う**。素朴な `code.replace(/\/\/.*$/, '')` は **禁止**—文字列リテラル内の `//`（例 `"http://x"; eval(y)`）でコメント開始を誤判定し、後続の本物（`eval`）を取りこぼす（false negative）。
 - [ ] パターンのキーワードが「コメント内に登場しただけ」で発火しないことを negative テストで確認する。
 
@@ -56,7 +56,7 @@
 ## 8. dist 再ビルド（必須）
 
 - [ ] `heuristic-review.mjs` / `review-engine.mjs` は GitHub Action の dist にバンドルされる。変更したら **docker で CI 一致 dist を再ビルド**する（詳細は [`dist-check-rebuild-guide.md`](./dist-check-rebuild-guide.md)）。
-- [ ] `what-is-river-review.md`（JA/EN）の実行モデル tier-2 の観点リストを更新する。編集後は `npm run lint:text` で確認する（textlint: 本文=ですます / 箇条書き=である / 1 文 ≤150 字 / 同一助詞の重複回避。ローカルは cache で pass しうるため CI でも確認）。
+- [ ] `what-is-river-review.md`（JA/EN）の実行モデル「2. 機械的チェック」の観点リストを更新する。編集後は `npm run lint:text` で確認する（textlint: 本文=ですます / 箇条書き=である / 1 文 ≤150 字 / 同一助詞の重複回避。ローカルは cache で pass しうるため CI でも確認）。
 
 ## 関連
 
@@ -64,3 +64,4 @@
 - `src/lib/review-engine.mjs`—`kind` → finding メッセージの `switch`
 - `docs/development/skill-severity-rubric.md`—severity 較正
 - `docs/development/dist-check-rebuild-guide.md`—dist 再ビルド手順
+- `pages/explanation/what-is-river-review.md`—実行モデル（no-key 観点リストの SSoT）
