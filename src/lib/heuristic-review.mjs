@@ -15,8 +15,8 @@ export const SKILL_HEURISTIC_MAP = {
     'findMergeConflict',
   ],
   'rr-midstream-typescript-strict-001': ['findTsSuppression'],
-  'rr-downstream-test-existence-001': ['findMissingTests', 'findFocusedTests'],
-  'rr-downstream-coverage-gap-001': ['findMissingTests', 'findFocusedTests'],
+  'rr-downstream-test-existence-001': ['findMissingTests', 'findFocusedTests', 'findDisabledTests'],
+  'rr-downstream-coverage-gap-001': ['findMissingTests', 'findFocusedTests', 'findDisabledTests'],
 };
 
 /**
@@ -417,6 +417,34 @@ function findFocusedTests({ diff }) {
   return comments;
 }
 
+// Disabled tests (`.skip` / `xit` / `xdescribe`) committed into the suite.
+// Advisory only (nit): sometimes intentional for known-pending tests.
+function matchesDisabledTest(code) {
+  const trimmed = String(code).trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  return (
+    /\b(?:describe|context|it|test|suite|bench)\.skip\s*\(/.test(trimmed) ||
+    /\b(?:xit|xdescribe|xtest)\s*\(/.test(trimmed)
+  );
+}
+
+function findDisabledTests({ diff }) {
+  const MAX_DISABLED_TEST_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (!looksLikeTestFile(filePath)) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesDisabledTest(text)) continue;
+      comments.push({ file: filePath, line, kind: 'disabled-test' });
+      if (comments.length >= MAX_DISABLED_TEST_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
 // Leftover `debugger;` statement (a near-zero-false-positive debug artifact).
 function matchesDebuggerLeftover(code) {
   let trimmed = String(code).trim();
@@ -574,12 +602,18 @@ export function buildHeuristicComments({ diff, plan }) {
     for (const c of findFocusedTests({ diff })) {
       comments.push({ ...c, skillId });
     }
+    for (const c of findDisabledTests({ diff })) {
+      comments.push({ ...c, skillId });
+    }
   } else if (hasSkill(plan, 'rr-downstream-coverage-gap-001')) {
     const skillId = 'rr-downstream-coverage-gap-001';
     for (const c of findMissingTests({ diff })) {
       comments.push({ ...c, skillId });
     }
     for (const c of findFocusedTests({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findDisabledTests({ diff })) {
       comments.push({ ...c, skillId });
     }
   }
