@@ -60816,9 +60816,10 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       // #976/#1027: resolve --skill-set within the review namespace so
       // `river review plan|exec --skill-set <name>` restricts candidates
       // (previously only `river run` honored it; the flag was silently
-      // ignored here).
+      // ignored here). Skip on the replay path: --plan replays a fixed
+      // source plan, so skill selection (and thus --skill-set) does not apply.
       let reviewSkillIds = null;
-      if (parsed.skillSet) {
+      if (parsed.skillSet && !isExecPlanReplay) {
         try {
           reviewSkillIds = await (0,skill_loader/* resolveRecommendationSet */.mm)(parsed.skillSet);
         } catch (err) {
