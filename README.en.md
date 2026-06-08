@@ -193,7 +193,7 @@ Pin to a release tag such as `@v1.2.2` for stability. Alternatively, use the flo
 
 <!-- x-release-please-start-version -->
 
-Latest release: [v1.2.2](https://github.com/s977043/river-review/releases/latest)
+Latest release: [v1.3.0](https://github.com/s977043/river-review/releases/latest)
 
 <!-- x-release-please-end -->
 
