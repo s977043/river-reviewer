@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.4.0](https://github.com/s977043/river-review/compare/v1.3.1...v1.4.0) (2026-06-08)
+
+
+### Features
+
+* **action:** suppress empty boilerplate comment when no LLM key ([#1067](https://github.com/s977043/river-review/issues/1067)) ([#1077](https://github.com/s977043/river-review/issues/1077)) ([5251832](https://github.com/s977043/river-review/commit/5251832e59a2e2bf4ee212d67e29ff7c09d25658))
+* **heuristic:** extend dangerous-eval (document.write, string-arg timers) ([#1085](https://github.com/s977043/river-review/issues/1085)) ([ca50d71](https://github.com/s977043/river-review/commit/ca50d71c7b0f12c18d1a6d96c84ac5a466af7ebb))
+* **heuristic:** no-key dangerous-eval and focused-test checks ([#1080](https://github.com/s977043/river-review/issues/1080)) ([36073cd](https://github.com/s977043/river-review/commit/36073cd665ce76b98f7389af1843854a528aa1d4))
+* **heuristic:** no-key debugger-leftover and insecure-tls checks ([#1081](https://github.com/s977043/river-review/issues/1081)) ([8abd36c](https://github.com/s977043/river-review/commit/8abd36c9171edbcad189ef98b7b2825e6d5355fc))
+* **heuristic:** no-key disabled-test check (.skip / xit / xdescribe) ([#1083](https://github.com/s977043/river-review/issues/1083)) ([a774f8e](https://github.com/s977043/river-review/commit/a774f8e23d0ac4e1d4ec1b24f6b60db678bada1a))
+* **heuristic:** no-key merge-conflict and ts-suppression checks ([#1082](https://github.com/s977043/river-review/issues/1082)) ([a27f781](https://github.com/s977043/river-review/commit/a27f781c7f2f0d8adbf46e1457c6417e4d3db462))
+* **heuristic:** no-key weak-hash and command-injection checks ([#1084](https://github.com/s977043/river-review/issues/1084)) ([c5f4f16](https://github.com/s977043/river-review/commit/c5f4f16732d2c4d04a910a115ac8aa98c5bd1c5a))
+
+
+### Bug Fixes
+
+* **ci:** exclude generated CHANGELOG.md from lychee link check ([#1065](https://github.com/s977043/river-review/issues/1065)) ([#1078](https://github.com/s977043/river-review/issues/1078)) ([12fb260](https://github.com/s977043/river-review/commit/12fb26055ef9520a5dae4cd2223e0dcf994f5745))
+* **run+docs:** wire --fail-on into river run + correct agent playbook (self-review) ([#1073](https://github.com/s977043/river-review/issues/1073)) ([edf6736](https://github.com/s977043/river-review/commit/edf67363eec12a177ae28644a5bf27a66ae0caf0))
+
 ## [1.3.1](https://github.com/s977043/river-review/compare/v1.3.0...v1.3.1) (2026-06-08)
 
 
