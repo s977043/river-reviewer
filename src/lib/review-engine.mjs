@@ -455,7 +455,7 @@ function normalizeHeuristicComments(rawComments) {
           message: formatFindingMessage({
             finding: 'コード実行/インジェクションのリスクがある API が追加されている',
             evidence:
-              'eval / new Function / dangerouslySetInnerHTML / document.write / 文字列引数の setTimeout・setInterval のいずれかが追加された',
+              'eval / new Function / dangerouslySetInnerHTML / document.write(ln) / 文字列引数の setTimeout・setInterval のいずれかが追加された',
             impact: '入力が信頼できない場合に任意コード実行や XSS につながる',
             fix: '動的評価を避ける（パース/ホワイトリスト化）、HTML はサニタイズして挿入し、タイマーには関数を渡す',
             severity: 'warning',

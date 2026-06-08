@@ -41597,6 +41597,27 @@ function looksLikeTestFile(filePath) {
   );
 }
 
+// Strip a trailing `//` line comment, but only when the `//` is NOT inside a
+// string literal. A naive `/\/\/.*$/` strip would corrupt lines like
+// `const u = "http://x"; eval(y)` (removing the real `eval`). We treat the
+// first `//` whose preceding text has balanced quotes as the comment start.
+function stripTrailingLineComment(code) {
+  const s = String(code);
+  let searchFrom = 0;
+  for (;;) {
+    const idx = s.indexOf('//', searchFrom);
+    if (idx === -1) return s;
+    const before = s.slice(0, idx);
+    const dq = (before.match(/"/g) || []).length;
+    const sq = (before.match(/'/g) || []).length;
+    const bq = (before.match(/`/g) || []).length;
+    if (dq % 2 === 0 && sq % 2 === 0 && bq % 2 === 0) {
+      return before;
+    }
+    searchFrom = idx + 2;
+  }
+}
+
 function looksLikeProductCodeFile(filePath) {
   const normalized = String(filePath).replaceAll('\\', '/');
   if (looksLikeTestFile(normalized)) return false;
@@ -41738,11 +41759,11 @@ function matchesDangerousEval(code) {
   // Skip comment lines and trailing comments so an `eval` in a comment is
   // not flagged.
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
-  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
+  trimmed = stripTrailingLineComment(trimmed).trim();
   if (/\beval\s*\(/.test(trimmed)) return true;
   if (/\bnew\s+Function\s*\(/.test(trimmed)) return true;
   if (/dangerouslySetInnerHTML/.test(trimmed)) return true;
-  if (/\bdocument\.write\s*\(/.test(trimmed)) return true;
+  if (/\bdocument\.write(?:ln)?\s*\(/.test(trimmed)) return true;
   // A string first argument to a timer is an implicit eval.
   if (/\b(?:setTimeout|setInterval)\s*\(\s*['"`]/.test(trimmed)) return true;
   return false;
@@ -41825,7 +41846,7 @@ function matchesDebuggerLeftover(code) {
   let trimmed = String(code).trim();
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
   // Drop a trailing line comment so `const x = 1; // debugger` is not flagged.
-  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
+  trimmed = stripTrailingLineComment(trimmed).trim();
   return /\bdebugger\s*;/.test(trimmed) || /(?:^|[;{}\s])debugger\s*$/.test(trimmed);
 }
 
@@ -41877,7 +41898,7 @@ function findInsecureTls({ diff }) {
 function matchesWeakHash(code) {
   let trimmed = String(code).trim();
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
-  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
+  trimmed = stripTrailingLineComment(trimmed).trim();
   return /createHash\s*\(\s*['"`](?:md5|sha1)['"`]/i.test(trimmed);
 }
 
@@ -41903,7 +41924,7 @@ function findWeakHash({ diff }) {
 function matchesCommandInjection(code) {
   let trimmed = String(code).trim();
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
-  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
+  trimmed = stripTrailingLineComment(trimmed).trim();
   // execSync / spawn / spawnSync are unambiguous child_process APIs. Bare `exec`
   // is matched only when NOT a method call (negative lookbehind) so that
   // `regex.exec(`...`)` and `db.exec(`...`)` are not false-flagged.
@@ -43335,7 +43356,7 @@ function normalizeHeuristicComments(rawComments) {
           message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: 'コード実行/インジェクションのリスクがある API が追加されている',
             evidence:
-              'eval / new Function / dangerouslySetInnerHTML / document.write / 文字列引数の setTimeout・setInterval のいずれかが追加された',
+              'eval / new Function / dangerouslySetInnerHTML / document.write(ln) / 文字列引数の setTimeout・setInterval のいずれかが追加された',
             impact: '入力が信頼できない場合に任意コード実行や XSS につながる',
             fix: '動的評価を避ける（パース/ホワイトリスト化）、HTML はサニタイズして挿入し、タイマーには関数を渡す',
             severity: 'warning',

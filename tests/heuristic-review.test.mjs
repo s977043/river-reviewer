@@ -86,6 +86,36 @@ test('buildHeuristicComments flags document.write and string-arg setTimeout (#da
   );
 });
 
+test('buildHeuristicComments flags document.writeln (#1085 review)', () => {
+  const diffText = `diff --git a/src/ui/render.ts b/src/ui/render.ts
+--- a/src/ui/render.ts
++++ b/src/ui/render.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++document.writeln(userHtml);
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.ok(comments.find((c) => c.kind === 'dangerous-eval'));
+});
+
+test('buildHeuristicComments still flags eval after a // inside a string (#1085 review)', () => {
+  // The trailing-comment strip must be quote-aware: the // here is inside the
+  // string literal, so the real eval after it must NOT be lost.
+  const diffText = `diff --git a/src/handler.ts b/src/handler.ts
+--- a/src/handler.ts
++++ b/src/handler.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++const u = "http://x"; eval(payload);
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.ok(comments.find((c) => c.kind === 'dangerous-eval'));
+});
+
 test('buildHeuristicComments does not flag dangerous eval in test files', () => {
   const diffText = `diff --git a/src/handler.test.ts b/src/handler.test.ts
 index 1111111..2222222 100644
