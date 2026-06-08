@@ -751,7 +751,30 @@ function formatRiskSummaryMarkdown(plan) {
   return lines.join('\n');
 }
 
+/**
+ * #1067: true when no LLM key is configured (LLM review skipped) AND there are
+ * no static findings — i.e. the run would otherwise post a value-less boilerplate
+ * PR comment (skipped-skills list / impact tags / token estimate). Used to emit a
+ * single concise note instead.
+ */
+function isLlmlessEmptyReview(result) {
+  const debug = result?.reviewDebug ?? {};
+  const llmKeyMissing = typeof debug.llmSkipped === 'string' && /not set/i.test(debug.llmSkipped);
+  const noFindings = (result?.comments?.length ?? 0) === 0;
+  return llmKeyMissing && noFindings;
+}
+
 function printMarkdownReport(result, phase) {
+  if (isLlmlessEmptyReview(result)) {
+    console.log(
+      `${COMMENT_MARKER}
+## River Review
+
+- フェーズ: \`${phase}\`
+- LLM レビュー未設定（\`ANTHROPIC_API_KEY\` / \`OPENAI_API_KEY\` / \`GOOGLE_API_KEY\` のいずれか未設定）のため静的チェックのみ実行し、**指摘はありません**。LLM レビューを有効化すると、リポジトリ固有の規約・差分スコープ等の観点でレビューします。`
+    );
+    return;
+  }
   const header = `${COMMENT_MARKER}
 ## River Review
 
@@ -1617,7 +1640,7 @@ Dependencies: ${
   }
 }
 
-export { parseArgs, main };
+export { parseArgs, main, isLlmlessEmptyReview };
 
 /**
  * この CLI が直接起動されたときのみ `main()` を実行する。
