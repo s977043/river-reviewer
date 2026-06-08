@@ -7,7 +7,35 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { parseArgs } from '../src/cli.mjs';
+import { parseArgs, isLlmlessEmptyReview } from '../src/cli.mjs';
+
+test('isLlmlessEmptyReview: true when LLM key missing and no findings (#1067)', () => {
+  assert.equal(
+    isLlmlessEmptyReview({ reviewDebug: { llmSkipped: 'OPENAI_API_KEY not set' }, comments: [] }),
+    true
+  );
+});
+
+test('isLlmlessEmptyReview: false when there are findings', () => {
+  assert.equal(
+    isLlmlessEmptyReview({
+      reviewDebug: { llmSkipped: 'OPENAI_API_KEY not set' },
+      comments: [{ severity: 'major' }],
+    }),
+    false
+  );
+});
+
+test('isLlmlessEmptyReview: false when LLM ran (no llmSkipped) even with 0 findings', () => {
+  assert.equal(isLlmlessEmptyReview({ reviewDebug: { llmUsed: true }, comments: [] }), false);
+});
+
+test('isLlmlessEmptyReview: false for dry-run skip (not a missing key)', () => {
+  assert.equal(
+    isLlmlessEmptyReview({ reviewDebug: { llmSkipped: 'dry-run' }, comments: [] }),
+    false
+  );
+});
 
 // parseArgs は process.env を参照してデフォルト値を決めるため、
 // 環境変数がテスト結果に影響しないよう一時的にクリアする。
