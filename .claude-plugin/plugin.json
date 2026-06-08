@@ -28,6 +28,5 @@
     "./commands/pr.md"
   ],
   "agents": "./agents/river-review.md",
-  "skills": "./skills/agent-skills/",
-  "hooks": "./hooks/hooks.json"
+  "skills": "./skills/agent-skills/"
 }
