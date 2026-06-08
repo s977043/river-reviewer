@@ -48,14 +48,13 @@ river review exec --max-cost 0.50
 
 ### Input selection
 
-| Option                 | Type       | Default     | Description                                                                                                         |
-| ---------------------- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------- |
-| `--artifact <id=path>` | repeatable | (unset)     | Specify an input file by [Artifact Input Contract](./artifact-input-contract.en.md) ID. `id` follows that contract. |
-| `--config <path>`      | string     | auto-detect | Explicit `river.config.*`. The `artifacts` section can resolve everything in one place.                             |
-| `--plan <path>`        | string     | (unset)     | Replay an existing plan JSON. When set, `exec` skips internal plan computation.                                     |
-| `--target <path>`      | string     | `.`         | Repository root. Set when different from `pwd`.                                                                     |
+| Option                 | Type       | Default | Description                                                                                                         |
+| ---------------------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------- |
+| `--artifact <id=path>` | repeatable | (unset) | Specify an input file by [Artifact Input Contract](./artifact-input-contract.en.md) ID. `id` follows that contract. |
+| `--plan <path>`        | string     | (unset) | Replay an existing plan JSON. When set, `exec` skips internal plan computation.                                     |
+| `--target <path>`      | string     | `.`     | Repository root. Set when different from `pwd`.                                                                     |
 
-Resolution priority (CLI > config > directory detection) follows the contract.
+Resolution priority (CLI > config file > directory detection) follows the contract. There is no `--config` flag; the config file is auto-detected from the repo root.
 
 ### Phase / planner
 
@@ -75,11 +74,11 @@ Resolution priority (CLI > config > directory detection) follows the contract.
 
 ### Output
 
-| Option                 | Type                           | Default | Description                                                                                |
-| ---------------------- | ------------------------------ | ------- | ------------------------------------------------------------------------------------------ |
-| `--output <format>`    | `text` \| `markdown` \| `json` | `text`  | Output format. `json` is the machine-readable contract. Compat alias: `--format <format>`. |
-| `--output-file <path>` | string                         | -       | Where to write the Review Artifact. Defaults to stdout when unset; `-` is also stdout.     |
-| `--no-write`           | bool                           | `false` | Print to stdout only; do not create files.                                                 |
+| Option                 | Type                 | Default | Description                                                                                                                                                           |
+| ---------------------- | -------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--output <format>`    | `json` \| `markdown` | `json`  | Output format. `json` is the machine-readable contract (default), `markdown` implemented in #976, `text` not implemented (exit 3). Compat alias: `--format <format>`. |
+| `--output-file <path>` | string               | -       | Where to write the Review Artifact. Defaults to stdout when unset; `-` is also stdout.                                                                                |
+| `--no-write`           | bool                 | `false` | Print to stdout only; do not create files.                                                                                                                            |
 
 > Note (#802 Phase 3, revised 2026-05-18): the output contract is unified across `plan`/`exec`/`verify` to `--output <format>` = format, `--output-file <path>` = destination (decision in the [PlanGate CLI Stabilization Roadmap](./plangate-cli-roadmap.en.md)). This matches the global `--output <mode>` (`river run`). `--format` is accepted as a review-namespace compatibility alias, but the canonical flag is `--output`; if `--output` and `--format` are both given and disagree, it is a configuration error (exit 3). The old spec's `--output <path>` (destination) is withdrawn.
 >
@@ -124,11 +123,11 @@ The output of `river review exec` is JSON conforming to the [Review Artifact sch
 
 Exit codes are fixed so CI can rely on them.
 
-| Exit | Use                            | Typical cause                                                                                           |
-| ---- | ------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `0`  | Success                        | `status` is one of `ok` / `no-changes` / `skipped-by-label`, and `--max-cost` was not exceeded.         |
-| `1`  | Failure (user input / runtime) | Bad input, required artifact unresolved, `git diff` failure, `--max-cost` exceeded, internal exception. |
-| `2`  | Configuration error            | `--config` cannot be loaded; unknown `--artifact id`; unknown `--phase` / `--planner` value.            |
+| Exit | Use                            | Typical cause                                                                                               |
+| ---- | ------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `0`  | Success                        | `status` is one of `ok` / `no-changes` / `skipped-by-label`, and `--max-cost` was not exceeded.             |
+| `1`  | Failure (user input / runtime) | Bad input, required artifact unresolved, `git diff` failure, `--max-cost` exceeded, internal exception.     |
+| `2`  | Configuration error            | Auto-detected config file cannot be loaded; unknown `--artifact id`; unknown `--phase` / `--planner` value. |
 
 `findings` severity (`critical` / `major` / `minor` / `info`) does not directly affect exit code. CI is expected to read the Review Artifact `findings` for gating ([Stable Interfaces](./stable-interfaces.en.md)).
 
@@ -153,7 +152,7 @@ Exit codes are fixed so CI can rely on them.
 - An uncaught, non-retryable exception occurs during skill execution.
 - The cost estimate exceeds `--max-cost` (not applicable when combined with `--estimate` — skills do not execute, so exec returns `status: ok` + exit `0`).
 
-Syntax errors for `--config` / `--artifact` / `--phase` / `--planner` (unknown values, invalid format) return Exit `2`.
+Syntax errors for `--artifact` / `--phase` / `--planner` (unknown values, invalid format) return Exit `2`.
 
 ## Fallback behavior
 

@@ -107,11 +107,11 @@ agents:
       - 'node:test 内で process.stdout.write を差し替えるとテストが silently drop されることに注意する'
       - 'dist/ の変更が build:action 再実行によるものかを確認する'
     entryPoints:
-      - path: .claude/agents/river-review.md
+      - path: agents/river-review.md
         kind: guide
         summary: 'Claude Code サブエージェントの定義（ツール権限・レビュー手順）'
     instructionFiles:
-      - path: .claude/agents/river-review.md
+      - path: agents/river-review.md
         kind: prompt
         summary: 'River Review サブエージェントプロンプト'
       - path: docs/review/viewpoints.md
