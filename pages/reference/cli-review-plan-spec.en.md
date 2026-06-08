@@ -93,9 +93,9 @@ The severity vocabulary is the same as [`schemas/output.schema.json`](../../sche
 
 ## Output Formats
 
-### `--output text` (default)
+### `--output text` (not implemented)
 
-Prints a human-readable summary to stdout. Format is **outside** the stable contract (may change in minor releases).
+A plain-text human-readable summary format is envisioned but **not implemented** for the review namespace (explicitly requesting it exits 3). Use `--output markdown` for human-facing output. The review namespace default is `--output json`.
 
 ### `--output markdown` (implemented in #976)
 

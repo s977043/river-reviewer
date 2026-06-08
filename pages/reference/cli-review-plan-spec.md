@@ -93,9 +93,9 @@ severity の語彙は [`schemas/output.schema.json`](../../schemas/output.schema
 
 ## 出力フォーマット
 
-### `--output text`（デフォルト）
+### `--output text`（未実装）
 
-人間が読める要約を stdout に出力する。フォーマットは安定契約の対象外（minor で変更可能）。
+人間が読める plain text 要約を想定するフォーマットだが、review namespace では**未実装**（明示指定すると exit 3）。人間向け表示には `--output markdown` を使用する。review namespace の既定は `--output json`。
 
 ### `--output markdown`（#976 実装済み）
 
