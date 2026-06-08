@@ -474,7 +474,9 @@ function findInsecureTls({ diff }) {
 // `>>>>>>>` markers are unambiguous; `=======` is intentionally excluded
 // (it collides with Markdown h1 underlines).
 function matchesMergeConflict(code) {
-  return /^<{7}(?:\s|$)/.test(code) || /^>{7}(?:\s|$)/.test(code);
+  // <<<<<<< / >>>>>>> are always present; ||||||| is the diff3/zdiff3 base
+  // marker. ======= is intentionally excluded (Markdown h1-underline collision).
+  return /^<{7}(?:\s|$)/.test(code) || /^>{7}(?:\s|$)/.test(code) || /^\|{7}(?:\s|$)/.test(code);
 }
 
 function findMergeConflict({ diff }) {

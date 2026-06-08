@@ -511,7 +511,7 @@ function normalizeHeuristicComments(rawComments) {
           skillId: c.skillId,
           message: formatFindingMessage({
             finding: '未解決のマージコンフリクトマーカーがコミットされている',
-            evidence: '`<<<<<<<` / `>>>>>>>` マーカーが追加された',
+            evidence: '`<<<<<<<` / `>>>>>>>`（diff3 では `|||||||` も）マーカーが追加された',
             impact: 'コードが壊れ、ビルド/実行が失敗する',
             fix: 'コンフリクトを解消し、マーカーを完全に削除する',
             severity: 'blocker',

@@ -143,6 +143,21 @@ index 1111111..2222222 100644
   assert.ok(comments.find((c) => c.kind === 'merge-conflict'));
 });
 
+test('buildHeuristicComments detects diff3 base marker ||||||| (#1082 review)', () => {
+  const diffText = `diff --git a/src/handler.ts b/src/handler.ts
+index 1111111..2222222 100644
+--- a/src/handler.ts
++++ b/src/handler.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++||||||| base
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-logging-observability-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.ok(comments.find((c) => c.kind === 'merge-conflict'));
+});
+
 test('buildHeuristicComments detects @ts-ignore but not @ts-expect-error (no LLM)', () => {
   const ignore = `diff --git a/src/x.ts b/src/x.ts
 --- a/src/x.ts

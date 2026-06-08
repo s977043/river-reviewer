@@ -41842,7 +41842,9 @@ function findInsecureTls({ diff }) {
 // `>>>>>>>` markers are unambiguous; `=======` is intentionally excluded
 // (it collides with Markdown h1 underlines).
 function matchesMergeConflict(code) {
-  return /^<{7}(?:\s|$)/.test(code) || /^>{7}(?:\s|$)/.test(code);
+  // <<<<<<< / >>>>>>> are always present; ||||||| is the diff3/zdiff3 base
+  // marker. ======= is intentionally excluded (Markdown h1-underline collision).
+  return /^<{7}(?:\s|$)/.test(code) || /^>{7}(?:\s|$)/.test(code) || /^\|{7}(?:\s|$)/.test(code);
 }
 
 function findMergeConflict({ diff }) {
@@ -43285,7 +43287,7 @@ function normalizeHeuristicComments(rawComments) {
           skillId: c.skillId,
           message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: '未解決のマージコンフリクトマーカーがコミットされている',
-            evidence: '`<<<<<<<` / `>>>>>>>` マーカーが追加された',
+            evidence: '`<<<<<<<` / `>>>>>>>`（diff3 では `|||||||` も）マーカーが追加された',
             impact: 'コードが壊れ、ビルド/実行が失敗する',
             fix: 'コンフリクトを解消し、マーカーを完全に削除する',
             severity: 'blocker',
