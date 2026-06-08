@@ -14,6 +14,6 @@ Japanese, organized by phase:
 > (currently Japanese). An English-generated catalog will follow once skills carry
 > English `description` fields.
 
-To browse skills directly, see [`skills/`](../../skills)
+To browse skills directly, see [`skills/`](https://github.com/s977043/river-review/tree/main/skills)
 in the repository. For how skills are selected and routed, see the
 [agent workflow guide](../guides/agent-workflow.en.md).
