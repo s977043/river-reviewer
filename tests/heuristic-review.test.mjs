@@ -71,6 +71,43 @@ index 1111111..2222222 100644
   );
 });
 
+test('buildHeuristicComments does not flag eval in a comment (#1080 review)', () => {
+  const diffText = `diff --git a/src/handler.ts b/src/handler.ts
+index 1111111..2222222 100644
+--- a/src/handler.ts
++++ b/src/handler.ts
+@@ -1,2 +1,3 @@
+ export function run(input) {
++  // never use eval(input) here
+ }
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.equal(
+    comments.find((c) => c.kind === 'dangerous-eval'),
+    undefined
+  );
+});
+
+test('buildHeuristicComments does not flag a commented-out .only (#1080 review)', () => {
+  const diffText = `diff --git a/tests/foo.test.mjs b/tests/foo.test.mjs
+index 1111111..2222222 100644
+--- a/tests/foo.test.mjs
++++ b/tests/foo.test.mjs
+@@ -1,2 +1,3 @@
+ import test from 'node:test';
++// test.only('focused', () => {});
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-downstream-test-existence-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.equal(
+    comments.find((c) => c.kind === 'focused-test'),
+    undefined
+  );
+});
+
 test('buildHeuristicComments detects focused tests (.only) for test skill (no LLM)', () => {
   const diffText = `diff --git a/tests/foo.test.mjs b/tests/foo.test.mjs
 index 1111111..2222222 100644

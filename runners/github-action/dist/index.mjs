@@ -41579,6 +41579,10 @@ function findSilentCatch({ diff }) {
 function looksLikeTestFile(filePath) {
   const normalized = String(filePath).replaceAll('\\', '/');
   return (
+    normalized.startsWith('test/') ||
+    normalized.startsWith('tests/') ||
+    normalized.startsWith('__tests__/') ||
+    normalized.includes('/test/') ||
     normalized.includes('/tests/') ||
     normalized.includes('/__tests__/') ||
     /\.(test|spec)\./.test(normalized)
@@ -41722,9 +41726,12 @@ function findGitHubActionsIssues({ diff }) {
 // (only patterns that are rarely intentional or safe) so the no-LLM path
 // stays low-false-positive.
 function matchesDangerousEval(code) {
-  if (/\beval\s*\(/.test(code)) return true;
-  if (/\bnew\s+Function\s*\(/.test(code)) return true;
-  if (/dangerouslySetInnerHTML/.test(code)) return true;
+  const trimmed = String(code).trim();
+  // Skip comment lines so an `eval` mentioned in a comment is not flagged.
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  if (/\beval\s*\(/.test(trimmed)) return true;
+  if (/\bnew\s+Function\s*\(/.test(trimmed)) return true;
+  if (/dangerouslySetInnerHTML/.test(trimmed)) return true;
   return false;
 }
 
@@ -41749,7 +41756,10 @@ function findDangerousEval({ diff }) {
 
 // Accidental focused tests (`.only`) silently skip the rest of the suite in CI.
 function matchesFocusedTest(code) {
-  return /\b(?:describe|context|it|test|suite|bench)\.only\s*\(/.test(code);
+  const trimmed = String(code).trim();
+  // Skip comment lines so a commented-out `.only` is not flagged.
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  return /\b(?:describe|context|it|test|suite|bench)\.only\s*\(/.test(trimmed);
 }
 
 function findFocusedTests({ diff }) {
