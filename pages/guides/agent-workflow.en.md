@@ -1,7 +1,7 @@
 # Using River Review from AI Agents
 
 > **Which entry point should I use?**
-> The primary, no-install entry point is the bundled **skill-routed review** — install the plugin and ask the `river-review` agent (or load the skills) to review your diff. Use `/review-local` when you want River Review orchestrated by Claude Code with automatic context passing from the current session; use the sub-agent (`.claude/agents/river-review.md`) for delegated, headless review tasks. The `river` CLI (`river run .`) is an **optional accelerator**, distributed separately and not yet published to npm.
+> The primary, no-install entry point is the bundled **skill-routed review** — install the plugin and ask the `river-review` agent (or load the skills) to review your diff. Use `/review-local` when you want River Review orchestrated by Claude Code with automatic context passing from the current session; use the sub-agent (`agents/river-review.md`) for delegated, headless review tasks. The `river` CLI (`river run .`) is an **optional accelerator**, distributed separately and not yet published to npm.
 
 ## Overview
 
@@ -56,7 +56,7 @@ When reviewing with multiple roles (including `auto`), a large diff is automatic
 
 | Agent          | How to Invoke                           | Dedicated Definition File                  |
 | -------------- | --------------------------------------- | ------------------------------------------ |
-| Claude Code    | Bash tool / `/review-local` / sub-agent | `.claude/agents/river-review.md`           |
+| Claude Code    | Bash tool / `/review-local` / sub-agent | `agents/river-review.md`                   |
 | Cursor         | Terminal tab / `@terminal`              | —                                          |
 | Codex CLI      | `codex exec "river run ."`              | `templates/agent-workflow/codex/AGENTS.md` |
 | GitHub Copilot | Run directly in terminal                | `.github/agents/river-review.agent.md`     |
@@ -80,7 +80,7 @@ Slash commands and the sub-agent are also available:
 Please ask river-review to review the current diff
 ```
 
-Dedicated definition: `.claude/agents/river-review.md`
+Dedicated definition: `agents/river-review.md`
 
 ### Cursor
 

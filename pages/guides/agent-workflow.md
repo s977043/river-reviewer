@@ -1,7 +1,7 @@
 # AI エージェントから River Review を使う
 
 > **どのエントリポイントを使うか**
-> 第一の（インストール不要の）エントリポイントは、同梱の **skill ルーティングレビュー** です。プラグインを導入し、`river-review` エージェントに diff のレビューを依頼する（または skill を読み込ませる）だけで動きます。Claude Code のセッションコンテキストを自動で渡したい場合は `/review-local`、ヘッドレスな委譲レビューにはサブエージェント（`.claude/agents/river-review.md`）を使ってください。`river` CLI（`river run .`）は **任意の高速化手段** で、プラグインとは別配布、かつ現時点では npm 未公開です。
+> 第一の（インストール不要の）エントリポイントは、同梱の **skill ルーティングレビュー** です。プラグインを導入し、`river-review` エージェントに diff のレビューを依頼する（または skill を読み込ませる）だけで動きます。Claude Code のセッションコンテキストを自動で渡したい場合は `/review-local`、ヘッドレスな委譲レビューにはサブエージェント（`agents/river-review.md`）を使ってください。`river` CLI（`river run .`）は **任意の高速化手段** で、プラグインとは別配布、かつ現時点では npm 未公開です。
 
 ## 概要
 
@@ -56,7 +56,7 @@ river run . --output json
 
 | エージェント   | 呼び出し方                                | 専用定義ファイル                           |
 | -------------- | ----------------------------------------- | ------------------------------------------ |
-| Claude Code    | Bash ツール / `/review-local` / sub-agent | `.claude/agents/river-review.md`           |
+| Claude Code    | Bash ツール / `/review-local` / sub-agent | `agents/river-review.md`                   |
 | Cursor         | Terminal タブ / `@terminal`               | —                                          |
 | Codex CLI      | `codex exec "river run ."`                | `templates/agent-workflow/codex/AGENTS.md` |
 | GitHub Copilot | ターミナルで直接実行                      | `.github/agents/river-review.agent.md`     |
@@ -80,7 +80,7 @@ river run . --reviewers auto
 river-review に現在の diff をレビューしてもらってください
 ```
 
-専用定義: `.claude/agents/river-review.md`
+専用定義: `agents/river-review.md`
 
 ### Cursor
 

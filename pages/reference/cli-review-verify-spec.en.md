@@ -52,14 +52,13 @@ river review verify --advisory-only \
 
 ### Input selection
 
-| Option                 | Type       | Default     | Description                                                                                                                     |
-| ---------------------- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `--artifact <id=path>` | repeatable | (unset)     | Specify an input file by [Artifact Input Contract](./artifact-input-contract.en.md) ID. `id` follows that contract.             |
-| `--config <path>`      | string     | auto-detect | Explicit `river.config.*`. The `artifacts` section can resolve everything in one place.                                         |
-| `--plan <path>`        | string     | (unset)     | Replay an existing plan JSON. When set, `verify` skips internal plan computation (the verify-family restriction still applies). |
-| `--target <path>`      | string     | `.`         | Repository root. Set when different from `pwd`.                                                                                 |
+| Option                 | Type       | Default | Description                                                                                                                     |
+| ---------------------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `--artifact <id=path>` | repeatable | (unset) | Specify an input file by [Artifact Input Contract](./artifact-input-contract.en.md) ID. `id` follows that contract.             |
+| `--plan <path>`        | string     | (unset) | Replay an existing plan JSON. When set, `verify` skips internal plan computation (the verify-family restriction still applies). |
+| `--target <path>`      | string     | `.`     | Repository root. Set when different from `pwd`.                                                                                 |
 
-Resolution priority (CLI > config > directory detection) follows the contract. If neither `review-self` nor `review-external` resolves, `verify` aborts with Exit `1` per "Fail conditions" below.
+Resolution priority (CLI > config file > directory detection) follows the contract. There is no `--config` flag; the config file is auto-detected from the repo root. If neither `review-self` nor `review-external` resolves, `verify` aborts with Exit `1` per "Fail conditions" below.
 
 ### Phase / planner
 
@@ -79,11 +78,11 @@ Resolution priority (CLI > config > directory detection) follows the contract. I
 
 ### Output
 
-| Option                 | Type                           | Default | Description                                                                                |
-| ---------------------- | ------------------------------ | ------- | ------------------------------------------------------------------------------------------ |
-| `--output <format>`    | `text` \| `markdown` \| `json` | `text`  | Output format. `json` is the machine-readable contract. Compat alias: `--format <format>`. |
-| `--output-file <path>` | string                         | -       | Where to write the Review Artifact. Defaults to stdout when unset; `-` is also stdout.     |
-| `--no-write`           | bool                           | `false` | Print to stdout only; do not create files.                                                 |
+| Option                 | Type                 | Default | Description                                                                                                                                                           |
+| ---------------------- | -------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--output <format>`    | `json` \| `markdown` | `json`  | Output format. `json` is the machine-readable contract (default), `markdown` implemented in #976, `text` not implemented (exit 3). Compat alias: `--format <format>`. |
+| `--output-file <path>` | string               | -       | Where to write the Review Artifact. Defaults to stdout when unset; `-` is also stdout.                                                                                |
+| `--no-write`           | bool                 | `false` | Print to stdout only; do not create files.                                                                                                                            |
 
 > Note (#802 Phase 3, revised 2026-05-18): the output contract is unified across `plan`/`exec`/`verify` to `--output <format>` = format, `--output-file <path>` = destination (decision in the [PlanGate CLI Stabilization Roadmap](./plangate-cli-roadmap.en.md)). This matches the global `--output <mode>` (`river run`). `--format` is accepted as a review-namespace compatibility alias, but the canonical flag is `--output`; if `--output` and `--format` are both given and disagree, it is a configuration error (exit 3). The old spec's `--output <path>` (destination) is withdrawn.
 >
@@ -140,7 +139,7 @@ Exit codes are fixed so CI can rely on them and share the three-value shape (`0`
 | ---- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `0`  | Success                        | `status` is `ok` or `skipped-by-label`, and `--max-cost` was not exceeded.                                                                                               |
 | `1`  | Failure (user input / runtime) | Neither `review-self` nor `review-external` resolved, required artifact unresolved, `--max-cost` exceeded, internal exception. All map to `status: error` with Exit `1`. |
-| `2`  | Configuration error            | `--config` cannot be loaded; unknown `--artifact id`; unknown `--phase` / `--planner` value.                                                                             |
+| `2`  | Configuration error            | Auto-detected config file cannot be loaded; unknown `--artifact id`; unknown `--phase` / `--planner` value.                                                              |
 
 `findings` severity (`critical` / `major` / `minor` / `info`) does not directly affect the exit code. CI should read the Review Artifact `findings` and gate there ([Stable Interfaces](./stable-interfaces.en.md)).
 
@@ -166,7 +165,7 @@ Unlike `exec`, `verify` **does not use the `no-changes` status**. Even when the 
 - An uncaught, non-retryable exception occurs during verify skill execution.
 - The cost estimate exceeds `--max-cost` (not applicable when combined with `--estimate` — skills do not execute, so verify returns `status: ok` + exit `0`).
 
-Syntax errors for `--config` / `--artifact` / `--phase` / `--planner` (unknown values, invalid format) return Exit `2`.
+Syntax errors for `--artifact` / `--phase` / `--planner` (unknown values, invalid format) return Exit `2`.
 
 ## Fallback behavior
 
