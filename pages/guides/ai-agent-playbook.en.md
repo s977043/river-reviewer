@@ -105,7 +105,7 @@ river run . --reviewers bug-hunter,security-scanner,test-gap --output json
 river run . --reviewers auto --output json
 ```
 
-- Get role-divided perspectives at once; results are returned deduped. See [agent-workflow](./agent-workflow.en.md).
+- Get role-divided perspectives at once; results are returned deduped. See [agent-workflow](./agent-workflow.en.md) for how `--reviewers auto` works.
 
 ## Task type × skill-set matrix (secondary axis)
 
@@ -137,12 +137,14 @@ implement()   # the agent implements
 
 # self-fix loop
 loop:
-    code = run("river run . --base main --fail-on critical --output json")
-    if exit_code == 0: break          # pass
-    fix(code.issues)                  # fix findings
-    if loop_count > N: escalate_to_human(code.summary)   # escalate if it does not converge
+    result = run("river run . --base main --fail-on critical --output json")
+    if result.exit_code == 0: break          # pass
+    fix(result.issues)                       # fix findings
+    if loop_count > N: escalate_to_human(result.summary)   # escalate if it does not converge
 
-open_pr(markdown_from("river run . --base main --output markdown"))
+# Render the PR comment from the JSON already obtained (re-running river run
+# would duplicate the LLM call, so avoid it).
+open_pr(to_markdown(result.issues))
 ```
 
 Key points: **consume JSON structurally and branch on exit code / verdict**; do not parse text. Escalate to a human if it does not converge (River only supplies decision material; avoid infinite self-fixing).

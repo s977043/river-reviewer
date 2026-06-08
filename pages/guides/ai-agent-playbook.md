@@ -104,7 +104,7 @@ river run . --reviewers bug-hunter,security-scanner,test-gap --output json
 river run . --reviewers auto --output json
 ```
 
-- 役割分担した複数視点を一括で得て、結果は dedup 済みで返る。仕組みは [agent-workflow](./agent-workflow.md#-reviewers-auto-の仕組み) を参照。
+- 役割分担した複数視点を一括で得て、結果は dedup 済みで返る。仕組みは [agent-workflow](./agent-workflow.md) を参照。
 
 ## タスク種別 × skill-set マトリクス（副軸）
 
@@ -136,12 +136,13 @@ implement()   # エージェントが実装
 
 # 自己修正ループ
 loop:
-    code = run("river run . --base main --fail-on critical --output json")
-    if exit_code == 0: break          # pass
-    fix(code.issues)                  # 指摘を修正
-    if loop_count > N: escalate_to_human(code.summary)   # 収束しなければ人間へ
+    result = run("river run . --base main --fail-on critical --output json")
+    if result.exit_code == 0: break          # pass
+    fix(result.issues)                       # 指摘を修正
+    if loop_count > N: escalate_to_human(result.summary)   # 収束しなければ人間へ
 
-open_pr(markdown_from("river run . --base main --output markdown"))
+# PR コメントは取得済み JSON から描画する（river run を再実行すると LLM 呼び出しが二重化するため避ける）
+open_pr(to_markdown(result.issues))
 ```
 
 要点: **出力は JSON を構造化消費し、分岐は exit code / verdict で行う**。text をパースしない。収束しない場合は人間にエスカレーションする（River は判断材料を出すだけで、無限自己修正は避ける）。
