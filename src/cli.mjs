@@ -771,7 +771,7 @@ function printMarkdownReport(result, phase) {
 ## River Review
 
 - フェーズ: \`${phase}\`
-- LLM レビュー未設定（\`ANTHROPIC_API_KEY\` / \`OPENAI_API_KEY\` / \`GOOGLE_API_KEY\` のいずれか未設定）のため静的チェックのみ実行し、**指摘はありません**。LLM レビューを有効化すると、リポジトリ固有の規約・差分スコープ等の観点でレビューします。`
+- LLM レビュー未設定（\`ANTHROPIC_API_KEY\` / \`OPENAI_API_KEY\` / \`GOOGLE_API_KEY\` のいずれも未設定）のため静的チェックのみ実行し、**指摘はありません**。いずれか 1 つを設定すると LLM レビューが有効になり、リポジトリ固有の規約・差分スコープ等の観点でレビューします。`
     );
     return;
   }
