@@ -447,6 +447,34 @@ function normalizeHeuristicComments(rawComments) {
             confidence: 'high',
           }),
         };
+      case 'dangerous-eval':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: 'コード実行/インジェクションのリスクがある API が追加されている',
+            evidence: 'eval / new Function / dangerouslySetInnerHTML のいずれかが追加された',
+            impact: '入力が信頼できない場合に任意コード実行や XSS につながる',
+            fix: '動的評価を避ける（パース/ホワイトリスト化）、HTML はサニタイズして挿入する',
+            severity: 'warning',
+            confidence: 'high',
+          }),
+        };
+      case 'focused-test':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: 'フォーカス済みテスト（.only）がコミットされている',
+            evidence: 'describe/it/test 等の .only が追加された',
+            impact: '他のテストが CI で実行されず、回帰を見逃す',
+            fix: '.only を外してから commit する（誤ってフォーカスを残さない）',
+            severity: 'warning',
+            confidence: 'high',
+          }),
+        };
       default:
         return {
           file: c.file,

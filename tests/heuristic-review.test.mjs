@@ -8,7 +8,7 @@ import { buildHeuristicComments } from '../src/lib/heuristic-review.mjs';
 test('buildHeuristicComments detects hardcoded secrets for security skill', () => {
   const diffText = fs.readFileSync(
     'tests/fixtures/planner-dataset/diffs/midstream-security-hardcoded-token.diff',
-    'utf8',
+    'utf8'
   );
   const parsed = parseUnifiedDiff(diffText);
   const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
@@ -24,7 +24,7 @@ test('buildHeuristicComments detects hardcoded secrets for security skill', () =
 test('buildHeuristicComments is quiet when security skill is not selected', () => {
   const diffText = fs.readFileSync(
     'tests/fixtures/planner-dataset/diffs/midstream-security-hardcoded-token.diff',
-    'utf8',
+    'utf8'
   );
   const parsed = parseUnifiedDiff(diffText);
   const plan = { selected: [{ metadata: { id: 'rr-midstream-typescript-strict-001' } }] };
@@ -32,6 +32,60 @@ test('buildHeuristicComments is quiet when security skill is not selected', () =
   const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
 
   assert.equal(comments.length, 0);
+});
+
+test('buildHeuristicComments detects dangerous eval for security skill (no LLM)', () => {
+  const diffText = `diff --git a/src/handler.ts b/src/handler.ts
+index 1111111..2222222 100644
+--- a/src/handler.ts
++++ b/src/handler.ts
+@@ -1,2 +1,3 @@
+ export function run(input) {
++  return eval(input);
+ }
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  const evalC = comments.find((c) => c.kind === 'dangerous-eval');
+  assert.ok(evalC, 'expected a dangerous-eval finding');
+  assert.equal(evalC.file, 'src/handler.ts');
+});
+
+test('buildHeuristicComments does not flag dangerous eval in test files', () => {
+  const diffText = `diff --git a/src/handler.test.ts b/src/handler.test.ts
+index 1111111..2222222 100644
+--- a/src/handler.test.ts
++++ b/src/handler.test.ts
+@@ -1,2 +1,3 @@
+ test('x', () => {
++  eval('1+1');
+ });
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.equal(
+    comments.find((c) => c.kind === 'dangerous-eval'),
+    undefined
+  );
+});
+
+test('buildHeuristicComments detects focused tests (.only) for test skill (no LLM)', () => {
+  const diffText = `diff --git a/tests/foo.test.mjs b/tests/foo.test.mjs
+index 1111111..2222222 100644
+--- a/tests/foo.test.mjs
++++ b/tests/foo.test.mjs
+@@ -1,2 +1,3 @@
+ import test from 'node:test';
++test.only('focused', () => {});
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-downstream-test-existence-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  const focused = comments.find((c) => c.kind === 'focused-test');
+  assert.ok(focused, 'expected a focused-test finding');
+  assert.equal(focused.file, 'tests/foo.test.mjs');
 });
 
 test('buildHeuristicComments detects hardcoded secrets in object literals (unquoted key)', () => {
@@ -73,7 +127,7 @@ index 1111111..2222222 100644
 
   assert.equal(comments.length, 3);
   assert.equal(comments[0].file, 'src/config/keys.ts');
-  assert.ok(comments.every(c => c.kind === 'hardcoded-secret'));
+  assert.ok(comments.every((c) => c.kind === 'hardcoded-secret'));
 });
 
 test('buildHeuristicComments ignores env var references (process.env / import.meta.env)', () => {
@@ -152,7 +206,7 @@ index 1111111..2222222 100644
 test('buildHeuristicComments detects silent catch for observability skill', () => {
   const diffText = fs.readFileSync(
     'tests/fixtures/planner-dataset/diffs/midstream-observability-silent-catch.diff',
-    'utf8',
+    'utf8'
   );
   const parsed = parseUnifiedDiff(diffText);
   const plan = { selected: [{ metadata: { id: 'rr-midstream-logging-observability-001' } }] };
@@ -168,7 +222,7 @@ test('buildHeuristicComments detects silent catch for observability skill', () =
 test('buildHeuristicComments detects missing tests for downstream test skills', () => {
   const diffText = fs.readFileSync(
     'tests/fixtures/planner-dataset/diffs/downstream-new-behavior-no-tests.diff',
-    'utf8',
+    'utf8'
   );
   const parsed = parseUnifiedDiff(diffText);
   const plan = { selected: [{ metadata: { id: 'rr-downstream-test-existence-001' } }] };
