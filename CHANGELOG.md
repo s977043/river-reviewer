@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.3.1](https://github.com/s977043/river-review/compare/v1.3.0...v1.3.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* **docs,agent:** spec drift + plugin-agent compliance (self-review) ([#1056](https://github.com/s977043/river-review/issues/1056)) ([7a461b3](https://github.com/s977043/river-review/commit/7a461b3b922155f189293861532a550e59f2812c))
+* **docs:** complete spec --config/--output drift + [#996](https://github.com/s977043/river-review/issues/996) agent danglers (self-review r2) ([#1059](https://github.com/s977043/river-review/issues/1059)) ([b8d9c88](https://github.com/s977043/river-review/commit/b8d9c8817aacea580b2f02bc279433564461ad03))
+* **docs:** repair docusaurus build (broken links + MDX import/export) ([#1061](https://github.com/s977043/river-review/issues/1061)) ([#1062](https://github.com/s977043/river-review/issues/1062)) ([8bd2ce6](https://github.com/s977043/river-review/commit/8bd2ce6adc69ece82d11be3283372a183d7d4822))
+* **review:** honor --skill-set in review plan/exec ([#976](https://github.com/s977043/river-review/issues/976)/[#1027](https://github.com/s977043/river-review/issues/1027)) ([#1063](https://github.com/s977043/river-review/issues/1063)) ([69bf4e9](https://github.com/s977043/river-review/commit/69bf4e9e9307a454f6c741d03a78f59a2f90aa65))
+* **review:** skip --skill-set resolution on the replay path ([#1063](https://github.com/s977043/river-review/issues/1063)) ([#1064](https://github.com/s977043/river-review/issues/1064)) ([9555e42](https://github.com/s977043/river-review/commit/9555e420039544eaf7fc5890c5bb99c572c92792))
+
 ## [1.3.0](https://github.com/s977043/river-review/compare/v1.2.2...v1.3.0) (2026-06-07)
 
 
