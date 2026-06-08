@@ -366,12 +366,17 @@ function findGitHubActionsIssues({ diff }) {
 // (only patterns that are rarely intentional or safe) so the no-LLM path
 // stays low-false-positive.
 function matchesDangerousEval(code) {
-  const trimmed = String(code).trim();
-  // Skip comment lines so an `eval` mentioned in a comment is not flagged.
+  let trimmed = String(code).trim();
+  // Skip comment lines and trailing comments so an `eval` in a comment is
+  // not flagged.
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
   if (/\beval\s*\(/.test(trimmed)) return true;
   if (/\bnew\s+Function\s*\(/.test(trimmed)) return true;
   if (/dangerouslySetInnerHTML/.test(trimmed)) return true;
+  if (/\bdocument\.write\s*\(/.test(trimmed)) return true;
+  // A string first argument to a timer is an implicit eval.
+  if (/\b(?:setTimeout|setInterval)\s*\(\s*['"`]/.test(trimmed)) return true;
   return false;
 }
 

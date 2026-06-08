@@ -41734,12 +41734,17 @@ function findGitHubActionsIssues({ diff }) {
 // (only patterns that are rarely intentional or safe) so the no-LLM path
 // stays low-false-positive.
 function matchesDangerousEval(code) {
-  const trimmed = String(code).trim();
-  // Skip comment lines so an `eval` mentioned in a comment is not flagged.
+  let trimmed = String(code).trim();
+  // Skip comment lines and trailing comments so an `eval` in a comment is
+  // not flagged.
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
   if (/\beval\s*\(/.test(trimmed)) return true;
   if (/\bnew\s+Function\s*\(/.test(trimmed)) return true;
   if (/dangerouslySetInnerHTML/.test(trimmed)) return true;
+  if (/\bdocument\.write\s*\(/.test(trimmed)) return true;
+  // A string first argument to a timer is an implicit eval.
+  if (/\b(?:setTimeout|setInterval)\s*\(\s*['"`]/.test(trimmed)) return true;
   return false;
 }
 
@@ -43329,9 +43334,10 @@ function normalizeHeuristicComments(rawComments) {
           skillId: c.skillId,
           message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
             finding: 'コード実行/インジェクションのリスクがある API が追加されている',
-            evidence: 'eval / new Function / dangerouslySetInnerHTML のいずれかが追加された',
+            evidence:
+              'eval / new Function / dangerouslySetInnerHTML / document.write / 文字列引数の setTimeout・setInterval のいずれかが追加された',
             impact: '入力が信頼できない場合に任意コード実行や XSS につながる',
-            fix: '動的評価を避ける（パース/ホワイトリスト化）、HTML はサニタイズして挿入する',
+            fix: '動的評価を避ける（パース/ホワイトリスト化）、HTML はサニタイズして挿入し、タイマーには関数を渡す',
             severity: 'warning',
             confidence: 'high',
           }),

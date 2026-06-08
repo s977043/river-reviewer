@@ -52,6 +52,40 @@ index 1111111..2222222 100644
   assert.equal(evalC.file, 'src/handler.ts');
 });
 
+test('buildHeuristicComments flags document.write and string-arg setTimeout (#dangerous-eval)', () => {
+  const docWrite = `diff --git a/src/ui/render.ts b/src/ui/render.ts
+--- a/src/ui/render.ts
++++ b/src/ui/render.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++document.write(userHtml);
+`;
+  const strTimer = `diff --git a/src/ui/render.ts b/src/ui/render.ts
+--- a/src/ui/render.ts
++++ b/src/ui/render.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++setTimeout('doStuff()', 100);
+`;
+  const safeTimer = `diff --git a/src/ui/render.ts b/src/ui/render.ts
+--- a/src/ui/render.ts
++++ b/src/ui/render.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++setTimeout(() => doStuff(), 100);
+`;
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const dw = buildHeuristicComments({ diff: { files: parseUnifiedDiff(docWrite).files }, plan });
+  const st = buildHeuristicComments({ diff: { files: parseUnifiedDiff(strTimer).files }, plan });
+  const safe = buildHeuristicComments({ diff: { files: parseUnifiedDiff(safeTimer).files }, plan });
+  assert.ok(dw.find((c) => c.kind === 'dangerous-eval'));
+  assert.ok(st.find((c) => c.kind === 'dangerous-eval'));
+  assert.equal(
+    safe.find((c) => c.kind === 'dangerous-eval'),
+    undefined
+  );
+});
+
 test('buildHeuristicComments does not flag dangerous eval in test files', () => {
   const diffText = `diff --git a/src/handler.test.ts b/src/handler.test.ts
 index 1111111..2222222 100644
