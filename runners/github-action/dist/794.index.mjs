@@ -663,6 +663,7 @@ async function runReviewPlan({
   debug = false,
   executionDeferred = false,
   executeReview = false,
+  skillIds = null,
   availableContexts,
   availableDependencies,
   now = () => new Date().toISOString(),
@@ -777,6 +778,9 @@ async function runReviewPlan({
         llmEnabled: executeReview,
         repoRoot: cwd,
         riskMap,
+        // #976/#1027: honor --skill-set in the review namespace, not just
+        // `river run`. null/empty = no restriction (all candidates).
+        skillIds,
         availableContexts: effectiveAvailableContexts,
         availableDependencies: effectiveAvailableDependencies,
       });

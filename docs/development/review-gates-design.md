@@ -69,7 +69,9 @@ Usage (PoC workflow—the one workflow #976 asks to pick first):
 
 ```bash
 # Before implementation: gate requirements + design + plan together.
-river review plan --skill-set pre-exec \
+# --phase upstream is required: the pre-exec skills are upstream-phase, so
+# they are phase-mismatched under the default midstream.
+river review plan --skill-set pre-exec --phase upstream \
   --artifact pbi-input=pbi-input.md \
   --artifact plan=plan.md \
   --artifact adr=docs/adr/00x.md
