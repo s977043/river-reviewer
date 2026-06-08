@@ -145,7 +145,7 @@ River Review のドキュメントは [Diátaxis documentation framework](https:
   - Docs: Tutorial—Getting started with River Review
   - Docs: How-to—Add a custom skill
   - Docs: Reference—GitHub Action inputs
-  - Docs: Explanation—River flow model）
+  - Docs: Explanation—River Review flow model）
 
 ## ✍️ ドキュメントスタイル（ダッシュ）
 
