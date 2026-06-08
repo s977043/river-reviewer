@@ -66,9 +66,9 @@
     "usage:summary": "node scripts/usage-summary.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.100.1",
+    "@anthropic-ai/sdk": "^0.102.0",
     "@google/generative-ai": "^0.24.1",
-    "@inquirer/prompts": "^8.4.3",
+    "@inquirer/prompts": "^8.5.2",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/auto-instrumentations-node": "^0.76.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.218.0",
@@ -87,7 +87,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.1",
+    "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
     "@docusaurus/core": "^3.10.1",
     "@docusaurus/preset-classic": "^3.10.1",
@@ -100,8 +100,8 @@
     "markdownlint-cli": "^0.48.0",
     "prettier": "^3.8.3",
     "prh": "^6.0.6",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "recharts": "^3.8.1",
     "textlint": "^15.7.1",
     "textlint-rule-preset-ja-technical-writing": "^12.0.2",
