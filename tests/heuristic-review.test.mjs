@@ -52,6 +52,70 @@ index 1111111..2222222 100644
   assert.equal(evalC.file, 'src/handler.ts');
 });
 
+test('buildHeuristicComments flags document.write and string-arg setTimeout (#dangerous-eval)', () => {
+  const docWrite = `diff --git a/src/ui/render.ts b/src/ui/render.ts
+--- a/src/ui/render.ts
++++ b/src/ui/render.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++document.write(userHtml);
+`;
+  const strTimer = `diff --git a/src/ui/render.ts b/src/ui/render.ts
+--- a/src/ui/render.ts
++++ b/src/ui/render.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++setTimeout('doStuff()', 100);
+`;
+  const safeTimer = `diff --git a/src/ui/render.ts b/src/ui/render.ts
+--- a/src/ui/render.ts
++++ b/src/ui/render.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++setTimeout(() => doStuff(), 100);
+`;
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const dw = buildHeuristicComments({ diff: { files: parseUnifiedDiff(docWrite).files }, plan });
+  const st = buildHeuristicComments({ diff: { files: parseUnifiedDiff(strTimer).files }, plan });
+  const safe = buildHeuristicComments({ diff: { files: parseUnifiedDiff(safeTimer).files }, plan });
+  assert.ok(dw.find((c) => c.kind === 'dangerous-eval'));
+  assert.ok(st.find((c) => c.kind === 'dangerous-eval'));
+  assert.equal(
+    safe.find((c) => c.kind === 'dangerous-eval'),
+    undefined
+  );
+});
+
+test('buildHeuristicComments flags document.writeln (#1085 review)', () => {
+  const diffText = `diff --git a/src/ui/render.ts b/src/ui/render.ts
+--- a/src/ui/render.ts
++++ b/src/ui/render.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++document.writeln(userHtml);
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.ok(comments.find((c) => c.kind === 'dangerous-eval'));
+});
+
+test('buildHeuristicComments still flags eval after a // inside a string (#1085 review)', () => {
+  // The trailing-comment strip must be quote-aware: the // here is inside the
+  // string literal, so the real eval after it must NOT be lost.
+  const diffText = `diff --git a/src/handler.ts b/src/handler.ts
+--- a/src/handler.ts
++++ b/src/handler.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++const u = "http://x"; eval(payload);
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.ok(comments.find((c) => c.kind === 'dangerous-eval'));
+});
+
 test('buildHeuristicComments does not flag dangerous eval in test files', () => {
   const diffText = `diff --git a/src/handler.test.ts b/src/handler.test.ts
 index 1111111..2222222 100644
