@@ -3,19 +3,19 @@ id: ai-agent-playbook-en
 title: AI-Driven Development Playbook (for Agents)
 ---
 
-This page is a practical, case-by-case guide for **AI agents (autonomous / semi-autonomous coding agents)** on _when_ and _how_ to call River Review. In AI-driven development the agent writes and fixes the code, but the key is to **let River gate the work and read its (JSON) output to decide the next action mechanically**.
+This page is a practical, case-by-case guide for **AI agents (autonomous / semi-autonomous coding agents)** on _when_ and _how_ to call River Review. In AI-driven development the agent writes and fixes the code, but the key is to **let River Review gate the work and read its (JSON) output to decide the next action mechanically**.
 
 > For the minimal per-tool invocation (Claude Code / Cursor / Codex / Copilot), see [Use River Review from an AI agent](./agent-workflow.en.md). This page covers **case-by-case usage along the AI-driven development loop**.
 
 ## The agent's stance (5 principles)
 
-1. **Don't review yourself. Let River gate.** Instead of the agent's own judgement, have the deterministically-routed skills review, and act on the result.
+1. **Don't review yourself. Let River Review gate.** Instead of the agent's own judgement, have the deterministically-routed skills review, and act on the result.
 2. **Read JSON, not human-facing text.** Use `--output json` and consume `river run`'s `issues[]` / `summary.issueCountBySeverity` and `river review`'s `findings[]` as structured data. `--output markdown` is for humans (PR comments) — the verdict summary appears there, not in JSON.
 3. **Branch on exit code and severity.** With `--fail-on <severity>`, finding severity becomes the exit code (1=fail / 2=warn / 0=pass) on both `river run` and `river review`. The agent branches on the exit code, or on `summary.issueCountBySeverity` counts: proceed / fix / escalate to a human.
 4. **Trust deterministic routing.** Which skills were selected/skipped (with reasons) is visible in `--debug` (`selectedSkills` / `skippedSkills`). Selection is decided by phase, target paths, and input context, and reproduces every time.
 5. **Understand the API-key requirement.** Producing real findings needs an LLM key (`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GOOGLE_API_KEY`). Without one it falls back to heuristic / empty, and **only the routing** (which skills would run) is determined.
 
-## Where River sits in the AI-driven development loop
+## Where River Review sits in the AI-driven development loop
 
 ```mermaid
 flowchart TD
@@ -30,7 +30,7 @@ flowchart TD
   G3 -->|pass| Verify[W-check / synthesis\nreview exec --artifact review-self/external]
 ```
 
-River only **emits findings and a verdict**; the final GO/NO-GO decision is made by whoever calls the gate (the agent or PlanGate).
+River Review only **emits findings and a verdict**; the final GO/NO-GO decision is made by whoever calls the gate (the agent or PlanGate).
 
 ## Case by stage (primary axis)
 
@@ -84,7 +84,7 @@ river run . --base main --fail-on critical --warn-on major --output markdown \
 
 ### Case 4: Verification — W-check (re-audit a review result)
 
-Have River **re-audit** another AI's / a human's review result to detect omissions, false positives, hallucinations, and missing evidence (double review).
+Have River Review **re-audit** another AI's / a human's review result to detect omissions, false positives, hallucinations, and missing evidence (double review).
 
 ```bash
 river review exec --artifact review-self=./self-review.md \
@@ -158,12 +158,12 @@ loop:
 open_pr(to_markdown(result.issues))
 ```
 
-Key points: **consume JSON structurally and branch on exit code / severity (`summary.issueCountBySeverity`)**; do not parse text. Escalate to a human if it does not converge (River only supplies decision material; avoid infinite self-fixing).
+Key points: **consume JSON structurally and branch on exit code / severity (`summary.issueCountBySeverity`)**; do not parse text. Escalate to a human if it does not converge (River Review only supplies decision material; avoid infinite self-fixing).
 
 ## Anti-patterns
 
 - ❌ **Regex-parsing human-facing text** → use `--output json` (`issues` / `findings`).
-- ❌ **Applying every River finding unconditionally** → triage by `severity`. Route `info` / `minor` to follow-ups and make only `critical` a blocking condition ([review policy](../reference/review-policy.en.md); whether `major` also auto-gates depends on calibration).
+- ❌ **Applying every River Review finding unconditionally** → triage by `severity`. Route `info` / `minor` to follow-ups and make only `critical` a blocking condition ([review policy](../reference/review-policy.en.md); whether `major` also auto-gates depends on calibration).
 - ❌ **Expecting real findings with no key** → without a key it is heuristic / empty. Set a key in CI.
 - ❌ **Expecting `review verify` to execute** → it is a stub (exit 3). Use `review exec --artifact review-self/external` for W-checks.
 - ❌ **Calling pre-exec without `--phase upstream`** → upstream skills are phase-mismatched and all skipped.

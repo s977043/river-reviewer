@@ -3,19 +3,19 @@ id: ai-agent-playbook
 title: AI 駆動開発プレイブック（エージェント向け）
 ---
 
-このページは **AI エージェント（自律 / 半自律のコーディングエージェント）** が River Review を「いつ・どう呼ぶか」をケース別にまとめた実践ガイドです。AI 駆動開発では、コードを書いて直すのはエージェントですが、**レビューは River にゲートさせ、出力（JSON）を読んで次の行動を機械的に決める**のが要点です。
+このページは **AI エージェント（自律 / 半自律のコーディングエージェント）** が River Review を「いつ・どう呼ぶか」をケース別にまとめた実践ガイドです。AI 駆動開発では、コードを書いて直すのはエージェントですが、**レビューは River Review にゲートさせ、出力（JSON）を読んで次の行動を機械的に決める**のが要点です。
 
 > ツール別（Claude Code / Cursor / Codex / Copilot）の最小呼び出しは [AI エージェントから River Review を使う](./agent-workflow.md) を参照。本ページは **AI 駆動開発のループに沿ったケース別の使い分け**を扱います。
 
 ## エージェントの基本姿勢（5 原則）
 
-1. **自分でレビューしない。River にゲートさせる。** エージェントの自己判断ではなく、決定論的にルーティングされた skill にレビューさせ、結果を根拠に行動する。
+1. **自分でレビューしない。River Review にゲートさせる。** エージェントの自己判断ではなく、決定論的にルーティングされた skill にレビューさせ、結果を根拠に行動する。
 2. **JSON を読む（人間向け text は読まない）。** `--output json` を使い、`river run` は `issues[]` / `summary.issueCountBySeverity`、`river review` は `findings[]` を構造化データとして消費する。`--output markdown` は人間（PR コメント）向けで、verdict 等の要約はこちらに出る（JSON には含まれない）。
 3. **exit code と重大度で分岐する。** `--fail-on <severity>` を付けると finding の重大度が exit code（1=fail / 2=warn / 0=pass）になる（`river run` / `river review` 両対応）。エージェントは exit code、または `summary.issueCountBySeverity` の件数で「次へ進む / 修正する / 人間にエスカレーション」を機械判断する。
 4. **決定論ルーティングを信頼する。** どの skill が選ばれ／除外されたかは `--debug` の `selectedSkills` / `skippedSkills`（理由付き）で確認できる。フェーズ・対象パス・入力コンテキストで決まり、毎回再現する。
 5. **API キーの要否を理解する。** 実際の finding 生成には LLM キー（`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GOOGLE_API_KEY` のいずれか）が必要。キーが無い場合は heuristic / 空にフォールバックし、**ルーティング（どの skill を実行するか）だけ**が確定する。
 
-## AI 駆動開発ループにおける River の位置
+## AI 駆動開発ループにおける River Review の位置
 
 ```mermaid
 flowchart TD
@@ -30,7 +30,7 @@ flowchart TD
   G3 -->|pass| Verify[W チェック / 統合\nreview exec --artifact review-self/external]
 ```
 
-River は**指摘（findings）と verdict を出す**だけで、進行可否（GO/NO-GO）の最終決定はゲートを呼ぶ側（エージェント or PlanGate）が行います。
+River Review は**指摘（findings）と verdict を出す**だけで、進行可否（GO/NO-GO）の最終決定はゲートを呼ぶ側（エージェント or PlanGate）が行います。
 
 ## ステージ別ケース（主軸）
 
@@ -83,7 +83,7 @@ river run . --base main --fail-on critical --warn-on major --output markdown \
 
 ### Case 4: 検証 — W チェック（レビュー結果の再点検）
 
-別の AI / 人間のレビュー結果を **River に再点検**させ、漏れ・誤検知・ハルシネーション・根拠欠落を検出します（二重レビュー）。
+別の AI / 人間のレビュー結果を **River Review に再点検**させ、漏れ・誤検知・ハルシネーション・根拠欠落を検出します（二重レビュー）。
 
 ```bash
 river review exec --artifact review-self=./self-review.md \
@@ -156,12 +156,12 @@ loop:
 open_pr(to_markdown(result.issues))
 ```
 
-要点: **出力は JSON を構造化消費し、分岐は exit code / 重大度（`summary.issueCountBySeverity`）で行う**。text をパースしない。収束しない場合は人間にエスカレーションする（River は判断材料を出すだけで、無限自己修正は避ける）。
+要点: **出力は JSON を構造化消費し、分岐は exit code / 重大度（`summary.issueCountBySeverity`）で行う**。text をパースしない。収束しない場合は人間にエスカレーションする（River Review は判断材料を出すだけで、無限自己修正は避ける）。
 
 ## アンチパターン
 
 - ❌ **人間向け text 出力を正規表現でパースする** → `--output json`（`issues` / `findings`）を使う。
-- ❌ **River の指摘を無条件に全部適用する** → `severity` で取捨。`info` / `minor` はフォローアップに回し、`critical` のみブロック条件にする運用が安定（[レビューポリシー](../reference/review-policy.md)参照。`major` も自動ゲートに含めるかは calibration 次第）。
+- ❌ **River Review の指摘を無条件に全部適用する** → `severity` で取捨。`info` / `minor` はフォローアップに回し、`critical` のみブロック条件にする運用が安定（[レビューポリシー](../reference/review-policy.md)参照。`major` も自動ゲートに含めるかは calibration 次第）。
 - ❌ **キー未設定で実 findings を期待する** → キーが無いと heuristic / 空。CI ではキーを設定する。
 - ❌ **`review verify` で実行を期待する** → 現状 stub（exit 3）。W チェックは `review exec --artifact review-self/external`。
 - ❌ **pre-exec を `--phase upstream` 無しで呼ぶ** → upstream skill がフェーズ不一致となり全 skip される。
