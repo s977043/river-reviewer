@@ -13,7 +13,7 @@ title: AI 駆動開発プレイブック（エージェント向け）
 2. **JSON を読む（人間向け text は読まない）。** `--output json` を使い、`river run` は `issues[]` / `summary.issueCountBySeverity`、`river review` は `findings[]` を構造化データとして消費する。`--output markdown` は人間（PR コメント）向けで、verdict 等の要約はこちらに出る（JSON には含まれない）。
 3. **exit code と重大度で分岐する。** `--fail-on <severity>` を付けると finding の重大度が exit code（1=fail / 2=warn / 0=pass）になる（`river run` / `river review` 両対応）。エージェントは exit code、または `summary.issueCountBySeverity` の件数で「次へ進む / 修正する / 人間にエスカレーション」を機械判断する。
 4. **決定論ルーティングを信頼する。** どの skill が選ばれ／除外されたかは `--debug` の `selectedSkills` / `skippedSkills`（理由付き）で確認できる。フェーズ・対象パス・入力コンテキストで決まり、毎回再現する。
-5. **API キーの要否を理解する。** 実際の finding 生成には LLM キー（`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GOOGLE_API_KEY` のいずれか）が必要。キーが無い場合は heuristic / 空にフォールバックし、**ルーティング（どの skill を実行するか）だけ**が確定する。
+5. **実行モデルを理解する（通常 LLM キーは不要）。** あなた（エージェント）がスキル / サブエージェントを読み込み**自分のモデルでレビューするなら、River Review 用の LLM キーは不要**。本ページの `river run` / `river review` コマンドはエージェントが River Review を**外部ツールとして呼ぶヘッドレス経路**で、その場合だけ LLM キー（`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GOOGLE_API_KEY` のいずれか）が要る（機械的チェックの 4 スキルはキー無しでも動く）。詳細は [River Review とは § 実行モデル](../explanation/what-is-river-review.md)。
 
 ## AI 駆動開発ループにおける River Review の位置
 
