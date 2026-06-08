@@ -143,6 +143,23 @@ index 1111111..2222222 100644
   assert.ok(comments.find((c) => c.kind === 'merge-conflict'));
 });
 
+test('buildHeuristicComments detects disabled tests (.skip / xit) (no LLM)', () => {
+  const diffText = `diff --git a/tests/foo.test.mjs b/tests/foo.test.mjs
+index 1111111..2222222 100644
+--- a/tests/foo.test.mjs
++++ b/tests/foo.test.mjs
+@@ -1,2 +1,4 @@
+ import test from 'node:test';
++test.skip('pending', () => {});
++xit('also disabled', () => {});
++xcontext('group disabled', () => {});
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-downstream-test-existence-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.ok(comments.find((c) => c.kind === 'disabled-test'));
+});
+
 test('buildHeuristicComments detects diff3 base marker ||||||| (#1082 review)', () => {
   const diffText = `diff --git a/src/handler.ts b/src/handler.ts
 index 1111111..2222222 100644
