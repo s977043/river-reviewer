@@ -45,7 +45,6 @@ river review plan --plan-only --output json
 | ------------------------ | ---------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--artifact <id>=<path>` | repeatable | Optional | Pair of artifact ID (defined in [Artifact Input Contract](./artifact-input-contract.en.md)) and file path. May be specified multiple times. |
 | `--artifacts-dir <path>` | string     | Optional | Base directory used for default-filename auto-detection. Defaults to current working directory.                                             |
-| `--config <path>`        | string     | Optional | Path to `river.config.*`. The `artifacts` section in the config is overridden by `--artifact`.                                              |
 
 Resolution order matches Artifact Input Contract "Input Channels" (CLI args → config file → directory auto-detection).
 
@@ -62,13 +61,13 @@ Resolution order matches Artifact Input Contract "Input Channels" (CLI args → 
 
 ### Output control
 
-| Option                  | Type   | Default | Description                                                                                               |
-| ----------------------- | ------ | ------- | --------------------------------------------------------------------------------------------------------- |
-| `--output <format>`     | enum   | `text`  | One of `text` / `markdown` / `json`. `json` is the machine-readable contract (see below).                 |
-| `--output-file <path>`  | string | -       | Output destination. Defaults to stdout when unset.                                                        |
-| `--summary-file <path>` | string | -       | Write a human-readable summary (Markdown) to a separate file. Intended to be paired with `--output json`. |
-| `--quiet`               | flag   | false   | Suppress progress logs on stdout (errors still go to stderr). For CI use.                                 |
-| `--debug`               | flag   | false   | Include debug data in the [Review Artifact](./review-artifact.en.md) `debug` field.                       |
+| Option                  | Type   | Default | Description                                                                                                     |
+| ----------------------- | ------ | ------- | --------------------------------------------------------------------------------------------------------------- |
+| `--output <format>`     | enum   | `json`  | `json` (default, machine-readable) / `markdown` (human-facing, implemented in #976). `text` is not implemented. |
+| `--output-file <path>`  | string | -       | Output destination. Defaults to stdout when unset.                                                              |
+| `--summary-file <path>` | string | -       | Write a human-readable summary (Markdown) to a separate file. Intended to be paired with `--output json`.       |
+| `--quiet`               | flag   | false   | Suppress progress logs on stdout (errors still go to stderr). For CI use.                                       |
+| `--debug`               | flag   | false   | Include debug data in the [Review Artifact](./review-artifact.en.md) `debug` field.                             |
 
 > Note (#802 Phase 3, 2026-05-18): the `--output <format>` = format, `--output-file <path>` = destination contract is unified across `plan`/`exec`/`verify` and matches the global `--output <mode>` (`river run`) (decision in the [PlanGate CLI Stabilization Roadmap](./plangate-cli-roadmap.en.md)). `--format <format>` is accepted as a review-namespace compatibility alias, but the canonical flag is `--output`. If `--output` and `--format` are both given and disagree, it is a configuration error (exit 3).
 >
