@@ -8,6 +8,8 @@ export const SKILL_HEURISTIC_MAP = {
     'findGitHubActionsIssues',
     'findDangerousEval',
     'findInsecureTls',
+    'findWeakHash',
+    'findCommandInjection',
   ],
   'rr-midstream-logging-observability-001': [
     'findSilentCatch',
@@ -498,6 +500,55 @@ function findInsecureTls({ diff }) {
   return comments;
 }
 
+// Weak hash algorithm via the Node crypto idiom (near-zero false positive).
+function matchesWeakHash(code) {
+  const trimmed = String(code).trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  return /createHash\s*\(\s*['"`](?:md5|sha1)['"`]/i.test(trimmed);
+}
+
+function findWeakHash({ diff }) {
+  const MAX_WEAK_HASH_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (looksLikeTestFile(filePath)) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesWeakHash(text)) continue;
+      comments.push({ file: filePath, line, kind: 'weak-hash' });
+      if (comments.length >= MAX_WEAK_HASH_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
+// Shell command built from a template literal with interpolation — a command
+// injection smell when the interpolated value can be attacker-controlled.
+function matchesCommandInjection(code) {
+  const trimmed = String(code).trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  return /\b(?:exec|execSync|spawn|spawnSync)\s*\(\s*`[^`]*\$\{/.test(trimmed);
+}
+
+function findCommandInjection({ diff }) {
+  const MAX_COMMAND_INJECTION_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (looksLikeTestFile(filePath)) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesCommandInjection(text)) continue;
+      comments.push({ file: filePath, line, kind: 'command-injection' });
+      if (comments.length >= MAX_COMMAND_INJECTION_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
 // Unresolved git conflict markers committed into a file. The `<<<<<<<` /
 // `>>>>>>>` markers are unambiguous; `=======` is intentionally excluded
 // (it collides with Markdown h1 underlines).
@@ -567,6 +618,12 @@ export function buildHeuristicComments({ diff, plan }) {
       comments.push({ ...c, skillId });
     }
     for (const c of findInsecureTls({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findWeakHash({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findCommandInjection({ diff })) {
       comments.push({ ...c, skillId });
     }
   }

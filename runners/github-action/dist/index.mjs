@@ -41376,6 +41376,8 @@ const SKILL_HEURISTIC_MAP = {
     'findGitHubActionsIssues',
     'findDangerousEval',
     'findInsecureTls',
+    'findWeakHash',
+    'findCommandInjection',
   ],
   'rr-midstream-logging-observability-001': [
     'findSilentCatch',
@@ -41866,6 +41868,55 @@ function findInsecureTls({ diff }) {
   return comments;
 }
 
+// Weak hash algorithm via the Node crypto idiom (near-zero false positive).
+function matchesWeakHash(code) {
+  const trimmed = String(code).trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  return /createHash\s*\(\s*['"`](?:md5|sha1)['"`]/i.test(trimmed);
+}
+
+function findWeakHash({ diff }) {
+  const MAX_WEAK_HASH_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (looksLikeTestFile(filePath)) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesWeakHash(text)) continue;
+      comments.push({ file: filePath, line, kind: 'weak-hash' });
+      if (comments.length >= MAX_WEAK_HASH_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
+// Shell command built from a template literal with interpolation — a command
+// injection smell when the interpolated value can be attacker-controlled.
+function matchesCommandInjection(code) {
+  const trimmed = String(code).trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  return /\b(?:exec|execSync|spawn|spawnSync)\s*\(\s*`[^`]*\$\{/.test(trimmed);
+}
+
+function findCommandInjection({ diff }) {
+  const MAX_COMMAND_INJECTION_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (looksLikeTestFile(filePath)) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesCommandInjection(text)) continue;
+      comments.push({ file: filePath, line, kind: 'command-injection' });
+      if (comments.length >= MAX_COMMAND_INJECTION_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
 // Unresolved git conflict markers committed into a file. The `<<<<<<<` /
 // `>>>>>>>` markers are unambiguous; `=======` is intentionally excluded
 // (it collides with Markdown h1 underlines).
@@ -41935,6 +41986,12 @@ function buildHeuristicComments({ diff, plan }) {
       comments.push({ ...c, skillId });
     }
     for (const c of findInsecureTls({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findWeakHash({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findCommandInjection({ diff })) {
       comments.push({ ...c, skillId });
     }
   }
@@ -43312,6 +43369,34 @@ function normalizeHeuristicComments(rawComments) {
             fix: '証明書検証を有効に保つ。自己署名証明書は CA を信頼ストアへ追加して対応する',
             severity: 'blocker',
             confidence: 'high',
+          }),
+        };
+      case 'weak-hash':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
+            finding: '弱いハッシュアルゴリズム（MD5 / SHA-1）が使われている',
+            evidence: "`createHash('md5')` または `createHash('sha1')` が追加された",
+            impact: '衝突攻撃に弱く、署名やパスワード等の用途では安全でない',
+            fix: 'SHA-256 以上を使う。パスワードは bcrypt/scrypt/argon2 を使う',
+            severity: 'warning',
+            confidence: 'medium',
+          }),
+        };
+      case 'command-injection':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
+            finding: 'シェルコマンドが文字列補間で組み立てられている',
+            evidence: '`exec`/`spawn` 系にテンプレートリテラルの `${...}` 補間が渡されている',
+            impact: '補間値が信頼できない場合、コマンドインジェクションにつながる',
+            fix: '引数配列を使う（例: `execFile(cmd, [args])`）、または入力を厳格に検証/エスケープする',
+            severity: 'warning',
+            confidence: 'medium',
           }),
         };
       case 'merge-conflict':

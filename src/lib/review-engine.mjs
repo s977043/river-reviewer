@@ -504,6 +504,34 @@ function normalizeHeuristicComments(rawComments) {
             confidence: 'high',
           }),
         };
+      case 'weak-hash':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: '弱いハッシュアルゴリズム（MD5 / SHA-1）が使われている',
+            evidence: "`createHash('md5')` または `createHash('sha1')` が追加された",
+            impact: '衝突攻撃に弱く、署名やパスワード等の用途では安全でない',
+            fix: 'SHA-256 以上を使う。パスワードは bcrypt/scrypt/argon2 を使う',
+            severity: 'warning',
+            confidence: 'medium',
+          }),
+        };
+      case 'command-injection':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: 'シェルコマンドが文字列補間で組み立てられている',
+            evidence: '`exec`/`spawn` 系にテンプレートリテラルの `${...}` 補間が渡されている',
+            impact: '補間値が信頼できない場合、コマンドインジェクションにつながる',
+            fix: '引数配列を使う（例: `execFile(cmd, [args])`）、または入力を厳格に検証/エスケープする',
+            severity: 'warning',
+            confidence: 'medium',
+          }),
+        };
       case 'merge-conflict':
         return {
           file: c.file,
