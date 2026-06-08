@@ -83,4 +83,4 @@ Which skills / gates / rules are ultimately selected is resolved deterministical
 
 The CLI / Action ship no auto-update mechanism. Consumers pin and update versions explicitly (GitHub Action version pinning, npm lockfiles). This is a deliberate choice favoring deterministic execution and auditability.
 
-See also: gate responsibilities in [Review Gates Design](../../docs/development/review-gates-design.md), and config options in [config-schema](../reference/config-schema.en.md).
+See also: gate responsibilities in [Review Gates Design](https://github.com/s977043/river-review/blob/main/docs/development/review-gates-design.md) (in-repo dev doc), and config options in [config-schema](../reference/config-schema.en.md).

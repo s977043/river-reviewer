@@ -67,7 +67,7 @@ river skills import --from ./vendor/skills --dry-run
 
 ファイルを書き出さずに変換・検証だけを行います。取り込み前の事前チェックに使います。
 
-import 完了時には「imported / failed / warnings」の件数が出力されます。`failed` が 1 件以上ある場合、終了コードは `1` になります。
+`import` 完了時には「imported / failed / warnings」の件数が出力されます。`failed` が 1 件以上ある場合、終了コードは `1` になります。
 
 ## 3. スキルを Agent Skills 形式で書き出す（`skills export`）
 
@@ -91,7 +91,7 @@ river skills export --include-assets
 
 `references/` / `scripts/` / `prompt/` ディレクトリを `SKILL.md` と並べてコピーします。スキル本体だけでなく、参照ファイルやスクリプトもまとめて配布したいときに指定します。
 
-export 完了時には「exported / failed」の件数が出力されます。`failed` が 1 件以上ある場合、終了コードは `1` になります。
+`export` 完了時には「exported / failed」の件数が出力されます。`failed` が 1 件以上ある場合、終了コードは `1` になります。
 
 ## オプション早見表
 

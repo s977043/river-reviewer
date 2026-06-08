@@ -81,4 +81,4 @@ River Review の**正規実行面は CLI** です。GitHub Action / Claude Code 
 
 CLI / Action は自動アップデート機構を持ちません。バージョンは利用側が明示的に固定・更新します（GitHub Action のバージョンピン、npm の lockfile など）。これは決定論的な実行と監査可能性を優先する設計判断です。
 
-関連: review gate の責務分担は [Review Gates Design](../../docs/development/review-gates-design.md)、設定項目は [config-schema](../reference/config-schema.md) を参照。
+関連: review gate の責務分担は [Review Gates Design](https://github.com/s977043/river-review/blob/main/docs/development/review-gates-design.md)（リポジトリ内 dev ドキュメント）、設定項目は [config-schema](../reference/config-schema.md) を参照。
