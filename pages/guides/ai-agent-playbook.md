@@ -10,8 +10,8 @@ title: AI 駆動開発プレイブック（エージェント向け）
 ## エージェントの基本姿勢（5 原則）
 
 1. **自分でレビューしない。River にゲートさせる。** エージェントの自己判断ではなく、決定論的にルーティングされた skill にレビューさせ、結果を根拠に行動する。
-2. **JSON を読む（人間向け text は読まない）。** `--output json` を使い、`issues` / `findings` / `verdict` を構造化データとして消費する。`--output markdown` は人間（PR コメント）向け。
-3. **verdict と exit code で分岐する。** `--fail-on <severity>` を付けると finding の重大度が exit code（1=fail / 2=warn / 0=pass）になる。エージェントは exit code で「次へ進む / 修正する / 人間にエスカレーション」を機械判断できる。
+2. **JSON を読む（人間向け text は読まない）。** `--output json` を使い、`river run` は `issues[]` / `summary.issueCountBySeverity`、`river review` は `findings[]` を構造化データとして消費する。`--output markdown` は人間（PR コメント）向けで、verdict 等の要約はこちらに出る（JSON には含まれない）。
+3. **exit code と重大度で分岐する。** `--fail-on <severity>` を付けると finding の重大度が exit code（1=fail / 2=warn / 0=pass）になる（`river run` / `river review` 両対応）。エージェントは exit code、または `summary.issueCountBySeverity` の件数で「次へ進む / 修正する / 人間にエスカレーション」を機械判断する。
 4. **決定論ルーティングを信頼する。** どの skill が選ばれ／除外されたかは `--debug` の `selectedSkills` / `skippedSkills`（理由付き）で確認できる。フェーズ・対象パス・入力コンテキストで決まり、毎回再現する。
 5. **API キーの要否を理解する。** 実際の finding 生成には LLM キー（`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GOOGLE_API_KEY` のいずれか）が必要。キーが無い場合は heuristic / 空にフォールバックし、**ルーティング（どの skill を実行するか）だけ**が確定する。
 
@@ -52,8 +52,9 @@ river review plan --skill-set pre-exec --phase upstream --plan-only \
 ```
 
 - **入力**: `pbi-input`（要件）/ `plan`（実装計画）/ `todo` / `test-cases` / `adr`（設計）。
-- **出力**: Review Artifact（`findings[]` + `plan` + `debug`）。`findings` の `severity` と `actions` / `questions` を読む。
-- **エージェントの次行動**: `questions`（不明点）を解消し、`findings` の指摘を計画に反映してから実装着手。critical があれば**実装に入らない**。
+- **出力**: Review Artifact（`findings[]` + `plan` + `debug`）。各 finding の `severity` / `message` / `suggestion`（修正提案）を読む。
+- **エージェントの次行動**: `findings` の指摘と `message` の不明点を計画に反映してから実装着手。critical があれば**実装に入らない**。
+- **注**: `--artifact` に渡すファイル（`pbi-input.md` 等）は事前に存在している必要がある。パスが解決できないと exit 3。
 
 ### Case 2: 実装中 / 直後 — 差分の自己レビューと自己修正ループ
 
@@ -65,7 +66,7 @@ river run . --base main --output json
 
 - **出力**: `{ issues[], summary }`（`output.schema.json`）。`issues[].severity`（critical/major/minor/info）と `message` / `file` / `line` を読む。
 - **エージェントの次行動（自己修正ループ）**: `issues` を重大度順に修正 → 再度 `river run` → `issues` が空 or info のみになるまで反復。
-- タスクが大きい場合は `--depth thorough`、対象を絞るなら `--files <glob>`。
+- タスクが大きい場合は `--depth thorough`、対象を絞るなら `--files <glob>`。`--base` は省略時に default ブランチを自動検出するため、`main` 以外（`master`/`develop` 等）のリポジトリでは省略するか `--base <default>` を明示する。
 
 ### Case 3: PR 提出ゲート — exit code で機械的にブロック
 
@@ -122,6 +123,16 @@ river run . --reviewers auto --output json
 | 重要 / 高リスク変更 | PR 前 (Case 3)           | `adversarial`                                    | pre-mortem / war-game で前提を崩す |
 
 > セットを指定しない場合は、フェーズ・対象パス・入力コンテキストから**自動選択**されます。迷ったら無指定（自動）で始め、観点を絞りたいときだけ `--skill-set` を使うのが基本。
+>
+> ⚠️ **phase trap**: `comprehensive` / `multitenancy` / `adversarial` は upstream skill（例 `rr-upstream-multitenancy-isolation-001` / `rr-upstream-pre-mortem-001`）を含む。既定の midstream で `river run` するとそれらは**フェーズ不一致で無警告 skip**される。upstream 観点も効かせたいなら別途 `--phase upstream` で実行するか、`--debug` の `skippedSkills` で実際に走った skill を必ず確認すること。
+
+## エージェント運用の補助機能
+
+自律ループを安全・効率的に回すための機能。
+
+- **誤検知の抑制（無限ループ回避）**: 同じ指摘を直せない／受容する場合は `river suppression add --fingerprint <fp> --feedback <false_positive|accepted_risk> --rationale "..."` で記録する。これをしないとエージェントが同じ finding を毎回拾い、自己修正ループが収束しない。
+- **収束の判定（run 永続化）**: `--save` で `.river/runs/` に保存し、`river runs diff <id> <id>` や `river run . --baseline <前回 json>` で「新規 / 解消」を比較する。`loop_count` だけに頼らず、**指摘が減っているか**で収束を判断する。
+- **コスト上限（暴走防止）**: 深いレビューや大きな diff では `--max-cost <usd>`（見積り超過で中断）と `--estimate`（見積りのみ）でランナウェイ LLM コストを防ぐ。
 
 ## エージェント実装パターン（擬似コード）
 
@@ -145,24 +156,24 @@ loop:
 open_pr(to_markdown(result.issues))
 ```
 
-要点: **出力は JSON を構造化消費し、分岐は exit code / verdict で行う**。text をパースしない。収束しない場合は人間にエスカレーションする（River は判断材料を出すだけで、無限自己修正は避ける）。
+要点: **出力は JSON を構造化消費し、分岐は exit code / 重大度（`summary.issueCountBySeverity`）で行う**。text をパースしない。収束しない場合は人間にエスカレーションする（River は判断材料を出すだけで、無限自己修正は避ける）。
 
 ## アンチパターン
 
 - ❌ **人間向け text 出力を正規表現でパースする** → `--output json`（`issues` / `findings`）を使う。
-- ❌ **River の指摘を無条件に全部適用する** → `severity` と verdict で取捨。`info` / `minor` はフォローアップに回し、`critical` のみブロック条件にする運用が安定（[レビューポリシー](../reference/review-policy.md)参照）。
+- ❌ **River の指摘を無条件に全部適用する** → `severity` で取捨。`info` / `minor` はフォローアップに回し、`critical` のみブロック条件にする運用が安定（[レビューポリシー](../reference/review-policy.md)参照。`major` も自動ゲートに含めるかは calibration 次第）。
 - ❌ **キー未設定で実 findings を期待する** → キーが無いと heuristic / 空。CI ではキーを設定する。
 - ❌ **`review verify` で実行を期待する** → 現状 stub（exit 3）。W チェックは `review exec --artifact review-self/external`。
 - ❌ **pre-exec を `--phase upstream` 無しで呼ぶ** → upstream skill がフェーズ不一致となり全 skip される。
 
 ## 出力契約クイックリファレンス
 
-| コマンド                 | JSON スキーマ                         | 主なキー                                                                       |
-| ------------------------ | ------------------------------------- | ------------------------------------------------------------------------------ |
-| `river run`              | `schemas/output.schema.json`          | `issues[]`, `summary`                                                          |
-| `river review plan/exec` | `schemas/review-artifact.schema.json` | `version`, `status`, `phase`, `findings[]`, `plan`, `debug`（scoring/verdict） |
+| コマンド                 | JSON スキーマ                         | 主なキー                                                                |
+| ------------------------ | ------------------------------------- | ----------------------------------------------------------------------- |
+| `river run`              | `schemas/output.schema.json`          | `issues[]`, `summary.issueCountBySeverity`, `summary.issueCountByPhase` |
+| `river review plan/exec` | `schemas/review-artifact.schema.json` | `version`, `status`, `phase`, `findings[]`, `plan`, `debug`             |
 
-verdict（`debug` 内 scoring）: `auto-approve` / `human-review-recommended` / `human-review-required`。エージェントの自動進行可否の判断に使える（ただし HITL ポリシーは置き換えない）。
+> **verdict は JSON に含まれない**。`auto-approve` / `human-review-recommended` / `human-review-required` の verdict は `--output markdown` の人間向け要約にのみ現れる（`output.schema.json` の `summary` は件数のみ、Review Artifact の `debug` は自由形式で verdict を保証しない）。エージェントの機械判断は **exit code（`--fail-on`）** と **`summary.issueCountBySeverity`** で行うこと（verdict が必要なら markdown を別途取得）。
 
 ## 関連ページ
 
