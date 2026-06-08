@@ -1,0 +1,66 @@
+# Heuristic Detector Checklist
+
+`src/lib/heuristic-review.mjs` に regex ベースの no-key 検出器（LLM キー無しで動く機械的チェック）を追加・変更するときのチェックリスト。
+
+これらの検出器は **LLM の判断なしに決定論で動く**ため、false positive / false negative がそのままレビューの質に直結する。本チェックリストは、過去に reviewer（gemini）が **検出器 1 本につきほぼ毎回**指摘した同一 class の不具合を front-load するためのもの。
+
+## いつ使うか
+
+- `heuristic-review.mjs` に `findXxx` 検出器を追加する
+- 既存検出器の正規表現を変更する
+- `SKILL_HEURISTIC_MAP` にエントリを追加する
+
+## 1. コメント行・文字列の扱い（最頻出の FP/FN 源）
+
+- [ ] **matcher 内で両方を行う**（既存 `matchesDangerousEval` を参照）: ① 先頭がコメントの行を `trimmed.startsWith('//') || startsWith('*') || startsWith('/*')` で早期 return、② その後 `stripTrailingLineComment(trimmed).trim()` で行末コメントを除去してから判定。①だけだと行末コメント FP が再発する（gemini が毎 PR 指摘した class）。
+- [ ] **行末コメント除去は quote-aware な共有ヘルパー `stripTrailingLineComment(code)` を使う**。素朴な `code.replace(/\/\/.*$/, '')` は **禁止**—文字列リテラル内の `//`（例 `"http://x"; eval(y)`）でコメント開始を誤判定し、後続の本物（`eval`）を取りこぼす（false negative）。
+- [ ] パターンのキーワードが「コメント内に登場しただけ」で発火しないことを negative テストで確認する。
+
+## 2. メソッド呼び出しと関数呼び出しの衝突
+
+- [ ] 関数名が他オブジェクトのメソッドと衝突しないか確認する。例: `exec` は `child_process.exec` だけでなく `RegExp.prototype.exec` / DB の `.exec` にも一致する。
+- [ ] 衝突する場合は **負の後読み** `(?<![.\w])exec\s*\(` で素の関数呼び出しに限定し、曖昧性のない alias（`execSync` / `spawn` / `spawnSync`）は `\b` で許容する。
+
+## 3. alias / 異形の網羅
+
+- [ ] 検出対象に異形がないか洗い出す。漏れがちな例:
+  - disabled test: `.skip` だけでなく `xit` / `xdescribe` / `xtest` / `xcontext`
+  - focused test: `describe` / `context` / `it` / `test` / `suite` / `bench` の `.only`
+  - merge conflict: `<<<<<<<` / `>>>>>>>` に加え diff3/zdiff3 の base marker `|||||||`（`=======` は Markdown h1 下線と衝突するため**使わない**）
+  - DOM 注入: `document.write` だけでなく `document.writeln`
+- [ ] 「設定値で危険になる」ものは条件を限定する。例: 環境変数 `NODE_TLS_REJECT_UNAUTHORIZED` は **`=0` に代入された場合のみ**（read や `=1` は除外）。オブジェクトリテラルの `rejectUnauthorized: false` は別 sink として扱う。
+
+## 4. スコープと上限
+
+- [ ] **テストファイル / fixture を除外**すべきか判断する（`looksLikeTestFile(filePath)` と `/fixtures/` + `/__fixtures__/` チェック）。セキュリティ系・debug 系は通常テストファイルを除外する。
+- [ ] 1 検出器あたりの件数上限を設ける（既存の多くは `MAX_*_COMMENTS = 3`。例外: `findSilentCatch` はハードコードの `>= 3`）。
+- [ ] **全体出力は `buildHeuristicComments` 末尾で `.slice(0, 8)` に bounded** である点を意識する。高頻度に発火する検出器を足すと、既存検出器が 8 枠を食い合って starve する。発火頻度が高い検出器は上限を低めにするか、配線順序を検討する。
+
+## 5. severity / confidence の較正
+
+- [ ] `review-engine.mjs` の `switch (c.kind)` に対応 case を追加し、finding / evidence / impact / fix / severity / confidence を埋める。
+- [ ] severity は内部語彙（blocker / warning / nit）。確実な危険は `blocker`、レビュー喚起レベルは `warning`、任意保留があり得るものは `nit`（例: `.skip` は意図的な保留がありうるため nit）。confidence は regex の確度に合わせる。
+
+## 6. 配線
+
+- [ ] `SKILL_HEURISTIC_MAP` の該当スキルに detector 名を追加する（ドキュメントとしての意味。実際の呼び出しは `buildHeuristicComments` 内で明示的に行う）。
+- [ ] `buildHeuristicComments` の該当スキルブロックに `for (const c of findXxx({ diff })) comments.push({ ...c, skillId });` を追加する。
+- [ ] 新スキルを heuristic 化する場合は、そのスキルの `applyTo` が対象ファイルに一致することを確認する（`SKILL.md` の `applyTo` を読む）。
+
+## 7. テスト（positive と negative の両方）
+
+- [ ] `tests/heuristic-review.test.mjs` に **検出される** ケースを追加する。
+- [ ] **検出されない** ケースを追加する: コメント内の言及 / 行末コメント / 安全な異形（例: `execFile(cmd, [args])` / `setTimeout(() => ...)` / `@ts-expect-error`）/ 条件を満たさない設定（`=1`）。
+- [ ] `node --test tests/heuristic-review.test.mjs` で確認後、`npm test` で全体を確認する。
+
+## 8. dist 再ビルド（必須）
+
+- [ ] `heuristic-review.mjs` / `review-engine.mjs` は GitHub Action の dist にバンドルされる。変更したら **docker で CI 一致 dist を再ビルド**する（詳細は [`dist-check-rebuild-guide.md`](./dist-check-rebuild-guide.md)）。
+- [ ] `what-is-river-review.md`（JA/EN）の実行モデル tier-2 の観点リストを更新する。編集後は `npm run lint:text` で確認する（textlint: 本文=ですます / 箇条書き=である / 1 文 ≤150 字 / 同一助詞の重複回避。ローカルは cache で pass しうるため CI でも確認）。
+
+## 関連
+
+- `src/lib/heuristic-review.mjs`—検出器本体と `stripTrailingLineComment` ヘルパー
+- `src/lib/review-engine.mjs`—`kind` → finding メッセージの `switch`
+- `docs/development/skill-severity-rubric.md`—severity 較正
+- `docs/development/dist-check-rebuild-guide.md`—dist 再ビルド手順
