@@ -60813,6 +60813,22 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
         }
         throw err;
       }
+      // #976/#1027: resolve --skill-set within the review namespace so
+      // `river review plan|exec --skill-set <name>` restricts candidates
+      // (previously only `river run` honored it; the flag was silently
+      // ignored here).
+      let reviewSkillIds = null;
+      if (parsed.skillSet) {
+        try {
+          reviewSkillIds = await (0,skill_loader/* resolveRecommendationSet */.mm)(parsed.skillSet);
+        } catch (err) {
+          if (err instanceof skill_loader/* SkillLoaderError */.vN) {
+            console.error(`Error: ${err.message}`);
+            return 3;
+          }
+          throw err;
+        }
+      }
       let artifact;
       try {
         if (isExecPlanReplay) {
@@ -60840,6 +60856,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
             artifactsDir: parsed.artifactsDir,
             debug: parsed.debug,
             executeReview: isExecExecute,
+            skillIds: reviewSkillIds,
             // Forward CLI-level --context / --dependency overrides so
             // authors can opt additional artifact IDs / dependency stubs
             // into selection without env vars.

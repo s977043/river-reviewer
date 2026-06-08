@@ -209,6 +209,44 @@ describe('runReviewPlan — output (#802 Phase 3)', () => {
     assert.deepEqual(planArgs.changedFiles, ['src/foo.mjs']);
   });
 
+  test('forwards skillIds to buildExecutionPlan (--skill-set wiring #976/#1027)', async () => {
+    let planArgs;
+    await runReviewPlan({
+      planOnly: true,
+      phase: 'upstream',
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      skillIds: ['rr-upstream-requirements-acceptance-001'],
+      resolveAllArtifactsImpl: async () => ({
+        diff: { id: 'diff', path: '/repo/d.patch', source: 'cwd', exists: true, optional: true },
+      }),
+      readFileImpl: async () => '+++ b/src/foo.mjs\n@@ -0,0 +1 @@\n+x\n',
+      buildExecutionPlanImpl: async (args) => {
+        planArgs = args;
+        return { selected: [], skipped: [] };
+      },
+    });
+    assert.deepEqual(planArgs.skillIds, ['rr-upstream-requirements-acceptance-001']);
+  });
+
+  test('skillIds defaults to null when --skill-set is not given', async () => {
+    let planArgs;
+    await runReviewPlan({
+      planOnly: true,
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: async () => ({
+        diff: { id: 'diff', path: '/repo/d.patch', source: 'cwd', exists: true, optional: true },
+      }),
+      readFileImpl: async () => '+++ b/src/foo.mjs\n@@ -0,0 +1 @@\n+x\n',
+      buildExecutionPlanImpl: async (args) => {
+        planArgs = args;
+        return { selected: [], skipped: [] };
+      },
+    });
+    assert.equal(planArgs.skillIds, null);
+  });
+
   test('wraps buildExecutionPlan failure as ReviewPlanError', async () => {
     await assert.rejects(
       () =>
