@@ -26,22 +26,22 @@ this doc records what to reuse, what is a genuine gap, and what not to adopt.**
 
 ## What already exists (vision → implementation map)
 
-| #976 review target     | Status  | Existing implementation                                                                                                  |
-| ---------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Requirements Review    | covered | `rr-upstream-requirements-acceptance-001` (skill)                                                                        |
-| Design Review          | covered | `rr-upstream-architecture-validation-plan-001`, `rr-upstream-architecture-boundaries-001`                                |
-| Plan Review            | covered | `rr-upstream-plangate-plan-integrity-001` (plan/pbi-input/todo/test-cases integrity)                                     |
-| Diff Review            | covered | `river run` / `river review exec` + midstream skills; conformance via `rr-upstream-plangate-exec-conformance-001`        |
-| Evidence/Report Review | partial | `rr-upstream-plangate-verification-audit-001` (W-check / META findings); `verify` gate runtime is a stub                 |
-| GO / NO-GO verdict     | covered | `deriveVerdict` (`auto-approve` / `human-review-recommended` / `human-review-required`)                                  |
-| Input contract         | covered | artifact-resolver: `pbi-input` / `plan` / `todo` / `test-cases` / `adr` / `diff` / `review-self` / `review-external`     |
-| Concept docs           | covered | `pages/explanation/review-scope.md` documents pre-execution Requirements/Design/Plan review and the River↔PlanGate split |
+| #976 review target     | Status  | Existing implementation                                                                                                         |
+| ---------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Requirements Review    | covered | `rr-upstream-requirements-acceptance-001` (skill)                                                                               |
+| Design Review          | covered | `rr-upstream-architecture-validation-plan-001`, `rr-upstream-architecture-boundaries-001`                                       |
+| Plan Review            | covered | `rr-upstream-plangate-plan-integrity-001` (plan/pbi-input/todo/test-cases integrity)                                            |
+| Diff Review            | covered | `river run` / `river review exec` + midstream skills; conformance via `rr-upstream-plangate-exec-conformance-001`               |
+| Evidence/Report Review | partial | `rr-upstream-plangate-verification-audit-001` (W-check / META findings); `verify` gate runtime is a stub                        |
+| GO / NO-GO verdict     | covered | `deriveVerdict` (`auto-approve` / `human-review-recommended` / `human-review-required`)                                         |
+| Input contract         | covered | artifact-resolver: `pbi-input` / `plan` / `todo` / `test-cases` / `adr` / `diff` / `review-self` / `review-external`            |
+| Concept docs           | covered | `pages/explanation/review-scope.md` documents pre-execution Requirements/Design/Plan review and the River Review↔PlanGate split |
 
 ## CLI naming decision
 
 `river review <subcommand>` already maps onto #976's stages:
 
-| #976 stage                                     | River command + selection                                                            |
+| #976 stage                                     | River Review command + selection                                                     |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Requirements / Design / Plan review (pre-exec) | `river review plan --skill-set pre-exec` with `pbi-input` / `plan` / `adr` artifacts |
 | Diff review                                    | `river run .` or `river review exec`                                                 |
