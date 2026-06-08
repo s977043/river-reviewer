@@ -524,8 +524,8 @@ function normalizeHeuristicComments(rawComments) {
           line: c.line,
           skillId: c.skillId,
           message: formatFindingMessage({
-            finding: '無効化されたテスト（.skip / xit / xdescribe）がコミットされている',
-            evidence: '`.skip` または `xit`/`xdescribe` が追加された',
+            finding: '無効化されたテスト（.skip / xit / xdescribe / xcontext）がコミットされている',
+            evidence: '`.skip` または `xit`/`xdescribe`/`xcontext` が追加された',
             impact: 'テストが実行されず、対象の挙動が未検証のまま残る',
             fix: '修正してスキップを外す。意図的な保留なら理由（Issue 等）をコメントで残す',
             severity: 'nit',

@@ -424,7 +424,7 @@ function matchesDisabledTest(code) {
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
   return (
     /\b(?:describe|context|it|test|suite|bench)\.skip\s*\(/.test(trimmed) ||
-    /\b(?:xit|xdescribe|xtest)\s*\(/.test(trimmed)
+    /\b(?:xit|xdescribe|xtest|xcontext)\s*\(/.test(trimmed)
   );
 }
 

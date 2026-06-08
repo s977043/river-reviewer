@@ -152,6 +152,7 @@ index 1111111..2222222 100644
  import test from 'node:test';
 +test.skip('pending', () => {});
 +xit('also disabled', () => {});
++xcontext('group disabled', () => {});
 `;
   const parsed = parseUnifiedDiff(diffText);
   const plan = { selected: [{ metadata: { id: 'rr-downstream-test-existence-001' } }] };
