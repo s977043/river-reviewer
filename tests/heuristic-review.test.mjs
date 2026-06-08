@@ -71,6 +71,61 @@ index 1111111..2222222 100644
   );
 });
 
+test('buildHeuristicComments detects leftover debugger for logging skill (no LLM)', () => {
+  const diffText = `diff --git a/src/handler.ts b/src/handler.ts
+index 1111111..2222222 100644
+--- a/src/handler.ts
++++ b/src/handler.ts
+@@ -1,2 +1,3 @@
+ export function run() {
++  debugger;
+ }
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-logging-observability-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  const dbg = comments.find((c) => c.kind === 'debugger-leftover');
+  assert.ok(dbg, 'expected a debugger-leftover finding');
+  assert.equal(dbg.file, 'src/handler.ts');
+});
+
+test('buildHeuristicComments does not flag a commented-out debugger', () => {
+  const diffText = `diff --git a/src/handler.ts b/src/handler.ts
+index 1111111..2222222 100644
+--- a/src/handler.ts
++++ b/src/handler.ts
+@@ -1,2 +1,3 @@
+ export function run() {
++  // debugger;
+ }
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-logging-observability-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.equal(
+    comments.find((c) => c.kind === 'debugger-leftover'),
+    undefined
+  );
+});
+
+test('buildHeuristicComments detects disabled TLS verification for security skill (no LLM)', () => {
+  const diffText = `diff --git a/src/config/http.ts b/src/config/http.ts
+index 1111111..2222222 100644
+--- a/src/config/http.ts
++++ b/src/config/http.ts
+@@ -1,2 +1,3 @@
+ export const agent = new https.Agent({
++  rejectUnauthorized: false,
+ });
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  const tls = comments.find((c) => c.kind === 'insecure-tls');
+  assert.ok(tls, 'expected an insecure-tls finding');
+  assert.equal(tls.file, 'src/config/http.ts');
+});
+
 test('buildHeuristicComments does not flag eval in a comment (#1080 review)', () => {
   const diffText = `diff --git a/src/handler.ts b/src/handler.ts
 index 1111111..2222222 100644

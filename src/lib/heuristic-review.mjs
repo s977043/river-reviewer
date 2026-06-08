@@ -7,8 +7,9 @@ export const SKILL_HEURISTIC_MAP = {
     'findHardcodedSecrets',
     'findGitHubActionsIssues',
     'findDangerousEval',
+    'findInsecureTls',
   ],
-  'rr-midstream-logging-observability-001': ['findSilentCatch'],
+  'rr-midstream-logging-observability-001': ['findSilentCatch', 'findDebuggerLeftover'],
   'rr-downstream-test-existence-001': ['findMissingTests', 'findFocusedTests'],
   'rr-downstream-coverage-gap-001': ['findMissingTests', 'findFocusedTests'],
 };
@@ -411,6 +412,55 @@ function findFocusedTests({ diff }) {
   return comments;
 }
 
+// Leftover `debugger;` statement (a near-zero-false-positive debug artifact).
+function matchesDebuggerLeftover(code) {
+  const trimmed = String(code).trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  return /(?:^|[;{}\s])debugger\s*;?\s*$/.test(trimmed) || /\bdebugger\s*;/.test(trimmed);
+}
+
+function findDebuggerLeftover({ diff }) {
+  const MAX_DEBUGGER_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesDebuggerLeftover(text)) continue;
+      comments.push({ file: filePath, line, kind: 'debugger-leftover' });
+      if (comments.length >= MAX_DEBUGGER_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
+// Disabled TLS certificate verification — a near-zero-false-positive security smell.
+function matchesInsecureTls(code) {
+  const trimmed = String(code).trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  if (/rejectUnauthorized\s*:\s*false/.test(trimmed)) return true;
+  if (/NODE_TLS_REJECT_UNAUTHORIZED/.test(trimmed)) return true;
+  return false;
+}
+
+function findInsecureTls({ diff }) {
+  const MAX_INSECURE_TLS_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (looksLikeTestFile(filePath)) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesInsecureTls(text)) continue;
+      comments.push({ file: filePath, line, kind: 'insecure-tls' });
+      if (comments.length >= MAX_INSECURE_TLS_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
 /**
  * Generate deterministic review comments from heuristics.
  * These comments are used as a fallback when LLM is not available.
@@ -431,12 +481,18 @@ export function buildHeuristicComments({ diff, plan }) {
     for (const c of findDangerousEval({ diff })) {
       comments.push({ ...c, skillId });
     }
+    for (const c of findInsecureTls({ diff })) {
+      comments.push({ ...c, skillId });
+    }
   }
 
   // ロギング・可観測性チェック
   if (hasSkill(plan, 'rr-midstream-logging-observability-001')) {
     const skillId = 'rr-midstream-logging-observability-001';
     for (const c of findSilentCatch({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findDebuggerLeftover({ diff })) {
       comments.push({ ...c, skillId });
     }
   }
