@@ -9,7 +9,12 @@ export const SKILL_HEURISTIC_MAP = {
     'findDangerousEval',
     'findInsecureTls',
   ],
-  'rr-midstream-logging-observability-001': ['findSilentCatch', 'findDebuggerLeftover'],
+  'rr-midstream-logging-observability-001': [
+    'findSilentCatch',
+    'findDebuggerLeftover',
+    'findMergeConflict',
+  ],
+  'rr-midstream-typescript-strict-001': ['findTsSuppression'],
   'rr-downstream-test-existence-001': ['findMissingTests', 'findFocusedTests'],
   'rr-downstream-coverage-gap-001': ['findMissingTests', 'findFocusedTests'],
 };
@@ -465,6 +470,54 @@ function findInsecureTls({ diff }) {
   return comments;
 }
 
+// Unresolved git conflict markers committed into a file. The `<<<<<<<` /
+// `>>>>>>>` markers are unambiguous; `=======` is intentionally excluded
+// (it collides with Markdown h1 underlines).
+function matchesMergeConflict(code) {
+  // <<<<<<< / >>>>>>> are always present; ||||||| is the diff3/zdiff3 base
+  // marker. ======= is intentionally excluded (Markdown h1-underline collision).
+  return /^<{7}(?:\s|$)/.test(code) || /^>{7}(?:\s|$)/.test(code) || /^\|{7}(?:\s|$)/.test(code);
+}
+
+function findMergeConflict({ diff }) {
+  const MAX_MERGE_CONFLICT_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesMergeConflict(text)) continue;
+      comments.push({ file: filePath, line, kind: 'merge-conflict' });
+      if (comments.length >= MAX_MERGE_CONFLICT_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
+// `@ts-ignore` / `@ts-nocheck` suppress type checking. `@ts-expect-error` is
+// the recommended, scoped form and is intentionally NOT flagged.
+function matchesTsSuppression(code) {
+  return /@ts-ignore\b/.test(code) || /@ts-nocheck\b/.test(code);
+}
+
+function findTsSuppression({ diff }) {
+  const MAX_TS_SUPPRESSION_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (looksLikeTestFile(filePath)) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesTsSuppression(text)) continue;
+      comments.push({ file: filePath, line, kind: 'ts-suppression' });
+      if (comments.length >= MAX_TS_SUPPRESSION_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
 /**
  * Generate deterministic review comments from heuristics.
  * These comments are used as a fallback when LLM is not available.
@@ -497,6 +550,17 @@ export function buildHeuristicComments({ diff, plan }) {
       comments.push({ ...c, skillId });
     }
     for (const c of findDebuggerLeftover({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findMergeConflict({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+  }
+
+  // TypeScript 型チェック抑制
+  if (hasSkill(plan, 'rr-midstream-typescript-strict-001')) {
+    const skillId = 'rr-midstream-typescript-strict-001';
+    for (const c of findTsSuppression({ diff })) {
       comments.push({ ...c, skillId });
     }
   }

@@ -126,6 +126,69 @@ index 1111111..2222222 100644
   assert.equal(tls.file, 'src/config/http.ts');
 });
 
+test('buildHeuristicComments detects merge conflict markers (no LLM)', () => {
+  const diffText = `diff --git a/src/handler.ts b/src/handler.ts
+index 1111111..2222222 100644
+--- a/src/handler.ts
++++ b/src/handler.ts
+@@ -1,1 +1,4 @@
+ const a = 1;
++<<<<<<< HEAD
++const b = 2;
++>>>>>>> feature
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-logging-observability-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.ok(comments.find((c) => c.kind === 'merge-conflict'));
+});
+
+test('buildHeuristicComments detects diff3 base marker ||||||| (#1082 review)', () => {
+  const diffText = `diff --git a/src/handler.ts b/src/handler.ts
+index 1111111..2222222 100644
+--- a/src/handler.ts
++++ b/src/handler.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++||||||| base
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-logging-observability-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.ok(comments.find((c) => c.kind === 'merge-conflict'));
+});
+
+test('buildHeuristicComments detects @ts-ignore but not @ts-expect-error (no LLM)', () => {
+  const ignore = `diff --git a/src/x.ts b/src/x.ts
+--- a/src/x.ts
++++ b/src/x.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++// @ts-ignore
+`;
+  const expectErr = `diff --git a/src/x.ts b/src/x.ts
+--- a/src/x.ts
++++ b/src/x.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++// @ts-expect-error reason
+`;
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-typescript-strict-001' } }] };
+  const ignoreComments = buildHeuristicComments({
+    diff: { files: parseUnifiedDiff(ignore).files },
+    plan,
+  });
+  const expectComments = buildHeuristicComments({
+    diff: { files: parseUnifiedDiff(expectErr).files },
+    plan,
+  });
+  assert.ok(ignoreComments.find((c) => c.kind === 'ts-suppression'));
+  assert.equal(
+    expectComments.find((c) => c.kind === 'ts-suppression'),
+    undefined
+  );
+});
+
 test('buildHeuristicComments does not flag debugger in a trailing comment (#1081 review)', () => {
   const diffText = `diff --git a/src/handler.ts b/src/handler.ts
 index 1111111..2222222 100644

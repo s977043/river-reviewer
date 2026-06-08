@@ -504,6 +504,34 @@ function normalizeHeuristicComments(rawComments) {
             confidence: 'high',
           }),
         };
+      case 'merge-conflict':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: '未解決のマージコンフリクトマーカーがコミットされている',
+            evidence: '`<<<<<<<` / `>>>>>>>`（diff3 では `|||||||` も）マーカーが追加された',
+            impact: 'コードが壊れ、ビルド/実行が失敗する',
+            fix: 'コンフリクトを解消し、マーカーを完全に削除する',
+            severity: 'blocker',
+            confidence: 'high',
+          }),
+        };
+      case 'ts-suppression':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: '型チェックの抑制（@ts-ignore / @ts-nocheck）が追加されている',
+            evidence: '`@ts-ignore` または `@ts-nocheck` が追加された',
+            impact: '型エラーが隠れ、潜在的な不具合を見逃す',
+            fix: '型を修正する。やむを得ない場合は範囲を限定した `@ts-expect-error` + 理由コメントを使う',
+            severity: 'nit',
+            confidence: 'medium',
+          }),
+        };
       default:
         return {
           file: c.file,
