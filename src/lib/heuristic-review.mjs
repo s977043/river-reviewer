@@ -502,8 +502,9 @@ function findInsecureTls({ diff }) {
 
 // Weak hash algorithm via the Node crypto idiom (near-zero false positive).
 function matchesWeakHash(code) {
-  const trimmed = String(code).trim();
+  let trimmed = String(code).trim();
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
   return /createHash\s*\(\s*['"`](?:md5|sha1)['"`]/i.test(trimmed);
 }
 
@@ -527,9 +528,16 @@ function findWeakHash({ diff }) {
 // Shell command built from a template literal with interpolation — a command
 // injection smell when the interpolated value can be attacker-controlled.
 function matchesCommandInjection(code) {
-  const trimmed = String(code).trim();
+  let trimmed = String(code).trim();
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
-  return /\b(?:exec|execSync|spawn|spawnSync)\s*\(\s*`[^`]*\$\{/.test(trimmed);
+  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
+  // execSync / spawn / spawnSync are unambiguous child_process APIs. Bare `exec`
+  // is matched only when NOT a method call (negative lookbehind) so that
+  // `regex.exec(`...`)` and `db.exec(`...`)` are not false-flagged.
+  return (
+    /(?<![.\w])exec\s*\(\s*`[^`]*\$\{/.test(trimmed) ||
+    /\b(?:execSync|spawnSync|spawn)\s*\(\s*`[^`]*\$\{/.test(trimmed)
+  );
 }
 
 function findCommandInjection({ diff }) {

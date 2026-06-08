@@ -188,6 +188,40 @@ test('buildHeuristicComments detects command injection via template literal (no 
   );
 });
 
+test('buildHeuristicComments does not flag weak hash in a trailing comment (#1084 review)', () => {
+  const diffText = `diff --git a/src/auth/token.ts b/src/auth/token.ts
+--- a/src/auth/token.ts
++++ b/src/auth/token.ts
+@@ -1,1 +1,2 @@
+ const a = 1;
++const h = strong(); // do not use createHash('md5')
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.equal(
+    comments.find((c) => c.kind === 'weak-hash'),
+    undefined
+  );
+});
+
+test('buildHeuristicComments does not flag regex.exec as command injection (#1084 review)', () => {
+  const diffText = `diff --git a/src/api/run.ts b/src/api/run.ts
+--- a/src/api/run.ts
++++ b/src/api/run.ts
+@@ -1,1 +1,2 @@
+ const re = /x/;
++const m = re.exec(\`value \${userInput}\`);
+`;
+  const parsed = parseUnifiedDiff(diffText);
+  const plan = { selected: [{ metadata: { id: 'rr-midstream-security-basic-001' } }] };
+  const comments = buildHeuristicComments({ diff: { files: parsed.files }, plan });
+  assert.equal(
+    comments.find((c) => c.kind === 'command-injection'),
+    undefined
+  );
+});
+
 test('buildHeuristicComments detects disabled tests (.skip / xit) (no LLM)', () => {
   const diffText = `diff --git a/tests/foo.test.mjs b/tests/foo.test.mjs
 index 1111111..2222222 100644
