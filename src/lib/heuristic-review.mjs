@@ -414,9 +414,11 @@ function findFocusedTests({ diff }) {
 
 // Leftover `debugger;` statement (a near-zero-false-positive debug artifact).
 function matchesDebuggerLeftover(code) {
-  const trimmed = String(code).trim();
+  let trimmed = String(code).trim();
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
-  return /(?:^|[;{}\s])debugger\s*;?\s*$/.test(trimmed) || /\bdebugger\s*;/.test(trimmed);
+  // Drop a trailing line comment so `const x = 1; // debugger` is not flagged.
+  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
+  return /\bdebugger\s*;/.test(trimmed) || /(?:^|[;{}\s])debugger\s*$/.test(trimmed);
 }
 
 function findDebuggerLeftover({ diff }) {
@@ -440,7 +442,9 @@ function matchesInsecureTls(code) {
   const trimmed = String(code).trim();
   if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
   if (/rejectUnauthorized\s*:\s*false/.test(trimmed)) return true;
-  if (/NODE_TLS_REJECT_UNAUTHORIZED/.test(trimmed)) return true;
+  // Only when NODE_TLS_REJECT_UNAUTHORIZED is being SET to 0 (which disables
+  // verification) — not when it is merely read or set to 1.
+  if (/NODE_TLS_REJECT_UNAUTHORIZED\s*[:=]\s*['"`]?0\b/.test(trimmed)) return true;
   return false;
 }
 

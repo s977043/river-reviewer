@@ -497,7 +497,7 @@ function normalizeHeuristicComments(rawComments) {
           message: formatFindingMessage({
             finding: 'TLS 証明書検証が無効化されている',
             evidence:
-              '`rejectUnauthorized: false` または `NODE_TLS_REJECT_UNAUTHORIZED` が追加された',
+              '`rejectUnauthorized: false` または `NODE_TLS_REJECT_UNAUTHORIZED=0` が追加された',
             impact: '中間者攻撃に対して脆弱になる',
             fix: '証明書検証を有効に保つ。自己署名証明書は CA を信頼ストアへ追加して対応する',
             severity: 'blocker',
