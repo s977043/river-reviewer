@@ -58,7 +58,7 @@ river review verify --advisory-only \
 | `--plan <path>`        | string     | （未指定） | 既存の plan JSON を入力として再生する。指定時は内部での plan 算出をスキップする（verify 系 skill のみに絞られる契約は維持）。 |
 | `--target <path>`      | string     | `.`        | リポジトリルート。`pwd` と異なる場合に指定する。                                                                              |
 
-`--artifact` / 設定ファイル（自動検出）/ カレントディレクトリ検出の優先順位は contract に従います（CLI > config > 検出）。`--config` フラグは存在せず、設定ファイルはリポジトリ直下から自動検出されます。`review-self` および `review-external` の少なくとも一方が解決できない場合、`verify` は後述「失敗条件」に従い Exit `1` で中断します。
+`--artifact` / 設定ファイル（自動検出）/ カレントディレクトリ検出の優先順位は contract に従います（CLI > config > 検出）。`--config` フラグは存在せず、設定ファイルはリポジトリ直下から自動検出されます。`review-self` および `review-external` の**いずれも解決できない場合**、`verify` は後述「失敗条件」に従い Exit `1` で中断します（一方のみ解決できた場合は解決できた方で W チェックを継続）。
 
 ### フェーズ / プランナー
 
