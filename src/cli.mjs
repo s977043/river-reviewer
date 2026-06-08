@@ -81,9 +81,9 @@ Options:
                     (e.g. basic, typescript, comprehensive). Default: all applicable skills
   --depth <name>    Force review depth: quick|standard|thorough. Default: auto-detected from diff size
   --save            Persist the review run to the project result store (.river/runs/)
-  --fail-on <sev>   (review) Exit 1 if a finding >= severity exists. Opt-in; default critical when set
-  --warn-on <sev>   (review) Exit 2 if a finding >= severity exists (below --fail-on). Default major when set
-  --advisory-only   (review) Report findings but always exit 0 (disables --fail-on/--warn-on gating)
+  --fail-on <sev>   (run/review) Exit 1 if a finding >= severity exists. Opt-in; default critical when set
+  --warn-on <sev>   (run/review) Exit 2 if a finding >= severity exists (below --fail-on). Default major when set
+  --advisory-only   (run/review) Report findings but always exit 0 (disables --fail-on/--warn-on gating)
 
 Commands:
   river runs list           List stored review runs
@@ -1552,6 +1552,29 @@ Dependencies: ${
       } else {
         printDebugInfo(result);
       }
+    }
+
+    // #1066 self-review: honor --fail-on / --warn-on / --advisory-only on
+    // `river run` too. Previously these were parsed but silently ignored on
+    // the run path (only `river review` gated), so agents that relied on the
+    // exit code never actually gated. Opt-in: exit 0 unless a gate flag is set.
+    if (parsed.failOn || parsed.warnOn || parsed.advisoryOnly) {
+      const { evaluateReviewGate } = await import('./lib/review-plan.mjs');
+      const issues = formatJsonOutput(result, parsed.phase).issues;
+      const gate = evaluateReviewGate(
+        { findings: issues },
+        {
+          failOn: parsed.failOn ?? 'critical',
+          warnOn: parsed.warnOn ?? 'major',
+          advisoryOnly: parsed.advisoryOnly,
+        }
+      );
+      if (gate.level === 'fail') {
+        console.error(`Review gate: FAIL (max severity: ${gate.maxSeverity}).`);
+      } else if (gate.level === 'warn') {
+        console.error(`Review gate: WARN (max severity: ${gate.maxSeverity}).`);
+      }
+      return gate.code;
     }
 
     return 0;

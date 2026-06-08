@@ -10,8 +10,8 @@ This page is a practical, case-by-case guide for **AI agents (autonomous / semi-
 ## The agent's stance (5 principles)
 
 1. **Don't review yourself. Let River gate.** Instead of the agent's own judgement, have the deterministically-routed skills review, and act on the result.
-2. **Read JSON, not human-facing text.** Use `--output json` and consume `issues` / `findings` / `verdict` as structured data. `--output markdown` is for humans (PR comments).
-3. **Branch on verdict and exit code.** With `--fail-on <severity>`, finding severity becomes the exit code (1=fail / 2=warn / 0=pass). The agent branches on the exit code: proceed / fix / escalate to a human.
+2. **Read JSON, not human-facing text.** Use `--output json` and consume `river run`'s `issues[]` / `summary.issueCountBySeverity` and `river review`'s `findings[]` as structured data. `--output markdown` is for humans (PR comments) — the verdict summary appears there, not in JSON.
+3. **Branch on exit code and severity.** With `--fail-on <severity>`, finding severity becomes the exit code (1=fail / 2=warn / 0=pass) on both `river run` and `river review`. The agent branches on the exit code, or on `summary.issueCountBySeverity` counts: proceed / fix / escalate to a human.
 4. **Trust deterministic routing.** Which skills were selected/skipped (with reasons) is visible in `--debug` (`selectedSkills` / `skippedSkills`). Selection is decided by phase, target paths, and input context, and reproduces every time.
 5. **Understand the API-key requirement.** Producing real findings needs an LLM key (`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GOOGLE_API_KEY`). Without one it falls back to heuristic / empty, and **only the routing** (which skills would run) is determined.
 
@@ -53,8 +53,9 @@ river review plan --skill-set pre-exec --phase upstream --plan-only \
 ```
 
 - **Input**: `pbi-input` (requirements) / `plan` / `todo` / `test-cases` / `adr` (design).
-- **Output**: a Review Artifact (`findings[]` + `plan` + `debug`). Read `findings.severity` plus `actions` / `questions`.
-- **Agent's next action**: resolve `questions`, fold the `findings` back into the plan, then start implementing. If there is a `critical`, **do not start implementing**.
+- **Output**: a Review Artifact (`findings[]` + `plan` + `debug`). Read each finding's `severity` / `message` / `suggestion`.
+- **Agent's next action**: fold the `findings` and any open points in `message` back into the plan, then start implementing. If there is a `critical`, **do not start implementing**.
+- **Note**: the `--artifact` files (`pbi-input.md`, etc.) must already exist; an unresolvable path exits 3.
 
 ### Case 2: During / right after implementation — self-review and self-fix loop
 
@@ -66,7 +67,7 @@ river run . --base main --output json
 
 - **Output**: `{ issues[], summary }` (`output.schema.json`). Read `issues[].severity` (critical/major/minor/info) and `message` / `file` / `line`.
 - **Agent's next action (self-fix loop)**: fix `issues` by severity → re-run `river run` → repeat until `issues` is empty or info-only.
-- For large tasks use `--depth thorough`; to narrow scope use `--files <glob>`.
+- For large tasks use `--depth thorough`; to narrow scope use `--files <glob>`. `--base` auto-detects the default branch when omitted, so on repos whose default is not `main` (`master`/`develop`), omit it or pass `--base <default>`.
 
 ### Case 3: PR submission gate — block mechanically via exit code
 
@@ -124,6 +125,16 @@ Within each stage, pick `--skill-set` by task type (sets: `adversarial` / `basic
 
 > When no set is given, skills are **auto-selected** by phase, target paths, and input context. Start with no flag (auto) and reach for `--skill-set` only when you want to narrow the lens.
 
+> ⚠️ **phase trap**: `comprehensive` / `multitenancy` / `adversarial` bundle upstream skills (e.g. `rr-upstream-multitenancy-isolation-001` / `rr-upstream-pre-mortem-001`). Running them with `river run` under the default midstream **silently skips** those on a phase mismatch. To also apply the upstream lens, run a separate `--phase upstream`, or always check `--debug`'s `skippedSkills` for what actually ran.
+
+## Agent operations helpers
+
+Features that keep an autonomous loop safe and efficient.
+
+- **Suppress false positives (avoid infinite loops)**: when a finding cannot be fixed or is an accepted risk, record it with `river suppression add --fingerprint <fp> --feedback <false_positive|accepted_risk> --rationale "..."`. Without this the agent re-flags the same finding every iteration and the self-fix loop never converges.
+- **Convergence signal (run persistence)**: use `--save` to store under `.river/runs/`, then `river runs diff <id> <id>` or `river run . --baseline <prev json>` to compare new-vs-fixed. Judge convergence by **whether findings are decreasing**, not by `loop_count` alone.
+- **Cost ceiling (runaway guard)**: for deep reviews or large diffs use `--max-cost <usd>` (abort if the estimate is exceeded) and `--estimate` (estimate only) to cap runaway LLM spend.
+
 ## Agent implementation pattern (pseudocode)
 
 ```text
@@ -147,24 +158,24 @@ loop:
 open_pr(to_markdown(result.issues))
 ```
 
-Key points: **consume JSON structurally and branch on exit code / verdict**; do not parse text. Escalate to a human if it does not converge (River only supplies decision material; avoid infinite self-fixing).
+Key points: **consume JSON structurally and branch on exit code / severity (`summary.issueCountBySeverity`)**; do not parse text. Escalate to a human if it does not converge (River only supplies decision material; avoid infinite self-fixing).
 
 ## Anti-patterns
 
 - ❌ **Regex-parsing human-facing text** → use `--output json` (`issues` / `findings`).
-- ❌ **Applying every River finding unconditionally** → triage by `severity` and verdict. Route `info` / `minor` to follow-ups and make only `critical` a blocking condition ([review policy](../reference/review-policy.en.md)).
+- ❌ **Applying every River finding unconditionally** → triage by `severity`. Route `info` / `minor` to follow-ups and make only `critical` a blocking condition ([review policy](../reference/review-policy.en.md); whether `major` also auto-gates depends on calibration).
 - ❌ **Expecting real findings with no key** → without a key it is heuristic / empty. Set a key in CI.
 - ❌ **Expecting `review verify` to execute** → it is a stub (exit 3). Use `review exec --artifact review-self/external` for W-checks.
 - ❌ **Calling pre-exec without `--phase upstream`** → upstream skills are phase-mismatched and all skipped.
 
 ## Output contract quick reference
 
-| Command                  | JSON schema                           | Main keys                                                                     |
-| ------------------------ | ------------------------------------- | ----------------------------------------------------------------------------- |
-| `river run`              | `schemas/output.schema.json`          | `issues[]`, `summary`                                                         |
-| `river review plan/exec` | `schemas/review-artifact.schema.json` | `version`, `status`, `phase`, `findings[]`, `plan`, `debug` (scoring/verdict) |
+| Command                  | JSON schema                           | Main keys                                                               |
+| ------------------------ | ------------------------------------- | ----------------------------------------------------------------------- |
+| `river run`              | `schemas/output.schema.json`          | `issues[]`, `summary.issueCountBySeverity`, `summary.issueCountByPhase` |
+| `river review plan/exec` | `schemas/review-artifact.schema.json` | `version`, `status`, `phase`, `findings[]`, `plan`, `debug`             |
 
-Verdict (under `debug` scoring): `auto-approve` / `human-review-recommended` / `human-review-required`. Useful for deciding whether the agent may auto-proceed (it does not replace a HITL policy).
+> **The verdict is not in JSON.** The `auto-approve` / `human-review-recommended` / `human-review-required` verdict appears only in the `--output markdown` human summary (`output.schema.json`'s `summary` carries counts only, and the Review Artifact's `debug` is free-form and does not guarantee a verdict). Make machine decisions from the **exit code (`--fail-on`)** and **`summary.issueCountBySeverity`** (fetch markdown separately if you need the verdict text).
 
 ## Related pages
 
