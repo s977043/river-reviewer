@@ -41375,8 +41375,9 @@ const SKILL_HEURISTIC_MAP = {
     'findHardcodedSecrets',
     'findGitHubActionsIssues',
     'findDangerousEval',
+    'findInsecureTls',
   ],
-  'rr-midstream-logging-observability-001': ['findSilentCatch'],
+  'rr-midstream-logging-observability-001': ['findSilentCatch', 'findDebuggerLeftover'],
   'rr-downstream-test-existence-001': ['findMissingTests', 'findFocusedTests'],
   'rr-downstream-coverage-gap-001': ['findMissingTests', 'findFocusedTests'],
 };
@@ -41779,6 +41780,59 @@ function findFocusedTests({ diff }) {
   return comments;
 }
 
+// Leftover `debugger;` statement (a near-zero-false-positive debug artifact).
+function matchesDebuggerLeftover(code) {
+  let trimmed = String(code).trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  // Drop a trailing line comment so `const x = 1; // debugger` is not flagged.
+  trimmed = trimmed.replace(/\/\/.*$/, '').trim();
+  return /\bdebugger\s*;/.test(trimmed) || /(?:^|[;{}\s])debugger\s*$/.test(trimmed);
+}
+
+function findDebuggerLeftover({ diff }) {
+  const MAX_DEBUGGER_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesDebuggerLeftover(text)) continue;
+      comments.push({ file: filePath, line, kind: 'debugger-leftover' });
+      if (comments.length >= MAX_DEBUGGER_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
+// Disabled TLS certificate verification — a near-zero-false-positive security smell.
+function matchesInsecureTls(code) {
+  const trimmed = String(code).trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  if (/rejectUnauthorized\s*:\s*false/.test(trimmed)) return true;
+  // Only when NODE_TLS_REJECT_UNAUTHORIZED is being SET to 0 (which disables
+  // verification) — not when it is merely read or set to 1.
+  if (/NODE_TLS_REJECT_UNAUTHORIZED\s*[:=]\s*['"`]?0\b/.test(trimmed)) return true;
+  return false;
+}
+
+function findInsecureTls({ diff }) {
+  const MAX_INSECURE_TLS_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (looksLikeTestFile(filePath)) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesInsecureTls(text)) continue;
+      comments.push({ file: filePath, line, kind: 'insecure-tls' });
+      if (comments.length >= MAX_INSECURE_TLS_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
 /**
  * Generate deterministic review comments from heuristics.
  * These comments are used as a fallback when LLM is not available.
@@ -41799,12 +41853,18 @@ function buildHeuristicComments({ diff, plan }) {
     for (const c of findDangerousEval({ diff })) {
       comments.push({ ...c, skillId });
     }
+    for (const c of findInsecureTls({ diff })) {
+      comments.push({ ...c, skillId });
+    }
   }
 
   // ロギング・可観測性チェック
   if (hasSkill(plan, 'rr-midstream-logging-observability-001')) {
     const skillId = 'rr-midstream-logging-observability-001';
     for (const c of findSilentCatch({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findDebuggerLeftover({ diff })) {
       comments.push({ ...c, skillId });
     }
   }
@@ -43124,6 +43184,35 @@ function normalizeHeuristicComments(rawComments) {
             impact: '他のテストが CI で実行されず、回帰を見逃す',
             fix: '.only を外してから commit する（誤ってフォーカスを残さない）',
             severity: 'warning',
+            confidence: 'high',
+          }),
+        };
+      case 'debugger-leftover':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
+            finding: 'デバッグ用 `debugger` 文がコミットされている',
+            evidence: '`debugger;` が追加された',
+            impact: '実行が一時停止する／本番に混入すると不具合や情報露出につながる',
+            fix: 'commit 前に `debugger` 文を削除する',
+            severity: 'warning',
+            confidence: 'high',
+          }),
+        };
+      case 'insecure-tls':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
+            finding: 'TLS 証明書検証が無効化されている',
+            evidence:
+              '`rejectUnauthorized: false` または `NODE_TLS_REJECT_UNAUTHORIZED=0` が追加された',
+            impact: '中間者攻撃に対して脆弱になる',
+            fix: '証明書検証を有効に保つ。自己署名証明書は CA を信頼ストアへ追加して対応する',
+            severity: 'blocker',
             confidence: 'high',
           }),
         };

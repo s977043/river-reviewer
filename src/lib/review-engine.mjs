@@ -475,6 +475,35 @@ function normalizeHeuristicComments(rawComments) {
             confidence: 'high',
           }),
         };
+      case 'debugger-leftover':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: 'デバッグ用 `debugger` 文がコミットされている',
+            evidence: '`debugger;` が追加された',
+            impact: '実行が一時停止する／本番に混入すると不具合や情報露出につながる',
+            fix: 'commit 前に `debugger` 文を削除する',
+            severity: 'warning',
+            confidence: 'high',
+          }),
+        };
+      case 'insecure-tls':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: formatFindingMessage({
+            finding: 'TLS 証明書検証が無効化されている',
+            evidence:
+              '`rejectUnauthorized: false` または `NODE_TLS_REJECT_UNAUTHORIZED=0` が追加された',
+            impact: '中間者攻撃に対して脆弱になる',
+            fix: '証明書検証を有効に保つ。自己署名証明書は CA を信頼ストアへ追加して対応する',
+            severity: 'blocker',
+            confidence: 'high',
+          }),
+        };
       default:
         return {
           file: c.file,
