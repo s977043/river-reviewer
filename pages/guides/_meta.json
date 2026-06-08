@@ -18,6 +18,7 @@
   "debug-skill-routing": "スキルルーティングのデバッグ",
   "manage-skills-cli": "スキルを import / export / list する（CLI）",
   "agent-workflow": "AI エージェントから River Review を使う",
+  "ai-agent-playbook": "AI 駆動開発プレイブック（エージェント向け）",
   "w-check": "W チェック（二重レビュー）",
   "repo-wide-review": "リポジトリ全体を踏まえたレビューの導入とチューニング",
   "run-phase-specific-review": "フェーズ固有のレビューを実行する",
