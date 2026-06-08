@@ -41371,10 +41371,14 @@ function collectAddedLineHints(diffText) {
  * dry-run 時はこのマッピングに含まれるスキルのみ実行される
  */
 const SKILL_HEURISTIC_MAP = {
-  'rr-midstream-security-basic-001': ['findHardcodedSecrets', 'findGitHubActionsIssues'],
+  'rr-midstream-security-basic-001': [
+    'findHardcodedSecrets',
+    'findGitHubActionsIssues',
+    'findDangerousEval',
+  ],
   'rr-midstream-logging-observability-001': ['findSilentCatch'],
-  'rr-downstream-test-existence-001': ['findMissingTests'],
-  'rr-downstream-coverage-gap-001': ['findMissingTests'],
+  'rr-downstream-test-existence-001': ['findMissingTests', 'findFocusedTests'],
+  'rr-downstream-coverage-gap-001': ['findMissingTests', 'findFocusedTests'],
 };
 
 /**
@@ -41575,6 +41579,10 @@ function findSilentCatch({ diff }) {
 function looksLikeTestFile(filePath) {
   const normalized = String(filePath).replaceAll('\\', '/');
   return (
+    normalized.startsWith('test/') ||
+    normalized.startsWith('tests/') ||
+    normalized.startsWith('__tests__/') ||
+    normalized.includes('/test/') ||
     normalized.includes('/tests/') ||
     normalized.includes('/__tests__/') ||
     /\.(test|spec)\./.test(normalized)
@@ -41714,6 +41722,63 @@ function findGitHubActionsIssues({ diff }) {
   return comments;
 }
 
+// High-confidence code-injection / XSS smells. Deliberately conservative
+// (only patterns that are rarely intentional or safe) so the no-LLM path
+// stays low-false-positive.
+function matchesDangerousEval(code) {
+  const trimmed = String(code).trim();
+  // Skip comment lines so an `eval` mentioned in a comment is not flagged.
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  if (/\beval\s*\(/.test(trimmed)) return true;
+  if (/\bnew\s+Function\s*\(/.test(trimmed)) return true;
+  if (/dangerouslySetInnerHTML/.test(trimmed)) return true;
+  return false;
+}
+
+function findDangerousEval({ diff }) {
+  const MAX_DANGEROUS_EVAL_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (looksLikeTestFile(filePath)) continue;
+    const normalized = String(filePath).replaceAll('\\', '/');
+    if (normalized.includes('/fixtures/') || normalized.includes('/__fixtures__/')) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesDangerousEval(text)) continue;
+      comments.push({ file: filePath, line, kind: 'dangerous-eval' });
+      if (comments.length >= MAX_DANGEROUS_EVAL_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
+// Accidental focused tests (`.only`) silently skip the rest of the suite in CI.
+function matchesFocusedTest(code) {
+  const trimmed = String(code).trim();
+  // Skip comment lines so a commented-out `.only` is not flagged.
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return false;
+  return /\b(?:describe|context|it|test|suite|bench)\.only\s*\(/.test(trimmed);
+}
+
+function findFocusedTests({ diff }) {
+  const MAX_FOCUSED_TEST_COMMENTS = 3;
+  const comments = [];
+  const files = ensureArray(diff?.files);
+  for (const file of files) {
+    const filePath = file?.path;
+    if (!filePath || filePath === '/dev/null') continue;
+    if (!looksLikeTestFile(filePath)) continue;
+    for (const { line, text } of iterateAddedLines(file)) {
+      if (!matchesFocusedTest(text)) continue;
+      comments.push({ file: filePath, line, kind: 'focused-test' });
+      if (comments.length >= MAX_FOCUSED_TEST_COMMENTS) return comments;
+    }
+  }
+  return comments;
+}
+
 /**
  * Generate deterministic review comments from heuristics.
  * These comments are used as a fallback when LLM is not available.
@@ -41729,6 +41794,9 @@ function buildHeuristicComments({ diff, plan }) {
       comments.push({ ...c, skillId });
     }
     for (const c of findGitHubActionsIssues({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findDangerousEval({ diff })) {
       comments.push({ ...c, skillId });
     }
   }
@@ -41747,9 +41815,15 @@ function buildHeuristicComments({ diff, plan }) {
     for (const c of findMissingTests({ diff })) {
       comments.push({ ...c, skillId });
     }
+    for (const c of findFocusedTests({ diff })) {
+      comments.push({ ...c, skillId });
+    }
   } else if (hasSkill(plan, 'rr-downstream-coverage-gap-001')) {
     const skillId = 'rr-downstream-coverage-gap-001';
     for (const c of findMissingTests({ diff })) {
+      comments.push({ ...c, skillId });
+    }
+    for (const c of findFocusedTests({ diff })) {
       comments.push({ ...c, skillId });
     }
   }
@@ -43022,6 +43096,34 @@ function normalizeHeuristicComments(rawComments) {
             impact: 'コマンドインジェクション攻撃のリスクがある',
             fix: 'jqやtoJSONを使用して入力をサニタイズする、または環境変数経由で渡す',
             severity: 'blocker',
+            confidence: 'high',
+          }),
+        };
+      case 'dangerous-eval':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
+            finding: 'コード実行/インジェクションのリスクがある API が追加されている',
+            evidence: 'eval / new Function / dangerouslySetInnerHTML のいずれかが追加された',
+            impact: '入力が信頼できない場合に任意コード実行や XSS につながる',
+            fix: '動的評価を避ける（パース/ホワイトリスト化）、HTML はサニタイズして挿入する',
+            severity: 'warning',
+            confidence: 'high',
+          }),
+        };
+      case 'focused-test':
+        return {
+          file: c.file,
+          line: c.line,
+          skillId: c.skillId,
+          message: (0,_finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__/* .formatFindingMessage */ .yv)({
+            finding: 'フォーカス済みテスト（.only）がコミットされている',
+            evidence: 'describe/it/test 等の .only が追加された',
+            impact: '他のテストが CI で実行されず、回帰を見逃す',
+            fix: '.only を外してから commit する（誤ってフォーカスを残さない）',
+            severity: 'warning',
             confidence: 'high',
           }),
         };
