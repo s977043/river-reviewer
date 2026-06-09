@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/s977043/river-review/compare/v1.6.0...v1.6.1) (2026-06-09)
+
+
+### Bug Fixes
+
+* align code and docs with the updated concept (audit follow-up) ([#1097](https://github.com/s977043/river-review/issues/1097)) ([99a78ce](https://github.com/s977043/river-review/commit/99a78ce628001a908d6fbc2177dfcb85b31b4623))
+
 ## [1.6.0](https://github.com/s977043/river-review/compare/v1.5.0...v1.6.0) (2026-06-09)
 
 
