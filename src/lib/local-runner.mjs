@@ -272,7 +272,7 @@ export async function planLocalReview({
     if (dryRun) {
       plannerSkipped = 'dry-run enabled';
     } else if (!llmEnabled) {
-      plannerSkipped = 'AI API key (OPENAI_API_KEY or GOOGLE_API_KEY) not set';
+      plannerSkipped = 'AI API key (ANTHROPIC_API_KEY, OPENAI_API_KEY, or GOOGLE_API_KEY) not set';
     } else {
       planner = createOpenAIPlanner();
     }

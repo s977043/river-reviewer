@@ -19,7 +19,7 @@ import CostEstimator from './core/cost-estimator.mjs';
 import { SkillDispatcher } from './core/skill-dispatcher.mjs';
 import { ProjectRulesError } from './lib/rules.mjs';
 import { RiskMapError } from './lib/risk-map.mjs';
-import { parseList } from './lib/utils.mjs';
+import { isLlmEnabled, parseList } from './lib/utils.mjs';
 import { PLANNER_MODES } from './lib/planner-utils.mjs';
 import { DEPTH_TO_REVIEW_MODE, resolveDepthToReviewMode } from './lib/review-plan-generator.mjs';
 import { scoreReview } from './lib/scoring/engine.mjs';
@@ -1380,7 +1380,7 @@ async function main(argv = process.argv.slice(2)) {
         availableDependencies: parsed.availableDependencies,
       });
 
-      const apiKey = process.env.RIVER_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+      const llmConfigured = isLlmEnabled();
 
       console.log(`River Review doctor
 Repo: ${result.repoRoot}
@@ -1388,8 +1388,8 @@ Base branch: ${result.defaultBranch}
 Merge base: ${result.mergeBase}
 Skills loaded: ${result.skillsCount}
 Project rules: ${result.projectRules ? 'present' : 'none'}
-OpenAI (review): ${apiKey ? 'configured' : 'not set'}
-OpenAI (planner): ${apiKey ? 'configured' : 'not set'}
+LLM (review): ${llmConfigured ? 'configured' : 'not set'}
+LLM (planner): ${llmConfigured ? 'configured' : 'not set'}
 Contexts: ${(result.availableContexts || []).join(', ') || 'none'}
 Dependencies: ${
         result.availableDependencies
@@ -1397,10 +1397,10 @@ Dependencies: ${
           : 'not specified (skip disabled)'
       }`);
 
-      if (!apiKey) {
+      if (!llmConfigured) {
         printHintLines([
-          'Set `OPENAI_API_KEY` (or `RIVER_OPENAI_API_KEY`) to enable LLM reviews.',
-          'You can still run with `--dry-run` for local validation.',
+          'Set `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GOOGLE_API_KEY` to enable headless LLM reviews.',
+          'Mechanical (no-key) checks and `--dry-run` / `--offline` still work without one.',
         ]);
       }
 

@@ -43588,7 +43588,7 @@ async function generateReview({
       ? `provider ${openAIConfig.provider} is not supported yet`
       : openAIConfig.apiKey
         ? null
-        : 'OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set';
+        : 'LLM API key (ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY) not set';
 
   if (!skipReason) {
     try {
@@ -45649,7 +45649,9 @@ function createOpenAIPlanner(options = {}) {
     endpoint: config.endpoint,
     plan: async ({ skills, context }) => {
       if (!config.apiKey) {
-        throw new Error('AI API key (OPENAI_API_KEY or GOOGLE_API_KEY) not set');
+        throw new Error(
+          'AI API key (ANTHROPIC_API_KEY, OPENAI_API_KEY, or GOOGLE_API_KEY) not set'
+        );
       }
       const prompt = buildPlannerPrompt({ skills, context });
       const output = await callOpenAI({
@@ -46253,7 +46255,7 @@ async function planLocalReview({
     if (dryRun) {
       plannerSkipped = 'dry-run enabled';
     } else if (!llmEnabled) {
-      plannerSkipped = 'AI API key (OPENAI_API_KEY or GOOGLE_API_KEY) not set';
+      plannerSkipped = 'AI API key (ANTHROPIC_API_KEY, OPENAI_API_KEY, or GOOGLE_API_KEY) not set';
     } else {
       planner = createOpenAIPlanner();
     }
@@ -61604,7 +61606,7 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
         availableDependencies: parsed.availableDependencies,
       });
 
-      const apiKey = external_node_process_namespaceObject.env.RIVER_OPENAI_API_KEY || external_node_process_namespaceObject.env.OPENAI_API_KEY;
+      const llmConfigured = (0,utils/* isLlmEnabled */.Rq)();
 
       console.log(`River Review doctor
 Repo: ${result.repoRoot}
@@ -61612,8 +61614,8 @@ Base branch: ${result.defaultBranch}
 Merge base: ${result.mergeBase}
 Skills loaded: ${result.skillsCount}
 Project rules: ${result.projectRules ? 'present' : 'none'}
-OpenAI (review): ${apiKey ? 'configured' : 'not set'}
-OpenAI (planner): ${apiKey ? 'configured' : 'not set'}
+LLM (review): ${llmConfigured ? 'configured' : 'not set'}
+LLM (planner): ${llmConfigured ? 'configured' : 'not set'}
 Contexts: ${(result.availableContexts || []).join(', ') || 'none'}
 Dependencies: ${
         result.availableDependencies
@@ -61621,10 +61623,10 @@ Dependencies: ${
           : 'not specified (skip disabled)'
       }`);
 
-      if (!apiKey) {
+      if (!llmConfigured) {
         printHintLines([
-          'Set `OPENAI_API_KEY` (or `RIVER_OPENAI_API_KEY`) to enable LLM reviews.',
-          'You can still run with `--dry-run` for local validation.',
+          'Set `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GOOGLE_API_KEY` to enable headless LLM reviews.',
+          'Mechanical (no-key) checks and `--dry-run` / `--offline` still work without one.',
         ]);
       }
 

@@ -46,6 +46,7 @@ Current stability level for each surface.
 - `--phase <upstream|midstream|downstream>`: Review phase (Default: `midstream`)
 - `--planner <off|order|prune>`: Planner mode (Default: `off`)
 - `--dry-run`: Run without calling external APIs
+- `--offline` (alias `--rules-only`): Skip AI even when an API key is set; review on deterministic mechanical checks only (reproduces the Auto-approve gate locally when CI is unavailable)
 - `--debug`: Output debug info
 - `--estimate`: Cost estimation only (no review execution)
 - `--max-cost <usd>`: Abort if estimate exceeds limit

@@ -33,6 +33,8 @@ jobs:
 ```
 
 > Pin to a release tag such as `@v1.2.2` for stability.
+>
+> The LLM key (`OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GOOGLE_API_KEY`) is needed only for the **AI review on this headless path**. Without one, the mechanical (no-key) checks still run — and in normal agent-driven use (Claude Code etc. applying the skills directly), no key is needed at all (see [the execution model](../explanation/what-is-river-review.en.md)).
 
 ## 2. Run the review
 

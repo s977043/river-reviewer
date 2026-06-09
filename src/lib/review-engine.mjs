@@ -687,7 +687,7 @@ export async function generateReview({
       ? `provider ${openAIConfig.provider} is not supported yet`
       : openAIConfig.apiKey
         ? null
-        : 'OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set';
+        : 'LLM API key (ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY) not set';
 
   if (!skipReason) {
     try {
