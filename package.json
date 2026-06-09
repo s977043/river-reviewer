@@ -63,7 +63,9 @@
     "prepare": "husky install",
     "eval:regression": "node scripts/evaluate-regression.mjs",
     "eval:compare": "node scripts/compare-eval-ledger.mjs",
-    "usage:summary": "node scripts/usage-summary.mjs"
+    "usage:summary": "node scripts/usage-summary.mjs",
+    "skills:manifest": "node scripts/generate-skill-manifest.mjs",
+    "skills:manifest:check": "node scripts/generate-skill-manifest.mjs --check"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",
