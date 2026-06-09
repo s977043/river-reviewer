@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/s977043/river-review/compare/v1.6.1...v1.7.0) (2026-06-09)
+
+
+### Features
+
+* **skills:** deterministic skill manifest for drift detection ([#1016](https://github.com/s977043/river-review/issues/1016)) ([#1100](https://github.com/s977043/river-review/issues/1100)) ([d22cba9](https://github.com/s977043/river-review/commit/d22cba90706a045db47f794ae3d5a97d8b6b07b1))
+
 ## [1.6.1](https://github.com/s977043/river-review/compare/v1.6.0...v1.6.1) (2026-06-09)
 
 
