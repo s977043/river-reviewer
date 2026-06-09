@@ -44858,7 +44858,10 @@ function parseList(value) {
  * @returns {boolean}
  */
 function isLlmEnabled() {
-  if (process.env.RIVER_OFFLINE === '1' || process.env.RIVER_OFFLINE === 'true') {
+  const offline = String(process.env.RIVER_OFFLINE ?? '')
+    .trim()
+    .toLowerCase();
+  if (offline === '1' || offline === 'true' || offline === 'yes' || offline === 'on') {
     return false;
   }
   return !!(

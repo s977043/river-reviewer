@@ -57,3 +57,19 @@ test('isLlmEnabled: RIVER_OFFLINE=true also forces false', () => {
     assert.equal(isLlmEnabled(), false);
   });
 });
+
+test('isLlmEnabled: RIVER_OFFLINE is case-insensitive and trims (#1094 review)', () => {
+  for (const v of ['TRUE', ' True ', 'YES', 'on']) {
+    withEnv({ OPENAI_API_KEY: 'sk-test', RIVER_OFFLINE: v }, () => {
+      assert.equal(isLlmEnabled(), false, `RIVER_OFFLINE=${JSON.stringify(v)} should disable`);
+    });
+  }
+});
+
+test('isLlmEnabled: RIVER_OFFLINE=0 / empty does not disable', () => {
+  for (const v of ['0', '', 'false']) {
+    withEnv({ OPENAI_API_KEY: 'sk-test', RIVER_OFFLINE: v }, () => {
+      assert.equal(isLlmEnabled(), true, `RIVER_OFFLINE=${JSON.stringify(v)} should not disable`);
+    });
+  }
+});
