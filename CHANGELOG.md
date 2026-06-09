@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/s977043/river-review/compare/v1.5.0...v1.6.0) (2026-06-09)
+
+
+### Features
+
+* **cli:** add --offline / --rules-only mode ([#1071](https://github.com/s977043/river-review/issues/1071), ADR-002) ([#1094](https://github.com/s977043/river-review/issues/1094)) ([3625170](https://github.com/s977043/river-review/commit/36251700faddefc9c8b0fc8d672ca30575843962))
+
 ## [1.5.0](https://github.com/s977043/river-review/compare/v1.4.0...v1.5.0) (2026-06-09)
 
 
