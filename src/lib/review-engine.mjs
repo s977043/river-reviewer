@@ -4,6 +4,7 @@ import { classifyFindings } from './finding-classifier.mjs';
 import { defaultConfig } from '../config/default.mjs';
 import { summarizeSkill } from '../../runners/core/review-runner.mjs';
 import { buildHeuristicComments, HEURISTIC_SKILL_IDS } from './heuristic-review.mjs';
+import { isOfflineMode } from './utils.mjs';
 import {
   formatFindingMessage,
   validateFindingMessage,
@@ -683,11 +684,13 @@ export async function generateReview({
 
   const skipReason = dryRun
     ? 'dry-run enabled'
-    : openAIConfig.provider !== 'openai'
-      ? `provider ${openAIConfig.provider} is not supported yet`
-      : openAIConfig.apiKey
-        ? null
-        : 'OPENAI_API_KEY (or RIVER_OPENAI_API_KEY) not set';
+    : isOfflineMode()
+      ? 'offline (rules-only) mode enabled'
+      : openAIConfig.provider !== 'openai'
+        ? `provider ${openAIConfig.provider} is not supported yet`
+        : openAIConfig.apiKey
+          ? null
+          : 'LLM API key (ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY) not set';
 
   if (!skipReason) {
     try {

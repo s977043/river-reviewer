@@ -11,6 +11,18 @@ export function parseList(value) {
 }
 
 /**
+ * Check if offline (rules-only) mode is enabled via `RIVER_OFFLINE`
+ * (set by `--offline` / `--rules-only`; ADR-002 / #1071).
+ * @returns {boolean}
+ */
+export function isOfflineMode() {
+  const offline = String(process.env.RIVER_OFFLINE ?? '')
+    .trim()
+    .toLowerCase();
+  return offline === '1' || offline === 'true' || offline === 'yes' || offline === 'on';
+}
+
+/**
  * Check if an LLM (OpenAI / Gemini / Anthropic) API key is configured in the environment.
  *
  * Offline (rules-only) mode: when `RIVER_OFFLINE` is set (via `--offline` /
@@ -19,10 +31,7 @@ export function parseList(value) {
  * @returns {boolean}
  */
 export function isLlmEnabled() {
-  const offline = String(process.env.RIVER_OFFLINE ?? '')
-    .trim()
-    .toLowerCase();
-  if (offline === '1' || offline === 'true' || offline === 'yes' || offline === 'on') {
+  if (isOfflineMode()) {
     return false;
   }
   return !!(

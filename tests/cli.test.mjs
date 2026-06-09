@@ -53,7 +53,10 @@ describe('river run - dry-run outputs', () => {
     const result = await runCliInProcess(['run', '.', '--debug'], { cwd: dir });
     assert.strictEqual(result.code, 0, result.stderr);
     assert.match(result.stdout, /River Review/);
-    assert.match(result.stdout, /LLM: OPENAI_API_KEY/i);
+    assert.match(
+      result.stdout,
+      /LLM: LLM API key \(ANTHROPIC_API_KEY \/ OPENAI_API_KEY \/ GOOGLE_API_KEY\) not set/i
+    );
     assert.match(result.stdout, /Planner: off/i);
     assert.match(result.stdout, /Review comments/);
   });
