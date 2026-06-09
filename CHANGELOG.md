@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.0](https://github.com/s977043/river-review/compare/v1.4.0...v1.5.0) (2026-06-09)
+
+
+### Features
+
+* **#1068:** doc-only PR 用のレビュー観点を追加 ([#1089](https://github.com/s977043/river-review/issues/1089)) ([bc418d3](https://github.com/s977043/river-review/commit/bc418d33092b2ef6082cddaac6f66f6a481a5ed2)), closes [#1068](https://github.com/s977043/river-review/issues/1068)
+* **#1069:** 重要度に「ドキュメント実害=Major」基準を追加 ([#1088](https://github.com/s977043/river-review/issues/1088)) ([db15135](https://github.com/s977043/river-review/commit/db151355bd840dabb5eb9def7a68d96b99949a0a)), closes [#1069](https://github.com/s977043/river-review/issues/1069)
+* **#1070:** カスタム静的解析の False-positive 責務分界を review-core に明記 ([#1087](https://github.com/s977043/river-review/issues/1087)) ([3ed7ef8](https://github.com/s977043/river-review/commit/3ed7ef8c269da324a46460823b5dd95b38212a02)), closes [#1070](https://github.com/s977043/river-review/issues/1070)
+
 ## [1.4.0](https://github.com/s977043/river-review/compare/v1.3.1...v1.4.0) (2026-06-08)
 
 
