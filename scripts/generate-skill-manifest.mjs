@@ -31,9 +31,10 @@ function sha256(buffer) {
 
 /** Extract the frontmatter `id:` from a SKILL.md (fallback: directory name). */
 export function extractSkillId(skillMdContent, fallback) {
-  const fm = /^---\n([\s\S]*?)\n---/.exec(skillMdContent);
+  // \r? keeps this working on Windows checkouts with CRLF line endings.
+  const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(skillMdContent);
   if (fm) {
-    const m = /^id:\s*['"]?([\w.-]+)['"]?\s*$/m.exec(fm[1]);
+    const m = /^id:\s*['"]?([\w.-]+)['"]?\s*\r?$/m.exec(fm[1]);
     if (m) return m[1];
   }
   return fallback;
@@ -62,7 +63,14 @@ export async function computeSkillEntry(skillDir, rootDir = '.') {
   const lines = [];
   for (const file of files) {
     const rel = path.relative(skillDir, file).replaceAll('\\', '/');
-    const content = await fs.readFile(file);
+    // Normalize CRLF to LF before hashing so a Windows checkout with
+    // core.autocrlf produces the same checksum as Linux/macOS. Skill dirs are
+    // text (md/yaml/json); treating any stray CRLF byte pair as LF keeps the
+    // hash deterministic across platforms.
+    const content = Buffer.from(
+      (await fs.readFile(file)).toString('binary').replaceAll('\r\n', '\n'),
+      'binary'
+    );
     lines.push(`${rel}\n${sha256(content)}\n`);
   }
   const composite = sha256(Buffer.from(lines.join(''), 'utf8'));
@@ -96,10 +104,7 @@ export async function findSkillDirs(skillsRoot = SKILLS_ROOT) {
 
 export async function generateManifest({ skillsRoot = SKILLS_ROOT, rootDir = '.' } = {}) {
   const dirs = await findSkillDirs(skillsRoot);
-  const skills = [];
-  for (const dir of dirs) {
-    skills.push(await computeSkillEntry(dir, rootDir));
-  }
+  const skills = await Promise.all(dirs.map((dir) => computeSkillEntry(dir, rootDir)));
   skills.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return {
     schemaVersion: 1,
@@ -128,7 +133,9 @@ async function main() {
     } catch {
       // missing file falls through to the stale branch
     }
-    if (current === rendered) {
+    // Normalize CRLF so a Windows checkout of the committed manifest does not
+    // false-positive against the LF-rendered output.
+    if (current !== null && current.replaceAll('\r\n', '\n') === rendered) {
       console.log(`skill manifest is up to date (${manifest.skillCount} skills).`);
       return 0;
     }

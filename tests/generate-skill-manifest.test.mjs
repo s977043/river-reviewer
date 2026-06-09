@@ -31,6 +31,26 @@ test('extractSkillId reads frontmatter id and falls back to dirname', () => {
   assert.equal(extractSkillId('# no frontmatter', 'fallback-dir'), 'fallback-dir');
 });
 
+test('extractSkillId handles CRLF line endings (#1100 review)', () => {
+  assert.equal(extractSkillId('---\r\nid: rr-x-001\r\nname: y\r\n---\r\nbody', 'fb'), 'rr-x-001');
+});
+
+test('checksum is identical for LF and CRLF content (#1100 review)', async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'manifest-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const lfDir = await makeFixtureSkill(root, 'lf-skill', { id: 'rr-eol-001' });
+  const lf = await computeSkillEntry(lfDir, root);
+
+  // Rewrite the same files with CRLF line endings; checksum must not change.
+  for (const rel of ['SKILL.md', path.join('prompt', 'user.md')]) {
+    const p = path.join(lfDir, rel);
+    const content = await fs.readFile(p, 'utf8');
+    await fs.writeFile(p, content.replaceAll('\n', '\r\n'));
+  }
+  const crlf = await computeSkillEntry(lfDir, root);
+  assert.equal(lf.checksum, crlf.checksum);
+});
+
 test('generateManifest is deterministic and sorted by id', async (t) => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'manifest-'));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
