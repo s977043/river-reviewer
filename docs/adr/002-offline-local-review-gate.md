@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted—implemented via `--offline` / `--rules-only` (#1071). `isLlmEnabled()` honors `RIVER_OFFLINE`, so AI is force-disabled and the review falls back to deterministic heuristics. The `--fail-on` / `--warn-on` / `--output json` gating works unchanged.
 
 ## Context
 

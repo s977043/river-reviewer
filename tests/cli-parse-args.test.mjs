@@ -258,6 +258,12 @@ test('parseArgs: --fail-on defaults null; --advisory-only defaults false', () =>
   assert.equal(parsed.advisoryOnly, false);
 });
 
+test('parseArgs: --offline and --rules-only set offline; defaults false (#1071)', () => {
+  assert.equal(parseArgs(['run', '.', '--offline']).offline, true);
+  assert.equal(parseArgs(['run', '.', '--rules-only']).offline, true);
+  assert.equal(parseArgs(['run', '.']).offline, false);
+});
+
 test('parseArgs: --fail-on rejects an unknown severity', () => {
   const parsed = parseArgs(['review', 'exec', '--fail-on', 'nope']);
   assert.equal(parsed.command, 'help');

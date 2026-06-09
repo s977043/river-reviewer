@@ -12,9 +12,19 @@ export function parseList(value) {
 
 /**
  * Check if an LLM (OpenAI / Gemini / Anthropic) API key is configured in the environment.
+ *
+ * Offline (rules-only) mode: when `RIVER_OFFLINE` is set (via `--offline` /
+ * `--rules-only`), AI is force-disabled even if a key is present, so the review
+ * runs on deterministic heuristics only (ADR-002 / #1071).
  * @returns {boolean}
  */
 export function isLlmEnabled() {
+  const offline = String(process.env.RIVER_OFFLINE ?? '')
+    .trim()
+    .toLowerCase();
+  if (offline === '1' || offline === 'true' || offline === 'yes' || offline === 'on') {
+    return false;
+  }
   return !!(
     process.env.RIVER_OPENAI_API_KEY ||
     process.env.OPENAI_API_KEY ||
