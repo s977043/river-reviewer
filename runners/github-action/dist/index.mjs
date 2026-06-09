@@ -44851,9 +44851,19 @@ function parseList(value) {
 
 /**
  * Check if an LLM (OpenAI / Gemini / Anthropic) API key is configured in the environment.
+ *
+ * Offline (rules-only) mode: when `RIVER_OFFLINE` is set (via `--offline` /
+ * `--rules-only`), AI is force-disabled even if a key is present, so the review
+ * runs on deterministic heuristics only (ADR-002 / #1071).
  * @returns {boolean}
  */
 function isLlmEnabled() {
+  const offline = String(process.env.RIVER_OFFLINE ?? '')
+    .trim()
+    .toLowerCase();
+  if (offline === '1' || offline === 'true' || offline === 'yes' || offline === 'on') {
+    return false;
+  }
   return !!(
     process.env.RIVER_OPENAI_API_KEY ||
     process.env.OPENAI_API_KEY ||
@@ -60298,6 +60308,8 @@ Options:
   --fail-on <sev>   (run/review) Exit 1 if a finding >= severity exists. Opt-in; default critical when set
   --warn-on <sev>   (run/review) Exit 2 if a finding >= severity exists (below --fail-on). Default major when set
   --advisory-only   (run/review) Report findings but always exit 0 (disables --fail-on/--warn-on gating)
+  --offline         (run) Skip AI; review on deterministic heuristics only, even if an API key is set.
+                    Reproduces the Auto-approve gate locally when CI/AI is unavailable. Alias: --rules-only
 
 Commands:
   river runs list           List stored review runs
@@ -60363,6 +60375,7 @@ function parseArgs(argv) {
     failOn: null,
     warnOn: null,
     advisoryOnly: false,
+    offline: false,
     outputFile: null,
     summaryFile: null,
     quiet: false,
@@ -60469,6 +60482,10 @@ function parseArgs(argv) {
     }
     if (arg === '--advisory-only') {
       parsed.advisoryOnly = true;
+      continue;
+    }
+    if (arg === '--offline' || arg === '--rules-only') {
+      parsed.offline = true;
       continue;
     }
     if (arg === '--plan') {
@@ -61197,6 +61214,12 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
   if (parsed.command === 'help' || !parsed.command) {
     printHelp();
     return 0;
+  }
+  // Offline (rules-only) mode: force-disable AI for this process so the review
+  // runs on deterministic heuristics only (ADR-002 / #1071). isLlmEnabled()
+  // honors RIVER_OFFLINE across all call sites (dispatcher / runner / engine).
+  if (parsed.offline) {
+    external_node_process_namespaceObject.env.RIVER_OFFLINE = '1';
   }
   if (
     !['run', 'doctor', 'eval', 'skills', 'runs', 'suppression', 'review'].includes(parsed.command)
