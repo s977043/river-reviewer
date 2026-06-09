@@ -67,6 +67,30 @@ test('generateReview redacts secrets in debug.promptPreview and returned prompt 
   assert.equal(/ghp_[A-Za-z0-9]{36,}/.test(result.prompt), false);
 });
 
+test('generateReview skips the LLM in offline mode even with an API key (#1097 review)', async () => {
+  const envBackup = {
+    RIVER_OFFLINE: process.env.RIVER_OFFLINE,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  };
+  process.env.RIVER_OFFLINE = '1';
+  process.env.OPENAI_API_KEY = 'sk-test-should-not-be-called';
+  try {
+    const result = await generateReview({
+      diff,
+      plan,
+      phase: 'midstream',
+      dryRun: false,
+      includeFallback: false,
+    });
+    assert.equal(result.debug.llmSkipped, 'offline (rules-only) mode enabled');
+  } finally {
+    for (const [k, v] of Object.entries(envBackup)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+  }
+});
+
 test('generateReview runs heuristics when LLM is skipped', async () => {
   // スキルが選択されている場合、ヒューリスティックが実行される。
   // ヒューリスティックが何も検出しなかった場合、コメントは0件となる（正常な動作）。

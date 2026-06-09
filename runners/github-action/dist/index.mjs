@@ -42895,15 +42895,17 @@ async function searchSymbolUsages({ symbols, repoRoot, excludeFiles, maxChars })
 /* harmony export */ });
 /* unused harmony exports buildPrompt, parseLineComments */
 /* harmony import */ var _config_loader_mjs__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(3833);
-/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_9__ = __nccwpck_require__(9946);
+/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_10__ = __nccwpck_require__(9946);
 /* harmony import */ var _finding_classifier_mjs__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(7440);
 /* harmony import */ var _config_default_mjs__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(4807);
 /* harmony import */ var _runners_core_review_runner_mjs__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(4584);
 /* harmony import */ var _heuristic_review_mjs__WEBPACK_IMPORTED_MODULE_4__ = __nccwpck_require__(2294);
+/* harmony import */ var _utils_mjs__WEBPACK_IMPORTED_MODULE_9__ = __nccwpck_require__(9746);
 /* harmony import */ var _finding_format_mjs__WEBPACK_IMPORTED_MODULE_5__ = __nccwpck_require__(5942);
 /* harmony import */ var _review_plan_generator_mjs__WEBPACK_IMPORTED_MODULE_6__ = __nccwpck_require__(8069);
 /* harmony import */ var _repo_context_mjs__WEBPACK_IMPORTED_MODULE_7__ = __nccwpck_require__(8601);
 /* harmony import */ var _secret_redactor_mjs__WEBPACK_IMPORTED_MODULE_8__ = __nccwpck_require__(12);
+
 
 
 
@@ -43584,11 +43586,13 @@ async function generateReview({
 
   const skipReason = dryRun
     ? 'dry-run enabled'
-    : openAIConfig.provider !== 'openai'
-      ? `provider ${openAIConfig.provider} is not supported yet`
-      : openAIConfig.apiKey
-        ? null
-        : 'LLM API key (ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY) not set';
+    : (0,_utils_mjs__WEBPACK_IMPORTED_MODULE_9__/* .isOfflineMode */ .hN)()
+      ? 'offline (rules-only) mode enabled'
+      : openAIConfig.provider !== 'openai'
+        ? `provider ${openAIConfig.provider} is not supported yet`
+        : openAIConfig.apiKey
+          ? null
+          : 'LLM API key (ANTHROPIC_API_KEY / OPENAI_API_KEY / GOOGLE_API_KEY) not set';
 
   if (!skipReason) {
     try {
@@ -43714,8 +43718,8 @@ async function generateReview({
   });
 
   findings.sort((a, b) => {
-    const bA = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_9__/* .computeFindingBreakdown */ ._)(a);
-    const bB = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_9__/* .computeFindingBreakdown */ ._)(b);
+    const bA = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_10__/* .computeFindingBreakdown */ ._)(a);
+    const bB = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_10__/* .computeFindingBreakdown */ ._)(b);
     return bB.composite - bA.composite;
   });
 
@@ -44834,6 +44838,7 @@ function shouldExcludeForContext(relPath, opts = {}) {
 /* harmony export */   E1: () => (/* binding */ parseList),
 /* harmony export */   Rq: () => (/* binding */ isLlmEnabled),
 /* harmony export */   TK: () => (/* binding */ resolveAvailableDependencies),
+/* harmony export */   hN: () => (/* binding */ isOfflineMode),
 /* harmony export */   ud: () => (/* binding */ resolveAvailableContexts)
 /* harmony export */ });
 /* unused harmony export dependencyStubs */
@@ -44850,6 +44855,18 @@ function parseList(value) {
 }
 
 /**
+ * Check if offline (rules-only) mode is enabled via `RIVER_OFFLINE`
+ * (set by `--offline` / `--rules-only`; ADR-002 / #1071).
+ * @returns {boolean}
+ */
+function isOfflineMode() {
+  const offline = String(process.env.RIVER_OFFLINE ?? '')
+    .trim()
+    .toLowerCase();
+  return offline === '1' || offline === 'true' || offline === 'yes' || offline === 'on';
+}
+
+/**
  * Check if an LLM (OpenAI / Gemini / Anthropic) API key is configured in the environment.
  *
  * Offline (rules-only) mode: when `RIVER_OFFLINE` is set (via `--offline` /
@@ -44858,10 +44875,7 @@ function parseList(value) {
  * @returns {boolean}
  */
 function isLlmEnabled() {
-  const offline = String(process.env.RIVER_OFFLINE ?? '')
-    .trim()
-    .toLowerCase();
-  if (offline === '1' || offline === 'true' || offline === 'yes' || offline === 'on') {
+  if (isOfflineMode()) {
     return false;
   }
   return !!(
@@ -46255,7 +46269,9 @@ async function planLocalReview({
     if (dryRun) {
       plannerSkipped = 'dry-run enabled';
     } else if (!llmEnabled) {
-      plannerSkipped = 'AI API key (ANTHROPIC_API_KEY, OPENAI_API_KEY, or GOOGLE_API_KEY) not set';
+      plannerSkipped = (0,utils/* isOfflineMode */.hN)()
+        ? 'offline (rules-only) mode enabled'
+        : 'AI API key (ANTHROPIC_API_KEY, OPENAI_API_KEY, or GOOGLE_API_KEY) not set';
     } else {
       planner = createOpenAIPlanner();
     }

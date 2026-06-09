@@ -17,6 +17,7 @@ import { collectRepoContext } from './repo-context.mjs';
 import { loadSkills } from '../../runners/core/skill-loader.mjs';
 import {
   isLlmEnabled,
+  isOfflineMode,
   parseList,
   resolveAvailableContexts as resolveAvailableContextsShared,
   resolveAvailableDependencies as resolveAvailableDependenciesShared,
@@ -272,7 +273,9 @@ export async function planLocalReview({
     if (dryRun) {
       plannerSkipped = 'dry-run enabled';
     } else if (!llmEnabled) {
-      plannerSkipped = 'AI API key (ANTHROPIC_API_KEY, OPENAI_API_KEY, or GOOGLE_API_KEY) not set';
+      plannerSkipped = isOfflineMode()
+        ? 'offline (rules-only) mode enabled'
+        : 'AI API key (ANTHROPIC_API_KEY, OPENAI_API_KEY, or GOOGLE_API_KEY) not set';
     } else {
       planner = createOpenAIPlanner();
     }
