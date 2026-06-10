@@ -14,7 +14,7 @@
 import path from 'path';
 import { promises as fs } from 'fs';
 import { realpathSync } from 'fs';
-import { pathToFileURL, fileURLToPath } from 'url';
+import { pathToFileURL } from 'url';
 import {
   defaultPaths,
   createSkillValidator,
@@ -27,7 +27,7 @@ import {
 const TIER_RANK = { experimental: 0, community: 1, official: 2 };
 
 async function buildSkillAssetIndex({ skillsDir, repoRoot }) {
-  const schema = await loadSchema(defaultPaths.schemaPath);
+  const schema = await loadSchema(path.join(repoRoot, 'schemas', 'skill.schema.json'));
   const validator = createSkillValidator(schema);
   const index = new Map();
   for (const filePath of await listSkillFiles(skillsDir)) {
