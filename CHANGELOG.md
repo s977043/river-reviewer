@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.0](https://github.com/s977043/river-review/compare/v1.8.0...v1.9.0) (2026-06-10)
+
+
+### Features
+
+* **config:** selection section in .river-review.yaml (packs/tags/include/exclude) ([#1117](https://github.com/s977043/river-review/issues/1117)) ([5a9f2ba](https://github.com/s977043/river-review/commit/5a9f2ba29fbc4897f7ecf7c98f8cf646bed3e558))
+* **loop:** per-skill FP regression signal and rule-promotion detection (L-4) ([#1118](https://github.com/s977043/river-review/issues/1118)) ([213c6e8](https://github.com/s977043/river-review/commit/213c6e8e6ee25c2c50327a2b161fdbc820b49f3d))
+
 ## [1.8.0](https://github.com/s977043/river-review/compare/v1.7.0...v1.8.0) (2026-06-10)
 
 
