@@ -99,7 +99,7 @@ Commands:
 
 function parseArgs(argv) {
   const args = [...argv];
-  const SKILLS_SUBCOMMANDS = new Set(['import', 'export', 'list']);
+  const SKILLS_SUBCOMMANDS = new Set(['import', 'export', 'list', 'resolve']);
   const parsed = {
     command: null,
     target: '.',
@@ -147,6 +147,7 @@ function parseArgs(argv) {
     suppressionPrNumber: null,
     // skills subcommand fields
     skillsSubcommand: null,
+    resolvePaths: null,
     fromPath: null,
     toPath: null,
     validationMode: 'strict',
@@ -240,6 +241,14 @@ function parseArgs(argv) {
       if (arg === '--pr') {
         const v = parseInt(args.shift() ?? '', 10);
         if (!Number.isNaN(v) && v > 0) parsed.suppressionPrNumber = v;
+        continue;
+      }
+    }
+    if (parsed.command === 'skills' && parsed.skillsSubcommand === 'resolve') {
+      if (arg === '--path') {
+        parsed.resolvePaths = parsed.resolvePaths ?? [];
+        const v = args.shift();
+        if (v) parsed.resolvePaths.push(v);
         continue;
       }
     }
@@ -1245,6 +1254,55 @@ async function main(argv = process.argv.slice(2)) {
 
   try {
     // Skills subcommands (import/export/list) – no git repo required
+    if (parsed.command === 'skills' && parsed.skillsSubcommand === 'resolve') {
+      // Deterministic resolution: which skills would run for the given
+      // path(s) and phase. No git, no LLM — pure metadata routing, so
+      // agents and CI can introspect skill selection cheaply (#1045).
+      const paths = parsed.resolvePaths?.length ? parsed.resolvePaths : null;
+      if (!paths) {
+        console.error('Error: `river skills resolve` requires at least one --path <file>.');
+        return 1;
+      }
+      const { buildExecutionPlan } = await import('../runners/core/review-runner.mjs');
+      const plan = await buildExecutionPlan({
+        phase: parsed.phase,
+        changedFiles: paths,
+        availableContexts: parsed.availableContexts ?? ['diff'],
+        preferredModelHint: 'balanced',
+      });
+      if (parsed.output === 'json') {
+        console.log(
+          JSON.stringify(
+            {
+              phase: parsed.phase,
+              paths,
+              selected: plan.selected.map((s) => s.metadata.id),
+              skipped: plan.skipped.map((e) => ({
+                id: e.skill.metadata.id,
+                reasons: e.reasons,
+              })),
+            },
+            null,
+            2
+          )
+        );
+        return 0;
+      }
+      console.log(`Resolved skills (phase=${parsed.phase}, paths=${paths.join(', ')}):`);
+      if (!plan.selected.length) console.log('  (none matched)');
+      for (const skill of plan.selected) {
+        console.log(`  ✓ ${skill.metadata.id}`);
+      }
+      const skippedWithReasons = plan.skipped.filter((e) => e.reasons?.length);
+      if (skippedWithReasons.length) {
+        console.log('Skipped:');
+        for (const e of skippedWithReasons) {
+          console.log(`  - ${e.skill.metadata.id}: ${e.reasons.join('; ')}`);
+        }
+      }
+      return 0;
+    }
+
     if (parsed.command === 'skills' && parsed.skillsSubcommand) {
       const { runSkillsSubcommand } = await import('./lib/agent-skill-bridge.mjs');
       return runSkillsSubcommand(parsed);
