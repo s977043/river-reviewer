@@ -1,0 +1,19 @@
+# .river-review.yaml の selection サンプル: アーキテクチャ重視チーム向け（DDD / マイクロサービス境界）
+# 設計ドキュメント・ADR を継続的にレビューし、境界・契約・運用性のドリフトを防ぐ。
+# 注意: selection セクションは設計段階の機能です（docs/development/skill-pack-design.md §6、実装は Phase B）。
+selection:
+  packs: []
+  # Phase C で ddd pack が landed したら packs: [ddd] へ移行する
+  tags:
+    - architecture
+  skills:
+    include:
+      - rr-upstream-bounded-context-language-001 # 境界づけられたコンテキストとユビキタス言語
+      - rr-upstream-architecture-boundaries-001 # 境界・依存方向・所有権
+      - rr-upstream-data-flow-state-ownership-001 # データフローと状態の所有
+      - rr-upstream-integration-contracts-001 # サービス間契約
+      - rr-upstream-event-driven-semantics-001 # イベント駆動の配信保証・冪等性
+      - rr-upstream-api-versioning-compat-001 # API 互換性と versioning
+      - rr-upstream-trust-boundaries-authz-001 # 信頼境界と認可
+    exclude: []
+  minTier: community

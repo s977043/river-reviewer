@@ -122,27 +122,56 @@ packs:
 
 テンプレートは `specs/templates/pack/pack.yaml` に配置します。
 
-## 6. 実行計画
+## 6. 導入プロジェクト側の selection 宣言
 
-| Phase | 内容                                                                                                                                                      | 変更範囲                                         |
-| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| A     | 本方針・軸・テンプレートの合意（本 PR）                                                                                                                   | docs / specs のみ                                |
-| B     | 第 1 号 `typescript` pack + `schemas/pack.schema.json` + resolver 拡張（packs 優先・衝突エラー・複数指定の set-union）+ ゲートのゲート canary + S1 明文化 | registry.yaml / schemas / runners/core / scripts |
-| C     | 第 2 号 `ddd` pack（upstream 軸の実証、degraded mode 込み）+ tier 自動判定スクリプト                                                                      | skills / registry.yaml / scripts                 |
-| D     | カタログ生成（`skills:catalog` 拡張）、pages/ への公開ドキュメント、README 訴求更新、recommendations の deprecation 判断、tag 実行フィルタ検討            | scripts / pages / README                         |
+導入プロジェクトが「どの pack / tag / skill を使うか」を宣言する場所として、既存の `.river-review.yaml`（ConfigLoader + Zod 検証）に `selection` セクションを追加します。
+新しい設定ファイル形式（.env 風など）は導入しません。選択は配列と除外を含む構造化データであり、既存 config への統合が保守性で優位なためです。
+
+```yaml
+selection:
+  packs: # pack 単位の導入（複数指定は skill id で set-union）
+    - typescript
+  tags: # tag による横断追加
+    - a11y
+  skills:
+    include: # pack 外の個別 skill を追加
+      - rr-midstream-loading-state-001
+    exclude: # pack に含まれるが使わない skill を除外
+      - rr-midstream-typescript-strict-001
+  minTier: community # この tier 未満の pack を既定で除外
+```
+
+設計上のルールは次の通りです。
+
+- 優先順位は `exclude > include > packs / tags の union` とする
+- selection は「実行するか」の宣言であり、suppression（finding 単位の抑制）とは役割を分ける
+- CLI の `--skill-set` は selection の一時上書き手段として位置づけ直す
+- 環境変数（`RIVER_PACKS` 等）は CI での一時上書き用の補助とし、SSoT は `.river-review.yaml` とする
+- ユースケース別のサンプルは `examples/selection/` に配置する（React + TypeScript / TDD / SDD など）
+
+selection の resolver は Phase B の pack resolver と同時に設計します。tag 実行フィルタ（旧 Phase D 候補）は selection の一部として実装する方が一貫するため、§7 の通りスコープを再配置します。
+
+## 7. 実行計画
+
+| Phase | 内容                                                                                                                                                                        | 変更範囲                                         |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| A     | 本方針・軸・テンプレートの合意 + selection 設計とユースケース別サンプル                                                                                                     | docs / specs / examples のみ                     |
+| B     | 第 1 号 `typescript` pack + `schemas/pack.schema.json` + resolver 拡張（packs 優先・衝突警告・複数指定の set-union・selection 読み込み）+ ゲートのゲート canary + S1 明文化 | registry.yaml / schemas / runners/core / scripts |
+| C     | 第 2 号 `ddd` pack（upstream 軸の実証、degraded mode 込み）+ tier 自動判定スクリプト                                                                                        | skills / registry.yaml / scripts                 |
+| D     | カタログ生成（`skills:catalog` 拡張）、pages/ への公開ドキュメント、README 訴求更新、recommendations の deprecation 判断、tags 実行フィルタの selection への実装            | scripts / pages / README                         |
 
 Phase B は loader（`runners/core/skill-loader.mjs`）と検証スクリプトに踏み込むため軽微ではありません。
 AGENTS.md の「Ask before editing」に従い、`src/` / `runners/` に触れる変更は個別 PR で承認を取ります。
 Phase C の DDD pack は「plan / 設計レビューに効く」という River Review 固有の価値を示すショーケースとして位置付けます。
 
-## 7. 非ゴール
+## 8. 非ゴール
 
 - 既存 94 skill の物理的なディレクトリ再編（参照で束ねるため不要）
 - pack の外部レジストリ / リモート配布（npm 配布は Epic 1 で別管理）
 - `recommendations:` の即時廃止（互換期間を置く。新規追加凍結は Phase B、廃止判断は Phase D）
 - pack 単位の suppression。suppression / feedback は従来通り **skill 単位**（pack 非依存）で管理する。pack 固有の調整が必要になった場合は skill の fork で対応する
 
-## 8. 検証記録（2026-06-10）
+## 9. 検証記録（2026-06-10）
 
 本ドラフトは technical / consistency / adversarial の 3 視点並列セルフレビューを実施し、次の主要指摘を反映済みです。
 
