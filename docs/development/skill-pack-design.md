@@ -74,6 +74,15 @@ pack はいずれか 1 つの軸に分類します。軸をまたぐ関心は ta
 - artifact 必須の skill は、artifact 欠如時に `NO_REVIEW` で skip し「plan を渡すと精度が上がる」と案内する
 - diff 単体でも安全に動く軽量 skill（例: ユビキタス言語の命名チェック）を 1〜2 個含め、空振りを防ぐ
 
+### skill インベントリ方針（2026-06-10 監査で確定）
+
+リポジトリに置く skill は「アーティファクトを評価・検査するもの」を原則とします。次の例外と境界を定めます。
+
+- **テスト関連の生成・実行 skill（rr-test-code-\* 7 件、Playwright 系 2 件）は review-adjacent として残す**。レビュー指摘（カバレッジギャップ等）への修正提案としてテスト追加を支援する位置づけであり、`review-support` tag で検査系と区別する
+- 汎用コードレビュー系の重複 skill は plugin の `river-review-code` に統合する（agent-code-review の多観点実行・件数制約、agent-code-quality の命名・カプセル化観点を統合済み）
+- 計画「作成」（rr-upstream-create-plan-001）は PlanGate の責務とし、PlanGate 側へ移管する（受け入れ Issue 登録済み。移管完了後に本リポジトリから削除し、以降は plan を検査する側の skill のみ持つ）
+- レビューと無関係な汎用開発ガイド（ドキュメント執筆・リファクタ手順）は持たない
+
 ## 4. 成熟度 tier
 
 pack 単位の成熟度として `tier` を新規導入します。既存フィールドとの関係は次の通りです。

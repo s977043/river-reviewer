@@ -11,6 +11,7 @@ applyTo:
   - '**/*.spec.{ts,tsx,js,jsx}'
   - '**/*.test.{ts,tsx,js,jsx}'
 tags:
+  - review-support
   - agent
   - testing
   - regression

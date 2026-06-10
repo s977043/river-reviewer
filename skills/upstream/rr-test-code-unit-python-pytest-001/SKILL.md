@@ -8,7 +8,7 @@ phase: upstream
 applyTo:
   - 'docs/**/*.md'
   - 'specs/**/*.md'
-tags: [unit-test, tdd, python]
+tags: [review-support, unit-test, tdd, python]
 severity: major
 inputContext: [fullFile]
 outputKind: [tests]

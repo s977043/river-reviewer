@@ -8,7 +8,7 @@ phase: upstream
 applyTo:
   - 'docs/**/*.md'
   - 'specs/**/*.md'
-tags: [unit-test, tdd, typescript, jest, vitest]
+tags: [review-support, unit-test, tdd, typescript, jest, vitest]
 severity: major
 inputContext: [fullFile]
 outputKind: [tests]
