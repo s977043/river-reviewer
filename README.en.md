@@ -25,13 +25,14 @@ River Review helps you answer questions like:
 
 ## Why River Review?
 
-| Axis                | Existing AI review tools | River Review                                     |
-| ------------------- | ------------------------ | ------------------------------------------------ |
-| Input               | Mostly the diff          | Plan, diff, tests, JUnit, prior review artifacts |
-| Judgment            | Vendor black box         | Versioned skills in your repository              |
-| Knowledge ownership | Provider-owned           | Repo-owned and reviewable                        |
-| Gates               | Usually PR-time only     | Design, implementation, and verification gates   |
-| Agent workflow      | Standalone reviewer      | **Audit layer for AI-assisted implementation**   |
+| Axis                    | Existing AI review tools | River Review                                                  |
+| ----------------------- | ------------------------ | ------------------------------------------------------------- |
+| Input                   | Mostly the diff          | Plan, diff, tests, JUnit, prior review artifacts              |
+| Judgment                | Vendor black box         | Versioned skills in your repository                           |
+| Knowledge ownership     | Provider-owned           | Repo-owned and reviewable                                     |
+| Gates                   | Usually PR-time only     | Design and implementation gates (verify gate planned)         |
+| Finding reproducibility | Varies per run           | Suppression memory, fixture regression, deterministic scoring |
+| Agent workflow          | Standalone reviewer      | **Audit layer for AI-assisted implementation**                |
 
 River Review is not another prompt wrapper around a PR diff. It is a way to make your team's review judgment executable — an audit layer that checks AI-written code against your own rules.
 
@@ -39,7 +40,7 @@ River Review is not another prompt wrapper around a PR diff. It is a way to make
 
 **Skills define judgment.** A skill describes how a review decision should be made: security policy, accessibility, migration safety, dependency rules, plan conformance, and other team-specific standards.
 
-**Gates execute judgment.** Plan, exec, and verify gates run those skills at the right point in the delivery flow — not only after the PR is already complete.
+**Gates execute judgment.** Plan and exec gates run those skills at the right point in the delivery flow — not only after the PR is already complete (a verify gate is planned in [#802](https://github.com/s977043/river-review/issues/802)).
 
 **Riverbed remembers judgment.** Review outcomes, decisions, and reusable context become part of the operating memory so future reviews stay consistent (see [`pages/guides/use-riverbed-memory.en.md`](pages/guides/use-riverbed-memory.en.md), with suppression of WontFix items and prior-decision recall).
 
