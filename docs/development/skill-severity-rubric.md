@@ -102,10 +102,10 @@ A skill's `severity` is decided by the **worst case finding it is allowed to emi
 
 本書に基づいて完了した再分類:
 
-| skill                                        | from  | to    | PR   | rubric criterion                                                                                                       |
-| -------------------------------------------- | ----- | ----- | ---- | ---------------------------------------------------------------------------------------------------------------------- |
-| `rr-midstream-normalization-consistency-001` | major | minor | #777 | minor の "naming, formatting, dead code, 軽微な inconsistency" に該当。normalization drift は merge blocker ではない。 |
-| `rr-upstream-create-plan-001`                | major | minor | #781 | minor の "教育・案内目的のスキル" に該当。outputKind が `[summary, actions, questions]` で advisory artifacts のみ。   |
+| skill                                                      | from  | to    | PR   | rubric criterion                                                                                                       |
+| ---------------------------------------------------------- | ----- | ----- | ---- | ---------------------------------------------------------------------------------------------------------------------- |
+| `rr-midstream-normalization-consistency-001`               | major | minor | #777 | minor の "naming, formatting, dead code, 軽微な inconsistency" に該当。normalization drift は merge blocker ではない。 |
+| `rr-upstream-create-plan-001`（PlanGate へ移管済み・削除） | major | minor | #781 | minor の "教育・案内目的のスキル" に該当。outputKind が `[summary, actions, questions]` で advisory artifacts のみ。   |
 
 ### 共通パターン（観察）
 
