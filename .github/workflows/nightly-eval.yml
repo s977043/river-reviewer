@@ -17,6 +17,7 @@ concurrency:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   eval:
@@ -52,6 +53,35 @@ jobs:
             lines.push('', 'Status: **' + r.status.toUpperCase() + '**');
             fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n'));
           "
+
+      - name: Open issue on KPI regression (improvement loop L-3)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if node scripts/compare-eval-ledger.mjs > compare-output.txt 2>&1; then
+            echo "No KPI regression detected."
+            exit 0
+          fi
+          cat compare-output.txt
+          existing=$(gh issue list --label eval-regression --state open --json number --jq 'length')
+          if [ "$existing" -gt 0 ]; then
+            echo "An eval-regression issue is already open; skipping creation."
+            exit 0
+          fi
+          {
+            echo "Nightly eval detected a KPI regression (improvement loop L-3 auto-trigger)."
+            echo ""
+            echo '```'
+            cat compare-output.txt
+            echo '```'
+            echo ""
+            echo "Next action: identify the skill behind the regressed metric and run the feedback loop (docs/development/skill-improvement-loop-design.md §3 L3)."
+          } > issue-body.md
+          gh issue create \
+            --title "eval: nightly KPI regression detected ($(date -u +%Y-%m-%d))" \
+            --label eval-regression \
+            --body-file issue-body.md
 
       - name: Upload eval artifacts
         if: always()
