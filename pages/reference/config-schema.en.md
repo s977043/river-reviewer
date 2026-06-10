@@ -47,6 +47,13 @@ Place `.river-review.json` in the repository root to customize review model sett
   - Each value is a string path, or an object `{ "path": "...", "optional": <boolean> }` (`optional` is a boolean).
   - Unknown keys are accepted for forward compatibility (catchall). See the [Artifact Input Contract](./artifact-input-contract.md) for the resolution order and per-artifact contract.
 
+- `selection` (skill pack adoption)
+  - `packs`: array of pack ids to adopt (e.g. `[typescript, ddd]`). Multiple packs are set-unioned by skill id so each skill runs at most once.
+  - `tags`: cross-cutting additions; skills carrying any listed tag join the selection.
+  - `skills.include` / `skills.exclude`: add or drop individual skills. Precedence: `exclude > include > union(packs, tags)`.
+  - `minTier`: `official` / `community` / `experimental`. Explicitly listed `packs` below minTier still run (warning only).
+  - When `--skill-set` is passed on the CLI it overrides the config selection. See [examples/selection/](https://github.com/s977043/river-review/tree/main/examples/selection) for samples.
+
 ### Configuration Example
 
 ```json

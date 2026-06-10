@@ -1,6 +1,6 @@
 # .river-review.yaml の selection サンプル: TDD（テスト駆動開発）チーム向け
 # テストファースト運用を前提に、テスト雛形生成（upstream）からカバレッジ検査（downstream）までを束ねる。
-# 注意: selection セクションは設計段階の機能です（docs/development/skill-pack-design.md §6、実装は Phase B）。
+# selection は .river-review.yaml の設定として実装済み（--skill-set 指定時は CLI が優先）。
 selection:
   packs: []
   tags:

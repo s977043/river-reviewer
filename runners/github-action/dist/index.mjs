@@ -39663,13 +39663,15 @@ __nccwpck_require__.d(__webpack_exports__, {
   vN: () => (/* binding */ SkillLoaderError),
   m: () => (/* binding */ createSkillValidator),
   KJ: () => (/* binding */ defaultPaths),
+  Qv: () => (/* binding */ loadAllSkillMetadata),
+  rn: () => (/* binding */ loadPacks),
   e$: () => (/* binding */ loadSchema),
   l1: () => (/* binding */ loadSkills),
   eJ: () => (/* binding */ parseFrontMatter),
   mw: () => (/* binding */ resolveSkillSet)
 });
 
-// UNUSED EXPORTS: listSkillFiles, loadAllSkillMetadata, loadPacks, loadRecommendationSets, loadSkillFile, loadSkillMetadata, parseSkillFile, resolveRecommendationSet
+// UNUSED EXPORTS: listSkillFiles, loadRecommendationSets, loadSkillFile, loadSkillMetadata, parseSkillFile, resolveRecommendationSet
 
 // EXTERNAL MODULE: external "fs"
 var external_fs_ = __nccwpck_require__(9896);
@@ -40519,6 +40521,18 @@ const artifactsConfigSchema = schemas/* object */.Ik({
   })
   .catchall(schemas/* unknown */.L5());
 
+const selectionConfigSchema = schemas/* object */.Ik({
+    packs: schemas/* array */.YO(schemas/* string */.Yj()).default([]),
+    tags: schemas/* array */.YO(schemas/* string */.Yj()).default([]),
+    skills: schemas/* object */.Ik({
+        include: schemas/* array */.YO(schemas/* string */.Yj()).default([]),
+        exclude: schemas/* array */.YO(schemas/* string */.Yj()).default([]),
+      })
+      .default({ include: [], exclude: [] }),
+    minTier: schemas/* enum */.k5(['official', 'community', 'experimental']).optional(),
+  })
+  .describe('Project-level skill selection (packs / tags / individual skills)');
+
 const riverReviewerConfigSchema = schemas/* object */.Ik({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
@@ -40527,6 +40541,7 @@ const riverReviewerConfigSchema = schemas/* object */.Ik({
   memory: memoryConfigSchema.optional(),
   context: contextConfigSchema.optional(),
   artifacts: artifactsConfigSchema.optional(),
+  selection: selectionConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -40593,6 +40608,7 @@ const ConfigSchema = schemas/* object */.Ik({
     memory: memoryConfigSchema.optional(),
     context: contextConfigSchema.optional(),
     artifacts: artifactsConfigSchema.optional(),
+    selection: selectionConfigSchema.optional(),
     skills: schemas/* array */.YO(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
@@ -45325,6 +45341,87 @@ var promises_ = __nccwpck_require__(1455);
 var esm = __nccwpck_require__(9519);
 // EXTERNAL MODULE: ./src/config/loader.mjs + 1 modules
 var loader = __nccwpck_require__(3833);
+// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 1 modules
+var skill_loader = __nccwpck_require__(8478);
+;// CONCATENATED MODULE: ./src/lib/selection.mjs
+// Project-level skill selection (`selection` in .river-review.yaml).
+// Design: docs/development/skill-pack-design.md §6.
+//
+// Resolution: union(packs, tag-matched skills, skills.include) minus
+// skills.exclude, deduplicated. `--skill-set` on the CLI overrides the
+// config selection entirely. minTier warns (but does not block) when an
+// explicitly listed pack sits below the threshold — explicit listing is
+// treated as an intentional choice.
+
+
+const TIER_RANK = { experimental: 0, community: 1, official: 2 };
+
+/** True when the selection declares anything that affects skill choice. */
+function hasSelection(selection) {
+  if (!selection || typeof selection !== 'object') return false;
+  return Boolean(
+    selection.packs?.length || selection.tags?.length || selection.skills?.include?.length
+  );
+}
+
+/**
+ * Resolve a config `selection` block to a deduplicated skill id list.
+ *
+ * @param {{ packs?: string[], tags?: string[], skills?: { include?: string[], exclude?: string[] }, minTier?: string }} selection
+ * @param {{ skillsDir?: string, warn?: (msg: string) => void }} [options]
+ * @returns {Promise<string[]|null>} skill ids, or null when the selection is empty
+ */
+async function resolveSelectionSkillIds(
+  selection,
+  { skillsDir, warn = (msg) => console.warn(msg) } = {}
+) {
+  if (!hasSelection(selection)) return null;
+  const resolved = [];
+
+  if (selection.packs?.length) {
+    const loaderOptions = skillsDir ? { skillsDir } : {};
+    const packs = await (0,skill_loader/* loadPacks */.rn)(loaderOptions);
+    for (const id of selection.packs) {
+      const pack = packs.find((p) => p.id === id);
+      if (!pack || !Array.isArray(pack.skills)) {
+        const available = packs.map((p) => p.id).join(', ') || '(none)';
+        throw new Error(`selection.packs: unknown pack "${id}". Available packs: ${available}.`);
+      }
+      if (
+        selection.minTier &&
+        TIER_RANK[pack.tier ?? 'experimental'] < TIER_RANK[selection.minTier]
+      ) {
+        warn(
+          `⚠️  selection: pack "${id}" (tier: ${pack.tier ?? 'experimental'}) is below minTier ` +
+            `"${selection.minTier}" but runs anyway because it was listed explicitly.`
+        );
+      }
+      resolved.push(...pack.skills);
+    }
+  }
+
+  if (selection.tags?.length) {
+    const wanted = new Set(selection.tags);
+    const loaderOptions = skillsDir ? { skillsDir } : {};
+    const metas = await (0,skill_loader/* loadAllSkillMetadata */.Qv)(loaderOptions);
+    for (const skill of metas) {
+      const tags = skill.metadata?.tags ?? [];
+      if (tags.some((t) => wanted.has(t))) resolved.push(skill.metadata.id);
+    }
+  }
+
+  resolved.push(...(selection.skills?.include ?? []));
+
+  const exclude = new Set(selection.skills?.exclude ?? []);
+  const seen = new Set();
+  return resolved.filter((id) => {
+    if (typeof id !== 'string' || !id.length) return false;
+    if (exclude.has(id) || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
 // EXTERNAL MODULE: ./src/lib/diff.mjs
 var lib_diff = __nccwpck_require__(4382);
 // EXTERNAL MODULE: ./src/lib/diff-optimizer.mjs
@@ -45966,8 +46063,6 @@ function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
 
 // EXTERNAL MODULE: ./src/lib/repo-context.mjs + 3 modules
 var repo_context = __nccwpck_require__(8601);
-// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 1 modules
-var skill_loader = __nccwpck_require__(8478);
 // EXTERNAL MODULE: ./src/lib/utils.mjs
 var utils = __nccwpck_require__(9746);
 // EXTERNAL MODULE: ./src/lib/finding-fingerprint.mjs
@@ -46104,6 +46199,7 @@ function applySuppressions(findings, memoryContext, opts = {}) {
 }
 
 ;// CONCATENATED MODULE: ./src/lib/local-runner.mjs
+
 
 
 
@@ -46319,6 +46415,14 @@ async function planLocalReview({
   });
   const plannerRequested = requestedPlannerMode !== 'off';
 
+  // Config-level selection (.river-review.yaml `selection`) supplies the
+  // skill id list unless the CLI already provided one via --skill-set,
+  // which takes precedence as the explicit per-run override (design §6).
+  let effectiveSkillIds = skillIds;
+  if (effectiveSkillIds == null && hasSelection(config.selection)) {
+    effectiveSkillIds = await resolveSelectionSkillIds(config.selection, {});
+  }
+
   const { matched: ignoredLabels, shouldSkip } = shouldSkipByLabel(
     prLabels,
     config.exclude?.prLabelsToIgnore ?? []
@@ -46387,7 +46491,7 @@ async function planLocalReview({
     llmEnabled,
     repoRoot,
     riskMap,
-    skillIds,
+    skillIds: effectiveSkillIds,
     manualReviewMode,
     specDirs: config.review?.specDirs ?? [],
   });

@@ -2,7 +2,7 @@
 
 `.river-review.yaml` の `selection` セクション（pack / tag / 個別 skill の宣言）のユースケース別サンプルです。
 
-> **注意**: `selection` は設計段階の機能です。設計は [docs/development/skill-pack-design.md](../../docs/development/skill-pack-design.md) §6、実装は Phase B で行います。現時点では `--skill-set` フラグと registry.yaml の `recommendations:` を利用してください。
+> `selection` は `.river-review.yaml` の設定として実装済みです。`--skill-set` を指定した実行ではそちらが優先されます（設計の経緯は [docs/development/skill-pack-design.md](../../docs/development/skill-pack-design.md) §6）。
 
 ## サンプル一覧
 
@@ -13,7 +13,7 @@
 | `sdd.yaml`                 | 仕様駆動開発（SDD）。plan / pbi-input / ADR と実装の整合を多段で検査 |
 | `architecture-review.yaml` | アーキテクチャ重視チーム。DDD 境界・契約・運用性のドリフト防止       |
 
-## 使い方（selection 実装後）
+## 使い方
 
 1. サンプルの `selection` セクションを、自分のリポジトリの既存 `.river-review.yaml` に **マージ** する（`model` / `review` / `exclude` など既存セクションを上書きしないこと。config が無い場合はファイルごとコピーしてよい）
 2. `selection.skills.include` をスタックに合わせて取捨選択する

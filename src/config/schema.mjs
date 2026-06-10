@@ -191,6 +191,20 @@ export const artifactsConfigSchema = z
   })
   .catchall(z.unknown());
 
+export const selectionConfigSchema = z
+  .object({
+    packs: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]),
+    skills: z
+      .object({
+        include: z.array(z.string()).default([]),
+        exclude: z.array(z.string()).default([]),
+      })
+      .default({ include: [], exclude: [] }),
+    minTier: z.enum(['official', 'community', 'experimental']).optional(),
+  })
+  .describe('Project-level skill selection (packs / tags / individual skills)');
+
 export const riverReviewerConfigSchema = z.object({
   model: modelConfigSchema.optional(),
   review: reviewConfigSchema.optional(),
@@ -199,6 +213,7 @@ export const riverReviewerConfigSchema = z.object({
   memory: memoryConfigSchema.optional(),
   context: contextConfigSchema.optional(),
   artifacts: artifactsConfigSchema.optional(),
+  selection: selectionConfigSchema.optional(),
 });
 
 // --- New Skill-based Schema (for river skills) ---
@@ -266,6 +281,7 @@ export const ConfigSchema = z
     memory: memoryConfigSchema.optional(),
     context: contextConfigSchema.optional(),
     artifacts: artifactsConfigSchema.optional(),
+    selection: selectionConfigSchema.optional(),
     skills: z.array(SkillSchema).default([]),
   })
   // Allow forward-compatible / custom keys; unknown detection is handled in loader for warnings
