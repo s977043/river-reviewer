@@ -174,7 +174,9 @@ export async function validatePacks({
 const isDirectRun =
   process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href;
 if (isDirectRun) {
-  const ok = (await validateSkills()) && (await validatePacks());
+  const skillsOk = await validateSkills();
+  const packsOk = await validatePacks();
+  const ok = skillsOk && packsOk;
   if (!ok) {
     process.exitCode = 1;
   }

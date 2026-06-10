@@ -39879,7 +39879,12 @@ async function resolveSkillSet(
   for (const name of requested) {
     const pack = packs.find((p) => p.id === name);
     const recommendation = sets[name];
-    if (pack && Array.isArray(pack.skills)) {
+    if (pack && !Array.isArray(pack.skills)) {
+      throw new SkillLoaderError(
+        `Pack "${name}" is malformed: \`skills\` must be an array. Fix skills/registry.yaml.`
+      );
+    }
+    if (pack) {
       if (recommendation) {
         warn(
           `⚠️  Skill set "${name}" exists as both a pack and a recommendation set; using the pack. ` +
