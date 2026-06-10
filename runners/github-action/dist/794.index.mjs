@@ -669,7 +669,7 @@ async function runReviewPlan({
   now = () => new Date().toISOString(),
   loadConfigImpl = loader/* loadConfig */.Z9,
   resolveAllArtifactsImpl = resolveAllArtifacts,
-  buildExecutionPlanImpl = review_runner/* buildExecutionPlan */.kN,
+  buildExecutionPlanImpl = review_runner.buildExecutionPlan,
   generateReviewImpl = review_engine/* generateReview */.G1,
   loadRiskMapImpl = risk_map/* loadRiskMap */.E$,
   readFileImpl = (p) => (0,promises_.readFile)(p, 'utf8'),
