@@ -35,7 +35,7 @@ pack はこの仕組みを置き換えるのではなく、メタデータを拡
 - pack manifest は skill を id の静的リストで参照する。存在しない id は validate でエラーにする
 - `--skill-set <pack-id>` の既存 UX をそのまま pack の選択手段にする
 - **解決順序**: packs を先に検索し、見つからなければ recommendations にフォールバックする
-- **同名衝突の禁止**: packs と recommendations に同じ id が存在する状態は validate でエラーにする。既存の `recommendations.typescript` 等は pack 移行時に deprecated 注記を付けて削除し、衝突自体を起こさない
+- **同名衝突の扱い**: 移行期間（Phase B〜C）中は packs 優先の解決順序で動作を保ちつつ、validate は警告に留める。既存の `recommendations.typescript` 等は deprecated 注記付きで残し、利用者の移行猶予を確保する。Phase D で recommendations 側を削除し、以後の同名衝突はエラーに昇格する
 - 併存期間中、recommendations への新規追加は凍結する（Phase B で宣言）
 
 注意: recommendations は「id をキーとするオブジェクト」、packs は「id フィールドを持つ配列」で形式が異なります。
@@ -115,8 +115,8 @@ packs:
 
 設計上のポイントは次の通りです。
 
-- `sources` は構造化フィールド（name / version / url / reviewed_at）とし、schema で必須化する。`reviewed_at` が一定期間（目安 6 ヶ月）を超えた pack には `skills:audit` で警告を出し、write-only metadata 化を防ぐ
-- `version` は pack 単位の SemVer とする。**参照先 skill の内容が変わったら pack も patch bump を必須** とし、pack version の再現性を担保する（validate で skill 更新日時と pack 更新の整合を警告）
+- `sources` は構造化フィールド（name / version / url / reviewed_at）とし、schema で必須化する。`reviewed_at` が一定期間（目安 6 ヶ月）を超えた pack には `skills:audit` で警告を出し、write-only metadata 化を防ぐ。外部出典を持たないオリジナル pack では `name: 'river-review original'` のような内部出典を許容する（url は省略可、reviewed_at は必須）
+- `version` は pack 単位の SemVer とする。参照先 skill の内容が変わったら pack の patch bump を推奨し、validate は skill 更新と pack 更新の不整合を **警告**（エラーではない）として報告する。厳密な再現性が必要になった場合の git hash ベースの pin は将来検討とする
 - `axis` は schema 上 enum の単一値として強制する
 - スキーマは `schemas/pack.schema.json` として追加し、`skills:validate` に統合する（Phase B）。required は `id` / `version` / `name` / `description` / `axis` / `tier` / `skills` とする
 
