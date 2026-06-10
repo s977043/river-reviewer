@@ -282,8 +282,8 @@
     {
       "id": "rr-midstream-type-driven-design-001",
       "path": "skills/midstream/rr-midstream-type-driven-design-001",
-      "checksum": "sha256:d75e4ba3c36618e699b7f4b13092e04db399b9bbc2300791c8ce3eb86ac0e4bc",
-      "files": 1
+      "checksum": "sha256:2e83f8862a960d0c89b079996fcc6bec4ab564f43f816a6ba645064b3f6463e9",
+      "files": 7
     },
     {
       "id": "rr-midstream-typescript-nullcheck-001",
