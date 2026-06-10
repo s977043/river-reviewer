@@ -63,7 +63,15 @@ const isDirectRun =
 if (isDirectRun) {
   const args = process.argv.slice(2);
   const minIdx = args.indexOf('--min');
-  const min = minIdx >= 0 ? parseInt(args[minIdx + 1] ?? '', 10) || 2 : 2;
+  let min = 2;
+  if (minIdx >= 0) {
+    const parsed = parseInt(args[minIdx + 1] ?? '', 10);
+    if (!Number.isInteger(parsed) || parsed < 1) {
+      console.error('Error: --min requires a positive integer.');
+      process.exit(2);
+    }
+    min = parsed;
+  }
   const monthIdx = args.indexOf('--month');
   const month = monthIdx >= 0 ? args[monthIdx + 1] : null;
   const entries = await listFeedbackEntries({ repoRoot, month, warn: (m) => console.warn(m) });

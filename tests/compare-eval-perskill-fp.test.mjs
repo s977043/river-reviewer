@@ -68,3 +68,22 @@ test('per-skill FP improvement never regresses', async () => {
   const { code } = run(ledger);
   assert.equal(code, 0);
 });
+
+test('no false regression when the previous entry lacks per-skill snapshots', async () => {
+  const old = entry({ fpRate: 0 });
+  delete old.snapshots;
+  const ledger = await writeLedger([old, entry({ fpRate: 0.5 })]);
+  const { code, out } = run(ledger);
+  assert.equal(code, 0);
+  assert.equal(out.regression, false);
+});
+
+test('a skill appearing only in the latest snapshot does not regress', async () => {
+  const prev = entry({ fpRate: 0.01 });
+  const curr = entry({ fpRate: 0.01 });
+  curr.snapshots.perSkillFp['rr-brand-new-skill-001'] = { guards: 10, fps: 5, fpRate: 0.5 };
+  const ledger = await writeLedger([prev, curr]);
+  const { code, out } = run(ledger);
+  assert.equal(code, 0);
+  assert.equal(out.perSkillFpRegressions.length, 0);
+});

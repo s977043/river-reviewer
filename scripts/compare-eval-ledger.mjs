@@ -92,8 +92,16 @@ function computeDelta(prev, curr) {
   // Per-skill FP worsening beyond +3pt is a regression signal too
   // (improvement-loop L-4): aggregate rates can mask a single skill
   // degrading while others improve.
-  const fpRows = diffPerSkillFp(prev.snapshots?.perSkillFp, curr.snapshots?.perSkillFp);
-  const fpRegressions = fpRows.filter((r) => r.rateDelta > PER_SKILL_FP_REGRESSION_THRESHOLD);
+  const prevFp = prev.snapshots?.perSkillFp;
+  const currFp = curr.snapshots?.perSkillFp;
+  const fpRows = diffPerSkillFp(prevFp, currFp);
+  // A regression needs a real baseline: skip when the previous entry has no
+  // per-skill snapshot at all (older ledger format) and skip skills that are
+  // new in the latest snapshot (their "previous" would be a synthetic 0).
+  const fpRegressions =
+    prevFp && currFp
+      ? fpRows.filter((r) => r.id in prevFp && r.rateDelta > PER_SKILL_FP_REGRESSION_THRESHOLD)
+      : [];
   if (fpRegressions.length) regression = true;
   return { rows, regression, fpRows, fpRegressions };
 }
