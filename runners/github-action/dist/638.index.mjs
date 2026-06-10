@@ -165,7 +165,9 @@ function buildFeedbackScaffold(entry) {
         verify: ['npm run eval:fixtures', 'npm run eval:repo-context'],
         fixtureStub: {
           suggestedPath: `tests/fixtures/review-eval/${skillId}-guard.md`,
-          content: `# Guard fixture for ${skillId}\n${evidenceLine}\n` + '```diff\n# TODO: paste the diff that was falsely flagged\n```\n\nexpectNoFindings: true\n',
+          content:
+            `# Guard fixture for ${skillId}\n${evidenceLine}\n` +
+            '```diff\n# TODO: paste the diff that was falsely flagged\n```\n\nexpectNoFindings: true\n',
         },
       };
     case 'missed_issue':
@@ -178,7 +180,9 @@ function buildFeedbackScaffold(entry) {
         ],
         fixtureStub: {
           suggestedPath: `tests/fixtures/review-eval/${skillId}-happy.md`,
-          content: `# Happy-path fixture for ${skillId}\n${evidenceLine}\n` + '```diff\n# TODO: paste the diff that should have been flagged\n```\n\nmustIncludeToken: TODO\n',
+          content:
+            `# Happy-path fixture for ${skillId}\n${evidenceLine}\n` +
+            '```diff\n# TODO: paste the diff that should have been flagged\n```\n\nmustIncludeToken: TODO\n',
         },
       };
     case 'accepted_risk':
