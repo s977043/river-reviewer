@@ -1,0 +1,20 @@
+# Skill Pack manifest template
+# このファイルは registry.yaml の packs: セクションに追加するエントリの雛形。
+# 設計方針・tier 昇格条件は docs/development/skill-pack-design.md を参照。
+id: <pack-id> # 例: typescript, ddd（小文字ケバブケース）。recommendations: と同名は validate エラー
+version: '0.1.0' # pack 単位の SemVer。参照先 skill の内容変更時は patch bump 必須
+name: '<Human readable pack name>'
+description: '<この pack が供給するレビュー判断の要約（1〜2 文）>'
+axis: technology # technology | methodology | concern のいずれか単一値
+tier: experimental # official | community | experimental（official のみ maintainer review 必須）
+sources:
+  # 出典・対象バージョン・確認日を構造化して記録する（陳腐化追跡用、skills:audit が参照）
+  - name: '<出典名>'
+    version: '<対象バージョン>'
+    url: '<URL>'
+    reviewed_at: '<YYYY-MM-DD>'
+skills:
+  # registry.yaml の skills[] に実在する id の静的リスト（物理移動はしない）
+  # 存在しない id は validate でエラーになる
+  - <skill-id-1>
+  - <skill-id-2>
