@@ -61733,9 +61733,9 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
             {
               phase: parsed.phase,
               paths,
-              selected: plan.selected.map((s) => s.metadata.id),
+              selected: plan.selected.map((s) => s.metadata?.id ?? s.id),
               skipped: plan.skipped.map((e) => ({
-                id: e.skill.metadata.id,
+                id: e.skill?.metadata?.id ?? e.skill?.id,
                 reasons: e.reasons,
               })),
             },
@@ -61748,13 +61748,13 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       console.log(`Resolved skills (phase=${parsed.phase}, paths=${paths.join(', ')}):`);
       if (!plan.selected.length) console.log('  (none matched)');
       for (const skill of plan.selected) {
-        console.log(`  ✓ ${skill.metadata.id}`);
+        console.log(`  ✓ ${skill.metadata?.id ?? skill.id}`);
       }
       const skippedWithReasons = plan.skipped.filter((e) => e.reasons?.length);
       if (skippedWithReasons.length) {
         console.log('Skipped:');
         for (const e of skippedWithReasons) {
-          console.log(`  - ${e.skill.metadata.id}: ${e.reasons.join('; ')}`);
+          console.log(`  - ${e.skill?.metadata?.id ?? e.skill?.id}: ${e.reasons.join('; ')}`);
         }
       }
       return 0;
