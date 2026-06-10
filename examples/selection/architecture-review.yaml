@@ -1,6 +1,6 @@
 # .river-review.yaml の selection サンプル: アーキテクチャ重視チーム向け（DDD / マイクロサービス境界）
 # 設計ドキュメント・ADR を継続的にレビューし、境界・契約・運用性のドリフトを防ぐ。
-# 注意: selection セクションは設計段階の機能です（docs/development/skill-pack-design.md §6、実装は Phase B）。
+# selection は .river-review.yaml の設定として実装済み（--skill-set 指定時は CLI が優先）。
 selection:
   packs:
     - ddd # bounded-context / type-driven-design / ubiquitous-language-naming（experimental tier のため minTier 注意）

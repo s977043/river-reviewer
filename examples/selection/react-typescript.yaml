@@ -1,6 +1,6 @@
 # .river-review.yaml の selection サンプル: React + TypeScript の Web アプリ開発向け
 # GitHub 上で React / TypeScript / Next.js を使う一般的なプロダクト開発を想定。
-# 注意: selection セクションは設計段階の機能です（docs/development/skill-pack-design.md §6、実装は Phase B）。
+# selection は .river-review.yaml の設定として実装済み（--skill-set 指定時は CLI が優先）。
 selection:
   packs:
     - typescript # Phase B で提供予定の第 1 号 pack（strict / nullcheck / type-driven-design）

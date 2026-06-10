@@ -1,7 +1,7 @@
 # .river-review.yaml の selection サンプル: SDD（仕様駆動開発 / plan 駆動開発）向け
 # pbi-input / plan / ADR などの上流アーティファクトを起点に、仕様と実装の整合を多段で検査する。
 # artifact の渡し方は pages/reference/artifact-input-contract.md を参照。
-# 注意: selection セクションは設計段階の機能です（docs/development/skill-pack-design.md §6、実装は Phase B）。
+# selection は .river-review.yaml の設定として実装済み（--skill-set 指定時は CLI が優先）。
 selection:
   packs: []
   tags:
