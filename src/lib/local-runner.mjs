@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { minimatch } from 'minimatch';
 import { ConfigLoader } from '../config/loader.mjs';
+import { hasSelection, resolveSelectionSkillIds } from './selection.mjs';
 import { collectRepoDiff } from './diff.mjs';
 import { renderDiffText } from './diff-optimizer.mjs';
 import { generateReview } from './review-engine.mjs';
@@ -226,6 +227,23 @@ export async function planLocalReview({
   });
   const plannerRequested = requestedPlannerMode !== 'off';
 
+  // Config-level selection (.river-review.yaml `selection`) supplies the
+  // skill id list unless the CLI already provided one via --skill-set,
+  // which takes precedence as the explicit per-run override (design §6).
+  let effectiveSkillIds = skillIds;
+  if (effectiveSkillIds == null && hasSelection(config.selection)) {
+    effectiveSkillIds = await resolveSelectionSkillIds(config.selection, {});
+  } else if (
+    effectiveSkillIds == null &&
+    config.selection &&
+    !hasSelection(config.selection) &&
+    (config.selection.skills?.exclude?.length ?? 0) > 0
+  ) {
+    console.warn(
+      '⚠️  selection: skills.exclude has no effect without packs, tags, or skills.include; all skills remain eligible.'
+    );
+  }
+
   const { matched: ignoredLabels, shouldSkip } = shouldSkipByLabel(
     prLabels,
     config.exclude?.prLabelsToIgnore ?? []
@@ -294,7 +312,7 @@ export async function planLocalReview({
     llmEnabled,
     repoRoot,
     riskMap,
-    skillIds,
+    skillIds: effectiveSkillIds,
     manualReviewMode,
     specDirs: config.review?.specDirs ?? [],
   });

@@ -56,6 +56,13 @@
   - 各値は文字列パス、または `{ "path": "...", "optional": <boolean> }` のオブジェクトで指定する（`optional` は真偽値）。
   - 未知のキーは将来互換のため受理される（catchall）。解決順序と各アーティファクトの契約は [Artifact Input Contract](./artifact-input-contract.md) を参照。
 
+- `selection`（skill pack の導入宣言）
+  - `packs`: 導入する pack id の配列（例: `[typescript, ddd]`）。複数指定は skill id で set-union され、各 skill は 1 回だけ実行される。
+  - `tags`: tag による横断追加。指定 tag を持つ skill が選択対象に加わる。
+  - `skills.include` / `skills.exclude`: 個別 skill の追加・除外。優先順位は `exclude > include > packs / tags の union`。
+  - `minTier`: `official` / `community` / `experimental`。明示した `packs` が minTier 未満でも実行される（警告のみ）。
+  - CLI の `--skill-set` を指定した実行では、config の selection より CLI 指定が優先される。サンプルは [examples/selection/](https://github.com/s977043/river-review/tree/main/examples/selection) を参照。
+
 ### 設定例
 
 ```json
