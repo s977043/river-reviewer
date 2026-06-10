@@ -854,11 +854,11 @@ skills:
 # ------------------------------------------------------------------
 packs:
   - id: typescript
-    version: '0.1.0'
+    version: '0.2.0'
     name: 'TypeScript Review Pack'
     description: 'TypeScript の型安全・null 安全・型駆動設計のレビュー基準'
     axis: technology
-    tier: community
+    tier: official
     sources:
       - name: 'TypeScript Handbook'
         version: 'TS 5.x'
@@ -874,11 +874,11 @@ packs:
   # diff 単体のリポジトリでは ubiquitous-language-naming / type-driven-design が
   # 空振りを防ぐ。
   - id: ddd
-    version: '0.1.0'
+    version: '0.2.0'
     name: 'Domain-Driven Design Review Pack'
     description: '境界づけられたコンテキスト・ユビキタス言語・型駆動のドメインモデリングのレビュー基準'
     axis: methodology
-    tier: experimental
+    tier: community
     sources:
       - name: 'Domain-Driven Design (Eric Evans)'
         version: '2003 / Evans classification'
