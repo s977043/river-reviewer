@@ -44,7 +44,7 @@ PR へのコメント投稿には `issues: write` が必要です。権限不足
 
 ## Anthropic (Claude) を使う場合
 
-`.river-review.json`（リポジトリルートに配置）で `claude-*` モデルを指定し、`ANTHROPIC_API_KEY` を渡します。設定できる全フィールドは [設定スキーマリファレンス](/reference/config-schema) を参照してください。
+`.river-review.json`（リポジトリルートに配置）で `claude-*` モデルを指定し、`ANTHROPIC_API_KEY` を渡します。設定できる全フィールドは [設定スキーマリファレンス](../reference/config-schema.md) を参照してください。
 
 ```yaml
 - name: Run River Review (midstream, Claude)
