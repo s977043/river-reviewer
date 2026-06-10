@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "description": "Deterministic skill manifest for drift detection by selective adopters. Compare the checksum of your copied skill against this list to notice upstream changes. Regenerate with: npm run skills:manifest",
-  "skillCount": 101,
+  "skillCount": 96,
   "skills": [
     {
       "id": "adversarial-review",
@@ -10,45 +10,15 @@
       "files": 2
     },
     {
-      "id": "agent-agentcheck-code-review",
-      "path": "skills/midstream/agent-agentcheck-code-review",
-      "checksum": "sha256:4f1988795bc8954f37d77ecb6fe5ae838a6097ffdd92e32142a1e2c36cc91086",
-      "files": 1
-    },
-    {
       "id": "agent-architecture-review",
       "path": "skills/upstream/agent-architecture-review",
       "checksum": "sha256:a3c47310c87f42b91644587cf976bcd790076f5a1dcb381315532faa0b8ade3d",
       "files": 1
     },
     {
-      "id": "agent-code-documentation",
-      "path": "skills/upstream/agent-code-documentation",
-      "checksum": "sha256:6e7f915d00d23f3ac25529afedac712e5800447a6f5d669c1bdf3764dc04f8c8",
-      "files": 1
-    },
-    {
-      "id": "agent-code-quality",
-      "path": "skills/midstream/agent-code-quality",
-      "checksum": "sha256:01714c665bc4b3a34ef37ea652697f661b66db0fb3fb7b986e077f7343bdbbd9",
-      "files": 1
-    },
-    {
-      "id": "agent-code-refactoring",
-      "path": "skills/midstream/agent-code-refactoring",
-      "checksum": "sha256:72cbcd2c38239a6bffcce20321f826b9fb67860dae04e3e1f8b90c1b0036377f",
-      "files": 1
-    },
-    {
-      "id": "agent-code-review",
-      "path": "skills/midstream/agent-code-review",
-      "checksum": "sha256:710f4a3305bf2bc515edfcabb13c5ff1f59d46b9847b34f557a05c9f9150d55a",
-      "files": 1
-    },
-    {
       "id": "agent-qa-regression",
       "path": "skills/downstream/agent-qa-regression",
-      "checksum": "sha256:3d52249f36d2b2cecf8044ec433c94d37ba68b98cae1ad04a761c8b2ec855daf",
+      "checksum": "sha256:0883975b02eeba0d3e84ab9e69148996548205efe57b4f0d387dc917959f23e3",
       "files": 1
     },
     {
@@ -60,7 +30,7 @@
     {
       "id": "agent-webapp-testing",
       "path": "skills/downstream/agent-webapp-testing",
-      "checksum": "sha256:5b6451fb36fdacc98e53cb2b4cad0204463b3c77bcf747e11b8cbb04fba7a3ce",
+      "checksum": "sha256:4034ea1509e39a2e3f5288e55560b21a34c225ad33e1dec721403ff28fbc17d4",
       "files": 1
     },
     {
@@ -78,7 +48,7 @@
     {
       "id": "river-review-code",
       "path": "skills/agent-skills/river-review-code",
-      "checksum": "sha256:e8dc0df3e04011bb7187dd4e5f38ff4cf318d78b39908f960dc6aa2f6fecd16c",
+      "checksum": "sha256:79b873a1002aec3dc0e2cdf19ee1bb34d5f6b6ea20ad1ddbe527f65094084e41",
       "files": 2
     },
     {
@@ -210,7 +180,7 @@
     {
       "id": "rr-midstream-independent-review-synthesis-001",
       "path": "skills/midstream/community/rr-midstream-independent-review-synthesis-001",
-      "checksum": "sha256:bbe913eec7e2bed8e919efb0d9375c3db7928ce548b7f2bb473e8e3fffed6600",
+      "checksum": "sha256:9554390455ba588dd39308a7742ee65cd5b19e1dcdab21e4f3740d247092e1a1",
       "files": 9
     },
     {
@@ -564,43 +534,43 @@
     {
       "id": "rr-upstream-test-code-nextjs-001",
       "path": "skills/upstream/rr-test-code-nextjs-001",
-      "checksum": "sha256:71c15e3e1f01da85448720bbb5239c00cfd08df40324bcf283a9b3b79f48fade",
+      "checksum": "sha256:4bc5d47a5c7afd61293155b1c3f48520170c6d2bd0dab76de4496f4e90ca5c9d",
       "files": 1
     },
     {
       "id": "rr-upstream-test-code-php-laravel-001",
       "path": "skills/upstream/rr-test-code-php-laravel-001",
-      "checksum": "sha256:cb9a57bac82f648d9b55bb108fd64c022042a62f5b6ff973b09759e7f33b03ec",
+      "checksum": "sha256:8e8dff6359cee9d4be35001ff02febc1e45af03f89d50cb8200ef70e3dacfcc0",
       "files": 1
     },
     {
       "id": "rr-upstream-test-code-react-001",
       "path": "skills/upstream/rr-test-code-react-001",
-      "checksum": "sha256:13ceaf2bcbad034e03eb5a97ebfc45cc76f8aab51ab260faa76ac6adf00dd10c",
+      "checksum": "sha256:6f66e62258bd595ddcd33c9af28e1875e48514f787e5739fa374af15949e0e00",
       "files": 1
     },
     {
       "id": "rr-upstream-test-code-remix-001",
       "path": "skills/upstream/rr-test-code-remix-001",
-      "checksum": "sha256:015def1f6dbbd7ced1abe57f30f0e9552496ed1946b5020cf3adddb6fd795014",
+      "checksum": "sha256:2e9f406faae047ca00bf4d655cb0b7b87f2b9f1825b248d35825aaa49a7dd73b",
       "files": 1
     },
     {
       "id": "rr-upstream-test-code-unit-python-pytest-001",
       "path": "skills/upstream/rr-test-code-unit-python-pytest-001",
-      "checksum": "sha256:d939bd82726a0de61737638991b2634faf7c9a510eae9a189f16ad87a96b167a",
+      "checksum": "sha256:0096f35307b505815aad902ac9b2d69f460f382e2467408745e46ff9323655fe",
       "files": 1
     },
     {
       "id": "rr-upstream-test-code-unit-ts-jest-001",
       "path": "skills/upstream/rr-test-code-unit-ts-jest-001",
-      "checksum": "sha256:8e9389ef6d353ce92f572b3235b8bff748034bb4656ae68e0ad3f989d1325a23",
+      "checksum": "sha256:8224c923be65193773ae05261f2b006c9357087548b2cadbe0e6fba727821711",
       "files": 1
     },
     {
       "id": "rr-upstream-test-code-vue-001",
       "path": "skills/upstream/rr-test-code-vue-001",
-      "checksum": "sha256:d91bbf54ecd2f7742a1380e2cca8b0b9bb53a6bdfbb7be16931fd299682238e2",
+      "checksum": "sha256:7052978cf1b0c6586d0583e9c6680209efe188a3fcd6d832da180b20acd3140c",
       "files": 1
     },
     {

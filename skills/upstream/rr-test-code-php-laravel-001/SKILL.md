@@ -8,7 +8,7 @@ phase: upstream
 applyTo:
   - 'docs/**/*.md'
   - 'specs/**/*.md'
-tags: [unit-test, tdd, php, laravel, phpunit]
+tags: [review-support, unit-test, tdd, php, laravel, phpunit]
 severity: major
 inputContext: [fullFile]
 outputKind: [tests]

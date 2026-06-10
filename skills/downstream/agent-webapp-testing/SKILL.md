@@ -11,6 +11,7 @@ applyTo:
   - 'src/**/*.{ts,tsx,js,jsx}'
   - '**/*.spec.{ts,tsx,js,jsx}'
 tags:
+  - review-support
   - agent
   - testing
   - playwright

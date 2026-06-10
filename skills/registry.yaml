@@ -62,51 +62,7 @@ skills:
     recommended: false
     description: '変更の全体設計、責務分離、境界の破綻を検知するためのレビュー手順。'
 
-  - id: agent-code-documentation
-    version: '0.1.0'
-    name: 'Code Documentation'
-    path: skills/upstream/agent-code-documentation/SKILL.md
-    category: upstream
-    phase: upstream
-    tags: [agent, documentation]
-    severity: minor
-    recommended: false
-    description: 'コードや API の意図を短時間で共有できるドキュメントの書き方をガイドする。'
-
   # Midstream Skills (Implementation Phase)
-  - id: agent-code-review
-    version: '0.1.0'
-    name: 'Code Review (Multi-perspective)'
-    path: skills/midstream/agent-code-review/SKILL.md
-    category: midstream
-    phase: midstream
-    tags: [agent, review, security, performance, quality]
-    severity: major
-    recommended: false
-    description: 'PR 向けの自動コードレビュー。セキュリティ・性能・品質・テスト観点で差分を評価する。'
-
-  - id: agent-code-quality
-    version: '0.1.0'
-    name: 'Code Quality'
-    path: skills/midstream/agent-code-quality/SKILL.md
-    category: midstream
-    phase: midstream
-    tags: [agent, quality, readability]
-    severity: minor
-    recommended: false
-    description: '可読性と保守性を中心に、コード品質の基本的な劣化を検知する。'
-
-  - id: agent-code-refactoring
-    version: '0.1.0'
-    name: 'Code Refactoring'
-    path: skills/midstream/agent-code-refactoring/SKILL.md
-    category: midstream
-    phase: midstream
-    tags: [agent, refactoring, maintainability]
-    severity: minor
-    recommended: false
-    description: '挙動を変えずに設計を整えるためのリファクタリング手順をガイドする。'
-
   - id: agent-test-coverage
     version: '0.1.0'
     name: 'Test Coverage'
@@ -117,17 +73,6 @@ skills:
     severity: major
     recommended: false
     description: '変更に対するテスト不足を検知し、最低限の補完方針を提示する。'
-
-  - id: agent-agentcheck-code-review
-    version: '0.1.0'
-    name: 'AgentCheck Code Review'
-    path: skills/midstream/agent-agentcheck-code-review/SKILL.md
-    category: midstream
-    phase: midstream
-    tags: [agent, automation, review]
-    severity: major
-    recommended: false
-    description: 'AgentCheck ベースでローカルリポジトリを走査し、PR 前のコードレビューを実行するスキル。'
 
   - id: rr-midstream-hello-skill-001
     version: '0.1.0'
@@ -377,7 +322,7 @@ skills:
     path: skills/downstream/agent-qa-regression/SKILL.md
     category: downstream
     phase: downstream
-    tags: [agent, testing, regression, playwright]
+    tags: [review-support, agent, testing, regression, playwright]
     severity: major
     recommended: false
     description: 'Playwright を使った回帰テストの設計と実行をガイドする。'
@@ -388,7 +333,7 @@ skills:
     path: skills/downstream/agent-webapp-testing/SKILL.md
     category: downstream
     phase: downstream
-    tags: [agent, testing, playwright, webapp]
+    tags: [review-support, agent, testing, playwright, webapp]
     severity: major
     recommended: false
     description: 'Playwright でローカル/プレビュー環境の Web アプリを操作・検証するための手順をまとめる。'
@@ -446,7 +391,7 @@ skills:
     path: skills/upstream/rr-test-code-nextjs-001/SKILL.md
     category: upstream
     phase: upstream
-    tags: [unit-test, tdd, nextjs, react, testing-library]
+    tags: [review-support, unit-test, tdd, nextjs, react, testing-library]
     severity: major
     recommended: false
     description: 'Generate React/Next.js component test skeletons (RTL) from specifications.'
@@ -457,7 +402,7 @@ skills:
     path: skills/upstream/rr-test-code-php-laravel-001/SKILL.md
     category: upstream
     phase: upstream
-    tags: [unit-test, tdd, php, laravel, phpunit]
+    tags: [review-support, unit-test, tdd, php, laravel, phpunit]
     severity: major
     recommended: false
     description: 'Generate PHP/Laravel (PHPUnit) test skeletons from specifications.'
@@ -468,7 +413,7 @@ skills:
     path: skills/upstream/rr-test-code-react-001/SKILL.md
     category: upstream
     phase: upstream
-    tags: [unit-test, tdd, react, testing-library, vite]
+    tags: [review-support, unit-test, tdd, react, testing-library, vite]
     severity: major
     recommended: false
     description: 'Generate generic React component test skeletons (RTL) from specifications.'
@@ -479,7 +424,7 @@ skills:
     path: skills/upstream/rr-test-code-remix-001/SKILL.md
     category: upstream
     phase: upstream
-    tags: [unit-test, tdd, remix, react, vitest]
+    tags: [review-support, unit-test, tdd, remix, react, vitest]
     severity: major
     recommended: false
     description: 'Generate Remix loader/action and route component test skeletons.'
@@ -490,7 +435,7 @@ skills:
     path: skills/upstream/rr-test-code-unit-python-pytest-001/SKILL.md
     category: upstream
     phase: upstream
-    tags: [unit-test, tdd, python]
+    tags: [review-support, unit-test, tdd, python]
     severity: major
     recommended: false
     description: 'Generate Python/pytest unit test skeletons from specifications.'
@@ -501,7 +446,7 @@ skills:
     path: skills/upstream/rr-test-code-unit-ts-jest-001/SKILL.md
     category: upstream
     phase: upstream
-    tags: [unit-test, tdd, typescript, jest, vitest]
+    tags: [review-support, unit-test, tdd, typescript, jest, vitest]
     severity: major
     recommended: false
     description: 'Generate TypeScript unit test skeletons (Jest/Vitest) from specifications.'
@@ -512,7 +457,7 @@ skills:
     path: skills/upstream/rr-test-code-vue-001/SKILL.md
     category: upstream
     phase: upstream
-    tags: [unit-test, tdd, vue, vitest, vue-test-utils]
+    tags: [review-support, unit-test, tdd, vue, vitest, vue-test-utils]
     severity: major
     recommended: false
     description: 'Generate Vue.js component test skeletons (Vue Test Utils) from specifications.'

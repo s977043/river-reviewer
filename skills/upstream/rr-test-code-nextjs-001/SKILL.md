@@ -8,7 +8,7 @@ phase: upstream
 applyTo:
   - 'docs/**/*.md'
   - 'specs/**/*.md'
-tags: [unit-test, tdd, nextjs, react, testing-library]
+tags: [review-support, unit-test, tdd, nextjs, react, testing-library]
 severity: major
 inputContext: [fullFile]
 outputKind: [tests]
