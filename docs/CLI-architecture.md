@@ -52,3 +52,17 @@
 - GitHub Action は `runners/github-action/dist/` 配下のバンドル済み JS を実行するため、`runners/github-action/src/**` を変更したら `npm run build:action` で `dist/` を再生成しないと CI の "Action dist freshness" が落ちる (`docs/development/dist-check-rebuild-guide.md` 参照)。
 - 両 CLI ともデフォルト `phase` は `midstream`。`RIVER_PHASE` / `RIVER_PLANNER_MODE` / `RIVER_AVAILABLE_CONTEXTS` / `RIVER_AVAILABLE_DEPENDENCIES` などの `RIVER_*` 環境変数はメイン CLI でのみ参照される (Runner CLI は対応する `--phase` / `--context` / `--dependency` オプションでの明示が必要)。
 - Runner CLI は `commander` の自動 help を使うため、メイン CLI の `printHelp()` (`src/cli.mjs`) と書式が揃っていない。両ヘルプを同期する責務は今のところ無い。
+
+## Thin adapter 原則（GitHub Action / 各エージェント連携）
+
+GitHub Action をはじめとする各実行面は、レビュー判断を持たない **thin adapter** として設計する（#1045 §4）。
+
+- **正規実行面はメイン CLI**（`src/cli.mjs`）である。skill / pack の解決、gate 判定、selection の解釈、出力スキーマはすべて CLI 側に置く
+- GitHub Action の責務は次の 3 点に限定する
+  1. repository / PR コンテキストの収集（イベントペイロード、ラベル、PR 本文）
+  2. CLI の実行（`dist/index.mjs run <repo>`—`src/cli.mjs` の ncc バンドル）
+  3. 結果（JSON / findings）の PR コメント・summary への変換
+- Claude Code / Codex プラグイン、Codex skill、shell 連携も同様に「CLI（または同一の skill 定義）を呼ぶ薄い層」とし、Action や plugin 側へレビュー方針・skill 解決ロジックを複製しない
+- adapter 側に判断を足したくなった場合は、CLI のフラグ / config（`.river-review.yaml`）へ昇格させてから adapter で透過させる
+
+この原則により、`river skills resolve` 等での選択結果と実際の実行結果が、どの実行面でも一致することを保証する。

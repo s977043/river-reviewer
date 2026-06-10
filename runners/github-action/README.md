@@ -4,6 +4,8 @@ GitHub Action runner for River Review - a phase-aware code review tool with inte
 
 ## Overview
 
+This GitHub Action is a **thin adapter** around the main River Review CLI: it collects repository/PR context, invokes the bundled CLI (`dist/index.mjs`, an ncc build of `src/cli.mjs`), and converts the result into PR comments and summaries. Skill/pack resolution, gates, and selection semantics all live in the CLI, so resolution behaves identically across the Action, local runs, and agent plugins (see `docs/CLI-architecture.md`).
+
 This GitHub Action allows you to run River Review as part of your CI/CD workflow. It integrates with GitHub pull requests to provide automated code reviews across three phases: upstream (requirements/specs), midstream (implementation), and downstream (testing/deployment).
 
 ## Usage
