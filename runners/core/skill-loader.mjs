@@ -140,6 +140,96 @@ export async function resolveRecommendationSet(name, { skillsDir = defaultSkills
   return entry.skills.filter((id) => typeof id === 'string' && id.length > 0);
 }
 
+/**
+ * Read the pack manifests declared under `packs:` in skills/registry.yaml.
+ * Packs are the distribution unit for bundled open review knowledge
+ * (docs/development/skill-pack-design.md). Unlike `recommendations:` (an
+ * object keyed by name), `packs:` is an array of entries with an `id` field.
+ *
+ * @param {{ skillsDir?: string }} [options]
+ * @returns {Promise<Array<{ id: string, skills: string[] }>>}
+ */
+export async function loadPacks({ skillsDir = defaultSkillsDir } = {}) {
+  const registryPath = path.join(skillsDir, 'registry.yaml');
+  let raw;
+  try {
+    raw = await fs.readFile(registryPath, 'utf8');
+  } catch {
+    return [];
+  }
+  let parsed;
+  try {
+    parsed = yaml.load(raw) ?? {};
+  } catch (err) {
+    throw new SkillLoaderError(`Failed to parse skill registry at ${registryPath}: ${err.message}`);
+  }
+  const packs = parsed?.packs;
+  return Array.isArray(packs) ? packs.filter((p) => p && typeof p.id === 'string') : [];
+}
+
+/**
+ * Resolve one or more skill-set names (comma separated) to a deduplicated
+ * skill id list. Resolution order per name: packs first, then
+ * recommendations as a fallback. Multiple names are set-unioned so each
+ * skill runs at most once (skill-pack-design.md §2 principle 1).
+ *
+ * During the packs/recommendations coexistence period a name present in
+ * both resolves to the pack and emits a warning (same-id conflicts become
+ * validate errors in Phase D).
+ *
+ * @param {string} names comma-separated pack/recommendation-set names
+ * @param {{ skillsDir?: string, warn?: (msg: string) => void }} [options]
+ * @returns {Promise<string[]>} deduplicated skill ids preserving first-seen order
+ * @throws {SkillLoaderError} when a name matches neither a pack nor a recommendation set
+ */
+export async function resolveSkillSet(
+  names,
+  { skillsDir = defaultSkillsDir, warn = (msg) => console.warn(msg) } = {}
+) {
+  const requested = String(names ?? '')
+    .split(',')
+    .map((n) => n.trim())
+    .filter(Boolean);
+  if (!requested.length) return [];
+  const [packs, sets] = await Promise.all([
+    loadPacks({ skillsDir }),
+    loadRecommendationSets({ skillsDir }),
+  ]);
+  const resolved = [];
+  for (const name of requested) {
+    const pack = packs.find((p) => p.id === name);
+    const recommendation = sets[name];
+    if (pack && !Array.isArray(pack.skills)) {
+      throw new SkillLoaderError(
+        `Pack "${name}" is malformed: \`skills\` must be an array. Fix skills/registry.yaml.`
+      );
+    }
+    if (pack) {
+      if (recommendation) {
+        warn(
+          `⚠️  Skill set "${name}" exists as both a pack and a recommendation set; using the pack. ` +
+            'Rename or remove the recommendation entry before Phase D, when this becomes an error.'
+        );
+      }
+      resolved.push(...pack.skills);
+      continue;
+    }
+    if (recommendation && Array.isArray(recommendation.skills)) {
+      resolved.push(...recommendation.skills);
+      continue;
+    }
+    const available =
+      [...packs.map((p) => p.id), ...Object.keys(sets)].sort().join(', ') || '(none)';
+    throw new SkillLoaderError(`Unknown skill set "${name}". Available sets: ${available}.`);
+  }
+  const seen = new Set();
+  return resolved.filter((id) => {
+    if (typeof id !== 'string' || !id.length || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
 export async function listSkillFiles(dir = defaultSkillsDir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = [];

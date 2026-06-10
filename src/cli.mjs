@@ -12,7 +12,7 @@ import {
   findMergeBase,
 } from './lib/git.mjs';
 import { doctorLocalReview, planLocalReview, runLocalReview } from './lib/local-runner.mjs';
-import { SkillLoaderError, resolveRecommendationSet } from '../runners/core/skill-loader.mjs';
+import { SkillLoaderError, resolveSkillSet } from '../runners/core/skill-loader.mjs';
 import { collectRepoDiff } from './lib/diff.mjs';
 import { renderDiffText } from './lib/diff-optimizer.mjs';
 import CostEstimator from './core/cost-estimator.mjs';
@@ -1094,7 +1094,7 @@ async function main(argv = process.argv.slice(2)) {
       let reviewSkillIds = null;
       if (parsed.skillSet && !isExecPlanReplay) {
         try {
-          reviewSkillIds = await resolveRecommendationSet(parsed.skillSet);
+          reviewSkillIds = await resolveSkillSet(parsed.skillSet);
         } catch (err) {
           if (err instanceof SkillLoaderError) {
             console.error(`Error: ${err.message}`);
@@ -1428,7 +1428,7 @@ Dependencies: ${
     let skillIds = null;
     if (parsed.skillSet) {
       try {
-        skillIds = await resolveRecommendationSet(parsed.skillSet);
+        skillIds = await resolveSkillSet(parsed.skillSet);
       } catch (err) {
         if (err instanceof SkillLoaderError) {
           console.error(`Error: ${err.message}`);

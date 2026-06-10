@@ -847,7 +847,32 @@ skills:
     recommended: false
     description: '既存のレビュー結果 (review-self / review-external) を再点検し、漏れ・誤検知・ハルシネーション・根拠欠落を検出する W チェック skill'
 
+# ------------------------------------------------------------------
+# Skill Packs (distribution units for bundled open review knowledge)
+# Schema: schemas/pack.schema.json / Design: docs/development/skill-pack-design.md
+# Resolution: `--skill-set <id>` checks packs first, then recommendations.
+# ------------------------------------------------------------------
+packs:
+  - id: typescript
+    version: '0.1.0'
+    name: 'TypeScript Review Pack'
+    description: 'TypeScript の型安全・null 安全・型駆動設計のレビュー基準'
+    axis: technology
+    tier: community
+    sources:
+      - name: 'TypeScript Handbook'
+        version: 'TS 5.x'
+        url: 'https://www.typescriptlang.org/docs/handbook/'
+        reviewed_at: '2026-06-10'
+    skills:
+      - rr-midstream-typescript-strict-001
+      - rr-midstream-typescript-nullcheck-001
+      - rr-midstream-type-driven-design-001
+
 # Recommended skill sets
+# NOTE: new additions are frozen (skill-pack-design.md §2). New bundles go to
+# `packs:` above. A name that collides with a pack id resolves to the pack
+# (with a warning) and the recommendation entry will be removed in Phase D.
 recommendations:
   basic:
     description: 'Basic skill set for getting started'
@@ -856,7 +881,7 @@ recommendations:
       - rr-midstream-logging-observability-001
 
   typescript:
-    description: 'Recommended skills for TypeScript projects'
+    description: 'DEPRECATED: superseded by the `typescript` pack (security/logging moved out; use `--skill-set typescript,basic` for the old behavior)'
     skills:
       - rr-midstream-typescript-strict-001
       - rr-midstream-typescript-nullcheck-001
