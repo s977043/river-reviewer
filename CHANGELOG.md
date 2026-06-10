@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.8.0](https://github.com/s977043/river-review/compare/v1.7.0...v1.8.0) (2026-06-10)
+
+
+### Features
+
+* **loop:** feedback capture CLI and feedback:apply scaffolder (L-2 P0) ([#1112](https://github.com/s977043/river-review/issues/1112)) ([06b625f](https://github.com/s977043/river-review/commit/06b625f0d2659394081380b08fafcc5e5439e7e4))
+* **loop:** suppression analytics and nightly eval regression auto-issue (L-3) ([#1114](https://github.com/s977043/river-review/issues/1114)) ([39107db](https://github.com/s977043/river-review/commit/39107dbe50f873cf7b71303bff819e178bcc4a4c))
+* **skills:** ddd pack with degraded mode and pack tier assessment (Phase C) ([#1113](https://github.com/s977043/river-review/issues/1113)) ([29913e3](https://github.com/s977043/river-review/commit/29913e3cc82faf6f7bcbca967ad6a00dc122c0ba))
+* **skills:** pack resolver, pack schema, and first typescript pack (Phase B) ([#1111](https://github.com/s977043/river-review/issues/1111)) ([8445983](https://github.com/s977043/river-review/commit/84459833a5b9ddca16cdb837931cff286972bfe5))
+
+
+### Bug Fixes
+
+* **docs:** repair 5 broken links failing lychee on every PR ([#1108](https://github.com/s977043/river-review/issues/1108)) ([203fb31](https://github.com/s977043/river-review/commit/203fb310f24e3ec1d9820dc00e69f1669a25fa0c))
+* **skills:** register 6 catalog-drifted skills in registry.yaml ([#1107](https://github.com/s977043/river-review/issues/1107)) ([8f7e4f4](https://github.com/s977043/river-review/commit/8f7e4f4d41a91c7da1e585774b2cb44fefd0e4e6))
+
 ## [1.7.0](https://github.com/s977043/river-review/compare/v1.6.1...v1.7.0) (2026-06-09)
 
 
