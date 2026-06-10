@@ -15,7 +15,7 @@
 
 ## 使い方（selection 実装後）
 
-1. サンプルを自分のリポジトリの `.river-review.yaml` にコピーする
+1. サンプルの `selection` セクションを、自分のリポジトリの既存 `.river-review.yaml` に **マージ** する（`model` / `review` / `exclude` など既存セクションを上書きしないこと。config が無い場合はファイルごとコピーしてよい）
 2. `selection.skills.include` をスタックに合わせて取捨選択する
 3. `river run .` / GitHub Actions の両方が同じ宣言を読む
 

@@ -144,6 +144,7 @@ selection:
 設計上のルールは次の通りです。
 
 - 優先順位は `exclude > include > packs / tags の union` とする
+- `minTier` は **tags による暗黙追加にのみ** 適用する。`packs:` に明示指定した pack は minTier 未満でも実行する（明示は意図的な選択とみなす）。その際は tier 不足の警告をログに出す
 - selection は「実行するか」の宣言であり、suppression（finding 単位の抑制）とは役割を分ける
 - CLI の `--skill-set` は selection の一時上書き手段として位置づけ直す
 - 環境変数（`RIVER_PACKS` 等）は CI での一時上書き用の補助とし、SSoT は `.river-review.yaml` とする
