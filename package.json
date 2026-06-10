@@ -65,7 +65,8 @@
     "eval:compare": "node scripts/compare-eval-ledger.mjs",
     "usage:summary": "node scripts/usage-summary.mjs",
     "skills:manifest": "node scripts/generate-skill-manifest.mjs",
-    "skills:manifest:check": "node scripts/generate-skill-manifest.mjs --check"
+    "skills:manifest:check": "node scripts/generate-skill-manifest.mjs --check",
+    "feedback:apply": "node scripts/apply-feedback.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",
