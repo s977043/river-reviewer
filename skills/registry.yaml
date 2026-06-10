@@ -206,6 +206,28 @@ skills:
     recommended: true
     description: 'Meta-review skill: detects review findings that belong in CI/lint/formatter rather than human review'
 
+  - id: rr-midstream-loading-state-001
+    version: '0.1.0'
+    name: 'Loading State Transition Review'
+    path: skills/midstream/rr-midstream-loading-state-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [ux, loading-state, error-handling, midstream]
+    severity: major
+    recommended: false
+    description: 'Detect missing loading/error/empty state handling that could trap users in spinners or disabled states.'
+
+  - id: rr-midstream-nullability-contract-001
+    version: '0.1.0'
+    name: 'Nullability Contract Review'
+    path: skills/midstream/rr-midstream-nullability-contract-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [nullability, contract, type-safety, defensive-programming, midstream]
+    severity: major
+    recommended: false
+    description: 'Detect null/undefined/empty handling gaps where callers or consumers may receive unexpected nullish values.'
+
   # ------------------------------------------------------------------
   # Community Skills (Experimental tier; recommended: false)
   # ------------------------------------------------------------------
@@ -337,6 +359,50 @@ skills:
     severity: major
     recommended: false
     description: 'Playwright でローカル/プレビュー環境の Web アプリを操作・検証するための手順をまとめる。'
+
+  - id: rr-downstream-test-existence-001
+    version: '0.1.0'
+    name: 'Test Presence for Changed Code'
+    path: skills/downstream/rr-downstream-test-existence-001/SKILL.md
+    category: downstream
+    phase: downstream
+    tags: [tests, coverage, downstream]
+    severity: major
+    recommended: true
+    description: 'Check whether changed code paths have corresponding tests and suggest minimal coverage.'
+
+  - id: rr-downstream-coverage-gap-001
+    version: '0.1.0'
+    name: 'Coverage and Failure Path Gaps'
+    path: skills/downstream/rr-downstream-coverage-gap-001/SKILL.md
+    category: downstream
+    phase: downstream
+    tags: [tests, coverage, reliability, downstream]
+    severity: major
+    recommended: true
+    description: 'Find missing tests for critical paths, edge cases, and failure handling in changed code.'
+
+  - id: rr-downstream-test-naming-001
+    version: '0.1.0'
+    name: 'Test Naming and Structure'
+    path: skills/downstream/rr-downstream-test-naming-001/SKILL.md
+    category: downstream
+    phase: downstream
+    tags: [tests, naming, downstream]
+    severity: minor
+    recommended: false
+    description: 'Ensure tests use clear naming and cover edge cases with proper describe/it structure.'
+
+  - id: rr-downstream-flaky-test-001
+    version: '0.1.0'
+    name: 'Flaky Test Risk Check'
+    path: skills/downstream/rr-downstream-flaky-test-001/SKILL.md
+    category: downstream
+    phase: downstream
+    tags: [tests, reliability, flakiness, downstream]
+    severity: major
+    recommended: false
+    description: 'Detects patterns that make tests flaky and proposes stabilization steps.'
 
   # Adversarial Review Skills (Cognitive Bias Countermeasures)
   - id: rr-upstream-pre-mortem-001
