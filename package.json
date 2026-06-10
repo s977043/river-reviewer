@@ -68,7 +68,8 @@
     "skills:manifest:check": "node scripts/generate-skill-manifest.mjs --check",
     "feedback:apply": "node scripts/apply-feedback.mjs",
     "packs:tier": "node scripts/pack-tier-check.mjs",
-    "suppression:analytics": "node scripts/suppression-analytics.mjs"
+    "suppression:analytics": "node scripts/suppression-analytics.mjs",
+    "feedback:rules": "node scripts/feedback-rule-candidates.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",

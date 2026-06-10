@@ -89,8 +89,18 @@ function computeDelta(prev, curr) {
     if (isRegression) regression = true;
     rows.push({ key: k, prev: a, curr: b, delta, regression: isRegression, lowerIsBetter });
   }
-  return { rows, regression };
+  // Per-skill FP worsening beyond +3pt is a regression signal too
+  // (improvement-loop L-4): aggregate rates can mask a single skill
+  // degrading while others improve.
+  const fpRows = diffPerSkillFp(prev.snapshots?.perSkillFp, curr.snapshots?.perSkillFp);
+  const fpRegressions = fpRows.filter((r) => r.rateDelta > PER_SKILL_FP_REGRESSION_THRESHOLD);
+  if (fpRegressions.length) regression = true;
+  return { rows, regression, fpRows, fpRegressions };
 }
+
+// +3pt per-skill FP rate increase between snapshots flags a regression
+// (docs/development/skill-improvement-loop-design.md §3 L5).
+const PER_SKILL_FP_REGRESSION_THRESHOLD = 0.03;
 
 function formatNumber(v) {
   if (typeof v !== 'number') return v == null ? '-' : String(v);
@@ -194,7 +204,7 @@ function renderMarkdown(prev, curr, delta) {
       } | ${noteFull} |`
     );
   }
-  // --- snapshot diffs (informational, never regression) ---
+  // --- snapshot diffs (severity/top1 informational; per-skill FP feeds regression) ---
   const sevDiff = diffSeverity(prev.snapshots?.severity, curr.snapshots?.severity);
   if (sevDiff.length) {
     lines.push('');
@@ -221,7 +231,7 @@ function renderMarkdown(prev, curr, delta) {
     }
   }
 
-  const fpDiff = diffPerSkillFp(prev.snapshots?.perSkillFp, curr.snapshots?.perSkillFp);
+  const fpDiff = delta.fpRows ?? [];
   if (fpDiff.length) {
     lines.push('');
     lines.push('## Per-skill false-positive rate changes');
@@ -231,7 +241,12 @@ function renderMarkdown(prev, curr, delta) {
     for (const r of fpDiff) {
       const fmtCell = (s) => `${s.fps}/${s.guards} = ${formatNumber(s.fpRate)}`;
       const sign = r.rateDelta >= 0 ? '+' : '';
-      const note = r.regression ? '⚠ FP increased' : '✓ FP decreased';
+      const note =
+        r.rateDelta > PER_SKILL_FP_REGRESSION_THRESHOLD
+          ? '⚠ regression (>+3pt)'
+          : r.regression
+            ? '⚠ FP increased'
+            : '✓ FP decreased';
       lines.push(
         `| ${r.id} | ${fmtCell(r.prev)} | ${fmtCell(r.curr)} | ${sign}${formatNumber(r.rateDelta)} | ${note} |`
       );
@@ -289,6 +304,8 @@ async function main() {
         previous: prev,
         latest: curr,
         delta: delta.rows,
+        perSkillFp: delta.fpRows,
+        perSkillFpRegressions: delta.fpRegressions,
         regression: delta.regression,
       }) + '\n'
     );
