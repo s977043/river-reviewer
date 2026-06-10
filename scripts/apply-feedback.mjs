@@ -35,10 +35,14 @@ export async function applyFeedback({ month = null, write = false, root = repoRo
           await fs.access(target);
           log(`  fixture: ${scaffold.fixtureStub.suggestedPath} (exists, skipped)`);
         } catch {
-          await fs.mkdir(path.dirname(target), { recursive: true });
-          await fs.writeFile(target, scaffold.fixtureStub.content, 'utf8');
-          written.push(scaffold.fixtureStub.suggestedPath);
-          log(`  fixture: ${scaffold.fixtureStub.suggestedPath} (stub written — fill TODOs)`);
+          try {
+            await fs.mkdir(path.dirname(target), { recursive: true });
+            await fs.writeFile(target, scaffold.fixtureStub.content, 'utf8');
+            written.push(scaffold.fixtureStub.suggestedPath);
+            log(`  fixture: ${scaffold.fixtureStub.suggestedPath} (stub written — fill TODOs)`);
+          } catch (err) {
+            console.error(`  fixture: failed to write ${scaffold.fixtureStub.suggestedPath}: ${err.message}`);
+          }
         }
       } else {
         log(`  fixture: ${scaffold.fixtureStub.suggestedPath} (pass --write to create the stub)`);

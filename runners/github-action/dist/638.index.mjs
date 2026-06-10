@@ -128,7 +128,13 @@ async function listFeedbackEntries({ repoRoot, month = null, warn = () => {} }) 
   if (month) files = files.filter((f) => f === `${month}.jsonl`);
   const entries = [];
   for (const file of files) {
-    const raw = await fs.readFile(path.join(dir, file), 'utf8');
+    let raw;
+    try {
+      raw = await fs.readFile(path.join(dir, file), 'utf8');
+    } catch (err) {
+      warn(`⚠️  ${file}: unreadable, skipped (${err.message})`);
+      continue;
+    }
     for (const line of raw.split('\n')) {
       if (!line.trim()) continue;
       try {
@@ -179,7 +185,7 @@ function buildFeedbackScaffold(entry) {
       return {
         action: 'suppression entry (rationale required)',
         verify: ['npm run skills:validate', 'npm run eval:regression'],
-        command: `river suppression add --fingerprint ${findingFingerprint ?? '<16-hex>'} --feedback accepted_risk --rationale "${evidence ?? '<why this risk is accepted>'}"`,
+        command: `river suppression add --fingerprint ${findingFingerprint ?? '<16-hex>'} --feedback accepted_risk --rationale "${(evidence ?? '<why this risk is accepted>').replaceAll('"', '\\"')}"`,
       };
     case 'not_actionable':
     case 'unclear':
