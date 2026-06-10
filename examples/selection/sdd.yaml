@@ -10,7 +10,6 @@ selection:
     include:
       # 仕様・計画の品質（実装前ゲート）
       - rr-upstream-requirements-acceptance-001 # 受け入れ基準・スコープの明確性
-      - rr-upstream-create-plan-001 # 実行計画の作成とレビュー
       - rr-upstream-plangate-plan-integrity-001 # pbi-input / plan / todo / test-cases の整合
       # 実装と計画の整合（実装中ゲート）
       - rr-upstream-plangate-exec-conformance-001 # 差分が plan から逸脱していないか

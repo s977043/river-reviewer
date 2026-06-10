@@ -803,17 +803,6 @@ skills:
     recommended: false
     description: 'Checks design/ADR docs for consistency and missing decisions.'
 
-  - id: rr-upstream-create-plan-001
-    version: '0.1.0'
-    name: '計画作成とレビュー'
-    path: skills/upstream/rr-upstream-create-plan-001/SKILL.md
-    category: upstream
-    phase: upstream
-    tags: [planning, upstream]
-    severity: minor
-    recommended: true
-    description: '課題のゴールと制約を整理し、仮説・リスク付きの実行計画を段階的に提示して人間レビューにかける'
-
   - id: rr-upstream-pr-template-qa-001
     version: '0.1.0'
     name: 'PRテンプレート品質チェック'

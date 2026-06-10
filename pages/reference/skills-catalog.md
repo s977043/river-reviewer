@@ -356,24 +356,6 @@ signals to keep knowledge aligned.`
 
 - findings / actions
 
-### `rr-upstream-create-plan-001`
-
-- 名前: `計画作成とレビュー`
-- 概要: `課題のゴールと制約を整理し、仮説・リスク付きの実行計画を段階的に提示して人間レビューにかける`
-- 対象:
-  - `docs/**/*`
-  - `pages/**/*`
-  - `docs/adr/**/*`
-  - `**/*.adr`
-- 重要度: minor
-- タグ: planning / upstream
-- 依存関係: none
-- 適用条件: phase=upstream, inputContext=diff / repoConfig
-
-チェック項目の例:
-
-- summary / actions / questions
-
 ### `rr-upstream-data-flow-state-ownership-001`
 
 - 名前: `Data Flow & State Ownership`
