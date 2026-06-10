@@ -385,9 +385,7 @@ Options:
     const [severity, top1PerCase, perSkillFp] = await Promise.all([
       getSeverityDistribution(),
       getTop1PerCase(),
-      fixturesRaw
-        ? getPerSkillFpRate(fixturesRaw.result, fixturesRaw.cases)
-        : getPerSkillFpRate(),
+      fixturesRaw ? getPerSkillFpRate(fixturesRaw.result, fixturesRaw.cases) : getPerSkillFpRate(),
     ]);
     snapshots = { severity, top1PerCase, perSkillFp };
   } catch (err) {

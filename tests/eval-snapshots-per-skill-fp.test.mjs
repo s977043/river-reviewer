@@ -1,9 +1,6 @@
 import assert from 'node:assert/strict';
 import test, { describe } from 'node:test';
-import {
-  computePerSkillFpRate,
-  getPerSkillFpRate,
-} from '../src/lib/eval-snapshots.mjs';
+import { computePerSkillFpRate, getPerSkillFpRate } from '../src/lib/eval-snapshots.mjs';
 
 // computePerSkillFpRate is the pure accumulator extracted in Issue #793.
 // It must return identical output whether called directly (fast path) or

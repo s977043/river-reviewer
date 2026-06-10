@@ -28,7 +28,11 @@ test('planSkills uses llmPlan ordering and reasons', async () => {
     }));
   };
 
-  const { planned, reasons, fallback } = await planSkills({ skills, context: mockContext, llmPlan });
+  const { planned, reasons, fallback } = await planSkills({
+    skills,
+    context: mockContext,
+    llmPlan,
+  });
   assert.equal(planned.length, skills.length);
   assert.equal(reasons.length, skills.length);
   assert.equal(fallback, false);

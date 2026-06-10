@@ -10,7 +10,8 @@ function makeFinding(overrides = {}) {
     lineStart: 10,
     lineEnd: 10,
     title: 'Possible null dereference in foo',
-    message: 'Finding: null-check Evidence: obj.foo called without guard here Impact: crash Fix: guard Severity: major Confidence: high',
+    message:
+      'Finding: null-check Evidence: obj.foo called without guard here Impact: crash Fix: guard Severity: major Confidence: high',
     severity: 'major',
     confidence: 'high',
     status: 'open',
@@ -21,7 +22,15 @@ function makeFinding(overrides = {}) {
 
 describe('diffReviews', () => {
   it('all-new when previous is empty', () => {
-    const curr = [makeFinding(), makeFinding({ ruleId: 'sql-injection', file: 'src/bar.mjs', message: 'Finding: sql Evidence: query concat Impact: injection Fix: parameterize Severity: critical Confidence: high' })];
+    const curr = [
+      makeFinding(),
+      makeFinding({
+        ruleId: 'sql-injection',
+        file: 'src/bar.mjs',
+        message:
+          'Finding: sql Evidence: query concat Impact: injection Fix: parameterize Severity: critical Confidence: high',
+      }),
+    ];
     const diff = diffReviews([], curr);
     assert.equal(diff.new.length, 2);
     assert.equal(diff.resolved.length, 0);
@@ -66,8 +75,18 @@ describe('diffReviews', () => {
   it('regression score = new - resolved', () => {
     const prev = [makeFinding()];
     const curr = [
-      makeFinding({ ruleId: 'sql-injection', file: 'src/bar.mjs', message: 'Finding: sql Evidence: query concat here Impact: injection Fix: param Severity: critical Confidence: high' }),
-      makeFinding({ ruleId: 'path-traversal', file: 'src/baz.mjs', message: 'Finding: path Evidence: user path used directly Impact: traversal Fix: sanitize Severity: critical Confidence: high' }),
+      makeFinding({
+        ruleId: 'sql-injection',
+        file: 'src/bar.mjs',
+        message:
+          'Finding: sql Evidence: query concat here Impact: injection Fix: param Severity: critical Confidence: high',
+      }),
+      makeFinding({
+        ruleId: 'path-traversal',
+        file: 'src/baz.mjs',
+        message:
+          'Finding: path Evidence: user path used directly Impact: traversal Fix: sanitize Severity: critical Confidence: high',
+      }),
     ];
     const diff = diffReviews(prev, curr);
     assert.equal(diff.summary.regressionScore, 2 - 1);

@@ -31,7 +31,9 @@ const markdownDiff = `diff --git a/README.md b/README.md
 
 function buildLargeDiff() {
   const before = Array.from({ length: 250 }, (_, i) => `${i + 1}`).join('\n');
-  const after = Array.from({ length: 250 }, (_, i) => `${i + 1}`).concat(['251', '252', '253']).join('\n');
+  const after = Array.from({ length: 250 }, (_, i) => `${i + 1}`)
+    .concat(['251', '252', '253'])
+    .join('\n');
   return `diff --git a/src/big.js b/src/big.js
 --- a/src/big.js
 +++ b/src/big.js

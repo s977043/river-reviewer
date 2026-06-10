@@ -67,7 +67,7 @@ function parseArgs(argv) {
       const raw = requireValue(argv, i, '--excluded-tags');
       args.excludedTags = raw
         .split(',')
-        .map(s => s.trim())
+        .map((s) => s.trim())
         .filter(Boolean);
       i++;
       continue;
@@ -119,7 +119,9 @@ Options:
   });
 
   const compareBaseline = args.compare ? await readJsonFile(args.compare) : null;
-  const comparison = compareBaseline ? compareEvaluations(compareBaseline, { summary, cases }) : null;
+  const comparison = compareBaseline
+    ? compareEvaluations(compareBaseline, { summary, cases })
+    : null;
 
   if (jsonMode) {
     const payload = {
@@ -143,7 +145,9 @@ Options:
   console.log('Planner dataset evaluation summary:');
   console.log(`- cases: ${summary.cases}`);
   console.log(`- coverage(avg): ${(summary.coverage * 100).toFixed(1)}%`);
-  console.log(`- top1Match(avg): ${(summary.top1Match * 100).toFixed(1)}% (cases: ${summary.top1MatchCases})`);
+  console.log(
+    `- top1Match(avg): ${(summary.top1Match * 100).toFixed(1)}% (cases: ${summary.top1MatchCases})`
+  );
 
   if (comparison) {
     console.log('\nComparison (vs baseline):');
@@ -190,7 +194,7 @@ Options:
   }
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
@@ -211,7 +215,7 @@ async function readJsonFile(filePath) {
 }
 
 function compareEvaluations(baseline, current) {
-  const normalize = value => ({
+  const normalize = (value) => ({
     summary: value?.summary ?? {},
     cases: value?.cases ?? [],
   });
@@ -219,8 +223,8 @@ function compareEvaluations(baseline, current) {
   const base = normalize(baseline);
   const curr = normalize(current);
 
-  const baseByName = new Map(base.cases.map(c => [c.name, c]));
-  const currByName = new Map(curr.cases.map(c => [c.name, c]));
+  const baseByName = new Map(base.cases.map((c) => [c.name, c]));
+  const currByName = new Map(curr.cases.map((c) => [c.name, c]));
   const allNames = new Set([...baseByName.keys(), ...currByName.keys()]);
 
   const addedCases = [];
@@ -246,7 +250,8 @@ function compareEvaluations(baseline, current) {
     const top1Changed = (b.top1 ?? null) !== (c.top1 ?? null);
     const coverageChanged = Math.abs((b.coverage ?? 0) - (c.coverage ?? 0)) > 1e-9;
     const top1MatchChanged = (b.top1Match ?? null) !== (c.top1Match ?? null);
-    const missingChanged = normalizeSetLikeArray(b.missingExpected) !== normalizeSetLikeArray(c.missingExpected);
+    const missingChanged =
+      normalizeSetLikeArray(b.missingExpected) !== normalizeSetLikeArray(c.missingExpected);
     const anyChanged = top1Changed || coverageChanged || top1MatchChanged || missingChanged;
 
     if (!anyChanged) {
@@ -299,10 +304,10 @@ function normalizeSetLikeArray(value) {
 }
 
 function printReport({ summary, cases }) {
-  const top1Counts = countBy(cases, c => c.top1 ?? '(none)');
-  const casesWithExpectedTop1 = cases.filter(c => (c.expectedTop1 ?? []).length > 0);
-  const mismatches = casesWithExpectedTop1.filter(c => c.top1Match === 0);
-  const mismatchTop1Counts = countBy(mismatches, c => c.top1 ?? '(none)');
+  const top1Counts = countBy(cases, (c) => c.top1 ?? '(none)');
+  const casesWithExpectedTop1 = cases.filter((c) => (c.expectedTop1 ?? []).length > 0);
+  const mismatches = casesWithExpectedTop1.filter((c) => c.top1Match === 0);
+  const mismatchTop1Counts = countBy(mismatches, (c) => c.top1 ?? '(none)');
 
   console.log(`- cases: ${summary.cases}`);
   console.log(`- top1Match cases: ${summary.top1MatchCases}`);
@@ -331,7 +336,7 @@ function printReport({ summary, cases }) {
     }
   }
 
-  const missingExpectedCases = cases.filter(c => (c.missingExpected ?? []).length > 0);
+  const missingExpectedCases = cases.filter((c) => (c.missingExpected ?? []).length > 0);
   if (missingExpectedCases.length) {
     console.log('\nCases with missing expectedAny:');
     for (const c of missingExpectedCases) {

@@ -6,9 +6,11 @@ import url from 'node:url';
 import { evaluatePlanner } from '../src/lib/planner-eval.mjs';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const cases = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'planner-eval-cases.json'), 'utf8'));
+const cases = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'fixtures', 'planner-eval-cases.json'), 'utf8')
+);
 
-const revived = cases.map(c => ({
+const revived = cases.map((c) => ({
   ...c,
   llmPlan: async () => c.plan,
 }));

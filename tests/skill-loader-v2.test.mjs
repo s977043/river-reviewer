@@ -3,7 +3,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import test from 'node:test';
-import { createSkillValidator, defaultPaths, loadSchema, loadSkillFile } from '../runners/core/skill-loader.mjs';
+import {
+  createSkillValidator,
+  defaultPaths,
+  loadSchema,
+  loadSkillFile,
+} from '../runners/core/skill-loader.mjs';
 
 async function buildValidator(schemaPath = defaultPaths.schemaPath) {
   const schema = await loadSchema(schemaPath);
@@ -20,7 +25,7 @@ async function withTempDir(fn) {
 }
 
 test('loads YAML skill with nested metadata and instruction', async () => {
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const validator = await buildValidator();
     const skillPath = path.join(tmpDir, 'nested.yaml');
     const content = `
@@ -48,7 +53,7 @@ instruction: "Do the thing"
 });
 
 test('loads YAML skill with flat structure and instruction', async () => {
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const validator = await buildValidator();
     const skillPath = path.join(tmpDir, 'flat.yaml');
     const content = `
@@ -73,7 +78,7 @@ instruction: "Check docs"
 });
 
 test('loads YAML skill with trigger container', async () => {
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const validator = await buildValidator();
     const skillPath = path.join(tmpDir, 'trigger.yaml');
     const content = `
@@ -98,7 +103,7 @@ instruction: "Check tests"
 });
 
 test('trigger does not override top-level phase/applyTo in YAML', async () => {
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const validator = await buildValidator();
     const skillPath = path.join(tmpDir, 'trigger-precedence.yaml');
     const content = `
@@ -126,7 +131,7 @@ instruction: "Do not override top-level"
 });
 
 test('loads YAML skill with instruction nested inside metadata', async () => {
-  await withTempDir(async tmpDir => {
+  await withTempDir(async (tmpDir) => {
     const validator = await buildValidator();
     const skillPath = path.join(tmpDir, 'nested-instruction.yaml');
     const content = `

@@ -160,16 +160,25 @@ export async function createCommand(skillName, options) {
       }
     }
 
-    const applyToArray = applyTo.split(',').map(p => p.trim()).filter(Boolean);
-    const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+    const applyToArray = applyTo
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
+    const tagsArray = tags
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
 
     const replacements = {
       'rr-<phase>-<category>-<number>': id,
       '<Skill Name>': name,
       '<What this skill does>': description,
       '"0.1.0"': `"${version}"`,
-      "  - 'src/**/*.ts'\n  - 'tests/**/*.test.ts'": applyToArray.map(p => `  - '${p}'`).join('\n'),
-      '  - example\n  - category': tagsArray.length > 0 ? tagsArray.map(t => `  - ${t}`).join('\n') : '  - example',
+      "  - 'src/**/*.ts'\n  - 'tests/**/*.test.ts'": applyToArray
+        .map((p) => `  - '${p}'`)
+        .join('\n'),
+      '  - example\n  - category':
+        tagsArray.length > 0 ? tagsArray.map((t) => `  - ${t}`).join('\n') : '  - example',
       'phase: midstream': `phase: ${phase}`,
       'severity: minor': `severity: ${severity}`,
     };
@@ -203,7 +212,6 @@ export async function createCommand(skillName, options) {
     logger.info('  4. Add expected output to golden/');
     logger.info('  5. Validate: npm run validate:skill-yaml');
     logger.info('  6. Test: npx promptfoo eval (if configured)\n');
-
   } catch (error) {
     logger.failSpinner('Skill creation failed');
     logger.error(`Error: ${error.message}`);

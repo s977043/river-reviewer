@@ -72,7 +72,9 @@ async function checkBilingualPairs() {
   }
 
   console.log('');
-  console.log(`📊 Summary: ${paired} paired, ${missingEn} missing .en.md, ${orphanedEn} orphaned .en.md`);
+  console.log(
+    `📊 Summary: ${paired} paired, ${missingEn} missing .en.md, ${orphanedEn} orphaned .en.md`
+  );
 
   const hasIssues = missingEn > 0 || orphanedEn > 0;
   if (hasIssues && strict) {

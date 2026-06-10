@@ -10,9 +10,7 @@ import { createCommand } from './commands/create.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const packageJson = JSON.parse(
-  readFileSync(join(__dirname, '..', 'package.json'), 'utf-8')
-);
+const packageJson = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf-8'));
 
 const program = new Command();
 
@@ -48,9 +46,7 @@ program
   .action(evalCommand);
 
 // river create command
-const createCmd = program
-  .command('create')
-  .description('Create new resources');
+const createCmd = program.command('create').description('Create new resources');
 
 createCmd
   .command('skill')

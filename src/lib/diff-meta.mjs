@@ -10,7 +10,10 @@ function countChangedLinesFromText(diffText) {
   if (!diffText) return 0;
   let lines = 0;
   for (const line of diffText.split('\n')) {
-    if ((line.startsWith('+') && !line.startsWith('+++')) || (line.startsWith('-') && !line.startsWith('---'))) {
+    if (
+      (line.startsWith('+') && !line.startsWith('+++')) ||
+      (line.startsWith('-') && !line.startsWith('---'))
+    ) {
       lines++;
     }
   }

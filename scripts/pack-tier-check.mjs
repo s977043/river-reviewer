@@ -79,7 +79,9 @@ export async function checkPackTiers({
     const declared = pack.tier ?? 'experimental';
     if (TIER_RANK[declared] > TIER_RANK[assessed]) {
       overDeclared.push({ id: pack.id, declared, assessed });
-      log(`❌ pack "${pack.id}": declared tier "${declared}" exceeds mechanical assessment "${assessed}"`);
+      log(
+        `❌ pack "${pack.id}": declared tier "${declared}" exceeds mechanical assessment "${assessed}"`
+      );
     } else if (TIER_RANK[declared] < TIER_RANK[assessed]) {
       promotable.push({ id: pack.id, declared, assessed });
       log(

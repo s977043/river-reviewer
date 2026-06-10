@@ -3,11 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import test from 'node:test';
 
-import {
-  createTempMemory,
-  makeMemoryEntry,
-  writeMemoryIndex,
-} from '../memory.mjs';
+import { createTempMemory, makeMemoryEntry, writeMemoryIndex } from '../memory.mjs';
 
 test('createTempMemory (nested) creates .river/memory/ structure', () => {
   const { dir, indexPath, cleanup } = createTempMemory({ layout: 'nested' });
@@ -72,10 +68,7 @@ test('writeMemoryIndex overwrites the index file with given entries', () => {
     const first = JSON.parse(readFileSync(indexPath, 'utf8'));
     assert.equal(first.entries.length, 1);
 
-    writeMemoryIndex(indexPath, [
-      makeMemoryEntry({ id: 'b' }),
-      makeMemoryEntry({ id: 'c' }),
-    ]);
+    writeMemoryIndex(indexPath, [makeMemoryEntry({ id: 'b' }), makeMemoryEntry({ id: 'c' })]);
     const second = JSON.parse(readFileSync(indexPath, 'utf8'));
     assert.equal(second.entries.length, 2);
     assert.equal(second.entries[0].id, 'b');

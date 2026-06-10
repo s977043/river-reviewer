@@ -67,8 +67,7 @@ export class CostEstimator {
   estimateFromUsage(usage) {
     if (!usage) return null;
     const pricing = MODEL_PRICES[usage.model] ?? this.pricing;
-    const freshInput =
-      (usage.inputTokens ?? 0) - (usage.cacheReadInputTokens ?? 0);
+    const freshInput = (usage.inputTokens ?? 0) - (usage.cacheReadInputTokens ?? 0);
     const cacheRead = usage.cacheReadInputTokens ?? 0;
     const cacheCreate = usage.cacheCreationInputTokens ?? 0;
     const output = usage.outputTokens ?? 0;

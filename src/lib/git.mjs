@@ -29,7 +29,9 @@ async function runGit(args, { cwd }) {
 }
 
 export async function ensureGitRepo(cwd) {
-  const insideWorkTree = await runGit(['rev-parse', '--is-inside-work-tree'], { cwd }).catch(() => null);
+  const insideWorkTree = await runGit(['rev-parse', '--is-inside-work-tree'], { cwd }).catch(
+    () => null
+  );
   if (insideWorkTree !== 'true') {
     throw new GitRepoNotFoundError(cwd);
   }
@@ -38,7 +40,9 @@ export async function ensureGitRepo(cwd) {
 
 export async function detectDefaultBranch(cwd) {
   const candidates = [];
-  const ref = await runGit(['symbolic-ref', '--quiet', 'refs/remotes/origin/HEAD'], { cwd }).catch(() => null);
+  const ref = await runGit(['symbolic-ref', '--quiet', 'refs/remotes/origin/HEAD'], { cwd }).catch(
+    () => null
+  );
   if (ref) {
     const parts = ref.split('/');
     candidates.push(parts[parts.length - 1]);
@@ -46,11 +50,13 @@ export async function detectDefaultBranch(cwd) {
   candidates.push('main', 'master');
 
   for (const branch of candidates) {
-    const exists = await runGit(['rev-parse', '--quiet', '--verify', branch], { cwd }).catch(() => null);
-    if (exists) return branch;
-    const remoteExists = await runGit(['rev-parse', '--quiet', '--verify', `origin/${branch}`], { cwd }).catch(
-      () => null,
+    const exists = await runGit(['rev-parse', '--quiet', '--verify', branch], { cwd }).catch(
+      () => null
     );
+    if (exists) return branch;
+    const remoteExists = await runGit(['rev-parse', '--quiet', '--verify', `origin/${branch}`], {
+      cwd,
+    }).catch(() => null);
     if (remoteExists) return branch;
   }
   return 'HEAD';
@@ -70,7 +76,7 @@ export async function listChangedFiles(cwd, baseRef) {
   const stdout = await runGit(['diff', '--name-only', baseRef], { cwd });
   return stdout
     .split('\n')
-    .map(line => line.trim())
+    .map((line) => line.trim())
     .filter(Boolean);
 }
 

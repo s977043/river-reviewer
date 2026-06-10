@@ -12,9 +12,10 @@ async function main() {
   const raw = fs.readFileSync(fixturePath, 'utf-8');
   const data = JSON.parse(raw);
   // revive llmPlan by wrapping provided plan array (offline eval用)
-  const cases = data.map(c => ({
+  const cases = data.map((c) => ({
     ...c,
-    llmPlan: async ({ skills, context }) => c.llmPlan ?? c.plan ?? c.expectedOrder.map(id => ({ id })),
+    llmPlan: async ({ skills, context }) =>
+      c.llmPlan ?? c.plan ?? c.expectedOrder.map((id) => ({ id })),
     skills: c.skills,
     context: c.context,
   }));
@@ -36,7 +37,7 @@ async function main() {
   }
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });

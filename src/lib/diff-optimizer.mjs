@@ -27,11 +27,11 @@ function normalizeWhitespace(line) {
 
 function isWhitespaceOnlyChange(lines) {
   const added = lines
-    .filter(line => line.startsWith('+') && !line.startsWith('+++'))
-    .map(line => line.slice(1));
+    .filter((line) => line.startsWith('+') && !line.startsWith('+++'))
+    .map((line) => line.slice(1));
   const removed = lines
-    .filter(line => line.startsWith('-') && !line.startsWith('---'))
-    .map(line => line.slice(1));
+    .filter((line) => line.startsWith('-') && !line.startsWith('---'))
+    .map((line) => line.slice(1));
   if (added.length === 0 && removed.length === 0) return false;
   return normalizeWhitespace(added.join('')) === normalizeWhitespace(removed.join(''));
 }
@@ -39,12 +39,12 @@ function isWhitespaceOnlyChange(lines) {
 const COMMENT_MARKERS = [/^\/\//, /^\/\*/, /^\*($|\s)/, /^\*\/$/, /^#/, /^<!--/, /^-->/];
 
 function isCommentOnlyChange(lines) {
-  const changed = lines.filter(line => line.startsWith('+') || line.startsWith('-'));
+  const changed = lines.filter((line) => line.startsWith('+') || line.startsWith('-'));
   if (!changed.length) return false;
-  return changed.every(line => {
+  return changed.every((line) => {
     const content = line.slice(1).trim();
     if (!content) return true;
-    return COMMENT_MARKERS.some(re => re.test(content));
+    return COMMENT_MARKERS.some((re) => re.test(content));
   });
 }
 
@@ -90,7 +90,10 @@ export function optimizeDiff(diff) {
 
   const diffText = renderDiffText(optimizedFiles);
   const tokenEstimate = Math.ceil(diffText.length / 4);
-  const reduction = rawTokenEstimate === 0 ? 0 : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
+  const reduction =
+    rawTokenEstimate === 0
+      ? 0
+      : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
 
   return {
     files: optimizedFiles,
@@ -107,8 +110,8 @@ export function renderDiffText(files) {
   for (const file of files) {
     const isNewFile = !file.oldPath || file.oldPath === '/dev/null';
     const isDeletedFile = !file.newPath || file.newPath === '/dev/null';
-    const oldPath = isNewFile ? '/dev/null' : file.oldPath ?? file.path;
-    const newPath = isDeletedFile ? '/dev/null' : file.newPath ?? file.path;
+    const oldPath = isNewFile ? '/dev/null' : (file.oldPath ?? file.path);
+    const newPath = isDeletedFile ? '/dev/null' : (file.newPath ?? file.path);
     const oldDisplay = oldPath === '/dev/null' ? '/dev/null' : `a/${oldPath}`;
     const newDisplay = newPath === '/dev/null' ? '/dev/null' : `b/${newPath}`;
 

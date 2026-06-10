@@ -177,7 +177,7 @@ describe('persistUsageEvents', () => {
         { file: 'a.js', skill: 's' },
         { file: 'b.js', skill: 's', error: 'boom' },
       ],
-      { rootDir: tmpDir },
+      { rootDir: tmpDir }
     );
     assert.equal(written, null);
     const dir = path.join(tmpDir, 'artifacts', 'usage');
@@ -209,7 +209,7 @@ describe('persistUsageEvents', () => {
           },
         },
       ],
-      { rootDir: tmpDir, runId: 'mkdirtest' },
+      { rootDir: tmpDir, runId: 'mkdirtest' }
     );
     assert.ok(written);
     const stat = await fs.stat(path.dirname(written));

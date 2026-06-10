@@ -32,7 +32,9 @@ module.exports = async function postComment({ github, context, core }) {
     per_page: 100,
   });
 
-  const existing = comments.find(c => typeof c.body === 'string' && c.body.includes(COMMENT_MARKER));
+  const existing = comments.find(
+    (c) => typeof c.body === 'string' && c.body.includes(COMMENT_MARKER)
+  );
   if (existing) {
     await github.rest.issues.updateComment({
       owner,
@@ -52,4 +54,3 @@ module.exports = async function postComment({ github, context, core }) {
   });
   core.info('Created new River Reviewer comment.');
 };
-

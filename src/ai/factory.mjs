@@ -72,7 +72,7 @@ async function withRetry(fn) {
       if (process.env.RIVER_AI_RETRY_DEBUG === '1') {
         // eslint-disable-next-line no-console
         console.warn(
-          `[AI retry] attempt ${attempt} failed (${err?.message || err}); retrying in ${delay}ms...`,
+          `[AI retry] attempt ${attempt} failed (${err?.message || err}); retrying in ${delay}ms...`
         );
       }
       await new Promise((res) => setTimeout(res, delay));
@@ -268,7 +268,7 @@ function assertAnthropicModelName(modelName) {
   if (!ANTHROPIC_MODEL_PATTERN.test(modelName)) {
     throw new Error(
       `Invalid Anthropic model name: ${modelName} ` +
-        `(expected claude-{sonnet|opus|haiku}-<version>)`,
+        `(expected claude-{sonnet|opus|haiku}-<version>)`
     );
   }
 }
@@ -339,7 +339,7 @@ class AnthropicClient {
       // eslint-disable-next-line no-console
       console.log(
         `[Anthropic usage] input=${u.inputTokens} output=${u.outputTokens} ` +
-          `cache_create=${u.cacheCreationInputTokens} cache_read=${u.cacheReadInputTokens}`,
+          `cache_create=${u.cacheCreationInputTokens} cache_read=${u.cacheReadInputTokens}`
       );
     }
 

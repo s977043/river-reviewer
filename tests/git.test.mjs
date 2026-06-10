@@ -26,7 +26,9 @@ describe('ensureGitRepo', () => {
     t.after(cleanup);
     const root = await ensureGitRepo(dir);
     // macOS realpath: /tmp -> /private/tmp
-    assert.ok(root.endsWith(dir.replace(/^\/private/, '')) || dir.endsWith(root.replace(/^\/private/, '')));
+    assert.ok(
+      root.endsWith(dir.replace(/^\/private/, '')) || dir.endsWith(root.replace(/^\/private/, ''))
+    );
   });
 
   test('throws GitRepoNotFoundError for non-repo directory', async (t) => {

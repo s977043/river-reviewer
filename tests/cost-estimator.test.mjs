@@ -13,7 +13,7 @@ describe('MODEL_PRICES table', () => {
       // Anthropic publishes cache read at 10% of input rate.
       assert.ok(
         Math.abs(p.cacheReadPer1k - p.inputPer1k * 0.1) < 1e-9,
-        `cacheReadPer1k for ${model} should be ~10% of inputPer1k`,
+        `cacheReadPer1k for ${model} should be ~10% of inputPer1k`
       );
     }
   });

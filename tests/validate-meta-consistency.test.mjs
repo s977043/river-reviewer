@@ -46,9 +46,5 @@ test('extractLatestRelease returns null for no match', () => {
 
 test('validateMeta passes on current repo state', async () => {
   const errors = await validateMeta();
-  assert.deepEqual(
-    errors,
-    [],
-    `Expected no errors but got: ${errors.join(', ')}`,
-  );
+  assert.deepEqual(errors, [], `Expected no errors but got: ${errors.join(', ')}`);
 });

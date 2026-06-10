@@ -3,11 +3,7 @@ import assert from 'node:assert/strict';
 import path from 'path';
 import fs from 'fs/promises';
 
-import {
-  loadPacks,
-  resolveSkillSet,
-  SkillLoaderError,
-} from '../runners/core/skill-loader.mjs';
+import { loadPacks, resolveSkillSet, SkillLoaderError } from '../runners/core/skill-loader.mjs';
 import { createTempDirAsync } from './helpers/temp-dir.mjs';
 
 const TMP_PREFIX = 'pack-resolver-';
@@ -99,16 +95,13 @@ test('resolveSkillSet set-unions multiple names and dedupes shared skills', asyn
 
 test('resolveSkillSet throws SkillLoaderError listing packs and sets for unknown names', async () => {
   const dir = await writeRegistry(REGISTRY);
-  await assert.rejects(
-    resolveSkillSet('nope', { skillsDir: dir, warn: () => {} }),
-    (err) => {
-      assert.ok(err instanceof SkillLoaderError);
-      assert.match(err.message, /Unknown skill set "nope"/);
-      assert.match(err.message, /typescript/);
-      assert.match(err.message, /basic/);
-      return true;
-    }
-  );
+  await assert.rejects(resolveSkillSet('nope', { skillsDir: dir, warn: () => {} }), (err) => {
+    assert.ok(err instanceof SkillLoaderError);
+    assert.match(err.message, /Unknown skill set "nope"/);
+    assert.match(err.message, /typescript/);
+    assert.match(err.message, /basic/);
+    return true;
+  });
 });
 
 test('resolveSkillSet returns empty array for empty input', async () => {

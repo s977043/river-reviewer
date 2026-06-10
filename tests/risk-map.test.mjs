@@ -53,7 +53,7 @@ rules:
     action: comment_only
 defaults:
   action: escalate
-`,
+`
     );
     const result = await loadRiskMap(dir);
     assert.equal(result.rules.length, 2);
@@ -74,7 +74,7 @@ test('loadRiskMap applies defaults when defaults section is absent', async () =>
 rules:
   - pattern: "**/*.sql"
     action: escalate
-`,
+`
     );
     const result = await loadRiskMap(dir);
     assert.equal(result.defaults.action, 'comment_only');
@@ -92,7 +92,7 @@ test('loadRiskMap rejects invalid action value', async () => {
 rules:
   - pattern: "**/*"
     action: auto_merge
-`,
+`
     );
     await assert.rejects(() => loadRiskMap(dir), { name: 'RiskMapError' });
   } finally {
@@ -120,7 +120,6 @@ test('loadRiskMap rejects path outside repository', async () => {
     await rm(dir, { recursive: true, force: true });
   }
 });
-
 
 test('loadRiskMap rejects malformed YAML', async () => {
   const dir = createTempDir();
@@ -167,11 +166,7 @@ test('evaluateRisk: aggregates to highest risk level', () => {
     ],
     defaults: { action: 'comment_only' },
   };
-  const result = evaluateRisk(riskMap, [
-    'docs/readme.md',
-    'src/app.ts',
-    'db/migrations/001.sql',
-  ]);
+  const result = evaluateRisk(riskMap, ['docs/readme.md', 'src/app.ts', 'db/migrations/001.sql']);
   assert.equal(result.aggregateAction, 'require_human_review');
   assert.deepEqual(result.escalatedFiles, ['src/app.ts']);
   assert.deepEqual(result.humanReviewFiles, ['db/migrations/001.sql']);
@@ -211,10 +206,6 @@ test('aggregateRiskLevel: returns fallback for empty array', () => {
 });
 
 test('aggregateRiskLevel: picks highest priority', () => {
-  const risks = [
-    { action: 'comment_only' },
-    { action: 'escalate' },
-    { action: 'comment_only' },
-  ];
+  const risks = [{ action: 'comment_only' }, { action: 'escalate' }, { action: 'comment_only' }];
   assert.equal(aggregateRiskLevel(risks), 'escalate');
 });
