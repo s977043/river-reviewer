@@ -122,7 +122,13 @@ export async function runSuppressionAnalytics({
     log(`No memory index found at ${indexPath}; nothing to analyze.`);
     return { active: 0, repeatedFingerprints: [], staleHighSeverity: [] };
   }
-  const index = JSON.parse(raw);
+  let index;
+  try {
+    index = JSON.parse(raw);
+  } catch (err) {
+    log(`Memory index at ${indexPath} is not valid JSON (${err.message}); nothing to analyze.`);
+    return { active: 0, repeatedFingerprints: [], staleHighSeverity: [] };
+  }
   const entries = Array.isArray(index?.entries) ? index.entries : [];
   return analyzeSuppressions(entries, { now });
 }

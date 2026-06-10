@@ -59,11 +59,19 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if node scripts/compare-eval-ledger.mjs > compare-output.txt 2>&1; then
+          set +e
+          node scripts/compare-eval-ledger.mjs > compare-output.txt 2>&1
+          rc=$?
+          set -e
+          cat compare-output.txt
+          if [ "$rc" -eq 0 ]; then
             echo "No KPI regression detected."
             exit 0
           fi
-          cat compare-output.txt
+          if [ "$rc" -ne 1 ]; then
+            echo "compare-eval-ledger failed with exit code $rc (fatal error, not a regression); skipping issue creation."
+            exit 0
+          fi
           existing=$(gh issue list --label eval-regression --state open --json number --jq 'length')
           if [ "$existing" -gt 0 ]; then
             echo "An eval-regression issue is already open; skipping creation."
