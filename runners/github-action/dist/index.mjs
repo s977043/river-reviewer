@@ -12531,6 +12531,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:util");
 
 /***/ }),
 
+/***/ 6928:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
+
+/***/ }),
+
 /***/ 4352:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -38914,8 +38921,8 @@ __nccwpck_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./node_modules/minimatch/dist/esm/index.js + 7 modules
 var esm = __nccwpck_require__(9519);
-// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
-var skill_loader = __nccwpck_require__(5541);
+// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 1 modules
+var skill_loader = __nccwpck_require__(8478);
 ;// CONCATENATED MODULE: ./src/lib/skill-planner.mjs
 
 
@@ -39647,7 +39654,7 @@ async function buildExecutionPlan(options) {
 
 /***/ }),
 
-/***/ 5541:
+/***/ 8478:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 
@@ -39666,8 +39673,8 @@ __nccwpck_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: external "fs"
 var external_fs_ = __nccwpck_require__(9896);
-;// CONCATENATED MODULE: external "path"
-const external_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("path");
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(6928);
 ;// CONCATENATED MODULE: external "url"
 const external_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
 // EXTERNAL MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
@@ -39719,12 +39726,12 @@ var dist = __nccwpck_require__(2815);
  */
 
 const skill_loader_filename = (0,external_url_namespaceObject.fileURLToPath)(import.meta.url);
-const skill_loader_dirname = external_path_namespaceObject.dirname(skill_loader_filename);
+const skill_loader_dirname = external_path_.dirname(skill_loader_filename);
 const repoRoot = process.env.RIVER_REPO_ROOT
-  ? external_path_namespaceObject.resolve(process.env.RIVER_REPO_ROOT)
-  : external_path_namespaceObject.resolve(skill_loader_dirname, '..', '..');
-const defaultSkillsDir = external_path_namespaceObject.join(repoRoot, 'skills');
-const defaultSchemaPath = external_path_namespaceObject.join(repoRoot, 'schemas', 'skill.schema.json');
+  ? external_path_.resolve(process.env.RIVER_REPO_ROOT)
+  : external_path_.resolve(skill_loader_dirname, '..', '..');
+const defaultSkillsDir = external_path_.join(repoRoot, 'skills');
+const defaultSchemaPath = external_path_.join(repoRoot, 'schemas', 'skill.schema.json');
 const markdownExtensions = new Set(['.md', '.mdx']);
 const yamlExtensions = new Set(['.yaml', '.yml']);
 const allowedExtensions = new Set([...markdownExtensions, ...yamlExtensions]);
@@ -39785,7 +39792,7 @@ function createSkillValidator(schema) {
  * @returns {Promise<Record<string, { description?: string, skills: string[] }>>}
  */
 async function loadRecommendationSets({ skillsDir = defaultSkillsDir } = {}) {
-  const registryPath = external_path_namespaceObject.join(skillsDir, 'registry.yaml');
+  const registryPath = external_path_.join(skillsDir, 'registry.yaml');
   let raw;
   try {
     raw = await external_fs_.promises.readFile(registryPath, 'utf8');
@@ -39830,7 +39837,7 @@ async function resolveRecommendationSet(name, { skillsDir = defaultSkillsDir } =
  * @returns {Promise<Array<{ id: string, skills: string[] }>>}
  */
 async function loadPacks({ skillsDir = defaultSkillsDir } = {}) {
-  const registryPath = external_path_namespaceObject.join(skillsDir, 'registry.yaml');
+  const registryPath = external_path_.join(skillsDir, 'registry.yaml');
   let raw;
   try {
     raw = await external_fs_.promises.readFile(registryPath, 'utf8');
@@ -39924,12 +39931,12 @@ async function listSkillFiles(dir = defaultSkillsDir) {
     if (!legacyEntry) {
       throw new Error(`skill.yaml detected but not found in ${dir}`);
     }
-    files.push(external_path_namespaceObject.join(dir, legacyEntry.name));
+    files.push(external_path_.join(dir, legacyEntry.name));
     return files.sort((a, b) => a.localeCompare(b));
   }
 
   for (const entry of entries) {
-    const entryPath = external_path_namespaceObject.join(dir, entry.name);
+    const entryPath = external_path_.join(dir, entry.name);
     if (entry.isDirectory()) {
       if (ignoredSkillDirNames.has(entry.name) || entry.name.startsWith('.')) {
         continue;
@@ -39939,7 +39946,7 @@ async function listSkillFiles(dir = defaultSkillsDir) {
       continue;
     }
 
-    const ext = external_path_namespaceObject.extname(entry.name).toLowerCase();
+    const ext = external_path_.extname(entry.name).toLowerCase();
     if (!allowedExtensions.has(ext)) continue;
     if (ignoredFileNames.has(entry.name)) continue;
     if (entry.name.startsWith('_')) continue;
@@ -39985,7 +39992,7 @@ function inferCategoryFromPhase(phase) {
 
 function inferCategoryFromPath(filePath) {
   if (!filePath) return undefined;
-  const segments = external_path_namespaceObject.normalize(filePath).split(external_path_namespaceObject.sep);
+  const segments = external_path_.normalize(filePath).split(external_path_.sep);
   const skillsIndex = segments.lastIndexOf('skills');
   const candidate = skillsIndex >= 0 ? segments[skillsIndex + 1] : undefined;
   if (candidate && streamCategories.has(candidate)) {
@@ -40090,7 +40097,7 @@ function parseFrontMatter(content, { filePath } = {}) {
 }
 
 async function parseSkillFile(filePath) {
-  const ext = external_path_namespaceObject.extname(filePath).toLowerCase();
+  const ext = external_path_.extname(filePath).toLowerCase();
   if (!allowedExtensions.has(ext)) {
     throw new SkillLoaderError(`Unsupported skill file extension: ${ext}`);
   }
@@ -40145,7 +40152,7 @@ function validateMetadata(metadata, validate) {
 }
 
 function relativeToRepo(filePath) {
-  return filePath.startsWith(repoRoot) ? external_path_namespaceObject.relative(repoRoot, filePath) : filePath;
+  return filePath.startsWith(repoRoot) ? external_path_.relative(repoRoot, filePath) : filePath;
 }
 
 function logSkillLoadError(filePath, err) {
@@ -45959,8 +45966,8 @@ function buildReviewEntry(reviewResult, { phase, changedFiles, commit } = {}) {
 
 // EXTERNAL MODULE: ./src/lib/repo-context.mjs + 3 modules
 var repo_context = __nccwpck_require__(8601);
-// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 2 modules
-var skill_loader = __nccwpck_require__(5541);
+// EXTERNAL MODULE: ./runners/core/skill-loader.mjs + 1 modules
+var skill_loader = __nccwpck_require__(8478);
 // EXTERNAL MODULE: ./src/lib/utils.mjs
 var utils = __nccwpck_require__(9746);
 // EXTERNAL MODULE: ./src/lib/finding-fingerprint.mjs
@@ -60461,6 +60468,13 @@ function parseArgs(argv) {
     runsId2: null,
     // suppression subcommand fields (#687 PR-D)
     suppressionSubcommand: null,
+    feedbackSubcommand: null,
+    feedbackType: null,
+    feedbackSkillId: null,
+    feedbackTrigger: null,
+    feedbackFingerprint: null,
+    feedbackEvidence: null,
+    feedbackPrNumber: null,
     suppressionFingerprint: null,
     suppressionFindingId: null,
     suppressionFeedbackType: null,
@@ -60500,7 +60514,8 @@ function parseArgs(argv) {
         arg === 'doctor' ||
         arg === 'skills' ||
         arg === 'runs' ||
-        arg === 'suppression')
+        arg === 'suppression' ||
+        arg === 'feedback')
     ) {
       parsed.command = arg;
       // Check for skills subcommands (import/export/list)
@@ -60515,7 +60530,15 @@ function parseArgs(argv) {
         }
       } else if (arg === 'suppression' && args[0] && !args[0].startsWith('-')) {
         parsed.suppressionSubcommand = args.shift(); // add (only one for now)
-      } else if (arg !== 'runs' && arg !== 'suppression' && args[0] && !args[0].startsWith('-')) {
+      } else if (arg === 'feedback' && args[0] && !args[0].startsWith('-')) {
+        parsed.feedbackSubcommand = args.shift(); // add (only one for now)
+      } else if (
+        arg !== 'runs' &&
+        arg !== 'suppression' &&
+        arg !== 'feedback' &&
+        args[0] &&
+        !args[0].startsWith('-')
+      ) {
         parsed.target = args.shift();
       }
       continue;
@@ -60556,6 +60579,33 @@ function parseArgs(argv) {
       if (arg === '--pr') {
         const v = parseInt(args.shift() ?? '', 10);
         if (!Number.isNaN(v) && v > 0) parsed.suppressionPrNumber = v;
+        continue;
+      }
+    }
+    if (parsed.command === 'feedback') {
+      if (arg === '--type') {
+        parsed.feedbackType = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--skill') {
+        parsed.feedbackSkillId = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--trigger') {
+        parsed.feedbackTrigger = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--fingerprint') {
+        parsed.feedbackFingerprint = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--evidence') {
+        parsed.feedbackEvidence = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--pr') {
+        const v = parseInt(args.shift() ?? '', 10);
+        if (!Number.isNaN(v) && v > 0) parsed.feedbackPrNumber = v;
         continue;
       }
     }
@@ -61330,7 +61380,9 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
     external_node_process_namespaceObject.env.RIVER_OFFLINE = '1';
   }
   if (
-    !['run', 'doctor', 'eval', 'skills', 'runs', 'suppression', 'review'].includes(parsed.command)
+    !['run', 'doctor', 'eval', 'skills', 'runs', 'suppression', 'feedback', 'review'].includes(
+      parsed.command
+    )
   ) {
     console.error(`Unknown command: ${parsed.command}`);
     printHelp();
@@ -61635,6 +61687,42 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
       console.log('  scope: ' + entry.context.scope);
       if (entry.context.severity) console.log('  severity: ' + entry.context.severity);
       console.log('  written to: ' + indexPath);
+      return 0;
+    }
+
+    if (parsed.command === 'feedback') {
+      if (parsed.feedbackSubcommand !== 'add') {
+        console.error(
+          'Error: only `river feedback add` is supported (need: --type --skill; optional: --trigger --fingerprint --evidence --pr).'
+        );
+        return 1;
+      }
+      const { buildFeedbackEntry, appendFeedbackEntry, buildFeedbackScaffold, FeedbackError } =
+        await __nccwpck_require__.e(/* import() */ 638).then(__nccwpck_require__.bind(__nccwpck_require__, 7638));
+      const repoRoot = await (0,git/* ensureGitRepo */.NC)(targetPath);
+      let entry;
+      try {
+        entry = buildFeedbackEntry({
+          feedbackType: parsed.feedbackType,
+          skillId: parsed.feedbackSkillId,
+          trigger: parsed.feedbackTrigger ?? undefined,
+          findingFingerprint: parsed.feedbackFingerprint,
+          evidence: parsed.feedbackEvidence,
+          pr: parsed.feedbackPrNumber,
+        });
+      } catch (err) {
+        if (err instanceof FeedbackError) {
+          console.error(`Error: ${err.message}`);
+          return 1;
+        }
+        throw err;
+      }
+      const filePath = await appendFeedbackEntry(entry, { repoRoot });
+      const scaffold = buildFeedbackScaffold(entry);
+      console.log('Feedback recorded: ' + entry.feedbackType + ' for ' + entry.skillId);
+      console.log('  written to: ' + filePath);
+      console.log('  next action: ' + scaffold.action);
+      console.log('  apply scaffolds with: npm run feedback:apply');
       return 0;
     }
 

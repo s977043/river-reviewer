@@ -129,6 +129,13 @@ function parseArgs(argv) {
     runsId2: null,
     // suppression subcommand fields (#687 PR-D)
     suppressionSubcommand: null,
+    feedbackSubcommand: null,
+    feedbackType: null,
+    feedbackSkillId: null,
+    feedbackTrigger: null,
+    feedbackFingerprint: null,
+    feedbackEvidence: null,
+    feedbackPrNumber: null,
     suppressionFingerprint: null,
     suppressionFindingId: null,
     suppressionFeedbackType: null,
@@ -168,7 +175,8 @@ function parseArgs(argv) {
         arg === 'doctor' ||
         arg === 'skills' ||
         arg === 'runs' ||
-        arg === 'suppression')
+        arg === 'suppression' ||
+        arg === 'feedback')
     ) {
       parsed.command = arg;
       // Check for skills subcommands (import/export/list)
@@ -183,7 +191,15 @@ function parseArgs(argv) {
         }
       } else if (arg === 'suppression' && args[0] && !args[0].startsWith('-')) {
         parsed.suppressionSubcommand = args.shift(); // add (only one for now)
-      } else if (arg !== 'runs' && arg !== 'suppression' && args[0] && !args[0].startsWith('-')) {
+      } else if (arg === 'feedback' && args[0] && !args[0].startsWith('-')) {
+        parsed.feedbackSubcommand = args.shift(); // add (only one for now)
+      } else if (
+        arg !== 'runs' &&
+        arg !== 'suppression' &&
+        arg !== 'feedback' &&
+        args[0] &&
+        !args[0].startsWith('-')
+      ) {
         parsed.target = args.shift();
       }
       continue;
@@ -224,6 +240,33 @@ function parseArgs(argv) {
       if (arg === '--pr') {
         const v = parseInt(args.shift() ?? '', 10);
         if (!Number.isNaN(v) && v > 0) parsed.suppressionPrNumber = v;
+        continue;
+      }
+    }
+    if (parsed.command === 'feedback') {
+      if (arg === '--type') {
+        parsed.feedbackType = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--skill') {
+        parsed.feedbackSkillId = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--trigger') {
+        parsed.feedbackTrigger = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--fingerprint') {
+        parsed.feedbackFingerprint = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--evidence') {
+        parsed.feedbackEvidence = args.shift() ?? null;
+        continue;
+      }
+      if (arg === '--pr') {
+        const v = parseInt(args.shift() ?? '', 10);
+        if (!Number.isNaN(v) && v > 0) parsed.feedbackPrNumber = v;
         continue;
       }
     }
@@ -998,7 +1041,9 @@ async function main(argv = process.argv.slice(2)) {
     process.env.RIVER_OFFLINE = '1';
   }
   if (
-    !['run', 'doctor', 'eval', 'skills', 'runs', 'suppression', 'review'].includes(parsed.command)
+    !['run', 'doctor', 'eval', 'skills', 'runs', 'suppression', 'feedback', 'review'].includes(
+      parsed.command
+    )
   ) {
     console.error(`Unknown command: ${parsed.command}`);
     printHelp();
@@ -1303,6 +1348,42 @@ async function main(argv = process.argv.slice(2)) {
       console.log('  scope: ' + entry.context.scope);
       if (entry.context.severity) console.log('  severity: ' + entry.context.severity);
       console.log('  written to: ' + indexPath);
+      return 0;
+    }
+
+    if (parsed.command === 'feedback') {
+      if (parsed.feedbackSubcommand !== 'add') {
+        console.error(
+          'Error: only `river feedback add` is supported (need: --type --skill; optional: --trigger --fingerprint --evidence --pr).'
+        );
+        return 1;
+      }
+      const { buildFeedbackEntry, appendFeedbackEntry, buildFeedbackScaffold, FeedbackError } =
+        await import('./lib/feedback.mjs');
+      const repoRoot = await ensureGitRepo(targetPath);
+      let entry;
+      try {
+        entry = buildFeedbackEntry({
+          feedbackType: parsed.feedbackType,
+          skillId: parsed.feedbackSkillId,
+          trigger: parsed.feedbackTrigger ?? undefined,
+          findingFingerprint: parsed.feedbackFingerprint,
+          evidence: parsed.feedbackEvidence,
+          pr: parsed.feedbackPrNumber,
+        });
+      } catch (err) {
+        if (err instanceof FeedbackError) {
+          console.error(`Error: ${err.message}`);
+          return 1;
+        }
+        throw err;
+      }
+      const filePath = await appendFeedbackEntry(entry, { repoRoot });
+      const scaffold = buildFeedbackScaffold(entry);
+      console.log('Feedback recorded: ' + entry.feedbackType + ' for ' + entry.skillId);
+      console.log('  written to: ' + filePath);
+      console.log('  next action: ' + scaffold.action);
+      console.log('  apply scaffolds with: npm run feedback:apply');
       return 0;
     }
 

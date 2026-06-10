@@ -20,6 +20,8 @@ artifacts/evals/*
 # Review result store (track directory, ignore run data)
 .river/runs/*
 !.river/runs/.gitkeep
+.river/feedback/*
+!.river/feedback/.gitkeep
 
 # Generated schema/examples backups
 *.schema_*.json

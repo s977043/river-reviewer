@@ -16,7 +16,7 @@ export const modules = {
 /* harmony import */ var gray_matter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9599);
 /* harmony import */ var ajv_dist_2020_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(2210);
 /* harmony import */ var ajv_formats__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(2815);
-/* harmony import */ var _runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(5541);
+/* harmony import */ var _runners_core_skill_loader_mjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(8478);
 
 
 
