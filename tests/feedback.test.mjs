@@ -45,10 +45,7 @@ test('buildFeedbackEntry produces the documented schema', () => {
 test('buildFeedbackEntry rejects unknown type, trigger, and bad fingerprint', () => {
   assert.throws(() => buildFeedbackEntry(entryInput({ feedbackType: 'nope' })), FeedbackError);
   assert.throws(() => buildFeedbackEntry(entryInput({ trigger: 'slack' })), FeedbackError);
-  assert.throws(
-    () => buildFeedbackEntry(entryInput({ findingFingerprint: 'XYZ' })),
-    FeedbackError
-  );
+  assert.throws(() => buildFeedbackEntry(entryInput({ findingFingerprint: 'XYZ' })), FeedbackError);
   assert.throws(() => buildFeedbackEntry(entryInput({ skillId: '  ' })), FeedbackError);
 });
 

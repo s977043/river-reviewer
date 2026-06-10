@@ -14,8 +14,17 @@ import { listFeedbackEntries, buildFeedbackScaffold } from '../src/lib/feedback.
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-export async function applyFeedback({ month = null, write = false, root = repoRoot, log = console.log } = {}) {
-  const entries = await listFeedbackEntries({ repoRoot: root, month, warn: (m) => console.warn(m) });
+export async function applyFeedback({
+  month = null,
+  write = false,
+  root = repoRoot,
+  log = console.log,
+} = {}) {
+  const entries = await listFeedbackEntries({
+    repoRoot: root,
+    month,
+    warn: (m) => console.warn(m),
+  });
   if (!entries.length) {
     log('No feedback entries found under .river/feedback/.');
     return { entries: 0, written: [] };
@@ -41,7 +50,9 @@ export async function applyFeedback({ month = null, write = false, root = repoRo
             written.push(scaffold.fixtureStub.suggestedPath);
             log(`  fixture: ${scaffold.fixtureStub.suggestedPath} (stub written — fill TODOs)`);
           } catch (err) {
-            console.error(`  fixture: failed to write ${scaffold.fixtureStub.suggestedPath}: ${err.message}`);
+            console.error(
+              `  fixture: failed to write ${scaffold.fixtureStub.suggestedPath}: ${err.message}`
+            );
           }
         }
       } else {
