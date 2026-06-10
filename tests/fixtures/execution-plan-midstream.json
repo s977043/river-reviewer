@@ -78,6 +78,13 @@
       "dependencies": []
     },
     {
+      "id": "rr-midstream-ubiquitous-language-naming-001",
+      "phase": "midstream",
+      "modelHint": "balanced",
+      "outputKind": ["findings", "questions"],
+      "dependencies": []
+    },
+    {
       "id": "rr-midstream-gh-address-comments-001",
       "phase": "midstream",
       "modelHint": "high-accuracy",

@@ -2,13 +2,12 @@
 # 設計ドキュメント・ADR を継続的にレビューし、境界・契約・運用性のドリフトを防ぐ。
 # 注意: selection セクションは設計段階の機能です（docs/development/skill-pack-design.md §6、実装は Phase B）。
 selection:
-  packs: []
-  # Phase C で ddd pack が landed したら packs: [ddd] へ移行する
+  packs:
+    - ddd # bounded-context / type-driven-design / ubiquitous-language-naming（experimental tier のため minTier 注意）
   tags:
     - architecture
   skills:
     include:
-      - rr-upstream-bounded-context-language-001 # 境界づけられたコンテキストとユビキタス言語
       - rr-upstream-architecture-boundaries-001 # 境界・依存方向・所有権
       - rr-upstream-data-flow-state-ownership-001 # データフローと状態の所有
       - rr-upstream-integration-contracts-001 # サービス間契約
@@ -16,4 +15,4 @@ selection:
       - rr-upstream-api-versioning-compat-001 # API 互換性と versioning
       - rr-upstream-trust-boundaries-authz-001 # 信頼境界と認可
     exclude: []
-  minTier: community
+  minTier: community # packs への明示指定（ddd）は minTier より優先される（警告のみ）
