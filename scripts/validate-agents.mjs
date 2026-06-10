@@ -64,7 +64,14 @@ async function validateAgents() {
   // Attempt to register the draft-07 https meta-schema with Ajv without
   // mutating the schema object. This avoids rewriting the schema's $schema
   // property to the http variant while still allowing validation to proceed.
-  const draft7Path = path.join(repoRoot, 'node_modules', 'ajv', 'dist', 'refs', 'json-schema-draft-07.json');
+  const draft7Path = path.join(
+    repoRoot,
+    'node_modules',
+    'ajv',
+    'dist',
+    'refs',
+    'json-schema-draft-07.json'
+  );
   try {
     const json = await fs.readFile(draft7Path, 'utf8');
     const draft7 = JSON.parse(json);
@@ -75,19 +82,22 @@ async function validateAgents() {
     const draft7Https = { ...draft7, $id: 'https://json-schema.org/draft-07/schema#' };
     ajv.addMetaSchema(draft7Https, 'https://json-schema.org/draft-07/schema#');
   } catch (err) {
-    console.warn('⚠️  Could not register draft-07 meta-schema for https; attempting without addMetaSchema:', err.message);
+    console.warn(
+      '⚠️  Could not register draft-07 meta-schema for https; attempting without addMetaSchema:',
+      err.message
+    );
   }
 
   const validate = ajv.compile(schema);
   const files = otelEnabled
     ? await tracer.startActiveSpan('list-files', async (span) => {
-      try {
-        return await listAgentFiles();
-      } catch (e) {
-        span.recordException(e);
-        throw e;
-      }
-    })
+        try {
+          return await listAgentFiles();
+        } catch (e) {
+          span.recordException(e);
+          throw e;
+        }
+      })
     : await listAgentFiles();
 
   if (files.length === 0) {
@@ -99,20 +109,24 @@ async function validateAgents() {
 
   for (const filePath of files) {
     if (otelEnabled) {
-      await tracer.startActiveSpan('validate-file', { attributes: { 'file.path': filePath } }, async (fileSpan) => {
-        try {
-          const result = await validateSingleFile(filePath, validate, repoRoot);
-          if (!result) {
+      await tracer.startActiveSpan(
+        'validate-file',
+        { attributes: { 'file.path': filePath } },
+        async (fileSpan) => {
+          try {
+            const result = await validateSingleFile(filePath, validate, repoRoot);
+            if (!result) {
+              success = false;
+            }
+          } catch (err) {
+            fileSpan.recordException(err);
+            fileSpan.setStatus({ code: SpanStatusCode.ERROR, message: err.message });
             success = false;
+          } finally {
+            fileSpan.end();
           }
-        } catch (err) {
-          fileSpan.recordException(err);
-          fileSpan.setStatus({ code: SpanStatusCode.ERROR, message: err.message });
-          success = false;
-        } finally {
-          fileSpan.end();
         }
-      });
+      );
     } else {
       const result = await validateSingleFile(filePath, validate, repoRoot);
       if (!result) {

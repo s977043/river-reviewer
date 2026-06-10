@@ -108,7 +108,7 @@ async function validateSkill(filePath) {
 
     // parseSkillFile を使用 (自動補完ロジックを含む)
     const parsed = await parseSkillFile(filePath);
-    
+
     if (!parsed.metadata || Object.keys(parsed.metadata).length === 0) {
       result.issues.push('メタデータが取得できないまたは空');
       result.priority = 'Blocker';

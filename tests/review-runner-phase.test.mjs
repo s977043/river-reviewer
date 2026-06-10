@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { matchesPhase } from '../runners/core/review-runner.mjs';
 
-const skillWithPhase = phase => ({
+const skillWithPhase = (phase) => ({
   metadata: { phase },
 });
 

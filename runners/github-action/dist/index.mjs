@@ -39027,7 +39027,7 @@ function containsSegment(file, segment) {
 
 function matchesAny(file, needles) {
   const normalized = file.toLowerCase();
-  return needles.some(n => normalized.includes(n));
+  return needles.some((n) => normalized.includes(n));
 }
 
 /**
@@ -39046,7 +39046,11 @@ function inferImpactTags(changedFiles, options = {}) {
 
     if (['ts', 'tsx', 'cts', 'mts'].includes(ext)) tags.add('typescript');
     if (['js', 'jsx', 'cjs', 'mjs'].includes(ext)) tags.add('javascript');
-    if (['md', 'mdx', 'adr'].includes(ext) || matchesAny(file, ['/docs/', '/design/']) || containsSegment(file, 'docs')) {
+    if (
+      ['md', 'mdx', 'adr'].includes(ext) ||
+      matchesAny(file, ['/docs/', '/design/']) ||
+      containsSegment(file, 'docs')
+    ) {
       tags.add('design');
     }
 
@@ -39060,7 +39064,8 @@ function inferImpactTags(changedFiles, options = {}) {
     }
 
     if (containsSegment(file, 'api') || containsSegment(file, 'routes')) tags.add('api');
-    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/'])) tags.add('reliability');
+    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/']))
+      tags.add('reliability');
 
     if (
       containsSegment(file, 'auth') ||
@@ -39079,7 +39084,10 @@ function inferImpactTags(changedFiles, options = {}) {
       tags.add('security');
     }
 
-    if (containsSegment(file, 'logging') || matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])) {
+    if (
+      containsSegment(file, 'logging') ||
+      matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])
+    ) {
       tags.add('observability');
       tags.add('reliability');
     }
@@ -39090,7 +39098,8 @@ function inferImpactTags(changedFiles, options = {}) {
     const lower = diffText.toLowerCase();
     const hasCatch = lower.includes('catch (') || lower.includes('catch(');
     const addsSilentReturn =
-      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) || /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
+      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) ||
+      /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
     const mentionsIgnore = lower.includes('ignore') || lower.includes('swallow');
     if (hasCatch && (addsSilentReturn || mentionsIgnore)) {
       tags.add('observability');
@@ -39320,7 +39329,10 @@ function countChangedLinesFromText(diffText) {
   if (!diffText) return 0;
   let lines = 0;
   for (const line of diffText.split('\n')) {
-    if ((line.startsWith('+') && !line.startsWith('+++')) || (line.startsWith('-') && !line.startsWith('---'))) {
+    if (
+      (line.startsWith('+') && !line.startsWith('+++')) ||
+      (line.startsWith('-') && !line.startsWith('---'))
+    ) {
       lines++;
     }
   }
@@ -40678,7 +40690,10 @@ class ConfigLoader {
         return fullPath;
       } catch (err) {
         if (err?.code !== 'ENOENT') {
-          throw new ConfigLoaderError('設定ファイルの存在確認に失敗しました', { cause: err, path: fullPath });
+          throw new ConfigLoaderError('設定ファイルの存在確認に失敗しました', {
+            cause: err,
+            path: fullPath,
+          });
         }
       }
     }
@@ -40713,20 +40728,25 @@ class ConfigLoader {
     try {
       const raw = await this.fs.readFile(configPath, 'utf8');
       const parsed = this.parseConfig(raw, configPath);
-      
+
       // Determine schema based on content
       const isNewSchema = 'skills' in parsed || 'version' in parsed;
-      
+
       if (isNewSchema) {
         const validated = ConfigSchema.safeParse(parsed);
         if (!validated.success) {
-          const detail = validated.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
-          throw new ConfigLoaderError(`設定ファイルの形式が正しくありません (Skill Schema): ${detail}`, { path: configPath });
+          const detail = validated.error.errors
+            .map((err) => `${err.path.join('.')}: ${err.message}`)
+            .join('; ');
+          throw new ConfigLoaderError(
+            `設定ファイルの形式が正しくありません (Skill Schema): ${detail}`,
+            { path: configPath }
+          );
         }
         parsedInput = validated.data;
 
         const knownKeys = new Set(['version', 'model', 'review', 'exclude', 'skills']);
-        const unknownKeys = Object.keys(parsedInput).filter(key => !knownKeys.has(key));
+        const unknownKeys = Object.keys(parsedInput).filter((key) => !knownKeys.has(key));
         if (unknownKeys.length) {
           const message = `Unknown config keys ignored: ${unknownKeys.join(', ')}`;
           if (process.env.RIVER_CONFIG_STRICT === '1') {
@@ -40739,23 +40759,34 @@ class ConfigLoader {
         // Fallback to old schema
         const validated = riverReviewerConfigSchema.safeParse(parsed);
         if (!validated.success) {
-           const detail = validated.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
-           throw new ConfigLoaderError(`設定ファイルの形式が正しくありません (Legacy Schema): ${detail}`, { path: configPath });
+          const detail = validated.error.errors
+            .map((err) => `${err.path.join('.')}: ${err.message}`)
+            .join('; ');
+          throw new ConfigLoaderError(
+            `設定ファイルの形式が正しくありません (Legacy Schema): ${detail}`,
+            { path: configPath }
+          );
         }
         parsedInput = validated.data;
       }
-      
     } catch (err) {
       if (err instanceof ConfigLoaderError) throw err;
       if (err instanceof SyntaxError || err?.name === 'YAMLException') {
-        throw new ConfigLoaderError('設定ファイルのパースに失敗しました', { cause: err, path: configPath });
+        throw new ConfigLoaderError('設定ファイルのパースに失敗しました', {
+          cause: err,
+          path: configPath,
+        });
       }
-      throw new ConfigLoaderError('設定ファイルの読み込みに失敗しました', { cause: err, path: configPath });
+      throw new ConfigLoaderError('設定ファイルの読み込みに失敗しました', {
+        cause: err,
+        path: configPath,
+      });
     }
 
     try {
       // Determine which base config to use
-      const baseToUse = ('skills' in parsedInput || 'version' in parsedInput) ? config_default/* defaultSkillConfig */.z : this.baseConfig;
+      const baseToUse =
+        'skills' in parsedInput || 'version' in parsedInput ? config_default/* defaultSkillConfig */.z : this.baseConfig;
       const merged = mergeConfig(baseToUse, parsedInput);
       return { config: merged, path: configPath, source: 'file' };
     } catch (err) {
@@ -40810,11 +40841,11 @@ function normalizeWhitespace(line) {
 
 function isWhitespaceOnlyChange(lines) {
   const added = lines
-    .filter(line => line.startsWith('+') && !line.startsWith('+++'))
-    .map(line => line.slice(1));
+    .filter((line) => line.startsWith('+') && !line.startsWith('+++'))
+    .map((line) => line.slice(1));
   const removed = lines
-    .filter(line => line.startsWith('-') && !line.startsWith('---'))
-    .map(line => line.slice(1));
+    .filter((line) => line.startsWith('-') && !line.startsWith('---'))
+    .map((line) => line.slice(1));
   if (added.length === 0 && removed.length === 0) return false;
   return normalizeWhitespace(added.join('')) === normalizeWhitespace(removed.join(''));
 }
@@ -40822,12 +40853,12 @@ function isWhitespaceOnlyChange(lines) {
 const COMMENT_MARKERS = [/^\/\//, /^\/\*/, /^\*($|\s)/, /^\*\/$/, /^#/, /^<!--/, /^-->/];
 
 function isCommentOnlyChange(lines) {
-  const changed = lines.filter(line => line.startsWith('+') || line.startsWith('-'));
+  const changed = lines.filter((line) => line.startsWith('+') || line.startsWith('-'));
   if (!changed.length) return false;
-  return changed.every(line => {
+  return changed.every((line) => {
     const content = line.slice(1).trim();
     if (!content) return true;
-    return COMMENT_MARKERS.some(re => re.test(content));
+    return COMMENT_MARKERS.some((re) => re.test(content));
   });
 }
 
@@ -40873,7 +40904,10 @@ function optimizeDiff(diff) {
 
   const diffText = renderDiffText(optimizedFiles);
   const tokenEstimate = Math.ceil(diffText.length / 4);
-  const reduction = rawTokenEstimate === 0 ? 0 : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
+  const reduction =
+    rawTokenEstimate === 0
+      ? 0
+      : Math.max(0, Math.round(((rawTokenEstimate - tokenEstimate) / rawTokenEstimate) * 100));
 
   return {
     files: optimizedFiles,
@@ -40890,8 +40924,8 @@ function renderDiffText(files) {
   for (const file of files) {
     const isNewFile = !file.oldPath || file.oldPath === '/dev/null';
     const isDeletedFile = !file.newPath || file.newPath === '/dev/null';
-    const oldPath = isNewFile ? '/dev/null' : file.oldPath ?? file.path;
-    const newPath = isDeletedFile ? '/dev/null' : file.newPath ?? file.path;
+    const oldPath = isNewFile ? '/dev/null' : (file.oldPath ?? file.path);
+    const newPath = isDeletedFile ? '/dev/null' : (file.newPath ?? file.path);
     const oldDisplay = oldPath === '/dev/null' ? '/dev/null' : `a/${oldPath}`;
     const newDisplay = newPath === '/dev/null' ? '/dev/null' : `b/${newPath}`;
 
@@ -41401,7 +41435,9 @@ async function runGit(args, { cwd }) {
 }
 
 async function ensureGitRepo(cwd) {
-  const insideWorkTree = await runGit(['rev-parse', '--is-inside-work-tree'], { cwd }).catch(() => null);
+  const insideWorkTree = await runGit(['rev-parse', '--is-inside-work-tree'], { cwd }).catch(
+    () => null
+  );
   if (insideWorkTree !== 'true') {
     throw new GitRepoNotFoundError(cwd);
   }
@@ -41410,7 +41446,9 @@ async function ensureGitRepo(cwd) {
 
 async function detectDefaultBranch(cwd) {
   const candidates = [];
-  const ref = await runGit(['symbolic-ref', '--quiet', 'refs/remotes/origin/HEAD'], { cwd }).catch(() => null);
+  const ref = await runGit(['symbolic-ref', '--quiet', 'refs/remotes/origin/HEAD'], { cwd }).catch(
+    () => null
+  );
   if (ref) {
     const parts = ref.split('/');
     candidates.push(parts[parts.length - 1]);
@@ -41418,11 +41456,13 @@ async function detectDefaultBranch(cwd) {
   candidates.push('main', 'master');
 
   for (const branch of candidates) {
-    const exists = await runGit(['rev-parse', '--quiet', '--verify', branch], { cwd }).catch(() => null);
-    if (exists) return branch;
-    const remoteExists = await runGit(['rev-parse', '--quiet', '--verify', `origin/${branch}`], { cwd }).catch(
-      () => null,
+    const exists = await runGit(['rev-parse', '--quiet', '--verify', branch], { cwd }).catch(
+      () => null
     );
+    if (exists) return branch;
+    const remoteExists = await runGit(['rev-parse', '--quiet', '--verify', `origin/${branch}`], {
+      cwd,
+    }).catch(() => null);
     if (remoteExists) return branch;
   }
   return 'HEAD';
@@ -41442,7 +41482,7 @@ async function listChangedFiles(cwd, baseRef) {
   const stdout = await runGit(['diff', '--name-only', baseRef], { cwd });
   return stdout
     .split('\n')
-    .map(line => line.trim())
+    .map((line) => line.trim())
     .filter(Boolean);
 }
 
@@ -44095,9 +44135,7 @@ function evaluateRisk(riskMap, filePaths) {
     }
   }
 
-  const escalatedFiles = fileRisks
-    .filter((r) => r.action === 'escalate')
-    .map((r) => r.file);
+  const escalatedFiles = fileRisks.filter((r) => r.action === 'escalate').map((r) => r.file);
   const humanReviewFiles = fileRisks
     .filter((r) => r.action === 'require_human_review')
     .map((r) => r.file);
@@ -44520,7 +44558,10 @@ function scoreReview(findings) {
   const overall = computeOverallScore(axes);
   const counts = countBySeverity(findings);
   const verdict = deriveVerdict({ overall, axes, counts });
-  const findingBreakdowns = (findings ?? []).map((f) => ({ id: f.id, ...(0,_breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__/* .computeFindingBreakdown */ ._)(f) }));
+  const findingBreakdowns = (findings ?? []).map((f) => ({
+    id: f.id,
+    ...(0,_breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__/* .computeFindingBreakdown */ ._)(f),
+  }));
   return { overall, axes, verdict, counts, findingBreakdowns, derived: true };
 }
 
@@ -46851,8 +46892,7 @@ class CostEstimator {
   estimateFromUsage(usage) {
     if (!usage) return null;
     const pricing = MODEL_PRICES[usage.model] ?? this.pricing;
-    const freshInput =
-      (usage.inputTokens ?? 0) - (usage.cacheReadInputTokens ?? 0);
+    const freshInput = (usage.inputTokens ?? 0) - (usage.cacheReadInputTokens ?? 0);
     const cacheRead = usage.cacheReadInputTokens ?? 0;
     const cacheCreate = usage.cacheCreationInputTokens ?? 0;
     const output = usage.outputTokens ?? 0;
@@ -59851,7 +59891,7 @@ async function withRetry(fn) {
       if (process.env.RIVER_AI_RETRY_DEBUG === '1') {
         // eslint-disable-next-line no-console
         console.warn(
-          `[AI retry] attempt ${attempt} failed (${err?.message || err}); retrying in ${delay}ms...`,
+          `[AI retry] attempt ${attempt} failed (${err?.message || err}); retrying in ${delay}ms...`
         );
       }
       await new Promise((res) => setTimeout(res, delay));
@@ -60034,7 +60074,7 @@ function assertAnthropicModelName(modelName) {
   if (!ANTHROPIC_MODEL_PATTERN.test(modelName)) {
     throw new Error(
       `Invalid Anthropic model name: ${modelName} ` +
-        `(expected claude-{sonnet|opus|haiku}-<version>)`,
+        `(expected claude-{sonnet|opus|haiku}-<version>)`
     );
   }
 }
@@ -60105,7 +60145,7 @@ class AnthropicClient {
       // eslint-disable-next-line no-console
       console.log(
         `[Anthropic usage] input=${u.inputTokens} output=${u.outputTokens} ` +
-          `cache_create=${u.cacheCreationInputTokens} cache_read=${u.cacheReadInputTokens}`,
+          `cache_create=${u.cacheCreationInputTokens} cache_read=${u.cacheReadInputTokens}`
       );
     }
 
@@ -60259,7 +60299,7 @@ async function persistUsageEvents(events, opts) {
         usage: e.usage,
         runId: opts.runId,
         commit: opts.commit,
-      }),
+      })
     )
     .filter(Boolean);
 
@@ -60300,7 +60340,7 @@ function resolveModelName(skill) {
 }
 
 function skill_dispatcher_shouldExclude(filePath, patterns = []) {
-  return patterns.some(pattern => (0,esm/* minimatch */.xF)(filePath, pattern, { dot: true }));
+  return patterns.some((pattern) => (0,esm/* minimatch */.xF)(filePath, pattern, { dot: true }));
 }
 
 class SkillDispatcher {
@@ -60314,7 +60354,7 @@ class SkillDispatcher {
     const language = config.review?.language || 'en';
     const llmEnabled = (0,utils/* isLlmEnabled */.Rq)();
 
-    let skills = (config.skills || []).map(skill => ({
+    let skills = (config.skills || []).map((skill) => ({
       ...skill,
       phase: skill.phase ?? skill.trigger?.phase,
       files: skill.files ?? skill.applyTo ?? [],
@@ -60323,7 +60363,7 @@ class SkillDispatcher {
       // Fallback: load skills from local directory if not in config
       console.log('Loading skills from local directory...');
       const loaded = await (0,skill_loader/* loadSkills */.l1)({ skillsDir: external_node_path_.join(this.repoRoot, 'skills') });
-      skills = loaded.map(s => ({
+      skills = loaded.map((s) => ({
         ...s.metadata,
         body: s.body, // Include body for prompt generation
         files: s.metadata.files || s.metadata.applyTo || [], // Normalize files
@@ -60337,7 +60377,7 @@ class SkillDispatcher {
     }
 
     const excludePatterns = config.exclude?.files ?? [];
-    const reviewFiles = changedFiles.filter(file => !skill_dispatcher_shouldExclude(file, excludePatterns));
+    const reviewFiles = changedFiles.filter((file) => !skill_dispatcher_shouldExclude(file, excludePatterns));
 
     if (!reviewFiles.length) {
       console.log('No files to review after applying exclude patterns.');
@@ -60346,30 +60386,34 @@ class SkillDispatcher {
 
     for (const file of reviewFiles) {
       // 1. Identify applicable skills for this file
-      const fileMatched = skills.filter(skill =>
-        (skill.files || []).some(pattern => (0,esm/* minimatch */.xF)(file, pattern, { dot: true })),
+      const fileMatched = skills.filter((skill) =>
+        (skill.files || []).some((pattern) => (0,esm/* minimatch */.xF)(file, pattern, { dot: true }))
       );
       const phaseMatched = fileMatched.filter(
-        skill =>
-          !skill.phase || skill.phase === phase || (Array.isArray(skill.phase) && skill.phase.includes(phase)),
+        (skill) =>
+          !skill.phase ||
+          skill.phase === phase ||
+          (Array.isArray(skill.phase) && skill.phase.includes(phase))
       );
       const applicableSkills = phaseMatched.filter(
-        skill => !(skill.exclude ?? []).some(pattern => (0,esm/* minimatch */.xF)(file, pattern, { dot: true })),
+        (skill) => !(skill.exclude ?? []).some((pattern) => (0,esm/* minimatch */.xF)(file, pattern, { dot: true }))
       );
 
       if (applicableSkills.length === 0) {
         if (debug) {
-          const excluded = phaseMatched.filter(skill =>
-            (skill.exclude ?? []).some(pattern => (0,esm/* minimatch */.xF)(file, pattern, { dot: true })),
+          const excluded = phaseMatched.filter((skill) =>
+            (skill.exclude ?? []).some((pattern) => (0,esm/* minimatch */.xF)(file, pattern, { dot: true }))
           );
           console.log(
-            `Skipping ${file}: matched files ${fileMatched.length}/${skills.length}, phase ok ${phaseMatched.length}/${fileMatched.length}, excluded ${excluded.length}.`,
+            `Skipping ${file}: matched files ${fileMatched.length}/${skills.length}, phase ok ${phaseMatched.length}/${fileMatched.length}, excluded ${excluded.length}.`
           );
         }
         continue;
       }
 
-      console.log(`Analyzing ${file} with skills: ${applicableSkills.map(s => s.name).join(', ')}`);
+      console.log(
+        `Analyzing ${file} with skills: ${applicableSkills.map((s) => s.name).join(', ')}`
+      );
 
       // 2. Execute skills in parallel
       const diff = await getFileDiff(file); // Dependency injection for file reading (once per file)
@@ -60380,25 +60424,27 @@ class SkillDispatcher {
           const systemPrompt = buildSystemPrompt(skill, language);
 
           if (debug) {
-            console.log(`\n--- System Prompt Debug (${skill.name}) ---\n${systemPrompt}\n-----------------------------------\n`);
+            console.log(
+              `\n--- System Prompt Debug (${skill.name}) ---\n${systemPrompt}\n-----------------------------------\n`
+            );
           }
 
           if (dryRun) {
-             console.log(`  -> Invoking (dry-run) ${modelName} for skill "${skill.name}"...`);
-             return {
-               file,
-               skill: skill.name,
-               review: `(dry-run) Skipped LLM call for skill: ${skill.name}`,
-             };
+            console.log(`  -> Invoking (dry-run) ${modelName} for skill "${skill.name}"...`);
+            return {
+              file,
+              skill: skill.name,
+              review: `(dry-run) Skipped LLM call for skill: ${skill.name}`,
+            };
           }
 
           if (!llmEnabled) {
-             console.log(`  -> Skipped (no API key) skill "${skill.name}"...`);
-             return {
-               file,
-               skill: skill.name,
-               review: `(skipped) LLM API key not set for skill: ${skill.name}`,
-             };
+            console.log(`  -> Skipped (no API key) skill "${skill.name}"...`);
+            return {
+              file,
+              skill: skill.name,
+              review: `(skipped) LLM API key not set for skill: ${skill.name}`,
+            };
           }
 
           const client = AIClientFactory.create({
@@ -60442,15 +60488,12 @@ class SkillDispatcher {
       } catch (err) {
         // Persistence is non-critical; failing here must not break the
         // review pipeline. Log and continue.
-        console.warn(
-          `[usage telemetry] failed to persist events: ${err?.message || err}`,
-        );
+        console.warn(`[usage telemetry] failed to persist events: ${err?.message || err}`);
       }
     }
 
     return results;
   }
-
 }
 
 // EXTERNAL MODULE: ./src/lib/review-plan-generator.mjs

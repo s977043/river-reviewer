@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { checkForResurfacingFindings, shouldResurface, buildResurfaceComments } from '../src/lib/resurface.mjs';
+import {
+  checkForResurfacingFindings,
+  shouldResurface,
+  buildResurfaceComments,
+} from '../src/lib/resurface.mjs';
 
 function makeSuppression(overrides = {}) {
   return {
@@ -15,7 +19,10 @@ function makeSuppression(overrides = {}) {
 }
 
 test('checkForResurfacingFindings returns empty for no suppressions', () => {
-  const result = checkForResurfacingFindings({ memoryContext: { suppressions: [] }, changedFiles: ['a.ts'] });
+  const result = checkForResurfacingFindings({
+    memoryContext: { suppressions: [] },
+    changedFiles: ['a.ts'],
+  });
   assert.deepEqual(result, []);
 });
 
@@ -33,12 +40,22 @@ test('checkForResurfacingFindings matches file-scoped suppression', () => {
 
 test('checkForResurfacingFindings skips unrelated files', () => {
   const ctx = { suppressions: [makeSuppression()] };
-  const result = checkForResurfacingFindings({ memoryContext: ctx, changedFiles: ['src/billing.ts'] });
+  const result = checkForResurfacingFindings({
+    memoryContext: ctx,
+    changedFiles: ['src/billing.ts'],
+  });
   assert.equal(result.length, 0);
 });
 
 test('shouldResurface matches subsystem scope', () => {
-  const s = makeSuppression({ context: { active: true, scope: 'subsystem' }, metadata: { createdAt: '2026-01-01T00:00:00Z', author: 't', relatedFiles: ['src/auth/login.ts'] } });
+  const s = makeSuppression({
+    context: { active: true, scope: 'subsystem' },
+    metadata: {
+      createdAt: '2026-01-01T00:00:00Z',
+      author: 't',
+      relatedFiles: ['src/auth/login.ts'],
+    },
+  });
   assert.equal(shouldResurface(s, ['src/auth/oauth.ts']), true);
   assert.equal(shouldResurface(s, ['src/billing/charge.ts']), false);
 });
@@ -49,7 +66,9 @@ test('shouldResurface returns false for inactive suppression', () => {
 });
 
 test('shouldResurface returns false for expired suppression', () => {
-  const s = makeSuppression({ context: { active: true, scope: 'file', expiresAt: '2025-01-01T00:00:00Z' } });
+  const s = makeSuppression({
+    context: { active: true, scope: 'file', expiresAt: '2025-01-01T00:00:00Z' },
+  });
   assert.equal(shouldResurface(s, ['src/auth.ts']), false);
 });
 

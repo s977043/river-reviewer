@@ -10,7 +10,8 @@ function makeFinding(overrides = {}) {
     lineStart: 10,
     lineEnd: 10,
     title: 'Possible null dereference',
-    message: 'Finding: null-check Evidence: obj.foo called without guard Impact: crash Fix: add guard Severity: major Confidence: high',
+    message:
+      'Finding: null-check Evidence: obj.foo called without guard Impact: crash Fix: add guard Severity: major Confidence: high',
     severity: 'major',
     confidence: 'high',
     status: 'open',

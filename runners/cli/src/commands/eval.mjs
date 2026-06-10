@@ -68,7 +68,6 @@ export async function evalCommand(skillPath, options) {
     }
 
     logger.success('\nSkill validation passed');
-
   } catch (error) {
     logger.failSpinner('Evaluation failed');
     logger.error(`Error: ${error.message}`);

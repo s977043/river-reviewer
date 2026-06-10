@@ -35,9 +35,7 @@ function getInputContextEnum() {
   const def = skillSchema.$defs?.inputContext ?? skillSchema.properties?.inputContext;
   // Both the $defs entry (string + enum) and the property reference resolve to
   // the same enum. Read whichever has it.
-  const raw =
-    skillSchema.$defs?.inputContext?.enum ??
-    (Array.isArray(def?.enum) ? def.enum : null);
+  const raw = skillSchema.$defs?.inputContext?.enum ?? (Array.isArray(def?.enum) ? def.enum : null);
   assert.ok(Array.isArray(raw), 'inputContext enum not found in skill.schema.json');
   return raw;
 }

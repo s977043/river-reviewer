@@ -3,11 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import test from 'node:test';
 
-import {
-  createTempGitRepo,
-  createRepoWithSilentCatchChange,
-  runGit,
-} from '../temp-repo.mjs';
+import { createTempGitRepo, createRepoWithSilentCatchChange, runGit } from '../temp-repo.mjs';
 
 test('createTempGitRepo creates an initialized git repo with default branch', async (t) => {
   const { dir, cleanup } = await createTempGitRepo();

@@ -58,7 +58,7 @@ test('withTempDir auto-cleans the directory when callback throws', async () => {
       capturedDir = dir;
       throw new Error('boom');
     }),
-    /boom/,
+    /boom/
   );
   assert.ok(capturedDir);
   assert.ok(!existsSync(capturedDir));

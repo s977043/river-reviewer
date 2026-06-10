@@ -1,6 +1,6 @@
 export function formatPlan(plan) {
-  const selected = plan.selected.map(skill => skill.metadata?.id ?? skill.id);
-  const skipped = plan.skipped.map(item => ({
+  const selected = plan.selected.map((skill) => skill.metadata?.id ?? skill.id);
+  const skipped = plan.skipped.map((item) => ({
     id: item.skill.metadata?.id ?? item.skill.id,
     reasons: item.reasons,
   }));
@@ -14,7 +14,7 @@ export function formatComments(comments) {
   }
 
   return comments
-    .map(comment => `  - ${comment.file}:${comment.line}: ${comment.message}`)
+    .map((comment) => `  - ${comment.file}:${comment.line}: ${comment.message}`)
     .join('\n');
 }
 
@@ -31,6 +31,6 @@ export function formatSkipped(skipped) {
     return '';
   }
 
-  const lines = skipped.map(item => `  - ${item.id}: ${item.reasons.join('; ')}`);
+  const lines = skipped.map((item) => `  - ${item.id}: ${item.reasons.join('; ')}`);
   return lines.join('\n');
 }

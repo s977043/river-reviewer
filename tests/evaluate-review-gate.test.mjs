@@ -117,7 +117,7 @@ test('throws on invalid input (missing summary)', async () => {
   try {
     await assert.rejects(
       () => evaluateGate({ input: tmpPath, failOnCritical: 1, failOnMajor: null }),
-      /missing summary/,
+      /missing summary/
     );
   } finally {
     await rm(tmpPath, { force: true });

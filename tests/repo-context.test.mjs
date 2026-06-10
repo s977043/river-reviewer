@@ -57,7 +57,9 @@ test('buildRepoContextSection returns empty string when no context', () => {
 
 test('buildRepoContextSection renders sections as markdown', () => {
   const ctx = {
-    sections: [{ label: 'Full file: src/foo.mjs', content: 'export const x = 1;', file: 'src/foo.mjs' }],
+    sections: [
+      { label: 'Full file: src/foo.mjs', content: 'export const x = 1;', file: 'src/foo.mjs' },
+    ],
     totalChars: 20,
     truncated: false,
   };

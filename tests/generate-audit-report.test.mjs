@@ -54,7 +54,7 @@ test('computeTrend calculates deltas correctly', () => {
   const current = { scores: { planner_coverage: 0.8 } };
   const trends = computeTrend(current, prev);
   assert.equal(trends.length, 1);
-  assert.ok(Math.abs(trends[0].delta - (-0.1)) < 0.001);
+  assert.ok(Math.abs(trends[0].delta - -0.1) < 0.001);
   assert.equal(trends[0].degraded, true);
 });
 

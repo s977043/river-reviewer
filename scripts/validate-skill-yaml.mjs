@@ -57,9 +57,7 @@ async function validateSkills() {
         error,
       });
       console.error(`❌ ${file}`);
-      console.error(
-        `   Parse error: ${error instanceof Error ? error.message : String(error)}`
-      );
+      console.error(`   Parse error: ${error instanceof Error ? error.message : String(error)}`);
       console.error('');
     }
   }

@@ -27,11 +27,7 @@ import { createTempDir, cleanupTempDir } from './temp-dir.mjs';
  * }}
  */
 export function createTempMemory(options = {}) {
-  const {
-    layout = 'nested',
-    entries = null,
-    prefix = 'river-mem-',
-  } = options;
+  const { layout = 'nested', entries = null, prefix = 'river-mem-' } = options;
 
   const dir = createTempDir({ prefix });
   let indexPath;
@@ -44,11 +40,7 @@ export function createTempMemory(options = {}) {
   }
 
   if (entries) {
-    writeFileSync(
-      indexPath,
-      JSON.stringify({ entries, version: '1' }, null, 2),
-      'utf8',
-    );
+    writeFileSync(indexPath, JSON.stringify({ entries, version: '1' }, null, 2), 'utf8');
   }
 
   const cleanup = () => cleanupTempDir(dir);
@@ -92,9 +84,5 @@ export function makeMemoryEntry(overrides = {}) {
  * @param {Array<object>} entries
  */
 export function writeMemoryIndex(indexPath, entries) {
-  writeFileSync(
-    indexPath,
-    JSON.stringify({ entries, version: '1' }, null, 2),
-    'utf8',
-  );
+  writeFileSync(indexPath, JSON.stringify({ entries, version: '1' }, null, 2), 'utf8');
 }

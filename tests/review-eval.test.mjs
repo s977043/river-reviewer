@@ -20,13 +20,13 @@ test('review eval fixtures keep must-include signals (heuristic path)', async ()
     const diffText = fs.readFileSync(diffPath, 'utf8');
     const parsed = parseUnifiedDiff(diffText);
     const plan = {
-      selected: (c.planSkills ?? []).map(id => ({ metadata: { id } })),
+      selected: (c.planSkills ?? []).map((id) => ({ metadata: { id } })),
       skipped: [],
     };
     const diff = {
       diffText,
       files: parsed.files,
-      changedFiles: parsed.files.map(f => f.path).filter(Boolean),
+      changedFiles: parsed.files.map((f) => f.path).filter(Boolean),
     };
 
     const result = await generateReview({
@@ -43,12 +43,18 @@ test('review eval fixtures keep must-include signals (heuristic path)', async ()
     const minFindings = Number.isFinite(c.minFindings) ? c.minFindings : expectNoFindings ? 0 : 1;
     const maxFindings = Number.isFinite(c.maxFindings) ? c.maxFindings : null;
 
-    assert.ok(result.comments.length >= minFindings, `[${c.name}] expected at least ${minFindings} finding(s)`);
+    assert.ok(
+      result.comments.length >= minFindings,
+      `[${c.name}] expected at least ${minFindings} finding(s)`
+    );
     if (typeof maxFindings === 'number') {
-      assert.ok(result.comments.length <= maxFindings, `[${c.name}] too many findings: ${result.comments.length}`);
+      assert.ok(
+        result.comments.length <= maxFindings,
+        `[${c.name}] too many findings: ${result.comments.length}`
+      );
     }
 
-    const merged = result.comments.map(x => x.message).join('\n');
+    const merged = result.comments.map((x) => x.message).join('\n');
     for (const token of c.mustInclude ?? []) {
       assert.ok(merged.includes(token), `[${c.name}] missing token: ${token}`);
     }
@@ -80,15 +86,22 @@ test('evaluateReviewFixtures returns structured result with exitCode, cases, and
   assert.ok(result.summary.passRate >= 0 && result.summary.passRate <= 1, 'passRate should be 0-1');
   assert.ok(
     result.summary.falsePositiveRate >= 0 && result.summary.falsePositiveRate <= 1,
-    'falsePositiveRate should be 0-1',
+    'falsePositiveRate should be 0-1'
   );
-  assert.ok(result.summary.evidenceRate >= 0 && result.summary.evidenceRate <= 1, 'evidenceRate should be 0-1');
+  assert.ok(
+    result.summary.evidenceRate >= 0 && result.summary.evidenceRate <= 1,
+    'evidenceRate should be 0-1'
+  );
 
   // total = passed + failed
   assert.equal(result.summary.total, result.summary.passed + result.summary.failed);
 
   // cases array matches total
-  assert.equal(result.cases.length, result.summary.total, 'cases length should match summary total');
+  assert.equal(
+    result.cases.length,
+    result.summary.total,
+    'cases length should match summary total'
+  );
 });
 
 test('evaluateReviewFixtures case results have correct shape', async () => {
@@ -106,10 +119,10 @@ test('evaluateReviewFixtures case results have correct shape', async () => {
   }
 
   // Guard cases should exist (we know the fixture data has some)
-  const guardCases = result.cases.filter(c => c.isGuardCase);
+  const guardCases = result.cases.filter((c) => c.isGuardCase);
   assert.ok(guardCases.length > 0, 'should have at least one guard case');
 
   // Non-guard cases should exist too
-  const nonGuardCases = result.cases.filter(c => !c.isGuardCase);
+  const nonGuardCases = result.cases.filter((c) => !c.isGuardCase);
   assert.ok(nonGuardCases.length > 0, 'should have at least one non-guard case');
 });

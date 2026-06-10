@@ -1,8 +1,11 @@
 {
-  "**/*.{js,ts,jsx,tsx}": ["prettier --write"],
+  "**/*.{js,mjs,cjs,ts,jsx,tsx}": ["prettier --write"],
   "**/*.{md,markdown}": ["npm run check:dashes", "prettier --write", "markdownlint --fix"],
   "**/*.{json,yml,yaml}": ["prettier --write"],
-  "skills/**/*.md": ["npm run skills:validate"],
+  "skills/**/*.md": [
+    "npm run skills:validate",
+    "bash -c 'npm run skills:manifest && git add docs/data/skill-manifest.json'"
+  ],
   "skills/agent-skills/**/*.md": ["npm run agent-skills:validate"],
   "pages/**/*.md": ["npm run check:bilingual"]
 }

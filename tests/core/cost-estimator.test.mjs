@@ -19,7 +19,12 @@ test('estimateFromDiff adds skill overhead', () => {
 
 test('formatCost renders human readable text', () => {
   const est = new CostEstimator('gpt-4');
-  const text = est.formatCost({ usd: 0.1234, inputTokens: 1000, outputTokens: 500, model: 'gpt-4' });
+  const text = est.formatCost({
+    usd: 0.1234,
+    inputTokens: 1000,
+    outputTokens: 500,
+    model: 'gpt-4',
+  });
   assert.match(text, /Model: gpt-4/);
   assert.match(text, /\$0\.1234/);
 });

@@ -37,11 +37,7 @@ function formatSummaryFromJson(data, inlinePostedCount, remainingIssues) {
   const summary = data.summary ?? {};
   const counts = summary.issueCountBySeverity ?? {};
 
-  const lines = [
-    COMMENT_MARKER,
-    '## River Reviewer',
-    '',
-  ];
+  const lines = [COMMENT_MARKER, '## River Reviewer', ''];
 
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
   if (total === 0) {
@@ -58,7 +54,9 @@ function formatSummaryFromJson(data, inlinePostedCount, remainingIssues) {
   lines.push('');
 
   if (inlinePostedCount > 0) {
-    lines.push(`_Successfully posted ${inlinePostedCount} inline review comment${inlinePostedCount === 1 ? '' : 's'}._`);
+    lines.push(
+      `_Successfully posted ${inlinePostedCount} inline review comment${inlinePostedCount === 1 ? '' : 's'}._`
+    );
     lines.push('');
   }
 
@@ -171,14 +169,18 @@ module.exports = async function postInlineComments({ github, context, core }) {
         });
         inlinePosted++;
       } catch (err) {
-        core.warning(`Could not post inline comment for ${issue.file}:${issue.line}: ${err.message}`);
+        core.warning(
+          `Could not post inline comment for ${issue.file}:${issue.line}: ${err.message}`
+        );
         inlineFailedIssues.push(issue);
         inlineFailed++;
       }
     }
   }
 
-  core.info(`Inline comments: ${inlinePosted} posted, ${inlineFailed} failed (will appear in summary)`);
+  core.info(
+    `Inline comments: ${inlinePosted} posted, ${inlineFailed} failed (will appear in summary)`
+  );
 
   // Build summary: findings without location + inline failures
   const remainingIssues = [...unlocatedIssues, ...inlineFailedIssues];

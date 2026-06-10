@@ -16,11 +16,7 @@ test('validates a minimal valid skill.yaml', () => {
   const result = SkillYamlSchema.safeParse(validSkill);
   assert.ok(result.success, 'Should validate minimal valid skill');
   // Only outputKind has default value per spec
-  assert.deepStrictEqual(
-    result.data.outputKind,
-    ['findings'],
-    'Should apply default outputKind'
-  );
+  assert.deepStrictEqual(result.data.outputKind, ['findings'], 'Should apply default outputKind');
 });
 
 test('validates a full-featured skill.yaml', () => {

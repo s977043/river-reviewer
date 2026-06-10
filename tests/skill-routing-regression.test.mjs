@@ -3,9 +3,9 @@ import test from 'node:test';
 import { buildExecutionPlan } from '../runners/core/review-runner.mjs';
 
 function findSkillInPlan(plan, id) {
-  const selected = plan.selected.find(s => s.metadata?.id === id);
+  const selected = plan.selected.find((s) => s.metadata?.id === id);
   if (selected) return { status: 'selected', reasons: [] };
-  const skipped = plan.skipped.find(s => s.skill?.metadata?.id === id);
+  const skipped = plan.skipped.find((s) => s.skill?.metadata?.id === id);
   if (skipped) return { status: 'skipped', reasons: skipped.reasons ?? [] };
   return { status: 'missing', reasons: [] };
 }

@@ -222,7 +222,9 @@ export async function evaluateReviewFixtures({ casesPath, phase = null, verbose 
         caseFailures.forEach((line) => console.log(`  ${line}`));
       }
     } else {
-      console.error(caseFailures.length ? formatFailure(name, caseFailures[0]) : formatSuccess(name));
+      console.error(
+        caseFailures.length ? formatFailure(name, caseFailures[0]) : formatSuccess(name)
+      );
     }
   }
 

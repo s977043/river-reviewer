@@ -18,7 +18,14 @@ function suppressionFor(fingerprint, contextOverride = {}) {
 }
 
 function findingFor(fingerprint, severity, extra = {}) {
-  return { id: 'f-' + fingerprint, fingerprint, severity, message: 'msg', file: 'src/x.ts', ...extra };
+  return {
+    id: 'f-' + fingerprint,
+    fingerprint,
+    severity,
+    message: 'msg',
+    file: 'src/x.ts',
+    ...extra,
+  };
 }
 
 test('applySuppressions returns inputs unchanged when no suppressions are loaded', () => {
@@ -204,9 +211,9 @@ test('applySuppressions is enabled by default (suppressionEnabled !== false)', (
 
 test('applySuppressions handles a mix of matched, P1-guarded, and unmatched findings', () => {
   const findings = [
-    findingFor(FP_A, 'minor'),    // suppressed (false_positive ok for minor)
+    findingFor(FP_A, 'minor'), // suppressed (false_positive ok for minor)
     findingFor(FP_B, 'critical'), // skipped (false_positive not ok for critical)
-    findingFor(FP_C, 'major'),    // kept (no matching suppression)
+    findingFor(FP_C, 'major'), // kept (no matching suppression)
     { id: 'f4', severity: 'info', message: 'no fp' }, // kept (no fingerprint)
   ];
   const memoryContext = {

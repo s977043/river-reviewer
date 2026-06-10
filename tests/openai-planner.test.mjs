@@ -55,7 +55,7 @@ describe('resolveOpenAIConfig', () => {
         const cfg = resolveOpenAIConfig();
         assert.equal(cfg.apiKey, 'key-env');
         assert.equal(cfg.endpoint, 'https://env.api/v1');
-      },
+      }
     );
   });
 
@@ -75,7 +75,7 @@ describe('resolveOpenAIConfig', () => {
         assert.equal(cfg.apiKey, undefined);
         assert.equal(cfg.model, 'gpt-4o-mini');
         assert.match(cfg.endpoint, /api\.openai\.com/);
-      },
+      }
     );
   });
 });
@@ -203,10 +203,7 @@ describe('createOpenAIPlanner', () => {
   test('plan() throws when no API key is configured', async () => {
     withEnv({ OPENAI_API_KEY: undefined, RIVER_OPENAI_API_KEY: undefined }, () => {
       const planner = createOpenAIPlanner();
-      assert.rejects(
-        planner.plan({ skills: [], context: {} }),
-        /API key/,
-      );
+      assert.rejects(planner.plan({ skills: [], context: {} }), /API key/);
     });
   });
 });

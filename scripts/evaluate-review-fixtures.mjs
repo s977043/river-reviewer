@@ -51,7 +51,7 @@ Defaults:
 
   const casesPath = path.resolve(
     repoRoot,
-    parsed.casesPath ?? path.join('tests', 'fixtures', 'review-eval', 'cases.json'),
+    parsed.casesPath ?? path.join('tests', 'fixtures', 'review-eval', 'cases.json')
   );
 
   return evaluateReviewFixtures({
@@ -62,11 +62,10 @@ Defaults:
 }
 
 main()
-  .then(code => {
+  .then((code) => {
     process.exitCode = code;
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(`Fixture runner error: ${err.message}`);
     process.exitCode = 1;
   });
-

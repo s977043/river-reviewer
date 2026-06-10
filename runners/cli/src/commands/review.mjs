@@ -57,7 +57,6 @@ export async function reviewCommand(files, options) {
 
     logger.info('\n✓ Review plan ready. Use --dry-run to see the plan without executing.');
     logger.info('Note: Actual review execution requires integration with review engine.');
-
   } catch (error) {
     logger.failSpinner('Review failed');
     logger.error(`Error: ${error.message}`);

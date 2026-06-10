@@ -14,10 +14,19 @@ const OUTPUT_PATH = 'audit-report.md';
 const DEGRADATION_THRESHOLD = 0.05;
 
 const RATIO_METRICS = new Set([
-  'exactMatch', 'top1Match', 'coverage', 'mrr',
-  'passRate', 'falsePositiveRate', 'evidenceRate', 'verifierRejectRate',
-  'policyPassRate', 'memoryRecallRate', 'escalationAccuracy',
-  'suppressionAccuracy', 'resurfaceAccuracy',
+  'exactMatch',
+  'top1Match',
+  'coverage',
+  'mrr',
+  'passRate',
+  'falsePositiveRate',
+  'evidenceRate',
+  'verifierRejectRate',
+  'policyPassRate',
+  'memoryRecallRate',
+  'escalationAccuracy',
+  'suppressionAccuracy',
+  'resurfaceAccuracy',
 ]);
 
 export function formatMetric(key, value) {
@@ -63,13 +72,16 @@ export function generateReport(envelope, previousEntry) {
   lines.push('## Sub-eval Results\n');
   lines.push('| Name | Status | Key Metrics |');
   lines.push('|------|--------|-------------|');
-  for (const r of (envelope.results ?? [])) {
+  for (const r of envelope.results ?? []) {
     const status = r.pass ? '✅ PASS' : '❌ FAIL';
-    const metricKeys = Object.keys(envelope.scores ?? {}).filter(k => k.startsWith(r.name + '_'));
-    const metricStr = metricKeys.map(k => {
-      const shortKey = k.replace(r.name + '_', '');
-      return shortKey + ': ' + formatMetric(shortKey, envelope.scores[k]);
-    }).join(', ') || '-';
+    const metricKeys = Object.keys(envelope.scores ?? {}).filter((k) => k.startsWith(r.name + '_'));
+    const metricStr =
+      metricKeys
+        .map((k) => {
+          const shortKey = k.replace(r.name + '_', '');
+          return shortKey + ': ' + formatMetric(shortKey, envelope.scores[k]);
+        })
+        .join(', ') || '-';
     lines.push('| ' + r.name + ' | ' + status + ' | ' + metricStr + ' |');
   }
   lines.push('');
@@ -86,15 +98,40 @@ export function generateReport(envelope, previousEntry) {
       lines.push('|--------|---------|----------|-------|-------|');
       for (const t of trends) {
         const alert = t.degraded ? '⚠️ DEGRADED' : '';
-        lines.push('| ' + t.key + ' | ' + formatMetric(t.key, t.current) + ' | ' + formatMetric(t.key, t.previous) + ' | ' + (t.delta >= 0 ? '+' : '') + formatMetric(t.key, t.delta) + ' | ' + alert + ' |');
+        lines.push(
+          '| ' +
+            t.key +
+            ' | ' +
+            formatMetric(t.key, t.current) +
+            ' | ' +
+            formatMetric(t.key, t.previous) +
+            ' | ' +
+            (t.delta >= 0 ? '+' : '') +
+            formatMetric(t.key, t.delta) +
+            ' | ' +
+            alert +
+            ' |'
+        );
       }
       lines.push('');
-      const degraded = trends.filter(t => t.degraded);
+      const degraded = trends.filter((t) => t.degraded);
       if (degraded.length) {
         lines.push('### ⚠️ Degradation Alert\n');
-        lines.push(degraded.length + ' metric(s) degraded by more than ' + (DEGRADATION_THRESHOLD * 100) + '%:\n');
+        lines.push(
+          degraded.length +
+            ' metric(s) degraded by more than ' +
+            DEGRADATION_THRESHOLD * 100 +
+            '%:\n'
+        );
         for (const d of degraded) {
-          lines.push('- **' + d.key + '**: ' + formatMetric(d.key, d.previous) + ' → ' + formatMetric(d.key, d.current));
+          lines.push(
+            '- **' +
+              d.key +
+              '**: ' +
+              formatMetric(d.key, d.previous) +
+              ' → ' +
+              formatMetric(d.key, d.current)
+          );
         }
         lines.push('');
       }
@@ -127,9 +164,14 @@ async function main() {
   console.log('Audit report written to ' + OUTPUT_PATH);
 }
 
-const isDirectRun = process.argv[1] &&
-  (process.argv[1].endsWith('generate-audit-report.mjs') || process.argv[1].endsWith('generate-audit-report'));
+const isDirectRun =
+  process.argv[1] &&
+  (process.argv[1].endsWith('generate-audit-report.mjs') ||
+    process.argv[1].endsWith('generate-audit-report'));
 
 if (isDirectRun) {
-  main().catch(err => { console.error('Audit report error: ' + err.message); process.exitCode = 1; });
+  main().catch((err) => {
+    console.error('Audit report error: ' + err.message);
+    process.exitCode = 1;
+  });
 }

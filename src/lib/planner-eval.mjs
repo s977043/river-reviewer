@@ -14,21 +14,20 @@ export async function evaluatePlanner(cases) {
       context: c.context,
       llmPlan: c.llmPlan,
     });
-    const plannedIds = planned.planned.map(s => s.id ?? s.metadata?.id);
+    const plannedIds = planned.planned.map((s) => s.id ?? s.metadata?.id);
     const expected = c.expectedOrder ?? [];
     const top1Match = plannedIds[0] === expected[0] ? 1 : 0;
     const coverage =
       expected.length === 0
         ? 1
-        : expected.filter(id => plannedIds.includes(id)).length / expected.length;
+        : expected.filter((id) => plannedIds.includes(id)).length / expected.length;
     const mrr = (() => {
       if (!expected.length) return 1;
       const idx = plannedIds.indexOf(expected[0]);
       return idx >= 0 ? 1 / (idx + 1) : 0;
     })();
     const exactMatch =
-      expected.length === plannedIds.length &&
-      expected.every((id, idx) => id === plannedIds[idx])
+      expected.length === plannedIds.length && expected.every((id, idx) => id === plannedIds[idx])
         ? 1
         : 0;
     results.push({
@@ -45,10 +44,10 @@ export async function evaluatePlanner(cases) {
 
   const summary = {
     cases: cases.length,
-    exactMatch: average(results.map(r => r.exactMatch)),
-    top1Match: average(results.map(r => r.top1Match)),
-    coverage: average(results.map(r => r.coverage)),
-    mrr: average(results.map(r => r.mrr)),
+    exactMatch: average(results.map((r) => r.exactMatch)),
+    top1Match: average(results.map((r) => r.top1Match)),
+    coverage: average(results.map((r) => r.coverage)),
+    mrr: average(results.map((r) => r.mrr)),
   };
 
   return { summary, cases: results };
