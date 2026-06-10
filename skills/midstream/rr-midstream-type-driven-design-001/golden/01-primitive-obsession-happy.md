@@ -10,7 +10,7 @@
 
 ```typescript
 type AccountId = string & { readonly __brand: 'AccountId' };
-export function transferFunds(from: AccountId, to: AccountId, amount: Money) { ... }
+export function transferFunds(from: AccountId, to: AccountId, amount: number) { ... }
 ```
 
 **Severity:** major
