@@ -25,14 +25,14 @@ River Review helps you answer questions like:
 
 ## Why River Review?
 
-| Axis                    | Existing AI review tools | River Review                                                  |
-| ----------------------- | ------------------------ | ------------------------------------------------------------- |
-| Input                   | Mostly the diff          | Plan, diff, tests, JUnit, prior review artifacts              |
-| Judgment                | Vendor black box         | Versioned skills in your repository                           |
-| Knowledge ownership     | Provider-owned           | Repo-owned and reviewable                                     |
-| Gates                   | Usually PR-time only     | Design and implementation gates (verify gate planned)         |
-| Finding reproducibility | Varies per run           | Suppression memory, fixture regression, deterministic scoring |
-| Agent workflow          | Standalone reviewer      | **Audit layer for AI-assisted implementation**                |
+| Axis                    | Existing AI review tools | River Review                                                              |
+| ----------------------- | ------------------------ | ------------------------------------------------------------------------- |
+| Input                   | Mostly the diff          | Plan, diff, tests, JUnit, prior review artifacts                          |
+| Judgment                | Vendor black box         | Versioned skills in your repository                                       |
+| Knowledge ownership     | Provider-owned           | Repo-owned and reviewable                                                 |
+| Gates                   | Usually PR-time only     | Design and implementation gates (verify gate planned)                     |
+| Finding reproducibility | Varies per run           | Suppression memory, fixture-based regression tests, deterministic scoring |
+| Agent workflow          | Standalone reviewer      | **Audit layer for AI-assisted implementation**                            |
 
 River Review is not another prompt wrapper around a PR diff. It is a way to make your team's review judgment executable — an audit layer that checks AI-written code against your own rules.
 
