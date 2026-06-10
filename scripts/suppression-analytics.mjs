@@ -70,7 +70,9 @@ export function analyzeSuppressions(entries, { now = new Date(), thresholds = TH
       fingerprint: e.context?.fingerprint ?? null,
       severity: e.context.severity,
       createdAt: e.createdAt,
-      ageDays: Math.floor((now.getTime() - new Date(e.createdAt).getTime()) / (24 * 60 * 60 * 1000)),
+      ageDays: Math.floor(
+        (now.getTime() - new Date(e.createdAt).getTime()) / (24 * 60 * 60 * 1000)
+      ),
       rationale: e.context?.rationale ?? e.summary ?? null,
     }));
 
@@ -146,8 +148,12 @@ if (isDirectRun) {
     console.log(formatIssueBody(result));
   } else {
     console.log(`active suppressions: ${result.active}`);
-    console.log(`repeated fingerprints (>=${THRESHOLDS.repeatPrCount} PRs): ${result.repeatedFingerprints.length}`);
-    console.log(`stale major/critical (>=${THRESHOLDS.staleHighSeverityDays}d): ${result.staleHighSeverity.length}`);
+    console.log(
+      `repeated fingerprints (>=${THRESHOLDS.repeatPrCount} PRs): ${result.repeatedFingerprints.length}`
+    );
+    console.log(
+      `stale major/critical (>=${THRESHOLDS.staleHighSeverityDays}d): ${result.staleHighSeverity.length}`
+    );
     if (result.repeatedFingerprints.length || result.staleHighSeverity.length) {
       console.log('\nRun with --issue-body to generate a diagnosis-request issue body.');
       process.exitCode = 2;
