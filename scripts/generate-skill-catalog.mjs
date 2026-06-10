@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { loadSkills } from '../runners/core/skill-loader.mjs';
+import { loadSkills, loadPacks } from '../runners/core/skill-loader.mjs';
 
 // docs/skills-catalog.md was removed as a duplicate; the canonical catalog lives
 // under pages/reference/ (rendered on the docs site).
@@ -84,9 +84,28 @@ function groupByPhase(skills) {
   return phases;
 }
 
+function formatPacksSection(packs) {
+  if (!packs.length) return [];
+  const lines = [
+    '## Skill Packs',
+    '',
+    '梱包済みレビューナレッジの配布単位です。`--skill-set <id>` で導入できます（詳細は [Skill Pack を使う](../guides/use-skill-packs.md) を参照）。',
+    '',
+    '| id | name | axis | tier | skills |',
+    '| --- | --- | --- | --- | --- |',
+  ];
+  for (const pack of packs) {
+    const skills = (pack.skills ?? []).map((id) => `\`${id}\``).join(' / ');
+    lines.push(`| \`${pack.id}\` | ${pack.name} | ${pack.axis} | ${pack.tier} | ${skills} |`);
+  }
+  lines.push('');
+  return lines;
+}
+
 async function main() {
   const skills = await loadSkills();
   const grouped = groupByPhase(skills);
+  const packs = await loadPacks();
 
   for (const outputPath of OUTPUT_PATHS) {
     const isTextlintTarget = outputPath.includes(`${path.sep}pages${path.sep}`);
@@ -95,6 +114,7 @@ async function main() {
       '',
       'River Review に同梱されているスキル一覧です。フェーズ別に分類しています。',
       '',
+      ...formatPacksSection(packs),
     ];
 
     for (const phase of ['upstream', 'midstream', 'downstream']) {

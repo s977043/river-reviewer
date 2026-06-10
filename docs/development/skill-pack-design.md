@@ -182,7 +182,12 @@ Phase C の DDD pack は「plan / 設計レビューに効く」という River 
 - `recommendations:` の即時廃止（互換期間を置く。新規追加凍結は Phase B、廃止判断は Phase D）
 - pack 単位の suppression。suppression / feedback は従来通り **skill 単位**（pack 非依存）で管理する。pack 固有の調整が必要になった場合は skill の fork で対応する
 
-## 9. 検証記録（2026-06-10）
+## 9. Phase D 判断記録（2026-06-10）
+
+- **recommendations の廃止判断**: 即時削除はせず、**次 major リリース（v2.0.0）で削除** する。それまでは現状の運用（新規追加凍結 + pack 優先解決 + 衝突警告 + DEPRECATED 注記）を継続する。理由は、プラグイン / GitHub Actions 利用者の `--skill-set basic` 等の既存導線を minor リリースで壊さないため
+- tags による実行フィルタは selection 実装（Phase B の resolver 拡張で導入済みの設計）に統合済みのため、独立タスクとしてはクローズ
+
+## 10. 検証記録（2026-06-10）
 
 本ドラフトは technical / consistency / adversarial の 3 視点並列セルフレビューを実施し、次の主要指摘を反映済みです。
 
