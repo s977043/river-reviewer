@@ -66,7 +66,8 @@
     "usage:summary": "node scripts/usage-summary.mjs",
     "skills:manifest": "node scripts/generate-skill-manifest.mjs",
     "skills:manifest:check": "node scripts/generate-skill-manifest.mjs --check",
-    "feedback:apply": "node scripts/apply-feedback.mjs"
+    "feedback:apply": "node scripts/apply-feedback.mjs",
+    "packs:tier": "node scripts/pack-tier-check.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.102.0",

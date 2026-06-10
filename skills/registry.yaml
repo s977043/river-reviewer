@@ -206,6 +206,17 @@ skills:
     recommended: true
     description: 'Meta-review skill: detects review findings that belong in CI/lint/formatter rather than human review'
 
+  - id: rr-midstream-ubiquitous-language-naming-001
+    version: '0.1.0'
+    name: 'Ubiquitous Language Naming Consistency'
+    path: skills/midstream/rr-midstream-ubiquitous-language-naming-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [ddd, domain, naming, ubiquitous-language, midstream]
+    severity: minor
+    recommended: false
+    description: 'Detects domain terms drifting between code identifiers and the established ubiquitous language.'
+
   - id: rr-midstream-loading-state-001
     version: '0.1.0'
     name: 'Loading State Transition Review'
@@ -868,6 +879,26 @@ packs:
       - rr-midstream-typescript-strict-001
       - rr-midstream-typescript-nullcheck-001
       - rr-midstream-type-driven-design-001
+
+  # 設計手法軸の実証 pack（skill-pack-design.md §3）。
+  # degraded mode: bounded-context は artifact / 設計ドキュメント差分にのみ反応し、
+  # diff 単体のリポジトリでは ubiquitous-language-naming / type-driven-design が
+  # 空振りを防ぐ。
+  - id: ddd
+    version: '0.1.0'
+    name: 'Domain-Driven Design Review Pack'
+    description: '境界づけられたコンテキスト・ユビキタス言語・型駆動のドメインモデリングのレビュー基準'
+    axis: methodology
+    tier: experimental
+    sources:
+      - name: 'Domain-Driven Design (Eric Evans)'
+        version: '2003 / Evans classification'
+        url: 'https://www.domainlanguage.com/ddd/'
+        reviewed_at: '2026-06-10'
+    skills:
+      - rr-upstream-bounded-context-language-001
+      - rr-midstream-type-driven-design-001
+      - rr-midstream-ubiquitous-language-naming-001
 
 # Recommended skill sets
 # NOTE: new additions are frozen (skill-pack-design.md §2). New bundles go to

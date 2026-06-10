@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "description": "Deterministic skill manifest for drift detection by selective adopters. Compare the checksum of your copied skill against this list to notice upstream changes. Regenerate with: npm run skills:manifest",
-  "skillCount": 96,
+  "skillCount": 97,
   "skills": [
     {
       "id": "adversarial-review",
@@ -296,6 +296,12 @@
       "path": "skills/midstream/rr-midstream-typescript-strict-001",
       "checksum": "sha256:0ea9d7a3d66add162ee44f5f0f488639212c6a301fccd9c279c91bfe7059e0b9",
       "files": 7
+    },
+    {
+      "id": "rr-midstream-ubiquitous-language-naming-001",
+      "path": "skills/midstream/rr-midstream-ubiquitous-language-naming-001",
+      "checksum": "sha256:4958582f8998b91f228d4ef76a34f0a9fc9ab9f2878717d6e3f81ae67075aa92",
+      "files": 1
     },
     {
       "id": "rr-midstream-war-game-001",
