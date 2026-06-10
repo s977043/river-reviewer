@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.10.0](https://github.com/s977043/river-review/compare/v1.9.0...v1.10.0) (2026-06-10)
+
+
+### Features
+
+* **cli:** deterministic skills resolve subcommand ([#1045](https://github.com/s977043/river-review/issues/1045)) ([#1121](https://github.com/s977043/river-review/issues/1121)) ([579aaf1](https://github.com/s977043/river-review/commit/579aaf19d7cbaa8baa3b437552308d4eaef7f3a3))
+* **skills:** promote typescript pack to official, ddd to community ([#1120](https://github.com/s977043/river-review/issues/1120)) ([e04f707](https://github.com/s977043/river-review/commit/e04f707b871a899244d7caecff7e11a4b7d2b10d))
+
 ## [1.9.0](https://github.com/s977043/river-review/compare/v1.8.0...v1.9.0) (2026-06-10)
 
 
