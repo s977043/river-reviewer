@@ -45,6 +45,10 @@ exclude = [
   # guide without making CI gate on it.
   '^https?://openai\.com/pricing',
 
+  # Large citation PDF that exceeds the request timeout under HEAD checks;
+  # it is a paper reference in a skill README, not a functional link.
+  '^https?://student\.cs\.uwaterloo\.ca/',
+
 ]
 
 # Exclude specific files that contain Docusaurus-internal routing links.
@@ -60,9 +64,10 @@ accept = [
   "200", "201", "202", "203", "204",
   # Server error codes to accept (temporary issues)
   "500", # Internal Server Error - may be temporary
+  "503", # Service Unavailable - transient (e.g. note.com maintenance windows)
   # Client error codes to accept (use carefully)
+  "429", # Too Many Requests - rate limiting, not a broken link
   # "403", # Forbidden - some sites block automated requests
-  # "429", # Too Many Requests
 ]
 
 # Exclude all private IPs from checking
