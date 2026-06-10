@@ -8,10 +8,10 @@ The Node API runner provides a TypeScript/JavaScript API for integrating River R
 
 ## Package
 
-|         | `@river-review/node-api`                                                                         | `@river-review/core-runner`                                                                            |
-| ------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| npm     | [npmjs.com/package/@river-review/node-api](https://www.npmjs.com/package/@river-review/node-api) | [npmjs.com/package/@river-review/core-runner](https://www.npmjs.com/package/@river-review/core-runner) |
-| Version | see [package.json](./package.json)                                                               | see [core package.json](../core/package.json)                                                          |
+|         | `@river-review/node-api`                                                                           | `@river-review/core-runner`                                                                           |
+| ------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| npm     | `@river-review/node-api`（npm 未公開、[#800](https://github.com/s977043/river-review/issues/800)） | `@river-review/core-runner`（npm 未公開、[#800](https://github.com/s977043/river-review/issues/800)） |
+| Version | see [package.json](./package.json)                                                                 | see [core package.json](../core/package.json)                                                         |
 
 ## Installation
 
