@@ -57,6 +57,7 @@ The shortest no-install path is the bundled plugin: add the marketplace and ask 
 | Try it in 5 minutes                     | [Quick start (GitHub Actions)](#quick-start-github-actions)                             |
 | Install as a Claude Code / Codex plugin | [Installing the plugin](#installing-the-river-review-plugin)                            |
 | Add to an existing repo                 | [Setup guide](https://river-review.the3396.com/guides/github-actions/)                  |
+| Start with a bundled Skill Pack         | [Using Skill Packs](pages/guides/use-skill-packs.en.md)                                 |
 | Create your first skill                 | [Skill tutorial](https://river-review.the3396.com/tutorials/creating-your-first-skill/) |
 | Estimate run cost                       | [Cost estimation guide](pages/guides/cost-estimation.en.md)                             |
 | Use W-check (double review)             | [W-check guide](pages/guides/w-check.en.md)                                             |
