@@ -65,10 +65,9 @@ accept = [
   # Server error codes to accept (temporary issues)
   "500", # Internal Server Error - may be temporary
   "503", # Service Unavailable - transient (e.g. note.com maintenance windows)
-  "429", # Too Many Requests - rate limiting, not a broken link
   # Client error codes to accept (use carefully)
+  "429", # Too Many Requests - rate limiting, not a broken link
   # "403", # Forbidden - some sites block automated requests
-  # "429", # Too Many Requests
 ]
 
 # Exclude all private IPs from checking
