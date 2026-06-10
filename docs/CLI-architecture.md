@@ -63,6 +63,6 @@ GitHub Action をはじめとする各実行面は、レビュー判断を持た
   2. CLI の実行（`dist/index.mjs run <repo>`—`src/cli.mjs` の ncc バンドル）
   3. 結果（JSON / findings）の PR コメント・summary への変換
 - Claude Code / Codex プラグイン、Codex skill、shell 連携も同様に「CLI（または同一の skill 定義）を呼ぶ薄い層」とし、Action や plugin 側へレビュー方針・skill 解決ロジックを複製しない
-- adapter 側に判断を足したくなった場合は、CLI のフラグ / config（`.river-review.yaml`）へ昇格させてから adapter で透過させる
+- adapter 側に判断を足したくなった場合は、CLI のフラグ / config（`.river-review.json` / `.yaml`）へ昇格させてから adapter で透過させる
 
 この原則により、`river skills resolve` 等での選択結果と実際の実行結果が、どの実行面でも一致することを保証する。
