@@ -140,6 +140,10 @@ const isDirectRun =
 if (isDirectRun) {
   const args = process.argv.slice(2);
   const idx = args.indexOf('--index');
+  if (idx >= 0 && !args[idx + 1]) {
+    console.error('Error: --index requires a path argument.');
+    process.exit(2);
+  }
   const indexPath = idx >= 0 ? path.resolve(args[idx + 1]) : DEFAULT_INDEX;
   const result = await runSuppressionAnalytics({ indexPath });
   if (args.includes('--json')) {
