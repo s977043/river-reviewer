@@ -1,5 +1,5 @@
 ---
-description: 'Pre-review harness check: run lint/typecheck/tests and summarize failures and risks'
+description: 'Pre-review harness check: run lint/tests and summarize failures and risks'
 ---
 
 対象プロジェクトに存在するチェックのみをこの順で実行して、失敗したら原因と修正案を出して：
