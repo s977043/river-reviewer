@@ -233,6 +233,15 @@ export async function planLocalReview({
   let effectiveSkillIds = skillIds;
   if (effectiveSkillIds == null && hasSelection(config.selection)) {
     effectiveSkillIds = await resolveSelectionSkillIds(config.selection, {});
+  } else if (
+    effectiveSkillIds == null &&
+    config.selection &&
+    !hasSelection(config.selection) &&
+    (config.selection.skills?.exclude?.length ?? 0) > 0
+  ) {
+    console.warn(
+      '⚠️  selection: skills.exclude has no effect without packs, tags, or skills.include; all skills remain eligible.'
+    );
   }
 
   const { matched: ignoredLabels, shouldSkip } = shouldSkipByLabel(

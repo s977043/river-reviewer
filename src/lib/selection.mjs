@@ -41,10 +41,13 @@ export async function resolveSelectionSkillIds(
         const available = packs.map((p) => p.id).join(', ') || '(none)';
         throw new Error(`selection.packs: unknown pack "${id}". Available packs: ${available}.`);
       }
-      if (
-        selection.minTier &&
-        TIER_RANK[pack.tier ?? 'experimental'] < TIER_RANK[selection.minTier]
-      ) {
+      const tierRank = TIER_RANK[pack.tier] ?? TIER_RANK.experimental;
+      if (selection.minTier && !(pack.tier in TIER_RANK)) {
+        warn(
+          `⚠️  selection: pack "${id}" declares unknown tier "${pack.tier}"; treating it as experimental.`
+        );
+      }
+      if (selection.minTier && tierRank < TIER_RANK[selection.minTier]) {
         warn(
           `⚠️  selection: pack "${id}" (tier: ${pack.tier ?? 'experimental'}) is below minTier ` +
             `"${selection.minTier}" but runs anyway because it was listed explicitly.`

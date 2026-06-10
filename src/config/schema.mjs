@@ -200,9 +200,11 @@ export const selectionConfigSchema = z
         include: z.array(z.string()).default([]),
         exclude: z.array(z.string()).default([]),
       })
+      .strict()
       .default({ include: [], exclude: [] }),
     minTier: z.enum(['official', 'community', 'experimental']).optional(),
   })
+  .strict()
   .describe('Project-level skill selection (packs / tags / individual skills)');
 
 export const riverReviewerConfigSchema = z.object({
