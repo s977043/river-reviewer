@@ -40,11 +40,7 @@ function setupRepo() {
 
   // 3. A test file that should be picked up alongside the source.
   mkdirSync(join(dir, 'tests'), { recursive: true });
-  writeFileSync(
-    join(dir, 'tests', 'leaky.test.mjs'),
-    'test("ok", () => {});\n',
-    'utf8'
-  );
+  writeFileSync(join(dir, 'tests', 'leaky.test.mjs'), 'test("ok", () => {});\n', 'utf8');
 
   return dir;
 }

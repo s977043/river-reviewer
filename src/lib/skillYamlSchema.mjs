@@ -56,7 +56,10 @@ const EvalSchema = z.object({
 
 // Trigger configuration (alternative format)
 const TriggerSchema = z.object({
-  phase: z.union([PhaseEnum, z.array(PhaseEnum)]).optional().describe('SDLC phase(s)'),
+  phase: z
+    .union([PhaseEnum, z.array(PhaseEnum)])
+    .optional()
+    .describe('SDLC phase(s)'),
   files: z.array(z.string().min(1)).optional().describe('File patterns (glob)'),
   path_patterns: z.array(z.string().min(1)).optional().describe('File patterns (alias)'),
   applyTo: z.array(z.string().min(1)).optional().describe('File patterns (alias)'),
@@ -76,7 +79,10 @@ export const SkillYamlSchema = z
     category: StreamCategoryEnum.describe('Stream category'),
 
     // Trigger conditions (at top level or in trigger object)
-    phase: z.union([PhaseEnum, z.array(PhaseEnum)]).optional().describe('SDLC phase(s)'),
+    phase: z
+      .union([PhaseEnum, z.array(PhaseEnum)])
+      .optional()
+      .describe('SDLC phase(s)'),
     applyTo: z.array(z.string().min(1)).optional().describe('File patterns (glob)'),
     path_patterns: z.array(z.string().min(1)).optional().describe('File patterns (alias)'),
     trigger: TriggerSchema.optional().describe('Alternative trigger format'),
@@ -85,10 +91,7 @@ export const SkillYamlSchema = z
     tags: z.array(z.string()).optional().describe('Classification tags'),
     severity: SeverityEnum.optional().describe('Severity level of findings'),
     inputContext: z.array(InputContextEnum).optional().describe('Input context references'),
-    outputKind: z
-      .array(OutputKindEnum)
-      .default(['findings'])
-      .describe('Output types'),
+    outputKind: z.array(OutputKindEnum).default(['findings']).describe('Output types'),
     modelHint: ModelHintEnum.optional().describe('Recommended model type'),
     dependencies: z.array(DependencySchema).optional().describe('Feature dependencies'),
     priority: z.number().int().optional().describe('Ordering hint for execution priority'),

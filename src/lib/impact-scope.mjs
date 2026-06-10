@@ -16,7 +16,7 @@ function containsSegment(file, segment) {
 
 function matchesAny(file, needles) {
   const normalized = file.toLowerCase();
-  return needles.some(n => normalized.includes(n));
+  return needles.some((n) => normalized.includes(n));
 }
 
 /**
@@ -35,7 +35,11 @@ export function inferImpactTags(changedFiles, options = {}) {
 
     if (['ts', 'tsx', 'cts', 'mts'].includes(ext)) tags.add('typescript');
     if (['js', 'jsx', 'cjs', 'mjs'].includes(ext)) tags.add('javascript');
-    if (['md', 'mdx', 'adr'].includes(ext) || matchesAny(file, ['/docs/', '/design/']) || containsSegment(file, 'docs')) {
+    if (
+      ['md', 'mdx', 'adr'].includes(ext) ||
+      matchesAny(file, ['/docs/', '/design/']) ||
+      containsSegment(file, 'docs')
+    ) {
       tags.add('design');
     }
 
@@ -49,7 +53,8 @@ export function inferImpactTags(changedFiles, options = {}) {
     }
 
     if (containsSegment(file, 'api') || containsSegment(file, 'routes')) tags.add('api');
-    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/'])) tags.add('reliability');
+    if (containsSegment(file, 'db') || matchesAny(file, ['/migrations/', '/schema/']))
+      tags.add('reliability');
 
     if (
       containsSegment(file, 'auth') ||
@@ -68,7 +73,10 @@ export function inferImpactTags(changedFiles, options = {}) {
       tags.add('security');
     }
 
-    if (containsSegment(file, 'logging') || matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])) {
+    if (
+      containsSegment(file, 'logging') ||
+      matchesAny(file, ['/logger', '/trace', '/tracing', '/otel', 'opentelemetry'])
+    ) {
       tags.add('observability');
       tags.add('reliability');
     }
@@ -79,7 +87,8 @@ export function inferImpactTags(changedFiles, options = {}) {
     const lower = diffText.toLowerCase();
     const hasCatch = lower.includes('catch (') || lower.includes('catch(');
     const addsSilentReturn =
-      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) || /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
+      /^\+.*\breturn\s*;\s*(?:\/\/.*)?$/m.test(diffText) ||
+      /^\+.*\breturn\s+null\s*;\s*(?:\/\/.*)?$/m.test(diffText);
     const mentionsIgnore = lower.includes('ignore') || lower.includes('swallow');
     if (hasCatch && (addsSilentReturn || mentionsIgnore)) {
       tags.add('observability');

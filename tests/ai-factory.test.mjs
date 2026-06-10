@@ -109,7 +109,7 @@ describe('withRetry', () => {
       (err) => {
         assert.match(err.message, /timeout/);
         return true;
-      },
+      }
     );
     // MAX_RETRIES = 2, so attempt should be 3 (1 initial + 2 retries)
     assert.equal(attempt, 3);
@@ -127,7 +127,7 @@ describe('withRetry', () => {
       (err) => {
         assert.match(err.message, /auth/);
         return true;
-      },
+      }
     );
     assert.equal(attempt, 1);
   });
@@ -146,7 +146,7 @@ describe('AIClientFactory.create', () => {
   test('throws for unsupported model name', () => {
     assert.throws(
       () => AIClientFactory.create({ modelName: 'mistral-large' }),
-      /Unsupported model/,
+      /Unsupported model/
     );
   });
 
@@ -174,7 +174,7 @@ describe('AIClientFactory.create', () => {
       delete process.env.RIVER_ANTHROPIC_API_KEY;
       assert.throws(
         () => AIClientFactory.create({ modelName: 'claude-sonnet-4-6' }),
-        /ANTHROPIC_API_KEY/,
+        /ANTHROPIC_API_KEY/
       );
     });
 
@@ -231,7 +231,7 @@ describe('AIClientFactory.create', () => {
   test('throws for fully unknown provider prefix', () => {
     assert.throws(
       () => AIClientFactory.create({ modelName: 'unsupported-fake-provider-xyz' }),
-      /Unsupported model/,
+      /Unsupported model/
     );
   });
 });
@@ -285,10 +285,7 @@ describe('getBackoffMs', () => {
     // up to ~1s of precision; we just assert the value is in a sane window
     // and clearly comes from the header (not the 500ms linear fallback).
     const future = new Date(Date.now() + 5000).toUTCString();
-    const ms = getBackoffMs(
-      { headers: { 'anthropic-ratelimit-requests-reset': future } },
-      1,
-    );
+    const ms = getBackoffMs({ headers: { 'anthropic-ratelimit-requests-reset': future } }, 1);
     assert.ok(ms > 1000 && ms <= 6000, `expected ~5s, got ${ms}ms`);
   });
 
@@ -569,7 +566,7 @@ describe('AnthropicClient.generateReview (prompt caching integration)', () => {
     assert.equal(
       received.system,
       'skill-system',
-      'disableCache:true should bypass caching even when env default is on',
+      'disableCache:true should bypass caching even when env default is on'
     );
   });
 
@@ -876,30 +873,24 @@ describe('assertAnthropicModelName', () => {
   test('rejects names without a known family token', () => {
     assert.throws(
       () => assertAnthropicModelName('claude-future-9000'),
-      /Invalid Anthropic model name/,
+      /Invalid Anthropic model name/
     );
-    assert.throws(
-      () => assertAnthropicModelName('claude-3-opus'),
-      /Invalid Anthropic model name/,
-    );
+    assert.throws(() => assertAnthropicModelName('claude-3-opus'), /Invalid Anthropic model name/);
   });
 
   test('rejects non-claude prefixes', () => {
-    assert.throws(
-      () => assertAnthropicModelName('gpt-4o'),
-      /Invalid Anthropic model name/,
-    );
+    assert.throws(() => assertAnthropicModelName('gpt-4o'), /Invalid Anthropic model name/);
     assert.throws(() => assertAnthropicModelName('claude'), /Invalid Anthropic model name/);
   });
 
   test('rejects spaces and slashes (injection-shaped strings)', () => {
     assert.throws(
       () => assertAnthropicModelName('claude-sonnet-4-6 ../foo'),
-      /Invalid Anthropic model name/,
+      /Invalid Anthropic model name/
     );
     assert.throws(
       () => assertAnthropicModelName('claude-sonnet-4-6/admin'),
-      /Invalid Anthropic model name/,
+      /Invalid Anthropic model name/
     );
   });
 });
@@ -926,13 +917,11 @@ describe('AIClientFactory rejects malformed claude-* names at AnthropicClient co
   test('throws for malformed claude-* name even though factory prefix matches', () => {
     assert.throws(
       () => AIClientFactory.create({ modelName: 'claude-evil-injection' }),
-      /Invalid Anthropic model name/,
+      /Invalid Anthropic model name/
     );
   });
 
   test('still accepts known sonnet/opus/haiku families', () => {
-    assert.doesNotThrow(() =>
-      AIClientFactory.create({ modelName: 'claude-sonnet-4-6' }),
-    );
+    assert.doesNotThrow(() => AIClientFactory.create({ modelName: 'claude-sonnet-4-6' }));
   });
 });

@@ -5,10 +5,7 @@ import { loadSkills } from '../../runners/core/skill-loader.mjs'; // Added
 import { AIClientFactory } from '../ai/factory.mjs';
 import { buildSystemPrompt } from '../prompts/buildSystemPrompt.mjs';
 import { isLlmEnabled } from '../lib/utils.mjs';
-import {
-  isUsageTelemetryEnabled,
-  persistUsageEvents,
-} from '../lib/usage-persistence.mjs';
+import { isUsageTelemetryEnabled, persistUsageEvents } from '../lib/usage-persistence.mjs';
 
 const MODEL_HINT_TO_NAME = {
   cheap: 'gpt-4o-mini',
@@ -25,7 +22,7 @@ function resolveModelName(skill) {
 }
 
 function shouldExclude(filePath, patterns = []) {
-  return patterns.some(pattern => minimatch(filePath, pattern, { dot: true }));
+  return patterns.some((pattern) => minimatch(filePath, pattern, { dot: true }));
 }
 
 export class SkillDispatcher {
@@ -39,7 +36,7 @@ export class SkillDispatcher {
     const language = config.review?.language || 'en';
     const llmEnabled = isLlmEnabled();
 
-    let skills = (config.skills || []).map(skill => ({
+    let skills = (config.skills || []).map((skill) => ({
       ...skill,
       phase: skill.phase ?? skill.trigger?.phase,
       files: skill.files ?? skill.applyTo ?? [],
@@ -48,7 +45,7 @@ export class SkillDispatcher {
       // Fallback: load skills from local directory if not in config
       console.log('Loading skills from local directory...');
       const loaded = await loadSkills({ skillsDir: path.join(this.repoRoot, 'skills') });
-      skills = loaded.map(s => ({
+      skills = loaded.map((s) => ({
         ...s.metadata,
         body: s.body, // Include body for prompt generation
         files: s.metadata.files || s.metadata.applyTo || [], // Normalize files
@@ -62,7 +59,7 @@ export class SkillDispatcher {
     }
 
     const excludePatterns = config.exclude?.files ?? [];
-    const reviewFiles = changedFiles.filter(file => !shouldExclude(file, excludePatterns));
+    const reviewFiles = changedFiles.filter((file) => !shouldExclude(file, excludePatterns));
 
     if (!reviewFiles.length) {
       console.log('No files to review after applying exclude patterns.');
@@ -71,30 +68,34 @@ export class SkillDispatcher {
 
     for (const file of reviewFiles) {
       // 1. Identify applicable skills for this file
-      const fileMatched = skills.filter(skill =>
-        (skill.files || []).some(pattern => minimatch(file, pattern, { dot: true })),
+      const fileMatched = skills.filter((skill) =>
+        (skill.files || []).some((pattern) => minimatch(file, pattern, { dot: true }))
       );
       const phaseMatched = fileMatched.filter(
-        skill =>
-          !skill.phase || skill.phase === phase || (Array.isArray(skill.phase) && skill.phase.includes(phase)),
+        (skill) =>
+          !skill.phase ||
+          skill.phase === phase ||
+          (Array.isArray(skill.phase) && skill.phase.includes(phase))
       );
       const applicableSkills = phaseMatched.filter(
-        skill => !(skill.exclude ?? []).some(pattern => minimatch(file, pattern, { dot: true })),
+        (skill) => !(skill.exclude ?? []).some((pattern) => minimatch(file, pattern, { dot: true }))
       );
 
       if (applicableSkills.length === 0) {
         if (debug) {
-          const excluded = phaseMatched.filter(skill =>
-            (skill.exclude ?? []).some(pattern => minimatch(file, pattern, { dot: true })),
+          const excluded = phaseMatched.filter((skill) =>
+            (skill.exclude ?? []).some((pattern) => minimatch(file, pattern, { dot: true }))
           );
           console.log(
-            `Skipping ${file}: matched files ${fileMatched.length}/${skills.length}, phase ok ${phaseMatched.length}/${fileMatched.length}, excluded ${excluded.length}.`,
+            `Skipping ${file}: matched files ${fileMatched.length}/${skills.length}, phase ok ${phaseMatched.length}/${fileMatched.length}, excluded ${excluded.length}.`
           );
         }
         continue;
       }
 
-      console.log(`Analyzing ${file} with skills: ${applicableSkills.map(s => s.name).join(', ')}`);
+      console.log(
+        `Analyzing ${file} with skills: ${applicableSkills.map((s) => s.name).join(', ')}`
+      );
 
       // 2. Execute skills in parallel
       const diff = await getFileDiff(file); // Dependency injection for file reading (once per file)
@@ -105,25 +106,27 @@ export class SkillDispatcher {
           const systemPrompt = buildSystemPrompt(skill, language);
 
           if (debug) {
-            console.log(`\n--- System Prompt Debug (${skill.name}) ---\n${systemPrompt}\n-----------------------------------\n`);
+            console.log(
+              `\n--- System Prompt Debug (${skill.name}) ---\n${systemPrompt}\n-----------------------------------\n`
+            );
           }
 
           if (dryRun) {
-             console.log(`  -> Invoking (dry-run) ${modelName} for skill "${skill.name}"...`);
-             return {
-               file,
-               skill: skill.name,
-               review: `(dry-run) Skipped LLM call for skill: ${skill.name}`,
-             };
+            console.log(`  -> Invoking (dry-run) ${modelName} for skill "${skill.name}"...`);
+            return {
+              file,
+              skill: skill.name,
+              review: `(dry-run) Skipped LLM call for skill: ${skill.name}`,
+            };
           }
 
           if (!llmEnabled) {
-             console.log(`  -> Skipped (no API key) skill "${skill.name}"...`);
-             return {
-               file,
-               skill: skill.name,
-               review: `(skipped) LLM API key not set for skill: ${skill.name}`,
-             };
+            console.log(`  -> Skipped (no API key) skill "${skill.name}"...`);
+            return {
+              file,
+              skill: skill.name,
+              review: `(skipped) LLM API key not set for skill: ${skill.name}`,
+            };
           }
 
           const client = AIClientFactory.create({
@@ -167,13 +170,10 @@ export class SkillDispatcher {
       } catch (err) {
         // Persistence is non-critical; failing here must not break the
         // review pipeline. Log and continue.
-        console.warn(
-          `[usage telemetry] failed to persist events: ${err?.message || err}`,
-        );
+        console.warn(`[usage telemetry] failed to persist events: ${err?.message || err}`);
       }
     }
 
     return results;
   }
-
 }

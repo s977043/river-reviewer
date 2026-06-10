@@ -127,7 +127,7 @@ export function formatText(summary, group) {
       `out=${String(s.outputTokens).padStart(7)} ` +
       `cacheRead=${String(s.cacheReadTokens).padStart(8)} ` +
       `hit=${(s.cacheHitRatio * 100).toFixed(1).padStart(5)}% ` +
-      `usd=$${s.usd.toFixed(4)}`,
+      `usd=$${s.usd.toFixed(4)}`
   );
   const totals = summary.reduce(
     (acc, s) => ({
@@ -137,7 +137,7 @@ export function formatText(summary, group) {
       cacheReadTokens: acc.cacheReadTokens + s.cacheReadTokens,
       usd: acc.usd + s.usd,
     }),
-    { calls: 0, inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, usd: 0 },
+    { calls: 0, inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, usd: 0 }
   );
   rows.push('');
   rows.push(
@@ -145,7 +145,7 @@ export function formatText(summary, group) {
       `in=${String(totals.inputTokens).padStart(8)} ` +
       `out=${String(totals.outputTokens).padStart(7)} ` +
       `cacheRead=${String(totals.cacheReadTokens).padStart(8)} ` +
-      `             usd=$${totals.usd.toFixed(4)}`,
+      `             usd=$${totals.usd.toFixed(4)}`
   );
   return [header, ...rows].join('\n');
 }

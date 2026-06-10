@@ -120,7 +120,7 @@ applyTo:
   - 'src/**/*.ts'
 ---
 Body
-`,
+`
     );
     const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
     const converted = convertAgentSkillToRR(parsed);
@@ -142,7 +142,7 @@ description: Has its own id
 id: my-custom-id
 ---
 Body content
-`,
+`
     );
     const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
     const converted = convertAgentSkillToRR(parsed);
@@ -165,7 +165,7 @@ name: test-skill
 description: Test skill
 ---
 Body
-`,
+`
     );
 
     const paths = await discoverAgentSkillPaths(tmpDir);
@@ -395,7 +395,7 @@ description: Skill with malicious id
 id: "../../../etc/passwd"
 ---
 Body
-`,
+`
     );
     const parsed = await parseAgentSkill(path.join(skillDir, 'SKILL.md'));
     const converted = convertAgentSkillToRR(parsed);
@@ -417,7 +417,7 @@ test('importAgentSkills records malformed SKILL.md in errors and continues', asy
     await mkdir(goodDir, { recursive: true });
     await writeFile(
       path.join(goodDir, 'SKILL.md'),
-      '---\nname: good-skill\ndescription: A valid skill\n---\nBody\n',
+      '---\nname: good-skill\ndescription: A valid skill\n---\nBody\n'
     );
     // One malformed skill (no frontmatter)
     const badDir = path.join(tmpDir, '.agents', 'skills', 'bad-skill');
@@ -428,7 +428,11 @@ test('importAgentSkills records malformed SKILL.md in errors and continues', asy
       strict: false,
       outputDir: path.join(tmpDir, 'out'),
     });
-    assert.equal(result.errors.length, 1, `Expected 1 error, got: ${JSON.stringify(result.errors)}`);
+    assert.equal(
+      result.errors.length,
+      1,
+      `Expected 1 error, got: ${JSON.stringify(result.errors)}`
+    );
     assert.equal(result.imported.length, 1, `Expected 1 imported, got: ${result.imported.length}`);
   });
 });
@@ -444,7 +448,7 @@ test('listAllSkills --source all deduplicates imported agent skills', async () =
     await mkdir(agentDir, { recursive: true });
     await writeFile(
       path.join(agentDir, 'SKILL.md'),
-      '---\nname: dup-skill\ndescription: Duplicate skill\nid: as-dup-skill\n---\nBody\n',
+      '---\nname: dup-skill\ndescription: Duplicate skill\nid: as-dup-skill\n---\nBody\n'
     );
 
     // Also import it into skills/ (simulating an already-imported state)
@@ -452,12 +456,16 @@ test('listAllSkills --source all deduplicates imported agent skills', async () =
     await mkdir(rrDir, { recursive: true });
     await writeFile(
       path.join(rrDir, 'SKILL.md'),
-      '---\nid: as-dup-skill\nname: dup-skill\ndescription: Duplicate skill\ncategory: core\nphase:\n  - upstream\n  - midstream\n  - downstream\napplyTo:\n  - "**/*"\nmetadata:\n  source: agent\n---\nBody\n',
+      '---\nid: as-dup-skill\nname: dup-skill\ndescription: Duplicate skill\ncategory: core\nphase:\n  - upstream\n  - midstream\n  - downstream\napplyTo:\n  - "**/*"\nmetadata:\n  source: agent\n---\nBody\n'
     );
 
     const result = await listAllSkills(tmpDir, { source: 'all' });
     const dupEntries = result.skills.filter((s) => s.id === 'as-dup-skill');
-    assert.equal(dupEntries.length, 1, `Expected 1 entry for as-dup-skill, got ${dupEntries.length}`);
+    assert.equal(
+      dupEntries.length,
+      1,
+      `Expected 1 entry for as-dup-skill, got ${dupEntries.length}`
+    );
     assert.equal(dupEntries[0].source, 'rr', 'RR source should take precedence');
   });
 });
@@ -471,7 +479,7 @@ test('importAgentSkills detects duplicate explicit ids in the same batch', async
       await mkdir(dir, { recursive: true });
       await writeFile(
         path.join(dir, 'SKILL.md'),
-        `---\nname: ${name}\ndescription: Skill ${name}\nid: same-id\n---\nBody\n`,
+        `---\nname: ${name}\ndescription: Skill ${name}\nid: same-id\n---\nBody\n`
       );
     }
 

@@ -128,7 +128,10 @@ export function scoreReview(findings) {
   const overall = computeOverallScore(axes);
   const counts = countBySeverity(findings);
   const verdict = deriveVerdict({ overall, axes, counts });
-  const findingBreakdowns = (findings ?? []).map((f) => ({ id: f.id, ...computeFindingBreakdown(f) }));
+  const findingBreakdowns = (findings ?? []).map((f) => ({
+    id: f.id,
+    ...computeFindingBreakdown(f),
+  }));
   return { overall, axes, verdict, counts, findingBreakdowns, derived: true };
 }
 

@@ -47,14 +47,26 @@ function diffReviews(previousFindings, currentFindings) {
   // New: in current but not in previous
   for (const [fp, f] of currByFp) {
     if (!prevByFp.has(fp)) {
-      newFindings.push({ fingerprint: fp, changeStatus: 'new', current: f, previous: null, scoreDelta: null });
+      newFindings.push({
+        fingerprint: fp,
+        changeStatus: 'new',
+        current: f,
+        previous: null,
+        scoreDelta: null,
+      });
     }
   }
 
   // Resolved: in previous but not in current
   for (const [fp, f] of prevByFp) {
     if (!currByFp.has(fp)) {
-      resolvedFindings.push({ fingerprint: fp, changeStatus: 'resolved', current: null, previous: f, scoreDelta: null });
+      resolvedFindings.push({
+        fingerprint: fp,
+        changeStatus: 'resolved',
+        current: null,
+        previous: f,
+        scoreDelta: null,
+      });
     }
   }
 
@@ -69,9 +81,21 @@ function diffReviews(previousFindings, currentFindings) {
     const changed = Math.abs(delta) >= 0.05;
 
     if (changed) {
-      scoreChangedFindings.push({ fingerprint: fp, changeStatus: 'score_changed', current: currF, previous: prevF, scoreDelta: delta });
+      scoreChangedFindings.push({
+        fingerprint: fp,
+        changeStatus: 'score_changed',
+        current: currF,
+        previous: prevF,
+        scoreDelta: delta,
+      });
     } else {
-      persistingFindings.push({ fingerprint: fp, changeStatus: 'persisting', current: currF, previous: prevF, scoreDelta: delta });
+      persistingFindings.push({
+        fingerprint: fp,
+        changeStatus: 'persisting',
+        current: currF,
+        previous: prevF,
+        scoreDelta: delta,
+      });
     }
   }
 
@@ -107,7 +131,9 @@ function formatRegressionSummary(diff) {
   lines.push(`| Resolved findings | ${summary.resolvedCount} |`);
   lines.push(`| Persisting | ${summary.persistingCount} |`);
   lines.push(`| Score changed | ${summary.scoreChangedCount} |`);
-  lines.push(`| Regression score | ${summary.regressionScore > 0 ? `+${summary.regressionScore}` : summary.regressionScore} |`);
+  lines.push(
+    `| Regression score | ${summary.regressionScore > 0 ? `+${summary.regressionScore}` : summary.regressionScore} |`
+  );
   lines.push('');
 
   if (newF.length) {
@@ -115,7 +141,9 @@ function formatRegressionSummary(diff) {
     for (const f of newF) {
       const sev = f.current.severity ?? 'unknown';
       const file = f.current.file ?? '?';
-      lines.push(`- **[${sev}]** \`${file}\`: ${(f.current.title || f.current.message || '').slice(0, 80)}`);
+      lines.push(
+        `- **[${sev}]** \`${file}\`: ${(f.current.title || f.current.message || '').slice(0, 80)}`
+      );
     }
     lines.push('');
   }
@@ -125,7 +153,9 @@ function formatRegressionSummary(diff) {
     for (const f of resolved) {
       const sev = f.previous.severity ?? 'unknown';
       const file = f.previous.file ?? '?';
-      lines.push(`- ~~[${sev}]~~ \`${file}\`: ${(f.previous.title || f.previous.message || '').slice(0, 80)}`);
+      lines.push(
+        `- ~~[${sev}]~~ \`${file}\`: ${(f.previous.title || f.previous.message || '').slice(0, 80)}`
+      );
     }
     lines.push('');
   }
@@ -135,7 +165,9 @@ function formatRegressionSummary(diff) {
     for (const f of scoreChanged) {
       const delta = f.scoreDelta ?? 0;
       const sign = delta > 0 ? '+' : '';
-      lines.push(`- \`${f.current.file ?? '?'}\` (${f.current.ruleId}): score ${sign}${delta.toFixed(2)}`);
+      lines.push(
+        `- \`${f.current.file ?? '?'}\` (${f.current.ruleId}): score ${sign}${delta.toFixed(2)}`
+      );
     }
     lines.push('');
   }

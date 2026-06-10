@@ -33,10 +33,7 @@ describe('eval/rubric.yaml integrity', () => {
 
   test('dimension weights sum to 1.0 (±1e-9)', () => {
     const total = rubric.dimensions.reduce((acc, d) => acc + d.weight, 0);
-    assert.ok(
-      Math.abs(total - 1.0) < 1e-9,
-      `weight sum is ${total}, expected 1.0 (±1e-9)`,
-    );
+    assert.ok(Math.abs(total - 1.0) < 1e-9, `weight sum is ${total}, expected 1.0 (±1e-9)`);
   });
 
   test('every dimension has a unique id', () => {
@@ -49,7 +46,7 @@ describe('eval/rubric.yaml integrity', () => {
     for (const d of rubric.dimensions) {
       assert.ok(
         d.direction === 'higher_is_better' || d.direction === 'lower_is_better',
-        `dimension '${d.id}' has invalid direction: ${d.direction}`,
+        `dimension '${d.id}' has invalid direction: ${d.direction}`
       );
     }
   });
@@ -63,30 +60,30 @@ describe('eval/rubric.yaml integrity', () => {
   test('scoringMethod values are within the allowed enum', () => {
     const allowed = new Set(['binary', 'ratio', 'manual']);
     for (const d of rubric.dimensions) {
-      assert.ok(allowed.has(d.scoringMethod), `invalid scoringMethod on ${d.id}: ${d.scoringMethod}`);
+      assert.ok(
+        allowed.has(d.scoringMethod),
+        `invalid scoringMethod on ${d.id}: ${d.scoringMethod}`
+      );
     }
   });
 });
 
 describe('ledger/rubric terminology alignment', () => {
   test('ledger dimensionScores uses scoringMethod (not method)', () => {
-    const dimensionItem =
-      ledgerSchema.properties.dimensionScores.items.properties;
+    const dimensionItem = ledgerSchema.properties.dimensionScores.items.properties;
     assert.ok(
       dimensionItem.scoringMethod,
-      'ledger schema should expose scoringMethod on dimensionScores items',
+      'ledger schema should expose scoringMethod on dimensionScores items'
     );
     assert.ok(
       !dimensionItem.method,
-      'ledger schema should no longer expose legacy `method` field on dimensionScores items',
+      'ledger schema should no longer expose legacy `method` field on dimensionScores items'
     );
   });
 
   test('ledger scoringMethod enum matches rubric scoringMethod enum', () => {
-    const ledgerEnum =
-      ledgerSchema.properties.dimensionScores.items.properties.scoringMethod.enum;
-    const rubricEnum =
-      rubricSchema.properties.dimensions.items.properties.scoringMethod.enum;
+    const ledgerEnum = ledgerSchema.properties.dimensionScores.items.properties.scoringMethod.enum;
+    const rubricEnum = rubricSchema.properties.dimensions.items.properties.scoringMethod.enum;
     assert.deepEqual([...ledgerEnum].sort(), [...rubricEnum].sort());
   });
 });

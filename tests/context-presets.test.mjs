@@ -30,12 +30,8 @@ test('preset budgets are ordered tiny < medium < large', () => {
 
 test('preset perSectionCaps grow with the preset size', () => {
   for (const section of ['fullFile', 'tests', 'usages', 'config']) {
-    assert.ok(
-      _PRESETS.tiny.perSectionCaps[section] <= _PRESETS.medium.perSectionCaps[section]
-    );
-    assert.ok(
-      _PRESETS.medium.perSectionCaps[section] <= _PRESETS.large.perSectionCaps[section]
-    );
+    assert.ok(_PRESETS.tiny.perSectionCaps[section] <= _PRESETS.medium.perSectionCaps[section]);
+    assert.ok(_PRESETS.medium.perSectionCaps[section] <= _PRESETS.large.perSectionCaps[section]);
   }
 });
 
@@ -61,16 +57,10 @@ test('resolveContextBudget returns null for unknown reviewMode without budget', 
 });
 
 test('preset objects are frozen so callers cannot mutate them', () => {
-  assert.throws(
-    () => {
-      _PRESETS.medium.maxTokens = 999_999;
-    },
-    /read[- ]only|object is not extensible/i
-  );
-  assert.throws(
-    () => {
-      _PRESETS.medium.perSectionCaps.fullFile = 0;
-    },
-    /read[- ]only|object is not extensible/i
-  );
+  assert.throws(() => {
+    _PRESETS.medium.maxTokens = 999_999;
+  }, /read[- ]only|object is not extensible/i);
+  assert.throws(() => {
+    _PRESETS.medium.perSectionCaps.fullFile = 0;
+  }, /read[- ]only|object is not extensible/i);
 });

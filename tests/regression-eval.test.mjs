@@ -25,28 +25,35 @@ test('evaluateRegression returns structured result shape', async () => {
 
 test('evaluateRegression: all current cases pass', async () => {
   const result = await evaluateRegression({ casesPath: CASES_PATH });
-  assert.equal(result.exitCode, 0, 'Expected all cases to pass. Failures: ' +
-    result.cases.filter(c => !c.pass).map(c => c.name).join(', '));
+  assert.equal(
+    result.exitCode,
+    0,
+    'Expected all cases to pass. Failures: ' +
+      result.cases
+        .filter((c) => !c.pass)
+        .map((c) => c.name)
+        .join(', ')
+  );
   assert.equal(result.summary.policyPassRate, 1.0);
 });
 
 test('evaluateRegression: memory_recall cases work', async () => {
   const result = await evaluateRegression({ casesPath: CASES_PATH });
-  const memoryCases = result.cases.filter(c => c.category === 'memory_recall');
+  const memoryCases = result.cases.filter((c) => c.category === 'memory_recall');
   assert.ok(memoryCases.length >= 3);
-  assert.ok(memoryCases.every(c => c.pass));
+  assert.ok(memoryCases.every((c) => c.pass));
 });
 
 test('evaluateRegression: suppression cases work', async () => {
   const result = await evaluateRegression({ casesPath: CASES_PATH });
-  const suppCases = result.cases.filter(c => c.category === 'suppression');
+  const suppCases = result.cases.filter((c) => c.category === 'suppression');
   assert.ok(suppCases.length >= 4);
-  assert.ok(suppCases.every(c => c.pass));
+  assert.ok(suppCases.every((c) => c.pass));
 });
 
 test('evaluateRegression: resurfacing cases work', async () => {
   const result = await evaluateRegression({ casesPath: CASES_PATH });
-  const resCases = result.cases.filter(c => c.category === 'resurfacing');
+  const resCases = result.cases.filter((c) => c.category === 'resurfacing');
   assert.ok(resCases.length >= 3);
-  assert.ok(resCases.every(c => c.pass));
+  assert.ok(resCases.every((c) => c.pass));
 });

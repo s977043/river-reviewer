@@ -43,17 +43,13 @@ async function checkDocPlacement() {
 
   console.log('');
   console.log(
-    `📊 Root .md files: ${rootMdFiles.length} total, ${rootMdFiles.length - violations} in allowlist, ${violations} violation(s)`,
+    `📊 Root .md files: ${rootMdFiles.length} total, ${rootMdFiles.length - violations} in allowlist, ${violations} violation(s)`
   );
 
   if (violations > 0) {
     console.error('');
-    console.error(
-      'Allowed root .md files: ' + [...ROOT_ALLOWLIST].sort().join(', '),
-    );
-    console.error(
-      'See DOCUMENTATION.md for placement policy.',
-    );
+    console.error('Allowed root .md files: ' + [...ROOT_ALLOWLIST].sort().join(', '));
+    console.error('See DOCUMENTATION.md for placement policy.');
     return false;
   }
   return true;

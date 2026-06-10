@@ -102,9 +102,7 @@ export function evaluateRisk(riskMap, filePaths) {
     }
   }
 
-  const escalatedFiles = fileRisks
-    .filter((r) => r.action === 'escalate')
-    .map((r) => r.file);
+  const escalatedFiles = fileRisks.filter((r) => r.action === 'escalate').map((r) => r.file);
   const humanReviewFiles = fileRisks
     .filter((r) => r.action === 'require_human_review')
     .map((r) => r.file);

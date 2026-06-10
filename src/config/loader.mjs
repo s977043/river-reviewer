@@ -57,7 +57,10 @@ export class ConfigLoader {
         return fullPath;
       } catch (err) {
         if (err?.code !== 'ENOENT') {
-          throw new ConfigLoaderError('設定ファイルの存在確認に失敗しました', { cause: err, path: fullPath });
+          throw new ConfigLoaderError('設定ファイルの存在確認に失敗しました', {
+            cause: err,
+            path: fullPath,
+          });
         }
       }
     }
@@ -92,20 +95,25 @@ export class ConfigLoader {
     try {
       const raw = await this.fs.readFile(configPath, 'utf8');
       const parsed = this.parseConfig(raw, configPath);
-      
+
       // Determine schema based on content
       const isNewSchema = 'skills' in parsed || 'version' in parsed;
-      
+
       if (isNewSchema) {
         const validated = ConfigSchema.safeParse(parsed);
         if (!validated.success) {
-          const detail = validated.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
-          throw new ConfigLoaderError(`設定ファイルの形式が正しくありません (Skill Schema): ${detail}`, { path: configPath });
+          const detail = validated.error.errors
+            .map((err) => `${err.path.join('.')}: ${err.message}`)
+            .join('; ');
+          throw new ConfigLoaderError(
+            `設定ファイルの形式が正しくありません (Skill Schema): ${detail}`,
+            { path: configPath }
+          );
         }
         parsedInput = validated.data;
 
         const knownKeys = new Set(['version', 'model', 'review', 'exclude', 'skills']);
-        const unknownKeys = Object.keys(parsedInput).filter(key => !knownKeys.has(key));
+        const unknownKeys = Object.keys(parsedInput).filter((key) => !knownKeys.has(key));
         if (unknownKeys.length) {
           const message = `Unknown config keys ignored: ${unknownKeys.join(', ')}`;
           if (process.env.RIVER_CONFIG_STRICT === '1') {
@@ -118,23 +126,34 @@ export class ConfigLoader {
         // Fallback to old schema
         const validated = riverReviewerConfigSchema.safeParse(parsed);
         if (!validated.success) {
-           const detail = validated.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
-           throw new ConfigLoaderError(`設定ファイルの形式が正しくありません (Legacy Schema): ${detail}`, { path: configPath });
+          const detail = validated.error.errors
+            .map((err) => `${err.path.join('.')}: ${err.message}`)
+            .join('; ');
+          throw new ConfigLoaderError(
+            `設定ファイルの形式が正しくありません (Legacy Schema): ${detail}`,
+            { path: configPath }
+          );
         }
         parsedInput = validated.data;
       }
-      
     } catch (err) {
       if (err instanceof ConfigLoaderError) throw err;
       if (err instanceof SyntaxError || err?.name === 'YAMLException') {
-        throw new ConfigLoaderError('設定ファイルのパースに失敗しました', { cause: err, path: configPath });
+        throw new ConfigLoaderError('設定ファイルのパースに失敗しました', {
+          cause: err,
+          path: configPath,
+        });
       }
-      throw new ConfigLoaderError('設定ファイルの読み込みに失敗しました', { cause: err, path: configPath });
+      throw new ConfigLoaderError('設定ファイルの読み込みに失敗しました', {
+        cause: err,
+        path: configPath,
+      });
     }
 
     try {
       // Determine which base config to use
-      const baseToUse = ('skills' in parsedInput || 'version' in parsedInput) ? defaultSkillConfig : this.baseConfig;
+      const baseToUse =
+        'skills' in parsedInput || 'version' in parsedInput ? defaultSkillConfig : this.baseConfig;
       const merged = mergeConfig(baseToUse, parsedInput);
       return { config: merged, path: configPath, source: 'file' };
     } catch (err) {

@@ -70,7 +70,7 @@ export async function persistUsageEvents(events, opts) {
         usage: e.usage,
         runId: opts.runId,
         commit: opts.commit,
-      }),
+      })
     )
     .filter(Boolean);
 
