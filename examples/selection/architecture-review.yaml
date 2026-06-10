@@ -3,7 +3,7 @@
 # selection は .river-review.yaml の設定として実装済み（--skill-set 指定時は CLI が優先）。
 selection:
   packs:
-    - ddd # bounded-context / type-driven-design / ubiquitous-language-naming（experimental tier のため minTier 注意）
+    - ddd # bounded-context / type-driven-design / ubiquitous-language-naming（community tier）
   tags:
     - architecture
   skills:
