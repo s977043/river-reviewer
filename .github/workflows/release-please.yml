@@ -62,3 +62,32 @@ jobs:
 
           git tag -f "${MAJOR_TAG}" "${COMMIT}"
           git push --force origin "refs/tags/${MAJOR_TAG}"
+
+      - name: Append "Skills changed" to release notes
+        # Surfaces which skills changed since the previous release so selective
+        # adopters can detect drift (#1016). Best-effort: never fails the release.
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          TAG="${{ steps.release.outputs.tag_name }}"
+
+          git fetch --tags --force --quiet || true
+          PREV_TAG="$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | grep -vx "${TAG}" | head -1 || true)"
+          if [ -z "${PREV_TAG}" ]; then
+            echo "No previous release tag; skipping skill changelog."
+            exit 0
+          fi
+
+          SECTION="$(node scripts/skill-changelog.mjs --base "${PREV_TAG}" --head "${TAG}" || true)"
+          if [ -z "${SECTION}" ]; then
+            echo "No skill changes between ${PREV_TAG} and ${TAG}."
+            exit 0
+          fi
+
+          BODY="$(gh release view "${TAG}" --json body --jq '.body' || true)"
+          {
+            printf '%s\n\n' "${BODY}"
+            printf '%s\n' "${SECTION}"
+          } | gh release edit "${TAG}" --notes-file - || echo "Failed to update release notes; continuing."

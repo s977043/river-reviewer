@@ -55,6 +55,15 @@ In ongoing operation, turning review results into assets at the following granul
 
 This promotion loop codifies AI-review judgment into reproducible checks. For the judgment units, see [choosing skills](./choose-skills.en.md) and the [skill-writing guide](./write-a-skill.en.md).
 
+## 4. Drift detection for Skill-adoption-only
+
+With "Skill adoption only," when upstream (River Review) improves a skill, the porting side cannot tell, so the copy goes stale over time. Two machine-readable footholds detect this:
+
+- **Skill manifest**: `docs/data/skill-manifest.json` records each skill's `id` / `path` / `checksum` (a content hash). Compare the checksum of the skill you ported against your copy to detect upstream changes automatically in CI.
+- **"Skills changed" in release notes**: Each release's notes list the skills that changed since the previous release (Changed / Added / Removed), so you can track which viewpoints to revisit per release.
+
+Locally, `npm run skills:changelog -- --base <prev-tag> --head <tag>` produces the same diff.
+
 ## Common failures and fixes
 
 | Failure                                   | Cause                                              | Fix                                                                                  |
