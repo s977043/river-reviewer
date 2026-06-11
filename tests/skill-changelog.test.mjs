@@ -38,6 +38,18 @@ test('diffManifests tolerates null / undefined inputs', () => {
   assert.deepEqual(diffManifests(null, undefined), { added: [], changed: [], removed: [] });
 });
 
+test('diffManifests skips malformed elements (null / missing id)', () => {
+  // null entries and entries without an id must not crash; valid ids still diff.
+  assert.deepEqual(
+    diffManifests([null, { checksum: '1' }], [{ id: 'a', checksum: 'x' }, undefined]),
+    {
+      added: ['a'],
+      changed: [],
+      removed: [],
+    }
+  );
+});
+
 test('renderSkillChangelog returns empty string when there are no changes', () => {
   assert.equal(renderSkillChangelog({ added: [], changed: [], removed: [] }), '');
 });

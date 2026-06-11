@@ -30,8 +30,10 @@ const MANIFEST_PATH = 'docs/data/skill-manifest.json';
  * @returns {{added:string[], removed:string[], changed:string[]}} sorted id lists
  */
 export function diffManifests(prevSkills, currSkills) {
-  const prev = new Map((prevSkills ?? []).map((s) => [s.id, s.checksum]));
-  const curr = new Map((currSkills ?? []).map((s) => [s.id, s.checksum]));
+  // Filter out malformed entries (null / undefined / missing id) defensively so
+  // a corrupt manifest can never crash the release pipeline.
+  const prev = new Map((prevSkills ?? []).filter((s) => s?.id).map((s) => [s.id, s.checksum]));
+  const curr = new Map((currSkills ?? []).filter((s) => s?.id).map((s) => [s.id, s.checksum]));
 
   const added = [];
   const removed = [];
