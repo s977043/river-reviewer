@@ -34,6 +34,29 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   exit 0
 fi
 
+# PostToolUse passes a stdin JSON payload whose .tool_input.file_path is the
+# single file just edited (the input is stdin JSON, not an env var). When that
+# file is available and jq can parse it, format only that file; otherwise fall
+# back to formatting the whole changed-file set below. This keeps the hook
+# backward-compatible when stdin / jq / file_path are absent.
+TARGET_FILE=""
+if [ ! -t 0 ]; then
+  HOOK_INPUT="$(cat 2>/dev/null || true)"
+  if [ -n "${HOOK_INPUT:-}" ] && command -v jq >/dev/null 2>&1; then
+    TARGET_FILE="$(printf '%s' "$HOOK_INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev/null || true)"
+  fi
+fi
+
+if [ -n "$TARGET_FILE" ] && [ -f "$TARGET_FILE" ] && printf '%s' "$TARGET_FILE" | grep -qE '\.(js|jsx|ts|tsx|cjs|mjs|json|md|yml|yaml)$'; then
+  if npx --no-install prettier --version >/dev/null 2>&1; then
+    npx --no-install prettier --write "$TARGET_FILE" || true
+    echo "[river-review:format] formatted 1 file (target: $TARGET_FILE)"
+  else
+    echo "[river-review:format] prettier not installed in project, skipping"
+  fi
+  exit 0
+fi
+
 CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRTUXB HEAD 2>/dev/null || echo "")
 if [ -z "$CHANGED_FILES" ]; then
   exit 0
