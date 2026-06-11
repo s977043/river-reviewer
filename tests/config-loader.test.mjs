@@ -207,3 +207,18 @@ test('global tier: どちらも無いとき従来どおり default', async () =>
     });
   });
 });
+
+test('global tier: globalConfigDir=null（無効化）でもクラッシュせず repo-local を解決', async () => {
+  await withTempDir(async (repoDir) => {
+    await fs.writeFile(
+      path.join(repoDir, '.river-review.json'),
+      JSON.stringify({ review: { language: 'en' } }),
+      'utf8'
+    );
+    // null disables the global tier (e.g. os.homedir() unavailable).
+    const loader = new ConfigLoader({ globalConfigDir: null });
+    const result = await loader.load(repoDir);
+    assert.equal(result.source, 'file');
+    assert.equal(result.config.review.language, 'en');
+  });
+});

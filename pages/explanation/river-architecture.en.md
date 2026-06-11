@@ -75,7 +75,7 @@ Which skills / gates / rules are ultimately selected is resolved deterministical
 
 1. **CLI explicit options** — `--skill-set` / `--context` / `--dependency`, etc. (the config file is auto-detected from the repo root, not via a `--config` flag; see below)
 2. **Repository local** — `.river-review.{json,yaml,yml}` (`src/config/loader.mjs`), `.river/rules.md` + `.river/rules.d/*.md`, `skills/registry.yaml`
-3. **User global** — `~/.river-review/config.{json,yaml,yml}` (`src/config/loader.mjs`). Applies when there is no repository-local config. When both exist, the repository-local config wins and the global one is merged underneath it.
+3. **User global** — `~/.river-review/config.{json,yaml,yml}` (`src/config/loader.mjs`). Always applies as a user-wide base. When a repository-local config exists, it is merged on top of the global one (repository-local wins).
 4. **Built-in** — bundled skills and defaults
 
 ### No auto-update

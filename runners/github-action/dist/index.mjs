@@ -40674,14 +40674,29 @@ class ConfigLoaderError extends Error {
   }
 }
 
+/**
+ * Resolve the default global config directory (~/.river-review). Returns null
+ * when the home directory cannot be determined (e.g. minimal containers where
+ * os.homedir() throws or yields an empty string), disabling the global tier.
+ */
+function defaultGlobalConfigDir() {
+  try {
+    const home = external_node_os_.homedir();
+    return home ? external_node_path_.join(home, '.river-review') : null;
+  } catch {
+    return null;
+  }
+}
+
 class ConfigLoader {
   constructor({
     baseConfig = config_default/* defaultConfig */.s,
     fileNames = ['.river-review.json', '.river-review.yaml', '.river-review.yml'],
     // Global user tier (#1045 A2): merged UNDER the repository-local config so a
-    // repo-local file always wins, while a user-wide config applies when the
-    // repo has none. Injectable so tests can point it at a temp dir.
-    globalConfigDir = external_node_path_.join(external_node_os_.homedir(), '.river-review'),
+    // repo-local file always wins; the global file supplies a user-wide base.
+    // Injectable so tests can point it at a temp dir. os.homedir() can throw or
+    // return falsy in minimal containers — fall back to null (tier disabled).
+    globalConfigDir = defaultGlobalConfigDir(),
     globalFileNames = ['config.json', 'config.yaml', 'config.yml'],
     fsImpl = promises_,
   } = {}) {
@@ -40695,6 +40710,8 @@ class ConfigLoader {
   }
 
   async findConfigPath(repoRoot, fileNames = this.fileNames) {
+    // Guard: a null/undefined root (e.g. a disabled global tier) has no config.
+    if (!repoRoot) return null;
     for (const candidate of fileNames) {
       const fullPath = external_node_path_.join(repoRoot, candidate);
       try {
