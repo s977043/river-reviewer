@@ -956,11 +956,11 @@ packs:
       - rr-midstream-ubiquitous-language-naming-001
 
   - id: react-router
-    version: '0.1.0'
+    version: '0.2.0'
     name: 'React Router Review Pack'
     description: 'React Router v7 (framework mode) の data loading / action 契約 / ErrorBoundary のレビュー基準'
     axis: technology
-    tier: experimental
+    tier: community
     sources:
       - name: 'React Router Docs (framework mode)'
         version: 'v7'
@@ -971,11 +971,11 @@ packs:
       - rr-midstream-react-router-action-contract-001
 
   - id: laravel
-    version: '0.1.0'
+    version: '0.2.0'
     name: 'Laravel Review Pack'
     description: 'Laravel 12 の Eloquent クエリ効率 / migration 安全性 / mass assignment・認可のレビュー基準'
     axis: technology
-    tier: experimental
+    tier: community
     sources:
       - name: 'Laravel Documentation'
         version: '12.x'
@@ -987,11 +987,11 @@ packs:
       - rr-midstream-laravel-mass-assignment-001
 
   - id: gha-security
-    version: '0.1.0'
+    version: '0.2.0'
     name: 'GitHub Actions Security Pack'
     description: 'GitHub Actions workflow のスクリプトインジェクション / pwn request / 権限・ピン留めのセキュリティレビュー基準'
     axis: concern
-    tier: experimental
+    tier: community
     sources:
       - name: 'GitHub — Secure use of GitHub Actions'
         version: '2026-06'

@@ -6,13 +6,13 @@ River Review に同梱されているスキル一覧です。フェーズ別に�
 
 梱包済みレビューナレッジの配布単位です。`--skill-set <id>` で導入できます（詳細は [Skill Pack を使う](../guides/use-skill-packs.md) を参照）。
 
-| id             | name                             | axis        | tier         | skills                                                                                                                               |
-| -------------- | -------------------------------- | ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `typescript`   | TypeScript Review Pack           | technology  | official     | `rr-midstream-typescript-strict-001` / `rr-midstream-typescript-nullcheck-001` / `rr-midstream-type-driven-design-001`               |
-| `ddd`          | Domain-Driven Design Review Pack | methodology | community    | `rr-upstream-bounded-context-language-001` / `rr-midstream-type-driven-design-001` / `rr-midstream-ubiquitous-language-naming-001`   |
-| `react-router` | React Router Review Pack         | technology  | experimental | `rr-midstream-react-router-loader-boundary-001` / `rr-midstream-react-router-action-contract-001`                                    |
-| `laravel`      | Laravel Review Pack              | technology  | experimental | `rr-midstream-laravel-eloquent-nplus1-001` / `rr-upstream-laravel-migration-safety-001` / `rr-midstream-laravel-mass-assignment-001` |
-| `gha-security` | GitHub Actions Security Pack     | concern     | experimental | `rr-downstream-gha-workflow-security-001`                                                                                            |
+| id             | name                             | axis        | tier      | skills                                                                                                                               |
+| -------------- | -------------------------------- | ----------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `typescript`   | TypeScript Review Pack           | technology  | official  | `rr-midstream-typescript-strict-001` / `rr-midstream-typescript-nullcheck-001` / `rr-midstream-type-driven-design-001`               |
+| `ddd`          | Domain-Driven Design Review Pack | methodology | community | `rr-upstream-bounded-context-language-001` / `rr-midstream-type-driven-design-001` / `rr-midstream-ubiquitous-language-naming-001`   |
+| `react-router` | React Router Review Pack         | technology  | community | `rr-midstream-react-router-loader-boundary-001` / `rr-midstream-react-router-action-contract-001`                                    |
+| `laravel`      | Laravel Review Pack              | technology  | community | `rr-midstream-laravel-eloquent-nplus1-001` / `rr-upstream-laravel-migration-safety-001` / `rr-midstream-laravel-mass-assignment-001` |
+| `gha-security` | GitHub Actions Security Pack     | concern     | community | `rr-downstream-gha-workflow-security-001`                                                                                            |
 
 ## upstream
 
