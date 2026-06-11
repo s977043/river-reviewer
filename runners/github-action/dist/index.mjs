@@ -40341,7 +40341,7 @@ __nccwpck_require__.d(__webpack_exports__, {
   R2: () => (/* binding */ mergeConfig)
 });
 
-// UNUSED EXPORTS: ConfigLoaderError, ConfigMergeError
+// UNUSED EXPORTS: ConfigLoaderError, ConfigMergeError, defaultGlobalConfigDir
 
 // EXTERNAL MODULE: external "node:fs/promises"
 var promises_ = __nccwpck_require__(1455);
@@ -40676,10 +40676,20 @@ class ConfigLoaderError extends Error {
 
 /**
  * Resolve the default global config directory (~/.river-review). Returns null
- * when the home directory cannot be determined (e.g. minimal containers where
- * os.homedir() throws or yields an empty string), disabling the global tier.
+ * (disabling the global tier) when:
+ * - `RIVER_REVIEW_DISABLE_GLOBAL_CONFIG=1` is set — an explicit opt-out for CI
+ *   and shared hosts where a stray `~/.river-review/config.*` (or a writable
+ *   home) must not silently alter review behavior (trust-boundary guard), or
+ * - the home directory cannot be determined (e.g. minimal containers where
+ *   os.homedir() throws or yields an empty string).
  */
 function defaultGlobalConfigDir() {
+  // Trust-boundary opt-out: accept common truthy spellings (1 / true, any case,
+  // surrounding whitespace) so the guard fails safe toward disabling.
+  const optOut = String(process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG ?? '')
+    .trim()
+    .toLowerCase();
+  if (optOut === '1' || optOut === 'true') return null;
   try {
     const home = external_node_os_.homedir();
     return home ? external_node_path_.join(home, '.river-review') : null;

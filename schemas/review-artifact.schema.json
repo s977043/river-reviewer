@@ -154,7 +154,7 @@
       "properties": {
         "run_id": {
           "type": "string",
-          "description": "Unique identifier for this review run. Matches the id used by the result store (.river/runs/) when --save is set."
+          "description": "Unique identifier for this review run, generated when the artifact is finalized. Independent of the result-store id assigned by --save (.river/runs/); do not assume the two are equal."
         }
       }
     },

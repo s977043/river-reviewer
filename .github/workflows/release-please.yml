@@ -87,6 +87,17 @@ jobs:
           fi
 
           BODY="$(gh release view "${TAG}" --json body --jq '.body' || true)"
+          # gh release edit --notes-file replaces the WHOLE body. Guard against
+          # destroying existing notes: skip when the read failed (empty BODY),
+          # and stay idempotent if the section was already appended.
+          if [ -z "${BODY}" ]; then
+            echo "Could not read existing release notes (empty); skipping append to avoid overwrite."
+            exit 0
+          fi
+          if printf '%s' "${BODY}" | grep -qF 'Skills changed'; then
+            echo "Release notes already contain a Skills changed section; skipping."
+            exit 0
+          fi
           {
             printf '%s\n\n' "${BODY}"
             printf '%s\n' "${SECTION}"

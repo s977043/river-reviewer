@@ -73,7 +73,7 @@ River Review の**正規実行面は CLI** です。GitHub Action / Claude Code 
 
 1. **CLI 明示指定** — `--skill-set` / `--context` / `--dependency` など（設定ファイルは `--config` フラグではなくリポジトリ直下から自動検出する。下記参照）
 2. **リポジトリローカル** — `.river-review.{json,yaml,yml}`（`src/config/loader.mjs`）、`.river/rules.md` + `.river/rules.d/*.md`、`skills/registry.yaml`
-3. **ユーザーグローバル** — `~/.river-review/config.{json,yaml,yml}`（`src/config/loader.mjs`）。ユーザー全体のベース設定として常に適用される。リポジトリローカル設定がある場合は、グローバルをベースにリポジトリローカルが上書きマージされる（リポジトリローカルが優先）。
+3. **ユーザーグローバル** — `~/.river-review/config.{json,yaml,yml}`（`src/config/loader.mjs`）。ユーザー全体のベース設定として常に適用される。リポジトリローカル設定がある場合は、グローバルをベースにリポジトリローカルが上書きマージされる（リポジトリローカルが優先）。共有 home を使う CI 等で意図しない設定混入を避けたい場合は、`RIVER_REVIEW_DISABLE_GLOBAL_CONFIG=1` でこの tier を無効化できる。
 4. **ビルトイン** — 同梱 skill と既定値
 
 ### auto-update は導入しない

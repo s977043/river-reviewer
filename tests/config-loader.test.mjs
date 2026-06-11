@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { ConfigLoader, ConfigLoaderError } from '../src/config/loader.mjs';
+import { ConfigLoader, ConfigLoaderError, defaultGlobalConfigDir } from '../src/config/loader.mjs';
 import { defaultConfig } from '../src/config/default.mjs';
 
 async function withTempDir(fn) {
@@ -221,4 +221,30 @@ test('global tier: globalConfigDir=null（無効化）でもクラッシュせ�
     assert.equal(result.source, 'file');
     assert.equal(result.config.review.language, 'en');
   });
+});
+
+test('global tier: RIVER_REVIEW_DISABLE_GLOBAL_CONFIG opt-out は truthy 綴りを許容', () => {
+  const prev = process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG;
+  try {
+    // Accepted truthy spellings (case-insensitive, trimmed) → tier disabled.
+    for (const v of ['1', 'true', 'TRUE', ' true ', '  1 ']) {
+      process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG = v;
+      assert.equal(defaultGlobalConfigDir(), null, `opt-out should apply for ${JSON.stringify(v)}`);
+    }
+    // Non-truthy values do NOT disable the tier.
+    for (const v of ['0', 'false', 'no', '']) {
+      process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG = v;
+      const resolved = defaultGlobalConfigDir();
+      assert.ok(
+        resolved === null || resolved.endsWith('.river-review'),
+        `non-opt-out value ${JSON.stringify(v)} must not force-disable`
+      );
+    }
+    delete process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG;
+    const resolved = defaultGlobalConfigDir();
+    assert.ok(resolved === null || resolved.endsWith('.river-review'));
+  } finally {
+    if (prev === undefined) delete process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG;
+    else process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG = prev;
+  }
 });
