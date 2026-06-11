@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/s977043/river-review/compare/v1.11.0...v1.12.0) (2026-06-11)
+
+
+### Features
+
+* **skills:** add S1 fixtures and promote react-router/laravel/gha-security to community ([#1128](https://github.com/s977043/river-review/issues/1128)) ([b567c50](https://github.com/s977043/river-review/commit/b567c50570dd1b117168932b23a3e175b05c3214))
+
 ## [1.11.0](https://github.com/s977043/river-review/compare/v1.10.0...v1.11.0) (2026-06-11)
 
 
