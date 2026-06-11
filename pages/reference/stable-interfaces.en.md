@@ -48,6 +48,7 @@ Current stability level for each surface.
 - `--dry-run`: Run without calling external APIs
 - `--offline` (alias `--rules-only`): Skip AI even when an API key is set; review on deterministic mechanical checks only (reproduces the Auto-approve gate locally when CI is unavailable)
 - `--debug`: Output debug info
+- `--explain`: Print the resolved skills / gates / config tier in human-readable form (to stderr)
 - `--estimate`: Cost estimation only (no review execution)
 - `--max-cost <usd>`: Abort if estimate exceeds limit
 - `--output <text|markdown>`: Output format (GitHub Actions uses `markdown`)

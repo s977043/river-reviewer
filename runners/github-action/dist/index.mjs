@@ -60621,6 +60621,7 @@ Options:
   --planner <mode>  Planner mode (off|order|prune). Default: env RIVER_PLANNER_MODE or off
   --dry-run         Do not call external services; print results to stdout
   --debug           Print debug information (merge base, files, token estimate)
+  --explain         Print which skills / gates / config tier were resolved (to stderr)
   --estimate        Print cost estimate only (no review)
   --max-cost <usd>  Abort if estimated cost exceeds this USD amount
   --output <mode>   Output format: text|markdown|json|yaml. Default: text
@@ -61019,6 +61020,10 @@ function parseArgs(argv) {
       parsed.debug = true;
       continue;
     }
+    if (arg === '--explain') {
+      parsed.explain = true;
+      continue;
+    }
     if (arg === '--estimate') {
       parsed.estimate = true;
       continue;
@@ -61177,10 +61182,12 @@ function parseArgs(argv) {
 }
 
 function formatPlan(plan) {
-  const selected = plan.selected.map((skill) => skill.metadata?.id ?? skill.id);
-  const skipped = plan.skipped.map((item) => ({
-    id: item.skill.metadata?.id ?? item.skill.id,
-    reasons: item.reasons,
+  // Defensive defaults: a plan may arrive without selected/skipped (e.g. an
+  // empty `{}` from `--explain` when no plan was computed). Never throw.
+  const selected = (plan?.selected ?? []).map((skill) => skill.metadata?.id ?? skill.id);
+  const skipped = (plan?.skipped ?? []).map((item) => ({
+    id: item.skill?.metadata?.id ?? item.skill?.id,
+    reasons: item.reasons ?? [],
   }));
   const reasonCounts = skipped.reduce((acc, item) => {
     (item.reasons || []).forEach((reason) => {
@@ -61484,6 +61491,43 @@ function formatScoreSectionMarkdown(result, phase) {
   );
   lines.push('');
   return lines.join('\n');
+}
+
+/**
+ * #1045 A3 (#1141): human-readable explanation of which skills / gates / config
+ * tier were resolved for this run. A focused alias over the same deterministic
+ * resolution the planner already computed — printed to stderr so it never
+ * corrupts machine-readable stdout (json / yaml).
+ */
+function printExplain(result, { log = console.error } = {}) {
+  const summary = formatPlan(result?.plan ?? {});
+  log('\nResolution (--explain):');
+
+  // Config tier that won (CLI > repo-local > global > built-in default).
+  const sourceLabel =
+    result?.configSource === 'file'
+      ? 'repository-local'
+      : result?.configSource === 'global'
+        ? 'user-global'
+        : 'built-in default';
+  log(`- Config: ${sourceLabel}${result?.configPath ? ` (${result.configPath})` : ''}`);
+
+  // Skill / gate resolution.
+  log(
+    `- Planner: ${formatPlannerStatus(result?.plan ?? {})}` +
+      (result?.manualReviewMode ? ` / review mode: ${result.manualReviewMode}` : '')
+  );
+  if (summary.selected.length) {
+    log(`- Selected skills (${summary.selected.length}): ${summary.selected.join(', ')}`);
+  } else {
+    log('- Selected skills (0): none matched this diff');
+  }
+  if (summary.skipped.length) {
+    log(`- Skipped skills (${summary.skipped.length}):`);
+    summary.skipped.forEach((item) => {
+      log(`  - ${item.id}: ${item.reasons.join('; ')}`);
+    });
+  }
 }
 
 function printDebugInfo(result, { log = console.log } = {}) {
@@ -62104,6 +62148,9 @@ Dependencies: ${
       if (result.plan) {
         printPlan(result.plan);
       }
+      if (parsed.explain) {
+        printExplain(result);
+      }
       if (parsed.debug) {
         const impactTags = Array.isArray(result.plan?.impactTags) ? result.plan.impactTags : [];
         console.log(
@@ -62221,6 +62268,10 @@ Dependencies: ${
       skillIds,
       manualReviewMode,
     });
+
+    if (parsed.explain) {
+      printExplain(result);
+    }
 
     // Persist run to result store when --save is provided
     if (parsed.save && result.status === 'ok') {

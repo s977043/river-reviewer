@@ -517,3 +517,13 @@ test('parseArgs: planFile defaults to null', () => {
   const parsed = parseArgs(['review', 'plan', '--plan-only']);
   assert.equal(parsed.planFile, null);
 });
+
+test('parseArgs: --explain sets explain flag (#1045 A3)', () => {
+  const parsed = parseArgs(['run', '.', '--explain']);
+  assert.equal(parsed.explain, true);
+});
+
+test('parseArgs: explain defaults to falsy without --explain', () => {
+  const parsed = parseArgs(['run', '.']);
+  assert.ok(!parsed.explain);
+});
