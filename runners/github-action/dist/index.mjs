@@ -40684,7 +40684,12 @@ class ConfigLoaderError extends Error {
  *   os.homedir() throws or yields an empty string).
  */
 function defaultGlobalConfigDir() {
-  if (process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG === '1') return null;
+  // Trust-boundary opt-out: accept common truthy spellings (1 / true, any case,
+  // surrounding whitespace) so the guard fails safe toward disabling.
+  const optOut = String(process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG ?? '')
+    .trim()
+    .toLowerCase();
+  if (optOut === '1' || optOut === 'true') return null;
   try {
     const home = external_node_os_.homedir();
     return home ? external_node_path_.join(home, '.river-review') : null;
