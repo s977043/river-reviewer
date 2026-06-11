@@ -36,8 +36,57 @@ import { generateReview as defaultGenerateReview } from './review-engine.mjs';
 import { loadRiskMap as defaultLoadRiskMap } from './risk-map.mjs';
 import { PHASES, PLANNER_MODES } from './planner-utils.mjs';
 import { resolveAvailableContexts, resolveAvailableDependencies } from './utils.mjs';
+import { scoreReview } from './scoring/engine.mjs';
 
 const VALID_PHASES = new Set(PHASES);
+
+/**
+ * Default run-id generator for the Review Artifact `trace.run_id`. Mirrors the
+ * format used by the result store (timestamp prefix + short random suffix) so
+ * ids sort chronologically. Injectable for deterministic tests.
+ */
+function defaultGenerateRunId() {
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  // padEnd guarantees a fixed 6-char suffix even when Math.random() yields a
+  // short hex fraction (e.g. 0 → '', 0.5 → '8'), keeping run_id length stable.
+  const rand = Math.random().toString(16).slice(2, 8).padEnd(6, '0');
+  return `${ts}-${rand}`;
+}
+
+/**
+ * Attach the additive Review Artifact fields introduced for #1045 A1
+ * (#1139): top-level `decision` (verdict), `trace.run_id`, and `usage`.
+ * All are additive over schema v1; artifacts that predate them stay valid.
+ *
+ * @param {object} artifact - the artifact being finalized (mutated)
+ * @param {object} opts
+ * @param {() => string} opts.generateRunId
+ * @param {{provider?: string, modelName?: string} | null} [opts.modelConfig]
+ * @param {boolean} [opts.llmUsed] - whether an LLM actually ran this review
+ * @returns {object} the same artifact
+ */
+function finalizeArtifact(artifact, { generateRunId, modelConfig = null, llmUsed = false }) {
+  // decision: derive the top-level verdict from the findings present in the
+  // artifact. Never let a scoring error break the artifact contract.
+  try {
+    artifact.decision = scoreReview(artifact.findings ?? []).verdict;
+  } catch {
+    // leave decision unset on scoring failure
+  }
+
+  artifact.trace = { run_id: generateRunId() };
+
+  // usage: only when an LLM actually ran and we know the model. Token / cost
+  // numbers are surfaced by callers that have them; provider/model are the
+  // deterministic minimum available here.
+  if (llmUsed && modelConfig && (modelConfig.provider || modelConfig.modelName)) {
+    artifact.usage = {};
+    if (modelConfig.provider) artifact.usage.provider = modelConfig.provider;
+    if (modelConfig.modelName) artifact.usage.model = modelConfig.modelName;
+  }
+
+  return artifact;
+}
 const VALID_PLANNER_MODES = new Set(PLANNER_MODES);
 const MODEL_HINTS = new Set(['cheap', 'balanced', 'high-accuracy']);
 
@@ -115,6 +164,7 @@ export async function runReviewExecReplay({
   loadConfigImpl = defaultLoadConfig,
   resolveAllArtifactsImpl = defaultResolveAllArtifacts,
   generateReviewImpl = defaultGenerateReview,
+  generateRunId = defaultGenerateRunId,
 } = {}) {
   if (!planFile || typeof planFile !== 'string') {
     throw new ReviewPlanError('--plan requires a file path.');
@@ -223,6 +273,9 @@ export async function runReviewExecReplay({
 
   let executionTrace = null;
   let replayDrift = null;
+  // Captured from config (when loaded for execution) so finalizeArtifact can
+  // surface usage.provider / usage.model when an LLM actually runs.
+  let modelConfigForUsage = null;
   if (executeReview && selectedSkills.length > 0) {
     // Resolve the diff from the CURRENT working tree (or --artifact), not from
     // the plan. The plan does not snapshot diff bytes (design decision in
@@ -234,6 +287,7 @@ export async function runReviewExecReplay({
     } catch (err) {
       throw new ReviewPlanError(`Failed to load config: ${err.message}`);
     }
+    modelConfigForUsage = config?.model ?? null;
     const configArtifacts =
       config && typeof config.artifacts === 'object' && config.artifacts ? config.artifacts : {};
     const detectionRoot = artifactsDir ? path.resolve(cwd, artifactsDir) : cwd;
@@ -303,6 +357,12 @@ export async function runReviewExecReplay({
     };
     if (executionTrace) artifact.debug.execution = executionTrace;
   }
+
+  finalizeArtifact(artifact, {
+    generateRunId,
+    modelConfig: modelConfigForUsage,
+    llmUsed: executionTrace?.llmUsed === true,
+  });
 
   return artifact;
 }
@@ -470,6 +530,7 @@ export async function runReviewPlan({
   generateReviewImpl = defaultGenerateReview,
   loadRiskMapImpl = defaultLoadRiskMap,
   readFileImpl = (p) => readFile(p, 'utf8'),
+  generateRunId = defaultGenerateRunId,
 } = {}) {
   if (executeReview && executionDeferred) {
     throw new ReviewPlanError(
@@ -637,6 +698,12 @@ export async function runReviewPlan({
     if (executionDeferred) artifact.debug.executionDeferred = true;
     if (executionTrace) artifact.debug.execution = executionTrace;
   }
+
+  finalizeArtifact(artifact, {
+    generateRunId,
+    modelConfig: config?.model ?? null,
+    llmUsed: executionTrace?.llmUsed === true,
+  });
 
   return artifact;
 }

@@ -238,4 +238,46 @@ describe('review-artifact.schema.json', () => {
       assert.equal(ok, true, JSON.stringify(validate.errors));
     });
   });
+
+  describe('decision / usage / trace (#1045 A1 — additive)', () => {
+    test('accepts an artifact with decision, usage, and trace', () => {
+      const ok = validate(
+        minimalArtifact({
+          decision: 'human-review-recommended',
+          usage: {
+            provider: 'openai',
+            model: 'gpt-5.5',
+            input_tokens: 1200,
+            output_tokens: 300,
+            estimated_cost_usd: 0.02,
+          },
+          trace: { run_id: '2026-01-01T00-00-00-000Z-abc123' },
+        })
+      );
+      assert.equal(ok, true, JSON.stringify(validate.errors));
+    });
+
+    test('accepts each of the three decision enum values', () => {
+      for (const decision of [
+        'auto-approve',
+        'human-review-recommended',
+        'human-review-required',
+      ]) {
+        assert.equal(validate(minimalArtifact({ decision })), true, decision);
+      }
+    });
+
+    test('rejects an unknown decision value', () => {
+      assert.equal(validate(minimalArtifact({ decision: 'pass' })), false);
+    });
+
+    test('rejects unknown properties inside usage / trace', () => {
+      assert.equal(validate(minimalArtifact({ usage: { foo: 1 } })), false);
+      assert.equal(validate(minimalArtifact({ trace: { foo: 'x' } })), false);
+    });
+
+    test('older artifacts without the new fields stay valid (additive)', () => {
+      assert.equal(validate(minimalArtifact()), true);
+    });
+  });
 });

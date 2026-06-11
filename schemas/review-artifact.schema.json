@@ -112,6 +112,52 @@
         }
       }
     },
+    "decision": {
+      "type": "string",
+      "enum": ["auto-approve", "human-review-recommended", "human-review-required"],
+      "description": "Top-level review verdict derived from findings (src/lib/scoring/engine.mjs deriveVerdict). Maps to the proposal's pass / warn / fail: auto-approve≈pass, human-review-recommended≈warn, human-review-required≈fail. Recommendation only; does NOT bypass HITL policy. Optional; absent on older artifacts."
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Provider/model usage for the run. Populated when an LLM was used; token / cost fields are present only when the surface reports them. Optional; absent for heuristic / dry-run / plan-only artifacts.",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "LLM provider (e.g. openai, anthropic, google)."
+        },
+        "model": {
+          "type": "string",
+          "description": "Model identifier used for the run."
+        },
+        "input_tokens": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Input (prompt) tokens consumed, when reported by the provider."
+        },
+        "output_tokens": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Output (completion) tokens produced, when reported by the provider."
+        },
+        "estimated_cost_usd": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated cost in USD, when computable."
+        }
+      }
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Run trace metadata for debugging, cost analysis, and agent handoff. Optional; absent on older artifacts.",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "description": "Unique identifier for this review run. Matches the id used by the result store (.river/runs/) when --save is set."
+        }
+      }
+    },
     "findings": {
       "type": "array",
       "description": "Review findings produced during the run. Each item conforms to the issue schema in output.schema.json.",

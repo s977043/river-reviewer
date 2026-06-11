@@ -169,6 +169,23 @@ describe('runReviewPlan — output (#802 Phase 3)', () => {
     assert.equal('debug' in artifact, false);
   });
 
+  test('emits decision + trace.run_id (#1045 A1); usage absent without LLM', async () => {
+    const artifact = await runReviewPlan({
+      planOnly: true,
+      phase: 'midstream',
+      now: fixedNow,
+      loadConfigImpl: okConfig,
+      resolveAllArtifactsImpl: async () => ({}),
+      generateRunId: () => 'fixed-run-id-1',
+    });
+    assert.equal(validate(artifact), true, JSON.stringify(validate.errors));
+    // empty findings → clean verdict
+    assert.equal(artifact.decision, 'auto-approve');
+    assert.deepEqual(artifact.trace, { run_id: 'fixed-run-id-1' });
+    // no LLM ran → no usage block
+    assert.equal('usage' in artifact, false);
+  });
+
   test('resolved diff artifact → deterministic skill selection (status ok), no LLM', async () => {
     let planArgs;
     const artifact = await runReviewPlan({

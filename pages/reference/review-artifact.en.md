@@ -16,16 +16,19 @@ The Review Artifact schema provides a complete record of a review execution.
 
 ### Top-Level
 
-| Field       | Type                 | Required | Description                                                                                                                          |
-| ----------- | -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `version`   | `string`             | Yes      | Schema version. Currently always `"1"`.                                                                                              |
-| `timestamp` | `string` (date-time) | Yes      | ISO 8601 timestamp of when the review run completed.                                                                                 |
-| `phase`     | `string`             | Yes      | SDLC phase of the review. `upstream` / `midstream` / `downstream`.                                                                   |
-| `status`    | `string`             | Yes      | Terminal status. `ok` / `no-changes` / `skipped-by-label` / `error`.                                                                 |
-| `plan`      | `object`             | No       | Execution plan. See below.                                                                                                           |
-| `findings`  | `array`              | No       | Array of review findings. Each item is compatible with the issue schema in `output.schema.json` (defined inline as `$defs/finding`). |
-| `context`   | `object`             | No       | Repository and diff context.                                                                                                         |
-| `debug`     | `object`             | No       | Free-form debug information. Structure is not guaranteed across versions.                                                            |
+| Field       | Type                 | Required | Description                                                                                                                                                                                                   |
+| ----------- | -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`   | `string`             | Yes      | Schema version. Currently always `"1"`.                                                                                                                                                                       |
+| `timestamp` | `string` (date-time) | Yes      | ISO 8601 timestamp of when the review run completed.                                                                                                                                                          |
+| `phase`     | `string`             | Yes      | SDLC phase of the review. `upstream` / `midstream` / `downstream`.                                                                                                                                            |
+| `status`    | `string`             | Yes      | Terminal status. `ok` / `no-changes` / `skipped-by-label` / `error`.                                                                                                                                          |
+| `decision`  | `string`             | No       | Top-level verdict derived from findings (`auto-approve` / `human-review-recommended` / `human-review-required`). Maps to the proposal's pass / warn / fail. Recommendation only; does not bypass HITL policy. |
+| `usage`     | `object`             | No       | Provider / model when an LLM ran (token / cost only when the surface reports them). Absent for heuristic / dry-run / plan-only.                                                                               |
+| `trace`     | `object`             | No       | Run trace. `run_id` (matches the result store id when `--save` is set).                                                                                                                                       |
+| `plan`      | `object`             | No       | Execution plan. See below.                                                                                                                                                                                    |
+| `findings`  | `array`              | No       | Array of review findings. Each item is compatible with the issue schema in `output.schema.json` (defined inline as `$defs/finding`).                                                                          |
+| `context`   | `object`             | No       | Repository and diff context.                                                                                                                                                                                  |
+| `debug`     | `object`             | No       | Free-form debug information. Structure is not guaranteed across versions.                                                                                                                                     |
 
 ### `plan` Object
 
