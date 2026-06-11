@@ -1483,7 +1483,6 @@ redirect on success; and 3-branch ErrorBoundary handling.`
 - 対象:
   - `app/**/*.{ts,tsx,js,jsx}`
   - `src/routes/**/*.{ts,tsx,js,jsx}`
-  - `app/routes/**/*.{ts,tsx,js,jsx}`
 - 重要度: major
 - タグ: react-router / remix / actions / validation / frontend / midstream
 - 依存関係: none
@@ -1501,7 +1500,6 @@ and missing HydrateFallback in React Router v7 framework mode.`
 - 対象:
   - `app/**/*.{ts,tsx,js,jsx}`
   - `src/routes/**/*.{ts,tsx,js,jsx}`
-  - `app/routes/**/*.{ts,tsx,js,jsx}`
 - 重要度: major
 - タグ: react-router / remix / data-loading / frontend / midstream
 - 依存関係: none

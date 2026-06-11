@@ -8,7 +8,6 @@ phase: midstream
 applyTo:
   - 'app/**/*.{ts,tsx,js,jsx}'
   - 'src/routes/**/*.{ts,tsx,js,jsx}'
-  - 'app/routes/**/*.{ts,tsx,js,jsx}'
 tags: [react-router, remix, actions, validation, frontend, midstream]
 severity: major
 inputContext: [diff]

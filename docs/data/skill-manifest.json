@@ -90,7 +90,7 @@
     {
       "id": "rr-downstream-gha-workflow-security-001",
       "path": "skills/downstream/rr-downstream-gha-workflow-security-001",
-      "checksum": "sha256:d3917d4c3d52d694f632a9a83c9e6278d7f8f3c97141b1aa1abc6140e55f641c",
+      "checksum": "sha256:d40f8c47a4aecf19f77f1fac5fbaecb5b706db9365d7553df63a74ea9fb6c5d3",
       "files": 1
     },
     {
@@ -192,13 +192,13 @@
     {
       "id": "rr-midstream-laravel-eloquent-nplus1-001",
       "path": "skills/midstream/rr-midstream-laravel-eloquent-nplus1-001",
-      "checksum": "sha256:b2c9a8437f3f65d4ab263282fc7fc13a1aaaf9bfb8b71cadd59c965fc513290e",
+      "checksum": "sha256:bf31e12a6819364679b76e47b46f602b3ce99532d14ea4d8242e25a3d50a080e",
       "files": 1
     },
     {
       "id": "rr-midstream-laravel-mass-assignment-001",
       "path": "skills/midstream/rr-midstream-laravel-mass-assignment-001",
-      "checksum": "sha256:b0da099883fcc12208f08f0d96bfc6bea53fd4dfba5639615c985b4309e11c8e",
+      "checksum": "sha256:1d019045e8caabc2b4ec045cf765170ce0e1bc64bd840e3f9adad47a411a18bd",
       "files": 1
     },
     {
@@ -270,13 +270,13 @@
     {
       "id": "rr-midstream-react-router-action-contract-001",
       "path": "skills/midstream/rr-midstream-react-router-action-contract-001",
-      "checksum": "sha256:692002e2f314594a34e1d44ee278f128d7812328b24f3601546aed5e8dc21f13",
+      "checksum": "sha256:0da5c7037b2655bd1d609e6a82185664f6fcb32915bff0562c84d026d08bf740",
       "files": 1
     },
     {
       "id": "rr-midstream-react-router-loader-boundary-001",
       "path": "skills/midstream/rr-midstream-react-router-loader-boundary-001",
-      "checksum": "sha256:95379b4590efc8a950e62cae35c95d7249de3510358706c0c7ca470df60d3ea7",
+      "checksum": "sha256:c8f7b3e8417465de4fc317df0d99dab358c73208bc0604e1a78804f85feda9b1",
       "files": 1
     },
     {
@@ -480,7 +480,7 @@
     {
       "id": "rr-upstream-laravel-migration-safety-001",
       "path": "skills/upstream/rr-upstream-laravel-migration-safety-001",
-      "checksum": "sha256:126ab5e919451e73ddccb9cfa137872adc1c1110fdc085b042e4f446e43608da",
+      "checksum": "sha256:fbb82f5c3e1f9bc24656ab55a638baede6207dc6c64be24aaa1d1a9fea0da7b8",
       "files": 1
     },
     {
