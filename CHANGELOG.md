@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/s977043/river-review/compare/v1.12.0...v1.13.0) (2026-06-11)
+
+
+### Features
+
+* **skills:** add tailwind / vitest / firebase / nextjs technology review packs ([#1132](https://github.com/s977043/river-review/issues/1132)) ([4c0a3c4](https://github.com/s977043/river-review/commit/4c0a3c4562ac2b8fae29baba5df9008c128affa6))
+
 ## [1.12.0](https://github.com/s977043/river-review/compare/v1.11.0...v1.12.0) (2026-06-11)
 
 
