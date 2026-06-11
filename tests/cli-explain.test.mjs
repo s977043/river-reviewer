@@ -55,3 +55,9 @@ test('handles an empty plan without throwing', () => {
   const out = capture({ configSource: 'default', plan: planWith() });
   assert.match(out, /Selected skills \(0\): none matched this diff/);
 });
+
+test('does not throw when plan is missing entirely (#1144 gemini)', () => {
+  // result.plan undefined → printExplain must not crash (formatPlan defaults).
+  const out = capture({ configSource: 'default' });
+  assert.match(out, /Selected skills \(0\)/);
+});

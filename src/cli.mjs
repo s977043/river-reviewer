@@ -629,10 +629,12 @@ function parseArgs(argv) {
 }
 
 function formatPlan(plan) {
-  const selected = plan.selected.map((skill) => skill.metadata?.id ?? skill.id);
-  const skipped = plan.skipped.map((item) => ({
-    id: item.skill.metadata?.id ?? item.skill.id,
-    reasons: item.reasons,
+  // Defensive defaults: a plan may arrive without selected/skipped (e.g. an
+  // empty `{}` from `--explain` when no plan was computed). Never throw.
+  const selected = (plan?.selected ?? []).map((skill) => skill.metadata?.id ?? skill.id);
+  const skipped = (plan?.skipped ?? []).map((item) => ({
+    id: item.skill?.metadata?.id ?? item.skill?.id,
+    reasons: item.reasons ?? [],
   }));
   const reasonCounts = skipped.reduce((acc, item) => {
     (item.reasons || []).forEach((reason) => {
