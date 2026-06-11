@@ -47,7 +47,9 @@ const VALID_PHASES = new Set(PHASES);
  */
 function defaultGenerateRunId() {
   const ts = new Date().toISOString().replace(/[:.]/g, '-');
-  const rand = Math.random().toString(16).slice(2, 8);
+  // padEnd guarantees a fixed 6-char suffix even when Math.random() yields a
+  // short hex fraction (e.g. 0 → '', 0.5 → '8'), keeping run_id length stable.
+  const rand = Math.random().toString(16).slice(2, 8).padEnd(6, '0');
   return `${ts}-${rand}`;
 }
 
