@@ -13,7 +13,7 @@ River Review is not a single integration path; there are several depending on yo
 | GitHub Actions                 | Run the River Review runner in CI                                                      |                 Yes (runner reads it from repo root)                  | Automated review at PR time                                    |
 | CLI / `river run`              | Run the CLI directly from local or any CI                                              |                 Yes (runner reads it from repo root)                  | Pre-PR self-review, headless runs                              |
 | Plugin (Claude Code / Codex …) | Strengthen the agent's review ability via skills                                       | No (the agent applies skills; repo rules come from `.river/rules.md`) | Interactive review, agent-driven development                   |
-| Skill adoption only (mode C)   | Port only the review viewpoints into your own agent skills without installing the core |               No (follows the destination's operation)                | Importing viewpoints into an existing in-house review workflow |
+| Skill adoption only            | Port only the review viewpoints into your own agent skills without installing the core |               No (follows the destination's operation)                | Importing viewpoints into an existing in-house review workflow |
 
 Rules of thumb:
 
@@ -50,7 +50,7 @@ Examples of low-noise initial settings:
 In ongoing operation, turning review results into assets at the following granularity prevents staleness:
 
 - **accepted (useful findings)**: If you want a viewpoint repeatedly, codify it as a skill ([add a new skill](./add-new-skill.en.md)).
-- **false positive**: Pin deterministically-decidable false positives as a skill fixture (false-positive guard case) to prevent regressions. Handle project-specific suppression via suppression (the `rr-midstream-suppression-feedback-001` workflow).
+- **false positive**: Pin deterministically-decidable false positives as a skill fixture (false-positive guard case) to prevent regressions. Handle project-specific cases via the suppression workflow (`rr-midstream-suppression-feedback-001`).
 - **missed issue**: Turn missed viewpoints into a new fixture (happy path) and a skill viewpoint.
 
 This promotion loop codifies AI-review judgment into reproducible checks. For the judgment units, see [choosing skills](./choose-skills.en.md) and the [skill-writing guide](./write-a-skill.en.md).
