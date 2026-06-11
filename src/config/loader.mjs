@@ -41,10 +41,15 @@ export class ConfigLoaderError extends Error {
 
 /**
  * Resolve the default global config directory (~/.river-review). Returns null
- * when the home directory cannot be determined (e.g. minimal containers where
- * os.homedir() throws or yields an empty string), disabling the global tier.
+ * (disabling the global tier) when:
+ * - `RIVER_REVIEW_DISABLE_GLOBAL_CONFIG=1` is set — an explicit opt-out for CI
+ *   and shared hosts where a stray `~/.river-review/config.*` (or a writable
+ *   home) must not silently alter review behavior (trust-boundary guard), or
+ * - the home directory cannot be determined (e.g. minimal containers where
+ *   os.homedir() throws or yields an empty string).
  */
-function defaultGlobalConfigDir() {
+export function defaultGlobalConfigDir() {
+  if (process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG === '1') return null;
   try {
     const home = os.homedir();
     return home ? path.join(home, '.river-review') : null;

@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { ConfigLoader, ConfigLoaderError } from '../src/config/loader.mjs';
+import { ConfigLoader, ConfigLoaderError, defaultGlobalConfigDir } from '../src/config/loader.mjs';
 import { defaultConfig } from '../src/config/default.mjs';
 
 async function withTempDir(fn) {
@@ -221,4 +221,20 @@ test('global tier: globalConfigDir=null（無効化）でもクラッシュせ�
     assert.equal(result.source, 'file');
     assert.equal(result.config.review.language, 'en');
   });
+});
+
+test('global tier: RIVER_REVIEW_DISABLE_GLOBAL_CONFIG=1 で default が null（CI opt-out）', () => {
+  const prev = process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG;
+  try {
+    process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG = '1';
+    assert.equal(defaultGlobalConfigDir(), null);
+    delete process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG;
+    // Without the opt-out, a home dir resolves to a ~/.river-review path (or
+    // null only when homedir is unavailable).
+    const resolved = defaultGlobalConfigDir();
+    assert.ok(resolved === null || resolved.endsWith('.river-review'));
+  } finally {
+    if (prev === undefined) delete process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG;
+    else process.env.RIVER_REVIEW_DISABLE_GLOBAL_CONFIG = prev;
+  }
 });
