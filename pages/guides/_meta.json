@@ -5,6 +5,7 @@
   },
   "quickstart": "クイックスタート (River Review)",
   "github-actions": "GitHub Actions で River Review をセットアップする",
+  "adopter-playbook": "導入プレイブック（Integration modes と段階導入）",
   "troubleshooting": "トラブルシューティング",
   "faq": "FAQ（よくある失敗）",
   "-- Skills": {
