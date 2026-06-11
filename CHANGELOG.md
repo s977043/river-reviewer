@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/s977043/river-review/compare/v1.10.0...v1.11.0) (2026-06-11)
+
+
+### Features
+
+* **skills:** add react-router, laravel, and gha-security packs from official docs ([#1126](https://github.com/s977043/river-review/issues/1126)) ([99e6038](https://github.com/s977043/river-review/commit/99e603822fe342ae001acfcf1e2c772a799d9252))
+
 ## [1.10.0](https://github.com/s977043/river-review/compare/v1.9.0...v1.10.0) (2026-06-10)
 
 
