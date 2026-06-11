@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.14.0](https://github.com/s977043/river-review/compare/v1.13.0...v1.14.0) (2026-06-11)
+
+
+### Features
+
+* **cli:** add --explain flag (skill / gate / config resolution) ([#1144](https://github.com/s977043/river-review/issues/1144)) ([76201c3](https://github.com/s977043/river-review/commit/76201c3292835ccfff408fbab72cebbfc678cfbe))
+* **config:** add global ~/.river-review/ config tier (4-layer resolution) ([#1143](https://github.com/s977043/river-review/issues/1143)) ([e37c684](https://github.com/s977043/river-review/commit/e37c684598793812960aff93a89a5d1e5963e882))
+* **hooks:** target-file-aware PostToolUse format path + hook input contract doc ([#1136](https://github.com/s977043/river-review/issues/1136)) ([72e7353](https://github.com/s977043/river-review/commit/72e7353276f74936763af7f8111acfd7b30705b9))
+* **schema:** add decision / usage / trace to Review Artifact (v1 additive) ([#1142](https://github.com/s977043/river-review/issues/1142)) ([1b19b08](https://github.com/s977043/river-review/commit/1b19b087121506aa81e8dcaf8b04ba311c0614e4))
+* **skills:** "Skills changed" release-notes section from manifest diff ([#1138](https://github.com/s977043/river-review/issues/1138)) ([65d0f7b](https://github.com/s977043/river-review/commit/65d0f7be05dc9589064a5790652daf50fc9726d6))
+
+
+### Bug Fixes
+
+* address multi-agent review findings on [#1045](https://github.com/s977043/river-review/issues/1045) (run_id contract + global config opt-out) ([#1145](https://github.com/s977043/river-review/issues/1145)) ([006933c](https://github.com/s977043/river-review/commit/006933c33e9b149ad8739d0e6d0b96a087baec8b))
+
 ## [1.13.0](https://github.com/s977043/river-review/compare/v1.12.0...v1.13.0) (2026-06-11)
 
 
