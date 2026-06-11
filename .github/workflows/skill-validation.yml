@@ -45,6 +45,13 @@ jobs:
           npm run skills:validate | tee skills-validate.log
         continue-on-error: true
 
+      - name: Check pack tiers
+        id: packs-tier
+        run: |
+          set -o pipefail
+          npm run packs:tier -- --strict | tee packs-tier.log
+        continue-on-error: true
+
       - name: Run tests
         id: test
         run: |
@@ -78,6 +85,7 @@ jobs:
           steps.agents-validate.outcome == 'failure' ||
           steps.agent-skills-validate.outcome == 'failure' ||
           steps.skills-validate.outcome == 'failure' ||
+          steps.packs-tier.outcome == 'failure' ||
           steps.test.outcome == 'failure' ||
           steps.lint.outcome == 'failure' ||
           steps.build.outcome == 'failure'
@@ -86,6 +94,7 @@ jobs:
           OUTCOME_AGENTS_VALIDATE: ${{ steps.agents-validate.outcome }}
           OUTCOME_AGENT_SKILLS_VALIDATE: ${{ steps.agent-skills-validate.outcome }}
           OUTCOME_SKILLS_VALIDATE: ${{ steps.skills-validate.outcome }}
+          OUTCOME_PACKS_TIER: ${{ steps.packs-tier.outcome }}
           OUTCOME_TEST: ${{ steps.test.outcome }}
           OUTCOME_LINT: ${{ steps.lint.outcome }}
           OUTCOME_BUILD: ${{ steps.build.outcome }}
@@ -114,6 +123,12 @@ jobs:
                 title: '定期チェック: npm run skills:validate が失敗しました',
                 outcome: process.env.OUTCOME_SKILLS_VALIDATE,
                 logPath: 'skills-validate.log',
+              },
+              {
+                key: 'packs:tier',
+                title: '定期チェック: npm run packs:tier -- --strict が失敗しました',
+                outcome: process.env.OUTCOME_PACKS_TIER,
+                logPath: 'packs-tier.log',
               },
               {
                 key: 'test',
