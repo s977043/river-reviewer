@@ -90,8 +90,8 @@
     {
       "id": "rr-downstream-gha-workflow-security-001",
       "path": "skills/downstream/rr-downstream-gha-workflow-security-001",
-      "checksum": "sha256:d40f8c47a4aecf19f77f1fac5fbaecb5b706db9365d7553df63a74ea9fb6c5d3",
-      "files": 1
+      "checksum": "sha256:83d8f97dc7541315596e1073019a10b5d0982e74ae4e44238cecab139ca463c5",
+      "files": 4
     },
     {
       "id": "rr-downstream-review-policy-standard-001",
@@ -192,14 +192,14 @@
     {
       "id": "rr-midstream-laravel-eloquent-nplus1-001",
       "path": "skills/midstream/rr-midstream-laravel-eloquent-nplus1-001",
-      "checksum": "sha256:bf31e12a6819364679b76e47b46f602b3ce99532d14ea4d8242e25a3d50a080e",
-      "files": 1
+      "checksum": "sha256:31595f3143ecb4ba9eeff8d6d5430852fe07d402faa6c0cd2c04e732b86d7eb2",
+      "files": 4
     },
     {
       "id": "rr-midstream-laravel-mass-assignment-001",
       "path": "skills/midstream/rr-midstream-laravel-mass-assignment-001",
-      "checksum": "sha256:1d019045e8caabc2b4ec045cf765170ce0e1bc64bd840e3f9adad47a411a18bd",
-      "files": 1
+      "checksum": "sha256:a0e09407ebfaa0835137d84859ae72f588a279b13f3e97826b75cfaf71ffcd57",
+      "files": 4
     },
     {
       "id": "rr-midstream-loading-state-001",
@@ -270,14 +270,14 @@
     {
       "id": "rr-midstream-react-router-action-contract-001",
       "path": "skills/midstream/rr-midstream-react-router-action-contract-001",
-      "checksum": "sha256:0da5c7037b2655bd1d609e6a82185664f6fcb32915bff0562c84d026d08bf740",
-      "files": 1
+      "checksum": "sha256:ed17070ccb02c0183d459480ba814a8f886fa445c2296ffd8fe5cbff5a01afe3",
+      "files": 4
     },
     {
       "id": "rr-midstream-react-router-loader-boundary-001",
       "path": "skills/midstream/rr-midstream-react-router-loader-boundary-001",
-      "checksum": "sha256:c8f7b3e8417465de4fc317df0d99dab358c73208bc0604e1a78804f85feda9b1",
-      "files": 1
+      "checksum": "sha256:b24a2f9df6aeab9f568b7d67b6b3b568cba629e5c1f251f6f4c17b85f2af45f8",
+      "files": 4
     },
     {
       "id": "rr-midstream-review-automation-boundary-001",
@@ -480,8 +480,8 @@
     {
       "id": "rr-upstream-laravel-migration-safety-001",
       "path": "skills/upstream/rr-upstream-laravel-migration-safety-001",
-      "checksum": "sha256:fbb82f5c3e1f9bc24656ab55a638baede6207dc6c64be24aaa1d1a9fea0da7b8",
-      "files": 1
+      "checksum": "sha256:05fec8c75d8a4f40356ed7a66e071b9b8da1c09d41f0a5acb1eda149db191be2",
+      "files": 4
     },
     {
       "id": "rr-upstream-migration-rollout-rollback-001",
