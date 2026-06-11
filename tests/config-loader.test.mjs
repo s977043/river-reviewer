@@ -153,3 +153,72 @@ test('スキーマ違反の設定はエラーになる', async () => {
     await assert.rejects(loader.load(dir), ConfigLoaderError);
   });
 });
+
+// Global user tier (#1045 A2): resolution order repo-local > global > built-in.
+test('global tier: グローバル設定のみのとき適用され source=global', async () => {
+  await withTempDir(async (repoDir) => {
+    await withTempDir(async (globalDir) => {
+      await fs.writeFile(
+        path.join(globalDir, 'config.json'),
+        JSON.stringify({ review: { language: 'en' } }),
+        'utf8'
+      );
+      const loader = new ConfigLoader({ globalConfigDir: globalDir });
+      const result = await loader.load(repoDir);
+      assert.equal(result.source, 'global');
+      assert.equal(result.path, path.join(globalDir, 'config.json'));
+      assert.equal(result.config.review.language, 'en');
+    });
+  });
+});
+
+test('global tier: repo-local が global を上書きする（repo 優先）', async () => {
+  await withTempDir(async (repoDir) => {
+    await withTempDir(async (globalDir) => {
+      await fs.writeFile(
+        path.join(globalDir, 'config.json'),
+        JSON.stringify({ review: { language: 'en', additionalInstructions: ['from-global'] } }),
+        'utf8'
+      );
+      await fs.writeFile(
+        path.join(repoDir, '.river-review.json'),
+        JSON.stringify({ review: { language: 'ja' } }),
+        'utf8'
+      );
+      const loader = new ConfigLoader({ globalConfigDir: globalDir });
+      const result = await loader.load(repoDir);
+      assert.equal(result.source, 'file');
+      assert.equal(result.path, path.join(repoDir, '.river-review.json'));
+      // repo wins for language
+      assert.equal(result.config.review.language, 'ja');
+      // global still contributes keys the repo did not set
+      assert.deepEqual(result.config.review.additionalInstructions, ['from-global']);
+    });
+  });
+});
+
+test('global tier: どちらも無いとき従来どおり default', async () => {
+  await withTempDir(async (repoDir) => {
+    await withTempDir(async (globalDir) => {
+      const loader = new ConfigLoader({ globalConfigDir: globalDir });
+      const result = await loader.load(repoDir);
+      assert.equal(result.source, 'default');
+      assert.equal(result.path, null);
+    });
+  });
+});
+
+test('global tier: globalConfigDir=null（無効化）でもクラッシュせず repo-local を解決', async () => {
+  await withTempDir(async (repoDir) => {
+    await fs.writeFile(
+      path.join(repoDir, '.river-review.json'),
+      JSON.stringify({ review: { language: 'en' } }),
+      'utf8'
+    );
+    // null disables the global tier (e.g. os.homedir() unavailable).
+    const loader = new ConfigLoader({ globalConfigDir: null });
+    const result = await loader.load(repoDir);
+    assert.equal(result.source, 'file');
+    assert.equal(result.config.review.language, 'en');
+  });
+});

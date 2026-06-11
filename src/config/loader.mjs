@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import yaml from 'js-yaml';
 import { ConfigSchema, riverReviewerConfigSchema } from './schema.mjs';
@@ -38,19 +39,45 @@ export class ConfigLoaderError extends Error {
   }
 }
 
+/**
+ * Resolve the default global config directory (~/.river-review). Returns null
+ * when the home directory cannot be determined (e.g. minimal containers where
+ * os.homedir() throws or yields an empty string), disabling the global tier.
+ */
+function defaultGlobalConfigDir() {
+  try {
+    const home = os.homedir();
+    return home ? path.join(home, '.river-review') : null;
+  } catch {
+    return null;
+  }
+}
+
 export class ConfigLoader {
   constructor({
     baseConfig = defaultConfig,
     fileNames = ['.river-review.json', '.river-review.yaml', '.river-review.yml'],
+    // Global user tier (#1045 A2): merged UNDER the repository-local config so a
+    // repo-local file always wins; the global file supplies a user-wide base.
+    // Injectable so tests can point it at a temp dir. os.homedir() can throw or
+    // return falsy in minimal containers — fall back to null (tier disabled).
+    globalConfigDir = defaultGlobalConfigDir(),
+    globalFileNames = ['config.json', 'config.yaml', 'config.yml'],
     fsImpl = fs,
   } = {}) {
     this.baseConfig = baseConfig;
     this.fileNames = Array.isArray(fileNames) ? [...fileNames] : [fileNames];
+    this.globalConfigDir = globalConfigDir;
+    this.globalFileNames = Array.isArray(globalFileNames)
+      ? [...globalFileNames]
+      : [globalFileNames];
     this.fs = fsImpl;
   }
 
-  async findConfigPath(repoRoot) {
-    for (const candidate of this.fileNames) {
+  async findConfigPath(repoRoot, fileNames = this.fileNames) {
+    // Guard: a null/undefined root (e.g. a disabled global tier) has no config.
+    if (!repoRoot) return null;
+    for (const candidate of fileNames) {
       const fullPath = path.join(repoRoot, candidate);
       try {
         await this.fs.access(fullPath);
@@ -84,14 +111,15 @@ export class ConfigLoader {
     return parsed;
   }
 
-  async load(repoRoot = process.cwd()) {
-    const configPath = await this.findConfigPath(repoRoot);
-    if (!configPath) {
-      return { config: this.baseConfig, path: null, source: 'default' };
-    }
-
-    let parsedInput = {};
-
+  /**
+   * Read, parse, and validate a single config file. Returns the validated
+   * input object (and whether it used the new "skill" schema). Throws
+   * ConfigLoaderError on read / parse / validation failure.
+   *
+   * @param {string} configPath
+   * @returns {Promise<{ parsedInput: object, isNewSchema: boolean }>}
+   */
+  async readConfigFile(configPath) {
     try {
       const raw = await this.fs.readFile(configPath, 'utf8');
       const parsed = this.parseConfig(raw, configPath);
@@ -110,7 +138,7 @@ export class ConfigLoader {
             { path: configPath }
           );
         }
-        parsedInput = validated.data;
+        const parsedInput = validated.data;
 
         const knownKeys = new Set(['version', 'model', 'review', 'exclude', 'skills']);
         const unknownKeys = Object.keys(parsedInput).filter((key) => !knownKeys.has(key));
@@ -122,20 +150,21 @@ export class ConfigLoader {
           // eslint-disable-next-line no-console
           console.warn(message);
         }
-      } else {
-        // Fallback to old schema
-        const validated = riverReviewerConfigSchema.safeParse(parsed);
-        if (!validated.success) {
-          const detail = validated.error.errors
-            .map((err) => `${err.path.join('.')}: ${err.message}`)
-            .join('; ');
-          throw new ConfigLoaderError(
-            `設定ファイルの形式が正しくありません (Legacy Schema): ${detail}`,
-            { path: configPath }
-          );
-        }
-        parsedInput = validated.data;
+        return { parsedInput, isNewSchema: true };
       }
+
+      // Fallback to old schema
+      const validated = riverReviewerConfigSchema.safeParse(parsed);
+      if (!validated.success) {
+        const detail = validated.error.errors
+          .map((err) => `${err.path.join('.')}: ${err.message}`)
+          .join('; ');
+        throw new ConfigLoaderError(
+          `設定ファイルの形式が正しくありません (Legacy Schema): ${detail}`,
+          { path: configPath }
+        );
+      }
+      return { parsedInput: validated.data, isNewSchema: false };
     } catch (err) {
       if (err instanceof ConfigLoaderError) throw err;
       if (err instanceof SyntaxError || err?.name === 'YAMLException') {
@@ -149,13 +178,35 @@ export class ConfigLoader {
         path: configPath,
       });
     }
+  }
+
+  async load(repoRoot = process.cwd()) {
+    const repoPath = await this.findConfigPath(repoRoot, this.fileNames);
+    const globalPath = await this.findConfigPath(this.globalConfigDir, this.globalFileNames);
+
+    // Resolution order (top wins): repository-local > global user > built-in.
+    const globalFile = globalPath ? await this.readConfigFile(globalPath) : null;
+    const repoFile = repoPath ? await this.readConfigFile(repoPath) : null;
+
+    if (!globalFile && !repoFile) {
+      return { config: this.baseConfig, path: null, source: 'default' };
+    }
 
     try {
-      // Determine which base config to use
-      const baseToUse =
-        'skills' in parsedInput || 'version' in parsedInput ? defaultSkillConfig : this.baseConfig;
-      const merged = mergeConfig(baseToUse, parsedInput);
-      return { config: merged, path: configPath, source: 'file' };
+      const usesNewSchema = (globalFile?.isNewSchema ?? false) || (repoFile?.isNewSchema ?? false);
+      const baseToUse = usesNewSchema ? defaultSkillConfig : this.baseConfig;
+
+      // Layer global UNDER repo-local so a repo-local file always wins.
+      let merged = baseToUse;
+      if (globalFile) merged = mergeConfig(merged, globalFile.parsedInput);
+      if (repoFile) merged = mergeConfig(merged, repoFile.parsedInput);
+
+      // `path` / `source` reflect the highest-precedence file that contributed.
+      return {
+        config: merged,
+        path: repoPath ?? globalPath,
+        source: repoFile ? 'file' : 'global',
+      };
     } catch (err) {
       throw new ConfigMergeError('設定のマージに失敗しました', { cause: err });
     }
