@@ -392,6 +392,61 @@ skills:
     recommended: true
     description: '既存デザインシステムコンポーネント（Button / Input / Modal / Card 等）を再実装していないかを検出する。'
 
+  - id: rr-midstream-tailwind-class-hygiene-001
+    version: '0.1.0'
+    name: 'Tailwind CSS Class Hygiene Review'
+    path: skills/midstream/rr-midstream-tailwind-class-hygiene-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [tailwind, css, frontend, midstream, community]
+    severity: minor
+    recommended: false
+    description: 'Checks Tailwind utility class hygiene: arbitrary-value overuse bypassing the theme scale, conflicting/duplicate utilities, and hardcoded arbitrary colors.'
+
+  - id: rr-midstream-vitest-mock-isolation-001
+    version: '0.1.0'
+    name: 'Vitest Mock Isolation Review'
+    path: skills/midstream/rr-midstream-vitest-mock-isolation-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [vitest, testing, mocks, frontend, midstream, community]
+    severity: major
+    recommended: false
+    description: 'Detects Vitest test-isolation hazards: unrestored vi.spyOn/vi.mock, un-awaited resolves/rejects assertions, and shared mutable module state.'
+
+  - id: rr-midstream-firebase-security-rules-001
+    version: '0.1.0'
+    name: 'Firebase Security Rules Review'
+    path: skills/midstream/rr-midstream-firebase-security-rules-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [firebase, security, baas, authorization, midstream, community]
+    severity: critical
+    recommended: false
+    description: 'Detects over-permissive Firestore/Storage rules, missing auth checks on writes, and admin SDK private key exposure to client bundles.'
+
+  - id: rr-midstream-supabase-rls-policy-001
+    version: '0.1.0'
+    name: 'Supabase RLS Policy Review'
+    path: skills/midstream/rr-midstream-supabase-rls-policy-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [supabase, security, baas, rls, authorization, midstream, community]
+    severity: critical
+    recommended: false
+    description: 'Detects tables without ROW LEVEL SECURITY enabled, over-permissive policies (USING (true) without owner conditions), and service_role key exposure in client code.'
+
+  - id: rr-midstream-nextjs-server-action-security-001
+    version: '0.1.0'
+    name: 'Next.js Server Action Security Review'
+    path: skills/midstream/rr-midstream-nextjs-server-action-security-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [nextjs, security, server-actions, authorization, midstream, community]
+    severity: critical
+    recommended: false
+    description: 'Checks Next.js Server Actions for missing auth/authz before mutations, missing input validation, and untrusted client-supplied IDs.'
+
   # Downstream Skills (Testing & Release)
   - id: rr-downstream-gha-workflow-security-001
     version: '0.1.0'
@@ -1003,6 +1058,84 @@ packs:
         reviewed_at: '2026-06-11'
     skills:
       - rr-downstream-gha-workflow-security-001
+
+  - id: tailwind
+    version: '0.1.0'
+    name: 'Tailwind CSS Review Pack'
+    description: 'Tailwind CSS の utility class 衛生（任意値の濫用 / クラス競合 / 任意カラーのトークン迂回）のレビュー基準'
+    axis: technology
+    tier: community
+    sources:
+      - name: 'Tailwind CSS Docs — Theme'
+        version: 'v3/v4'
+        url: 'https://tailwindcss.com/docs/theme'
+        reviewed_at: '2026-06-11'
+      - name: 'Tailwind CSS Docs — Using arbitrary values'
+        version: 'v3/v4'
+        url: 'https://tailwindcss.com/docs/adding-custom-styles#using-arbitrary-values'
+        reviewed_at: '2026-06-11'
+    skills:
+      - rr-midstream-tailwind-class-hygiene-001
+
+  - id: vitest
+    version: '0.1.0'
+    name: 'Vitest Review Pack'
+    description: 'Vitest のテスト分離（mock/spy 復元・非同期 assertion の await・共有可変状態）のレビュー基準'
+    axis: technology
+    tier: community
+    sources:
+      - name: 'Vitest Docs — Vi (mock utilities)'
+        version: 'v1/v2'
+        url: 'https://vitest.dev/api/vi.html'
+        reviewed_at: '2026-06-11'
+      - name: 'Vitest Docs — restoreMocks config'
+        version: 'v1/v2'
+        url: 'https://vitest.dev/config/#restoremocks'
+        reviewed_at: '2026-06-11'
+    skills:
+      - rr-midstream-vitest-mock-isolation-001
+
+  - id: firebase
+    version: '0.1.0'
+    name: 'Firebase / Supabase (BaaS) Security Pack'
+    description: 'BaaS の認可境界（Firebase Security Rules の過剰許可 / Supabase RLS の無効化・過剰 policy / 機密鍵のクライアント露出）のレビュー基準'
+    axis: concern
+    tier: community
+    sources:
+      - name: 'Firebase — Security Rules basics'
+        version: '2026-06'
+        url: 'https://firebase.google.com/docs/rules/basics'
+        reviewed_at: '2026-06-11'
+      - name: 'Firebase — Rules and Auth'
+        version: '2026-06'
+        url: 'https://firebase.google.com/docs/rules/rules-and-auth'
+        reviewed_at: '2026-06-11'
+      - name: 'Supabase — Row Level Security'
+        version: '2026-06'
+        url: 'https://supabase.com/docs/guides/database/postgres/row-level-security'
+        reviewed_at: '2026-06-11'
+    skills:
+      - rr-midstream-firebase-security-rules-001
+      - rr-midstream-supabase-rls-policy-001
+
+  - id: nextjs
+    version: '0.1.0'
+    name: 'Next.js Review Pack'
+    description: 'Next.js App Router の client/server 境界と Server Actions の認証・認可・入力検証のレビュー基準'
+    axis: technology
+    tier: community
+    sources:
+      - name: 'Next.js Docs — Server Actions: Authentication and authorization'
+        version: 'App Router'
+        url: 'https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations#authentication-and-authorization'
+        reviewed_at: '2026-06-11'
+      - name: 'Next.js Blog — How to Think About Security in Next.js'
+        version: '2026-06'
+        url: 'https://nextjs.org/blog/security-nextjs-server-components-actions'
+        reviewed_at: '2026-06-11'
+    skills:
+      - rr-midstream-nextjs-app-router-boundary-001
+      - rr-midstream-nextjs-server-action-security-001
 
 # Recommended skill sets
 # NOTE: new additions are frozen (skill-pack-design.md §2). New bundles go to

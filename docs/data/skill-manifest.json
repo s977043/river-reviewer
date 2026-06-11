@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "description": "Deterministic skill manifest for drift detection by selective adopters. Compare the checksum of your copied skill against this list to notice upstream changes. Regenerate with: npm run skills:manifest",
-  "skillCount": 102,
+  "skillCount": 107,
   "skills": [
     {
       "id": "adversarial-review",
@@ -166,6 +166,12 @@
       "files": 9
     },
     {
+      "id": "rr-midstream-firebase-security-rules-001",
+      "path": "skills/midstream/rr-midstream-firebase-security-rules-001",
+      "checksum": "sha256:3032e89ca927eb0cc80ba2289912a5bbfb0d885058b4de4f50e7a9249f68d391",
+      "files": 4
+    },
+    {
       "id": "rr-midstream-gh-address-comments-001",
       "path": "skills/midstream/rr-midstream-gh-address-comments-001",
       "checksum": "sha256:2851f61ccc23ea611ab842c71df96669ce0234b206ab505084d94cfc40518c90",
@@ -250,6 +256,12 @@
       "files": 9
     },
     {
+      "id": "rr-midstream-nextjs-server-action-security-001",
+      "path": "skills/midstream/rr-midstream-nextjs-server-action-security-001",
+      "checksum": "sha256:793398cee4de5fd1902419a0ff5080bddd7552f1bc80d602c472870e0092d69c",
+      "files": 4
+    },
+    {
       "id": "rr-midstream-normalization-consistency-001",
       "path": "skills/midstream/rr-midstream-normalization-consistency-001",
       "checksum": "sha256:1ccbdb8531b551d280d9a3a86f484b90f87109233aece4258dd9d4aab939a877",
@@ -304,10 +316,22 @@
       "files": 9
     },
     {
+      "id": "rr-midstream-supabase-rls-policy-001",
+      "path": "skills/midstream/rr-midstream-supabase-rls-policy-001",
+      "checksum": "sha256:b39f4891ad567f89d105a3f4808c75c4582792a971373c0acd57bd603a6c7c4f",
+      "files": 4
+    },
+    {
       "id": "rr-midstream-suppression-feedback-001",
       "path": "skills/midstream/rr-midstream-suppression-feedback-001",
       "checksum": "sha256:065c946ad30f2d5fde31b446472633ae505a30451e294516fe3316306d3763d8",
       "files": 10
+    },
+    {
+      "id": "rr-midstream-tailwind-class-hygiene-001",
+      "path": "skills/midstream/rr-midstream-tailwind-class-hygiene-001",
+      "checksum": "sha256:0132d7d1b62e670ccb17f3561e39d07d9edb03fc5edd3a15884f8471d2262e68",
+      "files": 4
     },
     {
       "id": "rr-midstream-type-driven-design-001",
@@ -332,6 +356,12 @@
       "path": "skills/midstream/rr-midstream-ubiquitous-language-naming-001",
       "checksum": "sha256:4958582f8998b91f228d4ef76a34f0a9fc9ab9f2878717d6e3f81ae67075aa92",
       "files": 1
+    },
+    {
+      "id": "rr-midstream-vitest-mock-isolation-001",
+      "path": "skills/midstream/rr-midstream-vitest-mock-isolation-001",
+      "checksum": "sha256:f826db1c8629e39504ed42c5f628ad2c9bc9ea39325d600248f9a463ca99cdd1",
+      "files": 4
     },
     {
       "id": "rr-midstream-war-game-001",
