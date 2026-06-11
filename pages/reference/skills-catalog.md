@@ -6,10 +6,13 @@ River Review に同梱されているスキル一覧です。フェーズ別に�
 
 梱包済みレビューナレッジの配布単位です。`--skill-set <id>` で導入できます（詳細は [Skill Pack を使う](../guides/use-skill-packs.md) を参照）。
 
-| id           | name                             | axis        | tier      | skills                                                                                                                             |
-| ------------ | -------------------------------- | ----------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `typescript` | TypeScript Review Pack           | technology  | official  | `rr-midstream-typescript-strict-001` / `rr-midstream-typescript-nullcheck-001` / `rr-midstream-type-driven-design-001`             |
-| `ddd`        | Domain-Driven Design Review Pack | methodology | community | `rr-upstream-bounded-context-language-001` / `rr-midstream-type-driven-design-001` / `rr-midstream-ubiquitous-language-naming-001` |
+| id             | name                             | axis        | tier         | skills                                                                                                                               |
+| -------------- | -------------------------------- | ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `typescript`   | TypeScript Review Pack           | technology  | official     | `rr-midstream-typescript-strict-001` / `rr-midstream-typescript-nullcheck-001` / `rr-midstream-type-driven-design-001`               |
+| `ddd`          | Domain-Driven Design Review Pack | methodology | community    | `rr-upstream-bounded-context-language-001` / `rr-midstream-type-driven-design-001` / `rr-midstream-ubiquitous-language-naming-001`   |
+| `react-router` | React Router Review Pack         | technology  | experimental | `rr-midstream-react-router-loader-boundary-001` / `rr-midstream-react-router-action-contract-001`                                    |
+| `laravel`      | Laravel Review Pack              | technology  | experimental | `rr-midstream-laravel-eloquent-nplus1-001` / `rr-upstream-laravel-migration-safety-001` / `rr-midstream-laravel-mass-assignment-001` |
+| `gha-security` | GitHub Actions Security Pack     | concern     | experimental | `rr-downstream-gha-workflow-security-001`                                                                                            |
 
 ## upstream
 
@@ -533,6 +536,22 @@ rollout/rollback expectations.`
 チェック項目の例:
 
 - summary / findings / actions / questions
+
+### `rr-upstream-laravel-migration-safety-001`
+
+- 名前: `Laravel Migration Safety Review`
+- 概要: `Reviews Laravel migrations for destructive operations; change() dropping modifiers; locking index creation on
+large tables (PostgreSQL); and asymmetric down().`
+- 対象:
+  - `database/migrations/**/*.php`
+- 重要度: major
+- タグ: laravel / migration / database / postgresql / safety / upstream
+- 依存関係: none
+- 適用条件: phase=upstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / questions
 
 ### `rr-upstream-migration-rollout-rollback-001`
 
@@ -1218,6 +1237,40 @@ without source usage.`
 
 - findings / summary / actions
 
+### `rr-midstream-laravel-eloquent-nplus1-001`
+
+- 名前: `Laravel Eloquent N+1 and Query Efficiency Review`
+- 概要: `Detects N+1 query patterns (relation access inside loops without eager loading); full-table get()/all() loads;
+and unsafe chunk()/cursor() usage in Laravel Eloquent code.`
+- 対象:
+  - `app/**/*.php`
+  - `src/**/*.php`
+- 重要度: major
+- タグ: laravel / eloquent / performance / n-plus-1 / php / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / questions
+
+### `rr-midstream-laravel-mass-assignment-001`
+
+- 名前: `Laravel Mass Assignment and Authorization Review`
+- 概要: `Detects mass assignment via create/update($request->all()); unguarded models; and missing authorization on
+mutating controller actions in Laravel.`
+- 対象:
+  - `app/**/*.php`
+  - `src/**/*.php`
+- 重要度: major
+- タグ: laravel / security / mass-assignment / authorization / php / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / questions
+
 ### `rr-midstream-loading-state-001`
 
 - 名前: `Loading State Transition Review`
@@ -1421,6 +1474,42 @@ linked issues).`
 チェック項目の例:
 
 - findings / actions
+
+### `rr-midstream-react-router-action-contract-001`
+
+- 名前: `React Router Action Contract Review`
+- 概要: `Checks React Router v7 action conventions: validation errors returned as data with 4xx status (not thrown);
+redirect on success; and 3-branch ErrorBoundary handling.`
+- 対象:
+  - `app/**/*.{ts,tsx,js,jsx}`
+  - `src/routes/**/*.{ts,tsx,js,jsx}`
+  - `app/routes/**/*.{ts,tsx,js,jsx}`
+- 重要度: major
+- タグ: react-router / remix / actions / validation / frontend / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / questions
+
+### `rr-midstream-react-router-loader-boundary-001`
+
+- 名前: `React Router Loader Boundary Review`
+- 概要: `Detects route data fetched in useEffect instead of loaders; server/client API leaks across loader boundaries;
+and missing HydrateFallback in React Router v7 framework mode.`
+- 対象:
+  - `app/**/*.{ts,tsx,js,jsx}`
+  - `src/routes/**/*.{ts,tsx,js,jsx}`
+  - `app/routes/**/*.{ts,tsx,js,jsx}`
+- 重要度: major
+- タグ: react-router / remix / data-loading / frontend / midstream
+- 依存関係: none
+- 適用条件: phase=midstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / questions
 
 ### `rr-midstream-review-automation-boundary-001`
 
@@ -1656,6 +1745,22 @@ under different names; or different concepts sharing a name).`
 チェック項目の例:
 
 - findings / actions / summary
+
+### `rr-downstream-gha-workflow-security-001`
+
+- 名前: `GitHub Actions Workflow Security Review`
+- 概要: `Reviews GitHub Actions workflow diffs for script injection of untrusted input; pull_request_target with
+untrusted checkout; over-broad GITHUB_TOKEN permissions; and unpinned third-party actions.`
+- 対象:
+  - `.github/workflows/**/*.{yml,yaml}`
+- 重要度: major
+- タグ: github-actions / security / ci / supply-chain / downstream
+- 依存関係: none
+- 適用条件: phase=downstream, inputContext=diff
+
+チェック項目の例:
+
+- findings / questions
 
 ### `rr-downstream-review-policy-standard-001`
 

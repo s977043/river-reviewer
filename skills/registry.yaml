@@ -217,6 +217,50 @@ skills:
     recommended: false
     description: 'Detects domain terms drifting between code identifiers and the established ubiquitous language.'
 
+  - id: rr-midstream-react-router-loader-boundary-001
+    version: '0.1.0'
+    name: 'React Router Loader Boundary Review'
+    path: skills/midstream/rr-midstream-react-router-loader-boundary-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [react-router, remix, data-loading, frontend, midstream]
+    severity: major
+    recommended: false
+    description: 'Detects route data fetched in useEffect instead of loaders and server/client API leaks across loader boundaries.'
+
+  - id: rr-midstream-react-router-action-contract-001
+    version: '0.1.0'
+    name: 'React Router Action Contract Review'
+    path: skills/midstream/rr-midstream-react-router-action-contract-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [react-router, remix, actions, validation, frontend, midstream]
+    severity: major
+    recommended: false
+    description: 'Checks React Router action conventions: validation errors as data with 4xx, redirect on success, 3-branch ErrorBoundary.'
+
+  - id: rr-midstream-laravel-eloquent-nplus1-001
+    version: '0.1.0'
+    name: 'Laravel Eloquent N+1 and Query Efficiency Review'
+    path: skills/midstream/rr-midstream-laravel-eloquent-nplus1-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [laravel, eloquent, performance, n-plus-1, php, midstream]
+    severity: major
+    recommended: false
+    description: 'Detects N+1 query patterns, full-table loads, and unsafe chunk()/cursor() usage in Laravel Eloquent.'
+
+  - id: rr-midstream-laravel-mass-assignment-001
+    version: '0.1.0'
+    name: 'Laravel Mass Assignment and Authorization Review'
+    path: skills/midstream/rr-midstream-laravel-mass-assignment-001/SKILL.md
+    category: midstream
+    phase: midstream
+    tags: [laravel, security, mass-assignment, authorization, php, midstream]
+    severity: major
+    recommended: false
+    description: 'Detects mass assignment via request->all() and missing authorization on mutating controller actions.'
+
   - id: rr-midstream-loading-state-001
     version: '0.1.0'
     name: 'Loading State Transition Review'
@@ -349,6 +393,17 @@ skills:
     description: '既存デザインシステムコンポーネント（Button / Input / Modal / Card 等）を再実装していないかを検出する。'
 
   # Downstream Skills (Testing & Release)
+  - id: rr-downstream-gha-workflow-security-001
+    version: '0.1.0'
+    name: 'GitHub Actions Workflow Security Review'
+    path: skills/downstream/rr-downstream-gha-workflow-security-001/SKILL.md
+    category: downstream
+    phase: downstream
+    tags: [github-actions, security, ci, supply-chain, downstream]
+    severity: major
+    recommended: false
+    description: 'Reviews workflow diffs for script injection, pull_request_target with untrusted checkout, over-broad permissions, and unpinned actions.'
+
   - id: agent-qa-regression
     version: '0.1.0'
     name: 'QA Regression (Playwright)'
@@ -449,6 +504,17 @@ skills:
     severity: major
     recommended: true
     description: '変更に含まれる設計判断・実装選択の論理的整合性を徹底的に検証し、確証バイアスを排除して判断精度を高める'
+
+  - id: rr-upstream-laravel-migration-safety-001
+    version: '0.1.0'
+    name: 'Laravel Migration Safety Review'
+    path: skills/upstream/rr-upstream-laravel-migration-safety-001/SKILL.md
+    category: upstream
+    phase: upstream
+    tags: [laravel, migration, database, postgresql, safety, upstream]
+    severity: major
+    recommended: false
+    description: 'Reviews Laravel migrations for destructive ops, change() dropping modifiers, locking index creation, and asymmetric down().'
 
   # Legacy Upstream Skills (Design Phase)
   - id: rr-upstream-review-policy-standard-001
@@ -888,6 +954,55 @@ packs:
       - rr-upstream-bounded-context-language-001
       - rr-midstream-type-driven-design-001
       - rr-midstream-ubiquitous-language-naming-001
+
+  - id: react-router
+    version: '0.1.0'
+    name: 'React Router Review Pack'
+    description: 'React Router v7 (framework mode) の data loading / action 契約 / ErrorBoundary のレビュー基準'
+    axis: technology
+    tier: experimental
+    sources:
+      - name: 'React Router Docs (framework mode)'
+        version: 'v7'
+        url: 'https://reactrouter.com/start/framework/data-loading'
+        reviewed_at: '2026-06-11'
+    skills:
+      - rr-midstream-react-router-loader-boundary-001
+      - rr-midstream-react-router-action-contract-001
+
+  - id: laravel
+    version: '0.1.0'
+    name: 'Laravel Review Pack'
+    description: 'Laravel 12 の Eloquent クエリ効率 / migration 安全性 / mass assignment・認可のレビュー基準'
+    axis: technology
+    tier: experimental
+    sources:
+      - name: 'Laravel Documentation'
+        version: '12.x'
+        url: 'https://laravel.com/docs/12.x'
+        reviewed_at: '2026-06-11'
+    skills:
+      - rr-midstream-laravel-eloquent-nplus1-001
+      - rr-upstream-laravel-migration-safety-001
+      - rr-midstream-laravel-mass-assignment-001
+
+  - id: gha-security
+    version: '0.1.0'
+    name: 'GitHub Actions Security Pack'
+    description: 'GitHub Actions workflow のスクリプトインジェクション / pwn request / 権限・ピン留めのセキュリティレビュー基準'
+    axis: concern
+    tier: experimental
+    sources:
+      - name: 'GitHub — Secure use of GitHub Actions'
+        version: '2026-06'
+        url: 'https://docs.github.com/en/actions/reference/security/secure-use'
+        reviewed_at: '2026-06-11'
+      - name: 'GitHub Security Lab — pwn requests / untrusted input'
+        version: '2026-06'
+        url: 'https://securitylab.github.com/resources/github-actions-preventing-pwn-requests/'
+        reviewed_at: '2026-06-11'
+    skills:
+      - rr-downstream-gha-workflow-security-001
 
 # Recommended skill sets
 # NOTE: new additions are frozen (skill-pack-design.md §2). New bundles go to

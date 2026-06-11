@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "description": "Deterministic skill manifest for drift detection by selective adopters. Compare the checksum of your copied skill against this list to notice upstream changes. Regenerate with: npm run skills:manifest",
-  "skillCount": 96,
+  "skillCount": 102,
   "skills": [
     {
       "id": "adversarial-review",
@@ -85,6 +85,12 @@
       "id": "rr-downstream-flaky-test-001",
       "path": "skills/downstream/rr-downstream-flaky-test-001",
       "checksum": "sha256:4b2b66b6a9c022f6e1fa949eea9bb0ae7d4276173f66d6a86ba9636502001a19",
+      "files": 1
+    },
+    {
+      "id": "rr-downstream-gha-workflow-security-001",
+      "path": "skills/downstream/rr-downstream-gha-workflow-security-001",
+      "checksum": "sha256:d3917d4c3d52d694f632a9a83c9e6278d7f8f3c97141b1aa1abc6140e55f641c",
       "files": 1
     },
     {
@@ -184,6 +190,18 @@
       "files": 9
     },
     {
+      "id": "rr-midstream-laravel-eloquent-nplus1-001",
+      "path": "skills/midstream/rr-midstream-laravel-eloquent-nplus1-001",
+      "checksum": "sha256:b2c9a8437f3f65d4ab263282fc7fc13a1aaaf9bfb8b71cadd59c965fc513290e",
+      "files": 1
+    },
+    {
+      "id": "rr-midstream-laravel-mass-assignment-001",
+      "path": "skills/midstream/rr-midstream-laravel-mass-assignment-001",
+      "checksum": "sha256:b0da099883fcc12208f08f0d96bfc6bea53fd4dfba5639615c985b4309e11c8e",
+      "files": 1
+    },
+    {
       "id": "rr-midstream-loading-state-001",
       "path": "skills/midstream/rr-midstream-loading-state-001",
       "checksum": "sha256:eb57e32d0b7b97a0b745511e76124eec12332fa6e54720a7d99d1e94eea66a2e",
@@ -247,6 +265,18 @@
       "id": "rr-midstream-pr-description-001",
       "path": "skills/midstream/rr-midstream-pr-description-001",
       "checksum": "sha256:9990a448481b228d2ff4535e2637ddd9688d589bc8c2cebc44c884992ee278ff",
+      "files": 1
+    },
+    {
+      "id": "rr-midstream-react-router-action-contract-001",
+      "path": "skills/midstream/rr-midstream-react-router-action-contract-001",
+      "checksum": "sha256:692002e2f314594a34e1d44ee278f128d7812328b24f3601546aed5e8dc21f13",
+      "files": 1
+    },
+    {
+      "id": "rr-midstream-react-router-loader-boundary-001",
+      "path": "skills/midstream/rr-midstream-react-router-loader-boundary-001",
+      "checksum": "sha256:95379b4590efc8a950e62cae35c95d7249de3510358706c0c7ca470df60d3ea7",
       "files": 1
     },
     {
@@ -445,6 +475,12 @@
       "id": "rr-upstream-integration-contracts-001",
       "path": "skills/upstream/rr-upstream-integration-contracts-001",
       "checksum": "sha256:891fd577269053661f9e001f82901eec9f5bbeccd0f9f2135ef618ecac4f4176",
+      "files": 1
+    },
+    {
+      "id": "rr-upstream-laravel-migration-safety-001",
+      "path": "skills/upstream/rr-upstream-laravel-migration-safety-001",
+      "checksum": "sha256:126ab5e919451e73ddccb9cfa137872adc1c1110fdc085b042e4f446e43608da",
       "files": 1
     },
     {
