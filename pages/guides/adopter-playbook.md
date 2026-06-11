@@ -55,6 +55,15 @@ severity と失敗条件の対応（CLI / runner 既定）:
 
 この昇格ループにより、AI レビューの判断を「再現可能な検査」へコード化していきます。判断単位の詳細は [スキルの選択と組み合わせ](./choose-skills.md) と [スキル作成ガイド](./write-a-skill.md) を参照してください。
 
+## 4. Skill adoption only の drift 検知
+
+観点を自前 skill へ移植する「Skill adoption only」では、上流（River Review）が skill を改善しても移植先が気づけず、時間とともに陳腐化します。これを機械的に検知する足場が2つあります。
+
+- **skill manifest**: `docs/data/skill-manifest.json` に各 skill の `id` / `path` / `checksum`（内容ハッシュ）が記録される。移植元 skill の checksum を自分のコピーと突き合わせれば、上流が変わったかを CI で自動検知できる。
+- **release notes の "Skills changed"**: 各リリースのノートに、前リリースから変わった skill（Changed / Added / Removed）が列挙される。どの観点を見直すべきかをリリース単位で追える。
+
+ローカルでも `npm run skills:changelog -- --base <前タグ> --head <タグ>` で同じ差分を確認できます。
+
 ## よくある失敗と対処
 
 | 失敗                               | 原因                                            | 対処                                                                         |

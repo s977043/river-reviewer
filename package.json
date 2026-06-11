@@ -66,6 +66,7 @@
     "usage:summary": "node scripts/usage-summary.mjs",
     "skills:manifest": "node scripts/generate-skill-manifest.mjs",
     "skills:manifest:check": "node scripts/generate-skill-manifest.mjs --check",
+    "skills:changelog": "node scripts/skill-changelog.mjs",
     "feedback:apply": "node scripts/apply-feedback.mjs",
     "packs:tier": "node scripts/pack-tier-check.mjs",
     "suppression:analytics": "node scripts/suppression-analytics.mjs",
