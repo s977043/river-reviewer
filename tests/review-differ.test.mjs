@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { diffReviews, formatRegressionSummary } from '../src/lib/review-differ.mjs';
+import { diffReviews, diffRunHistory, formatRegressionSummary } from '../src/lib/review-differ.mjs';
 
 function makeFinding(overrides = {}) {
   return {
@@ -106,6 +106,74 @@ describe('diffReviews', () => {
     for (const f of [...diff.new, ...diff.resolved, ...diff.persisting, ...diff.scoreChanged]) {
       assert.ok(typeof f.fingerprint === 'string' && f.fingerprint.length > 0);
     }
+  });
+});
+
+describe('diffRunHistory', () => {
+  function makeRecord(runId, timestamp, findings) {
+    return { runId, timestamp, findings };
+  }
+
+  it('3 runs: resolved then re-appeared → oscillated 1 finding', () => {
+    const f = makeFinding();
+    const run1 = makeRecord('run-1', '2024-01-01T00:00:00Z', [f]);
+    const run2 = makeRecord('run-2', '2024-01-02T00:00:00Z', []); // resolved
+    const run3 = makeRecord('run-3', '2024-01-03T00:00:00Z', [f]); // re-appeared
+    const result = diffRunHistory([run1, run2, run3]);
+    assert.equal(result.oscillated.length, 1, 'should detect 1 oscillating finding');
+    assert.equal(result.oscillated[0].changeStatus, 'oscillated');
+    assert.equal(result.summary.oscillatedCount, 1);
+    // timeline should have 3 entries
+    assert.equal(result.oscillated[0].timeline.length, 3);
+    assert.deepEqual(
+      result.oscillated[0].timeline.map((t) => t.present),
+      [true, false, true]
+    );
+  });
+
+  it('3 runs: monotonic improvement (new→resolved, never re-appears) → oscillated 0', () => {
+    const f = makeFinding();
+    const run1 = makeRecord('run-1', '2024-01-01T00:00:00Z', [f]);
+    const run2 = makeRecord('run-2', '2024-01-02T00:00:00Z', [f]);
+    const run3 = makeRecord('run-3', '2024-01-03T00:00:00Z', []); // resolved in run3
+    const result = diffRunHistory([run1, run2, run3]);
+    assert.equal(result.oscillated.length, 0);
+    assert.equal(result.summary.oscillatedCount, 0);
+  });
+
+  it('2 runs only → oscillated always empty', () => {
+    const f = makeFinding();
+    const run1 = makeRecord('run-1', '2024-01-01T00:00:00Z', [f]);
+    const run2 = makeRecord('run-2', '2024-01-02T00:00:00Z', []);
+    const result = diffRunHistory([run1, run2]);
+    assert.equal(result.oscillated.length, 0);
+    assert.equal(result.summary.oscillatedCount, 0);
+  });
+
+  it('timestamp out-of-order input still detects oscillation correctly', () => {
+    const f = makeFinding();
+    // Provide in reverse order: run3, run1, run2 — should sort and detect
+    const run1 = makeRecord('run-1', '2024-01-01T00:00:00Z', [f]);
+    const run2 = makeRecord('run-2', '2024-01-02T00:00:00Z', []); // resolved
+    const run3 = makeRecord('run-3', '2024-01-03T00:00:00Z', [f]); // re-appeared
+    const result = diffRunHistory([run3, run1, run2]); // shuffled
+    assert.equal(result.oscillated.length, 1, 'should detect oscillation despite unordered input');
+    assert.deepEqual(
+      result.oscillated[0].timeline.map((t) => t.runId),
+      ['run-1', 'run-2', 'run-3']
+    );
+  });
+
+  it('last adjacent diff fields are still present', () => {
+    const f = makeFinding();
+    const run1 = makeRecord('run-1', '2024-01-01T00:00:00Z', [f]);
+    const run2 = makeRecord('run-2', '2024-01-02T00:00:00Z', []);
+    const run3 = makeRecord('run-3', '2024-01-03T00:00:00Z', [f]);
+    const result = diffRunHistory([run1, run2, run3]);
+    // last diff is run2→run3 where finding re-appeared (new)
+    assert.ok(Array.isArray(result.new));
+    assert.ok(Array.isArray(result.resolved));
+    assert.ok(typeof result.summary.newCount === 'number');
   });
 });
 
