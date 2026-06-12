@@ -64,7 +64,8 @@ river review plan --skill-set pre-exec --phase upstream --plan-only \
 river run . --base main --output json
 ```
 
-- **出力**: `{ issues[], summary }`（`output.schema.json`）。`issues[].severity`（critical/major/minor/info）と `message` / `file` / `line` を読む。
+- **出力**: `{ issues[], summary, decision }`（`output.schema.json`）。`issues[].severity`（critical/major/minor/info）と `message` / `file` / `line` を読む。
+- **停止判定**: `decision`（`auto-approve` / `human-review-recommended` / `human-review-required`）と `summary.issueCountBySeverity` を組み合わせて機械判定できる。`decision === 'auto-approve'` かつ blocking（critical/major）がゼロであれば自動続行の基準にできる。
 - **エージェントの次行動（自己修正ループ）**: `issues` を重大度順に修正 → 再度 `river run` → `issues` が空 or info のみになるまで反復。
 - タスクが大きい場合は `--depth thorough`、対象を絞るなら `--files <glob>`。`--base` は省略時に default ブランチを自動検出するため、`main` 以外（`master`/`develop` 等）のリポジトリでは省略するか `--base <default>` を明示する。
 
@@ -168,12 +169,12 @@ open_pr(to_markdown(result.issues))
 
 ## 出力契約クイックリファレンス
 
-| コマンド                 | JSON スキーマ                         | 主なキー                                                                |
-| ------------------------ | ------------------------------------- | ----------------------------------------------------------------------- |
-| `river run`              | `schemas/output.schema.json`          | `issues[]`, `summary.issueCountBySeverity`, `summary.issueCountByPhase` |
-| `river review plan/exec` | `schemas/review-artifact.schema.json` | `version`, `status`, `phase`, `findings[]`, `plan`, `debug`             |
+| コマンド                 | JSON スキーマ                         | 主なキー                                                                            |
+| ------------------------ | ------------------------------------- | ----------------------------------------------------------------------------------- |
+| `river run`              | `schemas/output.schema.json`          | `issues[]`, `summary.issueCountBySeverity`, `summary.issueCountByPhase`, `decision` |
+| `river review plan/exec` | `schemas/review-artifact.schema.json` | `version`, `status`, `phase`, `findings[]`, `plan`, `debug`                         |
 
-> **verdict は JSON に含まれない**。`auto-approve` / `human-review-recommended` / `human-review-required` の verdict は `--output markdown` の人間向け要約にのみ現れる（`output.schema.json` の `summary` は件数のみ、Review Artifact の `debug` は自由形式で verdict を保証しない）。エージェントの機械判断は **exit code（`--fail-on`）** と **`summary.issueCountBySeverity`** で行うこと（verdict が必要なら markdown を別途取得）。
+> `river run --output json` の `decision` フィールド（`auto-approve` / `human-review-recommended` / `human-review-required`）は findings から決定論的に導出される。scoring 失敗時は省略されるため、存在チェックをしてから参照すること。エージェントの機械判断は **exit code（`--fail-on`）**・**`summary.issueCountBySeverity`**・**`decision`** の組み合わせで行う。`river review plan/exec` の verdict は Review Artifact の `decision` フィールドで確認できる。
 
 ## 関連ページ
 

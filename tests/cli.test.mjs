@@ -275,3 +275,50 @@ describe('river skills subcommands', () => {
     assert.match(result.stdout + result.stderr, /No Agent Skills/);
   });
 });
+
+// -----------------------------------------------------------------------------
+// river run - JSON output decision field (#1150 S1)
+// -----------------------------------------------------------------------------
+
+describe('river run - JSON output decision field', () => {
+  const VALID_DECISIONS = ['auto-approve', 'human-review-recommended', 'human-review-required'];
+
+  test('--output json includes decision as a valid enum value', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const result = await runCliInProcess(['run', '.', '--dry-run', '--output', 'json'], {
+      cwd: dir,
+    });
+
+    assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
+    const parsed = JSON.parse(result.stdout);
+    assert.ok('decision' in parsed, 'top-level decision field should be present');
+    assert.ok(
+      VALID_DECISIONS.includes(parsed.decision),
+      `decision must be one of ${VALID_DECISIONS.join(', ')}, got: ${parsed.decision}`
+    );
+  });
+
+  test('--output json with no findings produces decision auto-approve', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    // dry-run with no real findings still invokes scoreReview([]) → auto-approve
+    const result = await runCliInProcess(['run', '.', '--dry-run', '--output', 'json'], {
+      cwd: dir,
+    });
+
+    assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
+    const parsed = JSON.parse(result.stdout);
+    // When findings are empty, scoreReview([]).verdict must be 'auto-approve'
+    if (parsed.issues.length === 0) {
+      assert.equal(parsed.decision, 'auto-approve');
+    } else {
+      assert.ok(
+        VALID_DECISIONS.includes(parsed.decision),
+        `decision must be a valid enum value, got: ${parsed.decision}`
+      );
+    }
+  });
+});
