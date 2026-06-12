@@ -66,8 +66,8 @@ river run . --base main --output json
 ```
 
 - **Output**: `{ issues[], summary, decision }` (`output.schema.json`). Read `issues[].severity` (critical/major/minor/info) and `message` / `file` / `line`.
-- **Stop condition**: use `decision` (`auto-approve` / `human-review-recommended` / `human-review-required`) together with `summary.issueCountBySeverity` for machine-readable gate logic. `decision === 'auto-approve'` with zero blocking (critical/major) findings is a safe auto-continue signal.
-- **Agent's next action (self-fix loop)**: fix `issues` by severity → re-run `river run` → repeat until `issues` is empty or info-only.
+- **Stop condition**: use `critical + major == 0` as the convergence condition. Escalate immediately when `decision == "human-review-required"` or when `river runs diff` returns non-empty `oscillated`. `decision === 'auto-approve'` alone is not a stop condition — it can be returned even when minor / info findings remain. For the full composite formula, see [Loop Convergence Contract](../reference/loop-convergence-contract.en.md).
+- **Agent's next action (self-fix loop)**: fix `issues` by severity → re-run `river run` → repeat until `critical + major == 0`. Escalate to a human if the loop does not converge.
 - For large tasks use `--depth thorough`; to narrow scope use `--files <glob>`. `--base` auto-detects the default branch when omitted, so on repos whose default is not `main` (`master`/`develop`), omit it or pass `--base <default>`.
 
 ### Case 3: PR submission gate — block mechanically via exit code
@@ -79,7 +79,7 @@ river run . --base main --fail-on critical --warn-on major --output markdown \
   --output-file ./review.md
 ```
 
-- **exit code**: `0`=pass / `1`=fail (≥ `--fail-on`) / `2`=warn. **The agent branches on the exit code** (fail → back to fixing, pass → continue the PR).
+- **exit code**: non-zero only when `--fail-on` / `--warn-on` is specified. `0`=pass / `1`=fail (≥ `--fail-on`) / `2`=warn (≥ `--warn-on` but < `--fail-on`). **Without `--fail-on`, River Review always exits 0 regardless of findings** — for machine decisions, reading `summary.issueCountBySeverity` directly is more reliable. **The agent branches on the exit code** (fail → back to fixing, pass → continue the PR).
 - Post the `--output markdown` result as a PR comment (for human reviewers). Use exit code for machine decisions, markdown for human presentation.
 - `--advisory-only` reports findings but always exits 0 (observation mode).
 
