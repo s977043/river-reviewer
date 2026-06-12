@@ -12,7 +12,7 @@ River Review can persist review runs to a project-local **Run store** (`.river/r
 | -------------------------------------------- | ----------------------------------------- |
 | Save a review run                            | `river run <path> --save`                 |
 | List saved runs                              | `river runs list`                         |
-| Diff (regression of) two saved runs          | `river runs diff <run-id-1> <run-id-2>`   |
+| Diff saved runs (regression / oscillation)   | `river runs diff <id1> <id2> [<id3>...]`  |
 | See an aggregate dashboard across saved runs | `river runs summary`                      |
 | Compare against an arbitrary baseline JSON   | `river run <path> --baseline <prev.json>` |
 
@@ -65,7 +65,7 @@ Stored runs (/path/to/repo/.river/runs):
 
 If there are no saved runs, `No stored runs found in ...` is printed.
 
-## 3. Compare two runs (`river runs diff`)
+## 3. Compare two or more runs (`river runs diff`)
 
 Specify two saved runs by `runId` to compare finding regressions.
 
@@ -86,6 +86,16 @@ It prints a `## Regression Review Summary` Markdown block.
 The New / Resolved / Score changes sections list the affected file and the finding content.
 
 > Finding identity is determined by a fingerprint. Findings with the same file path, rule, and message gist are treated as identical; line-number shifts are ignored.
+
+### Oscillation detection with 3+ runs
+
+Passing three or more run IDs enables **oscillation detection**.
+
+```bash
+river runs diff <run-id-1> <run-id-2> <run-id-3>
+```
+
+An oscillated finding is one that was Resolved in an intermediate run but reappears as New in a later run. This is a signal that an AI-driven revise cycle introduced a different problem — a self-correction loop. The `Oscillated findings` section in the output lists these re-emergent findings. With `--output json` the same data is available in the `oscillated` array for machine consumption.
 
 ## 4. Aggregate dashboard (`river runs summary`)
 
