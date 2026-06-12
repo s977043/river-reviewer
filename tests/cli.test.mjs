@@ -313,7 +313,7 @@ describe('river run - JSON output decision field', () => {
     const parsed = JSON.parse(result.stdout);
     // When findings are empty, scoreReview([]).verdict must be 'auto-approve'
     if (parsed.issues.length === 0) {
-      assert.equal(parsed.decision, 'auto-approve');
+      assert.strictEqual(parsed.decision, 'auto-approve');
     } else {
       assert.ok(
         VALID_DECISIONS.includes(parsed.decision),

@@ -61638,7 +61638,11 @@ function formatJsonOutput(result, phase) {
   } catch {
     // scoring failure: omit decision (same fail-safe as finalizeArtifact)
   }
-  return decision !== undefined ? { issues, summary, decision } : { issues, summary };
+  return {
+    issues,
+    summary,
+    ...(decision !== undefined ? { decision } : {}),
+  };
 }
 
 function countChangedLines(files) {
