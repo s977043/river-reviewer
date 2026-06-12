@@ -1,5 +1,19 @@
-import { computeFindingBreakdown } from './scoring/breakdown.mjs';
-import { annotateFingerprints } from './finding-fingerprint.mjs';
+export const id = 4;
+export const ids = [4];
+export const modules = {
+
+/***/ 1004:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   diffReviews: () => (/* binding */ diffReviews),
+/* harmony export */   diffRunHistory: () => (/* binding */ diffRunHistory),
+/* harmony export */   formatRegressionSummary: () => (/* binding */ formatRegressionSummary)
+/* harmony export */ });
+/* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3926);
+/* harmony import */ var _finding_fingerprint_mjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9905);
+
+
 
 /**
  * @typedef {'new'|'resolved'|'persisting'|'score_changed'|'oscillated'} FindingStatus
@@ -19,9 +33,9 @@ import { annotateFingerprints } from './finding-fingerprint.mjs';
  * @param {object[]} currentFindings
  * @returns {{ new: ComparedFinding[], resolved: ComparedFinding[], persisting: ComparedFinding[], scoreChanged: ComparedFinding[], summary: object }}
  */
-export function diffReviews(previousFindings, currentFindings) {
-  const prev = annotateFingerprints(previousFindings ?? []);
-  const curr = annotateFingerprints(currentFindings ?? []);
+function diffReviews(previousFindings, currentFindings) {
+  const prev = (0,_finding_fingerprint_mjs__WEBPACK_IMPORTED_MODULE_0__/* .annotateFingerprints */ .i)(previousFindings ?? []);
+  const curr = (0,_finding_fingerprint_mjs__WEBPACK_IMPORTED_MODULE_0__/* .annotateFingerprints */ .i)(currentFindings ?? []);
 
   const prevByFp = new Map(prev.map((f) => [f.fingerprint, f]));
   const currByFp = new Map(curr.map((f) => [f.fingerprint, f]));
@@ -62,8 +76,8 @@ export function diffReviews(previousFindings, currentFindings) {
     const prevF = prevByFp.get(fp);
     if (!prevF) continue;
 
-    const prevScore = computeFindingBreakdown(prevF).composite;
-    const currScore = computeFindingBreakdown(currF).composite;
+    const prevScore = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__/* .computeFindingBreakdown */ ._)(prevF).composite;
+    const currScore = (0,_scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__/* .computeFindingBreakdown */ ._)(currF).composite;
     const delta = currScore - prevScore;
     const changed = Math.abs(delta) >= 0.05;
 
@@ -119,7 +133,7 @@ export function diffReviews(previousFindings, currentFindings) {
  *   summary: object
  * }}
  */
-export function diffRunHistory(runRecords) {
+function diffRunHistory(runRecords) {
   // Defensive: sort by timestamp ascending
   const sorted = [...runRecords].sort((a, b) => {
     const ta = new Date(a.timestamp).getTime();
@@ -139,7 +153,7 @@ export function diffRunHistory(runRecords) {
   // Pre-annotate each run once to avoid O(N×M) re-annotation per fingerprint
   const annotatedRuns = sorted.map((record) => {
     const fingerprints = new Set(
-      annotateFingerprints(record.findings ?? []).map((f) => f.fingerprint)
+      (0,_finding_fingerprint_mjs__WEBPACK_IMPORTED_MODULE_0__/* .annotateFingerprints */ .i)(record.findings ?? []).map((f) => f.fingerprint)
     );
     return { runId: record.runId, fingerprints };
   });
@@ -149,7 +163,7 @@ export function diffRunHistory(runRecords) {
   const allFingerprints = new Set();
 
   for (const record of sorted) {
-    const annotated = annotateFingerprints(record.findings ?? []);
+    const annotated = (0,_finding_fingerprint_mjs__WEBPACK_IMPORTED_MODULE_0__/* .annotateFingerprints */ .i)(record.findings ?? []);
     for (const f of annotated) {
       allFingerprints.add(f.fingerprint);
       fingerprintToFinding.set(f.fingerprint, f);
@@ -208,7 +222,7 @@ function _hasOscillation(timeline) {
 /**
  * Format a regression diff as a Markdown summary block.
  */
-export function formatRegressionSummary(diff) {
+function formatRegressionSummary(diff) {
   const { summary, new: newF, resolved, scoreChanged } = diff;
   const lines = ['## Regression Review Summary', ''];
 
@@ -261,3 +275,10 @@ export function formatRegressionSummary(diff) {
 
   return lines.join('\n');
 }
+
+
+/***/ })
+
+};
+
+//# sourceMappingURL=4.index.mjs.map

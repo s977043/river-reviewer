@@ -90,7 +90,7 @@ Options:
 
 Commands:
   river runs list           List stored review runs
-  river runs diff <id> <id> Diff two stored review runs
+  river runs diff <id1> <id2> [<id3>...] Diff stored review runs (3+ runs detect oscillation)
   river runs summary        Show aggregate dashboard metrics
   --cases <path>    (eval) Path to fixtures cases.json (default: tests/fixtures/review-eval/cases.json)
   --verbose         (eval) Print detailed per-case results
@@ -128,6 +128,7 @@ function parseArgs(argv) {
     runsSubcommand: null,
     runsId1: null,
     runsId2: null,
+    runsIds: [], // all run IDs for multi-run diff (3+)
     // suppression subcommand fields (#687 PR-D)
     suppressionSubcommand: null,
     feedbackSubcommand: null,
@@ -186,10 +187,16 @@ function parseArgs(argv) {
         parsed.skillsSubcommand = args.shift();
       } else if (arg === 'runs' && args[0] && !args[0].startsWith('-')) {
         parsed.runsSubcommand = args.shift(); // list | diff | summary
-        // diff takes two positional run IDs
+        // diff takes two or more positional run IDs
         if (parsed.runsSubcommand === 'diff') {
           parsed.runsId1 = args.shift() ?? null;
           parsed.runsId2 = args.shift() ?? null;
+          // Collect any additional run IDs for multi-run oscillation detection
+          const extra = [];
+          while (args.length && !args[0].startsWith('-')) {
+            extra.push(args.shift());
+          }
+          parsed.runsIds = [parsed.runsId1, parsed.runsId2, ...extra].filter(Boolean);
         }
       } else if (arg === 'suppression' && args[0] && !args[0].startsWith('-')) {
         parsed.suppressionSubcommand = args.shift(); // add (only one for now)
@@ -1522,16 +1529,51 @@ async function main(argv = process.argv.slice(2)) {
 
       if (parsed.runsSubcommand === 'diff') {
         if (!parsed.runsId1 || !parsed.runsId2) {
-          console.error('Error: river runs diff <run-id-1> <run-id-2>');
+          console.error('Error: river runs diff <id1> <id2> [<id3>...]');
           return 1;
         }
-        const { diffReviews, formatRegressionSummary } = await import('./lib/review-differ.mjs');
-        const [run1, run2] = await Promise.all([
-          loadRunRecord(storeDir, parsed.runsId1),
-          loadRunRecord(storeDir, parsed.runsId2),
-        ]);
-        const diff = diffReviews(run1.findings ?? [], run2.findings ?? []);
-        console.log(formatRegressionSummary(diff));
+        const { diffReviews, diffRunHistory, formatRegressionSummary } =
+          await import('./lib/review-differ.mjs');
+
+        if (parsed.runsIds.length >= 3) {
+          // Multi-run path: load all runs and detect oscillation
+          const runRecords = await Promise.all(
+            parsed.runsIds.map((id) => loadRunRecord(storeDir, id))
+          );
+          const diff = diffRunHistory(runRecords);
+          if (parsed.output === 'json') {
+            console.log(JSON.stringify(diff, null, 2));
+          } else {
+            console.log(formatRegressionSummary(diff));
+            if (diff.oscillated.length) {
+              console.log('\n### Oscillating findings (' + diff.oscillated.length + ')');
+              for (const o of diff.oscillated) {
+                const f = o.finding ?? {};
+                const file = f.file ?? '?';
+                const title = (f.title || f.message || '').slice(0, 80);
+                const timelineStr = o.timeline
+                  .map((t) => `${t.runId.slice(0, 8)}:${t.present ? 'present' : 'absent'}`)
+                  .join(' → ');
+                console.log(`- \`${o.fingerprint}\` \`${file}\`: ${title}`);
+                console.log(`  timeline: ${timelineStr}`);
+              }
+            } else {
+              console.log('\nNo oscillating findings detected.');
+            }
+          }
+        } else {
+          // 2-run path: existing behaviour, byte-compatible
+          const [run1, run2] = await Promise.all([
+            loadRunRecord(storeDir, parsed.runsId1),
+            loadRunRecord(storeDir, parsed.runsId2),
+          ]);
+          const diff = diffReviews(run1.findings ?? [], run2.findings ?? []);
+          if (parsed.output === 'json') {
+            console.log(JSON.stringify(diff, null, 2));
+          } else {
+            console.log(formatRegressionSummary(diff));
+          }
+        }
         return 0;
       }
 
