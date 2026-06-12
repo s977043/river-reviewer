@@ -2,7 +2,7 @@
 title: ループ収束コントラクト（自己修正ループの停止条件）
 ---
 
-River Review は generate → review → revise ループの **review ステージ**として機能します。返すのは判定素材（`decision` / `summary.issueCountBySeverity` / `oscillated` / exit code）のみです。反復・停止・エスカレーションの実行は **caller（呼び出し側エージェントまたはワークフロー）の責務**です（[#976 境界 — docs/ai/generate-review-revise-loop.md](../../docs/ai/generate-review-revise-loop.md) 参照）。
+River Review は generate → review → revise ループの **review ステージ**として機能します。返すのは判定素材（`decision` / `summary.issueCountBySeverity` / `oscillated` / exit code）のみです。反復・停止・エスカレーションの実行は **caller（呼び出し側エージェントまたはワークフロー）の責務**です（[#976 境界 — docs/ai/generate-review-revise-loop.md](https://github.com/s977043/river-review/blob/main/docs/ai/generate-review-revise-loop.md) 参照）。
 
 本ドキュメントは caller がループ制御を実装するために必要な停止・収束・発散ガードの契約を 1 ページで定義します。
 
@@ -156,5 +156,5 @@ exit 4
 ## 関連ドキュメント
 
 - [AI 駆動開発プレイブック（Case 2 / Case 3）](../guides/ai-agent-playbook.md) — ケース別の呼び出し方
-- [generate → review → revise ループ設計](../../docs/ai/generate-review-revise-loop.md) — 収束制御の背景設計（#1150 S2a の元 doc）
+- [generate → review → revise ループ設計](https://github.com/s977043/river-review/blob/main/docs/ai/generate-review-revise-loop.md) — 収束制御の背景設計（#1150 S2a の元 doc）
 - [安定インターフェース（CLI / GitHub Actions）](./stable-interfaces.md) — exit code を含む CLI 安定契約

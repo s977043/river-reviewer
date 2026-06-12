@@ -2,7 +2,7 @@
 title: Loop Convergence Contract (stop conditions for the self-fix loop)
 ---
 
-River Review acts as the **review stage** in a generate → review → revise loop. River Review only returns judgment materials (`decision` / `summary.issueCountBySeverity` / `oscillated` / exit code); iteration, stopping, and escalation are the **caller's responsibility** (the invoking agent or workflow). See [#976 boundary — docs/ai/generate-review-revise-loop.md](../../docs/ai/generate-review-revise-loop.md).
+River Review acts as the **review stage** in a generate → review → revise loop. River Review only returns judgment materials (`decision` / `summary.issueCountBySeverity` / `oscillated` / exit code); iteration, stopping, and escalation are the **caller's responsibility** (the invoking agent or workflow). See [#976 boundary — docs/ai/generate-review-revise-loop.md](https://github.com/s977043/river-review/blob/main/docs/ai/generate-review-revise-loop.md).
 
 This document defines the stop / convergence / divergence-guard contract that callers need to implement loop control, in one page.
 
@@ -156,5 +156,5 @@ exit 4
 ## Related documents
 
 - [AI-Driven Development Playbook (Case 2 / Case 3)](../guides/ai-agent-playbook.en.md) — case-by-case invocation guide
-- [generate → review → revise loop design](../../docs/ai/generate-review-revise-loop.md) — background design for convergence control (#1150 S2a source doc)
+- [generate → review → revise loop design](https://github.com/s977043/river-review/blob/main/docs/ai/generate-review-revise-loop.md) — background design for convergence control (#1150 S2a source doc)
 - [Stable Interfaces (CLI / GitHub Actions)](./stable-interfaces.en.md) — CLI stable contract including exit codes
