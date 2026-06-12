@@ -62095,7 +62095,8 @@ async function main(argv = external_node_process_namespaceObject.argv.slice(2)) 
           console.error('Error: river runs diff <id1> <id2> [<id3>...]');
           return 1;
         }
-        const { diffReviews, diffRunHistory, formatRegressionSummary } = await __nccwpck_require__.e(/* import() */ 4).then(__nccwpck_require__.bind(__nccwpck_require__, 1004));
+        const { diffReviews, diffRunHistory, formatRegressionSummary } =
+          await __nccwpck_require__.e(/* import() */ 4).then(__nccwpck_require__.bind(__nccwpck_require__, 1004));
 
         if (parsed.runsIds.length >= 3) {
           // Multi-run path: load all runs and detect oscillation
