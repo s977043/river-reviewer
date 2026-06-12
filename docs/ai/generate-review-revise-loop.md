@@ -108,7 +108,7 @@ S4（plan-review-gate）は #976 の pre-exec skill set で即時利用できる
 補足:
 
 - S2a の「unresolved」判定は run history / fingerprint（S2b の基盤）を前提とするため、S2b を先行させる。
-- S4 は #1148 で確定した human_approval policy を実装するため、`deriveVerdict` に `humanApprovalRequired` boolean を 1 個追加する。true なら axis スコアを汚染せず `human-review-required` へ短絡する（critical finding の emit で代替するとスコアを 30〜50 点不当に減点するため不可）。call site 伝播は `docs/development/pipeline-params-checklist.md` に従う。詳細は #1148 のコメントを参照。
+- S4 は #1148 で確定した human_approval policy を実装するため、`deriveVerdict` に `humanApprovalRequired` boolean を 1 個追加する。true なら axis スコアを汚染せず `human-review-required` へ短絡する（critical finding の emit で代替するとスコアを 30〜50 点不当に減点するため不可）。`deriveVerdict` は `scoreReview` 内部から呼ばれるため、伝播経路は `finalizeArtifact`（`review-plan.mjs`）→ `scoreReview(findings, { humanApprovalRequired })` → `deriveVerdict` の 3 段になる。call site 伝播は `docs/development/pipeline-params-checklist.md` に従う。詳細は #1148 のコメントを参照。
 
 ## 未確定事項
 
