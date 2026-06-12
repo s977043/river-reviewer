@@ -94,16 +94,16 @@ A pattern that reads JSON directly instead of using `--fail-on`.
 result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
 run_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
 
-critical=$(echo "$result" | jq '.summary.issueCountBySeverity.critical // 0')
-major=$(echo "$result" | jq '.summary.issueCountBySeverity.major // 0')
-decision=$(echo "$result" | jq -r '.decision // "unknown"')
+critical=$(echo "$result" | jq '.summary.issueCountBySeverity.critical // 0' 2>/dev/null)
+major=$(echo "$result" | jq '.summary.issueCountBySeverity.major // 0' 2>/dev/null)
+decision=$(echo "$result" | jq -r '.decision // "unknown"' 2>/dev/null)
 
 if [ "$decision" = "human-review-required" ]; then
   echo "ESCALATE: human review required" >&2
   exit 2
 fi
 
-if [ $((critical + major)) -gt 0 ]; then
+if [ $(( ${critical:-0} + ${major:-0} )) -gt 0 ]; then
   echo "REVISE: critical=$critical major=$major" >&2
   exit 1  # caller continues the loop
 fi
@@ -131,17 +131,17 @@ for i in $(seq 1 $max_iter); do
     id_b="${run_ids[$((n-2))]}"
     id_c="${run_ids[$((n-1))]}"
     oscillated=$(river runs diff "$id_a" "$id_b" "$id_c" --output json \
-                   | jq '.oscillated // [] | length')
-    if [ "$oscillated" -gt 0 ]; then
+                   | jq '.oscillated // [] | length' 2>/dev/null)
+    if [ "${oscillated:-0}" -gt 0 ]; then
       echo "OSCILLATION DETECTED: escalate to human" >&2
       exit 3
     fi
   fi
 
-  critical=$(echo "$result" | jq '.summary.issueCountBySeverity.critical // 0')
-  major=$(echo "$result" | jq '.summary.issueCountBySeverity.major // 0')
+  critical=$(echo "$result" | jq '.summary.issueCountBySeverity.critical // 0' 2>/dev/null)
+  major=$(echo "$result" | jq '.summary.issueCountBySeverity.major // 0' 2>/dev/null)
 
-  if [ $((critical + major)) -eq 0 ]; then
+  if [ $(( ${critical:-0} + ${major:-0} )) -eq 0 ]; then
     echo "CONVERGED after $i iteration(s)"
     exit 0
   fi
