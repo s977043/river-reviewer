@@ -61586,6 +61586,7 @@ function printDebugInfo(result, { log = console.log } = {}) {
 /**
  * Format review result as JSON conforming to schemas/output.schema.json.
  * Consumes the structured findings[] produced by the Finding Pipeline.
+ * Additively includes a top-level `decision` field derived from scoreReview verdict.
  */
 function formatJsonOutput(result, phase) {
   const issueCountBySeverity = { info: 0, minor: 0, major: 0, critical: 0 };
@@ -61631,7 +61632,13 @@ function formatJsonOutput(result, phase) {
       humanReviewFiles: riskAssessment.humanReviewFiles,
     };
   }
-  return { issues, summary };
+  let decision;
+  try {
+    decision = (0,engine/* scoreReview */.lS)(result.findings ?? []).verdict;
+  } catch {
+    // scoring failure: omit decision (same fail-safe as finalizeArtifact)
+  }
+  return decision !== undefined ? { issues, summary, decision } : { issues, summary };
 }
 
 function countChangedLines(files) {
