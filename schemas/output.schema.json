@@ -14,6 +14,11 @@
     "summary": {
       "description": "Aggregated counts and optional notes for this review run.",
       "$ref": "#/$defs/summary"
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["auto-approve", "human-review-recommended", "human-review-required"],
+      "description": "Run-level verdict derived deterministically from findings (same vocabulary as review-artifact decision). Optional; absent when scoring fails."
     }
   },
   "$defs": {

@@ -10,7 +10,7 @@ title: AI 駆動開発プレイブック（エージェント向け）
 ## エージェントの基本姿勢（5 原則）
 
 1. **自分でレビューしない。River Review にゲートさせる。** エージェントの自己判断ではなく、決定論的にルーティングされた skill にレビューさせ、結果を根拠に行動する。
-2. **JSON を読む（人間向け text は読まない）。** `--output json` を使い、`river run` は `issues[]` / `summary.issueCountBySeverity`、`river review` は `findings[]` を構造化データとして消費する。`--output markdown` は人間（PR コメント）向けで、verdict 等の要約はこちらに出る（JSON には含まれない）。
+2. **JSON を読む（人間向け text は読まない）。** `--output json` を使い、`river run` は `issues[]` / `summary.issueCountBySeverity`、`river review` は `findings[]` を構造化データとして消費する。`--output markdown` は人間（PR コメント）向けの読みやすい形式。機械判断用の `decision`（verdict）は JSON 出力にも含まれる。
 3. **exit code と重大度で分岐する。** `--fail-on <severity>` を付けると finding の重大度が exit code（1=fail / 2=warn / 0=pass）になる（`river run` / `river review` 両対応）。エージェントは exit code、または `summary.issueCountBySeverity` の件数で「次へ進む / 修正する / 人間にエスカレーション」を機械判断する。
 4. **決定論ルーティングを信頼する。** どの skill が選ばれ／除外されたかは `--debug` の `selectedSkills` / `skippedSkills`（理由付き）で確認できる。フェーズ・対象パス・入力コンテキストで決まり、毎回再現する。
 5. **実行モデルを理解する（通常 LLM キーは不要）。** あなた（エージェント）がスキル / サブエージェントを読み込み**自分のモデルでレビューするなら、River Review 用の LLM キーは不要**。本ページの `river run` / `river review` コマンドは、エージェントが River Review を**外部ツールとして呼ぶヘッドレス経路**である。その場合だけ LLM キー（`ANTHROPIC_API_KEY` 等）が要る（機械的チェックの 12 観点はキー無しでも動き、`--offline` で明示的に rules-only 実行もできる）。詳細は [River Review とは § 実行モデル](../explanation/what-is-river-review.md)。
@@ -64,7 +64,8 @@ river review plan --skill-set pre-exec --phase upstream --plan-only \
 river run . --base main --output json
 ```
 
-- **出力**: `{ issues[], summary }`（`output.schema.json`）。`issues[].severity`（critical/major/minor/info）と `message` / `file` / `line` を読む。
+- **出力**: `{ issues[], summary, decision }`（`output.schema.json`）。`issues[].severity`（critical/major/minor/info）と `message` / `file` / `line` を読む。
+- **停止判定**: `decision`（`auto-approve` / `human-review-recommended` / `human-review-required`）と `summary.issueCountBySeverity` を組み合わせて機械判定できる。`decision === 'auto-approve'` かつ blocking（critical/major）がゼロであれば自動続行の基準にできる。
 - **エージェントの次行動（自己修正ループ）**: `issues` を重大度順に修正 → 再度 `river run` → `issues` が空 or info のみになるまで反復。
 - タスクが大きい場合は `--depth thorough`、対象を絞るなら `--files <glob>`。`--base` は省略時に default ブランチを自動検出するため、`main` 以外（`master`/`develop` 等）のリポジトリでは省略するか `--base <default>` を明示する。
 
@@ -168,12 +169,12 @@ open_pr(to_markdown(result.issues))
 
 ## 出力契約クイックリファレンス
 
-| コマンド                 | JSON スキーマ                         | 主なキー                                                                |
-| ------------------------ | ------------------------------------- | ----------------------------------------------------------------------- |
-| `river run`              | `schemas/output.schema.json`          | `issues[]`, `summary.issueCountBySeverity`, `summary.issueCountByPhase` |
-| `river review plan/exec` | `schemas/review-artifact.schema.json` | `version`, `status`, `phase`, `findings[]`, `plan`, `debug`             |
+| コマンド                 | JSON スキーマ                         | 主なキー                                                                            |
+| ------------------------ | ------------------------------------- | ----------------------------------------------------------------------------------- |
+| `river run`              | `schemas/output.schema.json`          | `issues[]`, `summary.issueCountBySeverity`, `summary.issueCountByPhase`, `decision` |
+| `river review plan/exec` | `schemas/review-artifact.schema.json` | `version`, `status`, `phase`, `findings[]`, `plan`, `debug`                         |
 
-> **verdict は JSON に含まれない**。`auto-approve` / `human-review-recommended` / `human-review-required` の verdict は `--output markdown` の人間向け要約にのみ現れる（`output.schema.json` の `summary` は件数のみ、Review Artifact の `debug` は自由形式で verdict を保証しない）。エージェントの機械判断は **exit code（`--fail-on`）** と **`summary.issueCountBySeverity`** で行うこと（verdict が必要なら markdown を別途取得）。
+> `river run --output json` の `decision` フィールド（`auto-approve` / `human-review-recommended` / `human-review-required`）は findings から決定論的に導出される。scoring 失敗時は省略されるため、存在チェックをしてから参照すること。エージェントの機械判断は **exit code（`--fail-on`）**・**`summary.issueCountBySeverity`**・**`decision`** の組み合わせで行う。`river review plan/exec` の verdict は Review Artifact の `decision` フィールドで確認できる。
 
 ## 関連ページ
 
