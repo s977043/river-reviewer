@@ -10,7 +10,7 @@ title: AI 駆動開発プレイブック（エージェント向け）
 ## エージェントの基本姿勢（5 原則）
 
 1. **自分でレビューしない。River Review にゲートさせる。** エージェントの自己判断ではなく、決定論的にルーティングされた skill にレビューさせ、結果を根拠に行動する。
-2. **JSON を読む（人間向け text は読まない）。** `--output json` を使い、`river run` は `issues[]` / `summary.issueCountBySeverity`、`river review` は `findings[]` を構造化データとして消費する。`--output markdown` は人間（PR コメント）向けで、verdict 等の要約はこちらに出る（JSON には含まれない）。
+2. **JSON を読む（人間向け text は読まない）。** `--output json` を使い、`river run` は `issues[]` / `summary.issueCountBySeverity`、`river review` は `findings[]` を構造化データとして消費する。`--output markdown` は人間（PR コメント）向けの読みやすい形式。機械判断用の `decision`（verdict）は JSON 出力にも含まれる。
 3. **exit code と重大度で分岐する。** `--fail-on <severity>` を付けると finding の重大度が exit code（1=fail / 2=warn / 0=pass）になる（`river run` / `river review` 両対応）。エージェントは exit code、または `summary.issueCountBySeverity` の件数で「次へ進む / 修正する / 人間にエスカレーション」を機械判断する。
 4. **決定論ルーティングを信頼する。** どの skill が選ばれ／除外されたかは `--debug` の `selectedSkills` / `skippedSkills`（理由付き）で確認できる。フェーズ・対象パス・入力コンテキストで決まり、毎回再現する。
 5. **実行モデルを理解する（通常 LLM キーは不要）。** あなた（エージェント）がスキル / サブエージェントを読み込み**自分のモデルでレビューするなら、River Review 用の LLM キーは不要**。本ページの `river run` / `river review` コマンドは、エージェントが River Review を**外部ツールとして呼ぶヘッドレス経路**である。その場合だけ LLM キー（`ANTHROPIC_API_KEY` 等）が要る（機械的チェックの 12 観点はキー無しでも動き、`--offline` で明示的に rules-only 実行もできる）。詳細は [River Review とは § 実行モデル](../explanation/what-is-river-review.md)。
