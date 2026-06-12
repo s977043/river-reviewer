@@ -7,6 +7,7 @@ export const modules = {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   diffReviews: () => (/* binding */ diffReviews),
+/* harmony export */   diffRunHistory: () => (/* binding */ diffRunHistory),
 /* harmony export */   formatRegressionSummary: () => (/* binding */ formatRegressionSummary)
 /* harmony export */ });
 /* harmony import */ var _scoring_breakdown_mjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9946);
@@ -15,7 +16,7 @@ export const modules = {
 
 
 /**
- * @typedef {'new'|'resolved'|'persisting'|'score_changed'} FindingStatus
+ * @typedef {'new'|'resolved'|'persisting'|'score_changed'|'oscillated'} FindingStatus
  *
  * @typedef {object} ComparedFinding
  * @property {string} fingerprint
@@ -116,6 +117,106 @@ function diffReviews(previousFindings, currentFindings) {
     scoreChanged: scoreChangedFindings,
     summary,
   };
+}
+
+/**
+ * Compare 3+ runs for oscillating findings (resolved then re-appeared).
+ *
+ * @param {{ runId: string, timestamp: string, findings: object[] }[]} runRecords
+ *   Array of run records in any order; sorted internally by timestamp ascending.
+ * @returns {{
+ *   new: ComparedFinding[],
+ *   resolved: ComparedFinding[],
+ *   persisting: ComparedFinding[],
+ *   scoreChanged: ComparedFinding[],
+ *   oscillated: Array<{ fingerprint: string, finding: object, timeline: { runId: string, present: boolean }[] }>,
+ *   summary: object
+ * }}
+ */
+function diffRunHistory(runRecords) {
+  // Defensive: sort by timestamp ascending
+  const sorted = [...runRecords].sort((a, b) => {
+    const ta = new Date(a.timestamp).getTime();
+    const tb = new Date(b.timestamp).getTime();
+    return ta - tb;
+  });
+
+  // Last adjacent diff for the main diff fields
+  let lastDiff =
+    sorted.length >= 2
+      ? diffReviews(
+          sorted[sorted.length - 2].findings ?? [],
+          sorted[sorted.length - 1].findings ?? []
+        )
+      : diffReviews([], sorted.length === 1 ? (sorted[0].findings ?? []) : []);
+
+  // Pre-annotate each run once to avoid O(N×M) re-annotation per fingerprint
+  const annotatedRuns = sorted.map((record) => {
+    const fingerprints = new Set(
+      (0,_finding_fingerprint_mjs__WEBPACK_IMPORTED_MODULE_0__/* .annotateFingerprints */ .i)(record.findings ?? []).map((f) => f.fingerprint)
+    );
+    return { runId: record.runId, fingerprints };
+  });
+
+  // Compute per-fingerprint presence timeline across all runs
+  const fingerprintToFinding = new Map(); // fingerprint -> latest finding object
+  const allFingerprints = new Set();
+
+  for (const record of sorted) {
+    const annotated = (0,_finding_fingerprint_mjs__WEBPACK_IMPORTED_MODULE_0__/* .annotateFingerprints */ .i)(record.findings ?? []);
+    for (const f of annotated) {
+      allFingerprints.add(f.fingerprint);
+      fingerprintToFinding.set(f.fingerprint, f);
+    }
+  }
+
+  // Build timeline per fingerprint
+  const oscillated = [];
+
+  for (const fp of allFingerprints) {
+    const timeline = annotatedRuns.map((run) => ({
+      runId: run.runId,
+      present: run.fingerprints.has(fp),
+    }));
+
+    // Detect oscillation: present -> absent -> present pattern
+    if (sorted.length >= 3 && _hasOscillation(timeline)) {
+      oscillated.push({
+        fingerprint: fp,
+        finding: fingerprintToFinding.get(fp),
+        timeline,
+        changeStatus: 'oscillated',
+      });
+    }
+  }
+
+  return {
+    ...lastDiff,
+    oscillated,
+    summary: {
+      ...lastDiff.summary,
+      oscillatedCount: oscillated.length,
+    },
+  };
+}
+
+/**
+ * Returns true if the presence timeline contains a resolved→re-appeared pattern.
+ * @param {{ runId: string, present: boolean }[]} timeline
+ */
+function _hasOscillation(timeline) {
+  // Detect: present=true ... present=false ... present=true
+  let seenPresent = false;
+  let seenAbsent = false;
+  for (const entry of timeline) {
+    if (entry.present) {
+      if (seenAbsent) return true; // re-appeared after absence
+      seenPresent = true;
+    } else {
+      if (seenPresent) seenAbsent = true;
+    }
+  }
+  return false;
 }
 
 /**

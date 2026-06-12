@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.15.0](https://github.com/s977043/river-review/compare/v1.14.0...v1.15.0) (2026-06-12)
+
+
+### Features
+
+* **cli:** add run-level decision (verdict) to river run --output json ([#1150](https://github.com/s977043/river-review/issues/1150) S1) ([#1152](https://github.com/s977043/river-review/issues/1152)) ([a176304](https://github.com/s977043/river-review/commit/a176304582740c15b4f81067545d1578dbf44a55))
+* **runs:** detect finding oscillation across 3+ runs in runs diff ([#1150](https://github.com/s977043/river-review/issues/1150) S2b) ([#1156](https://github.com/s977043/river-review/issues/1156)) ([b1cef18](https://github.com/s977043/river-review/commit/b1cef18afa3defac9054274f97a2447c9e9d3218))
+
+
+### Bug Fixes
+
+* **schema:** define summary.prioritySummary in output.schema.json ([#1154](https://github.com/s977043/river-review/issues/1154)) ([#1155](https://github.com/s977043/river-review/issues/1155)) ([14ea2b3](https://github.com/s977043/river-review/commit/14ea2b3b181f63ffa346ce2cbf89f9ab83ad156b))
+
 ## [1.14.0](https://github.com/s977043/river-review/compare/v1.13.0...v1.14.0) (2026-06-11)
 
 
