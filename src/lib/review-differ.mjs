@@ -136,6 +136,14 @@ export function diffRunHistory(runRecords) {
         )
       : diffReviews([], sorted.length === 1 ? (sorted[0].findings ?? []) : []);
 
+  // Pre-annotate each run once to avoid O(N×M) re-annotation per fingerprint
+  const annotatedRuns = sorted.map((record) => {
+    const fingerprints = new Set(
+      annotateFingerprints(record.findings ?? []).map((f) => f.fingerprint)
+    );
+    return { runId: record.runId, fingerprints };
+  });
+
   // Compute per-fingerprint presence timeline across all runs
   const fingerprintToFinding = new Map(); // fingerprint -> latest finding object
   const allFingerprints = new Set();
@@ -152,11 +160,10 @@ export function diffRunHistory(runRecords) {
   const oscillated = [];
 
   for (const fp of allFingerprints) {
-    const timeline = sorted.map((record) => {
-      const annotated = annotateFingerprints(record.findings ?? []);
-      const present = annotated.some((f) => f.fingerprint === fp);
-      return { runId: record.runId, present };
-    });
+    const timeline = annotatedRuns.map((run) => ({
+      runId: run.runId,
+      present: run.fingerprints.has(fp),
+    }));
 
     // Detect oscillation: present -> absent -> present pattern
     if (sorted.length >= 3 && _hasOscillation(timeline)) {
