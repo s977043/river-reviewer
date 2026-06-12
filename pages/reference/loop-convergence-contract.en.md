@@ -47,8 +47,10 @@ Two safety mechanisms when an autonomous loop fails to converge.
 
 ```bash
 # Save the run, then diff to check for new findings
-river run . --base main --output json --save
-river runs diff <prev_run_id> <curr_run_id>
+# The run ID is written to stderr as "Run saved: <id>" — it is not in the stdout JSON
+result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
+curr_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
+river runs diff <prev_run_id> "$curr_id"
 # If new[] is empty, count it as 1 round toward loop-until-dry
 ```
 
@@ -64,6 +66,8 @@ river runs diff <id1> <id2> <id3>
 When `oscillated` is non-empty, the caller escalates immediately. Detection is based on `finding-fingerprint` (`ruleId + file + message` prefix), so the same finding is tracked even when line numbers shift due to a fix.
 
 ## Exit code contract (implementation-accurate)
+
+The table below covers `river run`. The `river review` family uses a separate contract (includes exit 3) and is out of scope for this page.
 
 Exit codes other than 0 are only produced when `--fail-on` / `--warn-on` is specified. **Without `--fail-on`, River Review always exits 0.**
 
@@ -86,8 +90,9 @@ A pattern that reads JSON directly instead of using `--fail-on`.
 
 ```bash
 #!/usr/bin/env bash
-result=$(river run . --base main --output json --save)
-run_id=$(echo "$result" | jq -r '.runId // empty')
+# The run ID is not in the stdout JSON. Retrieve it from the stderr "Run saved: <id>" line.
+result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
+run_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
 
 critical=$(echo "$result" | jq '.summary.issueCountBySeverity.critical // 0')
 major=$(echo "$result" | jq '.summary.issueCountBySeverity.major // 0')
@@ -110,17 +115,22 @@ echo "CONVERGED: proceed to next stage"
 
 ```bash
 #!/usr/bin/env bash
-prev_id=""
-dry_count=0
+# Accumulate run IDs in an array; pass the 3 most recent to detect oscillation
+declare -a run_ids=()
 max_iter=5
 
 for i in $(seq 1 $max_iter); do
-  result=$(river run . --base main --output json --save)
-  curr_id=$(echo "$result" | jq -r '.runId // empty')
+  result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
+  curr_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
+  run_ids+=("$curr_id")
 
-  # Oscillation detection (requires 3 or more run IDs)
-  if [ -n "$prev_id" ] && [ -n "$curr_id" ]; then
-    oscillated=$(river runs diff "$prev_id" "$curr_id" --output json \
+  # Oscillation detection: once 3+ run IDs are accumulated, pass the latest 3
+  n=${#run_ids[@]}
+  if [ "$n" -ge 3 ]; then
+    id_a="${run_ids[$((n-3))]}"
+    id_b="${run_ids[$((n-2))]}"
+    id_c="${run_ids[$((n-1))]}"
+    oscillated=$(river runs diff "$id_a" "$id_b" "$id_c" --output json \
                    | jq '.oscillated // [] | length')
     if [ "$oscillated" -gt 0 ]; then
       echo "OSCILLATION DETECTED: escalate to human" >&2
@@ -136,7 +146,6 @@ for i in $(seq 1 $max_iter); do
     exit 0
   fi
 
-  prev_id="$curr_id"
   # caller performs the revise step here
 done
 

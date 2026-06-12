@@ -47,8 +47,10 @@ else:
 
 ```bash
 # --save で実行を保存し、diff で新規 finding を確認する
-river run . --base main --output json --save
-river runs diff <prev_run_id> <curr_run_id>
+# run id は stderr に "Run saved: <id>" として出力される
+result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
+curr_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
+river runs diff <prev_run_id> "$curr_id"
 # 出力の new[] が空なら loop-until-dry の 1 周分としてカウントする
 ```
 
@@ -64,6 +66,8 @@ river runs diff <id1> <id2> <id3>
 `oscillated` が非空であれば caller は即 escalate します。振動検知は `finding-fingerprint`（`ruleId + file + message` の先頭）に基づくため、修正で行番号が変化しても同一 finding を追跡できます。
 
 ## exit code 契約（実装準拠）
+
+以下は `river run` の exit code 契約です。`river review` 系コマンドは別契約（exit 3 あり）であり、このページのスコープ外です。
 
 exit code は `--fail-on` / `--warn-on` を指定した場合のみ 0 以外になります。**`--fail-on` を指定しない場合、River Review は常に exit 0 を返します。**
 
@@ -86,8 +90,9 @@ severity の rank（低→高）: `info`=0 / `minor`=1 / `major`=2 / `critical`=
 
 ```bash
 #!/usr/bin/env bash
-result=$(river run . --base main --output json --save)
-run_id=$(echo "$result" | jq -r '.runId // empty')
+# run id は stdout JSON に含まれない。--save 時に stderr へ出力される "Run saved: <id>" から取得する
+result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
+run_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
 
 critical=$(echo "$result" | jq '.summary.issueCountBySeverity.critical // 0')
 major=$(echo "$result" | jq '.summary.issueCountBySeverity.major // 0')
@@ -110,17 +115,22 @@ echo "CONVERGED: proceed to next stage"
 
 ```bash
 #!/usr/bin/env bash
-prev_id=""
-dry_count=0
+# run ids を配列で保持し、3 つ以上たまったら直近 3 つで振動検知する
+declare -a run_ids=()
 max_iter=5
 
 for i in $(seq 1 $max_iter); do
-  result=$(river run . --base main --output json --save)
-  curr_id=$(echo "$result" | jq -r '.runId // empty')
+  result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
+  curr_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
+  run_ids+=("$curr_id")
 
-  # 振動検知 (3 件以上の run id があるとき)
-  if [ -n "$prev_id" ] && [ -n "$curr_id" ]; then
-    oscillated=$(river runs diff "$prev_id" "$curr_id" --output json \
+  # 振動検知: 3 件以上の run id が蓄積されたら直近 3 つを渡す
+  n=${#run_ids[@]}
+  if [ "$n" -ge 3 ]; then
+    id_a="${run_ids[$((n-3))]}"
+    id_b="${run_ids[$((n-2))]}"
+    id_c="${run_ids[$((n-1))]}"
+    oscillated=$(river runs diff "$id_a" "$id_b" "$id_c" --output json \
                    | jq '.oscillated // [] | length')
     if [ "$oscillated" -gt 0 ]; then
       echo "OSCILLATION DETECTED: escalate to human" >&2
@@ -136,7 +146,6 @@ for i in $(seq 1 $max_iter); do
     exit 0
   fi
 
-  prev_id="$curr_id"
   # caller がここで revise を実行する
 done
 
