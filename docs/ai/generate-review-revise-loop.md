@@ -97,13 +97,13 @@ orchestrator┼─ security-scanner  (既存)
 
 S4（plan-review-gate）は #976 の pre-exec skill set で即時利用できるため S3 に依存させない。S2 は停止条件と振動検知に分割可能。S3 は diff review team の品質改善として独立させる。
 
-| スライス | 内容                                                                                                                  | 依存         |
-| -------- | --------------------------------------------------------------------------------------------------------------------- | ------------ |
-| S1       | critic API: `river run` の verdict と handoff をループ消費可能な契約として固める                                      | 既存ほぼ完成 |
-| S2a      | 停止条件: blocking ゼロ かつ unresolved major / critical ゼロの複合条件（caller が消費）                              | S1, S2b      |
-| S2b      | 振動検知: 既存 `finding-fingerprint` と run history による再発検知                                                    | S1           |
-| S3       | review team の契約化: 既存 `reviewer-orchestrator.mjs` に `mergeFindings` + adversarial 追加                          | S1           |
-| S4       | plan-review-gate（#1148）: 既存 skill set + verdict 契約で実装、S1 後に前倒し可。`deriveVerdict` の拡張を含む（下記） | S1           |
+| スライス | 内容                                                                                                                                                                                                                                                 | 依存         |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| S1       | critic API: `river run` の verdict と handoff をループ消費可能な契約として固める                                                                                                                                                                     | 既存ほぼ完成 |
+| S2a      | 停止条件の契約明文化（[pages/reference/loop-convergence-contract.md](../../pages/reference/loop-convergence-contract.md)）: blocking ゼロ / human-review-required 即エスカレ / oscillated 即エスカレの複合条件を docs ページとして確定（#1150 完了） | S1, S2b      |
+| S2b      | 振動検知: 既存 `finding-fingerprint` と run history による再発検知                                                                                                                                                                                   | S1           |
+| S3       | review team の契約化: 既存 `reviewer-orchestrator.mjs` に `mergeFindings` + adversarial 追加                                                                                                                                                         | S1           |
+| S4       | plan-review-gate（#1148）: 既存 skill set + verdict 契約で実装、S1 後に前倒し可。`deriveVerdict` の拡張を含む（下記）                                                                                                                                | S1           |
 
 補足:
 

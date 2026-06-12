@@ -57,8 +57,18 @@ Current stability level for each surface.
 
 ### Exit Codes
 
-- `0`: Success (Review/Diagnosis/Estimation completed)
-- `1`: Failure (Invalid input, git diff failure, skill validation failure, `--max-cost` exceeded, etc.)
+Exit codes other than `0` are only produced when `--fail-on` / `--warn-on` is specified. **Without `--fail-on`, River Review always exits `0` (regardless of findings).**
+
+| Exit code | Condition                                                                                 | Description                           |
+| --------- | ----------------------------------------------------------------------------------------- | ------------------------------------- |
+| `0`       | `--fail-on` not specified / `--advisory-only` / max severity < warn rank                  | Pass (always 0)                       |
+| `1`       | `--fail-on <sev>` specified and max severity ≥ fail rank                                  | Fail (blocking threshold met)         |
+| `2`       | `--warn-on <sev>` specified and max severity ≥ warn rank but < fail rank                  | Warn (warn threshold met, below fail) |
+| `1`       | Invalid input / git diff failure / skill validation failure / `--max-cost` exceeded, etc. | Error exit                            |
+
+Severity rank (low → high): `info`=0 / `minor`=1 / `major`=2 / `critical`=3
+
+For the full usage contract including stop conditions, divergence guards, and oscillation detection in self-fix loops, see [Loop Convergence Contract](./loop-convergence-contract.en.md).
 
 ## GitHub Actions (`river-review`) Reference (Minimal)
 
