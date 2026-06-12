@@ -277,6 +277,59 @@ describe('river skills subcommands', () => {
 });
 
 // -----------------------------------------------------------------------------
+// river run - JSON output schema conformance (#1154)
+// -----------------------------------------------------------------------------
+
+describe('river run - JSON output schema conformance', () => {
+  test('--output json conforms to output.schema.json (including prioritySummary)', async (t) => {
+    const { dir, cleanup } = await createRepoWithSilentCatchChange();
+    t.after(cleanup);
+
+    const result = await runCliInProcess(['run', '.', '--dry-run', '--output', 'json'], {
+      cwd: dir,
+    });
+
+    assert.strictEqual(result.code, 0, `stderr: ${result.stderr}`);
+    const parsed = JSON.parse(result.stdout);
+
+    // Validate against output.schema.json using ajv (draft 2020-12)
+    const { createRequire } = await import('node:module');
+    const { readFileSync } = await import('node:fs');
+    const { fileURLToPath } = await import('node:url');
+    const req = createRequire(import.meta.url);
+    const Ajv2020 = req('ajv/dist/2020');
+    const schemaPath = fileURLToPath(new URL('../schemas/output.schema.json', import.meta.url));
+    const schema = JSON.parse(readFileSync(schemaPath, 'utf8'));
+    const ajv = new Ajv2020({ strict: false });
+    const validate = ajv.compile(schema);
+    const valid = validate(parsed);
+    assert.ok(
+      valid,
+      `JSON output does not conform to output.schema.json: ${JSON.stringify(validate.errors, null, 2)}`
+    );
+
+    // Explicit assertion that prioritySummary is present and well-formed
+    assert.ok(
+      parsed.summary && typeof parsed.summary.prioritySummary === 'object',
+      'summary.prioritySummary should be present'
+    );
+    const ps = parsed.summary.prioritySummary;
+    for (const key of ['P1', 'P2', 'P3', 'P4']) {
+      assert.strictEqual(
+        typeof ps.counts[key],
+        'number',
+        `prioritySummary.counts.${key} should be a number`
+      );
+    }
+    assert.strictEqual(
+      typeof ps.requiresImmediateAttention,
+      'boolean',
+      'requiresImmediateAttention should be boolean'
+    );
+  });
+});
+
+// -----------------------------------------------------------------------------
 // river run - JSON output decision field (#1150 S1)
 // -----------------------------------------------------------------------------
 

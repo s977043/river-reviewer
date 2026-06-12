@@ -148,6 +148,30 @@
             "escalatedFiles": { "type": "array", "items": { "type": "string" } },
             "humanReviewFiles": { "type": "array", "items": { "type": "string" } }
           }
+        },
+        "prioritySummary": {
+          "type": "object",
+          "description": "Priority rollup derived from severity (P1=critical, P2=major, P3=minor, P4=info). Optional for backward compatibility; always emitted by current river run.",
+          "required": ["counts", "requiresImmediateAttention"],
+          "additionalProperties": false,
+          "properties": {
+            "counts": {
+              "type": "object",
+              "description": "Issue counts keyed by priority bucket.",
+              "required": ["P1", "P2", "P3", "P4"],
+              "additionalProperties": false,
+              "properties": {
+                "P1": { "type": "integer", "minimum": 0 },
+                "P2": { "type": "integer", "minimum": 0 },
+                "P3": { "type": "integer", "minimum": 0 },
+                "P4": { "type": "integer", "minimum": 0 }
+              }
+            },
+            "requiresImmediateAttention": {
+              "type": "boolean",
+              "description": "True when one or more P1 (critical) issues are present."
+            }
+          }
         }
       }
     }
