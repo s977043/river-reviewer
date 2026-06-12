@@ -65,8 +65,8 @@ river run . --base main --output json
 ```
 
 - **出力**: `{ issues[], summary, decision }`（`output.schema.json`）。`issues[].severity`（critical/major/minor/info）と `message` / `file` / `line` を読む。
-- **停止判定**: `decision`（`auto-approve` / `human-review-recommended` / `human-review-required`）と `summary.issueCountBySeverity` を組み合わせて機械判定できる。`decision === 'auto-approve'` かつ blocking（critical/major）がゼロであれば自動続行の基準にできる。
-- **エージェントの次行動（自己修正ループ）**: `issues` を重大度順に修正 → 再度 `river run` → `issues` が空 or info のみになるまで反復。
+- **停止判定**: `critical + major == 0` を収束条件とし、`decision == "human-review-required"` または `river runs diff` の `oscillated` が非空の場合は即エスカレーションする。`decision === 'auto-approve'` 単独は停止条件にならない（minor/info が残存しても成立するため）。詳細な複合条件は [ループ収束コントラクト](../reference/loop-convergence-contract.md) を参照。
+- **エージェントの次行動（自己修正ループ）**: `issues` を重大度順で修正 → 再度 `river run` → `critical + major == 0` になるまで反復。収束しないときは人間へエスカレーションする。
 - タスクが大きい場合は `--depth thorough`、対象を絞るなら `--files <glob>`。`--base` は省略時に default ブランチを自動検出するため、`main` 以外（`master`/`develop` 等）のリポジトリでは省略するか `--base <default>` を明示する。
 
 ### Case 3: PR 提出ゲート — exit code で機械的にブロック
@@ -78,7 +78,7 @@ river run . --base main --fail-on critical --warn-on major --output markdown \
   --output-file ./review.md
 ```
 
-- **exit code**: `0`=pass / `1`=fail（`--fail-on` 以上）/ `2`=warn。**エージェントは exit code で分岐**（fail なら修正へ戻る、pass なら PR 続行）。
+- **exit code**: `--fail-on` / `--warn-on` を指定した場合のみ 0 以外になる。`0`=pass / `1`=fail（`--fail-on` 以上）/ `2`=warn（`--warn-on` 以上かつ `--fail-on` 未満）。**`--fail-on` を省略すると findings があっても常に exit 0**（機械判断には `summary.issueCountBySeverity` を直接読む方式が確実）。**エージェントは exit code で分岐**（fail なら修正へ戻る、pass なら PR 続行）。
 - `--output markdown` の結果を PR コメントへ投稿（人間レビュアー向け）。機械判断は exit code、人間提示は markdown、と使い分ける。
 - `--advisory-only` を付けると指摘は出すが常に exit 0（観測モード）。
 

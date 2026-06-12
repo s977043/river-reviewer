@@ -1,0 +1,160 @@
+---
+title: ループ収束コントラクト（自己修正ループの停止条件）
+---
+
+River Review は generate → review → revise ループの **review ステージ**として機能します。返すのは判定素材（`decision` / `summary.issueCountBySeverity` / `oscillated` / exit code）のみです。反復・停止・エスカレーションの実行は **caller（呼び出し側エージェントまたはワークフロー）の責務**です（[#976 境界 — docs/ai/generate-review-revise-loop.md](https://github.com/s977043/river-review/blob/main/docs/ai/generate-review-revise-loop.md) 参照）。
+
+本ドキュメントは caller がループ制御を実装するために必要な停止・収束・発散ガードの契約を 1 ページで定義します。
+
+## 停止（収束）条件の複合式
+
+### `decision == "auto-approve"` 単独では停止条件にならない理由
+
+`auto-approve` は「HITL（Human-in-the-Loop）をバイパスする助言」です。minor / info finding が残存していても `auto-approve` になる場合があります。これを停止の唯一の基準にすると、重要度の高い finding が残ったままループを抜ける恐れがあります。
+
+### 推奨する停止・続行判定
+
+| 条件                                                 | 推奨アクション                                                                                          |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `summary.issueCountBySeverity.critical + .major > 0` | **続行（revise）**: blocking finding が残存しているため修正を継続する                                   |
+| `critical == 0` かつ `major == 0`                    | **収束**: ループを抜けて次ステージへ進む。minor / info の許容は caller の policy に従う（既定では許容） |
+| `decision == "human-review-required"`                | **即 escalate**: caller は人間レビュアーに引き渡す                                                      |
+| `river runs diff` の `oscillated` が非空             | **即 escalate**: revise が別の問題を生み出す振動が発生している（詳細は「振動検知」を参照）              |
+
+複合条件の擬似コード:
+
+```text
+if decision == "human-review-required":
+    escalate_to_human(result)
+    stop
+if oscillated is non-empty:
+    escalate_to_human(result, reason="oscillation")
+    stop
+if critical + major == 0:
+    # 収束: minor / info の扱いは caller policy に委ねる
+    break  # ループ終了
+else:
+    revise(result.issues)
+    continue  # 次のイテレーションへ
+```
+
+## 発散ガード
+
+自律ループが収束しない場合の安全策を 2 つ設けます。
+
+- **max iterations（推奨 3〜5 回）**: イテレーション数の上限。上限到達時は人間へエスカレーションし、ループを強制終了する。
+- **loop-until-dry（新規 finding ゼロが連続 N 周）**: 前回と今回のレビューを `river runs diff` で比較し、`new` finding がゼロの状態が N 周（推奨 2 周）続いたら収束とみなす。同じ指摘が繰り返し出る場合はそれ以上 revise しても改善しないため、人間にエスカレーションする。
+
+```bash
+# --save で実行を保存し、diff で新規 finding を確認する
+# run id は stderr に "Run saved: <id>" として出力される
+result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
+curr_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
+river runs diff <prev_run_id> "$curr_id"
+# 出力の new[] が空なら loop-until-dry の 1 周分としてカウントする
+```
+
+## 振動検知
+
+revise によって解消した finding が次のイテレーションで再出現する場合、revise が別の問題を生み出している（振動）と判定します。
+
+```bash
+# 3 件以上の run id を渡すと oscillated が JSON 出力に含まれる
+river runs diff <id1> <id2> <id3>
+```
+
+`oscillated` が非空であれば caller は即 escalate します。振動検知は `finding-fingerprint`（`ruleId + file + message` の先頭）に基づくため、修正で行番号が変化しても同一 finding を追跡できます。
+
+## exit code 契約（実装準拠）
+
+以下は `river run` の exit code 契約です。`river review` 系コマンドは別契約（exit 3 あり）であり、このページのスコープ外です。
+
+exit code は `--fail-on` / `--warn-on` を指定した場合のみ 0 以外になります。**`--fail-on` を指定しない場合、River Review は常に exit 0 を返します。**
+
+| exit code | 条件                                                                     | 説明                                     |
+| --------- | ------------------------------------------------------------------------ | ---------------------------------------- |
+| `0`       | `--fail-on` 未指定 / `--advisory-only` / max severity < warn rank        | pass。findings の有無にかかわらず常に 0  |
+| `1`       | `--fail-on <sev>` を指定し、max severity ≥ fail rank                     | fail。ブロック条件を満たした             |
+| `2`       | `--warn-on <sev>` を指定し、max severity ≥ warn rank かつ fail rank 未満 | warn。閾値には達したが fail には至らない |
+| `1`       | 入力不正 / git diff 取得失敗 / `--max-cost` 超過など                     | エラー終了                               |
+
+severity の rank（低→高）: `info`=0 / `minor`=1 / `major`=2 / `critical`=3
+
+> **CI / エージェントでの推奨設定**: `--fail-on critical --warn-on major` を明示的に付けることで、exit code ベースの分岐が有効になります。`--fail-on` を省略すると findings があっても exit 0 になるため、機械判断には `summary.issueCountBySeverity` を直接読む方式（後述の最小例を参照）が確実です。
+
+## 機械消費の最小例
+
+### JSON 出力から収束判定する（フラグなし）
+
+`--fail-on` を使わず JSON を直接読んで判定する方式です。
+
+```bash
+#!/usr/bin/env bash
+# run id は stdout JSON に含まれない。--save 時に stderr へ出力される "Run saved: <id>" から取得する
+result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
+run_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
+
+critical=$(echo "$result" | jq '.summary.issueCountBySeverity.critical // 0' 2>/dev/null)
+major=$(echo "$result" | jq '.summary.issueCountBySeverity.major // 0' 2>/dev/null)
+decision=$(echo "$result" | jq -r '.decision // "unknown"' 2>/dev/null)
+
+if [ "$decision" = "human-review-required" ]; then
+  echo "ESCALATE: human review required" >&2
+  exit 2
+fi
+
+if [ $(( ${critical:-0} + ${major:-0} )) -gt 0 ]; then
+  echo "REVISE: critical=$critical major=$major" >&2
+  exit 1  # caller がループを継続する
+fi
+
+echo "CONVERGED: proceed to next stage"
+```
+
+### 振動検知を組み込んだループ例
+
+```bash
+#!/usr/bin/env bash
+# run ids を配列で保持し、3 つ以上たまったら直近 3 つで振動検知する
+declare -a run_ids=()
+max_iter=5
+
+for i in $(seq 1 $max_iter); do
+  result=$(river run . --base main --output json --save 2>/tmp/rr_stderr.txt)
+  curr_id=$(sed -n 's/^Run saved: \([^ ]*\).*/\1/p' /tmp/rr_stderr.txt)
+  run_ids+=("$curr_id")
+
+  # 振動検知: 3 件以上の run id が蓄積されたら直近 3 つを渡す
+  n=${#run_ids[@]}
+  if [ "$n" -ge 3 ]; then
+    id_a="${run_ids[$((n-3))]}"
+    id_b="${run_ids[$((n-2))]}"
+    id_c="${run_ids[$((n-1))]}"
+    oscillated=$(river runs diff "$id_a" "$id_b" "$id_c" --output json \
+                   | jq '.oscillated // [] | length' 2>/dev/null)
+    if [ "${oscillated:-0}" -gt 0 ]; then
+      echo "OSCILLATION DETECTED: escalate to human" >&2
+      exit 3
+    fi
+  fi
+
+  critical=$(echo "$result" | jq '.summary.issueCountBySeverity.critical // 0' 2>/dev/null)
+  major=$(echo "$result" | jq '.summary.issueCountBySeverity.major // 0' 2>/dev/null)
+
+  if [ $(( ${critical:-0} + ${major:-0} )) -eq 0 ]; then
+    echo "CONVERGED after $i iteration(s)"
+    exit 0
+  fi
+
+  # caller がここで revise を実行する
+done
+
+echo "MAX ITERATIONS reached: escalate to human" >&2
+exit 4
+```
+
+## 関連ドキュメント
+
+- [AI 駆動開発プレイブック（Case 2 / Case 3）](../guides/ai-agent-playbook.md) — ケース別の呼び出し方
+- [generate → review → revise ループ設計](https://github.com/s977043/river-review/blob/main/docs/ai/generate-review-revise-loop.md) — 収束制御の背景設計（#1150 S2a の元 doc）
+- [安定インターフェース（CLI / GitHub Actions）](./stable-interfaces.md) — exit code を含む CLI 安定契約
